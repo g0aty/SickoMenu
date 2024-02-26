@@ -16,7 +16,7 @@ A huge collection of various utilities and cheats such as
 - See Ghosts and Chat
 - Kill players even if you're not an impostor
 - Better AUM Chat (Type in regular chat: "/aum [insert message here]")
-And much more! Check out the full list of features [here](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)!
+- And much more! Check out the full list of features [here](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)!
 
 ## 📸 Screenshot
 <p align="center">
@@ -25,7 +25,7 @@ And much more! Check out the full list of features [here](https://github.com/g0a
 
 ## ⬇️ Download & Install
 ### For Windows
-You can find the latest release here: [Download](https://github.com/g0aty/SickoMenu/releases/latest)
+You can find the latest release here: [Download](https://github.com/g0aty/SickoMenu/releases/latest).
 Either inject "SickoMenu.dll" with a reliable injector or put "version.dll" in your Among Us directory (the folder containing "Among Us.exe").
 
 ### For Proton (Version Proxy Only)
