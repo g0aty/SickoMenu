@@ -96,12 +96,12 @@ jobs:
           name: Debug
       
       - name: Automatic Releases
-        if: ${{ github.event_name == 'push' }}
-        uses: marvinpinto/action-automatic-releases@526ce12c6675bbe6e0e9a4169c90d09a3f7ad3e2
+        uses: marvinpinto/action-automatic-releases@latest #maybe this fixed auto release versioning?
         id: "automatic_releases"
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: ${{ steps.semver_parser.outputs.prerelease != 0 }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}" #this is gonna give me a stroke
+          automatic_release_tag: "latest"
+          prerelease: false
           files: |
             Release.zip
             Debug.zip
