@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
       
       - name: Build Release
         shell: bash
@@ -30,7 +30,7 @@ jobs:
           tar -caf Release.zip SickoMenu.dll version.dll LICENSE
         
       - name: Upload Release Artifact
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
         with:
           name: Release
           path: Release.zip
@@ -39,7 +39,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
       
       - name: Build Debug
         shell: bash
@@ -57,7 +57,7 @@ jobs:
           tar -caf Debug.zip SickoMenu.dll version.dll LICENSE
         
       - name: Upload Debug Artifact
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
         with:
           name: Debug
           path: Debug.zip
@@ -85,12 +85,12 @@ jobs:
 #            echo 'is pre-release: ${{ steps.semver_parser.outputs.prerelease != 0 }}'
       
       - name: Download Release Artifact
-        uses: actions/download-artifact@v2.0.9
+        uses: actions/download-artifact@v3
         with:
           name: Release
       
       - name: Download Debug Artifact
-        uses: actions/download-artifact@v2.0.9
+        uses: actions/download-artifact@v3
         with:
           name: Debug
       
