@@ -22,3 +22,8 @@ void drawPlayerDot(PlayerControl* player, const ImVec2& winPos, ImU32 color, ImU
 void drawPlayerIcon(PlayerControl* player, const ImVec2& winPos, ImU32 color);
 void drawDeadPlayerDot(DeadBody* deadBody, const ImVec2& winPos, ImU32 color);
 void drawDeadPlayerIcon(DeadBody* deadBody, const ImVec2& winPos, ImU32 color);
+bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
+bool InputStringMultiline(const char* label, std::string* str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
+bool InputStringWithHint(const char* label, const char* hint, std::string* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
+bool ToggleButton(const char* str_id, bool* v);
+bool TabGroup(const char* label, bool highlight = false);

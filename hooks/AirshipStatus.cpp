@@ -28,8 +28,13 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 
 		State.mapType = Settings::MapType::Airship;
 
-		if (!State.DisableSMAU && State.confuser && State.confuseOnStart)
+		if (!State.PanicMode && State.confuser && State.confuseOnStart)
 			ControlAppearance(true);
+
+		if (State.AutoFakeRole) {
+			if (IsHost() || !State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
+			else State.rpcQueue.push(new SetRole((RoleTypes__Enum)State.FakeRole));
+		}
 	}
 	catch (...) {
 		LOG_DEBUG("Exception occurred in AirshipStatus_OnEnable (AirshipStatus)");
@@ -38,7 +43,7 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 
 float dAirshipStatus_CalculateLightRadius(AirshipStatus* __this, GameData_PlayerInfo* player, MethodInfo* method)
 {
-	if (!State.DisableSMAU && State.MaxVision)
+	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
 	return AirshipStatus_CalculateLightRadius(__this, player, method);
 }

@@ -10,7 +10,7 @@ Settings State;
 
 void Settings::Load() {
     auto path = getModulePath(hModule);
-    auto settingsPath = path.parent_path() / "settings.json";
+    auto settingsPath = path.parent_path() / "sicko-settings.json";
 
     if (!std::filesystem::exists(settingsPath))
         return;
@@ -26,6 +26,7 @@ void Settings::Load() {
             Log.Info(e.what()); \
         }
 
+        JSON_TRYGET("HasOpenedMenuBefore", this->HasOpenedMenuBefore);
         JSON_TRYGET("ShowMenuOnStartup", this->ShowMenuOnStartup);
         if (this->ShowMenuOnStartup)
             JSON_TRYGET("ShowMenu", this->ShowMenu);
@@ -41,12 +42,14 @@ void Settings::Load() {
         JSON_TRYGET("MenuThemeColor_A", this->MenuThemeColor.w);
         JSON_TRYGET("UnlockCosmetics", this->UnlockCosmetics);
         JSON_TRYGET("ShowKeybinds", this->ShowKeybinds);
+        JSON_TRYGET("KeybindsWhileChatting", this->KeybindsWhileChatting);
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
         JSON_TRYGET("FakeLevel", this->FakeLevel);
         JSON_TRYGET("SpoofFriendCode", this->SpoofFriendCode);
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
-        JSON_TRYGET("SpoofPuid", this->SpoofPuid);
-        JSON_TRYGET("FakePuid", this->FakePuid);
+        JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
+        JSON_TRYGET("FakePlatform", this->FakePlatform);
+        //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); v3.1 feature
 
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
@@ -70,6 +73,8 @@ void Settings::Load() {
         JSON_TRYGET("ModifyTaskBarUpdates", this->ModifyTaskBarUpdates);
         JSON_TRYGET("UserName", this->userName);
         JSON_TRYGET("ShowGhosts", this->ShowGhosts);
+        JSON_TRYGET("FakeRole", this->FakeRole);
+        JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
         JSON_TRYGET("ShowRadar", this->ShowRadar);
         JSON_TRYGET("ShowRadar_DeadBodies", this->ShowRadar_DeadBodies);
         JSON_TRYGET("ShowRadar_Ghosts", this->ShowRadar_Ghosts);
@@ -118,9 +123,11 @@ void Settings::Load() {
         JSON_TRYGET("ShowPlayerInfo", this->ShowPlayerInfo);
         JSON_TRYGET("ChatAlwaysActive", this->ChatAlwaysActive);
         JSON_TRYGET("ReadGhostMessages", this->ReadGhostMessages);
+        JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
         JSON_TRYGET("ResizeName", this->ResizeName);
+        JSON_TRYGET("NameSize", this->NameSize);
         JSON_TRYGET("ItalicName", this->ItalicName);
         JSON_TRYGET("UnderlineName", this->UnderlineName);
         JSON_TRYGET("StrikethroughName", this->StrikethroughName);
@@ -134,16 +141,18 @@ void Settings::Load() {
         JSON_TRYGET("NameColor2_B", this->NameColor2.z);
         JSON_TRYGET("NameColor2_A", this->NameColor2.w);
         JSON_TRYGET("AutoOpenDoors", this->AutoOpenDoors);
-        JSON_TRYGET("MoveInVent", this->MoveInVent);
+        JSON_TRYGET("MoveInVentAndShapeshift", this->MoveInVentAndShapeshift);
         JSON_TRYGET("AlwaysMove", this->AlwaysMove);
         JSON_TRYGET("AnimationlessShapeshift", this->AnimationlessShapeshift);
         JSON_TRYGET("DisableKillAnimation", this->DisableKillAnimation);
         JSON_TRYGET("KillImpostors", this->KillImpostors);
-        JSON_TRYGET("KillThroughWalls", this->KillThroughWalls);
+        JSON_TRYGET("BypassAngelProt", this->BypassAngelProt);
         JSON_TRYGET("InfiniteKillRange", this->InfiniteKillRange);
+        JSON_TRYGET("AutoKill", this->AutoKill);
         JSON_TRYGET("FakeAlive", this->FakeAlive);
         JSON_TRYGET("ShowHost", this->ShowHost);
         JSON_TRYGET("ShowVoteKicks", this->ShowVoteKicks);
+        JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
         JSON_TRYGET("NoClip", this->NoClip);
 
@@ -158,13 +167,12 @@ void Settings::Load() {
         if (this->ShowMenuOnStartup)
             JSON_TRYGET("ShowConsole", this->ShowConsole);
         JSON_TRYGET("ShowUnityLogs", this->ShowUnityLogs);
-        if (this->ShowMenuOnStartup)
-            JSON_TRYGET("ShowChat", this->ShowChat);
 
         JSON_TRYGET("RevealAnonymousVotes", this->RevealAnonymousVotes);
 
         JSON_TRYGET("ShiftRightClickTP", this->ShiftRightClickTP);
         JSON_TRYGET("RotateRadius", this->RotateRadius);
+        JSON_TRYGET("RelativeTeleport", this->RelativeTeleport);
         JSON_TRYGET("ShowKillCD", this->ShowKillCD);
 
         JSON_TRYGET("Confuser", this->confuser);
@@ -181,7 +189,7 @@ void Settings::Load() {
         JSON_TRYGET("HideCode", this->HideCode);
         JSON_TRYGET("RgbLobbyCode", this->RgbLobbyCode);
     } catch (...) {
-        Log.Info("Unable to load settings.json");
+        Log.Info("Unable to load sicko-settings.json");
     }
 
     //Do not do any IL2CPP stuff here!  The constructors of most classes have not run yet!
@@ -189,10 +197,12 @@ void Settings::Load() {
 
 void Settings::Save() {
     auto path = getModulePath(hModule);
-    auto settingsPath = path.parent_path() / "settings.json";
+    auto settingsPath = path.parent_path() / "sicko-settings.json";
 
     try {
         nlohmann::ordered_json j = nlohmann::ordered_json {
+            { "HasOpenedMenuBefore", this->HasOpenedMenuBefore },
+            { "ShowMenuOnStartup", this->ShowMenuOnStartup },
             { "ShowMenu", this->ShowMenu },
             { "KeyBinds", this->KeyBinds },
     #ifdef _DEBUG
@@ -206,12 +216,14 @@ void Settings::Save() {
             { "MenuThemeColor_A", this->MenuThemeColor.w },
             { "UnlockCosmetics", this->UnlockCosmetics },
             { "ShowKeybinds", this->ShowKeybinds },
+            { "KeybindsWhileChatting", this->KeybindsWhileChatting },
             { "SpoofLevel", this->SpoofLevel },
             { "FakeLevel", this->FakeLevel },
             { "SpoofFriendCode", this->SpoofFriendCode },
             { "FakeFriendCode", this->FakeFriendCode },
-            { "SpoofPuid", this->SpoofPuid },
-            { "FakePuid", this->FakePuid },
+            { "SpoofPlatform", this->SpoofPlatform },
+            { "FakePlatform", this->FakePlatform },
+            //{ "SpoofModdedHost", this->SpoofModdedHost }, v3.1 feature
 
             { "SelectedColorId", this->SelectedColorId },
             { "SnipeColor", this->SnipeColor },
@@ -236,6 +248,8 @@ void Settings::Save() {
             { "ModifyTaskBarUpdates", this->ModifyTaskBarUpdates },
             { "UserName", this->userName },
             { "ShowGhosts", this->ShowGhosts },
+            { "FakeRole", this->FakeRole },
+            { "AutoFakeRole", this->AutoFakeRole },
             { "ShowRadar", this->ShowRadar },
             { "ShowRadar_DeadBodies", this->ShowRadar_DeadBodies },
             { "ShowRadar_Ghosts", this->ShowRadar_Ghosts },
@@ -283,9 +297,11 @@ void Settings::Save() {
             { "ShowPlayerInfo", this->ShowPlayerInfo },
             { "ChatAlwaysActive", this->ChatAlwaysActive },
             { "ReadGhostMessages", this->ReadGhostMessages },
+            { "ReadAndSendAumChat", this->ReadAndSendAumChat },
             { "CustomName", this->CustomName },
             { "RgbName", this->RgbName },
             { "ResizeName", this->ResizeName },
+            { "NameSize", this->NameSize },
             { "ItalicName", this->ItalicName },
             { "UnderlineName", this->UnderlineName },
             { "StrikethroughName", this->StrikethroughName },
@@ -299,16 +315,18 @@ void Settings::Save() {
             { "NameColor2_B", this->NameColor2.z },
             { "NameColor2_A", this->NameColor2.w },
             { "AutoOpenDoors", this->AutoOpenDoors },
-            { "MoveInVent", this->MoveInVent },
+            { "MoveInVentAndShapeshift", this->MoveInVentAndShapeshift },
             { "AlwaysMove", this->AlwaysMove },
             { "AnimationlessShapeshift", this->AnimationlessShapeshift },
             { "DisableKillAnimation", this->DisableKillAnimation },
             { "KillImpostors", this->KillImpostors },
-            { "KillThroughWalls", this->KillThroughWalls },
+            { "BypassAngelProt", this->BypassAngelProt },
             { "InfiniteKillRange", this->InfiniteKillRange },
+            { "AutoKill", this->AutoKill },
             { "FakeAlive", this->FakeAlive },
             { "ShowHost", this->ShowHost },
             { "ShowVoteKicks", this->ShowVoteKicks },
+            { "ShowFps", this->ShowFps },
             { "DoTasksAsImpostor", this->DoTasksAsImpostor },
             { "NoClip", this->NoClip },
 
@@ -322,10 +340,10 @@ void Settings::Save() {
 
             { "ShowConsole", this->ShowConsole },
             { "ShowUnityLogs", this->ShowUnityLogs },
-            { "ShowChat", this->ShowChat },
 
             { "ShiftRightClickTP", this->ShiftRightClickTP },
             { "RotateRadius", this->RotateRadius },
+            { "RelativeTeleport", this->RelativeTeleport },
             { "ShowKillCD", this->ShowKillCD },
 
             { "Confuser", this->confuser },
@@ -346,6 +364,6 @@ void Settings::Save() {
         std::ofstream outSettings(settingsPath);
         outSettings << std::setw(4) << j << std::endl;
     } catch (...) {
-        Log.Info("Unable to save settings.json");
+        Log.Info("Unable to save sicko-settings.json");
     }
 }

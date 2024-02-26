@@ -20,8 +20,15 @@ RpcForceScanner::RpcForceScanner(PlayerControl* Player, bool playAnimation)
 
 void RpcForceScanner::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (Player == nullptr) return;
 
-	PlayerControl_RpcSetScanner(Player, playAnimation, NULL);
+	//PlayerControl_RpcSetScanner(Player, playAnimation, NULL);
+
+	for (auto p : GetAllPlayerControl()) {
+		MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId, 
+			uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, p->fields._.OwnerId, NULL);
+		MessageWriter_WriteBoolean(writer, playAnimation, NULL);
+		MessageWriter_WriteByte(writer, Player->fields.scannerCount + 1, NULL);
+		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+	}
 }

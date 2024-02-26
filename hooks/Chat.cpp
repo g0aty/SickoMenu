@@ -5,7 +5,7 @@
 #include "state.hpp"
 
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
-	if (!State.DisableSMAU && State.ReadGhostMessages) {
+	if (!State.PanicMode && State.ReadGhostMessages) {
 		bool wasDead = false;
 		GameData_PlayerInfo* player = GetPlayerData(sourcePlayer);
 		GameData_PlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
@@ -18,63 +18,42 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 		std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
 		std::string message = convert_from_string(chatText);
 		uint32_t colorId = outfit->fields.ColorId;
-		State.chatMessages.emplace_back(std::make_unique<RpcChatMessage>(playerName, message, colorId, std::chrono::system_clock::now()));
-		State.newChatMessage = true;
 		ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
 		if (wasDead) {
 			local->fields.IsDead = false;
 		}
 	}
 	else {
-		auto player = *Game::pLocalPlayer;
-		if (State.playerToChatAs.has_value())
-			player = GetPlayerControlById(State.playerToChatAs.get_PlayerId());
-		if (sourcePlayer != player) {
-			auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
-			std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
-			std::string message = convert_from_string(chatText);
-			uint32_t colorId = outfit->fields.ColorId;
-			State.chatMessages.emplace_back(std::make_unique<RpcChatMessage>(playerName, message, colorId, std::chrono::system_clock::now()));
-			State.newChatMessage = true;
-		}
+		auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
+		std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+		std::string message = convert_from_string(chatText);
+		uint32_t colorId = outfit->fields.ColorId;
 		ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
 	}
 }
 
 void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo* method) {
-	if (State.ChatAlwaysActive && !State.DisableSMAU)
+	if ((State.ChatAlwaysActive && !State.PanicMode) || (State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead))
 		ChatController_SetVisible(__this, true, method);
-	else {
+	else
+	{
 		State.ChatActiveOriginalState = visible;
 		ChatController_SetVisible(__this, visible, method);
 	}
 }
 
 void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {
-	if (!State.DisableSMAU && (IsInGame() || IsInLobby())) {
+	if (!State.PanicMode && (IsInGame() || IsInLobby())) {
 		for (auto playerData : GetAllPlayerData()) {
 			app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
 			if (outfit == NULL) continue;
 			if (playerName == GameData_PlayerOutfit_get_PlayerName(outfit, nullptr)) {
-				if (State.RevealRoles)
-					color = GetRoleColor(playerData->fields.Role);
-				else
-					color = Palette__TypeInfo->static_fields->White;
+				color = State.RevealRoles ? GetRoleColor(playerData->fields.Role) : 
+					(PlayerIsImpostor(playerData) ? Palette__TypeInfo->static_fields->ImpostorRed : Palette__TypeInfo->static_fields->White);
 
-				if (State.PlayerColoredDots) {
-					Color32&& nameColor = GetPlayerColor(outfit->fields.ColorId);
-					std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}>●</color>",
-						nameColor.r, nameColor.g, nameColor.b,
-						nameColor.a);
-
-					if (playerData != GetPlayerData(*Game::pLocalPlayer))
-						playerName = convert_to_string(convert_from_string(playerName) + " " + dot);
-					else
-						playerName = convert_to_string(dot + " " + convert_from_string(playerName));
-				}
 				if (State.CustomName && !State.ServerSideCustomName && playerData == GetPlayerData(*Game::pLocalPlayer)) {
 					if (State.ColoredName && !State.RgbName) {
-						playerName = convert_to_string(GetGradientUsername(convert_from_string(playerName)));
+						playerName = convert_to_string(GetGradientUsername(RemoveHtmlTags(convert_from_string(playerName)), true));
 					}
 					//we don't want to hide our own chat messages
 					/*if (State.ResizeName)
@@ -90,6 +69,18 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 						playerName = convert_to_string(State.rgbCode + convert_from_string(playerName) + "</color>");
 					}*/
 				}
+				
+				if (State.PlayerColoredDots) {
+					Color32&& nameColor = GetPlayerColor(outfit->fields.ColorId);
+					std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}>●</color>",
+						nameColor.r, nameColor.g, nameColor.b,
+						nameColor.a);
+
+					if (playerData != GetPlayerData(*Game::pLocalPlayer))
+						playerName = convert_to_string(convert_from_string(playerName) + " " + dot);
+					else
+						playerName = convert_to_string(dot + " " + convert_from_string(playerName));
+				}
 			}
 		}
 	}
@@ -104,7 +95,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	__this->fields.freeChatField->fields.textArea->fields.AllowEmail = true;
 	__this->fields.freeChatField->fields.textArea->fields.AllowSymbols = true;
 	if (!State.SafeMode)
-		__this->fields.timeSinceLastMessage = 3.f;
+		__this->fields.timeSinceLastMessage = 420.69f; //we can set this to anything more than or equal to 3 and it'll work
 
 	if (State.MessageSent && State.SafeMode) {
 		__this->fields.timeSinceLastMessage = 0.f;
@@ -118,8 +109,10 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 
 bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, MethodInfo* method)
 {
-	//0x08 is backspace, 0x0D is carriage return, 0x3C is <, 0x3E is >
-	return (unicode_char != 0x08 && unicode_char != 0x0D && ((State.SafeMode && unicode_char != 0x3C && unicode_char != 0x3E) || !State.SafeMode));
+	//0x08 is backspace, 0x0D is carriage return, 0x7F is delete character, 0x3C is <, 0x3E is >
+	//lobby codes force uppercase, and we don't change that to fix joining a lobby with code not working
+	if (!__this->fields.ForceUppercase) return (unicode_char != 0x08 && unicode_char != 0x0D && unicode_char != 0x7F && ((State.SafeMode && unicode_char != 0x3C && unicode_char != 0x3E) || !State.SafeMode));
+	return TextBoxTMP_IsCharAllowed(__this, unicode_char, method);
 }
 
 void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, MethodInfo* method)
@@ -135,8 +128,46 @@ void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, 
 
 void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodInfo* method)
 {
-	if (!State.DisableSMAU && __this == *Game::pLocalPlayer && !State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value())
-		PlayerControl_RpcSendChat(GetPlayerControlById(State.playerToChatAs.get_PlayerId()), chatText, NULL);
-	else
+	if (!State.PanicMode) {
+		auto playerToChatAs = (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+		if (State.ReadAndSendAumChat && convert_from_string(chatText).substr(0, 5) == "/aum ") {
+			if (IsInGame()) State.rpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), convert_from_string(chatText).substr(5), true));
+			if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), convert_from_string(chatText).substr(5), true));
+			return; //we don't want the chat to know we're using "aum"
+		}
+		if (State.activeWhisper && State.playerToWhisper.has_value()) {
+			MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
+				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,
+				State.playerToWhisper.get_PlayerControl().value_or(nullptr)->fields._.OwnerId, NULL);
+			std::string whisperMsg = std::format("{} whispers to you:\n{}", 
+				RemoveHtmlTags(convert_from_string(GameData_PlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
+				convert_from_string(chatText));
+			if (whisperMsg.length() <= 100 || !State.SafeMode)
+				MessageWriter_WriteString(writer, convert_to_string(whisperMsg), NULL);
+			else MessageWriter_WriteString(writer, chatText, NULL);
+			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+
+			std::string whisperMsgSelf = std::format("You whisper to {}:\n{}",
+				RemoveHtmlTags(convert_from_string(GameData_PlayerInfo_get_PlayerName(State.playerToWhisper.get_PlayerData().value_or(nullptr), NULL))),
+				convert_from_string(chatText));
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, playerToChatAs, convert_to_string(whisperMsgSelf), false, NULL);
+		}
+		else if (__this == *Game::pLocalPlayer && !State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) {
+			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(State.playerToChatAs.get_PlayerId())->fields._.NetId,
+				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+			MessageWriter_WriteString(writer, chatText, NULL);
+			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, GetPlayerControlById(State.playerToChatAs.get_PlayerId()), chatText, false, NULL);
+		}
+		else {
+			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
+				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+			MessageWriter_WriteString(writer, chatText, NULL);
+			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, __this, chatText, false, NULL);
+		}
+	}
+	else {
 		PlayerControl_RpcSendChat(__this, chatText, NULL);
+	}
 }

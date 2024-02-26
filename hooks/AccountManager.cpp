@@ -5,7 +5,7 @@
 
 void dAccountManager_UpdateKidAccountDisplay(AccountManager* __this, MethodInfo* method) {
     // grant permissions
-    if (!State.DisableSMAU) {
+    if (!State.PanicMode) {
         __this->fields.freeChatAllowed = KWSPermissionStatus__Enum::Granted;
         __this->fields.customDisplayName = KWSPermissionStatus__Enum::Granted;
         __this->fields.friendsListAllowed = KWSPermissionStatus__Enum::Granted;

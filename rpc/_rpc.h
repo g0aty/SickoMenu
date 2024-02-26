@@ -1,7 +1,7 @@
 #pragma once
 #include "utility.h"
 
-void HandleRpc(uint8_t callId, MessageReader* reader);
+void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader);
 
 class RPCInterface {
 public:
@@ -133,18 +133,18 @@ public:
 	virtual void Process() override;
 };
 
-class RpcReportPlayer : public RPCInterface {
+class RpcReportBody : public RPCInterface {
 	PlayerSelection reportedPlayer;
 public:
-	RpcReportPlayer(const PlayerSelection& target);
+	RpcReportBody(const PlayerSelection& target);
 	virtual void Process() override;
 };
 
-class RpcForceReportPlayer : public RPCInterface {
+class RpcForceReportBody : public RPCInterface {
 	PlayerControl* Player;
 	PlayerSelection reportedPlayer;
 public:
-	RpcForceReportPlayer(PlayerControl* Player, const PlayerSelection& target);
+	RpcForceReportBody(PlayerControl* Player, const PlayerSelection& target);
 	virtual void Process() override;
 };
 
@@ -166,8 +166,9 @@ public:
 class RpcMurderPlayer : public RPCInterface {
 	PlayerControl* Player;
 	PlayerControl* target;
+	bool success;
 public:
-	RpcMurderPlayer(PlayerControl* Player, PlayerControl* target);
+	RpcMurderPlayer(PlayerControl* Player, PlayerControl* target, bool success = true);
 	virtual void Process() override;
 };
 
@@ -261,9 +262,8 @@ public:
 class RpcForceColor : public RPCInterface {
 	PlayerControl* Player;
 	uint8_t bodyColor;
-	bool forceColor;
 public:
-	RpcForceColor(PlayerControl* player, uint8_t colorId, bool force = false);
+	RpcForceColor(PlayerControl* player, uint8_t colorId);
 	virtual void Process() override;
 };
 
@@ -375,5 +375,22 @@ class SetRole : public RPCInterface {
 	RoleTypes__Enum Role;
 public:
 	SetRole(RoleTypes__Enum role);
+	virtual void Process() override;
+};
+
+class RpcForceDetectAum : public RPCInterface {
+	PlayerSelection target;
+	bool completeForce;
+public:
+	RpcForceDetectAum(const PlayerSelection& target, bool completeForce = false);
+	virtual void Process() override;
+};
+
+class RpcForceAumChat : public RPCInterface {
+	PlayerSelection target;
+	std::string msg;
+	bool completeForce;
+public:
+	RpcForceAumChat(const PlayerSelection& target, std::string_view msg, bool completeForce = false);
 	virtual void Process() override;
 };

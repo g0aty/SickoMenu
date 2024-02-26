@@ -2,6 +2,7 @@
 
 namespace SelfTab {
 	const std::vector<const char*> TPOPTIONS = { "None", "Radar", "Anywhere" };
-	const std::vector<const char*> FAKEROLES = { "Crewmate", "Scientist", "Engineer", "Impostor", "Shapeshifter", "Crew Ghost", "Guardian Angel", "Imp Ghost" };
+	const std::vector<const char*> FAKEROLES = { "Crewmate", "Impostor", "Scientist", "Engineer", "Guardian Angel", "Shapeshifter", "Crewmate Ghost", "Impostor Ghost" };
+	const std::vector<const char*> NAMEGENERATION = { "Word Combo", "Random String", "Cycler Names" };
 	void Render();
 }

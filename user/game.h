@@ -31,6 +31,8 @@ namespace Game {
 	extern LobbyBehaviour** pLobbyBehaviour;
 
 	extern DestroyableSingleton<app::RoleManager*> RoleManager;
+	extern DestroyableSingleton<app::HudManager*> HudManager;
+	extern DestroyableSingleton<app::AccountManager*> AccountManager;
 
 	//typedef bool STEAMUSERSTATS_SETACHIEVEMENT(String* pchName);
 	//typedef bool STEAMUSERSTATS_STORESTATS();

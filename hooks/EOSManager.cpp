@@ -48,9 +48,15 @@ void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, Method
 void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	if (State.SpoofFriendCode) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
 	EOSManager_Update(__this, method);
+	EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
 }
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {
-	if (State.SpoofPuid && State.FakePuid != "") return convert_to_string(State.FakePuid);
+	//if (State.SpoofPuid && State.FakePuid != "") return convert_to_string(State.FakePuid);
 	return EOSManager_get_ProductUserId(__this, method);
+}
+
+void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method) {
+	if (State.SpoofPlatform) __this->fields.Platform = Platforms__Enum(State.FakePlatform + 1);
+	PlatformSpecificData_Serialize(__this, writer, method);
 }

@@ -15,7 +15,8 @@ public:
         VK_INSERT, // toggle radar
         VK_HOME, // toggle console
         VK_NEXT, // repair sabotage
-        0x00, // noclip
+        VK_LCONTROL, // noclip
+        0x00, // autokill
         0x00, // close all doors
         0x00, // toggle zoom
         0x00, // toggle freecam
@@ -24,13 +25,12 @@ public:
         0x00, //toggle HUD
         0x00, //reset appearance
         0x00, //save appearance
-        0x00, //randomize appearance
         0x00, //complete tasks
-        0x00, //toggle chat
-        VK_PAUSE //toggle SMAU
+        VK_PAUSE //toggle SickoMenu
     };
 
     bool ImGuiInitialized = false;
+    bool HasOpenedMenuBefore = false;
     bool ShowMenuOnStartup = true;
     bool ShowMenu = false;
 
@@ -47,8 +47,9 @@ public:
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
     std::string FakeFriendCode = "";
-    bool SpoofPuid = false;
-    std::string FakePuid = "";
+    bool SpoofPlatform = false;
+    int FakePlatform = 0;
+    bool SpoofModdedHost = false;
 
     bool AdjustByDPI = true;
     float dpiScale = 1.f;
@@ -70,7 +71,7 @@ public:
     bool UnlockVents = false;
     bool ShowGhosts = false;
     int FakeRole = 0;
-    bool FakeRoleToggle = false;
+    bool AutoFakeRole = false;
     bool SpamReport = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
@@ -118,7 +119,7 @@ public:
     bool CustomName = false;
     bool RgbName = false;
     bool ResizeName = false;
-    float NameSize = 2.3f; //for some reason among us defaults to 2.3, what a weird number
+    float NameSize = 1.f;
     bool ItalicName = false;
     bool UnderlineName = false;
     bool StrikethroughName = false;
@@ -136,17 +137,19 @@ public:
 
     bool DisableLights = false;
 
-    bool MoveInVent = false;
+    bool MoveInVentAndShapeshift = false;
     bool AlwaysMove = false;
     bool AnimationlessShapeshift = false;
     bool DisableKillAnimation = false;
     bool KillImpostors = false;
     bool OnlyProtectCrewmates = false;
-    bool KillThroughWalls = false;
+    bool BypassAngelProt = false;
     bool InfiniteKillRange = false;
+    bool AutoKill = false;
     bool FakeAlive = false;
     bool ShowHost = false;
     bool ShowVoteKicks = false;
+    bool ShowFps = false;
     bool DoTasksAsImpostor = false;
 
     PlayerSelection selectedPlayer;
@@ -159,7 +162,7 @@ public:
     bool HideRadar_During_Meetings = false;
     bool ShowRadar_RightClickTP = false;
     bool LockRadar = false;
-    bool RadarDrawIcons = true;
+    bool RadarDrawIcons = false;
     bool RadarVisorRoleColor = false;
     bool RadarBorder = false;
     int RadarExtraWidth = 0;
@@ -182,10 +185,12 @@ public:
     bool ChatAlwaysActive = false;
     bool ChatActiveOriginalState = false;
     bool ReadGhostMessages = false;
+    bool ReadAndSendAumChat = false;
     bool ShiftRightClickTP = false;
     bool TeleportEveryone = false;
     bool RotateEveryone = false;
     bool RotateServerSide = false;
+    bool RelativeTeleport = false;
     float RotateRadius = 1.f;
     float xCoordinate = 0.f;
     float yCoordinate = 0.f;
@@ -252,7 +257,7 @@ public:
 
     bool FakeCameraUsage = false;
 
-    ImVec4 MenuThemeColor = ImVec4(0.502f, 0.075f, 0.256f, 1.f);
+    ImVec4 MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
     ImVec4 RgbColor = ImVec4(1.f, 0.071f, 0.f, 1.f);
     ImVec4 SelectedColor = ImVec4(1.f, 1.f, 1.f, 0.75f);
     ImVec4 SelectedReplayMapColor = ImVec4(1.f, 1.f, 1.f, 0.75f);
@@ -278,10 +283,12 @@ public:
     bool SnipeColor = false;
     bool activeImpersonation = false;
     bool activeChatSpoof = false;
+    bool activeWhisper = false;
 
     PlayerSelection playerToFollow;
     PlayerSelection playerToAttach;
     PlayerSelection playerToChatAs;
+    PlayerSelection playerToWhisper;
 
     Vector3 camPos = { NULL, NULL, NULL };
     Vector3 prevCamPos = { NULL, NULL, NULL };
@@ -309,15 +316,11 @@ public:
     int confuserNameGeneration = 0;
     std::string rgbCode = "";
     std::string hostUserName = "";
-    std::string customCode = "GOATYY";
+    std::string customCode = "SICKOS";
     bool HideCode = false;
     bool RgbLobbyCode = false;
 
-    bool ShowChat = false;
-    bool newChatMessage = false;
-    std::vector<std::unique_ptr<RpcChatMessage>> chatMessages;
-
-    bool DisableSMAU = false;
+    bool PanicMode = false;
 
     enum class MapType : uint8_t
     {
@@ -335,7 +338,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v2.1";
+    std::string SickoVersion = "v3.0";
 
     void Load();
     void Save();

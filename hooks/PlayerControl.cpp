@@ -62,24 +62,24 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			static int nameDelay = 0;
 
 			if (__this == *Game::pLocalPlayer && !State.userName.empty() && 
-				!((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.DisableSMAU) {
+				!((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode) {
 				if (State.CustomName) {
 					std::string opener = "";
 					std::string closer = "";
 					if (State.ColoredName && !State.RgbName && !State.ServerSideCustomName) {
-						playerName = GetGradientUsername(RemoveHtmlTags(playerName));
+						playerName = GetGradientUsername(RemoveHtmlTags(playerName), true);
 					}
 					if (State.RgbName) {
 						const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
 						auto color_r = calculate(State.RgbNameColor + 0.f);
 						auto color_g = calculate(State.RgbNameColor + 4.f);
 						auto color_b = calculate(State.RgbNameColor + 2.f);
-						std::string rgbCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255), int(State.NameColor1.w * 255));
+						std::string rgbCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255), int((State.NameColor1.w + State.NameColor2.w) * 255 / 2));
 						opener += rgbCode;
 						closer += "</color>";
 					}
 					if (State.ResizeName) {
-						opener += std::format("<size={}>", State.NameSize);
+						opener += std::format("<size={}%>", State.NameSize * 100);
 						closer += "</size>";
 					}
 					if (State.ItalicName) {
@@ -98,22 +98,23 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					playerName = opener + playerName + closer;
 
 					if (nameDelay <= 0 && State.ServerSideCustomName && 
-						convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer)), nullptr)) != ((State.ColoredName && !State.RgbName) ? GetGradientUsername(RemoveHtmlTags(playerName)) : playerName)) {
-						std::string username = (State.ColoredName && !State.RgbName) ? GetGradientUsername(RemoveHtmlTags(State.userName)) : State.userName;
+						convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer)), nullptr)) != ((State.ColoredName && !State.RgbName) ? GetGradientUsername(RemoveHtmlTags(playerName), true) : playerName)) {
+						std::string username = (State.ColoredName && !State.RgbName) ? GetGradientUsername(RemoveHtmlTags(State.userName), true) : State.userName;
 						if (IsInGame()) {
 							State.rpcQueue.push(new RpcSetName(opener + username + closer));
-							nameDelay = 10;
+							nameDelay = 5;
 						}
 						else if (IsInLobby()) {
 							State.lobbyRpcQueue.push(new RpcSetName(opener + username + closer));
-							nameDelay = 10;
+							nameDelay = 5;
 						}
+						nameDelay = 0;
 					}
 					else nameDelay--;
 				}
 			}
 
-			if (State.PlayerColoredDots && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.DisableSMAU)
+			if (State.PlayerColoredDots && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
 			{
 				app::GameData_PlayerOutfit* realOutfit = GetPlayerOutfit(playerData);
 				Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
@@ -124,7 +125,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				playerName = "<#0000>● </color>" + playerName + dot;
 			}
 
-			if (State.ShowPlayerInfo && IsInLobby() && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.DisableSMAU)
+			if (State.ShowPlayerInfo && IsInLobby() && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
 			{
 				uint32_t playerLevel = playerData->fields.PlayerLevel + 1;
 				uint8_t playerId = GetPlayerControlById(playerData->fields.PlayerId)->fields._.OwnerId;
@@ -167,7 +168,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						break;
 					}
 				}
-				std::string levelText = std::format("<#9ef>Level <#0f0>{}</color> ({})</color>", playerLevel, platform);
+				std::string isAum = std::count(State.aumUsers.begin(), State.aumUsers.end(), playerData->fields.PlayerId) ? " <#f55>[AUM]</color>" : "";
+				std::string levelText = std::format("<#9ef>Level <#0f0>{}</color> ({}){}</color>", playerLevel, platform, isAum);
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				if (IsStreamerMode() && friendCode != "")
 					friendCode = (convert_from_string(playerData->fields.FriendCode)).substr(0, 1) + "...";
@@ -186,7 +188,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			if (IsInGame() && State.RevealRoles && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.DisableSMAU)
+			if (IsInGame() && State.RevealRoles && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
 			{
 				std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
 				int completedTasks = 0;
@@ -220,11 +222,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				&& playerData->fields.Role
 				&& playerData->fields.Role->fields.CanUseKillButton
 				&& !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent)
-				&& !State.DisableSMAU) {
+				&& !State.PanicMode) {
 				if (State.RevealRoles) {
 					float killTimer = __this->fields.killTimer;
 					Color32&& color = GetKillCooldownColor(killTimer);
-					playerName += std::format("<size=1.4><#{:02x}{:02x}{:02x}{:02x}>Cooldown: {:.2f}s<#0000>0",
+					playerName += std::format("<size=1.4><#{:02x}{:02x}{:02x}{:02x}>Kill Cooldown: {:.2f}s<#0000>0",
 						color.r, color.g, color.b, color.a,
 						killTimer);
 				}
@@ -232,13 +234,13 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					float killTimer = __this->fields.killTimer;
 					Color32&& color = GetKillCooldownColor(killTimer);
 					playerName = "<size=1.4><#0000>0\n</color></size>" + playerName;
-					playerName += std::format("\n<size=1.4><#{:02x}{:02x}{:02x}{:02x}>Cooldown: {:.2f}s",
+					playerName += std::format("\n<size=1.4><#{:02x}{:02x}{:02x}{:02x}>Kill Cooldown: {:.2f}s",
 						color.r, color.g, color.b, color.a,
 						killTimer);
 				}
 			}
 
-			if (IsInGame() && (State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && !(GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames))) && __this->fields.inVent && !State.DisableSMAU) {
+			if (IsInGame() && (State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && !(GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames))) && __this->fields.inVent && !State.PanicMode) {
 				playerName = "<#0000>" + playerName + "</color>";
 			}
 
@@ -249,7 +251,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			if ((IsHost() || !State.SafeMode) && State.TeleportEveryone && (IsInGame() && !State.InMeeting)
 				&& State.ShiftRightClickTP && (ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT))
 				&& (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)
-				&& !State.DisableSMAU) {
+				&& !State.PanicMode) {
 				ImVec2 mouse = ImGui::GetMousePos();
 				Vector2 target = {
 					(mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
@@ -262,7 +264,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			else if ((IsHost() || !State.SafeMode) && State.TeleportEveryone && IsInLobby() && State.ShiftRightClickTP
 				&& (ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT)) 
 				&& (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)
-				&& !State.DisableSMAU) {
+				&& !State.PanicMode) {
 				ImVec2 mouse = ImGui::GetMousePos();
 				Vector2 target = {
 					(mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
@@ -271,7 +273,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				for (auto player : GetAllPlayerControl())
 					State.lobbyRpcQueue.push(new RpcForceSnapTo(player, ScreenToWorld(target)));
 			}
-			if (!State.DisableSMAU) {
+			if (!State.PanicMode) {
 				if (State.RotateEveryone) {
 					static float f = 0.f;
 					static float rotateDelay = 0;
@@ -307,10 +309,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						Vector2 target = { num, num2 };
 						if (rotateDelay <= 0) {
 							for (auto player : GetAllPlayerControl()) {
-								player->fields.NetTransform->fields.lastPosition = target;
-								player->fields.NetTransform->fields.lastPosSent = target;
-								rotateDelay = 25 * float(GetAllPlayerControl().size());
-								f += 36 * 0.017453292f;
+								if (player == *Game::pLocalPlayer) continue;
+								CustomNetworkTransform_SnapTo(player->fields.NetTransform, target, player->fields.NetTransform->fields.lastSequenceId, NULL);
+								player->fields.NetTransform->fields.lastSequenceId += 100;
+								rotateDelay = 0;//25 * float(GetAllPlayerControl().size());
+								f += 360 * 0.017453292f / float(GetAllPlayerControl().size());
 							}
 						}
 						else {
@@ -320,20 +323,12 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 				if (!State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby())) {
 					static float spamDelay = 0;
-					auto player = *Game::pLocalPlayer;
-					if (State.playerToChatAs.has_value())
-						player = GetPlayerControlById(State.playerToChatAs.get_PlayerId());
+					auto player = State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
 					if (spamDelay <= 0) {
-						if (IsInGame()) {
-							for (auto p : GetAllPlayerControl()) {
-								if (p == player || State.ChatSpamEveryone)
-									State.rpcQueue.push(new RpcSendChat(player, State.chatMessage));
-							}
-						}
-						else if (IsInLobby()) {
-							for (auto p : GetAllPlayerControl()) {
-								if (p == player || State.ChatSpamEveryone)
-									State.lobbyRpcQueue.push(new RpcSendChat(player, State.chatMessage));
+						for (auto p : GetAllPlayerControl()) {
+							if (p == player || State.ChatSpamEveryone) {
+								if (IsInGame()) State.rpcQueue.push(new RpcSendChat(p, State.chatMessage));
+								if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChat(p, State.chatMessage));
 							}
 						}
 						spamDelay = 25 * float(GetAllPlayerControl().size());
@@ -342,13 +337,12 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 
 				if (State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f) {
-					if (IsInGame()) State.rpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, State.chatMessage));
-					else if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, State.chatMessage));
-
+					PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(State.chatMessage), NULL);
+					//remove rpc queue stuff cuz of delay and anticheat kick
 					State.MessageSent = true;
 				}
 
-				if (IsHost() && State.ForceColorForEveryone)
+				if ((IsHost() || !State.SafeMode) && State.ForceColorForEveryone)
 				{
 					static float forceColorDelay = 0;
 					for (auto player : GetAllPlayerControl()) {
@@ -356,9 +350,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 							app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
 							auto colorId = outfit->fields.ColorId;
 							if (IsInGame() && colorId != State.HostSelectedColorId)
-								State.rpcQueue.push(new RpcForceColor(player, State.HostSelectedColorId, true));
+								State.rpcQueue.push(new RpcForceColor(player, State.HostSelectedColorId));
 							else if (IsInLobby() && colorId != State.HostSelectedColorId)
-								State.lobbyRpcQueue.push(new RpcForceColor(player, State.HostSelectedColorId, true));
+								State.lobbyRpcQueue.push(new RpcForceColor(player, State.HostSelectedColorId));
 							forceColorDelay = State.CycleDuration * GetAllPlayerControl().size();
 						}
 						else {
@@ -388,14 +382,16 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					static float forceNameDelay = 0;
 					if (forceNameDelay <= 0) {
 						for (auto player : GetAllPlayerControl()) {
-							app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
-							std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
-							std::string playerId = std::format("{}", player->fields.PlayerId);
-							std::string newName = State.hostUserName + "<size=0>" + playerId + "</size>";
-							if (IsInGame() && playerName != newName)
-								State.rpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
-							else if (IsInLobby() && (playerName.find(State.hostUserName) == std::string::npos))
-								State.lobbyRpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
+							if (player != *Game::pLocalPlayer || !(State.CustomName && ((IsHost() || !State.SafeMode) && State.ServerSideCustomName))) {
+								app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
+								std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+								std::string playerId = std::format("{}", player->fields.PlayerId);
+								std::string newName = State.hostUserName + "<size=0>" + playerId + "</size>";
+								if (IsInGame() && playerName != newName)
+									State.rpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
+								else if (IsInLobby() && playerName != newName)
+									State.lobbyRpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
+							}
 						}
 						forceNameDelay = State.CycleDuration * GetAllPlayerControl().size();
 					}
@@ -482,10 +478,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (_Duration > 0.f)
 					app::PlayerControl_TurnOnProtection(__this, State.ShowProtections, pair.first, __this->fields.protectedByGuardianId, nullptr);
 				options.SetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, ProtectionDurationSeconds);
-			} while (State.DisableSMAU);
+			} while (State.PanicMode);
 
 			if ((State.Wallhack || State.IsRevived) && __this == *Game::pLocalPlayer && !State.FreeCam
-				&& !State.playerToFollow.has_value() && !State.DisableSMAU) {
+				&& !State.playerToFollow.has_value() && !State.PanicMode) {
 				auto mainCamera = Camera_get_main(NULL);
 
 				Transform* cameraTransform = Component_get_transform((Component_1*)mainCamera, NULL);
@@ -503,7 +499,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					};
 				}
 				if (State.FollowerCam != nullptr) {
-					if (State.EnableZoom && !State.InMeeting && (IsInGame() || IsInLobby()) && !State.DisableSMAU) //chat button disappears after meeting
+					if (State.EnableZoom && !State.InMeeting && (IsInGame() || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
 						Camera_set_orthographicSize(State.FollowerCam, State.CameraHeight * 3, NULL);
 					else
 						Camera_set_orthographicSize(State.FollowerCam, 3.0f, NULL);
@@ -524,6 +520,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
+			if (playerData->fields.IsDead) {
+				PlayerControl_set_Visible(__this, State.ShowGhosts || localData->fields.IsDead, NULL);
+			}
+
 			if (!State.FreeCam && __this == *Game::pLocalPlayer && State.prevCamPos.x != NULL) {
 				auto mainCamera = Camera_get_main(NULL);
 
@@ -535,7 +535,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				State.prevCamPos = { NULL, NULL, NULL };
 			}
 
-			if (State.FreeCam && __this == *Game::pLocalPlayer && !State.DisableSMAU) {
+			if (State.FreeCam && __this == *Game::pLocalPlayer && !State.PanicMode) {
 				auto mainCamera = Camera_get_main(NULL);
 
 				Transform* cameraTransform = Component_get_transform((Component_1*)mainCamera, NULL);
@@ -698,8 +698,8 @@ void dPlayerControl_RpcSyncSettings(PlayerControl* __this, Byte__Array* optionsB
 
 bool dPlayerControl_get_CanMove(PlayerControl* __this, MethodInfo* method) {
 	try {
-		if (!State.DisableSMAU) {
-			if (((State.AlwaysMove) || (State.MoveInVent && (((*Game::pLocalPlayer)->fields.inVent) || ((*Game::pLocalPlayer)->fields.shapeshifting)))) && !State.ChatFocused && !((*Game::pLocalPlayer)->fields.petting))
+		if (!State.PanicMode) {
+			if (((State.AlwaysMove) || (State.MoveInVentAndShapeshift && (((*Game::pLocalPlayer)->fields.inVent) || ((*Game::pLocalPlayer)->fields.shapeshifting)))) && !State.ChatFocused && !((*Game::pLocalPlayer)->fields.petting))
 				return true;
 		}
 	}
@@ -722,15 +722,18 @@ void dPlayerControl_OnGameStart(PlayerControl* __this,  MethodInfo* method) {
 void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, MurderResultFlags__Enum resultFlags, MethodInfo* method)
 {
 	try {
-		if (!State.DisableSMAU) {
+		if (IsInLobby() && target == *Game::pLocalPlayer) return; //for some reason this kicks you from the lobby
+		if (!State.PanicMode) {
 			if (!PlayerIsImpostor(GetPlayerData(__this)) || PlayerIsImpostor(GetPlayerData(target))) {
 				synchronized(Replay::replayEventMutex) {
 					State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayerControl(__this).value(), CHEAT_ACTIONS::CHEAT_KILL_IMPOSTOR));
 				}
 			}
-			synchronized(Replay::replayEventMutex) {
-				State.liveReplayEvents.emplace_back(std::make_unique<KillEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value(), PlayerControl_GetTruePosition(__this, NULL), PlayerControl_GetTruePosition(target, NULL)));
-				State.replayDeathTimePerPlayer[target->fields.PlayerId] = std::chrono::system_clock::now();
+			if (resultFlags == MurderResultFlags__Enum::Succeeded) {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<KillEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value(), PlayerControl_GetTruePosition(__this, NULL), PlayerControl_GetTruePosition(target, NULL)));
+					State.replayDeathTimePerPlayer[target->fields.PlayerId] = std::chrono::system_clock::now();
+				}
 			}
 
 			// ESP: Reset Kill Cooldown
@@ -769,10 +772,11 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target, MethodInfo* method)
 {
 	try {
-		if (!State.DisableSMAU)
-			PlayerControl_RpcMurderPlayer(__this, target, true, method);
-		else
-			PlayerControl_CmdCheckMurder(__this, target, method);
+		if (!State.PanicMode && __this == *Game::pLocalPlayer) {
+			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId >= 0 || State.BypassAngelProt, NULL);
+			return;
+		}
+		PlayerControl_CmdCheckMurder(__this, target, method);
 	}
 	catch (...) {
 		LOG_DEBUG("Exception occurred in PlayerControl_CmdCheckMurder (PlayerControl)");
@@ -783,7 +787,7 @@ void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target,
 void dPlayerControl_RpcShapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method)
 {
 	try {
-		PlayerControl_RpcShapeshift(__this, target, (State.DisableSMAU ? animate : !State.AnimationlessShapeshift), method);
+		PlayerControl_RpcShapeshift(__this, target, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
 	}
 	catch (...) {
 		LOG_DEBUG("Exception occurred in PlayerControl_RpcShapeshift (PlayerControl)");
@@ -794,7 +798,8 @@ void dPlayerControl_RpcShapeshift(PlayerControl* __this, PlayerControl* target, 
 void dPlayerControl_CmdCheckShapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method)
 {
 	try {
-		PlayerControl_CmdCheckShapeshift(__this, target, (State.DisableSMAU ? animate : !State.AnimationlessShapeshift), method);
+		if (!State.SafeMode) PlayerControl_RpcShapeshift(__this, target, animate, method);
+		else PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
 	}
 	catch (...) {
 		LOG_DEBUG("Exception occurred in PlayerControl_RpcShapeshift (PlayerControl)");
@@ -805,7 +810,8 @@ void dPlayerControl_CmdCheckShapeshift(PlayerControl* __this, PlayerControl* tar
 void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
 {
 	try {
-		PlayerControl_CmdCheckRevertShapeshift(__this, (State.DisableSMAU ? animate : !State.AnimationlessShapeshift), method);
+		if (!State.SafeMode) PlayerControl_RpcShapeshift(__this, __this, animate, method);
+		else PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
 	}
 	catch (...) {
 		LOG_DEBUG("Exception occurred in PlayerControl_RpcShapeshift (PlayerControl)");
@@ -831,7 +837,7 @@ void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate
 void dPlayerControl_StartMeeting(PlayerControl* __this, GameData_PlayerInfo* target, MethodInfo* method)
 {
 	try {
-		if (!State.DisableSMAU && State.DisableMeetings) {
+		if (!State.PanicMode && State.DisableMeetings) {
 			return;
 		}
 		else {
@@ -848,10 +854,11 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, GameData_PlayerInfo* tar
 
 void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	try {
-		if (!State.DisableSMAU) {
-			HandleRpc(callId, reader);
-			if (IsHost() && ((State.DisableMeetings && (callId == 11 || callId == 14)) || (State.DisableSabotages && (callId == 27 || callId == 28))))
-				return; //11 is rpcreportdeadbody, 14 is rpcstartmeeting, 27 is rpcclosedoorsoftype, 28 is RpcUpdateSystem (unintentionally disables medbay scanning, look into this later)
+		if (!State.PanicMode) {
+			HandleRpc(__this, callId, reader);
+			if (IsHost() && ((State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) || 
+				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
+				return;
 			if (State.DisableCallId && callId == State.ToDisableCallId)
 				return;
 		}
@@ -865,7 +872,7 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 {
 	try {//If we're already rendering it, lets skip checking if we should
-		if (!State.DisableSMAU) {
+		if (!State.PanicMode) {
 			if ((IsInGame() || IsInLobby()) && !value && State.ShowGhosts)
 			{
 				Transform* rendererTrans = app::Component_get_transform(reinterpret_cast<app::Component_1*>(__this), NULL);
@@ -889,6 +896,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 							{
 								value = true;
 							}
+							playerInfo->fields._object->fields.MyPhysics->fields.Animations;
 						}
 					}
 				}
@@ -904,7 +912,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 {
 	try {
-		if (!State.DisableSMAU) {
+		if (!State.PanicMode) {
 			if ((IsInGame() || IsInLobby()) && !value) { //If we're already rendering it, lets skip checking if we should
 				for (auto player : GetAllPlayerControl()) {
 					auto playerInfo = GetPlayerData(player);
@@ -936,7 +944,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 
 void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, GameData_PlayerInfo* target, MethodInfo* method) {
 	try {
-		if (!State.DisableSMAU && State.DisableMeetings) {
+		if (!State.PanicMode && State.DisableMeetings) {
 			return;
 		}
 	}
@@ -1009,66 +1017,36 @@ void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method) 
 	PlayerControl_RemoveProtection(__this, method);
 }
 
-void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method) {
-	try {
-		if (!State.DisableSMAU) {
-			bool IsRangedRole = false;
-			if ((PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer)) && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) || GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::GuardianAngel)
-				IsRangedRole = true;
-			if (!IsRangedRole)
-				return KillButton_SetTarget(__this, NULL, method);
-			bool allowImpostors = State.KillImpostors ? true : false;
-			//we have to set the target to null for the kill button to not glow
-			if (!State.KillThroughWalls) {
-				if (target == nullptr || GetPlayerData(target)->fields.IsDead)
-					return KillButton_SetTarget(__this, NULL, method);
-				float maxDistance = State.ModifyKillDistance ? State.KillDistance : State.GameKillDistance;
-				if (Vector2_Distance(PlayerControl_GetTruePosition(*Game::pLocalPlayer, NULL), PlayerControl_GetTruePosition(target, NULL), NULL) > maxDistance)
-					return KillButton_SetTarget(__this, NULL, method);
-				return KillButton_SetTarget(__this, target, method);
-			}
-			if (State.InfiniteKillRange && State.KillThroughWalls) {
-				auto closestPlayer = *Game::pLocalPlayer;
-				float distance = FLT_MAX; //(probably not "infinite") large value
-				for (auto player : GetAllPlayerControl()) {
-					if (player != *Game::pLocalPlayer && !GetPlayerData(player)->fields.IsDead && Vector2_Distance(PlayerControl_GetTruePosition(*Game::pLocalPlayer, NULL), PlayerControl_GetTruePosition(player, NULL), NULL) < distance
-						&& (allowImpostors || !PlayerIsImpostor(GetPlayerData(player)))) {
-						closestPlayer = player;
-						distance = Vector2_Distance(PlayerControl_GetTruePosition(*Game::pLocalPlayer, NULL), PlayerControl_GetTruePosition(player, NULL), NULL);
-					}
-				}
-				if (closestPlayer == *Game::pLocalPlayer || GetPlayerData(closestPlayer)->fields.IsDead)
-					return KillButton_SetTarget(__this, NULL, method);
-				return KillButton_SetTarget(__this, closestPlayer, method);
-			}
-			if (State.KillThroughWalls) {
-				auto closestPlayer = *Game::pLocalPlayer;
-				float distance = State.ModifyKillDistance ? State.KillDistance : State.GameKillDistance;
-				for (auto player : GetAllPlayerControl()) {
-					if (player != *Game::pLocalPlayer && !GetPlayerData(player)->fields.IsDead && Vector2_Distance(PlayerControl_GetTruePosition(*Game::pLocalPlayer, NULL), PlayerControl_GetTruePosition(player, NULL), NULL) < distance
-						&& (allowImpostors || !PlayerIsImpostor(GetPlayerData(player)))) {
-						closestPlayer = player;
-						distance = Vector2_Distance(PlayerControl_GetTruePosition(*Game::pLocalPlayer, NULL), PlayerControl_GetTruePosition(player, NULL), NULL);
-					}
-				}
-				if (closestPlayer == *Game::pLocalPlayer || GetPlayerData(closestPlayer)->fields.IsDead)
-					return KillButton_SetTarget(__this, NULL, method);
-				float maxDistance = State.ModifyKillDistance ? State.KillDistance : State.GameKillDistance;
-				if (Vector2_Distance(PlayerControl_GetTruePosition(*Game::pLocalPlayer, NULL), PlayerControl_GetTruePosition(closestPlayer, NULL), NULL) > maxDistance)
-					return KillButton_SetTarget(__this, NULL, method);
-				return KillButton_SetTarget(__this, closestPlayer, method);
+PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
+	auto result = ImpostorRole_FindClosestTarget(__this, method);
+	if (result == nullptr && State.InfiniteKillRange) {
+		PlayerControl* new_result = nullptr;
+		float max_dist = FLT_MAX;
+		auto localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
+		for (auto p : GetAllPlayerControl()) {
+			if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
+			auto pData = GetPlayerData(p);
+			if (PlayerIsImpostor(pData) && !State.KillImpostors) continue; //neither impostors
+			if (pData->fields.IsDead) continue; //nor ghosts
+			float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
+			if (currentDist < max_dist) {
+				new_result = p;
+				max_dist = currentDist;
 			}
 		}
+		result = new_result;
 	}
-	catch (...) {
-		LOG_DEBUG("Exception occurred in KillButton_SetTarget (PlayerControl)");
+
+	if (result != nullptr && State.AutoKill && (State.AlwaysMove || (*Game::pLocalPlayer)->fields.moveable) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
+		if (IsInGame()) State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+		else State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 	}
-	return KillButton_SetTarget(__this, target, method);
+	return result;
 }
 
 float dConsole_1_CanUse(Console_1* __this, GameData_PlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
 	try {
-		if (!State.DisableSMAU) {
+		if (!State.PanicMode) {
 			std::vector<int> sabotageTaskIds = { 16, 17, 19, 20, 30, 35, 59 }; //don't prevent impostor from fixing sabotages
 			if (State.DoTasksAsImpostor || !PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer)))
 				__this->fields.AllowImpostor = true;

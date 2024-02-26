@@ -8583,6 +8583,132 @@ namespace app
     };
 #pragma endregion
 
+#pragma region RpcCalls__Enum
+#if defined(_CPLUSPLUS_)
+    enum class RpcCalls__Enum : uint8_t {
+        PlayAnimation = 0x00,
+        CompleteTask = 0x01,
+        SyncSettings = 0x02,
+        SetInfected = 0x03,
+        Exiled = 0x04,
+        CheckName = 0x05,
+        SetName = 0x06,
+        CheckColor = 0x07,
+        SetColor = 0x08,
+        SetHat = 0x09,
+        SetSkin = 0x0a,
+        ReportDeadBody = 0x0b,
+        MurderPlayer = 0x0c,
+        SendChat = 0x0d,
+        StartMeeting = 0x0e,
+        SetScanner = 0x0f,
+        SendChatNote = 0x10,
+        SetPet = 0x11,
+        SetStartCounter = 0x12,
+        EnterVent = 0x13,
+        ExitVent = 0x14,
+        SnapTo = 0x15,
+        CloseMeeting = 0x16,
+        VotingComplete = 0x17,
+        CastVote = 0x18,
+        ClearVote = 0x19,
+        AddVote = 0x1a,
+        CloseDoorsOfType = 0x1b,
+        SetTasks = 0x1d,
+        ClimbLadder = 0x1f,
+        UsePlatform = 0x20,
+        SendQuickChat = 0x21,
+        BootFromVent = 0x22,
+        UpdateSystem = 0x23,
+        SetVisor = 0x24,
+        SetNamePlate = 0x25,
+        SetLevel = 0x26,
+        SetHatStr = 0x27,
+        SetSkinStr = 0x28,
+        SetPetStr = 0x29,
+        SetVisorStr = 0x2a,
+        SetNamePlateStr = 0x2b,
+        SetRole = 0x2c,
+        ProtectPlayer = 0x2d,
+        Shapeshift = 0x2e,
+        CheckMurder = 0x2f,
+        CheckProtect = 0x30,
+        Pet = 0x31,
+        CancelPet = 0x32,
+        CheckZipline = 0x33,
+        UseZipline = 0x34,
+        TriggerSpores = 0x35,
+        CheckSpore = 0x36,
+        CheckShapeshift = 0x37,
+        RejectShapeshift = 0x38,
+        LobbyTimeExpiring = 0x3c,
+        ExtendLobbyTimer = 0x3d,
+    };
+
+#else
+    enum RpcCalls__Enum {
+        RpcCalls__Enum_PlayAnimation = 0x00,
+        RpcCalls__Enum_CompleteTask = 0x01,
+        RpcCalls__Enum_SyncSettings = 0x02,
+        RpcCalls__Enum_SetInfected = 0x03,
+        RpcCalls__Enum_Exiled = 0x04,
+        RpcCalls__Enum_CheckName = 0x05,
+        RpcCalls__Enum_SetName = 0x06,
+        RpcCalls__Enum_CheckColor = 0x07,
+        RpcCalls__Enum_SetColor = 0x08,
+        RpcCalls__Enum_SetHat = 0x09,
+        RpcCalls__Enum_SetSkin = 0x0a,
+        RpcCalls__Enum_ReportDeadBody = 0x0b,
+        RpcCalls__Enum_MurderPlayer = 0x0c,
+        RpcCalls__Enum_SendChat = 0x0d,
+        RpcCalls__Enum_StartMeeting = 0x0e,
+        RpcCalls__Enum_SetScanner = 0x0f,
+        RpcCalls__Enum_SendChatNote = 0x10,
+        RpcCalls__Enum_SetPet = 0x11,
+        RpcCalls__Enum_SetStartCounter = 0x12,
+        RpcCalls__Enum_EnterVent = 0x13,
+        RpcCalls__Enum_ExitVent = 0x14,
+        RpcCalls__Enum_SnapTo = 0x15,
+        RpcCalls__Enum_CloseMeeting = 0x16,
+        RpcCalls__Enum_VotingComplete = 0x17,
+        RpcCalls__Enum_CastVote = 0x18,
+        RpcCalls__Enum_ClearVote = 0x19,
+        RpcCalls__Enum_AddVote = 0x1a,
+        RpcCalls__Enum_CloseDoorsOfType = 0x1b,
+        RpcCalls__Enum_SetTasks = 0x1d,
+        RpcCalls__Enum_ClimbLadder = 0x1f,
+        RpcCalls__Enum_UsePlatform = 0x20,
+        RpcCalls__Enum_SendQuickChat = 0x21,
+        RpcCalls__Enum_BootFromVent = 0x22,
+        RpcCalls__Enum_UpdateSystem = 0x23,
+        RpcCalls__Enum_SetVisor = 0x24,
+        RpcCalls__Enum_SetNamePlate = 0x25,
+        RpcCalls__Enum_SetLevel = 0x26,
+        RpcCalls__Enum_SetHatStr = 0x27,
+        RpcCalls__Enum_SetSkinStr = 0x28,
+        RpcCalls__Enum_SetPetStr = 0x29,
+        RpcCalls__Enum_SetVisorStr = 0x2a,
+        RpcCalls__Enum_SetNamePlateStr = 0x2b,
+        RpcCalls__Enum_SetRole = 0x2c,
+        RpcCalls__Enum_ProtectPlayer = 0x2d,
+        RpcCalls__Enum_Shapeshift = 0x2e,
+        RpcCalls__Enum_CheckMurder = 0x2f,
+        RpcCalls__Enum_CheckProtect = 0x30,
+        RpcCalls__Enum_Pet = 0x31,
+        RpcCalls__Enum_CancelPet = 0x32,
+        RpcCalls__Enum_CheckZipline = 0x33,
+        RpcCalls__Enum_UseZipline = 0x34,
+        RpcCalls__Enum_TriggerSpores = 0x35,
+        RpcCalls__Enum_CheckSpore = 0x36,
+        RpcCalls__Enum_CheckShapeshift = 0x37,
+        RpcCalls__Enum_RejectShapeshift = 0x38,
+        RpcCalls__Enum_LobbyTimeExpiring = 0x3c,
+        RpcCalls__Enum_ExtendLobbyTimer = 0x3d,
+    };
+
+#endif
+#pragma endregion
+
     struct __declspec(align(4)) List_1_Platforms___Fields {
         struct Platforms__Enum__Array* _items;
         int32_t _size;
@@ -11879,6 +12005,87 @@ struct VoteBanSystem__Fields {
     };
 #pragma endregion
 
+#pragma region AssetReference
+    struct AsyncOperationHandle {
+        struct IAsyncOperation_1* m_InternalOp;
+        int32_t m_Version;
+        struct String* m_LocationName;
+    };
+
+    struct AsyncOperationHandle__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData System_Collections_IEnumerator_MoveNext;
+        VirtualInvokeData System_Collections_IEnumerator_get_Current;
+        VirtualInvokeData System_Collections_IEnumerator_Reset;
+    };
+
+    struct AsyncOperationHandle__StaticFields {
+        bool m_IsWaitingForCompletion;
+    };
+
+    struct AsyncOperationHandle__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AsyncOperationHandle__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct AsyncOperationHandle__VTable vtable;
+    };
+
+    struct __declspec(align(4)) AssetReference__Fields {
+        struct String* m_AssetGUID;
+        struct String* m_SubObjectName;
+        struct String* m_SubObjectType;
+        struct AsyncOperationHandle m_Operation;
+    };
+
+    struct AssetReference {
+        struct AssetReference__Class* klass;
+        MonitorData* monitor;
+        struct AssetReference__Fields fields;
+    };
+
+    struct AssetReference__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_RuntimeKey;
+        VirtualInvokeData RuntimeKeyIsValid;
+        VirtualInvokeData get_RuntimeKey_1;
+        VirtualInvokeData get_AssetGUID;
+        VirtualInvokeData get_SubObjectName;
+        VirtualInvokeData set_SubObjectName;
+        VirtualInvokeData get_SubOjbectType;
+        VirtualInvokeData get_Asset;
+        VirtualInvokeData LoadAssetAsync;
+        VirtualInvokeData LoadSceneAsync;
+        VirtualInvokeData UnLoadScene;
+        VirtualInvokeData InstantiateAsync;
+        VirtualInvokeData InstantiateAsync_1;
+        VirtualInvokeData RuntimeKeyIsValid_1;
+        VirtualInvokeData ReleaseAsset;
+        VirtualInvokeData ReleaseInstance;
+        VirtualInvokeData ValidateAsset;
+        VirtualInvokeData ValidateAsset_1;
+    };
+
+    struct AssetReference__StaticFields {
+    };
+
+    struct AssetReference__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AssetReference__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct AssetReference__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region Console_1
     struct Console_1__Fields {
         struct MonoBehaviour__Fields _;
@@ -11972,8 +12179,47 @@ struct VoteBanSystem__Fields {
     };
 #pragma endregion
 
+#pragma region Activity_1
+    struct Activity_1 {
+        void* Type;
+        int64_t ApplicationId;
+        struct String* Name;
+        struct String* State;
+        struct String* Details;
+        void* Timestamps;
+        void* Assets;
+        void* Party;
+        void* Secrets;
+        bool Instance;
+        uint32_t SupportedPlatforms;
+    };
+
+    struct Activity_1__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct Activity_1__StaticFields {
+    };
+
+    struct Activity_1__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct Activity_1__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct Activity_1__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
+    typedef Il2CppObject ActivityManager;
+    typedef Il2CppObject ImpostorRole;
+    typedef Il2CppObject LogicGameFlowNormal;
+    typedef Il2CppObject LogicGameFlowHnS;
     typedef Il2CppObject PlayerData;
     typedef Il2CppObject PlayerCustomizationData;
     typedef Il2CppObject PlayerPurchasesData;

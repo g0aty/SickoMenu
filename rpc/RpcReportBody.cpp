@@ -2,26 +2,25 @@
 #include "_rpc.h"
 #include "game.h"
 
-RpcReportPlayer::RpcReportPlayer(const PlayerSelection& target)
+RpcReportBody::RpcReportBody(const PlayerSelection& target)
 {
 	this->reportedPlayer = target;
 }
 
-void RpcReportPlayer::Process()
+void RpcReportBody::Process()
 {
 	PlayerControl_CmdReportDeadBody(*Game::pLocalPlayer, reportedPlayer.get_PlayerData().value_or(nullptr), nullptr);
 }
 
-RpcForceReportPlayer::RpcForceReportPlayer(PlayerControl* Player, const PlayerSelection& target)
+RpcForceReportBody::RpcForceReportBody(PlayerControl* Player, const PlayerSelection& target)
 {
 	this->Player = Player;
 	this->reportedPlayer = target;
 }
 
-void RpcForceReportPlayer::Process()
+void RpcForceReportBody::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (Player == nullptr) return;
 
 	PlayerControl_CmdReportDeadBody(Player, reportedPlayer.get_PlayerData().value_or(nullptr), nullptr);
 }
@@ -34,8 +33,7 @@ RpcForceMeeting::RpcForceMeeting(PlayerControl* Player, const PlayerSelection& t
 
 void RpcForceMeeting::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (Player == nullptr) return;
 
 	PlayerControl_RpcStartMeeting(Player, reportedPlayer.get_PlayerData().value_or(nullptr), nullptr);
 }

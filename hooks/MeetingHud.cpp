@@ -14,7 +14,7 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 
 		static std::string strVoteSpreaderType = translate_type_name("VoteSpreader, Assembly-CSharp");
 		voteSpreaderType = app::Type_GetType(convert_to_string(strVoteSpreaderType), nullptr);
-		if (State.confuser && State.confuseOnMeeting && !State.DisableSMAU)
+		if (State.confuser && State.confuseOnMeeting && !State.PanicMode)
 			ControlAppearance(true);
 	}
 	catch (...) {
@@ -126,7 +126,7 @@ void dMeetingHud_PopulateResults(MeetingHud* __this, Il2CppArraySize* states, Me
 }
 
 void RevealAnonymousVotes() {
-	if (State.DisableSMAU || (!State.InMeeting
+	if (State.PanicMode || (!State.InMeeting
 		|| !app::MeetingHud__TypeInfo
 		|| !app::MeetingHud__TypeInfo->static_fields->Instance
 		|| !GameOptions().GetBool(app::BoolOptionNames__Enum::AnonymousVotes)))
@@ -145,7 +145,7 @@ void RevealAnonymousVotes() {
 
 void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 	try {
-		if (!State.DisableSMAU) {
+		if (!State.PanicMode) {
 			const bool isBeforeResultsState = __this->fields.state < app::MeetingHud_VoteStates__Enum::Results;
 			il2cpp::Array playerStates(__this->fields.playerStates);
 			for (auto playerVoteArea : playerStates) {
@@ -162,7 +162,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 				if (playerData == GetPlayerData(*Game::pLocalPlayer) && State.CustomName && (!State.ServerSideCustomName || State.ServerSideCustomName && (!IsHost() || State.SafeMode)) && !State.userName.empty()) {
 					if (State.CustomName && !State.ServerSideCustomName) {
 						if (State.ColoredName && !State.RgbName) {
-							playerName = GetGradientUsername(playerName);
+							playerName = GetGradientUsername(RemoveHtmlTags(playerName), true);
 						}
 						//we don't want a big name hiding everything in the meeting
 						/*if (State.ResizeName)
@@ -240,11 +240,12 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 						STREAM_DEBUG(ToString(playerData) << " voted for " << ToString(playerVoteArea->fields.VotedFor));
 
 						// avoid duplicate votes
+						GameOptions options;
+						const auto prevAnonymousVotes = options.GetBool(app::BoolOptionNames__Enum::AnonymousVotes);
+						if (prevAnonymousVotes && State.RevealAnonymousVotes)
+							options.SetBool(app::BoolOptionNames__Enum::AnonymousVotes, false);
+
 						if (isBeforeResultsState) {
-							GameOptions options;
-							const auto prevAnonymousVotes = options.GetBool(app::BoolOptionNames__Enum::AnonymousVotes);
-							if (prevAnonymousVotes && State.RevealAnonymousVotes)
-								options.SetBool(app::BoolOptionNames__Enum::AnonymousVotes, false);
 							if (playerVoteArea->fields.VotedFor != Game::SkippedVote) {
 								for (auto votedForArea : playerStates) {
 									if (votedForArea->fields.TargetPlayerId == playerVoteArea->fields.VotedFor) {

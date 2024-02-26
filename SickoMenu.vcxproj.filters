@@ -25,6 +25,9 @@
     <ClCompile Include="gui\radar.cpp">
       <Filter>gui</Filter>
     </ClCompile>
+    <ClCompile Include="gui\tabs\about_tab.cpp">
+      <Filter>gui\tabs</Filter>
+    </ClCompile>
     <ClCompile Include="gui\tabs\debug_tab.cpp">
       <Filter>gui\tabs</Filter>
     </ClCompile>
@@ -145,7 +148,7 @@
     <ClCompile Include="rpc\RpcUpdateSystem.cpp">
       <Filter>rpc</Filter>
     </ClCompile>
-    <ClCompile Include="rpc\RpcReportPlayer.cpp">
+    <ClCompile Include="rpc\RpcReportBody.cpp">
       <Filter>rpc</Filter>
     </ClCompile>
     <ClCompile Include="rpc\RpcSetScanner.cpp">
@@ -235,9 +238,6 @@
     <ClCompile Include="rpc\RpcPlayerAppearance.cpp">
       <Filter>rpc</Filter>
     </ClCompile>
-	<ClCompile Include="gui\gamechat.cpp">
-      <Filter>gui</Filter>
-    </ClCompile>
     <ClCompile Include="gui\console.cpp">
       <Filter>gui</Filter>
     </ClCompile>
@@ -301,9 +301,6 @@
     <ClCompile Include="hooks\PlayerStorageManager.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
-	<ClCompile Include="rpc\RpcChatMessage.cpp">
-      <Filter>rpc</Filter>
-    </ClCompile>
     <ClCompile Include="user\achievements.cpp">
       <Filter>user</Filter>
     </ClCompile>
@@ -358,6 +355,9 @@
     </ClInclude>
     <ClInclude Include="gui\theme.hpp">
       <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\tabs\settings_tab.h">
+      <Filter>gui\tabs</Filter>
     </ClInclude>
     <ClInclude Include="gui\tabs\debug_tab.h">
       <Filter>gui\tabs</Filter>
@@ -478,9 +478,6 @@
     </ClInclude>
     <ClInclude Include="user\logger.h">
       <Filter>user</Filter>
-    </ClInclude>
-	<ClInclude Include="gui\gamechat.hpp">
-      <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="gui\console.hpp">
       <Filter>gui</Filter>

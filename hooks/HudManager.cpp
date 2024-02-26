@@ -9,24 +9,24 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 		static bool bChatAlwaysActivePrevious = false;
 		if (bChatAlwaysActivePrevious != State.ChatAlwaysActive)
 		{
-			if (State.ChatAlwaysActive && !State.DisableSMAU)
+			if (State.ChatAlwaysActive && !State.PanicMode)
 				ChatController_SetVisible(__this->fields.Chat, true, NULL);
 			else if (!State.InMeeting && !IsInLobby()) //You will lose chat ability in meeting otherwise
 				ChatController_SetVisible(__this->fields.Chat, State.ChatActiveOriginalState, NULL);
 			bChatAlwaysActivePrevious = State.ChatAlwaysActive;
 		}
-		__this->fields.PlayerCam->fields.Locked = State.FreeCam && !State.DisableSMAU;
+		__this->fields.PlayerCam->fields.Locked = State.FreeCam && !State.PanicMode;
 
 		if (__this->fields.Chat && __this->fields.Chat->fields.freeChatField) {
-			__this->fields.Chat->fields.freeChatField->fields.textArea->fields.AllowPaste = State.ChatPaste && !State.DisableSMAU;
+			__this->fields.Chat->fields.freeChatField->fields.textArea->fields.AllowPaste = State.ChatPaste && !State.PanicMode;
 		}
 
-		bool DisableActivation = false; //so a ghost seek button doesn't show up
+		static bool DisableActivation = false; //so a ghost seek button doesn't show up
 
 		if (State.InMeeting)
 			HudManager_SetHudActive(__this, false, NULL);
 		else {
-			if (State.DisableHud && !State.DisableSMAU) {
+			if (State.DisableHud && !State.PanicMode) {
 				HudManager_SetHudActive(__this, false, NULL);
 				DisableActivation = false;
 			}
@@ -45,7 +45,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 			GameObject* shadowLayerObject = Component_get_gameObject((Component_1*)__this->fields.ShadowQuad, NULL);
 			if (IsInGame() || IsInLobby()) {
 				GameObject_SetActive(shadowLayerObject,
-					(State.DisableSMAU || (!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
+					(State.PanicMode || (!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
 					&& !localData->fields.IsDead,
 					NULL);
 			}
@@ -56,7 +56,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 				app::RoleTypes__Enum role = playerRole != nullptr ? playerRole->fields.Role : app::RoleTypes__Enum::Crewmate;
 				GameObject* ImpostorVentButton = app::Component_get_gameObject((Component_1*)__this->fields.ImpostorVentButton, NULL);
 
-				if (role == RoleTypes__Enum::Engineer && State.UnlockVents && !State.DisableSMAU)
+				if (role == RoleTypes__Enum::Engineer && State.UnlockVents && !State.PanicMode)
 				{
 					app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
 					if (engineerRole->fields.cooldownSecondsRemaining > 0.0f)
@@ -69,10 +69,10 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 				}
 				else
 				{
-					app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents || (((*Game::pLocalPlayer)->fields.inVent && role == RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal) && !State.DisableSMAU), nullptr);
+					app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents || (((*Game::pLocalPlayer)->fields.inVent && role == RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal) && !State.PanicMode), nullptr);
 				}
 
-				if ((IsInGame() || IsInLobby()) && !State.DisableSMAU) {
+				if ((IsInGame() || IsInLobby()) && !State.PanicMode) {
 					for (auto player : GetAllPlayerControl())
 					{
 						auto playerInfo = GetPlayerData(player);
@@ -95,7 +95,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 	VersionShower_Start(__this, method);
-	const auto& versionText = !State.DisableSMAU ? std::format("<size=75%>{} ~ <#0f0>SickoMode</color><#f00>AU</color> <#fb0>{}</color></size>",
+	const auto& versionText = !State.PanicMode ? std::format("<size=75%>{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color></size>",
 		convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)), State.SickoVersion) :
 		convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
 	app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(versionText), nullptr);
@@ -104,8 +104,16 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 	app::PingTracker_Update(__this, method);
 	try {
-		if (!State.DisableSMAU) {
+		if (!IsStreamerMode() && !State.PanicMode) {
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
+			int fps = GetFps();
+			std::string fpsText = "";
+			if (State.ShowFps) {
+				if (fps <= 20) fpsText = std::format("\nFPS: <#f00>{}</color>", fps);
+				else if (fps <= 40) fpsText = std::format("\n<#ff0>FPS: {}</color>", fps);
+				else fpsText = std::format("\n<#0f0>FPS: {}</color>", fps);
+			}
+			std::string autoKill = State.AutoKill ? "\n<#f00>Autokill</color>" : "";
 			std::string noClip = State.NoClip ? "\nNoClip" : "";
 			std::string freeCam = State.FreeCam ? "\nFreecam" : "";
 			std::string spectating = "";
@@ -120,12 +128,24 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 			std::string hostText = State.ShowHost ?
 				(IsHost() ? "\nYou are Host" : std::format("\nHost: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format("\nVote Kicks: {}", State.VoteKicks) : "";
-			std::string pingText = std::format("{}\n<size=50%><#0f0>SickoMode</color><#f00>AU</color> <#fb0>{}</color>{}{}{}{}</size>", ping, State.SickoVersion, hostText, noClip, freeCam, spectating);
+			std::string pingText = std::format("<#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ {}<size=50%>{}{}{}{}{}{}</size>", State.SickoVersion, ping, fpsText, hostText, autoKill, noClip, freeCam, spectating);
 			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopRight, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
+		}
+		else {
+			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
+			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopRight, nullptr);
+			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(ping), nullptr);
 		}
 	}
 	catch (...) {
 		LOG_DEBUG("Exception occurred in PingTracker_Update (HudManager)");
 	}
+}
+
+bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, MethodInfo* method) {
+	return false; //fix black screen when you set fake role
+}
+bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method) {
+	return false; //fix black screen when you set fake role
 }

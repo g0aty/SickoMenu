@@ -27,8 +27,7 @@ RpcForceCompleteTask::RpcForceCompleteTask(PlayerControl* Player, uint32_t taskI
 
 void RpcForceCompleteTask::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (Player == nullptr) return;
 	
 	auto tasks = GetNormalPlayerTasks(Player);
 

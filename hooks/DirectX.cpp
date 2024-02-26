@@ -19,7 +19,6 @@
 #include "resource_data.h"
 #include "game.h"
 #include "console.hpp"
-#include "gamechat.hpp"
 #include "profiler.h"
 
 #include <future>
@@ -63,23 +62,17 @@ ImVec2 DirectX::GetWindowSize()
 
 static bool CanDrawEsp()
 {
-	return (!State.DisableSMAU && IsInGame() || IsInLobby()) && State.ShowEsp && (!State.InMeeting || !State.HideEsp_During_Meetings);
+	return (!State.PanicMode && IsInGame() || IsInLobby()) && State.ShowEsp && (!State.InMeeting || !State.HideEsp_During_Meetings);
 }
 
 static bool CanDrawRadar()
 {
-	return !State.DisableSMAU && IsInGame() && State.ShowRadar && (!State.InMeeting || !State.HideRadar_During_Meetings);
-}
-
-
-static bool CanDrawChat()
-{
-    return !State.DisableSMAU && (IsInGame() || IsInLobby()) && State.ShowChat;
+	return !State.PanicMode && IsInGame() && State.ShowRadar && (!State.InMeeting || !State.HideRadar_During_Meetings);
 }
 
 static bool CanDrawReplay()
 {
-    return !State.DisableSMAU && IsInGame() && State.ShowReplay;
+    return !State.PanicMode && IsInGame() && State.ShowReplay;
 }
 
 LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -108,21 +101,23 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
     KeyBinds::WndProc(uMsg, wParam, lParam);
 
-    if (!State.DisableSMAU && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/) {
+    if (!State.PanicMode && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/) {
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Menu)) State.ShowMenu = !State.ShowMenu;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Radar)) State.ShowRadar = !State.ShowRadar;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Console)) State.ShowConsole = !State.ShowConsole;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Repair_Sabotage) && IsInGame()) RepairSabotage(*Game::pLocalPlayer);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Noclip) && (IsInGame() || IsInLobby())) { State.NoClip = !State.NoClip; State.HotkeyNoClip = true; }
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Autokill) && (IsInGame() || IsInLobby())) State.AutoKill = !State.AutoKill;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Close_All_Doors) && IsInGame()) State.CloseAllDoors = true;
-        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Zoom) && (IsInGame() || IsInLobby())) State.EnableZoom = !State.EnableZoom;
-        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Freecam) && (IsInGame() || IsInLobby())) State.FreeCam = !State.FreeCam;
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Zoom) && (IsInGame() || IsInLobby())) { State.EnableZoom = !State.EnableZoom; if (!State.EnableZoom) RefreshChat(); }
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Freecam) && (IsInGame() || IsInLobby())) {
+            State.FreeCam = !State.FreeCam;
+            State.playerToFollow = PlayerSelection();
+        }
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Close_Current_Room_Door) && IsInGame()) State.rpcQueue.push(new RpcCloseDoorsOfType(GetSystemTypes(GetTrueAdjustedPosition(*Game::pLocalPlayer)), false));
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Replay)) State.ShowReplay = !State.ShowReplay;
-        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Chat)) State.ShowChat = !State.ShowChat;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Hud) && (IsInGame() || IsInLobby())) State.DisableHud = !State.DisableHud;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Reset_Appearance) && (IsInGame() || IsInLobby())) ControlAppearance(false);
-        if (KeyBinds::IsKeyPressed(State.KeyBinds.Save_Appearance) && (IsInGame() || IsInLobby())) SaveOriginalAppearance();
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Randomize_Appearance)) ControlAppearance(true);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Complete_Tasks) && IsInGame()) {
             auto tasks = GetNormalPlayerTasks(*Game::pLocalPlayer);
@@ -140,7 +135,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.05f >= 0.05f) State.FreeCamSpeed -= 0.05f;
         }
     }
-    if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_SMAU)) State.DisableSMAU = !State.DisableSMAU;
+    if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) State.PanicMode = !State.PanicMode;
 
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
@@ -332,19 +327,14 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    if (!State.DisableSMAU && State.ShowMenu)
+    if (!State.PanicMode && State.ShowMenu)
     {
         ImGuiRenderer::Submit([]() { Menu::Render(); });
     }
 
-    if (!State.DisableSMAU && State.ShowConsole)
+    if (!State.PanicMode && State.ShowConsole)
     {
         ImGuiRenderer::Submit([]() { ConsoleGui::Render(); });
-    }
-
-    if (CanDrawChat())
-    {
-        ImGuiRenderer::Submit([]() { ChatGui::Render(); });
     }
 
     if (CanDrawEsp())

@@ -34,6 +34,7 @@ DO_APP_FUNC(Camera*, Camera_get_main, (MethodInfo* method), "UnityEngine.CoreMod
 DO_APP_FUNC(void, Camera_set_orthographicSize, (Camera* __this, float value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Camera::set_orthographicSize(System.Single)");
 DO_APP_FUNC(float, Camera_get_orthographicSize, (Camera* __this, MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Camera::get_orthographicSize()");
 DO_APP_FUNC(Color, SpriteRenderer_get_color, (SpriteRenderer* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Color UnityEngine.SpriteRenderer::get_color()");
+DO_APP_FUNC(float, Time_get_deltaTime, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_deltaTime()");
 DO_APP_FUNC(float, Time_get_fixedDeltaTime, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_fixedDeltaTime()");
 DO_APP_FUNC(float, Time_get_realtimeSinceStartup, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_realtimeSinceStartup()");
 DO_APP_FUNC(float, Time_get_time, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_time()");
@@ -172,6 +173,12 @@ DO_APP_FUNC(void, MessageExtensions_WriteNetObject, (MessageWriter* self, InnerN
 
 //DO_APP_FUNC(bool, Constants_1_ShouldFlipSkeld, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldFlipSkeld()");
 //this causes issues with dleks
+DO_APP_FUNC(bool, Constants_1_ShouldHorseAround, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldHorseAround()");
+DO_APP_FUNC(Platforms__Enum, Constants_1_GetPlatformType, (MethodInfo* method), "Assembly-CSharp, Platforms Constants::GetPlatformType()");
+DO_APP_FUNC(int32_t, Constants_1_GetBroadcastVersion, (MethodInfo* method), "Assembly-CSharp, System.Int32 Constants::GetBroadcastVersion()");
+DO_APP_FUNC(bool, Constants_1_IsVersionModded, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::IsVersionModded()");
+//DO_APP_FUNC(PlatformSpecificData*, Constants_1_GetPlatformData, (MethodInfo * method), "");
+DO_APP_FUNC(void, PlatformSpecificData_Serialize, (PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method), "Assembly-CSharp, System.Void PlatformSpecificData::Serialize(Hazel.MessageWriter)");
 
 DO_APP_FUNC(void, LobbyBehaviour_Start, (LobbyBehaviour* __this, MethodInfo* method), "Assembly-CSharp, System.Void LobbyBehaviour::Start()");
 
@@ -196,6 +203,7 @@ DO_APP_FUNC(void, MessageWriter_WriteString, (MessageWriter* __this, String* val
 DO_APP_FUNC(void, MessageWriter_WriteBytesAndSize, (MessageWriter* __this, Byte__Array* bytes, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Byte[])");
 DO_APP_FUNC(void, MessageWriter_WriteByteArray, (MessageWriter* __this, Byte__Array* bytes, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Byte[])");
 DO_APP_FUNC(void, MessageWriter_EndMessage, (MessageWriter* __this, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::EndMessage()");
+DO_APP_FUNC(void, NetHelpers_WriteVector2, (Vector2 vec, MessageWriter* writer, MethodInfo* method), "Assembly-CSharp, System.Void NetHelpers::WriteVector2(UnityEngine.Vector2, Hazel.MessageWriter)");
 
 DO_APP_FUNC(void, AccountTab_Open, (AccountTab* __this, MethodInfo* method), "Assembly-CSharp, System.Void AccountTab::Open()");
 DO_APP_FUNC(void, FullAccount_CanSetCustomName, (FullAccount* __this, bool canSetName, MethodInfo* method), "Assembly-CSharp, System.Void FullAccount::CanSetCustomName(System.Boolean)");
@@ -293,8 +301,13 @@ DO_APP_FUNC(void, EOSManager_set_FriendCode, (EOSManager* __this, String* value,
 DO_APP_FUNC(float, LogicOptions_GetKillDistance, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, System.Single LogicOptions::GetKillDistance()");
 //DO_APP_FUNC(TaskBarMode__Enum, LogicOptions_GetTaskBarMode, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, TaskbarMode LogicOptions::GetTaskBarMode()");
 DO_APP_FUNC(void, KillButton_SetTarget, (KillButton* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::SetTarget(PlayerControl)");
-//DO_APP_FUNC(void*, AmongUsClient_CoStartGameHost, (AmongUsClient* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoStartGameHost()");
+DO_APP_FUNC(PlayerControl*, ImpostorRole_FindClosestTarget, (ImpostorRole* __this, MethodInfo* method), "Assembly-CSharp, PlayerControl ImpostorRole::FindClosestTarget()");
+DO_APP_FUNC(void*, AmongUsClient_CoStartGameHost, (AmongUsClient* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoStartGameHost()");
+//DO_APP_FUNC(AsyncOperationHandle_1_UnityEngine_GameObject_, AssetReference_InstantiateAsync_1, (AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle UnityEngine.AddressableAssets.AssetReference::InstantiateAsync(UnityEngine.Transform, System.Boolean)");
 DO_APP_FUNC(float, Console_1_CanUse, (Console_1* __this, GameData_PlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method), "Assembly-CSharp, System.Single Console::CanUse(GameData.PlayerInfo, System.Boolean&, System.Boolean&)");
 DO_APP_FUNC(void, Ladder_SetDestinationCooldown, (Ladder* __this, MethodInfo* method), "Assembly-CSharp, System.Void Ladder::SetDestinationCooldown()");
 DO_APP_FUNC(void, ZiplineConsole_SetDestinationCooldown, (ZiplineConsole* __this, MethodInfo* method), "Assembly-CSharp, System.Void ZiplineConsole::SetDestinationCooldown()");
 DO_APP_FUNC(void, MushroomWallDoor_SetDoorway, (MushroomWallDoor* __this, bool open, MethodInfo* method), "Assembly-CSharp, System.Void MushroomWallDoor::SetDoorway(System.Boolean)");
+//DO_APP_FUNC(void, ActivityManager_UpdateActivity, (ActivityManager* __this, Activity_1 activity, void* callback, MethodInfo* method), "Assembly-CSharp, System.Void Discord.ActivityManager::UpdateActivity(Discord.Activity, Discord.ActivityManager.UpdateActivityHandler)");
+DO_APP_FUNC(bool, LogicGameFlowNormal_IsGameOverDueToDeath, (LogicGameFlowNormal* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean LogicGameFlowNormal::IsGameOverDueToDeath()");
+DO_APP_FUNC(bool, LogicGameFlowHnS_IsGameOverDueToDeath, (LogicGameFlowHnS* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean LogicGameFlowHnS::IsGameOverDueToDeath()");

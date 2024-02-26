@@ -7,12 +7,14 @@
 #include "profiler.h"
 #include <random>
 #include <regex>
+#include <shellapi.h> //open links
 
 using namespace std::string_view_literals;
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
 int randi(int lo, int hi) {
+	srand(unsigned int(time(NULL) + (static_cast<long long>(rand()) * 1000)));
 	int n = hi - lo + 1;
 	int i = rand() % n;
 	if (i < 0) i = -i;
@@ -122,7 +124,7 @@ int GenerateRandomNumber(int min, int max)
 Vector2 GetTrueAdjustedPosition(PlayerControl* playerControl)
 {
 	Vector2 playerVector2 = PlayerControl_GetTruePosition(playerControl, NULL);
-	playerVector2.y += 0.36f;
+	playerVector2.y += 0.3636f; //correct accuracy to 4 places
 	return playerVector2;
 }
 
@@ -250,6 +252,10 @@ bool IsHost() {
 	return app::InnerNetClient_get_AmHost((InnerNetClient*)(*Game::pAmongUsClient), NULL);
 }
 
+bool IsModdedHost() {
+	return IsHost() && (IsInGame() || State.SpoofModdedHost);
+}
+
 bool IsInGame() {
 	if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
 	if (!app::GameManager_get_Instance(nullptr)) return false;
@@ -299,7 +305,18 @@ std::string RemoveHtmlTags(std::string html_str) {
 
 bool IsNameValid(std::string str) {
 	if (str == "") return false;
-	if (str.length() > 12) return false;
+	std::vector<std::string> properChars = {}; //check properly for length
+	String* blank = convert_to_string("");
+	std::string last_char = "";
+	for (size_t i = 0; i < str.length(); i++) {
+		if (convert_to_string(last_char + str[i]) == blank) {
+			last_char += str[i];
+			continue;
+		}
+		properChars.push_back(last_char + str[i]);
+		last_char = "";
+	}
+	if (properChars.size() > 12) return false;
 	if (str.find("<") != std::string::npos || str.find(">") != std::string::npos || str.find("=") != std::string::npos) return false;
 	return true;
 }
@@ -362,6 +379,27 @@ std::string GenerateRandomString(bool completelyRandom) {
 		st[0] = std::toupper(st[0]);
 		return st;
 	}
+}
+
+int GetFps() {
+	return int(round(1.f / Time_get_deltaTime(NULL)));
+}
+
+void OpenLink(const char* path)
+{
+#ifdef _WIN32
+	// Note: executable path must use backslashes!
+	ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT);
+#else
+#if __APPLE__
+	const char* open_executable = "open";
+#else
+	const char* open_executable = "xdg-open";
+#endif
+	char command[256];
+	snprintf(command, 256, "%s \"%s\"", open_executable, path);
+	system(command);
+#endif
 }
 
 PlainDoor* GetPlainDoorByRoom(SystemTypes__Enum room) {
@@ -440,11 +478,29 @@ Object_1* GetSabotageTask(PlayerControl* player) {
 }
 
 void RepairSabotage(PlayerControl* player) {
+	if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle)
+		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 16));
+	else if (State.mapType == Settings::MapType::Pb)
+		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 16));
+	else if (State.mapType == Settings::MapType::Airship) {
+		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 16));
+		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 17));
+	}
+
+	if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq)
+		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 16));
+
+	State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 16));
+	if (State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle) State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 17));
+	/*else if ("MushroomMixupSabotageTask"sv == sabotageTask->klass->_0.name) {
+		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 0));
+	}*/ //mushroom mixup cannot be repaired
+
 	static std::string electricTaskType = translate_type_name("ElectricTask");
-	static std::string hqHudOverrideTaskType = translate_type_name("HqHudOverrideTask");
+	/*static std::string hqHudOverrideTaskType = translate_type_name("HqHudOverrideTask");
 	static std::string hudOverrideTaskType = translate_type_name("HudOverrideTask");
 	static std::string noOxyTaskType = translate_type_name("NoOxyTask");
-	static std::string reactorTaskType = translate_type_name("ReactorTask");
+	static std::string reactorTaskType = translate_type_name("ReactorTask");*/
 
 	auto sabotageTask = GetSabotageTask(player);
 	if (sabotageTask == NULL) return;
@@ -464,35 +520,6 @@ void RepairSabotage(PlayerControl* player) {
 					State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
 			}
 		}
-	}
-	else if (hqHudOverrideTaskType == sabotageTask->klass->_0.name) {
-		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 16));
-		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 17));
-	}
-	else if (hudOverrideTaskType == sabotageTask->klass->_0.name) {
-		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 0));
-	}
-	else if (noOxyTaskType == sabotageTask->klass->_0.name) {
-		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 64));
-		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 65));
-	}
-	else if (reactorTaskType == sabotageTask->klass->_0.name) {
-		if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq) {
-			State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 64));
-			State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 65));
-		}
-
-		if (State.mapType == Settings::MapType::Pb) {
-			State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 64));
-			State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 65));
-		}
-		if (State.mapType == Settings::MapType::Airship) {
-			State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 16));
-			State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 17));
-		}
-	}
-	else if ("MushroomMixupSabotageTask"sv == sabotageTask->klass->_0.name) {
-		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 0));
 	}
 	else {
 		STREAM_ERROR("Unknown Task:" << sabotageTask->klass->_0.name);
@@ -748,6 +775,7 @@ void ImpersonateOutfit(GameData_PlayerOutfit* outfit)
 	if (!(IsInGame() || IsInLobby() || outfit)) return;
 	
 	if (IsInGame()) {
+		State.rpcQueue.push(new RpcSetColor((IsHost() || !State.SafeMode) ? outfit->fields.ColorId : GetRandomColorId(), (IsHost() || !State.SafeMode)));
 		State.rpcQueue.push(new RpcSetHat(outfit->fields.HatId));
 		State.rpcQueue.push(new RpcSetVisor(outfit->fields.VisorId));
 		State.rpcQueue.push(new RpcSetSkin(outfit->fields.SkinId));
@@ -755,6 +783,7 @@ void ImpersonateOutfit(GameData_PlayerOutfit* outfit)
 		State.rpcQueue.push(new RpcSetNamePlate(outfit->fields.NamePlateId));
 	}
 	else if (IsInLobby()) {
+		State.lobbyRpcQueue.push(new RpcSetColor((IsHost() || !State.SafeMode) ? outfit->fields.ColorId : GetRandomColorId(), (IsHost() || !State.SafeMode)));
 		State.lobbyRpcQueue.push(new RpcSetHat(outfit->fields.HatId));
 		State.lobbyRpcQueue.push(new RpcSetVisor(outfit->fields.VisorId));
 		State.lobbyRpcQueue.push(new RpcSetSkin(outfit->fields.SkinId));
@@ -801,57 +830,75 @@ Game::ColorId GetRandomColorId()
 	return colorId;
 }
 
-std::string GetGradientUsername(std::string str) {
-	std::vector<int> color1 = { int(State.NameColor1.x * 255), int(State.NameColor1.y * 255), int(State.NameColor1.z * 255), int(State.NameColor1.w * 255) };
-	std::vector<int> color2 = { int(State.NameColor2.x * 255), int(State.NameColor2.y * 255), int(State.NameColor2.z * 255), int(State.NameColor2.w * 255) };
-	if (color1 == color2) //if user doesn't want gradients, don't cause extra lag
-		return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>", color1[0], color1[1], color1[2], color1[3], str);
-	int nameLength = int(str.length());
+std::string GetGradientUsername(std::string str, bool useState, bool underline, bool strike, ImVec4 color1, ImVec4 color2) {
+	if (useState) {
+		underline = State.UnderlineName;
+		strike = State.StrikethroughName;
+		color1 = State.NameColor1;
+		color2 = State.NameColor2;
+	}
+	std::vector<int> hex1 = { int(color1.x * 255), int(color1.y * 255), int(color1.z * 255), int(color1.w * 255) };
+	std::vector<int> hex2 = { int(color2.x * 255), int(color2.y * 255), int(color2.z * 255), int(color2.w * 255) };
+
+	//names look ugly af with white strikethrough
+	std::string opener = "";
+	if (underline) opener += "<u>";
+	if (strike) opener += "<s>";
+
+	std::string closer = "";
+	if (underline) closer += "</s>";
+	if (strike) closer += "</u>";
+
+	if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
+		return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
+
+	std::vector<std::string> properChars = {};
+	String* blank = convert_to_string("");
+	std::string last_char = "";
+	for (size_t i = 0; i < str.length(); i++) {
+		if (convert_to_string(last_char + str[i]) == blank) {
+			last_char += str[i];
+			continue;
+		}
+		properChars.push_back(last_char + str[i]);
+		last_char = "";
+	}
+	int nameLength = int(properChars.size());
 	if (nameLength > 1) { //fix division by zero
-		float stepR = float((color2[0] - color1[0]) / (nameLength - 1));
-		float stepG = float((color2[1] - color1[1]) / (nameLength - 1));
-		float stepB = float((color2[2] - color1[2]) / (nameLength - 1));
-		float stepA = float((color2[3] - color1[3]) / (nameLength - 1));
+		float stepR = float((hex2[0] - hex1[0]) / (nameLength - 1));
+		float stepG = float((hex2[1] - hex1[1]) / (nameLength - 1));
+		float stepB = float((hex2[2] - hex1[2]) / (nameLength - 1));
+		float stepA = float((hex2[3] - hex1[3]) / (nameLength - 1));
 		std::string gradientText = "";
 		for (int i = 0; i < nameLength; i++)
 		{
-			int r = int(color1[0] + std::round(stepR * i));
-			int g = int(color1[1] + std::round(stepG * i));
-			int b = int(color1[2] + std::round(stepB * i));
-			int a = int(color1[3] + std::round(stepA * i));
-			//names look ugly af with white strikethrough
-			std::string opener = "";
-			if (State.UnderlineName) opener += "<u>";
-			if (State.StrikethroughName) opener += "<s>";
-
-			std::string closer = "";
-			if (State.StrikethroughName) closer += "</s>";
-			if (State.UnderlineName) closer += "</u>";
+			int r = int(hex1[0] + std::round(stepR * i));
+			int g = int(hex1[1] + std::round(stepG * i));
+			int b = int(hex1[2] + std::round(stepB * i));
+			int a = int(hex1[3] + std::round(stepA * i));
 
 			std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", r, g, b, a);
-			gradientText += colorCode + opener + str[i] + closer + "</color>";
+			gradientText += colorCode + opener + properChars[i] + closer + "</color>";
 		}
 
 		return gradientText;
 	}
 	else {
-		int r = int((color1[0] + color2[0]) / 2);
-		int g = int((color1[1] + color2[1]) / 2);
-		int b = int((color1[2] + color2[2]) / 2);
-		int a = int((color1[3] + color2[3]) / 2);
+		int r = int((hex1[0] + hex2[0]) / 2);
+		int g = int((hex1[1] + hex2[1]) / 2);
+		int b = int((hex1[2] + hex2[2]) / 2);
+		int a = int((hex1[3] + hex2[3]) / 2);
 		std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", r, g, b, a);
-
-		std::string opener = "";
-		if (State.UnderlineName) opener += "<u>";
-		if (State.StrikethroughName) opener += "<s>";
-
-		std::string closer = "";
-		if (State.StrikethroughName) closer += "</s>";
-		if (State.UnderlineName) closer += "</u>";
 
 		std::string gradientText = colorCode + opener + str + closer + "</color>";
 		return gradientText;
 	}
+}
+
+void RefreshChat() {
+	if (!Game::HudManager.IsInstanceExists()) return;
+	ChatController_SetVisible(Game::HudManager.GetInstance()->fields.Chat, false, NULL);
+	ChatController_SetVisible(Game::HudManager.GetInstance()->fields.Chat, (State.ChatAlwaysActive || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
 }
 
 void SaveOriginalAppearance()
@@ -873,12 +920,48 @@ void ResetOriginalAppearance()
 {
 	try {
 		LOG_DEBUG("Reset appearance values to invalid");
-		State.originalSkin = nullptr;
-		State.originalHat = nullptr;
-		State.originalPet = nullptr;
-		State.originalColor = Game::NoColorId;
-		State.originalVisor = nullptr;
-		State.originalNamePlate = nullptr;
+		auto player = app::DataManager_get_Player(nullptr);
+		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "customization");
+		LOG_ASSERT(field != nullptr);
+		auto customization = il2cpp_field_get_value_object(field, player);
+		LOG_ASSERT(customization != nullptr);
+
+		/*static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "colorID");
+		auto colorId = il2cpp_field_get_value_object(field2, customization);
+		LOG_ASSERT(colorId != nullptr);
+		uint8_t originalColor = (uint8_t(colorId) / 16);*/
+
+		static FieldInfo* field3 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "hat");
+		auto hat = il2cpp_field_get_value_object(field3, customization);
+		LOG_ASSERT(hat != nullptr);
+		auto originalHat = reinterpret_cast<String*>(hat);
+
+		static FieldInfo* field4 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "visor");
+		auto visor = il2cpp_field_get_value_object(field4, customization);
+		LOG_ASSERT(visor != nullptr);
+		auto originalVisor = reinterpret_cast<String*>(visor);
+
+		static FieldInfo* field5 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "skin");
+		auto skin = il2cpp_field_get_value_object(field5, customization);
+		LOG_ASSERT(skin != nullptr);
+		auto originalSkin = reinterpret_cast<String*>(skin);
+
+		static FieldInfo* field6 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "pet");
+		auto pet = il2cpp_field_get_value_object(field6, customization);
+		LOG_ASSERT(pet != nullptr);
+		auto originalPet = reinterpret_cast<String*>(pet);
+
+		static FieldInfo* field7 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "namePlate");
+		auto namePlate = il2cpp_field_get_value_object(field7, customization);
+		LOG_ASSERT(namePlate != nullptr);
+		auto originalNamePlate = reinterpret_cast<String*>(namePlate);
+
+		State.originalSkin = originalSkin;
+		State.originalHat = originalHat;
+		State.originalPet = originalPet;
+		State.originalColor = State.SelectedColorId;
+		State.originalVisor = originalVisor;
+		State.originalNamePlate = originalNamePlate;
 	}
 	catch (...) {
 		LOG_DEBUG("Failed to reset appearance due to exception");
@@ -937,8 +1020,9 @@ void ControlAppearance(bool randomize)
 			}
 		}
 		else if (IsInGame() || IsInLobby()) {
+			ResetOriginalAppearance();
 			if (IsHost() || !State.SafeMode)
-				queue->push(new RpcForceColor(*Game::pLocalPlayer, State.originalColor, true));
+				queue->push(new RpcForceColor(*Game::pLocalPlayer, State.originalColor));
 			else
 				queue->push(new RpcSetColor(State.originalColor));
 			queue->push(new RpcSetPet(State.originalPet));
@@ -946,7 +1030,7 @@ void ControlAppearance(bool randomize)
 			queue->push(new RpcSetHat(State.originalHat));
 			queue->push(new RpcSetVisor(State.originalVisor));
 			queue->push(new RpcSetNamePlate(State.originalNamePlate));
-			queue->push(new RpcSetName(State.originalName));
+			queue->push(new RpcSetName(GetPlayerName()));
 		}
 	}
 	catch (...) {

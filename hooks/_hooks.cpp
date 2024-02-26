@@ -177,17 +177,23 @@ void DetourInitilization() {
 	HOOKFUNC(EOSManager_get_ProductUserId);
 	HOOKFUNC(GameOptionsManager_set_CurrentGameOptions);
 	HOOKFUNC(ExileController_ReEnableGameplay);
-	//HOOKFUNC(SabotageSystemType_ForceSabTime);
+	//HOOKFUNC(ActivityManager_UpdateActivity);
 	HOOKFUNC(PingTracker_Update);
 	HOOKFUNC(KillOverlay_ShowKillAnimation_1);
-	HOOKFUNC(KillButton_SetTarget);
+	HOOKFUNC(ImpostorRole_FindClosestTarget);
 	HOOKFUNC(MushroomDoorSabotageMinigame_Begin);
 	//HOOKFUNC(AmongUsClient_CoStartGameHost);
 	HOOKFUNC(Console_1_CanUse);
 	HOOKFUNC(Ladder_SetDestinationCooldown);
 	HOOKFUNC(ZiplineConsole_SetDestinationCooldown);
 	HOOKFUNC(MushroomWallDoor_SetDoorway);
-	HOOKFUNC(VoteBanSystem_AddVote)
+	HOOKFUNC(VoteBanSystem_AddVote);
+	//HOOKFUNC(PlatformSpecificData_Serialize);
+	//HOOKFUNC(Constants_1_GetBroadcastVersion);
+	//HOOKFUNC(Constants_1_IsVersionModded);
+	HOOKFUNC(PlatformSpecificData_Serialize);
+	HOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
+	HOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -289,17 +295,23 @@ void DetourUninitialization()
 	UNHOOKFUNC(EOSManager_get_ProductUserId);
 	UNHOOKFUNC(GameOptionsManager_set_CurrentGameOptions);
 	UNHOOKFUNC(ExileController_ReEnableGameplay);
-	//UNHOOKFUNC(SabotageSystemType_ForceSabTime);
+	//UNHOOKFUNC(ActivityManager_UpdateActivity);
 	UNHOOKFUNC(PingTracker_Update);
 	UNHOOKFUNC(KillOverlay_ShowKillAnimation_1);
-	UNHOOKFUNC(KillButton_SetTarget);
+	UNHOOKFUNC(ImpostorRole_FindClosestTarget);
 	UNHOOKFUNC(MushroomDoorSabotageMinigame_Begin);
 	//UNHOOKFUNC(AmongUsClient_CoStartGameHost);
 	UNHOOKFUNC(Console_1_CanUse);
 	UNHOOKFUNC(Ladder_SetDestinationCooldown);
 	UNHOOKFUNC(ZiplineConsole_SetDestinationCooldown);
 	UNHOOKFUNC(MushroomWallDoor_SetDoorway);
-	UNHOOKFUNC(VoteBanSystem_AddVote)
+	UNHOOKFUNC(VoteBanSystem_AddVote);
+	//UNHOOKFUNC(PlatformSpecificData_Serialize);
+	//UNHOOKFUNC(Constants_1_GetBroadcastVersion);
+	//UNHOOKFUNC(Constants_1_IsVersionModded);
+	UNHOOKFUNC(PlatformSpecificData_Serialize);
+	UNHOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
+	UNHOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

@@ -3,33 +3,34 @@
 #include "game.h"
 #include "state.hpp"
 #include "utility.h"
+#include "gui-helpers.hpp"
 
 namespace EspTab {
 
 	void Render() {
 		bool changed = false;
-		if (ImGui::BeginTabItem("ESP")) {
+		ImGui::SameLine(100 * State.dpiScale);
+		ImGui::BeginChild("###ESP", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+		changed |= ToggleButton("Enable", &State.ShowEsp);
 
-			changed |= ImGui::Checkbox("Enable", &State.ShowEsp);
+		changed |= ToggleButton("Show Ghosts", &State.ShowEsp_Ghosts);
+		//dead bodies for v3.1
+		changed |= ToggleButton("Hide During Meetings", &State.HideEsp_During_Meetings);
 
-			changed |= ImGui::Checkbox("Show Ghosts", &State.ShowEsp_Ghosts);
-			changed |= ImGui::Checkbox("Hide During Meetings", &State.HideEsp_During_Meetings);
+		changed |= ToggleButton("Show Boxes", &State.ShowEsp_Box);
+		changed |= ToggleButton("Show Tracers", &State.ShowEsp_Tracers);
+		changed |= ToggleButton("Show Distances", &State.ShowEsp_Distance);
+		//better esp (from noobuild) coming v3.1
+		changed |= ToggleButton("Role-based", &State.ShowEsp_RoleBased);
 
-			changed |= ImGui::Checkbox("Show Box", &State.ShowEsp_Box);
-			changed |= ImGui::Checkbox("Show Tracers", &State.ShowEsp_Tracers);
-			changed |= ImGui::Checkbox("Show Distance", &State.ShowEsp_Distance);
-
-			changed |= ImGui::Checkbox("Role-based", &State.ShowEsp_RoleBased);
-
-			if (State.ShowEsp_RoleBased) {
-				ImGui::SameLine();
-				changed |= ImGui::Checkbox("Crewmates", &State.ShowEsp_Crew);
-				ImGui::SameLine();
-				changed |= ImGui::Checkbox("Impostors", &State.ShowEsp_Imp);
-			}
-
-			ImGui::EndTabItem();
+		if (State.ShowEsp_RoleBased) {
+			ImGui::SameLine();
+			changed |= ToggleButton("Crewmates", &State.ShowEsp_Crew);
+			ImGui::SameLine();
+			changed |= ToggleButton("Impostors", &State.ShowEsp_Imp);
 		}
+
+		ImGui::EndChild();
 		if (changed) {
 			State.Save();
 		}

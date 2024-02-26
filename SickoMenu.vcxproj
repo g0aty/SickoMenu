@@ -30,7 +30,6 @@
     <ClCompile Include="events\TaskCompletedEvent.cpp" />
     <ClCompile Include="events\VentEvent.cpp" />
     <ClCompile Include="events\WalkEvent.cpp" />
-	<ClCompile Include="gui\gamechat.cpp" />
     <ClCompile Include="gui\console.cpp" />
     <ClCompile Include="gui\esp.cpp" />
     <ClCompile Include="gui\gui-helpers.cpp" />
@@ -47,6 +46,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Version|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="gui\replay.cpp" />
+    <ClCompile Include="gui\tabs\about_tab.cpp" />
     <ClCompile Include="gui\tabs\debug_tab.cpp" />
     <ClCompile Include="gui\tabs\doors_tab.cpp" />
     <ClCompile Include="gui\tabs\esp_tab.cpp" />
@@ -81,7 +81,6 @@
     <ClCompile Include="hooks\UnityDebug.cpp" />
     <ClCompile Include="rpc\CmdCheckMurder.cpp" />
     <ClCompile Include="rpc\CustomRpcHandler.cpp" />
-	<ClCompile Include="rpc\RpcChatMessage.cpp" />
     <ClCompile Include="rpc\RpcPlayerAppearance.cpp" />
     <ClCompile Include="rpc\RpcSetRole.cpp" />
     <ClCompile Include="rpc\RpcUsePlatform.cpp" />
@@ -208,7 +207,7 @@
     <ClCompile Include="rpc\RpcMurderPlayer.cpp" />
     <ClCompile Include="rpc\RpcPlayAnimation.cpp" />
     <ClCompile Include="rpc\RpcUpdateSystem.cpp" />
-    <ClCompile Include="rpc\RpcReportPlayer.cpp" />
+    <ClCompile Include="rpc\RpcReportBody.cpp" />
     <ClCompile Include="rpc\RpcSetScanner.cpp" />
     <ClCompile Include="rpc\RpcSnapTo.cpp" />
     <ClCompile Include="gui\tabs\self_tab.cpp" />
@@ -333,13 +332,13 @@
     <ClInclude Include="appdata\il2cpp-functions.h" />
     <ClInclude Include="appdata\il2cpp-translations.h" />
     <ClInclude Include="events\_events.h" />
-	<ClInclude Include="gui\gamechat.hpp" />
     <ClInclude Include="gui\console.hpp" />
     <ClInclude Include="gui\esp.hpp" />
     <ClInclude Include="gui\gui-helpers.hpp" />
     <ClInclude Include="gui\RenderCmd.hpp" />
     <ClInclude Include="gui\Renderer.hpp" />
     <ClInclude Include="gui\replay.hpp" />
+    <ClInclude Include="gui\tabs\about_tab.h" />
     <ClInclude Include="gui\tabs\debug_tab.h" />
     <ClInclude Include="gui\tabs\doors_tab.h" />
     <ClInclude Include="gui\tabs\esp_tab.h" />
@@ -422,7 +421,7 @@
     <!--<VCProjectVersion>16.0</VCProjectVersion>-->
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{AA556AC8-55E7-46C4-B59E-A7A781A4710A}</ProjectGuid>
-    <RootNamespace>SickoModeAU</RootNamespace>
+    <RootNamespace>SickoMenu</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <!--<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>-->
   </PropertyGroup>

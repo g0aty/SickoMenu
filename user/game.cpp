@@ -10,6 +10,8 @@ namespace Game {
 	ShipStatus** pShipStatus = nullptr;
 	LobbyBehaviour** pLobbyBehaviour = nullptr;
 	DestroyableSingleton<app::RoleManager*> RoleManager { "Assembly-CSharp, RoleManager" };
+	DestroyableSingleton<app::HudManager*> HudManager { "Assembly-CSharp, HudManager" };
+	DestroyableSingleton<app::AccountManager*> AccountManager { "Assembly-CSharp, AccountManager" };
 
 	//STEAMUSERSTATS_SETACHIEVEMENT* SteamUserStats_SetAchievement = nullptr;
 	//STEAMUSERSTATS_STORESTATS* SteamUserStats_StoreStats = nullptr;

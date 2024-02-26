@@ -20,8 +20,7 @@ RpcForcePet::RpcForcePet(PlayerControl* Player, String* petId)
 
 void RpcForcePet::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (!PlayerSelection(Player).has_value()) return;
 	
 	PlayerControl_RpcSetPet(Player, this->PetId, NULL);
 }
@@ -44,8 +43,7 @@ RpcForceSkin::RpcForceSkin(PlayerControl* Player, String* skinId)
 
 void RpcForceSkin::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (!PlayerSelection(Player).has_value()) return;
 
 	PlayerControl_RpcSetSkin(Player, this->SkinId, NULL);
 }
@@ -68,8 +66,7 @@ RpcForceHat::RpcForceHat(PlayerControl* Player, String* hatId)
 
 void RpcForceHat::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (!PlayerSelection(Player).has_value()) return;
 
 	PlayerControl_RpcSetHat(Player, this->HatId, NULL);
 }
@@ -92,8 +89,7 @@ RpcForceVisor::RpcForceVisor(PlayerControl* Player, String* visorId)
 
 void RpcForceVisor::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (!PlayerSelection(Player).has_value()) return;
 
 	PlayerControl_RpcSetVisor(Player, this->VisorId, NULL);
 }
@@ -116,8 +112,7 @@ RpcForceNamePlate::RpcForceNamePlate(PlayerControl* Player, String* namePlateId)
 
 void RpcForceNamePlate::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (!PlayerSelection(Player).has_value()) return;
 
 	PlayerControl_RpcSetNamePlate(Player, this->NamePlateId, NULL);
 }

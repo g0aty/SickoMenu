@@ -12,7 +12,7 @@ RpcUsePlatform::RpcUsePlatform()
 
 void RpcUsePlatform::Process()
 {
-	if (State.mapType == Settings::MapType::Airship && IsHost())
+	if (State.mapType == Settings::MapType::Airship/* && IsHost()*/)
 	{
 		auto shipStatus = (AirshipStatus*)*(Game::pShipStatus);
 		auto movingPlatform = shipStatus->fields.GapPlatform;

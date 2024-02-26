@@ -4,13 +4,13 @@
 #include <iostream>
 #include "utility.h"
 
-SMAULogger Log;
+SickoLogger Log;
 
-void SMAULogger::Create()
+void SickoLogger::Create()
 {
 	const auto path = getModulePath(NULL);
-	const auto logPath = path.parent_path() / "smau-log.txt";
-	const auto prevLogPath = path.parent_path() / "smau-prev-log.txt";
+	const auto logPath = path.parent_path() / "sicko-log.txt";
+	const auto prevLogPath = path.parent_path() / "sicko-prev-log.txt";
 
 	std::error_code errCode;
 	std::filesystem::remove(prevLogPath, errCode);
@@ -20,7 +20,7 @@ void SMAULogger::Create()
 	this->filePath = logPath;
 }
 
-void SMAULogger::Write(std::string_view verbosity, std::string_view source, std::string_view message)
+void SickoLogger::Write(std::string_view verbosity, std::string_view source, std::string_view message)
 {
 	std::stringstream ss;
 	// FIXME: std::chrono::current_zone requires Windows 10 version 1903/19H1 or later.
@@ -34,32 +34,32 @@ void SMAULogger::Write(std::string_view verbosity, std::string_view source, std:
 	file.close();
 }
 
-void SMAULogger::Debug(std::string_view source, std::string_view message)
+void SickoLogger::Debug(std::string_view source, std::string_view message)
 {
 	Write("DEBUG", source, message);
 }
 
-void SMAULogger::Error(std::string_view source, std::string_view message)
+void SickoLogger::Error(std::string_view source, std::string_view message)
 {
 	Write("ERROR", source, message);
 }
 
-void SMAULogger::Info(std::string_view source, std::string_view message)
+void SickoLogger::Info(std::string_view source, std::string_view message)
 {
 	Write("INFO", source, message);
 }
 
-void SMAULogger::Debug(std::string_view message)
+void SickoLogger::Debug(std::string_view message)
 {
-	Debug("SMAU", message);
+	Debug("SICKO", message);
 }
 
-void SMAULogger::Error(std::string_view message)
+void SickoLogger::Error(std::string_view message)
 {
-	Error("SMAU", message);
+	Error("SICKO", message);
 }
 
-void SMAULogger::Info(std::string_view message)
+void SickoLogger::Info(std::string_view message)
 {
-	Info("SMAU", message);
+	Info("SICKO", message);
 }

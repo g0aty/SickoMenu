@@ -11,6 +11,7 @@ namespace KeyBinds {
         uint8_t Toggle_Console;
         uint8_t Repair_Sabotage;
         uint8_t Toggle_Noclip;
+        uint8_t Toggle_Autokill;
         uint8_t Close_All_Doors;
         uint8_t Toggle_Zoom;
         uint8_t Toggle_Freecam;
@@ -18,11 +19,9 @@ namespace KeyBinds {
         uint8_t Toggle_Replay;
         uint8_t Toggle_Hud;
         uint8_t Reset_Appearance;
-        uint8_t Save_Appearance;
         uint8_t Randomize_Appearance;
         uint8_t Complete_Tasks;
-        uint8_t Toggle_Chat;
-        uint8_t Toggle_SMAU;
+        uint8_t Toggle_Sicko;
     };
 
     void WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);

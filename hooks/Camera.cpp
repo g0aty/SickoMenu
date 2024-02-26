@@ -7,7 +7,7 @@
 Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo* method)
 {
 	try {
-		if (!State.DisableSMAU && State.EnableZoom)
+		if (!State.PanicMode && State.EnableZoom)
 		{	//Figured it is better to restore the current camera height than using state
 			float orthographicSize = Camera_get_orthographicSize(__this, NULL);
 			Camera_set_orthographicSize(__this, 3.0f, NULL);
@@ -25,7 +25,7 @@ Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo*
 
 void dFollowerCamera_Update(FollowerCamera* __this, MethodInfo* method) {
 	try {
-		if (!State.DisableSMAU) {
+		if (!State.PanicMode) {
 			if (auto playerToFollow = State.playerToFollow.validate(); playerToFollow.has_value())
 			{
 				__this->fields.Target = (MonoBehaviour*)playerToFollow.get_PlayerControl();

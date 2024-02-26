@@ -194,6 +194,7 @@ void KeyBinds::to_json(nlohmann::ordered_json& j, KeyBinds::Config value)
         {"Toggle_Console", value.Toggle_Console},
         {"Repair_Sabotage", value.Repair_Sabotage},
         {"Toggle_Noclip", value.Toggle_Noclip},
+        {"Toggle_Autokill", value.Toggle_Autokill},
         {"Close_All_Doors", value.Close_All_Doors},
         {"Toggle_Zoom", value.Toggle_Zoom},
         {"Toggle_Freecam", value.Toggle_Freecam},
@@ -201,11 +202,9 @@ void KeyBinds::to_json(nlohmann::ordered_json& j, KeyBinds::Config value)
         {"Toggle_Replay", value.Toggle_Replay},
         {"Toggle_Hud", value.Toggle_Hud},
         {"Reset_Appearance", value.Reset_Appearance},
-        {"Save_Appearance", value.Save_Appearance},
         {"Randomize_Appearance", value.Randomize_Appearance},
         {"Complete_Tasks", value.Complete_Tasks},
-        {"Toggle_Chat", value.Toggle_Chat},
-        {"Toggle_SMAU", value.Toggle_SMAU},
+        {"Toggle_Sicko", value.Toggle_Sicko},
     };
 }
 
@@ -216,6 +215,7 @@ void KeyBinds::from_json(const nlohmann::ordered_json& j, KeyBinds::Config& valu
     j.at("Toggle_Console").get_to(value.Toggle_Console);
     j.at("Repair_Sabotage").get_to(value.Repair_Sabotage);
     j.at("Toggle_Noclip").get_to(value.Toggle_Noclip);
+    j.at("Toggle_Autokill").get_to(value.Toggle_Autokill);
     j.at("Close_All_Doors").get_to(value.Close_All_Doors);
     j.at("Toggle_Zoom").get_to(value.Toggle_Zoom);
     j.at("Toggle_Freecam").get_to(value.Toggle_Freecam);
@@ -223,9 +223,7 @@ void KeyBinds::from_json(const nlohmann::ordered_json& j, KeyBinds::Config& valu
     j.at("Toggle_Replay").get_to(value.Toggle_Replay);
     j.at("Toggle_Hud").get_to(value.Toggle_Hud);
     j.at("Reset_Appearance").get_to(value.Reset_Appearance);
-    j.at("Save_Appearance").get_to(value.Save_Appearance);
     j.at("Randomize_Appearance").get_to(value.Randomize_Appearance);
     j.at("Complete_Tasks").get_to(value.Complete_Tasks);
-    j.at("Toggle_Chat").get_to(value.Toggle_Chat);
-    j.at("Toggle_SMAU").get_to(value.Toggle_SMAU);
+    j.at("Toggle_Sicko").get_to(value.Toggle_Sicko);
 }

@@ -225,7 +225,7 @@ bool SliderChrono(const char* label, void* p_data, const void* p_min, const void
 	if (!State.Replay_IsLive && !State.Replay_IsPlaying) {
 		const auto& playIcon = icons.at(ICON_TYPES::PLAY);
 		const auto& iconSize = ImVec2((float)playIcon.iconImage.imageWidth, (float)playIcon.iconImage.imageHeight) * playIcon.scale;
-		if (ImGui::ImageButton((ImTextureID)playIcon.iconImage.shaderResourceView, iconSize))
+		if (ImageButton((ImTextureID)playIcon.iconImage.shaderResourceView, iconSize))
 		{
 			State.Replay_IsPlaying = true;
 		}
@@ -234,13 +234,13 @@ bool SliderChrono(const char* label, void* p_data, const void* p_min, const void
 		// Live or Playing
 		const auto& pauseIcon = icons.at(ICON_TYPES::PAUSE);
 		const auto& iconSize = ImVec2((float)pauseIcon.iconImage.imageWidth, (float)pauseIcon.iconImage.imageHeight) * pauseIcon.scale;
-		if (ImGui::ImageButton((ImTextureID)pauseIcon.iconImage.shaderResourceView, iconSize))
+		if (ImageButton((ImTextureID)pauseIcon.iconImage.shaderResourceView, iconSize))
 		{
 			State.Replay_IsPlaying = State.Replay_IsLive = false;
 		}
 	}
 
-	ImGui::SameLine(0.0f * State.dpiScale, 1.0f * State.dpiScale);
+	SameLine(0.0f * State.dpiScale, 1.0f * State.dpiScale);
 
 	ImGuiContext& g = *GImGui;
 	const ImGuiStyle& style = g.Style;
@@ -314,13 +314,13 @@ bool SliderChrono(const char* label, void* p_data, const void* p_min, const void
 	if (label_size.x > 0.0f)
 		RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
 
-	ImGui::SameLine(0.0f * State.dpiScale, 10.0f * State.dpiScale);
+	SameLine(0.0f * State.dpiScale, 10.0f * State.dpiScale);
 
-	ImU32 liveColor = (State.Replay_IsLive) ? ImGui::ColorConvertFloat4ToU32(ImVec4(255.0f, 0.f, 0.f, 255.0f)) : ImGui::ColorConvertFloat4ToU32(ImVec4(128.f, 128.f, 128.f, 255.0f));
+	ImU32 liveColor = (State.Replay_IsLive) ? ColorConvertFloat4ToU32(ImVec4(255.0f, 0.f, 0.f, 255.0f)) : ColorConvertFloat4ToU32(ImVec4(128.f, 128.f, 128.f, 255.0f));
 	const ImVec2 circlePos(window->DC.CursorPos.x, window->DC.CursorPos.y + 9.5f * State.dpiScale);
 	window->DrawList->AddCircleFilled(circlePos, 5.0f * State.dpiScale, liveColor);
-	ImGui::SameLine(0.0f * State.dpiScale, 18.f * State.dpiScale);
-	ImGui::Text("Live");
+	SameLine(0.0f * State.dpiScale, 18.f * State.dpiScale);
+	Text("Live");
 
 
 	IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags);
@@ -396,8 +396,8 @@ void drawPlayerIcon(PlayerControl* player, const ImVec2& winPos, ImU32 color)
 		ImVec2(0.0f, 1.0f),
 		ImVec2(1.0f, 0.0f),
 		(State.RadarVisorRoleColor && State.RevealRoles) ? 
-		ImGui::GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerData(player)->fields.Role))) : 
-		ImGui::GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->VisorColor)));
+		GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerData(player)->fields.Role))) : 
+		GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->VisorColor)));
 
 	if (GetPlayerData(player)->fields.IsDead)
 		drawList->AddImage((void*)icons.at(ICON_TYPES::CROSS).iconImage.shaderResourceView, 
@@ -442,4 +442,111 @@ void drawDeadPlayerIcon(DeadBody* deadBody, const ImVec2& winPos, ImU32 color)
 		ImVec2(radX, radY) * State.dpiScale + winPos,
 		ImVec2(radXMax, radYMax) * State.dpiScale + winPos,
 		ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f), color);
+}
+
+struct InputTextCallback_UserData
+{
+	std::string* Str;
+	ImGuiInputTextCallback  ChainCallback;
+	void* ChainCallbackUserData;
+};
+
+static int InputTextCallback(ImGuiInputTextCallbackData* data)
+{
+	InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
+	if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+	{
+		// Resize string callback
+		// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to what we want.
+		std::string* str = user_data->Str;
+		IM_ASSERT(data->Buf == str->c_str());
+		str->resize(data->BufTextLen);
+		data->Buf = (char*)str->c_str();
+	}
+	else if (user_data->ChainCallback)
+	{
+		// Forward to user callback, if any
+		data->UserData = user_data->ChainCallbackUserData;
+		return user_data->ChainCallback(data);
+	}
+	return 0;
+}
+
+bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+{
+	IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+	flags |= ImGuiInputTextFlags_CallbackResize;
+
+	InputTextCallback_UserData cb_user_data;
+	cb_user_data.Str = str;
+	cb_user_data.ChainCallback = callback;
+	cb_user_data.ChainCallbackUserData = user_data;
+	return InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+}
+
+bool InputStringMultiline(const char* label, std::string* str, const ImVec2& size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+{
+	IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+	flags |= ImGuiInputTextFlags_CallbackResize;
+
+	InputTextCallback_UserData cb_user_data;
+	cb_user_data.Str = str;
+	cb_user_data.ChainCallback = callback;
+	cb_user_data.ChainCallbackUserData = user_data;
+	return InputTextMultiline(label, (char*)str->c_str(), str->capacity() + 1, size, flags, InputTextCallback, &cb_user_data);
+}
+
+bool InputStringWithHint(const char* label, const char* hint, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+{
+	IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+	flags |= ImGuiInputTextFlags_CallbackResize;
+
+	InputTextCallback_UserData cb_user_data;
+	cb_user_data.Str = str;
+	cb_user_data.ChainCallback = callback;
+	cb_user_data.ChainCallbackUserData = user_data;
+	return InputTextWithHint(label, hint, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+}
+
+bool ToggleButton(const char* str_id, bool* v)
+{
+	ImVec4* colors = GetStyle().Colors;
+	ImVec2 p = GetCursorScreenPos();
+	ImDrawList* draw_list = GetWindowDrawList();
+
+	float height = GetFrameHeight();
+	float width = height * 1.55f;
+	float radius = height * 0.50f;
+	InvisibleButton(str_id, ImVec2(width, height));
+	bool result = false;
+	if (IsItemClicked()) {
+		*v = !*v;
+		result = true;
+	}
+	
+	if (IsItemHovered())
+		draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f);
+	else
+		draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBgActive] : colors[ImGuiCol_FrameBg]), height * 0.50f);
+	draw_list->AddCircleFilled(ImVec2(p.x + radius + (*v ? 1 : 0) * (width - radius * 2.0f), p.y + radius), radius - 1.5f, GetColorU32(colors[ImGuiCol_CheckMark]));
+	SameLine();
+	Text(str_id);
+	return result;
+}
+
+bool TabGroup(const char* label, bool highlight)
+{
+	auto vec = State.RgbMenuTheme ? State.RgbColor : State.MenuThemeColor;
+	auto defaultCol = ImVec4((float)(vec.x / 1.25), (float)(vec.y / 1.25), (float)(vec.z / 1.25), 0.76f * State.MenuThemeColor.w);
+	auto hoveredCol = ImVec4((float)(vec.x / 1.25), (float)(vec.y / 1.25), (float)(vec.z / 1.25), 0.86f * State.MenuThemeColor.w);
+	auto activeCol = ImVec4((float)(vec.x / 1.25), (float)(vec.y / 1.25), (float)(vec.z / 1.25), 1.0f * State.MenuThemeColor.w);
+
+	ImGui::PushID(label);
+	ImGui::PushStyleColor(ImGuiCol_Button, highlight ? activeCol : defaultCol);
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hoveredCol);
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, activeCol);
+	bool selected = ImGui::Button(label);
+	ImGui::PopStyleColor(3);
+	ImGui::PopID();
+	return selected;
 }

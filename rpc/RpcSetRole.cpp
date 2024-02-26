@@ -1,6 +1,7 @@
 #include "pch-il2cpp.h"
 #include "_rpc.h"
 #include "game.h"
+#include "utility.h"
 
 RpcSetRole::RpcSetRole(PlayerControl* player, RoleTypes__Enum role)
 {
@@ -10,8 +11,7 @@ RpcSetRole::RpcSetRole(PlayerControl* player, RoleTypes__Enum role)
 
 void RpcSetRole::Process()
 {
-	if (!PlayerSelection(Player).has_value())
-		return;
+	if (Player == nullptr) return;
 
 	PlayerControl_RpcSetRole(Player, Role, NULL);
 }

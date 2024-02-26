@@ -10,10 +10,40 @@
 #include <sstream>
 #include "esp.hpp"
 
+static void onGameEnd() {
+    try {
+        LOG_DEBUG("Reset All");
+        Replay::Reset();
+        State.aumUsers.clear();
+        State.activeImpersonation = false;
+        State.FollowerCam = nullptr;
+        State.EnableZoom = false;
+        State.FreeCam = false;
+        State.MatchEnd = std::chrono::system_clock::now();
+        std::fill(State.assignedRoles.begin(), State.assignedRoles.end(), RoleType::Random); //Clear Pre assigned roles to avoid bugs.
+        State.engineers_amount = 0;
+        State.scientists_amount = 0;
+        State.shapeshifters_amount = 0;
+        State.impostors_amount = 0;
+        State.crewmates_amount = 0; //We need to reset these. Or if the host doesn't turn on host tab ,these value won't update.
+        State.IsRevived = false;
+        State.protectMonitor.clear();
+        State.VoteKicks = 0;
+
+        drawing_t& instance = Esp::GetDrawing();
+        synchronized(instance.m_DrawingMutex) {
+            instance.m_Players = {};
+        }
+    }
+    catch (...) {
+        LOG_DEBUG("Exception occurred in onGameEnd (InnerNetClient)");
+    }
+}
+
 void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 {
     try {
-        if (!State.DisableSMAU) {
+        if (!State.PanicMode) {
             static bool onStart = true;
             if (!IsInLobby()) {
                 State.LobbyTimer = -1;
@@ -98,7 +128,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.CloseAllDoors = false;
                 }
 
-                if (State.MoveInVent && (((*Game::pLocalPlayer)->fields.inVent) || (*Game::pLocalPlayer)->fields.shapeshifting)) {
+                if (State.MoveInVentAndShapeshift && (((*Game::pLocalPlayer)->fields.inVent) || (*Game::pLocalPlayer)->fields.shapeshifting)) {
                     (*Game::pLocalPlayer)->fields.moveable = true;
                 }
             }
@@ -199,19 +229,21 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     if (IsHost() || !State.SafeMode) {
                         if (IsHost()) {
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
-                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 0);
                         }
                         else {
                             app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
                             if (shapeshifterRole->fields.cooldownSecondsRemaining > 0.0f)
                                 shapeshifterRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                            shapeshifterRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
                         }
                         if (role == RoleTypes__Enum::GuardianAngel) {
                             app::GuardianAngelRole* guardianAngelRole = (app::GuardianAngelRole*)playerRole;
                             if (guardianAngelRole->fields.cooldownSecondsRemaining > 0.0f)
                                 guardianAngelRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         }
+                    }
+                    if (role == RoleTypes__Enum::Shapeshifter) {
+                        app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
+                        shapeshifterRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
                     }
                 }
             }
@@ -277,13 +309,13 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.Save();
             }
 
-            static int reportDelay = 0; //If we spam too many name changes, we're banned
+            static int reportDelay = 0;
             if (reportDelay <= 0 && State.SpamReport && IsInGame()) {
                 for (auto p : GetAllPlayerControl()) {
                     if (State.InMeeting)
-                        State.rpcQueue.push(new RpcForceMeeting(*Game::pLocalPlayer, PlayerSelection(p)));
+                        State.rpcQueue.push(new RpcForceMeeting(p, PlayerSelection(p)));
                     else
-                        State.rpcQueue.push(new RpcReportPlayer(PlayerSelection(p)));
+                        State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
                 }
                 reportDelay = 50; //Should be approximately 1 second
             }
@@ -632,6 +664,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
         }
     }
+    catch (Exception* ex) {
+        onGameEnd();
+        InnerNetClient_DisconnectInternal(__this, DisconnectReasons__Enum::Error, convert_to_string("InnerNetClient_Update exception"), NULL);
+        InnerNetClient_EnqueueDisconnect(__this, DisconnectReasons__Enum::Error, convert_to_string("InnerNetClient_Update exception"), NULL);
+        LOG_DEBUG("InnerNetClient_Update Exception " + convert_from_string(ex->fields._message));
+    }
     catch (...) {
         LOG_DEBUG("Exception occurred in InnerNetClient_Update (InnerNetClient)");
     }
@@ -640,9 +678,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
 void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, MethodInfo* method) {
     try {
-        if (!State.DisableSMAU) {
+        if (!State.PanicMode) {
             Log.Debug("Joined lobby " + convert_from_string(gameIdString));
         }
+        RefreshChat();
     }
     catch (...) {
         LOG_DEBUG("Exception occurred in AmongUsClient_OnGameJoined (InnerNetClient)");
@@ -652,7 +691,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
     try {
-        if (!State.DisableSMAU) {
+        if (!State.PanicMode) {
             if (data->fields.Character) { // Don't use Object_1_IsNotNull().
                 auto playerInfo = GetPlayerData(data->fields.Character);
 
@@ -722,8 +761,8 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
 }
 
 void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method) {
-    try {//Leave this out until we fix it.
-        if (!State.DisableSMAU) {
+    /*try {//Leave this out until we fix it.
+        if (!State.PanicMode) {
             if (!IsInGame()) {
                 CustomNetworkTransform_SnapTo(__this, position, minSid, method);
                 return;
@@ -745,39 +784,8 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
     }
     catch (...) {
         LOG_DEBUG("Exception occurred in CustomNetworkTransform_SnapTo (InnerNetClient)");
-    }
+    }*/
     CustomNetworkTransform_SnapTo(__this, position, minSid, method);
-}
-
-static void onGameEnd() {
-    try {
-        LOG_DEBUG("Reset All");
-        Replay::Reset();
-        State.aumUsers.clear();
-        State.chatMessages.clear();
-        State.activeImpersonation = false;
-        State.FollowerCam = nullptr;
-        State.EnableZoom = false;
-        State.FreeCam = false;
-        State.MatchEnd = std::chrono::system_clock::now();
-        std::fill(State.assignedRoles.begin(), State.assignedRoles.end(), RoleType::Random); //Clear Pre assigned roles to avoid bugs.
-        State.engineers_amount = 0;
-        State.scientists_amount = 0;
-        State.shapeshifters_amount = 0;
-        State.impostors_amount = 0;
-        State.crewmates_amount = 0; //We need to reset these. Or if the host doesn't turn on host tab ,these value won't update.
-        State.IsRevived = false;
-        State.protectMonitor.clear();
-        State.VoteKicks = 0;
-
-        drawing_t& instance = Esp::GetDrawing();
-        synchronized(instance.m_DrawingMutex) {
-            instance.m_Players = {};
-        }
-    }
-    catch (...) {
-        LOG_DEBUG("Exception occurred in onGameEnd (InnerNetClient)");
-    }
 }
 
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, Object* endGameResult, MethodInfo* method) {
@@ -818,7 +826,7 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
 
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method) {
     try {
-        if (!State.DisableSMAU && IsHost() && State.NoGameEnd)
+        if (!State.PanicMode && IsHost() && State.NoGameEnd)
             return;
     }
     catch (...) {
@@ -829,7 +837,7 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
 
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, GameData_PlayerInfo* killer, GameData_PlayerInfo* victim, MethodInfo* method) {
     try {
-        if (!State.DisableSMAU && State.DisableKillAnimation)
+        if (!State.PanicMode && State.DisableKillAnimation)
             return;
     }
     catch (...) {
@@ -840,7 +848,7 @@ void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, GameData_PlayerInfo* 
 
 float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
     try {
-        if (!State.DisableSMAU) {
+        if (!State.PanicMode) {
             State.GameKillDistance = LogicOptions_GetKillDistance(__this, method);
             if (State.InfiniteKillRange)
                 return FLT_MAX;
@@ -856,7 +864,7 @@ float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
 
 void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
     try {
-        if (!State.DisableSMAU && State.NoAbilityCD) {
+        if (!State.PanicMode && State.NoAbilityCD) {
             __this->fields._CoolDown_k__BackingField = 0.f;
             return;
         }
@@ -869,7 +877,7 @@ void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
 
 void dZiplineConsole_SetDestinationCooldown(ZiplineConsole* __this, MethodInfo* method) {
     try {
-        if (!State.DisableSMAU && State.NoAbilityCD) {
+        if (!State.PanicMode && State.NoAbilityCD) {
             __this->fields._CoolDown_k__BackingField = 0.f;
             return;
         }

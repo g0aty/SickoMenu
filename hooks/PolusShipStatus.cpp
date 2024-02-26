@@ -30,8 +30,13 @@ void dPolusShipStatus_OnEnable(PolusShipStatus* __this, MethodInfo* method)
 
 		State.mapType = Settings::MapType::Pb;
 
-		if (!State.DisableSMAU && State.confuser && State.confuseOnStart)
+		if (!State.PanicMode && State.confuser && State.confuseOnStart)
 			ControlAppearance(true);
+
+		if (State.AutoFakeRole) {
+			if (IsHost() || !State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
+			else State.rpcQueue.push(new SetRole((RoleTypes__Enum)State.FakeRole));
+		}
 	}
 	catch (...) {
 		LOG_DEBUG("Exception occurred in PolusShipStatus_OnEnable (PolusShipStatus)");

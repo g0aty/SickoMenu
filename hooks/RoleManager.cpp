@@ -8,7 +8,7 @@
 
 void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 	try {
-		if (!State.DisableSMAU) {
+		if (!State.PanicMode) {
 			std::vector<uint8_t> assignedPlayers;
 			GameOptions options;
 			auto allPlayers = GetAllPlayerControl();

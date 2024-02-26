@@ -8,7 +8,7 @@
 #include "game.h"
 
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, GameData_PlayerInfo* player, MethodInfo* method) {
-	if (!State.DisableSMAU && State.MaxVision)
+	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
 	else
 		return ShipStatus_CalculateLightRadius(__this, player, method);
@@ -37,8 +37,13 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 
 		State.mapType = State.mapDoors.empty() ? Settings::MapType::Hq : Settings::MapType::Ship; //exploit the fact that MiraHQ has no doors and all other maps have their own shipstatus
 
-		if (!State.DisableSMAU && State.confuser && State.confuseOnStart)
+		if (!State.PanicMode && State.confuser && State.confuseOnStart)
 			ControlAppearance(true);
+
+		if (State.AutoFakeRole) {
+			if (IsHost() || !State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
+			else State.rpcQueue.push(new SetRole((RoleTypes__Enum)State.FakeRole));
+		}
 
 		//if (!State.mapDoors.empty() && Constants_1_ShouldFlipSkeld(NULL))
 			//State.FlipSkeld = true; fix later
@@ -50,14 +55,14 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 }
 
 void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, int32_t amount, MethodInfo* method) {
-	if (!State.DisableSMAU && IsHost() && State.DisableSabotages) {
+	if (!State.PanicMode && IsHost() && State.DisableSabotages) {
 		return;
 	}
 	ShipStatus_RpcUpdateSystem(__this, systemType, amount, method);
 }
 
 void dShipStatus_RpcCloseDoorsOfType (ShipStatus* __this, SystemTypes__Enum type, MethodInfo* method) {
-	if (!State.DisableSMAU && State.DisableSabotages) {
+	if (!State.PanicMode && State.DisableSabotages) {
 		return;
 	}
 	ShipStatus_RpcCloseDoorsOfType(__this, type, method);
@@ -65,7 +70,7 @@ void dShipStatus_RpcCloseDoorsOfType (ShipStatus* __this, SystemTypes__Enum type
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 	try {
-		if (State.HideCode && IsStreamerMode() && !State.DisableSMAU) {
+		if (State.HideCode && IsStreamerMode() && !State.PanicMode) {
 			if (State.RgbLobbyCode)
 				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + State.customCode), NULL);
 			else
@@ -73,7 +78,7 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 		}
 		else {
 			std::string LobbyCode = convert_from_string(InnerNet_GameCode_IntToGameName((*Game::pAmongUsClient)->fields._.GameId, NULL));
-			if (State.RgbLobbyCode && !State.DisableSMAU)
+			if (State.RgbLobbyCode && !State.PanicMode)
 				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + LobbyCode), NULL);
 			else
 				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode), NULL);

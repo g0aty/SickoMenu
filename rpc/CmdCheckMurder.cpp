@@ -9,5 +9,6 @@ CmdCheckMurder::CmdCheckMurder(const PlayerSelection& target)
 
 void CmdCheckMurder::Process()
 {
+	if (!target.has_value()) return;
 	PlayerControl_CmdCheckMurder(*Game::pLocalPlayer, target.get_PlayerControl().value_or(nullptr), NULL);
 }
