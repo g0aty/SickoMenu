@@ -63,26 +63,27 @@ jobs:
           path: Debug.zip
           
   AutoRelease:
+    if: ${{ github.event_name == 'push' }}
     runs-on: windows-2022
     needs: [Build_Release, Build_Debug]
     steps:
-#      - name: Parse tag semver
-#        uses: booxmedialtd/ws-action-parse-semver@3576f3a20a39f8752fe0d8195f5ed384090285dc
-#        id: semver_parser
-#        with:
-#          input_string: ${{ github.ref }}
-#          version_extractor_regex: '\/v(.*)$'
+      - name: Parse tag semver
+        uses: booxmedialtd/ws-action-parse-semver@3576f3a20a39f8752fe0d8195f5ed384090285dc
+        id: semver_parser
+        with:
+          input_string: ${{ github.ref }}
+          version_extractor_regex: '\/v(.*)$'
           
       # please keep this for an adjustment period, will help diagnose any issues
-#      - name: Debug semver
-#        run: |
-#            echo 'major: ${{ steps.semver_parser.outputs.major }}'
-#            echo 'minor: ${{ steps.semver_parser.outputs.minor }}'
-#            echo 'patch: ${{ steps.semver_parser.outputs.patch }}'
-#            echo 'feature (is pre-release?): ${{ steps.semver_parser.outputs.prerelease }}'
-#            echo 'feature ver: ${{ steps.semver_parser.outputs.build }}'
-#            echo 'full: ${{ steps.semver_parser.outputs.fullversion }}'
-#            echo 'is pre-release: ${{ steps.semver_parser.outputs.prerelease != 0 }}'
+      - name: Debug semver
+        run: |
+            echo 'major: ${{ steps.semver_parser.outputs.major }}'
+            echo 'minor: ${{ steps.semver_parser.outputs.minor }}'
+            echo 'patch: ${{ steps.semver_parser.outputs.patch }}'
+            echo 'feature (is pre-release?): ${{ steps.semver_parser.outputs.prerelease }}'
+            echo 'feature ver: ${{ steps.semver_parser.outputs.build }}'
+            echo 'full: ${{ steps.semver_parser.outputs.fullversion }}'
+            echo 'is pre-release: ${{ steps.semver_parser.outputs.prerelease != 0 }}'
       
       - name: Download Release Artifact
         uses: actions/download-artifact@v2.0.9
@@ -95,12 +96,12 @@ jobs:
           name: Debug
       
       - name: Automatic Releases
-        uses: marvinpinto/action-automatic-releases@latest #maybe this fixed auto release versioning?
+        if: ${{ github.event_name == 'push' }}
+        uses: marvinpinto/action-automatic-releases@526ce12c6675bbe6e0e9a4169c90d09a3f7ad3e2
         id: "automatic_releases"
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}" #this is gonna give me a stroke
-          automatic_release_tag: "latest"
-          prerelease: false
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: ${{ steps.semver_parser.outputs.prerelease != 0 }}
           files: |
             Release.zip
             Debug.zip
