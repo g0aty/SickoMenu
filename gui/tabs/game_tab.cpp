@@ -154,11 +154,12 @@ namespace GameTab {
 						}
 					}
 				}
-				ImGui::SameLine();
+				
 				if (ToggleButton("Spam", &State.ChatSpam))
 				{
 					State.Save();
 				}
+				ImGui::SameLine();
 				if (!State.SafeMode && ToggleButton("Spam by Everyone", &State.ChatSpamEveryone))
 				{
 					State.Save();
@@ -243,7 +244,7 @@ namespace GameTab {
 					}
 					if (!State.SafeMode) {
 						ImGui::SameLine();
-						if (ImGui::Button("Suicide All Crewmates")) {
+						if (ImGui::Button("Suicide Crewmates")) {
 							for (auto player : GetAllPlayerControl()) {
 								if (!PlayerIsImpostor(GetPlayerData(player))) {
 									if (IsInGame())
@@ -256,7 +257,7 @@ namespace GameTab {
 							}
 						}
 						ImGui::SameLine();
-						if (ImGui::Button("Suicide All Impostors")) {
+						if (ImGui::Button("Suicide Impostors")) {
 							for (auto player : GetAllPlayerControl()) {
 								if (PlayerIsImpostor(GetPlayerData(player))) {
 									if (IsInGame())
@@ -283,7 +284,7 @@ namespace GameTab {
 							else State.lobbyRpcQueue.push(new RpcForceScanner(p, false));
 						}
 					}
-					if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) ImGui::SameLine();
+					if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && State.InMeeting) ImGui::SameLine();
 					if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("End Meeting")) {
 						State.rpcQueue.push(new RpcEndMeeting());
 						State.InMeeting = false;
