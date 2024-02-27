@@ -22,7 +22,6 @@ void RpcForceSnapTo::Process()
 {
 	if (!PlayerSelection(Player).has_value()) return;
 
-	//CustomNetworkTransform_RpcSnapTo((Player)->fields.NetTransform, targetVector, NULL);
 	CustomNetworkTransform_SnapTo(Player->fields.NetTransform, targetVector, Player->fields.NetTransform->fields.lastSequenceId + 100, NULL);
 	for (auto p : GetAllPlayerControl()) {
 		if (p == *Game::pLocalPlayer) continue;
@@ -33,4 +32,6 @@ void RpcForceSnapTo::Process()
 		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 	}
 	Player->fields.NetTransform->fields.lastSequenceId += 100;
+
+	CustomNetworkTransform_RpcSnapTo((Player)->fields.NetTransform, targetVector, NULL);
 }
