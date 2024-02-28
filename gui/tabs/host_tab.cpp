@@ -124,6 +124,9 @@ namespace HostTab {
 				State.Save();
 			if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
 				State.Save();
+			if (ToggleButton("Disable Kills", &State.DisableKills))
+				State.Save();
+			if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
 
 			/*if (ToggleButton("Disable Specific RPC Call ID", &State.DisableCallId))
 				State.Save();

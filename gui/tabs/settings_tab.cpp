@@ -78,12 +78,12 @@ namespace SettingsTab {
 			State.Save();
 		}
 		ImGui::SameLine();
-		SteppedSliderFloat("Opacity", (float*)&State.MenuThemeColor.w, 0.1f, 1.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
-
 		if (ImGui::Button("Reset Menu Theme Color"))
 		{
 			State.MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
 		}
+
+		SteppedSliderFloat("Opacity", (float*)&State.MenuThemeColor.w, 0.1f, 1.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
 #ifdef _DEBUG
 		if (ToggleButton("Show Debug Tab", &State.showDebugTab)) {

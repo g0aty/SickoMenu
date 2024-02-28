@@ -772,8 +772,12 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target, MethodInfo* method)
 {
 	try {
+		if (__this != *Game::pLocalPlayer) {
+			if (IsHost() && State.DisableKills) return;
+			PlayerControl_CmdCheckMurder(__this, target, method);
+		}
 		if (!State.PanicMode && __this == *Game::pLocalPlayer) {
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId >= 0 || State.BypassAngelProt, NULL);
+			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
 			return;
 		}
 		PlayerControl_CmdCheckMurder(__this, target, method);
@@ -857,7 +861,8 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 		if (!State.PanicMode) {
 			HandleRpc(__this, callId, reader);
 			if (IsHost() && ((State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) || 
-				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
+				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) ||
+				(State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder))) //we cannot prevent murderplayer because the player will force it
 				return;
 			if (State.DisableCallId && callId == State.ToDisableCallId)
 				return;

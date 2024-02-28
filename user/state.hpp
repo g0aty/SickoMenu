@@ -75,6 +75,7 @@ public:
     bool SpamReport = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
+    bool DisableKills = false;
     bool NoGameEnd = false;
     bool ChatSpam = false;
     bool ChatSpamEveryone = false;
@@ -338,7 +339,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.0";
+    std::string SickoVersion = "v3.0.1";
 
     void Load();
     void Save();

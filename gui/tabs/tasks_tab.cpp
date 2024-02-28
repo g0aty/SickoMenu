@@ -21,7 +21,7 @@ namespace TasksTab {
 					++tasksCompleted;
 			}
 
-			if (tasks.size() == tasksCompleted) {
+			if (tasks.size() != tasksCompleted) {
 				if (ImGui::Button("Complete All Tasks")) {
 					for (auto task : tasks) {
 						if (task->fields.taskStep != task->fields.MaxStep)

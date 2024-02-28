@@ -6,7 +6,8 @@
 #include <chrono>
 
 static app::Type* voteSpreaderType = nullptr;
-
+static bool namesUpdated = false;
+static std::map<uint8_t, String*> playerNames = {};
 void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 	try {
 		State.voteMonitor.clear();
@@ -26,6 +27,8 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
 	try {
 		State.InMeeting = false;
+		namesUpdated = false;
+		playerNames.clear();
 
 		if (State.Replay_ClearAfterMeeting)
 		{
@@ -158,7 +161,8 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 				auto playerControl = GetPlayerControlById(playerVoteArea->fields.TargetPlayerId);
 				auto playerNameTMP = playerVoteArea->fields.NameText;
 				app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
-				std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+				std::string playerName = namesUpdated ? convert_from_string(playerNames[playerData->fields.PlayerId]) : 
+					convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
 				if (playerData == GetPlayerData(*Game::pLocalPlayer) && State.CustomName && (!State.ServerSideCustomName || State.ServerSideCustomName && (!IsHost() || State.SafeMode)) && !State.userName.empty()) {
 					if (State.CustomName && !State.ServerSideCustomName) {
 						if (State.ColoredName && !State.RgbName) {
@@ -206,7 +210,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 									totalTasks++;
 							}
 							std::string tasksText = std::format("({}/{})", completedTasks, totalTasks);
-							if (totalTasks == 0 || PlayerIsImpostor(playerData))
+							if (totalTasks == 0 || (PlayerIsImpostor(playerData) && completedTasks == 0))
 								playerName = "<size=1.2>" + roleName + "\n</size>" + playerName + "\n<size=1.2><#0000>0";
 							else
 								playerName = "<size=1.2>" + roleName + " " + tasksText + "\n</size>" + playerName + "\n<size=1.2><#0000>0";
@@ -221,7 +225,9 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 					}
 
 					String* playerNameStr = convert_to_string(playerName);
-					app::TMP_Text_set_text((app::TMP_Text*)playerNameTMP, playerNameStr, NULL);
+					if (!namesUpdated)
+						playerNames[playerData->fields.PlayerId] = GameData_PlayerOutfit_get_PlayerName(outfit, nullptr);
+					TMP_Text_set_text((app::TMP_Text*)playerNameTMP, playerNameStr, NULL);
 				}
 
 				if (playerData)
@@ -278,6 +284,9 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 						}
 					}
 				}
+			}
+			if (!namesUpdated) {
+				namesUpdated = true;
 			}
 
 			if (isBeforeResultsState) {

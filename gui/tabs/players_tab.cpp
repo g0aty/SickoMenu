@@ -787,6 +787,7 @@ namespace PlayersTab {
 					}
 
 					if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby())) {
+						ImGui::NewLine(); //force a new line
 						if (InputString("Username", &State.hostUserName)) {
 							State.Save();
 						}
@@ -927,7 +928,7 @@ namespace PlayersTab {
 								if (task->fields.taskStep == task->fields.MaxStep)
 									ImGui::TextColored(ImVec4(0.0F, 1.0F, 0.0F, 1.0F), (std::string(TranslateTaskTypes(task->fields._.TaskType))).c_str());
 								else {
-									if (!State.SafeMode || selectedPlayer.is_LocalPlayer()) ImGui::Text((std::string(TranslateTaskTypes(task->fields._.TaskType))).c_str());
+									if (State.SafeMode && !selectedPlayer.is_LocalPlayer()) ImGui::Text((std::string(TranslateTaskTypes(task->fields._.TaskType))).c_str());
 									else {
 										if (ImGui::Button((std::string(TranslateTaskTypes(task->fields._.TaskType))).c_str())) {
 											State.rpcQueue.push(new RpcForceCompleteTask(selectedPlayer.get_PlayerControl(), task->fields._._Id_k__BackingField));

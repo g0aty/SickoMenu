@@ -124,7 +124,7 @@ namespace GameTab {
 				if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) {
 					State.Save();
 				}
-				if (State.ChatCooldown >= 3.f) {
+				if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f) {
 					ImGui::SameLine();
 					if (ImGui::Button("Send"))
 					{
@@ -139,19 +139,17 @@ namespace GameTab {
 							State.MessageSent = true;
 						}
 					}
-					ImGui::SameLine();
-					if (State.ReadAndSendAumChat && ImGui::Button("Send to AUM"))
-					{
-						auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
-							State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-						if (IsInGame()) {
-							State.rpcQueue.push(new RpcForceAumChat(PlayerSelection(player), State.chatMessage, true));
-							State.MessageSent = true;
-						}
-						else if (IsInLobby()) {
-							State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(player), State.chatMessage, true));
-							State.MessageSent = true;
-						}
+				}
+				if ((IsInGame() || IsInLobby()) && State.ReadAndSendAumChat) ImGui::SameLine();
+				if (State.ReadAndSendAumChat && ImGui::Button("Send to AUM"))
+				{
+					auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
+						State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+					if (IsInGame()) {
+						State.rpcQueue.push(new RpcForceAumChat(PlayerSelection(player), State.chatMessage, true));
+					}
+					else if (IsInLobby()) {
+						State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(player), State.chatMessage, true));
 					}
 				}
 				
@@ -214,7 +212,7 @@ namespace GameTab {
 					State.rpcQueue.push(new RpcVent(*Game::pLocalPlayer, 1, true));
 				}*/
 
-				if (ToggleButton("Spam Report", &State.SpamReport)) {
+				if (IsInGame() && ToggleButton("Spam Report", &State.SpamReport)) {
 					State.Save();
 				}
 

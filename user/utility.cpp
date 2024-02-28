@@ -897,8 +897,7 @@ std::string GetGradientUsername(std::string str, bool useState, bool underline, 
 
 void RefreshChat() {
 	if (!Game::HudManager.IsInstanceExists()) return;
-	ChatController_SetVisible(Game::HudManager.GetInstance()->fields.Chat, false, NULL);
-	ChatController_SetVisible(Game::HudManager.GetInstance()->fields.Chat, (State.ChatAlwaysActive || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
+	ChatController_SetVisible(Game::HudManager.GetInstance()->fields.Chat, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
 }
 
 void SaveOriginalAppearance()
