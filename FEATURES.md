@@ -213,6 +213,7 @@ View the player's tasks (and complete them with Safe Mode disabled)
 - **Force Start of Game** Forces the game to start
 - **Disable Meetings** Disables meetings and body reports (Default: OFF)
 - **Disable Sabotages** Prevents players from sabotaging stuff (Default: OFF)
+- **Disable Kills** Prevents players from killing others (Cheaters can still bypass this as of now) (Default: OFF)
 - **Switch Moving Platform Side** *(Only on Airship)* Switches the moving platform's side
 - **Disable Game Ending** Prevents the game from ending (Default: OFF)
 - **End Game** End the game at your own will for your desired reason
