@@ -149,6 +149,7 @@ A dedicated player menu for viewing and manipulating players
 - **Ban** *(Only as Host)* Bans the selected player
 - **Shift** *(Only as Shapeshifter/Safe Mode disabled)* Shapeshifts you into the selected player
 - **Protect** *(Only as Guardian Angel/Host/Safe Mode disabled)* Casts a guardian angel protection on the selected player
+- View the player's tasks (and complete them with Safe Mode disabled)
 
 ### Trolling
 - **Force Meeting By** Forces an emergency meeting by the selected player
@@ -180,9 +181,6 @@ A dedicated player menu for viewing and manipulating players
 - **Fake AUM Detection** Makes AUM users falsely flag the selected player for AUM
 - **Fake AUM Chat** Makes AUM users falsely receive an AUM chat message from the selected player
 - **Chat As** *(Only with Safe Mode disabled)* Spoofs your chat messages from the selected player
-
-### Tasks
-View the player's tasks (and complete them with Safe Mode disabled)
 
 ## ✅ Tasks
 - **Complete All Tasks** Completes your tasks
