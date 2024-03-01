@@ -170,7 +170,7 @@ A dedicated player menu for viewing and manipulating players
 - **Teleport To You** *(Only with Safe Mode disabled)* Teleports the selected player to you
 - **Attach To** Attaches yourself to the selected player
 - **Turn into Ghost** *(Only as host/Safe Mode disabled)* Makes the selected player a ghost
-- **Revive** *(Only as host/Safe Mode disabled)* Brings back a player from the dead
+- **Revive** *(Only as host)* Brings back a player from the dead
 - **Set Role** *(Only as host/Safe Mode disabled)* Sets the selected player's role to whatever you choose
 - **Set Scanner** *(Only with Safe Mode disabled)* Makes the selected player medbay scan
 - **Stop Scanner** *(Only with Safe Mode disabled)* Makes the selected player stop medbay scanning
