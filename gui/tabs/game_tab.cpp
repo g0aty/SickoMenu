@@ -163,24 +163,6 @@ namespace GameTab {
 					State.Save();
 				}
 
-				/*if (IsInGame() && ImGui::Button("Boot Everyone from Vents")) {
-					int minCount = 0;
-					int maxCount = 0;
-					if (State.mapType == Settings::MapType::Ship)
-						maxCount = 13;
-					else if (State.mapType == Settings::MapType::Hq) {
-						minCount = 1; maxCount = 11;
-					}
-					else if (State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship)
-						maxCount = 11;
-					else if (State.mapType == Settings::MapType::Fungle)
-						maxCount = 10;
-					int i = maxCount;
-					if (i >= minCount) {
-						State.rpcQueue.push(new RpcBootFromVent(i)); --i;
-					}
-				}*/
-
 				if ((IsInGame() || IsInLobby()) && ImGui::Button("Reset Appearance"))
 				{
 					ControlAppearance(false);
@@ -212,6 +194,10 @@ namespace GameTab {
 					State.rpcQueue.push(new RpcVent(*Game::pLocalPlayer, 1, true));
 				}*/
 
+				if (IsInGame() && ToggleButton("Disable Venting", &State.DisableVents)) {
+					State.Save();
+				}
+				if (IsInGame()) ImGui::SameLine();
 				if (IsInGame() && ToggleButton("Spam Report", &State.SpamReport)) {
 					State.Save();
 				}
@@ -282,7 +268,11 @@ namespace GameTab {
 							else State.lobbyRpcQueue.push(new RpcForceScanner(p, false));
 						}
 					}
-					if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && State.InMeeting) ImGui::SameLine();
+					if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) ImGui::SameLine();
+					if (IsInGame() && ImGui::Button("Kick Everyone From Vents")) {
+						State.rpcQueue.push(new RpcBootAllVents());
+					}
+					if (State.InMeeting) ImGui::SameLine();
 					if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("End Meeting")) {
 						State.rpcQueue.push(new RpcEndMeeting());
 						State.InMeeting = false;

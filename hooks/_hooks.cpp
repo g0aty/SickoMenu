@@ -188,9 +188,9 @@ void DetourInitilization() {
 	HOOKFUNC(ZiplineConsole_SetDestinationCooldown);
 	HOOKFUNC(MushroomWallDoor_SetDoorway);
 	HOOKFUNC(VoteBanSystem_AddVote);
-	//HOOKFUNC(PlatformSpecificData_Serialize);
-	//HOOKFUNC(Constants_1_GetBroadcastVersion);
-	//HOOKFUNC(Constants_1_IsVersionModded);
+	HOOKFUNC(PlatformSpecificData_Serialize);
+	HOOKFUNC(Constants_1_GetBroadcastVersion);
+	HOOKFUNC(Constants_1_IsVersionModded);
 	HOOKFUNC(PlatformSpecificData_Serialize);
 	HOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
 	HOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
@@ -306,9 +306,9 @@ void DetourUninitialization()
 	UNHOOKFUNC(ZiplineConsole_SetDestinationCooldown);
 	UNHOOKFUNC(MushroomWallDoor_SetDoorway);
 	UNHOOKFUNC(VoteBanSystem_AddVote);
-	//UNHOOKFUNC(PlatformSpecificData_Serialize);
-	//UNHOOKFUNC(Constants_1_GetBroadcastVersion);
-	//UNHOOKFUNC(Constants_1_IsVersionModded);
+	UNHOOKFUNC(PlatformSpecificData_Serialize);
+	UNHOOKFUNC(Constants_1_GetBroadcastVersion);
+	UNHOOKFUNC(Constants_1_IsVersionModded);
 	UNHOOKFUNC(PlatformSpecificData_Serialize);
 	UNHOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
 	UNHOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);

@@ -72,6 +72,7 @@ public:
     bool ShowGhosts = false;
     int FakeRole = 0;
     bool AutoFakeRole = false;
+    bool DisableVents = false;
     bool SpamReport = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
@@ -230,6 +231,7 @@ public:
     std::map<Game::Voter, Game::VotedFor> voteMonitor;
 
     std::vector<Game::PlayerId> aumUsers;
+    std::vector<Game::PlayerId> sickoUsers;
     int32_t rpcCooldown = 15;
     int32_t playerKilledId = 0;
 
@@ -322,6 +324,7 @@ public:
     bool RgbLobbyCode = false;
 
     bool PanicMode = false;
+    bool SickoDetection = true;
 
     enum class MapType : uint8_t
     {
@@ -339,7 +342,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.0.2";
+    std::string SickoVersion = "v3.1";
 
     void Load();
     void Save();

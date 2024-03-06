@@ -5308,7 +5308,7 @@ namespace app
         void* _AllStepWatchers_k__BackingField;
         struct PlainShipRoom__Array* _AllRooms_k__BackingField;
         void* _FastRooms_k__BackingField;
-        void* _AllVents_k__BackingField;
+        struct Vent__Array* _AllVents_k__BackingField;
         void* SabotageSound;
         void* WeaponFires;
         void* WeaponsImage;
@@ -7232,6 +7232,7 @@ namespace app
         struct SpriteRenderer* layer;
         void* animator;
         void* skin;
+        void* data;
         struct PlayerMaterial_Properties matProperties;
     };
 
@@ -7269,6 +7270,8 @@ namespace app
         Normal = 0x00000000,
         Horse = 0x00000001,
         Seeker = 0x00000002,
+        Long = 0x00000003,
+        LongSeeker = 0x00000004,
     };
 
 #else
@@ -7276,6 +7279,8 @@ namespace app
         PlayerBodyTypes__Enum_Normal = 0x00000000,
         PlayerBodyTypes__Enum_Horse = 0x00000001,
         PlayerBodyTypes__Enum_Seeker = 0x00000002,
+        PlayerBodyTypes__Enum_Long = 0x00000003,
+        PlayerBodyTypes__Enum_LongSeeker = 0x00000004,
     };
 
 #endif
@@ -7339,6 +7344,9 @@ namespace app
 #pragma region CosmeticsLayer
     struct CosmeticsLayer__Fields {
         struct MonoBehaviour__Fields _;
+        void* OnColorChange;
+        void* OnSetBodyAsGhost;
+        void* OnCosmeticSet;
         bool alwaysDrawNormalPlayer;
         bool uiPet;
         float zIndexSpacing;
@@ -7359,10 +7367,11 @@ namespace app
 #endif
         struct PlayerMaterial_Properties bodyMatProperties;
         void* currentBodySprite;
-        struct PetBehaviour* currentPet;
+        void* currentPet;
         void* normalBodySprite;
         bool initialized;
         void* petAsset;
+        void* longboi;
         bool visible;
         bool isNameVisible;
         bool lockVisible;
@@ -7398,62 +7407,62 @@ namespace app
 #pragma region PlayerControl
 
     struct PlayerControl__Fields {
-    struct InnerNetObject__Fields _;
-    int32_t LastStartCounter;
-    uint8_t PlayerId;
-    struct String *FriendCode;
-    struct String *Puid;
-    float MaxReportDistance;
-    bool moveable;
-    struct CosmeticsLayer *cosmetics;
-    bool ForceKillTimerContinue;
-    #if defined(_CPLUSPLUS_)
-    PlayerOutfitType__Enum _CurrentOutfitType_k__BackingField;
-    #else
-    int32_t _CurrentOutfitType_k__BackingField;
-    #endif
-    bool inVent;
-    bool walkingToVent;
-    bool petting;
-    bool inMovingPlat;
-    bool onLadder;
-    bool protectedByGuardianThisRound;
-    bool shapeshifting;
-    bool waitingForShapeshiftResponse;
-    bool isKilling;
-    struct GameData_PlayerInfo *_cachedData;
-    int32_t protectedByGuardianId;
-    float flashlightAngle;
-    int32_t shapeshiftTargetPlayerId;
-    struct AudioSource *FootSteps;
-    struct AudioClip *KillSfx;
-    struct KillAnimation__Array *KillAnimations;
-    float killTimer;
-    int32_t RemainingEmergencies;
-    struct LightSource *LightPrefab;
-    struct LightSource *lightSource;
-    struct Collider2D *Collider;
-    struct PlayerPhysics *MyPhysics;
-    struct CustomNetworkTransform *NetTransform;
-    struct Collider2D *clickKillCollider;
-    struct Vector3 defaultCosmeticsScale;
-    struct List_1_PlayerTask_ *myTasks;
-    struct List_1_RoleEffectAnimation_ *currentRoleAnimations;
-    struct GameObject *TargetFlashlight;
-    bool isDummy;
-    bool notRealPlayer;
-    struct Logger_2 *logger;
-    struct List_1_IPlayerVisibleItem_ *visibilityItems;
-    struct Collider2D__Array *hitBuffer;
-    struct IUsable *closest;
-    bool isNew;
-    struct Rigidbody2D *rigidbody2D;
-    struct Dictionary_2_UnityEngine_Collider2D_IUsable_ *cache;
-    struct List_1_IUsable_ *itemsInRange;
-    struct List_1_IUsable_ *newItemsInRange;
-    uint8_t scannerCount;
-    bool roleAssigned;
-};
+        struct InnerNetObject__Fields _;
+        int32_t LastStartCounter;
+        uint8_t PlayerId;
+        struct String* FriendCode;
+        struct String* Puid;
+        float MaxReportDistance;
+        bool moveable;
+        struct CosmeticsLayer* cosmetics;
+        bool ForceKillTimerContinue;
+#if defined(_CPLUSPLUS_)
+        PlayerOutfitType__Enum _CurrentOutfitType_k__BackingField;
+#else
+        int32_t _CurrentOutfitType_k__BackingField;
+#endif
+        bool inVent;
+        bool walkingToVent;
+        bool petting;
+        bool inMovingPlat;
+        bool onLadder;
+        bool protectedByGuardianThisRound;
+        bool shapeshifting;
+        bool waitingForShapeshiftResponse;
+        bool isKilling;
+        struct GameData_PlayerInfo* _cachedData;
+        int32_t protectedByGuardianId;
+        float flashlightAngle;
+        int32_t shapeshiftTargetPlayerId;
+        struct AudioSource* FootSteps;
+        struct AudioClip* KillSfx;
+        struct KillAnimation__Array* KillAnimations;
+        float killTimer;
+        int32_t RemainingEmergencies;
+        struct LightSource* LightPrefab;
+        struct LightSource* lightSource;
+        struct Collider2D* Collider;
+        struct PlayerPhysics* MyPhysics;
+        struct CustomNetworkTransform* NetTransform;
+        struct Collider2D* clickKillCollider;
+        struct Vector3 defaultCosmeticsScale;
+        struct List_1_PlayerTask_* myTasks;
+        struct List_1_RoleEffectAnimation_* currentRoleAnimations;
+        struct GameObject* TargetFlashlight;
+        bool isDummy;
+        bool notRealPlayer;
+        struct Logger_2* logger;
+        struct List_1_IPlayerVisibleItem_* visibilityItems;
+        struct Collider2D__Array* hitBuffer;
+        struct IUsable* closest;
+        bool isNew;
+        struct Rigidbody2D* rigidbody2D;
+        struct Dictionary_2_UnityEngine_Collider2D_IUsable_* cache;
+        struct List_1_IUsable_* itemsInRange;
+        struct List_1_IUsable_* newItemsInRange;
+        uint8_t scannerCount;
+        bool roleAssigned;
+    };
 
     struct PlayerControl {
         struct PlayerControl__Class* klass;
@@ -8168,6 +8177,7 @@ namespace app
         IncorrectGame = 0x00000012,
         ServerRequest = 0x00000013,
         ServerFull = 0x00000014,
+        MismatchedVersion = 0x00000015,
         InternalPlayerMissing = 0x00000064,
         InternalNonceFailure = 0x00000065,
         InternalConnectionToken = 0x00000066,
@@ -8194,6 +8204,7 @@ namespace app
         PlatformFailedToGetUserBlock = 0x000000d5,
         ServerNotFound = 0x000000d6,
         ClientTimeout = 0x000000d7,
+        ErrorAuthNonceFailure = 0x000000d8,
         Unknown = 0x000000ff,
     };
 
@@ -8216,6 +8227,7 @@ namespace app
         DisconnectReasons__Enum_IncorrectGame = 0x00000012,
         DisconnectReasons__Enum_ServerRequest = 0x00000013,
         DisconnectReasons__Enum_ServerFull = 0x00000014,
+        DisconnectReasons__Enum_MismatchedVersion = 0x00000015,
         DisconnectReasons__Enum_InternalPlayerMissing = 0x00000064,
         DisconnectReasons__Enum_InternalNonceFailure = 0x00000065,
         DisconnectReasons__Enum_InternalConnectionToken = 0x00000066,
@@ -8242,6 +8254,7 @@ namespace app
         DisconnectReasons__Enum_PlatformFailedToGetUserBlock = 0x000000d5,
         DisconnectReasons__Enum_ServerNotFound = 0x000000d6,
         DisconnectReasons__Enum_ClientTimeout = 0x000000d7,
+        DisconnectReasons__Enum_ErrorAuthNonceFailure = 0x000000d8,
         DisconnectReasons__Enum_Unknown = 0x000000ff,
     };
 
@@ -8273,6 +8286,8 @@ namespace app
         None = 0x00,
         Normal = 0x01,
         HideNSeek = 0x02,
+        NormalFools = 0x03,
+        SeekFools = 0x04,
     };
 
 #else
@@ -8280,6 +8295,8 @@ namespace app
         GameModes__Enum_None = 0x00,
         GameModes__Enum_Normal = 0x01,
         GameModes__Enum_HideNSeek = 0x02,
+        GameModes__Enum_NormalFools = 0x03,
+        GameModes__Enum_SeekFools = 0x04,
     };
 
 #endif
@@ -8910,7 +8927,7 @@ namespace app
     };
 #pragma endregion
 
-struct VoteBanSystem__Fields {
+    struct VoteBanSystem__Fields {
         struct InnerNetObject__Fields _;
         struct Dictionary_2_System_Int32_System_Int32__1* Votes;
     };
@@ -9236,6 +9253,8 @@ struct VoteBanSystem__Fields {
         void* sporeMushrooms;
         void* specialSabotage;
         void* startAMBSounds;
+        void* staticWavesAsset;
+        void* animatedWavesAsset;
         void* _Zipline_k__BackingField;
         struct Vector2 _LastBinocularPos_k__BackingField;
     };
@@ -10030,8 +10049,8 @@ struct VoteBanSystem__Fields {
         MonitorData* monitor;
         struct OverlayAnimation__Fields fields;
     };
-    
-    #if defined(_CPLUSPLUS_)
+
+#if defined(_CPLUSPLUS_)
     enum class KillAnimType__Enum : int32_t {
         Stab = 0x00000000,
         Tongue = 0x00000001,
@@ -10041,7 +10060,7 @@ struct VoteBanSystem__Fields {
         None = 0x0000270f,
     };
 
-    #else
+#else
     enum KillAnimType__Enum {
         KillAnimType__Enum_Stab = 0x00000000,
         KillAnimType__Enum_Tongue = 0x00000001,
@@ -10051,24 +10070,24 @@ struct VoteBanSystem__Fields {
         KillAnimType__Enum_None = 0x0000270f,
     };
 
-    #endif
+#endif
     struct KillAnimType__Enum__Boxed {
         struct KillAnimType__Enum__Class* klass;
         MonitorData* monitor;
-    #if defined(_CPLUSPLUS_)
+#if defined(_CPLUSPLUS_)
         KillAnimType__Enum value;
-    #else
+#else
         int32_t value;
-    #endif
+#endif
     };
 
     struct OverlayKillAnimation__Fields {
         struct OverlayAnimation__Fields _;
-        #if defined(_CPLUSPLUS_)
+#if defined(_CPLUSPLUS_)
         KillAnimType__Enum KillType;
-        #else
+#else
         int32_t KillType;
-        #endif
+#endif
         struct PoolablePlayer* killerParts;
         struct Vector3 KillerPetPosition;
         struct PoolablePlayer* victimParts;
@@ -10518,6 +10537,8 @@ struct VoteBanSystem__Fields {
     struct IGameOptions__VTable {
         VirtualInvokeData get_Version;
         VirtualInvokeData get_GameMode;
+        VirtualInvokeData get_AprilFoolsOnMode;
+        VirtualInvokeData get_AprilFoolsOffMode;
         VirtualInvokeData get_MaxPlayers;
         VirtualInvokeData get_Keywords;
         VirtualInvokeData get_MapId;
@@ -10532,6 +10553,7 @@ struct VoteBanSystem__Fields {
         VirtualInvokeData SetBool;
         VirtualInvokeData SetInt;
         VirtualInvokeData SetUInt;
+        VirtualInvokeData TryClearAprilFoolsMode;
         VirtualInvokeData GetByte;
         VirtualInvokeData GetFloat;
         VirtualInvokeData GetBool;
@@ -10986,6 +11008,29 @@ struct VoteBanSystem__Fields {
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct Vent__VTable vtable;
+    };
+
+    struct Vent__Array {
+        struct Vent__Array__Class* klass;
+        MonitorData* monitor;
+        Il2CppArrayBounds* bounds;
+        il2cpp_array_size_t max_length;
+        struct Vent* vector[32];
+    };
+
+    struct Vent__Array__VTable {
+    };
+
+    struct Vent__Array__StaticFields {
+    };
+
+    struct Vent__Array__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct Vent__Array__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct Vent__Array__VTable vtable;
     };
 #pragma endregion
 
@@ -11994,6 +12039,7 @@ struct VoteBanSystem__Fields {
         void* closeSound;
         VirtualInvokeData Serialize;
         bool open;
+        bool allowAudio;
     };
 
     struct MushroomWallDoor {

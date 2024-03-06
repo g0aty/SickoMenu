@@ -51,6 +51,32 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			assert(Object_1_IsNotNull((Object_1*)__this->fields.cosmetics));
 			auto nameTextTMP = __this->fields.cosmetics->fields.nameText;
 
+			if (State.SickoDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 420 call to detect usage
+				if (State.rpcCooldown == 0) {
+					//SickoMenu users can detect this rpc
+					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)420, (SendOption__Enum)1, NULL);
+					MessageWriter_EndMessage(writer, NULL);
+					State.rpcCooldown = 15;
+				}
+				else {
+					State.rpcCooldown--;
+				}
+			}
+
+			if (IsInGame() && State.DisableVents && __this->fields.inVent) {
+				if (State.rpcCooldown == 0) {
+					//copy rpc code so that we don't spam the rpc queue
+					il2cpp::Array<Vent__Array> allVents = (*Game::pShipStatus)->fields._AllVents_k__BackingField;
+					for (auto vent : allVents) {
+						VentilationSystem_Update(VentilationSystem_Operation__Enum::BootImpostors, vent->fields.Id, NULL);
+					}
+					State.rpcCooldown = 15;
+				}
+				else {
+					State.rpcCooldown--;
+				}
+			}
+
 			if (!playerData || !localData)
 				return;
 
@@ -169,10 +195,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					}
 				}
 				std::string isAum = std::count(State.aumUsers.begin(), State.aumUsers.end(), playerData->fields.PlayerId) ? " <#f55>[AUM]</color>" : "";
-				std::string levelText = std::format("<#9ef>Level <#0f0>{}</color> ({}){}</color>", playerLevel, platform, isAum);
+				std::string isSicko = (playerData == localData || std::count(State.sickoUsers.begin(), State.sickoUsers.end(), playerData->fields.PlayerId)) ? " <#afa>[SICKO]</color>" : "";
+				std::string levelText = std::format("<#9ef>Level <#0f0>{}</color> ({}){}{}</color>", playerLevel, platform, isSicko, isAum);
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
-				if (IsStreamerMode() && friendCode != "")
-					friendCode = (convert_from_string(playerData->fields.FriendCode)).substr(0, 1) + "...";
+				if (IsStreamerMode())
+					friendCode = "Friend Code Hidden";
 				std::string hostFriendCode = convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.FriendCode);
 				if (playerId == hostId) {
 					if (friendCode == "" && !IsStreamerMode())
@@ -863,8 +890,6 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 			if (IsHost() && ((State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) || 
 				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) ||
 				(State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder))) //we cannot prevent murderplayer because the player will force it
-				return;
-			if (State.DisableCallId && callId == State.ToDisableCallId)
 				return;
 		}
 	}

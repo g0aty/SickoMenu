@@ -57,10 +57,9 @@ public:
 	virtual void Process() override;
 };
 
-class RpcBootFromVent : public RPCInterface {
-	int32_t ventId;
+class RpcBootAllVents : public RPCInterface {
 public:
-	RpcBootFromVent(int32_t ventId);
+	RpcBootAllVents();
 	virtual void Process() override;
 };
 

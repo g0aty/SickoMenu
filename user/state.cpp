@@ -49,7 +49,7 @@ void Settings::Load() {
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
-        //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); v3.1 feature
+        //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
 
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
@@ -188,6 +188,8 @@ void Settings::Load() {
         JSON_TRYGET("CustomCode", this->customCode);
         JSON_TRYGET("HideCode", this->HideCode);
         JSON_TRYGET("RgbLobbyCode", this->RgbLobbyCode);
+
+        JSON_TRYGET("SickoDetection", this->SickoDetection);
     } catch (...) {
         Log.Info("Unable to load sicko-settings.json");
     }
@@ -223,7 +225,7 @@ void Settings::Save() {
             { "FakeFriendCode", this->FakeFriendCode },
             { "SpoofPlatform", this->SpoofPlatform },
             { "FakePlatform", this->FakePlatform },
-            //{ "SpoofModdedHost", this->SpoofModdedHost }, v3.1 feature
+            //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
 
             { "SelectedColorId", this->SelectedColorId },
             { "SnipeColor", this->SnipeColor },
@@ -359,6 +361,9 @@ void Settings::Save() {
             { "CustomCode", this->customCode },
             { "HideCode", this->HideCode },
             { "RgbLobbyCode", this->RgbLobbyCode },
+
+
+            { "SickoDetection", this->SickoDetection },
         };
 
         std::ofstream outSettings(settingsPath);

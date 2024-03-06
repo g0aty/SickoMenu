@@ -69,7 +69,7 @@ namespace PlayersTab {
 				std::string playerName = RemoveHtmlTags(convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr)));
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0) * State.dpiScale);
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0) * State.dpiScale);
-				if (ImGui::Selectable(std::string("##" + playerName + std::format("{}", playerData->fields.PlayerId)).c_str(), selectedPlayer.equals(player))) { //fix selection problems with multiple ppl having same name
+				if (ImGui::Selectable(std::string("##" + ToString(playerData->fields.PlayerId)).c_str(), selectedPlayer.equals(player))) { //fix selection problems with multiple ppl having same name
 					State.selectedPlayer = player;
 					selectedPlayer = player;
 				}
@@ -91,8 +91,8 @@ namespace PlayersTab {
 				}
 				else if (PlayerIsImpostor(localData) && PlayerIsImpostor(playerData))
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
-				//else if (std::count(State.aumUsers.begin(), State.aumUsers.end(), playerData->fields.PlayerId))
-					//nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
+				else if (std::count(State.sickoUsers.begin(), State.sickoUsers.end(), playerData->fields.PlayerId))
+					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->AcceptedGreen);
 
 				if (playerData->fields.IsDead)
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
@@ -104,6 +104,7 @@ namespace PlayersTab {
 
 			if (selectedPlayer.has_value()) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
 			{
+				ImGui::Text("Is using SickoMenu: %s", selectedPlayer.is_LocalPlayer() || std::count(State.sickoUsers.begin(), State.sickoUsers.end(), selectedPlayer.get_PlayerData()->fields.PlayerId) ? "Yes" : "No");
 				ImGui::Text("Is using AUM: %s", std::count(State.aumUsers.begin(), State.aumUsers.end(), selectedPlayer.get_PlayerData()->fields.PlayerId) ? "Yes" : "No");
 				std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
 				std::string playerIdText = std::format("Player ID: {}", playerId);
@@ -181,10 +182,10 @@ namespace PlayersTab {
 					CloseOtherGroups(Groups::Trolling);
 				}
 			}
-			if (State.DisableMeetings)
+			if (State.DisableMeetings && IsHost())
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Meetings have been disabled.");
 			GameOptions options;
-			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && !State.DisableMeetings) { //Player selection doesn't matter
+			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings && IsHost())) { //Player selection doesn't matter
 				if (!State.InMeeting) {
 					if (ImGui::Button("Call Meeting")) {
 						State.rpcQueue.push(new RpcReportBody({}));
@@ -327,7 +328,7 @@ namespace PlayersTab {
 				app::RoleBehaviour* playerRole = localData->fields.Role;
 				app::RoleTypes__Enum role = playerRole != nullptr ? playerRole->fields.Role : app::RoleTypes__Enum::Crewmate;
 
-				if (!State.SafeMode)
+				if (IsHost() || !State.SafeMode)
 				{
 					if (ImGui::Button("Shift"))
 					{

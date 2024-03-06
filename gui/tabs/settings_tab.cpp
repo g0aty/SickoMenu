@@ -174,8 +174,11 @@ namespace SettingsTab {
 		}
 		/*ImGui::SameLine();
 		if (ToggleButton("Spoof Modded Host", &State.SpoofModdedHost)) {
-			State.Save(); //v3.1 feature
+			State.Save(); //haven't figured this out yet
 		}*/
+		if (ToggleButton("Allow other SickoMenu users to see you're using SickoMenu", &State.SickoDetection)) {
+			State.Save();
+		}
 
 		ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
 

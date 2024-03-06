@@ -8,6 +8,15 @@
 void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 	if (player == nullptr) return;
 	switch (callId) {
+		case (uint8_t)420:
+		{
+			uint8_t playerId = player->fields.PlayerId; //true SickoMenu detection
+			if (!std::count(State.sickoUsers.begin(), State.sickoUsers.end(), playerId)) {
+				State.sickoUsers.push_back(playerId);
+				STREAM_DEBUG("RPC Received for another SickoMenu user from " << ToString((Game::PlayerId)playerId));
+			}
+		}
+		break;
 		case (uint8_t)42069:
 		{
 			uint8_t playerId = MessageReader_ReadByte(reader, NULL);

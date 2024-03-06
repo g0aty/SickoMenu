@@ -173,7 +173,7 @@ DO_APP_FUNC(void, MessageExtensions_WriteNetObject, (MessageWriter* self, InnerN
 
 //DO_APP_FUNC(bool, Constants_1_ShouldFlipSkeld, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldFlipSkeld()");
 //this causes issues with dleks
-DO_APP_FUNC(bool, Constants_1_ShouldHorseAround, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldHorseAround()");
+//DO_APP_FUNC(bool, Constants_1_ShouldHorseAround, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldHorseAround()");
 DO_APP_FUNC(Platforms__Enum, Constants_1_GetPlatformType, (MethodInfo* method), "Assembly-CSharp, Platforms Constants::GetPlatformType()");
 DO_APP_FUNC(int32_t, Constants_1_GetBroadcastVersion, (MethodInfo* method), "Assembly-CSharp, System.Int32 Constants::GetBroadcastVersion()");
 DO_APP_FUNC(bool, Constants_1_IsVersionModded, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::IsVersionModded()");
@@ -243,6 +243,7 @@ DO_APP_FUNC(void, InnerNetClient_DisconnectInternal, (InnerNetClient* __this, Di
 DO_APP_FUNC(void, PlayerPhysics_FixedUpdate, (PlayerPhysics* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::FixedUpdate()");
 DO_APP_FUNC(void, PlayerPhysics_RpcEnterVent, (PlayerPhysics* __this, int32_t id, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcEnterVent(System.Int32)");
 DO_APP_FUNC(void, PlayerPhysics_RpcExitVent, (PlayerPhysics* __this, int32_t id, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcExitVent(System.Int32)");
+DO_APP_FUNC(void, PlayerPhysics_RpcBootFromVent, (PlayerPhysics* __this, int32_t ventId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcBootFromVent(System.Int32)");
 
 DO_APP_FUNC(void, PlayerControl_TurnOnProtection, (PlayerControl* __this, bool visible, int32_t colorId, int32_t guardianPlayerId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::TurnOnProtection(System.Boolean, System.Int32, System.Int32)");
 DO_APP_FUNC(void, PlayerControl_RemoveProtection, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RemoveProtection()");
@@ -261,7 +262,7 @@ DO_APP_FUNC(String*, GameData_PlayerInfo_get_PlayerName, (GameData_PlayerInfo* _
 
 DO_APP_FUNC(void, AccountManager_UpdateKidAccountDisplay, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void AccountManager::UpdateKidAccountDisplay()");
 DO_APP_FUNC(String*, AccountManager_GetRandomName, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.String AccountManager::GetRandomName()");
-DO_APP_FUNC(void, PlayerStorageManager_OnReadPlayerPrefsComplete, (PlayerStorageManager* __this, void* data, MethodInfo* method), "Assembly-CSharp, System.Void PlayerStorageManager::OnReadPlayerPrefsComplete(Epic.OnlineServices.PlayerDataStorage.ReadFileCallbackInfo)");
+DO_APP_FUNC(void, PlayerStorageManager_OnReadPlayerPrefsComplete, (PlayerStorageManager* __this, void* data, MethodInfo* method), "Assembly-CSharp, System.Void PlayerStorageManager::OnReadPlayerPrefsComplete(Epic.OnlineServices.PlayerDataStorage.ReadFileCallbackInfo&)");
 
 DO_APP_FUNC(void, AchievementManager_1_UnlockAchievement, (AchievementManager_1* __this, String* key, MethodInfo* method), "Assembly-CSharp, System.Void AchievementManager::UnlockAchievement(System.String)");
 

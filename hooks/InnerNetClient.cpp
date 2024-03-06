@@ -15,6 +15,7 @@ static void onGameEnd() {
         LOG_DEBUG("Reset All");
         Replay::Reset();
         State.aumUsers.clear();
+        State.sickoUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
         State.EnableZoom = false;
@@ -83,6 +84,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableLights = false;
                 State.CloseAllDoors = false;
                 State.SpamReport = false;
+                State.DisableVents = false;
 
                 if (!IsInLobby()) {
                     State.selectedPlayer = PlayerSelection();
@@ -662,6 +664,13 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 else
                     State.IsRevived = false;
             }
+
+            if (!IsHost() && (IsInGame() || IsInLobby())) {
+                State.DisableCallId = false;
+                State.DisableKills = false;
+                State.DisableMeetings = false;
+                State.DisableSabotages = false;
+            }
         }
     }
     catch (Exception* ex) {
@@ -706,9 +715,13 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 else
                     Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
-                auto it = std::find(State.aumUsers.begin(), State.aumUsers.end(), data->fields.Character->fields.PlayerId);
-                if (it != State.aumUsers.end())
-                    State.aumUsers.erase(it);
+                auto itAum = std::find(State.aumUsers.begin(), State.aumUsers.end(), data->fields.Character->fields.PlayerId);
+                if (itAum != State.aumUsers.end())
+                    State.aumUsers.erase(itAum);
+
+                auto it = std::find(State.sickoUsers.begin(), State.sickoUsers.end(), data->fields.Character->fields.PlayerId);
+                if (it != State.sickoUsers.end())
+                    State.sickoUsers.erase(it);
 
                 if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                     synchronized(Replay::replayEventMutex) {
