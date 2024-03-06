@@ -1,4 +1,4 @@
-# 👺 SickoMenu v3.0.2: The Community Update (Hotfix)
+# 👺 SickoMenu v3.1: The "Update" Update?
 A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
 
 Join our very own [Discord](https://dsc.gg/sickos) server for support, bug reports, and sneak peeks!

@@ -24,6 +24,7 @@
 - **Unlock All Achievements** Unlocks all Achievements
 - **Unlock Cosmetics** Unlocks every cosmetic (hats, visors, etc.) (Default: OFF)
 - **Safe Mode** Disables certain features whenever there is an anticheat (Default: ON)
+- **Allow other SickoMenu users to see you're using SickoMenu** Allows SickoMenu users to see other SickoMenu users
 
 ## 🎮 Game
 ### General
@@ -37,6 +38,7 @@
 - **Spam** Spams chat with your desired message
 - **Spam by Everyone** *(Only with Safe Mode disabled)* Spams the chat as all players with your desired message (Default: OFF)
 - **Console** Shows a console window that tracks all game events (Default: OFF)
+- **Disable Venting** Prevents anyone from venting
 - **Spam Report** Spams dead body reports
 - **Kill All Crewmates** Kills all crewmates as yourself
 - **Kill All Impostors** Kills all impostors as yourself
