@@ -1,4 +1,3 @@
-
 # Features of SickoMenu
 
 ## ⚙️ Settings
@@ -38,14 +37,15 @@
 - **Spam** Spams chat with your desired message
 - **Spam by Everyone** *(Only with Safe Mode disabled)* Spams the chat as all players with your desired message (Default: OFF)
 - **Console** Shows a console window that tracks all game events (Default: OFF)
-- **Disable Venting** Prevents anyone from venting
-- **Spam Report** Spams dead body reports
+- **Disable Venting** Instantly kicks anyone in the vents out (Default: OFF)
+- **Spam Report** Spams dead body reports (Default: OFF)
 - **Kill All Crewmates** Kills all crewmates as yourself
 - **Kill All Impostors** Kills all impostors as yourself
 - **Suicide All Crewmates** *(Only with Safe Mode disabled)* Kills all crewmates as themselves
 - **Suicide All Impostors** *(Only with Safe Mode disabled)* Kills all impostors as themselves
 - **Scan Everyone** *(Only with Safe Mode disabled and visual tasks enabled)* Forces everyone to medbay scan
 - **Stop Scanning Everyone** *(Only with Safe Mode disabled and visual tasks enabled)* Forces everyone to stop medbay scannning
+- **Kick Everyone from Vents** Fakes vent cleaning for every vent to kick everyone from vents
 - **End Meeting** *(Only as host/Safe Mode disabled)* Forces the meeting to end
 - **Force Name for Everyone** *(Only with Safe Mode disabled)* Forces your desired name for everyone
 - **Force Color for Everyone** *(Only with Safe Mode disabled)* Forces your desired color for everyone
@@ -117,7 +117,6 @@ View the game options!
 - **Right Click to Teleport** Allows you to right click and teleport anywhere on the radar (Default: OFF)
 - **Hide Radar During Meetings** Hides radar in meetings (Default: OFF)
 - **Draw Player Icons** Replaces player colored dots with player icons (Default: OFF)
-- **Show Role Color on Visor** If you choose to draw player icons, show the role color on the visor (Default: OFF)
 - **Lock Radar Position** Locks the radar in place (Default: OFF)
 - **Show Border** Shows a border on the radar (Default: OFF)
 - **Radar Color** Changes the radar's color

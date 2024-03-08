@@ -87,7 +87,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 			static int nameDelay = 0;
 
-			if (__this == *Game::pLocalPlayer && !State.userName.empty() && 
+			if (__this == *Game::pLocalPlayer && !State.userName.empty() &&
 				!((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode) {
 				if (State.CustomName) {
 					std::string opener = "";
@@ -123,7 +123,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 					playerName = opener + playerName + closer;
 
-					if (nameDelay <= 0 && State.ServerSideCustomName && 
+					if (nameDelay <= 0 && State.ServerSideCustomName &&
 						convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer)), nullptr)) != ((State.ColoredName && !State.RgbName) ? GetGradientUsername(RemoveHtmlTags(playerName), true) : playerName)) {
 						std::string username = (State.ColoredName && !State.RgbName) ? GetGradientUsername(RemoveHtmlTags(State.userName), true) : State.userName;
 						if (IsInGame()) {
@@ -176,7 +176,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 							platform = "itch.io - PC";
 							break;
 						case Platforms__Enum::IPhone:
-							platform = "iOS - Mobile";
+							platform = "iOS/iPadOS - Mobile";
 							break;
 						case Platforms__Enum::Android:
 							platform = "Android - Mobile";
@@ -274,7 +274,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			else {
 				playerName = playerName; //failsafe
 			}
-			
+
 			if ((IsHost() || !State.SafeMode) && State.TeleportEveryone && (IsInGame() && !State.InMeeting)
 				&& State.ShiftRightClickTP && (ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT))
 				&& (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)
@@ -289,7 +289,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			}
 
 			else if ((IsHost() || !State.SafeMode) && State.TeleportEveryone && IsInLobby() && State.ShiftRightClickTP
-				&& (ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT)) 
+				&& (ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT))
 				&& (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)
 				&& !State.PanicMode) {
 				ImVec2 mouse = ImGui::GetMousePos();
@@ -736,7 +736,7 @@ bool dPlayerControl_get_CanMove(PlayerControl* __this, MethodInfo* method) {
 	return PlayerControl_get_CanMove(__this, method);
 }
 
-void dPlayerControl_OnGameStart(PlayerControl* __this,  MethodInfo* method) {
+void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method) {
 	try {
 		SaveGameOptions();
 	}
@@ -798,56 +798,31 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 
 void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target, MethodInfo* method)
 {
-	try {
-		if (__this != *Game::pLocalPlayer) {
-			if (IsHost() && State.DisableKills) return;
-			PlayerControl_CmdCheckMurder(__this, target, method);
-		}
-		if (!State.PanicMode && __this == *Game::pLocalPlayer) {
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-			return;
-		}
-		PlayerControl_CmdCheckMurder(__this, target, method);
+	if (!State.PanicMode) {
+		if (State.DisableKills || (State.GodMode && __this == *Game::pLocalPlayer)) return;
+
+		if (__this != *Game::pLocalPlayer) PlayerControl_CmdCheckMurder(__this, target, method); //hopefully this fixes kill issues as host
+		else PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
 	}
-	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_CmdCheckMurder (PlayerControl)");
-		PlayerControl_CmdCheckMurder(__this, target, method);
-	}
+	else PlayerControl_CmdCheckMurder(__this, target, method);
 }
 
 void dPlayerControl_RpcShapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method)
 {
-	try {
-		PlayerControl_RpcShapeshift(__this, target, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
-	}
-	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_RpcShapeshift (PlayerControl)");
-		PlayerControl_RpcShapeshift(__this, target, animate, method);
-	}
+	if (__this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
+	else PlayerControl_RpcShapeshift(__this, target, animate, method);
 }
 
 void dPlayerControl_CmdCheckShapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method)
 {
-	try {
-		if (!State.SafeMode) PlayerControl_RpcShapeshift(__this, target, animate, method);
-		else PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
-	}
-	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_RpcShapeshift (PlayerControl)");
-		PlayerControl_CmdCheckShapeshift(__this, target, animate, method);
-	}
+	if (!State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, animate, method);
+	else PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
 }
 
 void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
 {
-	try {
-		if (!State.SafeMode) PlayerControl_RpcShapeshift(__this, __this, animate, method);
-		else PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
-	}
-	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_RpcShapeshift (PlayerControl)");
-		PlayerControl_CmdCheckRevertShapeshift(__this, animate, method);
-	}
+	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, __this, animate, method);
+	else PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
 }
 
 /*void dPlayerControl_RpcRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
@@ -887,7 +862,7 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 	try {
 		if (!State.PanicMode) {
 			HandleRpc(__this, callId, reader);
-			if (IsHost() && ((State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) || 
+			if (IsHost() && ((State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
 				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) ||
 				(State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder))) //we cannot prevent murderplayer because the player will force it
 				return;

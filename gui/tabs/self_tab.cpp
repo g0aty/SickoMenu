@@ -90,7 +90,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Allow Paste in Chat", &State.ChatPaste)) { //add copying in v3.1
+            if (ToggleButton("Allow Paste in Chat", &State.ChatPaste)) { //add copying later
                 State.Save();
             }
             

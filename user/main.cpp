@@ -92,16 +92,19 @@ void Run(LPVOID lpParam) {
 		ss << "\tVersion: " << State.SickoVersion << std::endl;
 		ss << "\tAmong Us Version: " << getGameVersion() << std::endl; // Log among us info
 		LOG_INFO(ss.str());
+#if _DEBUG
+		SetConsoleTitleA(std::format("Debug Console - SickoMenu {} (Among Us v{})", State.SickoVersion, getGameVersion()).c_str());
+#endif
 	}
 	State.Load();
 #if _DEBUG
 	hUnloadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	
-	#define DO_APP_CLASS(n, s) if(!n ## __TypeInfo) printf("Unable to locate %s\n", #n "__TypeInfo")
+	#define DO_APP_CLASS(n, s) if(!n ## __TypeInfo) LOG_ERROR("Unable to locate " #n "__TypeInfo")
 	#include "il2cpp-classes.h"
 	#undef DO_APP_CLASS
 
-	#define DO_APP_FUNC(r, n, p, s) if(!n) printf("Unable to locate %s\n", #n)
+	#define DO_APP_FUNC(r, n, p, s) if(!n) LOG_ERROR("Unable to locate " #n)
 	#include "il2cpp-functions.h"
 	#undef DO_APP_FUNC
 	/*

@@ -122,7 +122,7 @@ namespace PlayersTab {
 				uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
 				std::string levelText = std::format("Level: {}", playerLevel);
 				ImGui::Text(const_cast<char*>(levelText.c_str()));
-				std::string platform = "";
+				std::string platform = "Unknown";
 				for (auto client : GetAllClients()) {
 					if (GetPlayerControlById(selectedPlayer.get_PlayerData()->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
 						switch (client->fields.PlatformData->fields.Platform) {
@@ -142,7 +142,7 @@ namespace PlayersTab {
 							platform = "itch.io (PC)";
 							break;
 						case Platforms__Enum::IPhone:
-							platform = "iOS (Mobile)";
+							platform = "iOS/iPadOS (Mobile)";
 							break;
 						case Platforms__Enum::Android:
 							platform = "Android (Mobile)";
@@ -328,7 +328,7 @@ namespace PlayersTab {
 				app::RoleBehaviour* playerRole = localData->fields.Role;
 				app::RoleTypes__Enum role = playerRole != nullptr ? playerRole->fields.Role : app::RoleTypes__Enum::Crewmate;
 
-				if (IsHost() || !State.SafeMode)
+				if (!State.SafeMode)
 				{
 					if (ImGui::Button("Shift"))
 					{

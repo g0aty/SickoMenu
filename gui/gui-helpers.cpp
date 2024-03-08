@@ -9,7 +9,7 @@
 
 using namespace ImGui;
 
-bool CustomListBoxInt(const char* label, int* value, const std::vector<const char*> list, float width, ImGuiComboFlags flags) {
+bool CustomListBoxInt(const char* label, int* value, const std::vector<const char*> list, float width, ImVec4 col, ImGuiComboFlags flags) {
 	auto comboLabel = "##" + std::string(label);
 	auto leftArrow = "##" + std::string(label) + "Left";
 	auto rightArrow = "##" + std::string(label) + "Right";
@@ -49,7 +49,9 @@ bool CustomListBoxInt(const char* label, int* value, const std::vector<const cha
 		return RightResponse;
 	}
 	SameLine(0, spacing);
-	Text(label);
+	//noobuild by gdjkhp
+	if (col.x == 0 && col.y == 0 && col.z == 0 && col.w == 0) Text(label);
+	else TextColored(col, label);
 
 	return response;
 }
@@ -395,7 +397,7 @@ void drawPlayerIcon(PlayerControl* player, const ImVec2& winPos, ImU32 color)
 		p_min, p_max,
 		ImVec2(0.0f, 1.0f),
 		ImVec2(1.0f, 0.0f),
-		(State.RadarVisorRoleColor && State.RevealRoles) ? 
+		(/*State.RadarVisorRoleColor && */State.RevealRoles) ?
 		GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerData(player)->fields.Role))) : 
 		GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->VisorColor)));
 

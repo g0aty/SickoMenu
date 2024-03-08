@@ -41,7 +41,8 @@ namespace HostTab {
 					app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
 					if (outfit == NULL) continue;
 					const std::string& playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
-					if (CustomListBoxInt(playerName.c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale))
+					//player colors in host tab by gdjkhp (https://github.com/GDjkhp/AmongUsMenu/commit/53b017183bac503c546f198e2bc03539a338462c)
+					if (CustomListBoxInt(playerName.c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId))))
 					{
 						State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
 						State.scientists_amount = (int)GetRoleCount(RoleType::Scientist);

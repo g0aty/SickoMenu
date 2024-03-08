@@ -9,7 +9,6 @@
 #include <sstream>
 #include <chrono>
 
-
 namespace Replay
 {
 	// NOTE:
@@ -299,6 +298,7 @@ namespace Replay
 			}
 
 			IconTexture icon = icons.at(ICON_TYPES::PLAYER);
+			IconTexture visorIcon = icons.at(ICON_TYPES::PLAYERVISOR);
 			const auto& map = maps[(size_t)MapType];
 			// the latestPos variable is already pre-transformed for line rendering, so we have to un-transform and then re-transform for proper icon positioning
 			// existing transformation:
@@ -322,6 +322,13 @@ namespace Replay
 				ImVec2(0.0f, 0.0f),
 				ImVec2(1.0f, 1.0f),
 				GetReplayPlayerColor(plrLineData.colorId));
+			drawList->AddImage((void*)visorIcon.iconImage.shaderResourceView,
+				p_min, p_max,
+				ImVec2(0.0f, 0.0f),
+				ImVec2(1.0f, 1.0f),
+				State.RevealRoles ?
+				ImGui::GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerDataById(plrLineData.playerId)->fields.Role))) :
+				ImGui::GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->VisorColor)));
 
 			app::GameData_PlayerInfo* plrInfo = GetPlayerDataById(plrLineData.playerId);
 			if ((plrInfo != NULL) &&

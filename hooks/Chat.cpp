@@ -33,7 +33,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 }
 
 void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo* method) {
-	if ((State.ChatAlwaysActive && !State.PanicMode) || (State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead))
+	if (State.ChatAlwaysActive && !State.PanicMode)
 		ChatController_SetVisible(__this, true, method);
 	else
 	{

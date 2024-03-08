@@ -1,4 +1,4 @@
-# 👺 SickoMenu v3.1: The "Update" Update?
+# 👺 SickoMenu v3.1.1: The "Update" Update? (Hotfix)
 A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
 
 Join our very own [Discord](https://dsc.gg/sickos) server for support, bug reports, and sneak peeks!
@@ -22,6 +22,15 @@ A huge collection of various utilities and cheats such as
 <p align="center">
    <img src="screenshot.png">
 </p>
+
+## 👌 Supported Versions
+- ✅ Steam (Supported)
+- ✅ Epic Games (Supported)
+- ✅ itch.io (Supported)
+- ❓ Cracked (works occasionally, I don't condone it)
+- ❌ Microsoft Store (Not Supported)
+- ❌ iOS/iPadOS/Android (Not Supported)
+- ❌ Switch/Xbox/Playstation (Not Supported)
 
 ## ⬇️ Download & Install
 ### For Windows

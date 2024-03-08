@@ -207,7 +207,7 @@ void ImpersonateName(__maybenull GameData_PlayerInfo* data);
 void ImpersonateOutfit(GameData_PlayerOutfit* outfit);
 Game::ColorId GetRandomColorId();
 std::string GetGradientUsername(std::string str, bool useState, bool underline = false, bool strike = false, ImVec4 color1 = ImVec4(1.f, 1.f, 1.f, 1.f), ImVec4 color2 = ImVec4(1.f, 1.f, 1.f, 1.f));
-void RefreshChat();
+void RefreshChat(bool alsoShow = false);
 void SaveOriginalAppearance();
 void ResetOriginalAppearance();
 void ControlAppearance(bool randomize);

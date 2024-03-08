@@ -40,6 +40,10 @@ namespace AboutTab {
             ImGui::Text(welcomeText.c_str());
             ImGui::Text("SickoMenu is a highly sophisticated cheat menu for Among Us based on AmongUsMenu.");
             ImGui::Text("It promises more features and regular updates.");
+            if (ImGui::Button("GitHub")) {
+                OpenLink("https://github.com/g0aty/SickoMenu");
+            }
+            ImGui::SameLine();
             if (ImGui::Button("Check for Updates")) {
                 OpenLink("https://github.com/g0aty/SickoMenu/releases/latest");
             }
@@ -47,6 +51,9 @@ namespace AboutTab {
             if (ImGui::Button("Join our Discord!")) {
                 OpenLink("https://dsc.gg/sickos"); //sickomenu discord invite
             }
+            ImGui::Text("SickoMenu is a free and open-source software.");
+            ImGui::Text("If you've paid for this menu, demand a refund immediately.");
+            //hopefully stop people from reselling a foss menu for actual money
         }
 
         if (openCredits) {

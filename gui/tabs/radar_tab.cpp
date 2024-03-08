@@ -43,12 +43,12 @@ namespace RadarTab {
 		if (ToggleButton("Draw Player Icons", &State.RadarDrawIcons)) {
 			State.Save();
 		}
-		if (State.RadarDrawIcons && State.RevealRoles) {
+		/*if (State.RadarDrawIcons && State.RevealRoles) {
 			ImGui::SameLine();
 			if (ToggleButton("Show Role Color on Visor", &State.RadarVisorRoleColor)) {
 				State.Save();
 			}
-		}
+		}*/
 
 		if (ToggleButton("Lock Radar Position", &State.LockRadar)) {
 			State.Save();
@@ -64,10 +64,14 @@ namespace RadarTab {
 			| ImGuiColorEditFlags_AlphaPreview)) {
 			State.Save();
 		}
-		if (ImGui::InputInt("Extra Width", &State.RadarExtraWidth))
+		if (ImGui::InputInt("Extra Width", &State.RadarExtraWidth)) {
+			State.RadarExtraWidth = abs(State.RadarExtraWidth); //prevent negatives
 			State.Save();
-		if (ImGui::InputInt("Extra Height", &State.RadarExtraHeight))
+		}
+		if (ImGui::InputInt("Extra Height", &State.RadarExtraHeight)) {
+			State.RadarExtraHeight = abs(State.RadarExtraHeight); //prevent negatives
 			State.Save();
+		}
 
 		ImGui::EndChild();
 	}
