@@ -131,6 +131,14 @@ namespace SettingsTab {
 		}
 
 		if (ImGui::CollapsingHeader("Spoof Account Info")) {
+			if (ToggleButton("Spoof Guest Account", &State.SpoofGuestAccount)) {
+				State.Save();
+			}
+			ImGui::SameLine();
+			if (InputString("Guest Friend Code", &State.GuestFriendCode)) {
+				State.Save();
+			}
+			ImGui::Text("Guest friend code can only be less than 10 characters long and cannot have the (#0000) tag.");
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
 			}

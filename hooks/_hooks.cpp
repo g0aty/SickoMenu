@@ -151,6 +151,7 @@ void DetourInitilization() {
 	HOOKFUNC(Debug_LogException);
 	HOOKFUNC(Debug_LogWarning);
 	HOOKFUNC(VersionShower_Start);
+	HOOKFUNC(EOSManager_StartInitialLoginFlow);
 	HOOKFUNC(EOSManager_LoginFromAccountTab);
 	HOOKFUNC(EOSManager_InitializePlatformInterface);
 	HOOKFUNC(EOSManager_IsFreechatAllowed);
@@ -271,6 +272,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(Debug_LogException);
 	UNHOOKFUNC(Debug_LogWarning);
 	UNHOOKFUNC(VersionShower_Start);
+	UNHOOKFUNC(EOSManager_StartInitialLoginFlow);
 	UNHOOKFUNC(EOSManager_LoginFromAccountTab);
 	UNHOOKFUNC(EOSManager_InitializePlatformInterface);
 	UNHOOKFUNC(EOSManager_IsFreechatAllowed);

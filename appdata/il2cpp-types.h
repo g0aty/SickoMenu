@@ -4701,6 +4701,44 @@ namespace app
     };
 #pragma endregion
 
+#pragma region EditAccountUsername
+    struct EditAccountUsername__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* UsernameText;
+        struct TextMeshPro* SuccessText;
+        struct GameObject* SuccessMessage;
+        struct GameObject* PopUp;
+        struct UiElement* DefaultButtonSelected;
+        struct List_1_UiElement_* ControllerSelectable;
+    };
+
+    struct EditAccountUsername {
+        struct EditAccountUsername__Class* klass;
+        MonitorData* monitor;
+        struct EditAccountUsername__Fields fields;
+    };
+
+    struct EditAccountUsername__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData OnDisable;
+    };
+
+    struct EditAccountUsername__StaticFields {
+    };
+
+    struct EditAccountUsername__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct EditAccountUsername__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct EditAccountUsername__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region FullAccount
     struct FullAccount__Fields {
         struct MonoBehaviour__Fields _;
@@ -12202,6 +12240,7 @@ namespace app
     typedef Il2CppObject LogicGameFlowNormal;
     typedef Il2CppObject LogicGameFlowHnS;
     typedef Il2CppObject PlayerData;
+    typedef Il2CppObject PlayerAccountData;
     typedef Il2CppObject PlayerCustomizationData;
     typedef Il2CppObject PlayerPurchasesData;
     typedef Il2CppObject ExileController;

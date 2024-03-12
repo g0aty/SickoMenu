@@ -3,35 +3,59 @@
 #include "logger.h"
 #include "state.hpp"
 
-/*void fakeSuccessfulLogin(EOSManager* eosManager)
+void fakeSuccessfulLogin(EOSManager* eosManager)
 {
-	eosManager->fields.loginFlowFinished = true;
-	EOSManager_HasFinishedLoginFlow(eosManager, NULL);
-}*/
+	EOSManager_DeleteDeviceID(eosManager, NULL, NULL);
+	/*eosManager->fields.loginFlowFinished = true;
+	EOSManager_HasFinishedLoginFlow(eosManager, NULL);*/
+	auto player = app::DataManager_get_Player(nullptr);
+	static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
+	LOG_ASSERT(field != nullptr);
+	auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
+	//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
+	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->Il2CppClass.klass, "loginStatus");
+	auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
+	il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
+	if (State.GuestFriendCode != "") {
+		auto username = eosManager->fields.editAccountUsername;
+		TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
+		EditAccountUsername_SaveUsername(username, NULL);
+	}
+}
+
+void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
+	if (!State.SpoofGuestAccount) {
+		EOSManager_StartInitialLoginFlow(__this, method);
+		return;
+	}
+	EOSManager_StartTempAccountFlow(__this, method);
+	EOSManager_CloseStartupWaitScreen(__this, method);
+}
 
 void dEOSManager_LoginFromAccountTab(EOSManager* __this, MethodInfo* method)
 {
-	//EOSManager_DeleteDeviceID(__this, NULL);
 	EOSManager_LoginFromAccountTab(__this, method);
-	//LOG_DEBUG("Faking login");
-	//fakeSuccessfulLogin(__this);
+	if (State.SpoofGuestAccount) {
+		LOG_DEBUG("Faking login");
+		fakeSuccessfulLogin(__this);
+	}
 }
 
 void dEOSManager_InitializePlatformInterface(EOSManager* __this, MethodInfo* method)
 {
 	EOSManager_InitializePlatformInterface(__this, method);
 	//LOG_DEBUG("Skipping device identification");
-	//__this->fields.platformInitialized = true;
+	__this->fields.platformInitialized = true;
 }
 
 bool dEOSManager_IsFreechatAllowed(EOSManager* __this, MethodInfo* method)
 {
-	return app::EOSManager_IsFreechatAllowed(__this, method);
+	return true;//app::EOSManager_IsFreechatAllowed(__this, method);
 }
 
 bool dEOSManager_IsFriendsListAllowed(EOSManager* __this, MethodInfo* method)
 {
-	return app::EOSManager_IsFriendsListAllowed(__this, method);
+	return true;//app::EOSManager_IsFriendsListAllowed(__this, method);
 }
 
 void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, MethodInfo* method) {
@@ -46,9 +70,28 @@ void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, Method
 }
 
 void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
+	static bool hasDeletedDeviceId = false;
 	if (State.SpoofFriendCode) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
 	EOSManager_Update(__this, method);
 	EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
+	auto player = app::DataManager_get_Player(nullptr);
+	static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
+	LOG_ASSERT(field != nullptr);
+	auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
+	//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
+	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->Il2CppClass.klass, "loginStatus");
+	auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
+	il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
+	if (State.GuestFriendCode != "") {
+		auto username = __this->fields.editAccountUsername;
+		TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
+		EditAccountUsername_SaveUsername(username, NULL);
+	}
+	if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
+		EOSManager_DeleteDeviceID(__this, NULL, NULL);
+		LOG_DEBUG("Successfully deleted device ID!");
+		hasDeletedDeviceId = true;
+	}
 }
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {

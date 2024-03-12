@@ -46,9 +46,11 @@ public:
     bool ShowKeybinds = true;
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
+    std::string GuestFriendCode = "";
     std::string FakeFriendCode = "";
     bool SpoofPlatform = false;
     int FakePlatform = 0;
+    bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
 
     bool AdjustByDPI = true;

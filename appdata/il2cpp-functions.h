@@ -217,14 +217,20 @@ DO_APP_FUNC(void, Debug_LogWarning, (Object* message, MethodInfo* method), "Unit
 DO_APP_FUNC(String*, Object_ToString, (Object* __this, MethodInfo* method), "mscorlib, System.String System.Object::ToString()");
 DO_APP_FUNC(void, VersionShower_Start, (VersionShower* __this, MethodInfo* method), "Assembly-CSharp, System.Void VersionShower::Start()");
 
+DO_APP_FUNC(void, EOSManager_StartInitialLoginFlow, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::StartInitialLoginFlow()");
 DO_APP_FUNC(void, EOSManager_LoginFromAccountTab, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::LoginFromAccountTab()");
 DO_APP_FUNC(bool, EOSManager_HasFinishedLoginFlow, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean EOSManager::HasFinishedLoginFlow()");
 DO_APP_FUNC(void, EOSManager_InitializePlatformInterface, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::InitializePlatformInterface()");
 DO_APP_FUNC(bool, EOSManager_IsFreechatAllowed, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean EOSManager::IsFreechatAllowed()");
 DO_APP_FUNC(void, EOSManager_UpdatePermissionKeys, (EOSManager* __this, void* callback, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::UpdatePermissionKeys(System.Action)");
+DO_APP_FUNC(void, EOSManager_DeleteDeviceID, (EOSManager* __this, void* callback, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::DeleteDeviceID(System.Action)");
 DO_APP_FUNC(void, EOSManager_Update, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::Update()");
 DO_APP_FUNC(bool, EOSManager_IsFriendsListAllowed, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean EOSManager::IsFriendsListAllowed()");
 DO_APP_FUNC(String*, EOSManager_get_ProductUserId, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.String EOSManager::get_ProductUserId()");
+DO_APP_FUNC(void, EOSManager_StartTempAccountFlow, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::StartTempAccountFlow()");
+DO_APP_FUNC(void, EOSManager_CloseStartupWaitScreen, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::CloseStartupWaitScreen()");
+DO_APP_FUNC(void, PlayerAccountData_set_LoginStatus, (PlayerAccountData* __this, EOSManager_AccountLoginStatus__Enum value, MethodInfo* method), "Assembly-CSharp, System.Void AmongUs.Data.Player.PlayerAccountData::set_LoginStatus(EOSManager.AccountLoginStatus)");
+DO_APP_FUNC(void, EditAccountUsername_SaveUsername, (EditAccountUsername* __this, MethodInfo* method), "Assembly-CSharp, System.Void EditAccountUsername::SaveUsername()");
 
 DO_APP_FUNC(void, TextMeshPro_SetFaceColor, (TextMeshPro* __this, Color32 color, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TextMeshPro::SetFaceColor(UnityEngine.Color32)");
 DO_APP_FUNC(void, TextMeshPro_SetOutlineColor, (TextMeshPro* __this, Color32 color, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TextMeshPro::SetOutlineColor(UnityEngine.Color32)");

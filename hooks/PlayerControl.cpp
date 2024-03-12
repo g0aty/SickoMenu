@@ -151,44 +151,46 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				playerName = "<#0000>● </color>" + playerName + dot;
 			}
 
-			if (State.ShowPlayerInfo && IsInLobby() && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
+			if (State.ShowPlayerInfo && IsInLobby() && !State.PanicMode)
 			{
 				uint32_t playerLevel = playerData->fields.PlayerLevel + 1;
 				uint8_t playerId = GetPlayerControlById(playerData->fields.PlayerId)->fields._.OwnerId;
 				uint8_t hostId = InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Id;
-				std::string platform = "";
+				std::string platformId = "Unknown";
 				for (auto client : GetAllClients()) {
 					if (GetPlayerControlById(GetPlayerData(__this)->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
-						switch (client->fields.PlatformData->fields.Platform) {
+						auto platform = client->fields.PlatformData->fields.Platform;
+						if (client->fields.Character == *Game::pLocalPlayer && State.SpoofPlatform) platform = Platforms__Enum(State.FakePlatform + 1); //fix incorrect platform showing for yourself
+						switch (platform) {
 						case Platforms__Enum::StandaloneEpicPC:
-							platform = "Epic Games - PC";
+							platformId = "Epic Games - PC";
 							break;
 						case Platforms__Enum::StandaloneSteamPC:
-							platform = "Steam - PC";
+							platformId = "Steam - PC";
 							break;
 						case Platforms__Enum::StandaloneMac:
-							platform = "Mac";
+							platformId = "Mac";
 							break;
 						case Platforms__Enum::StandaloneWin10:
-							platform = "Microsoft Store - PC";
+							platformId = "Microsoft Store - PC";
 							break;
 						case Platforms__Enum::StandaloneItch:
-							platform = "itch.io - PC";
+							platformId = "itch.io - PC";
 							break;
 						case Platforms__Enum::IPhone:
-							platform = "iOS/iPadOS - Mobile";
+							platformId = "iOS/iPadOS - Mobile";
 							break;
 						case Platforms__Enum::Android:
-							platform = "Android - Mobile";
+							platformId = "Android - Mobile";
 							break;
 						case Platforms__Enum::Switch:
-							platform = "Nintendo Switch - Console";
+							platformId = "Nintendo Switch - Console";
 							break;
 						case Platforms__Enum::Xbox:
-							platform = "Xbox - Console";
+							platformId = "Xbox - Console";
 							break;
 						default:
-							platform = "Unknown Platform";
+							platformId = "Unknown Platform";
 							break;
 						}
 						break;
@@ -196,7 +198,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 				std::string isAum = std::count(State.aumUsers.begin(), State.aumUsers.end(), playerData->fields.PlayerId) ? " <#f55>[AUM]</color>" : "";
 				std::string isSicko = (playerData == localData || std::count(State.sickoUsers.begin(), State.sickoUsers.end(), playerData->fields.PlayerId)) ? " <#afa>[SICKO]</color>" : "";
-				std::string levelText = std::format("<#9ef>Level <#0f0>{}</color> ({}){}{}</color>", playerLevel, platform, isSicko, isAum);
+				std::string levelText = std::format("<#9ef>Level <#0f0>{}</color> ({}){}{}</color>", playerLevel, platformId, isSicko, isAum);
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				if (IsStreamerMode())
 					friendCode = "Friend Code Hidden";
@@ -1024,7 +1026,7 @@ void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method) 
 
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
 	auto result = ImpostorRole_FindClosestTarget(__this, method);
-	if (result == nullptr && State.InfiniteKillRange) {
+	if (!State.PanicMode && result == nullptr && State.InfiniteKillRange) {
 		PlayerControl* new_result = nullptr;
 		float max_dist = FLT_MAX;
 		auto localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
@@ -1042,7 +1044,7 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 		result = new_result;
 	}
 
-	if (result != nullptr && State.AutoKill && (State.AlwaysMove || (*Game::pLocalPlayer)->fields.moveable) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
+	if (!State.PanicMode && result != nullptr && State.AutoKill && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
 		if (IsInGame()) State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 		else State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 	}

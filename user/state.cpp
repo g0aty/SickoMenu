@@ -46,9 +46,11 @@ void Settings::Load() {
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
         JSON_TRYGET("FakeLevel", this->FakeLevel);
         JSON_TRYGET("SpoofFriendCode", this->SpoofFriendCode);
+        JSON_TRYGET("GuestFriendCode", this->GuestFriendCode);
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
+        JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
 
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
@@ -222,9 +224,11 @@ void Settings::Save() {
             { "SpoofLevel", this->SpoofLevel },
             { "FakeLevel", this->FakeLevel },
             { "SpoofFriendCode", this->SpoofFriendCode },
+            { "GuestFriendCode", this->GuestFriendCode },
             { "FakeFriendCode", this->FakeFriendCode },
             { "SpoofPlatform", this->SpoofPlatform },
             { "FakePlatform", this->FakePlatform },
+            { "SpoofGuestAccount", this->SpoofGuestAccount },
             //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
 
             { "SelectedColorId", this->SelectedColorId },

@@ -66,6 +66,7 @@ void dDebug_LogError(Object* message, MethodInfo* method);
 void dDebug_LogException(Exception* exception, MethodInfo* method);
 void dDebug_LogWarning(Object* message, MethodInfo* method);
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method);
+void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method);
 void dEOSManager_LoginFromAccountTab(EOSManager* __this, MethodInfo* method);
 void dEOSManager_InitializePlatformInterface(EOSManager* __this, MethodInfo* method);
 bool dEOSManager_IsFreechatAllowed(EOSManager* __this, MethodInfo* method);
