@@ -16,11 +16,6 @@ void fakeSuccessfulLogin(EOSManager* eosManager)
 	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->Il2CppClass.klass, "loginStatus");
 	auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
 	il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
-	if (State.GuestFriendCode != "") {
-		auto username = eosManager->fields.editAccountUsername;
-		TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
-		EditAccountUsername_SaveUsername(username, NULL);
-	}
 }
 
 void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
@@ -71,26 +66,34 @@ void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, Method
 
 void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	static bool hasDeletedDeviceId = false;
-	if (State.SpoofFriendCode) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
+	__this->fields.ageOfConsent = 0; //why tf does amogus have an age of consent lmao
+	if (State.SpoofFriendCode && IsHost()) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
 	EOSManager_Update(__this, method);
 	EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
-	auto player = app::DataManager_get_Player(nullptr);
-	static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
-	LOG_ASSERT(field != nullptr);
-	auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
-	//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
-	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->Il2CppClass.klass, "loginStatus");
-	auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
-	il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
-	if (State.GuestFriendCode != "") {
-		auto username = __this->fields.editAccountUsername;
-		TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
-		EditAccountUsername_SaveUsername(username, NULL);
+	if (State.SpoofGuestAccount) {
+		auto player = app::DataManager_get_Player(nullptr);
+		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
+		LOG_ASSERT(field != nullptr);
+		auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
+		//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
+		static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->Il2CppClass.klass, "loginStatus");
+		auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
+		il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
+		if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
+			auto username = __this->fields.editAccountUsername;
+			TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
+			EditAccountUsername_SaveUsername(username, NULL);
+		}
+		if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
+			EOSManager_DeleteDeviceID(__this, NULL, NULL);
+			LOG_DEBUG("Successfully deleted device ID!");
+			hasDeletedDeviceId = true;
+		}
 	}
-	if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
-		EOSManager_DeleteDeviceID(__this, NULL, NULL);
-		LOG_DEBUG("Successfully deleted device ID!");
-		hasDeletedDeviceId = true;
+
+	if (!IsHost() && (IsInLobby() || IsInGame())) {
+		auto friendCode = (*Game::pLocalPlayer)->fields.FriendCode;
+		__this->fields.friendCode = friendCode;
 	}
 }
 

@@ -151,6 +151,13 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				playerName = "<#0000>● </color>" + playerName + dot;
 			}
 
+			if (IsInLobby() && State.RevealRoles) {
+				Color32&& roleColor = app::Color32_op_Implicit(GetRoleColor(playerData->fields.Role), NULL);
+				playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
+					roleColor.r, roleColor.g, roleColor.b,
+					roleColor.a, playerName);
+			}
+
 			if (State.ShowPlayerInfo && IsInLobby() && !State.PanicMode)
 			{
 				uint32_t playerLevel = playerData->fields.PlayerLevel + 1;
@@ -216,7 +223,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#9ef>" + friendCode + "</color><#0000>0</color>";
 				}
 			}
-
 			if (IsInGame() && State.RevealRoles && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
 			{
 				std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);

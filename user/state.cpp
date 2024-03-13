@@ -46,6 +46,7 @@ void Settings::Load() {
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
         JSON_TRYGET("FakeLevel", this->FakeLevel);
         JSON_TRYGET("SpoofFriendCode", this->SpoofFriendCode);
+        JSON_TRYGET("UseGuestFriendCode", this->UseGuestFriendCode);
         JSON_TRYGET("GuestFriendCode", this->GuestFriendCode);
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
@@ -224,6 +225,7 @@ void Settings::Save() {
             { "SpoofLevel", this->SpoofLevel },
             { "FakeLevel", this->FakeLevel },
             { "SpoofFriendCode", this->SpoofFriendCode },
+            { "UseGuestFriendCode", this->UseGuestFriendCode },
             { "GuestFriendCode", this->GuestFriendCode },
             { "FakeFriendCode", this->FakeFriendCode },
             { "SpoofPlatform", this->SpoofPlatform },

@@ -1,6 +1,7 @@
 # Features of SickoMenu
 
 ## ⚙️ Settings
+### General
 - **Keybinds** Show/Hide Menu/Console (Default: DELETE, HOME)
 - **Show Keybinds** Allows you to see and modify keybinds (Default: ON)
 - **Allow Keybinds while Chatting** Allows you to use keybinds while chatting (Default: OFF)
@@ -17,13 +18,16 @@
 - **Automatically Set Name** If your name is not the same as the username, set the username automatically (Default: OFF)
 - **Replace Streamer Mode Lobby Code** Changes the streamer mode hidden code from "******" to your custom text (Default: "SICKOS")
 - **RGB Lobby Code** Makes the lobby code RGB (Default: OFF)
-- **Spoof Level** Spoofs your level in game (Default: OFF)
-- **Spoof Friend Code** *(Note: This only works as host due to Innersloth patches)* Spoofs your friend code  (Default: OFF)
-- **Spoof Platform** Spoofs your platform to whatever you choose (Default: OFF)
 - **Unlock All Achievements** Unlocks all Achievements
 - **Unlock Cosmetics** Unlocks every cosmetic (hats, visors, etc.) (Default: OFF)
 - **Safe Mode** Disables certain features whenever there is an anticheat (Default: ON)
 - **Allow other SickoMenu users to see you're using SickoMenu** Allows SickoMenu users to see other SickoMenu users
+### Spoofing
+- **Spoof Guest Account** Spoofs your account to be a new guest account everytime you log in *(Works best with version.dll)* (Default: OFF)
+- **Use Custom Guest Friend Code** Changes your new friend code to whatever you want as long as it's valid (Default: OFF)
+- **Spoof Level** Spoofs your level in game (Default: OFF)
+- **Spoof Friend Code** *(Note: This only works as host due to Innersloth patches)* Spoofs your friend code  (Default: OFF)
+- **Spoof Platform** Spoofs your platform to whatever you choose (Default: OFF)
 
 ## 🎮 Game
 ### General

@@ -46,6 +46,7 @@ public:
     bool ShowKeybinds = true;
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
+    bool UseGuestFriendCode = false;
     std::string GuestFriendCode = "";
     std::string FakeFriendCode = "";
     bool SpoofPlatform = false;
@@ -344,7 +345,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.1.1";
+    std::string SickoVersion = "v3.2";
 
     void Load();
     void Save();

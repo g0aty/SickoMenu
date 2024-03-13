@@ -32,8 +32,9 @@ namespace HostTab {
 				auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
 				for (size_t index = 0; index < playerAmount; index++) {
 					auto playerData = allPlayers[index];
+					if (playerData == nullptr) continue;
 					PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
-
+					if (playerCtrl == nullptr) continue;
 					State.assignedRolesPlayer[index] = playerCtrl;
 					if (State.assignedRolesPlayer[index] == nullptr)
 						continue;

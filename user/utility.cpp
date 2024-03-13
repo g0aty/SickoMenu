@@ -341,7 +341,7 @@ PlayerControl* GetPlayerControlById(Game::PlayerId id) {
 
 bool IsColorAvailable(int colorId) {
 	for (auto player : GetAllPlayerData()) {
-		if (GetPlayerOutfit(player)->fields.ColorId = colorId) {
+		if (GetPlayerOutfit(player)->fields.ColorId == colorId) { //aw hell nah, i made a classic mistake: forgetting another =
 			return false;
 			break;
 		}

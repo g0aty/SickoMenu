@@ -48,9 +48,12 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 			app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
 			if (outfit == NULL) continue;
 			if (playerName == GameData_PlayerOutfit_get_PlayerName(outfit, nullptr)) {
+				auto localData = GetPlayerData(*Game::pLocalPlayer);
 				color = State.RevealRoles ? GetRoleColor(playerData->fields.Role) : 
-					(PlayerIsImpostor(playerData) ? Palette__TypeInfo->static_fields->ImpostorRed : Palette__TypeInfo->static_fields->White);
-
+					(PlayerIsImpostor(localData) && PlayerIsImpostor(playerData) ? Palette__TypeInfo->static_fields->ImpostorRed : Palette__TypeInfo->static_fields->White);
+				if (State.RevealRoles && IsInGame()) {
+					playerName = convert_to_string("<size=50%>" + GetRoleName(playerData->fields.Role) + "</size> " + convert_from_string(playerName));
+				}
 				if (State.CustomName && !State.ServerSideCustomName && playerData == GetPlayerData(*Game::pLocalPlayer)) {
 					if (State.ColoredName && !State.RgbName) {
 						playerName = convert_to_string(GetGradientUsername(RemoveHtmlTags(convert_from_string(playerName)), true));

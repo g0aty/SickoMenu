@@ -154,7 +154,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     else if (IsInLobby())
                         queue = &State.lobbyRpcQueue;
 
-                    if (State.SafeMode) {
+                    if (!IsHost() || State.SafeMode) {
                         queue->push(new RpcSetColor(State.SelectedColorId));
                         LOG_INFO("Successfully sniped your desired color!");
                     }
