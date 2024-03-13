@@ -25,7 +25,7 @@ A huge collection of various utilities and cheats such as
 
 ## 👌 Supported Versions
 - ✅ Steam (Supported)
-- ✅ Epic Games (Supported)
+- ✅ Epic Games (Supported - Broken as of v3.2)
 - ✅ itch.io (Supported)
 - ❓ Cracked (works occasionally, I don't condone it)
 - ❌ Microsoft Store (Not Supported)
