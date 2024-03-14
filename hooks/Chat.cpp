@@ -169,6 +169,7 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, __this, chatText, false, NULL);
 		}
+		return;
 	}
 	else {
 		PlayerControl_RpcSendChat(__this, chatText, NULL);
