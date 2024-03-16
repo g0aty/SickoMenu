@@ -149,6 +149,10 @@ namespace HostTab {
 			}
 
 			if (IsInMultiplayerGame() || IsInLobby()) { //lobby isn't possible in freeplay
+				if (ToggleButton("Vote Immunity for Self", &State.VoteImmunity)) {
+					State.Save();
+				}
+
 				if (ToggleButton("Disable Game Ending", &State.NoGameEnd)) {
 					State.Save();
 				}

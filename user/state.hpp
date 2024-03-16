@@ -257,6 +257,7 @@ public:
 
     bool DisableHud = false;
     bool GodMode = false;
+    bool VoteImmunity = true;
 
     bool ActiveAttach = false;
     bool ActiveShapeshift = false;

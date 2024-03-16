@@ -2,6 +2,7 @@
 #include "utility.h"
 
 void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader);
+bool CanHandleVotes(PlayerControl* player, uint8_t callId, MessageReader* reader);
 
 class RPCInterface {
 public:

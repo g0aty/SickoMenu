@@ -153,6 +153,9 @@ namespace PlayersTab {
 						case Platforms__Enum::Xbox:
 							platform = "Xbox (Console)";
 							break;
+						case Platforms__Enum::Playstation:
+							platform = "Playstation (Console)";
+							break;
 						default:
 							platform = "Unknown";
 							break;
@@ -885,9 +888,9 @@ namespace PlayersTab {
 						ImGui::InputInt("Level", &level);
 						if (ImGui::Button("Force Level")) {
 							if (IsInGame())
-								State.rpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level));
+								State.rpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level - 1));
 							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level));
+								State.lobbyRpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level - 1));
 						}
 					}
 

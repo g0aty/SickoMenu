@@ -196,6 +196,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						case Platforms__Enum::Xbox:
 							platformId = "Xbox - Console";
 							break;
+						case Platforms__Enum::Playstation:
+							platformId = "Playstation - Console";
+							break;
 						default:
 							platformId = "Unknown Platform";
 							break;
@@ -874,6 +877,7 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) ||
 				(State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder))) //we cannot prevent murderplayer because the player will force it
 				return;
+			if (CanHandleVotes(__this, callId, reader)) return;
 		}
 	}
 	catch (...) {

@@ -50,3 +50,12 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		break;
 	}
 }
+
+bool CanHandleVotes(PlayerControl* player, uint8_t callId, MessageReader* reader) {
+	if (!IsHost() || !State.VoteImmunity || callId != (uint8_t)RpcCalls__Enum::CastVote) return false;
+	uint8_t voterId = MessageReader_ReadByte(reader, NULL);
+	uint8_t sussyId = MessageReader_ReadByte(reader, NULL);
+	if (sussyId != (*Game::pLocalPlayer)->fields.PlayerId) return false;
+	MeetingHud_CmdCastVote(MeetingHud__TypeInfo->static_fields->Instance, voterId, Game::SkippedVote, NULL);
+	return true;
+}

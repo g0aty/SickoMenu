@@ -166,6 +166,7 @@ void Settings::Load() {
 
         JSON_TRYGET("CustomImpostorAmount", this->CustomImpostorAmount);
         JSON_TRYGET("ImpostorCount", this->ImpostorCount);
+        JSON_TRYGET("VoteImmunity", this->VoteImmunity);
 
         if (this->ShowMenuOnStartup)
             JSON_TRYGET("ShowConsole", this->ShowConsole);
@@ -345,6 +346,7 @@ void Settings::Save() {
 
             { "CustomImpostorAmount", this->CustomImpostorAmount },
             { "ImpostorCount", this->ImpostorCount },
+            { "VoteImmunity", this->VoteImmunity },
 
             { "ShowConsole", this->ShowConsole },
             { "ShowUnityLogs", this->ShowUnityLogs },
