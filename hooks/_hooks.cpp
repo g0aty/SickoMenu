@@ -41,7 +41,7 @@ void DetourInitilization() {
 		return;
 	} else {
 		// Attempting to hook the Steam overlay
-		do {
+		/*do {
 			if (oPresent)
 				break;
 			HMODULE hModule = GetModuleHandleA("GameOverlayRenderer.dll");
@@ -83,7 +83,7 @@ void DetourInitilization() {
 				return;
 			}
 			oPresent = d3d11.presentFunction;
-		} while (0);
+		} while (0);*/
 		if (!oPresent)
 			oPresent = d3d11.presentFunction;
 	}

@@ -912,9 +912,9 @@ namespace PlayersTab {
 						ImGui::InputInt("Level", &level);
 						if (ImGui::Button("Force Level")) {
 							if (IsInGame())
-								State.rpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level));
+								State.rpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level - 1));
 							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level));
+								State.lobbyRpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level - 1));
 						}
 					}
 
