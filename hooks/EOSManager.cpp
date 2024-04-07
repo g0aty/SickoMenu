@@ -67,7 +67,7 @@ void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, Method
 void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	static bool hasDeletedDeviceId = false;
 	__this->fields.ageOfConsent = 0; //why tf does amogus have an age of consent lmao
-	if (State.SpoofFriendCode && IsHost()) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
+	if (State.SpoofFriendCode) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
 	EOSManager_Update(__this, method);
 	EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
 	if (State.SpoofGuestAccount) {
@@ -82,13 +82,13 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
 			auto username = __this->fields.editAccountUsername;
 			TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
-			EditAccountUsername_SaveUsername(username, NULL);
+			//EditAccountUsername_SaveUsername(username, NULL);
 		}
-		if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
-			EOSManager_DeleteDeviceID(__this, NULL, NULL);
-			LOG_DEBUG("Successfully deleted device ID!");
-			hasDeletedDeviceId = true;
-		}
+	}
+	if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
+		EOSManager_DeleteDeviceID(__this, NULL, NULL);
+		LOG_DEBUG("Successfully deleted device ID!");
+		hasDeletedDeviceId = true;
 	}
 
 	if (!IsHost() && (IsInLobby() || IsInGame())) {

@@ -48,6 +48,11 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 					(State.PanicMode || (!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
 					&& !localData->fields.IsDead,
 					NULL);
+				static int countdown = 25;
+				if (countdown <= 0) {
+					State.CanChangeOutfit = true;
+				}
+				else countdown--;
 			}
 
 			if (!State.InMeeting && !State.DisableHud)

@@ -30,6 +30,8 @@ static void onGameEnd() {
         State.IsRevived = false;
         State.protectMonitor.clear();
         State.VoteKicks = 0;
+        State.CanChangeOutfit = false;
+        State.RealRole = RoleTypes__Enum::Crewmate;
 
         drawing_t& instance = Esp::GetDrawing();
         synchronized(instance.m_DrawingMutex) {
@@ -218,14 +220,14 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                             engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
                     }
-                    else if (role == RoleTypes__Enum::Scientist) {
+                    if (role == RoleTypes__Enum::Scientist) {
                         app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
                         if (scientistRole->fields.currentCooldown > 0.0f)
                             scientistRole->fields.currentCooldown = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         scientistRole->fields.currentCharge = 69420.0f + 1.0f; //Can be anything as it will always be written
                     }
                     if (GameLogicOptions().GetKillCooldown() > 0)
-                        (*Game::pLocalPlayer)->fields.killTimer = 0;
+                        PlayerControl_SetKillTimer(*Game::pLocalPlayer, 0.f, NULL);
                     else
                         GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, 0.0042069f); //force cooldown > 0 as ur unable to kill otherwise
                     if (IsHost() || !State.SafeMode) {
@@ -247,6 +249,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
                         shapeshifterRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
                     }
+                    if (IsInGame()) {
+                        (*Game::pLocalPlayer)->fields.RemainingEmergencies = 69420;
+                        (*Game::pShipStatus)->fields.EmergencyCooldown = 0.f;
+                    }
                 }
             }
             if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && State.NoAbilityCD) {
@@ -261,6 +267,36 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                     engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
                 }
+            }
+
+            if (!State.NoAbilityCD && (IsInGame() || IsInLobby()) && GameOptions().HasOptions()) {
+                auto localData = GetPlayerData(*Game::pLocalPlayer);
+                app::RoleBehaviour* playerRole = localData->fields.Role;
+                app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
+                GameOptions options;
+                if (role == RoleTypes__Enum::Engineer)
+                {
+                    app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
+                    float ventTime = options.GetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, 1.0F);;
+                    if (engineerRole->fields.inVentTimeRemaining > ventTime)
+                        engineerRole->fields.inVentTimeRemaining = ventTime;
+                }
+                if (role == RoleTypes__Enum::Scientist) {
+                    app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
+                    float charge = options.GetFloat(app::FloatOptionNames__Enum::ScientistBatteryCharge, 1.0F);
+                    if (scientistRole->fields.currentCharge > charge)
+                        scientistRole->fields.currentCharge = charge;
+                }
+                if (role == RoleTypes__Enum::Shapeshifter) {
+                    app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
+                    float shiftTime = options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F);
+                    if (shapeshifterRole->fields.durationSecondsRemaining > shiftTime)
+                        shapeshifterRole->fields.durationSecondsRemaining = shiftTime;
+                }
+
+                int emergencies = options.GetInt(app::Int32OptionNames__Enum::NumEmergencyMeetings, 1);
+                if (IsInGame() && (*Game::pLocalPlayer)->fields.RemainingEmergencies > emergencies)
+                    (*Game::pLocalPlayer)->fields.RemainingEmergencies = emergencies;
             }
 
             static int weaponsDelay = 0;
@@ -369,7 +405,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (State.CycleBetweenPlayers)
                 State.Cycler = false;
 
-            if (State.Cycler && (!State.InMeeting || State.CycleInMeeting)) {
+            if (State.Cycler && (!State.InMeeting || State.CycleInMeeting) && State.CanChangeOutfit) {
                 static float cycleNameDelay = 0;
                 if (State.CycleName && cycleNameDelay <= 0) {
                     std::vector<std::string> validNames;
@@ -419,7 +455,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     cycleNameDelay--;
                 }
 
-                if (colorChangeCycleDelay <= 0 && State.RandomColor && !State.activeImpersonation && !State.CycleForEveryone) {
+                if (colorChangeCycleDelay <= 0 && State.RandomColor && !State.activeImpersonation && !State.CycleForEveryone && State.CanChangeOutfit) {
                     if (IsInGame()) {
                         State.RandomColorId = GetRandomColorId();
                         State.rpcQueue.push(new RpcSetColor(State.RandomColorId));
@@ -443,7 +479,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     hatChangeCycler--;
                 }
 
-                if (hatChangeCycleDelay <= 0 && State.RandomHat && !State.activeImpersonation) {
+                if (hatChangeCycleDelay <= 0 && State.RandomHat && !State.activeImpersonation && State.CanChangeOutfit) {
                     if (IsInGame()) {
                         State.rpcQueue.push(new RpcSetHat(State.cyclerHat));
                         hatChangeCycleDelay = State.CycleDuration; //idk how long this is
@@ -466,7 +502,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     skinChangeCycler--;
                 }
 
-                if (skinChangeCycleDelay <= 0 && State.RandomSkin && !State.activeImpersonation) {
+                if (skinChangeCycleDelay <= 0 && State.RandomSkin && !State.activeImpersonation && State.CanChangeOutfit) {
                     if (IsInGame()) {
                         State.rpcQueue.push(new RpcSetSkin(State.cyclerSkin));
                         skinChangeCycleDelay = State.CycleDuration; //idk how long this is
@@ -489,7 +525,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     visorChangeCycler--;
                 }
 
-                if (visorChangeCycleDelay <= 0 && State.RandomVisor && !State.activeImpersonation) {
+                if (visorChangeCycleDelay <= 0 && State.RandomVisor && !State.activeImpersonation && State.CanChangeOutfit) {
                     if (IsInGame()) {
                         State.rpcQueue.push(new RpcSetVisor(State.cyclerVisor));
                         visorChangeCycleDelay = State.CycleDuration; //idk how long this is
@@ -512,7 +548,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     petChangeCycler--;
                 }
 
-                if (petChangeCycleDelay <= 0 && State.RandomPet && !State.activeImpersonation) {
+                if (petChangeCycleDelay <= 0 && State.RandomPet && !State.activeImpersonation && State.CanChangeOutfit) {
                     if (IsInGame()) {
                         State.rpcQueue.push(new RpcSetPet(State.cyclerPet));
                         petChangeCycleDelay = State.CycleDuration; //idk how long this is
@@ -536,7 +572,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     namePlateChangeCycler--;
                 }
 
-                if (namePlateChangeCycleDelay <= 0 && State.RandomNamePlate && !State.activeImpersonation) {
+                if (namePlateChangeCycleDelay <= 0 && State.RandomNamePlate && !State.activeImpersonation && State.CanChangeOutfit) {
                     if (IsInGame()) {
                         State.rpcQueue.push(new RpcSetNamePlate(State.cyclerNamePlate));
                         namePlateChangeCycleDelay = State.CycleDuration; //idk how long this is
@@ -622,7 +658,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.rpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(playerToAttach.get_PlayerControl())));
                 else if (IsInLobby())
                     State.lobbyRpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(playerToAttach.get_PlayerControl())));
-                attachDelay = 25; //Should be approximately 0.5 second
+                attachDelay = 15; //Should be approximately 0.3 second
             }
             else {
                 attachDelay--;
@@ -671,6 +707,15 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableMeetings = false;
                 State.DisableSabotages = false;
             }
+
+            static bool hasConfusedInLobby = false;
+
+            if (!hasConfusedInLobby && State.confuser && State.confuseOnJoin && IsInLobby() && State.CanChangeOutfit) {
+                ControlAppearance(true);
+                hasConfusedInLobby = true;
+            }
+
+            if (!IsInGame() && !IsInLobby()) hasConfusedInLobby = false;
         }
     }
     catch (Exception* ex) {

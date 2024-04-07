@@ -2,7 +2,6 @@
 #include "utility.h"
 
 void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader);
-bool CanHandleVotes(PlayerControl* player, uint8_t callId, MessageReader* reader);
 
 class RPCInterface {
 public:
@@ -221,8 +220,9 @@ public:
 
 class RpcVoteKick : public RPCInterface {
 	PlayerControl* target;
+	bool exploit;
 public:
-	RpcVoteKick(PlayerControl* target);
+	RpcVoteKick(PlayerControl* target, bool exploit = false);
 	virtual void Process() override;
 };
 

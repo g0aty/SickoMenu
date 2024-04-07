@@ -1,4 +1,4 @@
-# 👺 SickoMenu v3.2: The Guest Mode Update
+# 👺 SickoMenu v3.3: The Enhancements Update
 A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
 
 Join our very own [Discord](https://dsc.gg/sickos) server for support, bug reports, and sneak peeks!

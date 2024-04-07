@@ -162,6 +162,7 @@ DO_APP_FUNC(void, AmongUsClient_OnGameJoined, (AmongUsClient* __this, String* ga
 DO_APP_FUNC(void, AmongUsClient_OnPlayerLeft, (AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnPlayerLeft(InnerNet.ClientData, DisconnectReasons)");
 DO_APP_FUNC(bool, InnerNetClient_get_AmHost, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean InnerNet.InnerNetClient::get_AmHost()");
 DO_APP_FUNC(ClientData*, InnerNetClient_GetHost, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, InnerNet.ClientData InnerNet.InnerNetClient::GetHost()");
+DO_APP_FUNC(ClientData*, InnerNetClient_GetClientFromCharacter, (InnerNetClient* __this, InnerNetObject* character, MethodInfo* method), "Assembly-CSharp, InnerNet.ClientData InnerNet.InnerNetClient::GetClientFromCharacter(InnerNet.InnerNetObject)");
 DO_APP_FUNC(void, InnerNetClient_KickPlayer, (InnerNetClient* __this, int32_t clientId, bool ban, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::KickPlayer(System.Int32, System.Boolean)");
 DO_APP_FUNC(void, InnerNetClient_SendStartGame, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::SendStartGame()");
 DO_APP_FUNC(void, InnerNetClient_Update, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::Update()");
@@ -307,7 +308,7 @@ DO_APP_FUNC(String*, EOSManager_get_FriendCode, (EOSManager* __this, MethodInfo*
 DO_APP_FUNC(void, EOSManager_set_FriendCode, (EOSManager* __this, String* value, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::set_FriendCode(System.String)");
 DO_APP_FUNC(float, LogicOptions_GetKillDistance, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, System.Single LogicOptions::GetKillDistance()");
 //DO_APP_FUNC(TaskBarMode__Enum, LogicOptions_GetTaskBarMode, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, TaskbarMode LogicOptions::GetTaskBarMode()");
-//DO_APP_FUNC(void, KillButton_SetTarget, (KillButton* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::SetTarget(PlayerControl)");
+DO_APP_FUNC(void, KillButton_SetTarget, (KillButton* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::SetTarget(PlayerControl)");
 DO_APP_FUNC(PlayerControl*, ImpostorRole_FindClosestTarget, (ImpostorRole* __this, MethodInfo* method), "Assembly-CSharp, PlayerControl ImpostorRole::FindClosestTarget()");
 DO_APP_FUNC(void*, AmongUsClient_CoStartGameHost, (AmongUsClient* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoStartGameHost()");
 //DO_APP_FUNC(AsyncOperationHandle_1_UnityEngine_GameObject_, AssetReference_InstantiateAsync_1, (AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle UnityEngine.AddressableAssets.AssetReference::InstantiateAsync(UnityEngine.Transform, System.Boolean)");
@@ -318,3 +319,11 @@ DO_APP_FUNC(void, MushroomWallDoor_SetDoorway, (MushroomWallDoor* __this, bool o
 //DO_APP_FUNC(void, ActivityManager_UpdateActivity, (ActivityManager* __this, Activity_1 activity, void* callback, MethodInfo* method), "Assembly-CSharp, System.Void Discord.ActivityManager::UpdateActivity(Discord.Activity, Discord.ActivityManager.UpdateActivityHandler)");
 DO_APP_FUNC(bool, LogicGameFlowNormal_IsGameOverDueToDeath, (LogicGameFlowNormal* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean LogicGameFlowNormal::IsGameOverDueToDeath()");
 DO_APP_FUNC(bool, LogicGameFlowHnS_IsGameOverDueToDeath, (LogicGameFlowHnS* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean LogicGameFlowHnS::IsGameOverDueToDeath()");
+DO_APP_FUNC(void, ChatController_OnResolutionChanged, (ChatController* __this, float aspectRatio, int32_t width, int32_t height, bool fullscreen, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::OnResolutionChanged(System.Single, System.Int32, System.Int32, System.Boolean)");
+DO_APP_FUNC(void, ChatController_ForceClosed, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::ForceClosed()");
+DO_APP_FUNC(void, PlayerControl_SetKillTimer, (PlayerControl* __this, float time, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetKillTimer(System.Single)");
+
+//april fools functions
+DO_APP_FUNC(bool, AprilFoolsMode_ShouldFlipSkeld, (MethodInfo* method), "Assembly-CSharp, System.Boolean AprilFoolsMode::ShouldFlipSkeld()");
+DO_APP_FUNC(bool, AprilFoolsMode_ShouldHorseAround, (MethodInfo* method), "Assembly-CSharp, System.Boolean AprilFoolsMode::ShouldHorseAround()");
+DO_APP_FUNC(bool, AprilFoolsMode_ShouldLongAround, (MethodInfo* method), "Assembly-CSharp, System.Boolean AprilFoolsMode::ShouldLongAround()");

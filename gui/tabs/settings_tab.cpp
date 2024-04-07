@@ -12,15 +12,18 @@
 namespace SettingsTab {
 	enum Groups {
 		General,
-		Spoofing
+		Spoofing,
+		Keybinds
 	};
 
 	static bool openGeneral = true; //default to general tab group
 	static bool openSpoofing = false;
+	static bool openKeybinds = false;
 
 	void CloseOtherGroups(Groups group) {
 		openGeneral = group == Groups::General;
 		openSpoofing = group == Groups::Spoofing;
+		openKeybinds = group == Groups::Keybinds;
 	}
 
 	void Render() {
@@ -33,39 +36,21 @@ namespace SettingsTab {
 		if (TabGroup("Spoofing", openSpoofing)) {
 			CloseOtherGroups(Groups::Spoofing);
 		}
+		ImGui::SameLine();
+		if (TabGroup("Keybinds", openKeybinds)) {
+			CloseOtherGroups(Groups::Keybinds);
+		}
 		if (openGeneral) {
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-			if (ToggleButton("Show Keybinds", &State.ShowKeybinds)) {
-				State.Save();
-			}
 			ImGui::SameLine();
 			if (ToggleButton("Allow Activating Keybinds while Chatting", &State.KeybindsWhileChatting)) {
 				State.Save();
-			}
-			if (State.ShowKeybinds) {
-				ImGui::Text("Show/Hide Menu Keybind:");
-				ImGui::SameLine();
-				if (HotKey(State.KeyBinds.Toggle_Menu)) {
-					State.Save();
-				}
-
-				ImGui::Text("Show/Hide Console Keybind:");
-				ImGui::SameLine();
-				if (HotKey(State.KeyBinds.Toggle_Console)) {
-					State.Save();
-				}
 			}
 			if (ToggleButton("Always Show Menu on Startup", &State.ShowMenuOnStartup)) {
 				State.Save();
 			}
 			if (ToggleButton("Panic (Disable SickoMenu)", &State.PanicMode)) {
 				State.Save();
-			}
-			if (State.ShowKeybinds) {
-				ImGui::SameLine();
-				if (HotKey(State.KeyBinds.Toggle_Sicko)) {
-					State.Save();
-				}
 			}
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			ImGui::Separator();
@@ -214,6 +199,124 @@ namespace SettingsTab {
 			ImGui::SameLine();
 			if (CustomListBoxInt("Platform", &State.FakePlatform, PLATFORMS))
 				State.Save();
+		}
+
+		if (openKeybinds) {
+			if (HotKey(State.KeyBinds.Toggle_Menu)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Show/Hide Menu");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Console)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Show/Hide Console");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Radar))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Show/Hide Radar");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Replay))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Show/Hide Replay");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Sicko))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Panic Mode");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Hud))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Enable/Disable HUD");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Freecam)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Freecam");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Zoom))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Zoom");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Noclip))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("NoClip");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_Autokill))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Autokill");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Reset_Appearance))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Reset Appearance");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Randomize_Appearance))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Confuse Now");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Repair_Sabotage)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Repair All Sabotages");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Close_All_Doors)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Close All Doors");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Close_Current_Room_Door)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Close Current Room Door");
+
+
+			if (HotKey(State.KeyBinds.Complete_Tasks)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Complete All Tasks");
 		}
 		ImGui::EndChild();
 	}

@@ -40,6 +40,8 @@ namespace AboutTab {
             ImGui::Text(welcomeText.c_str());
             ImGui::Text("SickoMenu is a highly sophisticated cheat menu for Among Us based on AmongUsMenu.");
             ImGui::Text("It promises more features and regular updates.");
+            ImGui::Text("Make sure to use the latest version of SickoMenu from the GitHub repository!");
+            ImGui::Text("Use the \"Check for Updates\" button to download the latest release!");
             if (ImGui::Button("GitHub")) {
                 OpenLink("https://github.com/g0aty/SickoMenu");
             }

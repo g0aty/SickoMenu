@@ -51,20 +51,10 @@ namespace SelfTab {
             }
             ImGui::SameLine();
             ToggleButton("Disable HUD", &State.DisableHud);
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                HotKey(State.KeyBinds.Toggle_Hud);
-            }
 
             if (ToggleButton("Freecam", &State.FreeCam)) {
                 State.playerToFollow = PlayerSelection();
                 State.Save();
-            }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                if (HotKey(State.KeyBinds.Toggle_Freecam)) {
-                    State.Save();
-                }
             }
 
             ImGui::SameLine(145.0f * State.dpiScale);
@@ -73,10 +63,6 @@ namespace SelfTab {
             if (ToggleButton("Zoom", &State.EnableZoom)) {
                 State.Save();
                 if (!State.EnableZoom) RefreshChat();
-            }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                HotKey(State.KeyBinds.Toggle_Zoom);
             }
 
             ImGui::SameLine(145.0f * State.dpiScale);
@@ -228,6 +214,8 @@ namespace SelfTab {
                 State.Save();
             }
 
+            if (ToggleButton("Always Long Mode", &State.AprilFools_AlwaysLong)) State.Save();
+
             if (State.InMeeting && ImGui::Button("Move in Meeting"))
             {
                 State.rpcQueue.push(new EndMeeting());
@@ -257,10 +245,6 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                HotKey(State.KeyBinds.Toggle_Noclip);
-            }
 
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
@@ -277,12 +261,12 @@ namespace SelfTab {
             if (ToggleButton("Autokill", &State.AutoKill)) {
                 State.Save();
             }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                HotKey(State.KeyBinds.Toggle_Autokill);
-            }
 
             if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Always Use Kill Exploit", &State.AlwaysUseKillExploit)) {
                 State.Save();
             }
 
@@ -502,10 +486,6 @@ namespace SelfTab {
                     ControlAppearance(true);
                 }
                 if (IsInGame() || IsInLobby()) {
-                    if (State.ShowKeybinds) {
-                        ImGui::SameLine();
-                        HotKey(State.KeyBinds.Randomize_Appearance);
-                    }
                     if (IsHost() || !State.SafeMode)
                         ImGui::SameLine();
                 }

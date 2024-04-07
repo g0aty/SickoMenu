@@ -142,6 +142,7 @@
     <AlternativeType Name="app::List_1_RoleTypes_"/>
     <AlternativeType Name="app::List_1_RoleEffectAnimation_"/>
     <AlternativeType Name="app::List_1_UnityEngine_SpriteRenderer_"/>
+    <AlternativeType Name="app::List_1_UnityEngine_AddressableAssets_AssetReference_"/>
     <DisplayString>{{ size={fields._size} }}</DisplayString>
     <Expand>
       <Item Name="[size]">fields._size</Item>

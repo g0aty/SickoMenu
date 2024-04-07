@@ -94,11 +94,11 @@ namespace HostTab {
 					// disable flip
 					/*if (State.mapHostChoice == 3) {
 						options.SetByte(app::ByteOptionNames__Enum::MapId, 0);
-						State.FlipSkeld = true;
+						State.AprilFools_FlipSkeld = true;
 					}
 					else {
 						options.SetByte(app::ByteOptionNames__Enum::MapId, State.mapHostChoice);
-						State.FlipSkeld = false;
+						State.AprilFools_FlipSkeld = false;
 					}*/
 					auto id = State.mapHostChoice;
 					if (id >= 3) id++;
@@ -124,8 +124,8 @@ namespace HostTab {
 			}
 			if (ToggleButton("Disable Meetings", &State.DisableMeetings))
 				State.Save();
-			if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
-				State.Save();
+			/*if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
+				State.Save();*/ //does not work
 			if (ToggleButton("Disable Kills", &State.DisableKills))
 				State.Save();
 			if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
@@ -149,10 +149,6 @@ namespace HostTab {
 			}
 
 			if (IsInMultiplayerGame() || IsInLobby()) { //lobby isn't possible in freeplay
-				if (ToggleButton("Vote Immunity for Self", &State.VoteImmunity)) {
-					State.Save();
-				}
-
 				if (ToggleButton("Disable Game Ending", &State.NoGameEnd)) {
 					State.Save();
 				}
@@ -182,13 +178,14 @@ namespace HostTab {
 			}
 
 			static int framesPassed = -1;
-
+			static bool isReviving = false;
 			if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
 			{
 				app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
 				State.rpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
 				State.rpcQueue.push(new RpcForceColor(*Game::pLocalPlayer, outfit->fields.ColorId));
 				framesPassed = 40;
+				isReviving = true;
 			}
 
 			if (framesPassed == 20)
@@ -199,6 +196,7 @@ namespace HostTab {
 			else if (framesPassed <= 0 && (*Game::pLocalPlayer)->fields.inVent) {
 				State.rpcQueue.push(new RpcVent(*Game::pLocalPlayer, 1, true)); //for showing you as alive to ALL players
 				framesPassed = -1;
+				isReviving = false;
 			}
 			else framesPassed--;
 

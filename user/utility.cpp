@@ -286,12 +286,17 @@ bool IsStreamerMode() {
 	return false;
 }
 
+PlayerControl* GetHost() {
+	if (IsInGame() || IsInLobby()) return InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Character;
+	return NULL;
+}
+
 std::string GetHostUsername(bool colored) {
 	if (IsInGame() || IsInLobby() && !colored)
-		return convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.PlayerName);
+		return convert_from_string(GameData_PlayerInfo_get_PlayerName(GetPlayerData(GetHost()), NULL));
 	if (IsInGame() || IsInLobby()) {
-		Color32 color = GetPlayerColor(GetPlayerOutfit(GetPlayerData(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Character))->fields.ColorId);
-		std::string username = convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.PlayerName);
+		Color32 color = GetPlayerColor(GetPlayerOutfit(GetPlayerData(GetHost()))->fields.ColorId);
+		std::string username = convert_from_string(GameData_PlayerInfo_get_PlayerName(GetPlayerData(GetHost()), NULL));
 		return std::format("<#{:02x}{:02x}{:02x}>{}</color>", color.r, color.g, color.b, RemoveHtmlTags(username));
 	}
 	return "";
@@ -496,19 +501,16 @@ void RepairSabotage(PlayerControl* player) {
 		State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 0));
 	}*/ //mushroom mixup cannot be repaired
 
-	static std::string electricTaskType = translate_type_name("ElectricTask");
-	/*static std::string hqHudOverrideTaskType = translate_type_name("HqHudOverrideTask");
+	/*static std::string electricTaskType = translate_type_name("ElectricTask");
+	static std::string hqHudOverrideTaskType = translate_type_name("HqHudOverrideTask");
 	static std::string hudOverrideTaskType = translate_type_name("HudOverrideTask");
 	static std::string noOxyTaskType = translate_type_name("NoOxyTask");
 	static std::string reactorTaskType = translate_type_name("ReactorTask");*/
 
-	auto sabotageTask = GetSabotageTask(player);
-	if (sabotageTask == NULL) return;
+	if (State.mapType != Settings::MapType::Fungle) {
+		il2cpp::Dictionary<Dictionary_2_SystemTypes_ISystemType_> systems = (*Game::pShipStatus)->fields.Systems;
+		auto switchSystem = (SwitchSystem*)(systems[SystemTypes__Enum::Electrical]);
 
-	if (electricTaskType == sabotageTask->klass->_0.name) {
-		auto electricTask = (ElectricTask*)sabotageTask;
-
-		auto switchSystem = electricTask->fields.system;
 		auto actualSwitches = switchSystem->fields.ActualSwitches;
 		auto expectedSwitches = switchSystem->fields.ExpectedSwitches;
 
@@ -520,9 +522,6 @@ void RepairSabotage(PlayerControl* player) {
 					State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
 			}
 		}
-	}
-	else {
-		STREAM_ERROR("Unknown Task:" << sabotageTask->klass->_0.name);
 	}
 }
 
@@ -896,14 +895,14 @@ std::string GetGradientUsername(std::string str, bool useState, bool underline, 
 }
 
 void RefreshChat(bool alsoShow) {
-	if (!Game::HudManager.IsInstanceExists()) return;
+	/*if (!Game::HudManager.IsInstanceExists()) return;
 	try {
 		auto chat = Game::HudManager.GetInstance()->fields.Chat;
 		GameObject_SetActive(chat->fields.chatButton, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
 		ChatController_SetVisible(chat, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
 		//if (alsoShow) GameObject_SetActive(chat->fields.chatScreen, true, NULL);
 	}
-	catch (...) {}
+	catch (...) {}*/
 }
 
 void SaveOriginalAppearance()
