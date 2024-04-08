@@ -43,6 +43,7 @@ public:
     bool UnlockCosmetics = true;
     bool SpoofLevel = false;
     int FakeLevel = 1;
+    bool ShowKeybinds = true;
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
     bool UseGuestFriendCode = false;
@@ -155,10 +156,6 @@ public:
     bool ShowVoteKicks = false;
     bool ShowFps = false;
     bool DoTasksAsImpostor = false;
-    bool AlwaysUseKillExploit = false;
-
-    bool AprilFools_FlipSkeld = false;
-    bool AprilFools_AlwaysLong = false;
 
     PlayerSelection selectedPlayer;
     std::queue<RPCInterface*> rpcQueue;
@@ -302,6 +299,7 @@ public:
     Vector3 camPos = { NULL, NULL, NULL };
     Vector3 prevCamPos = { NULL, NULL, NULL };
 
+    bool FlipSkeld = false;
     bool CustomImpostorAmount = false;
     int ImpostorCount = 1;
     bool DisableCallId = false;
@@ -310,14 +308,12 @@ public:
 
 	bool OcclusionCulling = false;
     bool ShowUnityLogs = true;
-    bool ShowRpcLogs = false;
 
     int LobbyTimer = -1;
     float ChatCooldown = 0.f;
     bool MessageSent = false;
     bool ChatFocused = false;
     bool IsRevived = false;
-    bool CanChangeOutfit = false;
 
     std::string chatMessage = "";
     std::string userName = "";
@@ -342,8 +338,6 @@ public:
         Fungle = 4
     } mapType = MapType::Ship;
 
-    RoleTypes__Enum RealRole = RoleTypes__Enum::Crewmate;
-
     bool AutoOpenDoors = false;
 
     Settings()
@@ -351,7 +345,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.3";
+    std::string SickoVersion = "v3.2";
 
     void Load();
     void Save();

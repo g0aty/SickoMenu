@@ -72,10 +72,22 @@ namespace DoorsTab {
 					State.rpcQueue.push(new RpcCloseDoorsOfType(door, false));
 				}
 			}
+			if (State.ShowKeybinds)
+				ImGui::SameLine();
+
+			if (State.ShowKeybinds && HotKey(State.KeyBinds.Close_All_Doors)) {
+				State.Save();
+			}
 
 			if (ImGui::Button("Close Room Door"))
 			{
 				State.rpcQueue.push(new RpcCloseDoorsOfType(GetSystemTypes(GetTrueAdjustedPosition(*Game::pLocalPlayer)), false));
+			}
+			if (State.ShowKeybinds)
+				ImGui::SameLine();
+
+			if (State.ShowKeybinds && HotKey(State.KeyBinds.Close_Current_Room_Door)) {
+				State.Save();
 			}
 
 			if (ImGui::Button("Pin All Doors"))

@@ -39,7 +39,6 @@ namespace DebugTab {
 			State.rpcQueue = std::queue<RPCInterface*>();
 			State.lobbyRpcQueue = std::queue<RPCInterface*>();
 		}
-		if (ToggleButton("Show RPC Logs", &State.ShowRpcLogs)) State.Save();
 
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 

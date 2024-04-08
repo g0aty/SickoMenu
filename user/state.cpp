@@ -41,6 +41,7 @@ void Settings::Load() {
         JSON_TRYGET("MenuThemeColor_B", this->MenuThemeColor.z);
         JSON_TRYGET("MenuThemeColor_A", this->MenuThemeColor.w);
         JSON_TRYGET("UnlockCosmetics", this->UnlockCosmetics);
+        JSON_TRYGET("ShowKeybinds", this->ShowKeybinds);
         JSON_TRYGET("KeybindsWhileChatting", this->KeybindsWhileChatting);
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
         JSON_TRYGET("FakeLevel", this->FakeLevel);
@@ -156,10 +157,7 @@ void Settings::Load() {
         JSON_TRYGET("ShowVoteKicks", this->ShowVoteKicks);
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
-        JSON_TRYGET("AlwaysUseKillExploit", this->AlwaysUseKillExploit);
         JSON_TRYGET("NoClip", this->NoClip);
-
-        JSON_TRYGET("AprilFools_AlwaysLong", this->AprilFools_AlwaysLong);
 
         JSON_TRYGET("AdjustByDPI", this->AdjustByDPI);
 
@@ -172,7 +170,6 @@ void Settings::Load() {
         if (this->ShowMenuOnStartup)
             JSON_TRYGET("ShowConsole", this->ShowConsole);
         JSON_TRYGET("ShowUnityLogs", this->ShowUnityLogs);
-        JSON_TRYGET("ShowRpcLogs", this->ShowRpcLogs);
 
         JSON_TRYGET("RevealAnonymousVotes", this->RevealAnonymousVotes);
 
@@ -223,6 +220,7 @@ void Settings::Save() {
             { "MenuThemeColor_B", this->MenuThemeColor.z },
             { "MenuThemeColor_A", this->MenuThemeColor.w },
             { "UnlockCosmetics", this->UnlockCosmetics },
+            { "ShowKeybinds", this->ShowKeybinds },
             { "KeybindsWhileChatting", this->KeybindsWhileChatting },
             { "SpoofLevel", this->SpoofLevel },
             { "FakeLevel", this->FakeLevel },
@@ -338,10 +336,7 @@ void Settings::Save() {
             { "ShowVoteKicks", this->ShowVoteKicks },
             { "ShowFps", this->ShowFps },
             { "DoTasksAsImpostor", this->DoTasksAsImpostor },
-            { "AlwaysUseKillExploit", this->AlwaysUseKillExploit },
             { "NoClip", this->NoClip },
-
-            { "AprilFools_AlwaysLong", this->AprilFools_AlwaysLong },
 
             { "RevealVotes", this->RevealVotes },
             { "RevealAnonymousVotes", this->RevealAnonymousVotes },
@@ -353,7 +348,6 @@ void Settings::Save() {
 
             { "ShowConsole", this->ShowConsole },
             { "ShowUnityLogs", this->ShowUnityLogs },
-            { "ShowRpcLogs", this->ShowRpcLogs },
 
             { "ShiftRightClickTP", this->ShiftRightClickTP },
             { "RotateRadius", this->RotateRadius },

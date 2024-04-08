@@ -105,10 +105,9 @@ void RpcVotePlayer::Process()
 		MeetingHud_CmdCastVote(MeetingHud__TypeInfo->static_fields->Instance, Player->fields.PlayerId, target->fields.PlayerId, NULL);
 }
 
-RpcVoteKick::RpcVoteKick(PlayerControl* target, bool exploit)
+RpcVoteKick::RpcVoteKick(PlayerControl* target)
 {
 	this->target = target;
-	this->exploit = exploit;
 }
 
 void RpcVoteKick::Process()
@@ -116,18 +115,15 @@ void RpcVoteKick::Process()
 	if (!PlayerSelection(target).has_value())
 		return;
 
-	if (!exploit) VoteBanSystem_CmdAddVote(VoteBanSystem__TypeInfo->static_fields->Instance, target->fields._.OwnerId, NULL);
-	else {
-		int32_t hostId = InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Id;
-		for (auto p : GetAllPlayerControl()) { //code taken from https://github.com/scp222thj/MalumMenu/ v2.0.0, sadly it got patched in official servers ;(
-			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
-				VoteBanSystem__TypeInfo->static_fields->Instance->fields._.NetId, uint8_t(RpcCalls__Enum::AddVote),
-				SendOption__Enum::None, hostId, NULL);
-			MessageWriter_WriteInt32(writer, p->fields._.OwnerId, NULL);
-			MessageWriter_WriteInt32(writer, target->fields._.OwnerId, NULL);
-			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-		}
-	}
+	VoteBanSystem_CmdAddVote(VoteBanSystem__TypeInfo->static_fields->Instance, target->fields._.OwnerId, NULL);
+	/*for (auto p : GetAllPlayerControl()) {
+		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
+			VoteBanSystem__TypeInfo->static_fields->Instance->fields._.NetId, uint8_t(RpcCalls__Enum::AddVote),
+			SendOption__Enum::None, -1, NULL);
+		MessageWriter_WriteInt32(writer, p->fields._.OwnerId, NULL);
+		MessageWriter_WriteInt32(writer, target->fields._.OwnerId, NULL);
+		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+	}*/
 }
 
 RpcClearVote::RpcClearVote(PlayerControl* Player)

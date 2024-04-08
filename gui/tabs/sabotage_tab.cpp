@@ -20,10 +20,16 @@ namespace SabotageTab {
             if (ImGui::Button("Repair Sabotage")) {
                 RepairSabotage(*Game::pLocalPlayer);
             }
+            if (State.ShowKeybinds) {
+                ImGui::SameLine();
+                if (HotKey(State.KeyBinds.Repair_Sabotage)) {
+                    State.Save();
+                }
+            }
             ImGui::NewLine();
             if (State.DisableSabotages)
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Sabotages have been disabled. Nothing can be sabotaged.");
-            //i skidded some code from https://github.com/scp222thj/MalumMenu/ for making the no cooldown sabotages (right back up :D)
+            //i skidded some code from https://github.com/scp222thj/MalumMenu/ for making the no cooldown sabotages (it's taken down as of now)
             if (ImGui::Button("Sabotage All")) {
                 if (State.mapType != Settings::MapType::Fungle) { //lights don't work on fungle
                     for (size_t i = 0; i < 5; i++)
@@ -44,64 +50,6 @@ namespace SabotageTab {
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 1));
 
                 State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
-            }
-
-            if (ImGui::Button("Random Sabotage")) {
-                switch (State.mapType) {
-                case Settings::MapType::Pb:
-                {
-                    int randIndex = randi(1, 3);
-                    switch (randIndex) {
-                    case 1:
-                    {
-                        for (size_t i = 0; i < 5; i++)
-                            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
-                    } break;
-                    case 2: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 128)); break;
-                    case 3: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128)); break;
-                    }
-                }
-                break;
-                case Settings::MapType::Airship:
-                {
-                    int randIndex = randi(1, 3);
-                    switch (randIndex) {
-                    case 1:
-                    {
-                        for (size_t i = 0; i < 5; i++)
-                            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
-                    } break;
-                    case 2: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 128)); break;
-                    case 3: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128)); break;
-                    }
-                }
-                break;
-                case Settings::MapType::Fungle:
-                {
-                    int randIndex = randi(1, 3);
-                    switch (randIndex) {
-                    case 1: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 1)); break;
-                    case 2: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128)); break;
-                    case 3: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128)); break;
-                    }
-                }
-                break;
-                default: //skeld and mira have same sabotages
-                {
-                    int randIndex = randi(1, 4);
-                    switch (randIndex) {
-                    case 1:
-                    {
-                        for (size_t i = 0; i < 5; i++)
-                            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
-                    } break;
-                    case 2: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128)); break;
-                    case 3: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 128)); break;
-                    case 4: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128)); break;
-                    }
-                }
-                break;
-                }
             }
 
             if (State.mapType != Settings::MapType::Fungle && ImGui::Button("Sabotage Lights")) {

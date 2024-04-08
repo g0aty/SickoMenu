@@ -12,6 +12,12 @@ namespace RadarTab {
 		if (ToggleButton("Show Radar", &State.ShowRadar)) {
 			State.Save();
 		}
+		if (State.ShowKeybinds) {
+			ImGui::SameLine();
+			if (HotKey(State.KeyBinds.Toggle_Radar)) {
+				State.Save();
+			}
+		}
 
 		ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 		ImGui::Separator();

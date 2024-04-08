@@ -28,6 +28,10 @@ namespace TasksTab {
 							State.rpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
 					}
 				}
+				if (State.ShowKeybinds) {
+					ImGui::SameLine();
+					HotKey(State.KeyBinds.Complete_Tasks);
+				}
 			}
 			if (!State.SafeMode) {
 				ImGui::SameLine();

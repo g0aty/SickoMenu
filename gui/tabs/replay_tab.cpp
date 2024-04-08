@@ -12,6 +12,12 @@ namespace ReplayTab {
 		if (ToggleButton("Show Replay", &State.ShowReplay)) {
 			State.Save();
 		}
+		if (State.ShowKeybinds) {
+			ImGui::SameLine();
+			if (HotKey(State.KeyBinds.Toggle_Replay)) {
+				State.Save();
+			}
+		}
 		if (ToggleButton("Show only last", &State.Replay_ShowOnlyLastSeconds))
 		{
 			State.Save();

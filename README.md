@@ -1,4 +1,4 @@
-# 👺 SickoMenu v3.3: The Enhancements Update
+# 👺 SickoMenu v3.2: The Guest Mode Update
 A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
 
 Join our very own [Discord](https://dsc.gg/sickos) server for support, bug reports, and sneak peeks!
@@ -25,7 +25,7 @@ A huge collection of various utilities and cheats such as
 
 ## 👌 Supported Versions
 - ✅ Steam (Supported)
-- ✅ Epic Games (Supported - Broken as of v3.2)
+- ✅ Epic Games (Supported)
 - ✅ itch.io (Supported)
 - ❓ Cracked (works occasionally, I don't condone it)
 - ❌ Microsoft Store (Not Supported)

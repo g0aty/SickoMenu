@@ -52,12 +52,9 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 				color = State.RevealRoles ? GetRoleColor(playerData->fields.Role) : 
 					(PlayerIsImpostor(localData) && PlayerIsImpostor(playerData) ? Palette__TypeInfo->static_fields->ImpostorRed : Palette__TypeInfo->static_fields->White);
 				if (State.RevealRoles && IsInGame()) {
-					if (playerData == localData)
-						playerName = convert_to_string("<size=50%>" + GetRoleName(playerData->fields.Role) + "</size> " + convert_from_string(playerName));
-					else
-						playerName = convert_to_string(convert_from_string(playerName) + "<size=50%>" + GetRoleName(playerData->fields.Role) + "</size> ");
+					playerName = convert_to_string("<size=50%>" + GetRoleName(playerData->fields.Role) + "</size> " + convert_from_string(playerName));
 				}
-				if (State.CustomName && !State.ServerSideCustomName && playerData == localData) {
+				if (State.CustomName && !State.ServerSideCustomName && playerData == GetPlayerData(*Game::pLocalPlayer)) {
 					if (State.ColoredName && !State.RgbName) {
 						playerName = convert_to_string(GetGradientUsername(RemoveHtmlTags(convert_from_string(playerName)), true));
 					}
@@ -82,7 +79,7 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 						nameColor.r, nameColor.g, nameColor.b,
 						nameColor.a);
 
-					if (playerData != localData)
+					if (playerData != GetPlayerData(*Game::pLocalPlayer))
 						playerName = convert_to_string(convert_from_string(playerName) + " " + dot);
 					else
 						playerName = convert_to_string(dot + " " + convert_from_string(playerName));
@@ -109,13 +106,6 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	}
 	State.ChatCooldown = __this->fields.timeSinceLastMessage;
 	State.ChatFocused = __this->fields.freeChatField->fields.textArea->fields.hasFocus;
-
-	if (State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby()) && __this->fields.timeSinceLastMessage >= 5.f) {
-		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(State.chatMessage), NULL);
-		//remove rpc queue stuff cuz of delay and anticheat kick
-		//State.MessageSent = true;
-		__this->fields.timeSinceLastMessage = 0.f;
-	}
 
 	ChatController_Update(__this, method);
 }

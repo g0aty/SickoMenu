@@ -220,9 +220,8 @@ public:
 
 class RpcVoteKick : public RPCInterface {
 	PlayerControl* target;
-	bool exploit;
 public:
-	RpcVoteKick(PlayerControl* target, bool exploit = false);
+	RpcVoteKick(PlayerControl* target);
 	virtual void Process() override;
 };
 

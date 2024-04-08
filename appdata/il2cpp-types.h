@@ -2404,7 +2404,7 @@ typedef union Il2CppSingle_float
 namespace app
 {
 #endif
-    /*AUM starts defining from here, don't put anything in here directly future goaty and other devs*/
+
 #pragma region Object
     struct Object
     {
@@ -11342,6 +11342,87 @@ namespace app
     };
 #pragma endregion
 
+#pragma region AssetReference
+    struct AsyncOperationHandle {
+        struct IAsyncOperation_1* m_InternalOp;
+        int32_t m_Version;
+        struct String* m_LocationName;
+    };
+
+    struct AsyncOperationHandle__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData System_Collections_IEnumerator_MoveNext;
+        VirtualInvokeData System_Collections_IEnumerator_get_Current;
+        VirtualInvokeData System_Collections_IEnumerator_Reset;
+    };
+
+    struct AsyncOperationHandle__StaticFields {
+        bool m_IsWaitingForCompletion;
+    };
+
+    struct AsyncOperationHandle__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AsyncOperationHandle__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct AsyncOperationHandle__VTable vtable;
+    };
+
+    struct __declspec(align(4)) AssetReference__Fields {
+        struct String* m_AssetGUID;
+        struct String* m_SubObjectName;
+        struct String* m_SubObjectType;
+        struct AsyncOperationHandle m_Operation;
+    };
+
+    struct AssetReference {
+        struct AssetReference__Class* klass;
+        MonitorData* monitor;
+        struct AssetReference__Fields fields;
+    };
+
+    struct AssetReference__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_RuntimeKey;
+        VirtualInvokeData RuntimeKeyIsValid;
+        VirtualInvokeData get_RuntimeKey_1;
+        VirtualInvokeData get_AssetGUID;
+        VirtualInvokeData get_SubObjectName;
+        VirtualInvokeData set_SubObjectName;
+        VirtualInvokeData get_SubOjbectType;
+        VirtualInvokeData get_Asset;
+        VirtualInvokeData LoadAssetAsync;
+        VirtualInvokeData LoadSceneAsync;
+        VirtualInvokeData UnLoadScene;
+        VirtualInvokeData InstantiateAsync;
+        VirtualInvokeData InstantiateAsync_1;
+        VirtualInvokeData RuntimeKeyIsValid_1;
+        VirtualInvokeData ReleaseAsset;
+        VirtualInvokeData ReleaseInstance;
+        VirtualInvokeData ValidateAsset;
+        VirtualInvokeData ValidateAsset_1;
+    };
+
+    struct AssetReference__StaticFields {
+    };
+
+    struct AssetReference__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AssetReference__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct AssetReference__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region Console_1
     struct Console_1__Fields {
         struct MonoBehaviour__Fields _;
@@ -11395,6 +11476,46 @@ namespace app
     };
 #pragma endregion
 
+#pragma region AmongUsClient_CoStartGameHost_d_30
+    struct __declspec(align(4)) AmongUsClient_CoStartGameHost_d_30__Fields {
+        int32_t __1__state;
+        struct Object* __2__current;
+        struct AmongUsClient* __4__this;
+        float _timer_5__2;
+        bool _stopWaiting_5__3;
+    };
+
+    struct AmongUsClient_CoStartGameHost_d_30 {
+        struct AmongUsClient_CoStartGameHost_d_30__Class* klass;
+        MonitorData* monitor;
+        struct AmongUsClient_CoStartGameHost_d_30__Fields fields;
+    };
+
+    struct AmongUsClient_CoStartGameHost_d_30__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData System_Collections_Generic_IEnumerator_System_Object__get_Current;
+        VirtualInvokeData System_IDisposable_Dispose;
+        VirtualInvokeData MoveNext;
+        VirtualInvokeData System_Collections_IEnumerator_get_Current;
+        VirtualInvokeData System_Collections_IEnumerator_Reset;
+    };
+
+    struct AmongUsClient_CoStartGameHost_d_30__StaticFields {
+    };
+
+    struct AmongUsClient_CoStartGameHost_d_30__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AmongUsClient_CoStartGameHost_d_30__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct AmongUsClient_CoStartGameHost_d_30__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region Activity_1
     struct Activity_1 {
         void* Type;
@@ -11427,35 +11548,6 @@ namespace app
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct Activity_1__VTable vtable;
-    };
-#pragma endregion
-
-#pragma region ResolutionManager
-    struct ResolutionManager {
-        struct ResolutionManager__Class* klass;
-        MonitorData* monitor;
-    };
-
-    struct ResolutionManager__VTable {
-        VirtualInvokeData Equals;
-        VirtualInvokeData Finalize;
-        VirtualInvokeData GetHashCode;
-        VirtualInvokeData ToString;
-    };
-
-    typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
-
-    struct ResolutionManager__StaticFields {
-        struct ResolutionManager_ResolutionChangedHandler* ResolutionChanged;
-    };
-
-    struct ResolutionManager__Class {
-        Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
-        struct ResolutionManager__StaticFields* static_fields;
-        const Il2CppRGCTXData* rgctx_data;
-        Il2CppClass_1 _1;
-        struct ResolutionManager__VTable vtable;
     };
 #pragma endregion
 

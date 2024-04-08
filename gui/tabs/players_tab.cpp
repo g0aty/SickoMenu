@@ -185,7 +185,7 @@ namespace PlayersTab {
 			if (State.DisableMeetings && IsHost())
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Meetings have been disabled.");
 			GameOptions options;
-			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings || !IsHost())) { //Player selection doesn't matter
+			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings && IsHost())) { //Player selection doesn't matter
 				if (!State.InMeeting) {
 					if (ImGui::Button("Call Meeting")) {
 						State.rpcQueue.push(new RpcReportBody({}));
@@ -254,34 +254,19 @@ namespace PlayersTab {
 					}
 				}
 				else {// if (!State.SafeMode)*/
-				if (IsInGame() && (State.RealRole == RoleTypes__Enum::Impostor || State.RealRole == RoleTypes__Enum::Shapeshifter)
-					&& !selectedPlayer.get_PlayerData()->fields.IsDead
-					&& !selectedPlayer.get_PlayerControl()->fields.inVent
-					&& !selectedPlayer.get_PlayerControl()->fields.inMovingPlat
-					&& !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ((*Game::pLocalPlayer)->fields.killTimer <= 0.0f)
-					&& selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0
-					&& !State.InMeeting) {
-					if (ImGui::Button("Kill"))
-					{
-						State.rpcQueue.push(new CmdCheckMurder(selectedPlayer));
+				if (ImGui::Button("Kill"))
+				{
+					if (IsInGame()) {
+						State.rpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), selectedPlayer.get_PlayerControl(),
+							selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
 					}
-				}
-				else {
-					if (ImGui::Button("Kill"))
-					{
-						if (IsInGame()) {
-							State.rpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), selectedPlayer.get_PlayerControl(),
-								selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
-						}
-						else if (IsInLobby()) {
-							State.lobbyRpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), selectedPlayer.get_PlayerControl(),
-								selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
-						}
+					else if (IsInLobby()) {
+						State.lobbyRpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), selectedPlayer.get_PlayerControl(),
+							selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
 					}
-
 				}
 				//}
-				if (IsInGame() && (State.RealRole == RoleTypes__Enum::Impostor || State.RealRole == RoleTypes__Enum::Shapeshifter)
+				if (IsInGame() && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
 					&& !selectedPlayer.get_PlayerData()->fields.IsDead
 					&& !selectedPlayer.get_PlayerControl()->fields.inVent
 					&& !selectedPlayer.get_PlayerControl()->fields.inMovingPlat
@@ -314,28 +299,19 @@ namespace PlayersTab {
 					}
 				}
 
-				if (IsHost() && (IsInMultiplayerGame() || IsInLobby()) && ImGui::Button("Kick")) {
+				if (IsHost() && ImGui::Button("Kick")) {
 					app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl()->fields._.OwnerId, false, NULL);
 				}
-				if ((IsInMultiplayerGame() || IsInLobby()) && ImGui::Button("Votekick")) {
+				if (ImGui::Button("Votekick")) {
 					if (IsInGame()) {
 						State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
 					}
 					else if (IsInLobby()) {
 						State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
-					}
-				}
-				ImGui::SameLine();
-				if ((IsInMultiplayerGame() || IsInLobby()) && !State.SafeMode && ImGui::Button("Kick Exploit")) {
-					if (IsInGame()) {
-						State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl(), true));
-					}
-					else if (IsInLobby()) {
-						State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl(), true));
 					}
 				}
 				if (IsHost()) ImGui::SameLine();
-				if (IsHost() && (IsInMultiplayerGame() || IsInLobby()) && ImGui::Button("Ban")) { //you can't ban dummies silly
+				if (IsHost() && ImGui::Button("Ban")) {
 					app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl()->fields._.OwnerId, true, NULL);
 				}
 
@@ -461,11 +437,8 @@ namespace PlayersTab {
 					ImGui::SameLine();
 					if (!State.InMeeting) {
 						if (ImGui::Button("Self-Report")) {
-							if (IsHost() || !State.SafeMode) State.rpcQueue.push(new RpcForceReportBody(selectedPlayer.get_PlayerControl(), State.selectedPlayer));
-							else {
-								State.rpcQueue.push(new RpcReportBody(selectedPlayer));
-								State.rpcQueue.push(new RpcForceMeeting(selectedPlayer.get_PlayerControl(), State.selectedPlayer));
-							}
+							if (!(IsHost() || !State.SafeMode)) State.rpcQueue.push(new RpcReportBody(State.selectedPlayer));
+							State.rpcQueue.push(new RpcForceMeeting(selectedPlayer.get_PlayerControl(), State.selectedPlayer));
 						}
 					}
 					else {
@@ -771,17 +744,17 @@ namespace PlayersTab {
 					}
 				}
 
-				if (!selectedPlayer.is_Disconnected())
+				if ((IsInGame() || IsInLobby()) && !selectedPlayer.is_Disconnected() && selectedPlayer.has_value())
 				{
-					if (State.playerToFollow.equals(State.selectedPlayer) || (selectedPlayer.is_LocalPlayer() && selectedPlayer.has_value())) {
+					if (State.playerToAttach.equals(State.selectedPlayer) && State.ActiveAttach && (selectedPlayer.is_LocalPlayer() && selectedPlayer.has_value())) {
 						if (ImGui::Button("Stop Attaching")) {
-							State.playerToFollow = {};
+							State.playerToAttach = {};
 							State.ActiveAttach = false;
 						}
 					}
 					else {
-						if (!selectedPlayer.is_LocalPlayer() && ImGui::Button("Attach To")) {
-							State.playerToFollow = State.selectedPlayer;
+						if (ImGui::Button("Attach To")) {
+							State.playerToAttach = State.selectedPlayer;
 							State.ActiveAttach = true;
 						}
 					}
@@ -912,9 +885,9 @@ namespace PlayersTab {
 						ImGui::InputInt("Level", &level);
 						if (ImGui::Button("Force Level")) {
 							if (IsInGame())
-								State.rpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level - 1));
+								State.rpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level));
 							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level - 1));
+								State.lobbyRpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level));
 						}
 					}
 

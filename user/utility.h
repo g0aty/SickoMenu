@@ -156,7 +156,6 @@ bool IsInGame();
 bool IsInMultiplayerGame();
 bool IsColorBlindMode();
 bool IsStreamerMode();
-PlayerControl* GetHost();
 std::string GetHostUsername(bool colored = false);
 std::string RemoveHtmlTags(std::string html_str);
 bool IsNameValid(std::string str);

@@ -41,7 +41,7 @@ void DetourInitilization() {
 		return;
 	} else {
 		// Attempting to hook the Steam overlay
-		/*do {
+		do {
 			if (oPresent)
 				break;
 			HMODULE hModule = GetModuleHandleA("GameOverlayRenderer.dll");
@@ -83,7 +83,7 @@ void DetourInitilization() {
 				return;
 			}
 			oPresent = d3d11.presentFunction;
-		} while (0);*/
+		} while (0);
 		if (!oPresent)
 			oPresent = d3d11.presentFunction;
 	}
@@ -107,7 +107,7 @@ void DetourInitilization() {
 	HOOKFUNC(SabotageSystemType_SetInitialSabotageCooldown);
 	HOOKFUNC(Vent_CanUse);
 	HOOKFUNC(Vent_EnterVent);
-	HOOKFUNC(Vent_ExitVent);
+	//HOOKFUNC(Vent_ExitVent);
 	HOOKFUNC(StatsManager_get_AmBanned);
 	HOOKFUNC(StatsManager_get_BanMinutesLeft);
 	HOOKFUNC(StatsManager_get_BanPoints);
@@ -195,10 +195,6 @@ void DetourInitilization() {
 	HOOKFUNC(PlatformSpecificData_Serialize);
 	HOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
 	HOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
-	HOOKFUNC(PlayerControl_SetRole);
-	HOOKFUNC(AprilFoolsMode_ShouldFlipSkeld);
-	HOOKFUNC(AprilFoolsMode_ShouldHorseAround);
-	HOOKFUNC(AprilFoolsMode_ShouldLongAround);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -233,7 +229,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(SabotageSystemType_SetInitialSabotageCooldown);
 	UNHOOKFUNC(Vent_CanUse);
 	UNHOOKFUNC(Vent_EnterVent);
-	UNHOOKFUNC(Vent_ExitVent);
+	//UNHOOKFUNC(Vent_ExitVent);
 	UNHOOKFUNC(StatsManager_get_AmBanned);
 	UNHOOKFUNC(StatsManager_get_BanMinutesLeft);
 	UNHOOKFUNC(StatsManager_get_BanPoints);
@@ -318,10 +314,6 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlatformSpecificData_Serialize);
 	UNHOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
 	UNHOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
-	UNHOOKFUNC(PlayerControl_SetRole);
-	UNHOOKFUNC(AprilFoolsMode_ShouldFlipSkeld);
-	UNHOOKFUNC(AprilFoolsMode_ShouldHorseAround);
-	UNHOOKFUNC(AprilFoolsMode_ShouldLongAround);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

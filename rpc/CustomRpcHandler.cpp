@@ -48,7 +48,5 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 			}
 		}
 		break;
-		default:
-			if (State.ShowRpcLogs) STREAM_DEBUG("RPC ID " << std::to_string((uint8_t)callId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 	}
 }

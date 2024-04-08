@@ -2,9 +2,11 @@
 
 ## ⚙️ Settings
 ### General
+- **Keybinds** Show/Hide Menu/Console (Default: DELETE, HOME)
+- **Show Keybinds** Allows you to see and modify keybinds (Default: ON)
 - **Allow Keybinds while Chatting** Allows you to use keybinds while chatting (Default: OFF)
 - **Always Show Menu on Startup** Shows the menu on startup (Default: ON)
-- **Panic** Disables the mod at will (Default: OFF)
+- **Panic** Disables the mod at will (Default: OFF, Hotkey: PAUSE BREAK)
 - **Adjust by DPI** Allows you to change scaling of the menu (Default: ON)
 - **Menu Scale** Change the size of the menu (Default: 100%)
 - **Menu Theme Color**: Change the accent color of the menu (Default: #801341)
@@ -26,23 +28,6 @@
 - **Spoof Level** Spoofs your level in game (Default: OFF)
 - **Spoof Friend Code** *(Note: This only works as host due to Innersloth patches)* Spoofs your friend code  (Default: OFF)
 - **Spoof Platform** Spoofs your platform to whatever you choose (Default: OFF)
-### Keybinds
-- **Show/Hide Menu** (Default: DELETE)
-- **Show/Hide Console** (Default: HOME)
-- **Show/Hide Radar** (Default: Insert)
-- **Show/Hide Replay** (Default: End)
-- **Panic (Disable SickoMenu)** (Default: PAUSE BREAK)
-- **Enable/Disable HUD** (Default: None)
-- **Enable/Disable HUD** (Default: None)
-- **Freecam** (Default: None)
-- **Zoom** (Default: None)
-- **NoClip** (Default: CTRL)
-- **Reset Appearance** (Default: None)
-- **Confuse Now** (Default: None)
-- **Repair All Sabotages** (Default: PAGE DOWN)
-- **Close All Doors** (Default: None)
-- **Close Current Room Door** (Default: None)
-- **Complete All Tasks** (Default: None)
 
 ## 🎮 Game
 ### General
@@ -105,12 +90,11 @@ View the game options!
 - **Move While in Vent & Shapeshifting** Allows you to move in vent and while shapeshifting (Default: OFF)
 - **Always Move** Allows you to move in meetings and game menus such as tasks (Default: OFF)
 - **Shapeshift without Animation** Allows you to shapeshift without the animation (Default: OFF)
-- **NoClip** Allows you to walk through walls (Default: OFF)
+- **NoClip** Allows you to walk through walls (Default: OFF, Hotkey: CTRL)
 - **Kill Other Impostors** Allows you to kill fellow impostors (Default: OFF)
 - **Infinite Kill Range** Extends your kill reach (Default: OFF)
 - **Bypass Guardian Angel Protections** Allows you to kill protected players (Default: OFF)
 - **Do Tasks as Impostor** Allows you to complete tasks as impostor (Default: OFF)
-- **Always Use Kill Exploit** Forces the kill exploit to always be used, thus bypassing Disable Kills (Default: OFF)
 - **Fake Alive** Appear to yourself as alive even if you're dead (Default: OFF)
 - *(Only as host/Safe Mode disabled)* **God Mode** Prevents you from dying (Default: OFF)
 - **(Shift + Right Click) to Teleport** Teleports you to wherever you clicked (Default: OFF)
@@ -166,8 +150,7 @@ A dedicated player menu for viewing and manipulating players
 - **Kill** Kills the selected player
 - **Telekill** Kills the selected player and teleports you to your previous location
 - **Kick** *(Only as Host)* Kicks the selected player
-- **Votekick** Votekicks the selected player (2 more are required to actually kick the player)
-- **Kick Exploit** *(Only with Safe Mode disabled)* Attempts to kick the player using an exploit
+- **Votekick** Votekicks the selected player
 - **Ban** *(Only as Host)* Bans the selected player
 - **Shift** *(Only as Shapeshifter/Safe Mode disabled)* Shapeshifts you into the selected player
 - **Protect** *(Only as Guardian Angel/Host/Safe Mode disabled)* Casts a guardian angel protection on the selected player
@@ -216,8 +199,7 @@ A dedicated player menu for viewing and manipulating players
 ## 🚨 Sabotage
 - **Disable Sabotages** *(Only as Host)* Prevents players from sabotaging stuff
 - **Repair Sabotage** Repairs the ongoing sabotage
-- **Random Sabotage** Sabotages a random system
-- *All specific map sabotages can be sabotaged*
+- *All specific map sabotages can be sabotaged/repaired*
 - **Disable Lights** Prevents lights from being fixed by regular means
 
 ## 🚪 Doors
@@ -233,6 +215,7 @@ A dedicated player menu for viewing and manipulating players
 - **Custom Impostor Amount** Force your desired number of impostors to spawn (Default: OFF)
 - **Force Start of Game** Forces the game to start
 - **Disable Meetings** Disables meetings and body reports (Default: OFF)
+- **Disable Sabotages** Prevents players from sabotaging stuff (Default: OFF)
 - **Disable Kills** Prevents players from killing others (Cheaters can still bypass this as of now) (Default: OFF)
 - **Switch Moving Platform Side** *(Only on Airship)* Switches the moving platform's side
 - **Disable Game Ending** Prevents the game from ending (Default: OFF)
@@ -246,5 +229,4 @@ A dedicated player menu for viewing and manipulating players
 - **Force Load Settings** Forces the loading of settings from the settings file
 - **Force Save Settings** Force save your settings
 - **Clear RPC Queues** Clears RPC queues when there are too many RPCs to handle
-- **Show RPC Logs** Shows what RPC id is sent by a player in the game log (Default: OFF)
 - **Log Unity Debug Messages** Shows Unity debug stuff in the game log (Default: ON)

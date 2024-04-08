@@ -24,23 +24,3 @@ bool dConstants_1_IsVersionModded(MethodInfo* method) {
 	if (IsModdedHost()) return true; //this helps to bypass anticheat in our hosted lobbies
 	return false;
 }
-
-bool dAprilFoolsMode_ShouldFlipSkeld(MethodInfo* method) {
-	bool orig_return = AprilFoolsMode_ShouldFlipSkeld(method);
-	/*if (State.AprilFools_FlipSkeld) {
-		return true;
-	}
-	else if (orig_return)
-	{
-		State.AprilFools_FlipSkeld = true;
-	}*/ //this DOES NOT work
-	return orig_return;
-}
-
-bool dAprilFoolsMode_ShouldHorseAround(MethodInfo* method) {
-	return /*State.AprilFools_AlwaysHorse || */AprilFoolsMode_ShouldHorseAround(method);
-}
-
-bool dAprilFoolsMode_ShouldLongAround(MethodInfo* method) {
-	return State.AprilFools_AlwaysLong || AprilFoolsMode_ShouldLongAround(method);
-}

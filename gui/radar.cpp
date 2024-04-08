@@ -114,8 +114,8 @@ namespace Radar {
 		ImGui::Image((void*)map.mapImage.shaderResourceView,
 			ImVec2((float)map.mapImage.imageWidth * 0.5F, (float)map.mapImage.imageHeight * 0.5F) * State.dpiScale,
 			ImVec2((float)State.RadarExtraWidth * State.dpiScale, (float)State.RadarExtraHeight * State.dpiScale),
-			(State.AprilFools_FlipSkeld && State.mapType == Settings::MapType::Ship) ? ImVec2(1.0f, 0.0f) : ImVec2(0.0f, 0.0f),
-			(State.AprilFools_FlipSkeld && State.mapType == Settings::MapType::Ship) ? ImVec2(0.0f, 1.0f) : ImVec2(1.0f, 1.0f),
+			(State.FlipSkeld && State.mapType == Settings::MapType::Ship) ? ImVec2(1.0f, 0.0f) : ImVec2(0.0f, 0.0f),
+			(State.FlipSkeld && State.mapType == Settings::MapType::Ship) ? ImVec2(0.0f, 1.0f) : ImVec2(1.0f, 1.0f),
 			RadarColor);
 
 		for (auto player : GetAllPlayerControl()) {
