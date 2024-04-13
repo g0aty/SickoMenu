@@ -162,44 +162,45 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			{
 				uint32_t playerLevel = playerData->fields.PlayerLevel + 1;
 				uint8_t playerId = GetPlayerControlById(playerData->fields.PlayerId)->fields._.OwnerId;
-				uint8_t hostId = InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Id;
+				ClientData* host = InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL);
+				ClientData* client = InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), (InnerNetObject*)__this, NULL);
 				std::string platformId = "Unknown";
-				for (auto client : GetAllClients()) {
-					if (GetPlayerControlById(GetPlayerData(__this)->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
-						auto platform = client->fields.PlatformData->fields.Platform;
-						if (client->fields.Character == *Game::pLocalPlayer && State.SpoofPlatform) platform = Platforms__Enum(State.FakePlatform + 1); //fix incorrect platform showing for yourself
-						switch (platform) {
-						case Platforms__Enum::StandaloneEpicPC:
-							platformId = "Epic Games - PC";
-							break;
-						case Platforms__Enum::StandaloneSteamPC:
-							platformId = "Steam - PC";
-							break;
-						case Platforms__Enum::StandaloneMac:
-							platformId = "Mac";
-							break;
-						case Platforms__Enum::StandaloneWin10:
-							platformId = "Microsoft Store - PC";
-							break;
-						case Platforms__Enum::StandaloneItch:
-							platformId = "itch.io - PC";
-							break;
-						case Platforms__Enum::IPhone:
-							platformId = "iOS/iPadOS - Mobile";
-							break;
-						case Platforms__Enum::Android:
-							platformId = "Android - Mobile";
-							break;
-						case Platforms__Enum::Switch:
-							platformId = "Nintendo Switch - Console";
-							break;
-						case Platforms__Enum::Xbox:
-							platformId = "Xbox - Console";
-							break;
-						default:
-							platformId = "Unknown Platform";
-							break;
-						}
+				if (client != NULL) {
+					auto platform = client->fields.PlatformData->fields.Platform;
+					if (client->fields.Character == *Game::pLocalPlayer && State.SpoofPlatform) platform = Platforms__Enum(State.FakePlatform + 1); //fix incorrect platform showing for yourself
+					switch (platform) {
+					case Platforms__Enum::StandaloneEpicPC:
+						platformId = "Epic Games - PC";
+						break;
+					case Platforms__Enum::StandaloneSteamPC:
+						platformId = "Steam - PC";
+						break;
+					case Platforms__Enum::StandaloneMac:
+						platformId = "Mac";
+						break;
+					case Platforms__Enum::StandaloneWin10:
+						platformId = "Microsoft Store - PC";
+						break;
+					case Platforms__Enum::StandaloneItch:
+						platformId = "itch.io - PC";
+						break;
+					case Platforms__Enum::IPhone:
+						platformId = "iOS/iPadOS - Mobile";
+						break;
+					case Platforms__Enum::Android:
+						platformId = "Android - Mobile";
+						break;
+					case Platforms__Enum::Switch:
+						platformId = "Nintendo Switch - Console";
+						break;
+					case Platforms__Enum::Xbox:
+						platformId = "Xbox - Console";
+						break;
+					case Platforms__Enum::Playstation:
+						platformId = "Playstation - Console";
+						break;
+					default:
+						platformId = "Unknown Platform";
 						break;
 					}
 				}
@@ -210,7 +211,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (IsStreamerMode())
 					friendCode = "Friend Code Hidden";
 				std::string hostFriendCode = convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.FriendCode);
-				if (playerId == hostId) {
+				if (client != NULL && client == host) {
 					if (friendCode == "" && !IsStreamerMode())
 						playerName = "<size=1.4><#0f0>[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#9ef>No Friend Code</color><#0000>0</color>";
 					else
@@ -371,12 +372,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					else spamDelay--;
 				}
 
-				if (State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f) {
-					PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(State.chatMessage), NULL);
-					//remove rpc queue stuff cuz of delay and anticheat kick
-					State.MessageSent = true;
-				}
-
 				if ((IsHost() || !State.SafeMode) && State.ForceColorForEveryone)
 				{
 					static float forceColorDelay = 0;
@@ -480,7 +475,13 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			app::TMP_Text_set_text((app::TMP_Text*)nameTextTMP, playerNameStr, NULL);
 
 			if (IsColorBlindMode()) {
-				// TODO: Adjust the position of nameTextTMP
+				auto colorBlindText = __this->fields.cosmetics->fields.colorBlindText;
+				String* text = TMP_Text_get_text((TMP_Text*)colorBlindText, NULL);
+				if ((State.ShowPlayerInfo && IsInLobby()) || (State.ShowKillCD && IsInGame() && PlayerIsImpostor(GetPlayerData(__this))))
+					text = convert_from_string(text).find("\n\n") == std::string::npos ? convert_to_string("\n\n" + convert_from_string(text)) : text;
+				else
+					text = convert_from_string(text).find("\n\n") != std::string::npos ? convert_to_string(convert_from_string(text).substr(2)) : text;
+				TMP_Text_set_text((app::TMP_Text*)colorBlindText, text, NULL);
 			}
 
 			// SeeProtect
@@ -758,45 +759,49 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 {
 	try {
 		if (IsInLobby() && target == *Game::pLocalPlayer) return; //for some reason this kicks you from the lobby
-		if (!State.PanicMode) {
-			if (!PlayerIsImpostor(GetPlayerData(__this)) || PlayerIsImpostor(GetPlayerData(target))) {
-				synchronized(Replay::replayEventMutex) {
-					State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayerControl(__this).value(), CHEAT_ACTIONS::CHEAT_KILL_IMPOSTOR));
-				}
-			}
-			if (resultFlags == MurderResultFlags__Enum::Succeeded) {
-				synchronized(Replay::replayEventMutex) {
-					State.liveReplayEvents.emplace_back(std::make_unique<KillEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value(), PlayerControl_GetTruePosition(__this, NULL), PlayerControl_GetTruePosition(target, NULL)));
-					State.replayDeathTimePerPlayer[target->fields.PlayerId] = std::chrono::system_clock::now();
-				}
-			}
-
-			// ESP: Reset Kill Cooldown
-			if (__this->fields._.OwnerId != (*Game::pAmongUsClient)->fields._.ClientId) {
-				if (!target || target->fields.protectedByGuardianId < 0)
-					__this->fields.killTimer = (std::max)(GameOptions().GetKillCooldown(), 0.f);
-				else
-					__this->fields.killTimer = (std::max)(GameOptions().GetKillCooldown() * 0.5f, 0.f);
-				//STREAM_DEBUG("Player " << ToString(__this) << " KillTimer " << __this->fields.killTimer);
-			}
-
-			do {
-				if (!State.ShowProtections) break;
-				if (!target || target->fields.protectedByGuardianId < 0)
-					break;
-				if (__this->fields._.OwnerId == (*Game::pAmongUsClient)->fields._.ClientId)
-					break; // AmKiller
-				if (auto localData = GetPlayerData(*Game::pLocalPlayer);
-					!localData || !localData->fields.Role
-					|| localData->fields.Role->fields.Role == RoleTypes__Enum::GuardianAngel)
-					break; // AmAngel
-				int prev = target->fields.protectedByGuardianId;
-				PlayerControl_ShowFailedMurder(target, nullptr);
-				target->fields.protectedByGuardianId = prev;
-			} while (false);
-			if (__this == *Game::pLocalPlayer && State.confuser && State.confuseOnKill)
-				ControlAppearance(true);
+		if (static_cast<int32_t>(resultFlags) & static_cast<int32_t>(MurderResultFlags__Enum::FailedError)) {
+			app::PlayerControl_MurderPlayer(__this, target, resultFlags, method);
+			return;
 		}
+		auto killer = GetEventPlayerControl(__this);
+		auto victim = GetEventPlayerControl(target);
+		if (killer && victim) {
+			if (PlayerIsImpostor(GetPlayerData(__this)) && PlayerIsImpostor(GetPlayerData(target))) {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(killer.value(), CHEAT_ACTIONS::CHEAT_KILL_IMPOSTOR));
+				}
+			}
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<KillEvent>(killer.value(), victim.value(), PlayerControl_GetTruePosition(__this, NULL), PlayerControl_GetTruePosition(target, NULL)));
+				State.replayDeathTimePerPlayer[target->fields.PlayerId] = std::chrono::system_clock::now();
+			}
+		}
+
+		// ESP: Reset Kill Cooldown
+		if (__this->fields._.OwnerId != (*Game::pAmongUsClient)->fields._.ClientId) {
+			if (!target || target->fields.protectedByGuardianId < 0)
+				__this->fields.killTimer = (std::max)(GameOptions().GetKillCooldown(), 0.f);
+			else
+				__this->fields.killTimer = (std::max)(GameOptions().GetKillCooldown() * 0.5f, 0.f);
+			//STREAM_DEBUG("Player " << ToString(__this) << " KillTimer " << __this->fields.killTimer);
+		}
+
+		do {
+			if (!State.ShowProtections) break;
+			if (!target || target->fields.protectedByGuardianId < 0)
+				break;
+			if (__this->fields._.OwnerId == (*Game::pAmongUsClient)->fields._.ClientId)
+				break; // AmKiller
+			if (auto localData = GetPlayerData(*Game::pLocalPlayer);
+				!localData || !localData->fields.Role
+				|| localData->fields.Role->fields.Role == RoleTypes__Enum::GuardianAngel)
+				break; // AmAngel
+			int prev = target->fields.protectedByGuardianId;
+			PlayerControl_ShowFailedMurder(target, nullptr);
+			target->fields.protectedByGuardianId = prev;
+		} while (false);
+		if (__this == *Game::pLocalPlayer && State.confuser && State.confuseOnKill)
+			ControlAppearance(true);
 	}
 	catch (...) {
 		LOG_DEBUG("Exception occurred in PlayerControl_MurderPlayer (PlayerControl)");
@@ -809,28 +814,36 @@ void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target,
 	if (!State.PanicMode) {
 		if (State.DisableKills || (State.GodMode && __this == *Game::pLocalPlayer)) return;
 
-		if (__this != *Game::pLocalPlayer) PlayerControl_CmdCheckMurder(__this, target, method); //hopefully this fixes kill issues as host
-		else PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+		if (State.AlwaysUseKillExploit)
+			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+		else if (IsInLobby())
+			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+		else if (State.RealRole != RoleTypes__Enum::Impostor && State.RealRole != RoleTypes__Enum::Shapeshifter)
+			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+		else if ((*Game::pLocalPlayer)->fields.killTimer > 0)
+			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+		else
+			PlayerControl_CmdCheckMurder(*Game::pLocalPlayer, target, NULL);
 	}
 	else PlayerControl_CmdCheckMurder(__this, target, method);
 }
 
 void dPlayerControl_RpcShapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method)
 {
-	if (__this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
+	if (!State.PanicMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (State.PanicMode ? animate : (!State.AnimationlessShapeshift || animate)), method);
 	else PlayerControl_RpcShapeshift(__this, target, animate, method);
 }
 
 void dPlayerControl_CmdCheckShapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method)
 {
-	if (!State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, animate, method);
-	else PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
+	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (!State.AnimationlessShapeshift || animate), method);
+	else PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : (!State.AnimationlessShapeshift || animate)), method);
 }
 
 void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
 {
-	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, __this, animate, method);
-	else PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : !State.AnimationlessShapeshift), method);
+	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, __this, (!State.AnimationlessShapeshift || animate), method);
+	else PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : (!State.AnimationlessShapeshift || animate)), method);
 }
 
 /*void dPlayerControl_RpcRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
@@ -1060,7 +1073,7 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 float dConsole_1_CanUse(Console_1* __this, GameData_PlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
 	try {
 		if (!State.PanicMode) {
-			std::vector<int> sabotageTaskIds = { 16, 17, 19, 20, 30, 35, 59 }; //don't prevent impostor from fixing sabotages
+			std::vector<int> sabotageTaskIds = { 0, 1, 2 }; //don't prevent impostor from fixing sabotages
 			if (State.DoTasksAsImpostor || !PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer)))
 				__this->fields.AllowImpostor = true;
 			else if (std::find(sabotageTaskIds.begin(), sabotageTaskIds.end(), __this->fields.ConsoleId) == sabotageTaskIds.end())
@@ -1071,4 +1084,20 @@ float dConsole_1_CanUse(Console_1* __this, GameData_PlayerInfo* pc, bool* canUse
 		LOG_DEBUG("Exception occurred in Console_1_CanUse (PlayerControl)");
 	}
 	return Console_1_CanUse(__this, pc, canUse, couldUse, method);
+}
+
+void dPlayerControl_SetRole(PlayerControl* __this, RoleTypes__Enum role, MethodInfo* method) {
+	if (__this == *Game::pLocalPlayer) State.RealRole = role;
+	if (!IsInMultiplayerGame() || __this != *Game::pLocalPlayer) {
+		PlayerControl_SetRole(__this, role, method);
+		return;
+	}
+	bool hasAlreadySetRole = role == RoleTypes__Enum::GuardianAngel || role == RoleTypes__Enum::CrewmateGhost || role == RoleTypes__Enum::ImpostorGhost;
+	if (State.AutoFakeRole && !hasAlreadySetRole) {
+		if (State.RealRole != RoleTypes__Enum::Shapeshifter && State.FakeRole == 5 && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead)
+			role = RoleTypes__Enum::Impostor;
+
+		else role = (RoleTypes__Enum)State.FakeRole;
+	}
+	PlayerControl_SetRole(__this, role, method);
 }

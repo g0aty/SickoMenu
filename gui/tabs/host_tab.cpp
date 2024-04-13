@@ -178,25 +178,45 @@ namespace HostTab {
 			}
 
 			static int framesPassed = -1;
+			static bool isReviving = false;
 
-			if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
+			if (IsHost() && IsInGame() && !isReviving && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
 			{
 				app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
 				State.rpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
 				State.rpcQueue.push(new RpcForceColor(*Game::pLocalPlayer, outfit->fields.ColorId));
-				framesPassed = 40;
+				framesPassed = 100;
+				switch (State.mapType) {
+				case Settings::MapType::Ship:
+					State.rpcQueue.push(new RpcSnapTo({ 9.3840f, -6.0744f }));
+					break;
+				case Settings::MapType::Hq:
+					State.rpcQueue.push(new RpcSnapTo({ 23.7700f, -1.5764f }));
+					break;
+				case Settings::MapType::Pb:
+					State.rpcQueue.push(new RpcSnapTo({ 6.9000f, -14.0464f }));
+					break;
+				case Settings::MapType::Airship:
+					State.rpcQueue.push(new RpcSnapTo({ -22.0990f, -1.1484f }));
+					break;
+				case Settings::MapType::Fungle:
+					State.rpcQueue.push(new RpcSnapTo({ -15.3590f, -9.4194f }));
+					break;
+				}
+				isReviving = true;
 			}
 
-			if (framesPassed == 20)
+			if (isReviving && framesPassed == 50)
 			{
 				State.rpcQueue.push(new RpcVent(*Game::pLocalPlayer, 1, false));
 				framesPassed--;
 			}
-			else if (framesPassed <= 0 && (*Game::pLocalPlayer)->fields.inVent) {
+			else if (isReviving && framesPassed <= 0 && (*Game::pLocalPlayer)->fields.inVent) {
 				State.rpcQueue.push(new RpcVent(*Game::pLocalPlayer, 1, true)); //for showing you as alive to ALL players
 				framesPassed = -1;
+				isReviving = false;
 			}
-			else framesPassed--;
+			else if (isReviving) framesPassed--;
 
 			ImGui::EndChild();
 		}

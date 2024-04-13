@@ -42,7 +42,6 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 
 		if (State.AutoFakeRole) {
 			if (!State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
-			State.rpcQueue.push(new SetRole((RoleTypes__Enum)State.FakeRole));
 		}
 
 		//if (!State.mapDoors.empty() && Constants_1_ShouldFlipSkeld(NULL))

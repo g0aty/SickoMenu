@@ -48,6 +48,12 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 					(State.PanicMode || (!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
 					&& !localData->fields.IsDead,
 					NULL);
+				if (State.OutfitCooldown == 0) {
+					if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin)
+						ControlAppearance(true);
+					State.CanChangeOutfit = true;
+				}
+				else State.OutfitCooldown--;
 			}
 
 			if (!State.InMeeting && !State.DisableHud)

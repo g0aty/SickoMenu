@@ -54,6 +54,7 @@ void Settings::Load() {
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
 
+        JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
         JSON_TRYGET("CycleBetweenPlayers", this->CycleBetweenPlayers);
@@ -157,6 +158,7 @@ void Settings::Load() {
         JSON_TRYGET("ShowVoteKicks", this->ShowVoteKicks);
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
+        JSON_TRYGET("AlwaysUseKillExploit", this->AlwaysUseKillExploit);
         JSON_TRYGET("NoClip", this->NoClip);
 
         JSON_TRYGET("AdjustByDPI", this->AdjustByDPI);
@@ -233,6 +235,7 @@ void Settings::Save() {
             { "SpoofGuestAccount", this->SpoofGuestAccount },
             //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
 
+            { "NoAbilityCD", this->NoAbilityCD },
             { "SelectedColorId", this->SelectedColorId },
             { "SnipeColor", this->SnipeColor },
             { "CycleBetweenPlayers", this->CycleBetweenPlayers },
@@ -336,6 +339,7 @@ void Settings::Save() {
             { "ShowVoteKicks", this->ShowVoteKicks },
             { "ShowFps", this->ShowFps },
             { "DoTasksAsImpostor", this->DoTasksAsImpostor },
+            { "AlwaysUseKillExploit", this->AlwaysUseKillExploit },
             { "NoClip", this->NoClip },
 
             { "RevealVotes", this->RevealVotes },

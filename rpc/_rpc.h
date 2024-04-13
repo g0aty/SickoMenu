@@ -393,3 +393,9 @@ public:
 	RpcForceAumChat(const PlayerSelection& target, std::string_view msg, bool completeForce = false);
 	virtual void Process() override;
 };
+
+class RpcSyncSettings : public RPCInterface {
+public:
+	RpcSyncSettings();
+	virtual void Process() override;
+};

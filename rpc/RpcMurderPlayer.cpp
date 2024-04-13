@@ -298,3 +298,15 @@ void RpcForceAumChat::Process()
 	std::string chatVisual = "<#f55><b>[AUM Chat]</b></color>\n" + msg;
 	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(chatVisual), false, NULL);
 }
+
+RpcSyncSettings::RpcSyncSettings() {
+
+}
+
+void RpcSyncSettings::Process()
+{
+	IGameOptions* iGameOptions = GameOptionsManager_get_CurrentGameOptions(GameOptionsManager_get_Instance(NULL), NULL);
+	GameOptionsFactory* gameOptionsFactory = (GameOptionsFactory*)((InnerNetClient*)(*Game::pAmongUsClient))->fields.gameOptionsFactory;
+	Byte__Array* arr = GameOptionsFactory_ToBytes(gameOptionsFactory, iGameOptions, false, NULL);
+	for (auto p : GetAllPlayerControl()) PlayerControl_RpcSyncSettings(p, arr, NULL);
+}

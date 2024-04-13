@@ -8234,6 +8234,8 @@ namespace app
 #endif
 #pragma endregion
 
+    typedef Il2CppObject GameOptionsFactory;
+
 #pragma region InnerNetClient
 
 #if defined(_CPLUSPLUS_)
@@ -8353,7 +8355,7 @@ namespace app
         void* LastMatchmakerError;
         void* PreSpawnDispatcher;
         void* Dispatcher;
-        void* gameOptionsFactory;
+        GameOptionsFactory* gameOptionsFactory;
         bool _IsGamePublic_k__BackingField;
 #if defined(_CPLUSPLUS_)
         InnerNetClient_GameStates__Enum GameState;

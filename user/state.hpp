@@ -156,6 +156,7 @@ public:
     bool ShowVoteKicks = false;
     bool ShowFps = false;
     bool DoTasksAsImpostor = false;
+    bool AlwaysUseKillExploit = false;
 
     PlayerSelection selectedPlayer;
     std::queue<RPCInterface*> rpcQueue;
@@ -338,6 +339,10 @@ public:
         Fungle = 4
     } mapType = MapType::Ship;
 
+    bool CanChangeOutfit = false;
+    uint8_t OutfitCooldown = 50;
+    RoleTypes__Enum RealRole = RoleTypes__Enum::Crewmate;
+
     bool AutoOpenDoors = false;
 
     Settings()
@@ -345,7 +350,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.2";
+    std::string SickoVersion = "v3.3.1";
 
     void Load();
     void Save();

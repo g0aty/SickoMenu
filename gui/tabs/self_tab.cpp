@@ -51,20 +51,10 @@ namespace SelfTab {
             }
             ImGui::SameLine();
             ToggleButton("Disable HUD", &State.DisableHud);
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                HotKey(State.KeyBinds.Toggle_Hud);
-            }
 
             if (ToggleButton("Freecam", &State.FreeCam)) {
                 State.playerToFollow = PlayerSelection();
                 State.Save();
-            }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                if (HotKey(State.KeyBinds.Toggle_Freecam)) {
-                    State.Save();
-                }
             }
 
             ImGui::SameLine(145.0f * State.dpiScale);
@@ -73,10 +63,6 @@ namespace SelfTab {
             if (ToggleButton("Zoom", &State.EnableZoom)) {
                 State.Save();
                 if (!State.EnableZoom) RefreshChat();
-            }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                HotKey(State.KeyBinds.Toggle_Zoom);
             }
 
             ImGui::SameLine(145.0f * State.dpiScale);
@@ -257,10 +243,6 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                HotKey(State.KeyBinds.Toggle_Noclip);
-            }
 
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
@@ -277,12 +259,12 @@ namespace SelfTab {
             if (ToggleButton("Autokill", &State.AutoKill)) {
                 State.Save();
             }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                HotKey(State.KeyBinds.Toggle_Autokill);
-            }
 
             if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Always Use Kill Exploit", &State.AlwaysUseKillExploit)) {
                 State.Save();
             }
 
@@ -373,7 +355,7 @@ namespace SelfTab {
                 else if (IsInLobby())
                     State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum(State.FakeRole)));
             }
-            ImGui::SameLine();
+            if (IsHost() || !State.SafeMode) ImGui::SameLine();
             if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && ImGui::Button("Set for Everyone")) {
                 if (IsInGame()) {
                     for (auto player : GetAllPlayerControl())
@@ -392,9 +374,14 @@ namespace SelfTab {
                 else if (IsInLobby())
                     State.lobbyRpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRole)));
             }
-            if (State.SafeMode) ImGui::SameLine();
+            ImGui::SameLine();
             if (ToggleButton("Automatically Set Fake Role", &State.AutoFakeRole)) {
                 State.Save();
+            }
+            if (IsInLobby() || IsInGame()) {
+                ImGui::SameLine();
+                std::string roleText = FAKEROLES[int(State.RealRole)];
+                ImGui::Text(("Real Role: " + roleText).c_str());
             }
         }
 
@@ -502,10 +489,6 @@ namespace SelfTab {
                     ControlAppearance(true);
                 }
                 if (IsInGame() || IsInLobby()) {
-                    if (State.ShowKeybinds) {
-                        ImGui::SameLine();
-                        HotKey(State.KeyBinds.Randomize_Appearance);
-                    }
                     if (IsHost() || !State.SafeMode)
                         ImGui::SameLine();
                 }

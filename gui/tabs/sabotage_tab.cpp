@@ -20,16 +20,10 @@ namespace SabotageTab {
             if (ImGui::Button("Repair Sabotage")) {
                 RepairSabotage(*Game::pLocalPlayer);
             }
-            if (State.ShowKeybinds) {
-                ImGui::SameLine();
-                if (HotKey(State.KeyBinds.Repair_Sabotage)) {
-                    State.Save();
-                }
-            }
             ImGui::NewLine();
             if (State.DisableSabotages)
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Sabotages have been disabled. Nothing can be sabotaged.");
-            //i skidded some code from https://github.com/scp222thj/MalumMenu/ for making the no cooldown sabotages (it's taken down as of now)
+            //i skidded some code from https://github.com/scp222thj/MalumMenu/ for making the no cooldown sabotages (right back up :D)
             if (ImGui::Button("Sabotage All")) {
                 if (State.mapType != Settings::MapType::Fungle) { //lights don't work on fungle
                     for (size_t i = 0; i < 5; i++)

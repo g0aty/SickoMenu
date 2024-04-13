@@ -107,6 +107,24 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	State.ChatCooldown = __this->fields.timeSinceLastMessage;
 	State.ChatFocused = __this->fields.freeChatField->fields.textArea->fields.hasFocus;
 
+	if (State.FollowerCam != nullptr && !State.PanicMode && State.EnableZoom && 
+		(__this->fields.state == ChatControllerState__Enum::Closed || (__this->fields.state == ChatControllerState__Enum::Closing && State.EnableZoom))) {
+		Camera_set_orthographicSize(State.FollowerCam, 3.f, NULL);
+		int32_t width = Screen_get_width(NULL);
+		int32_t height = Screen_get_height(NULL);
+		bool fullscreen = Screen_get_fullScreen(NULL);
+		ChatController_OnResolutionChanged(__this, (float)(width / height), width, height, fullscreen, NULL);
+		if (__this->fields.state == ChatControllerState__Enum::Closing && State.EnableZoom) ChatController_ForceClosed(__this, NULL); //force close the chat as it stays open otherwise
+		Camera_set_orthographicSize(State.FollowerCam, 3.f * (State.EnableZoom ? State.CameraHeight : 1.f), NULL);
+	}
+
+	if (!State.PanicMode && State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby()) && __this->fields.timeSinceLastMessage >= 3.5f) {
+		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(State.chatMessage), NULL);
+		//remove rpc queue stuff cuz of delay and anticheat kick
+		State.MessageSent = true;
+	}
+
+
 	ChatController_Update(__this, method);
 }
 

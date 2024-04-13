@@ -112,3 +112,4 @@ bool dConstants_1_IsVersionModded(MethodInfo* method);
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method);
 bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, MethodInfo* method);
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method);
+void dPlayerControl_SetRole(PlayerControl* __this, RoleTypes__Enum role, MethodInfo* method);

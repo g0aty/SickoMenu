@@ -33,7 +33,6 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 
 		if (State.AutoFakeRole) {
 			if (!State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
-			State.rpcQueue.push(new SetRole((RoleTypes__Enum)State.FakeRole));
 		}
 	}
 	catch (...) {

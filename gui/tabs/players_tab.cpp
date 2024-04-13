@@ -153,6 +153,9 @@ namespace PlayersTab {
 						case Platforms__Enum::Xbox:
 							platform = "Xbox (Console)";
 							break;
+						case Platforms__Enum::Playstation:
+							platform = "Playstation (Console)";
+							break;
 						default:
 							platform = "Unknown";
 							break;

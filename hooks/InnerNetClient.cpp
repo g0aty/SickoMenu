@@ -30,6 +30,9 @@ static void onGameEnd() {
         State.IsRevived = false;
         State.protectMonitor.clear();
         State.VoteKicks = 0;
+        State.OutfitCooldown = 50;
+        State.CanChangeOutfit = false;
+        State.RealRole = RoleTypes__Enum::Crewmate;
 
         drawing_t& instance = Esp::GetDrawing();
         synchronized(instance.m_DrawingMutex) {
@@ -218,7 +221,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                             engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
                     }
-                    else if (role == RoleTypes__Enum::Scientist) {
+                    if (role == RoleTypes__Enum::Scientist) {
                         app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
                         if (scientistRole->fields.currentCooldown > 0.0f)
                             scientistRole->fields.currentCooldown = 0.01f; //This will be deducted below zero on the next FixedUpdate call
@@ -247,6 +250,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
                         shapeshifterRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
                     }
+                    if (IsInGame()) {
+                        (*Game::pLocalPlayer)->fields.RemainingEmergencies = 69420;
+                        (*Game::pShipStatus)->fields.EmergencyCooldown = 0.f;
+                    }
                 }
             }
             if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && State.NoAbilityCD) {
@@ -261,6 +268,36 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                     engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
                 }
+            }
+
+            if (!State.NoAbilityCD && (IsInGame() || IsInLobby()) && GameOptions().HasOptions()) {
+                auto localData = GetPlayerData(*Game::pLocalPlayer);
+                app::RoleBehaviour* playerRole = localData->fields.Role;
+                app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
+                GameOptions options;
+                if (role == RoleTypes__Enum::Engineer)
+                {
+                    app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
+                    float ventTime = options.GetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, 1.0F);;
+                    if (engineerRole->fields.inVentTimeRemaining > ventTime)
+                        engineerRole->fields.inVentTimeRemaining = ventTime;
+                }
+                if (role == RoleTypes__Enum::Scientist) {
+                    app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
+                    float charge = options.GetFloat(app::FloatOptionNames__Enum::ScientistBatteryCharge, 1.0F);
+                    if (scientistRole->fields.currentCharge > charge)
+                        scientistRole->fields.currentCharge = charge;
+                }
+                if (role == RoleTypes__Enum::Shapeshifter) {
+                    app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
+                    float shiftTime = options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F);
+                    if (shapeshifterRole->fields.durationSecondsRemaining > shiftTime)
+                        shapeshifterRole->fields.durationSecondsRemaining = shiftTime;
+                }
+
+                int emergencies = options.GetInt(app::Int32OptionNames__Enum::NumEmergencyMeetings, 1);
+                if (IsInGame() && (*Game::pLocalPlayer)->fields.RemainingEmergencies > emergencies)
+                    (*Game::pLocalPlayer)->fields.RemainingEmergencies = emergencies;
             }
 
             static int weaponsDelay = 0;
@@ -369,7 +406,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (State.CycleBetweenPlayers)
                 State.Cycler = false;
 
-            if (State.Cycler && (!State.InMeeting || State.CycleInMeeting)) {
+            if (State.Cycler && (!State.InMeeting || State.CycleInMeeting) && State.CanChangeOutfit) {
                 static float cycleNameDelay = 0;
                 if (State.CycleName && cycleNameDelay <= 0) {
                     std::vector<std::string> validNames;
@@ -572,7 +609,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             static float playerCycleDelay = 0;
 
-            if (State.CycleBetweenPlayers && (IsInGame() || IsInLobby()) && (!State.InMeeting || State.CycleInMeeting)) {
+            if (State.CycleBetweenPlayers && (IsInGame() || IsInLobby()) && (!State.InMeeting || State.CycleInMeeting) && State.CanChangeOutfit) {
                 if (playerCycleDelay <= 0) {
                     std::vector<PlayerControl*> players = {};
                     for (auto player : GetAllPlayerControl()) {
@@ -599,8 +636,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             State.RgbNameColor += 0.025f;
-            constexpr auto d_pi = 2.f * 3.14159265358979323846f;
-            while (State.RgbNameColor > d_pi) State.RgbNameColor -= d_pi;
+            constexpr auto tau = 2.f * 3.14159265358979323846f;
+            while (State.RgbNameColor > tau) State.RgbNameColor -= tau;
             const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
             auto color_r = calculate(State.RgbNameColor + 0.f);
             auto color_g = calculate(State.RgbNameColor + 4.f);
@@ -659,10 +696,21 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 (*Game::pLocalPlayer)->fields.MyPhysics->fields.GhostSpeed = State.MultiplySpeed ? (float)(2.5 * State.PlayerSpeed) : 2.5f;
             }
             if (IsInGame() || IsInLobby()) {
-                if (!GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::GuardianAngel || GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::CrewmateGhost || GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::ImpostorGhost))
+                auto localData = GetPlayerData(*Game::pLocalPlayer);
+                auto roleType = localData->fields.RoleType;
+                bool roleAssigned = (*Game::pLocalPlayer)->fields.roleAssigned;
+
+                if (!localData->fields.IsDead && (State.RealRole == RoleTypes__Enum::GuardianAngel || State.RealRole == RoleTypes__Enum::CrewmateGhost || State.RealRole == RoleTypes__Enum::ImpostorGhost))
                     State.IsRevived = true;
                 else
                     State.IsRevived = false;
+
+                std::queue<RPCInterface*>* queue = IsInGame() ? &State.rpcQueue : &State.lobbyRpcQueue;
+                if (State.SafeMode && (IsInMultiplayerGame() || IsInLobby())) {
+                    if (roleType == RoleTypes__Enum::GuardianAngel && State.RealRole != RoleTypes__Enum::GuardianAngel) {
+                        queue->push(new SetRole(RoleTypes__Enum::CrewmateGhost)); //prevent being unable to protect
+                    }
+                }
             }
 
             if (!IsHost() && (IsInGame() || IsInLobby())) {

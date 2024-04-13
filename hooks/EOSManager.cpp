@@ -69,7 +69,7 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	__this->fields.ageOfConsent = 0; //why tf does amogus have an age of consent lmao
 	if (State.SpoofFriendCode && IsHost()) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
 	EOSManager_Update(__this, method);
-	EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
+	//EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
 	if (State.SpoofGuestAccount) {
 		auto player = app::DataManager_get_Player(nullptr);
 		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
@@ -82,7 +82,7 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
 			auto username = __this->fields.editAccountUsername;
 			TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
-			EditAccountUsername_SaveUsername(username, NULL);
+			//EditAccountUsername_SaveUsername(username, NULL);
 		}
 		if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
 			EOSManager_DeleteDeviceID(__this, NULL, NULL);

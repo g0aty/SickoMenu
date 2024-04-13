@@ -167,18 +167,11 @@ namespace GameTab {
 				{
 					ControlAppearance(false);
 				}
-				if (State.ShowKeybinds && (IsInGame() || IsInLobby())) {
-					ImGui::SameLine();
-					HotKey(State.KeyBinds.Reset_Appearance);
-				}/*
+				/*
 				if (IsInGame() || IsInLobby())
 				{
 					if (ImGui::Button("Save Appearance"))
 						SaveOriginalAppearance();
-				}
-				if (State.ShowKeybinds && (IsInGame() || IsInLobby())) {
-					ImGui::SameLine();
-					HotKey(State.KeyBinds.Save_Appearance);
 				}*/
 
 				ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);

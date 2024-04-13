@@ -502,13 +502,10 @@ void RepairSabotage(PlayerControl* player) {
 	static std::string noOxyTaskType = translate_type_name("NoOxyTask");
 	static std::string reactorTaskType = translate_type_name("ReactorTask");*/
 
-	auto sabotageTask = GetSabotageTask(player);
-	if (sabotageTask == NULL) return;
+	if (State.mapType != Settings::MapType::Fungle) {
+		il2cpp::Dictionary<Dictionary_2_SystemTypes_ISystemType_> systems = (*Game::pShipStatus)->fields.Systems;
 
-	if (electricTaskType == sabotageTask->klass->_0.name) {
-		auto electricTask = (ElectricTask*)sabotageTask;
-
-		auto switchSystem = electricTask->fields.system;
+		auto switchSystem = (SwitchSystem*)(systems[SystemTypes__Enum::Electrical]);
 		auto actualSwitches = switchSystem->fields.ActualSwitches;
 		auto expectedSwitches = switchSystem->fields.ExpectedSwitches;
 
@@ -520,9 +517,6 @@ void RepairSabotage(PlayerControl* player) {
 					State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
 			}
 		}
-	}
-	else {
-		STREAM_ERROR("Unknown Task:" << sabotageTask->klass->_0.name);
 	}
 }
 
@@ -896,14 +890,14 @@ std::string GetGradientUsername(std::string str, bool useState, bool underline, 
 }
 
 void RefreshChat(bool alsoShow) {
-	if (!Game::HudManager.IsInstanceExists()) return;
+	/*if (!Game::HudManager.IsInstanceExists()) return;
 	try {
 		auto chat = Game::HudManager.GetInstance()->fields.Chat;
 		GameObject_SetActive(chat->fields.chatButton, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
 		ChatController_SetVisible(chat, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
 		//if (alsoShow) GameObject_SetActive(chat->fields.chatScreen, true, NULL);
 	}
-	catch (...) {}
+	catch (...) {}*/
 }
 
 void SaveOriginalAppearance()
