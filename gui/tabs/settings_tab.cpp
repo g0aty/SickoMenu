@@ -23,6 +23,7 @@ namespace SettingsTab {
 	void CloseOtherGroups(Groups group) {
 		openGeneral = group == Groups::General;
 		openSpoofing = group == Groups::Spoofing;
+		openKeybinds = group == Groups::Keybinds;
 	}
 
 	void Render() {
@@ -313,6 +314,7 @@ namespace SettingsTab {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Close Current Room Door");
 
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			if (HotKey(State.KeyBinds.Complete_Tasks)) {
 				State.Save();
