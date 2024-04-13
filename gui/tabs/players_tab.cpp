@@ -310,7 +310,18 @@ namespace PlayersTab {
 						State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
 					}
 					else if (IsInLobby()) {
-						State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
+						State.lobbyRpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
+					}
+				}
+				if (!State.SafeMode) {
+					ImGui::SameLine();
+					if (ImGui::Button("Kick Exploit")) {
+						if (IsInGame()) {
+							State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl(), true));
+						}
+						else if (IsInLobby()) {
+							State.lobbyRpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl(), true));
+						}
 					}
 				}
 				if (IsHost()) ImGui::SameLine();
