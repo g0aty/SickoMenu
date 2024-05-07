@@ -41,7 +41,7 @@ void DetourInitilization() {
 		return;
 	} else {
 		// Attempting to hook the Steam overlay
-		do {
+		/*do {
 			if (oPresent)
 				break;
 			HMODULE hModule = GetModuleHandleA("GameOverlayRenderer.dll");
@@ -60,10 +60,12 @@ void DetourInitilization() {
 #endif
 				return;
 			}
-			oPresent = d3d11.presentFunction;
-		} while (0);
+			LOG_ERROR("Failed to hook the Steam overlay D3DPresent function. This may cause the menu to be visible to streaming applications.");
+			//move to logs so user doesn't get a popup every time
+			//oPresent = d3d11.presentFunction;
+		} while (0);*/
 		// Attempting to hook the Epic overlay
-		do {
+		/*do {
 			if (oPresent)
 				break;
 			HMODULE hModule = GetModuleHandleA("EOSOVH-Win32-Shipping.dll");
@@ -82,8 +84,10 @@ void DetourInitilization() {
 #endif
 				return;
 			}
-			oPresent = d3d11.presentFunction;
-		} while (0);
+			LOG_ERROR("Failed to hook the Epic overlay D3DPresent function. This may cause the menu to be visible to streaming applications.");
+			//move to logs so user doesn't get a popup every time
+			//oPresent = d3d11.presentFunction;
+		} while (0);*/
 		if (!oPresent)
 			oPresent = d3d11.presentFunction;
 	}
@@ -181,6 +185,7 @@ void DetourInitilization() {
 	//HOOKFUNC(ActivityManager_UpdateActivity);
 	HOOKFUNC(PingTracker_Update);
 	HOOKFUNC(KillOverlay_ShowKillAnimation_1);
+	HOOKFUNC(KillButton_SetTarget);
 	HOOKFUNC(ImpostorRole_FindClosestTarget);
 	HOOKFUNC(MushroomDoorSabotageMinigame_Begin);
 	//HOOKFUNC(AmongUsClient_CoStartGameHost);
@@ -301,6 +306,7 @@ void DetourUninitialization()
 	//UNHOOKFUNC(ActivityManager_UpdateActivity);
 	UNHOOKFUNC(PingTracker_Update);
 	UNHOOKFUNC(KillOverlay_ShowKillAnimation_1);
+	UNHOOKFUNC(KillButton_SetTarget);
 	UNHOOKFUNC(ImpostorRole_FindClosestTarget);
 	UNHOOKFUNC(MushroomDoorSabotageMinigame_Begin);
 	//UNHOOKFUNC(AmongUsClient_CoStartGameHost);

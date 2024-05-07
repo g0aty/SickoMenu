@@ -218,6 +218,7 @@ std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated = false);
 RoleTypes__Enum GetRoleTypesEnum(RoleType role);
 float GetDistanceBetweenPoints_Unity(const Vector2& p1, const Vector2& p2);
 float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2);
+void ShowHudNotification(std::string text);
 
 /// <summary>
 /// Simplifies a list of points by ensuring the distance between consecutive points is greater than the squared distance threshold; all other points are discarded.

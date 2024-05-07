@@ -12,7 +12,7 @@
 #include "version.h"
 #include <fstream>
 #include <sstream>
-#include "gitparams.h"
+//#include "gitparams.h"
 
 // test autoRelease main ver increment
 

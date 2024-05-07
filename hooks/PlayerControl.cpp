@@ -587,19 +587,24 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				BYTE arr[256];
 				if (GetKeyboardState(arr) && !State.ChatFocused)
 				{
+					float xOffset = 0, yOffset = 0;
 					if ((arr[0x57] & 0x80) != 0) {
-						State.camPos.y = State.camPos.y + (0.1f * State.FreeCamSpeed);
+						yOffset = 1;
 					}
 					if ((arr[0x41] & 0x80) != 0) {
-						State.camPos.x = State.camPos.x - (0.1f * State.FreeCamSpeed);
+						xOffset = -1;
 					}
 					if ((arr[0x53] & 0x80) != 0) {
-						State.camPos.y = State.camPos.y - (0.1f * State.FreeCamSpeed);
+						yOffset = -1;
 					}
 					if ((arr[0x44] & 0x80) != 0)
 					{
-						State.camPos.x = State.camPos.x + (0.1f * State.FreeCamSpeed);
+						xOffset = 1;
 					}
+					float magnitude = (xOffset == 0 && yOffset == 0) ? 1 : sqrt(xOffset * xOffset + yOffset * yOffset);
+					//check for zero and prevent you from moving ~1.414 times faster diagonally
+					State.camPos.x += float(0.1f * State.FreeCamSpeed * xOffset / magnitude);
+					State.camPos.y += float(0.1f * State.FreeCamSpeed * yOffset / magnitude);
 				}
 
 				Transform_set_position(cameraTransform, { State.camPos.x, State.camPos.y }, NULL);
@@ -814,7 +819,7 @@ void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target,
 	if (!State.PanicMode) {
 		if (State.DisableKills || (State.GodMode && __this == *Game::pLocalPlayer)) return;
 
-		if (State.AlwaysUseKillExploit)
+		if (State.AlwaysUseKillExploit || State.NoAbilityCD)
 			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
 		else if (IsInLobby())
 			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
@@ -830,20 +835,20 @@ void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target,
 
 void dPlayerControl_RpcShapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method)
 {
-	if (!State.PanicMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (State.PanicMode ? animate : (!State.AnimationlessShapeshift || animate)), method);
+	if (!State.PanicMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
 	else PlayerControl_RpcShapeshift(__this, target, animate, method);
 }
 
 void dPlayerControl_CmdCheckShapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method)
 {
-	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (!State.AnimationlessShapeshift || animate), method);
-	else PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : (!State.AnimationlessShapeshift || animate)), method);
+	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (!State.AnimationlessShapeshift && animate), method);
+	else PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
 }
 
 void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
 {
-	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, __this, (!State.AnimationlessShapeshift || animate), method);
-	else PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : (!State.AnimationlessShapeshift || animate)), method);
+	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, __this, (!State.AnimationlessShapeshift && animate), method);
+	else PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
 }
 
 /*void dPlayerControl_RpcRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
@@ -886,6 +891,15 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 			if (IsHost() && ((State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
 				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) ||
 				(State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder))) //we cannot prevent murderplayer because the player will force it
+				return;
+			int crew = 0, imp = 0;
+			for (auto p : GetAllPlayerData()) {
+				if (p->fields.IsDead) continue;
+				PlayerIsImpostor(p) ? imp++ : crew++;
+			}
+			bool shouldCheckMeeting = (imp >= crew) || imp == 0;
+			if (State.NoGameEnd && shouldCheckMeeting && 
+				(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting))
 				return;
 		}
 	}
@@ -1041,6 +1055,51 @@ void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method) 
 		Log.Debug("Exception occurred in PlayerControl_RemoveProtection (PlayerControl)");
 	}
 	PlayerControl_RemoveProtection(__this, method);
+}
+
+void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method) {
+	auto result = target;
+	bool amImpostor = PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer));
+	if (State.UnlockKillButton && !amImpostor) {
+		if (!State.PanicMode && result == nullptr) {
+			PlayerControl* new_result = nullptr;
+			float defaultKillDist = 2.5f;
+			auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
+			switch (killDistSetting) {
+			case 0: 
+				defaultKillDist = 1.f; 
+				break; //short
+			case 1: 
+				defaultKillDist = 1.8f; 
+				break; //medium
+			case 2: 
+				defaultKillDist = 2.5f; 
+				break; //long
+			}
+			float max_dist = State.InfiniteKillRange ? FLT_MAX : defaultKillDist; //medium kill distance is 1.8
+			auto localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
+			for (auto p : GetAllPlayerControl()) {
+				if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
+				auto pData = GetPlayerData(p);
+				if (PlayerIsImpostor(pData) && !State.KillImpostors) continue; //neither impostors
+				if (pData->fields.IsDead) continue; //nor ghosts
+				float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
+				if (currentDist < max_dist) {
+					new_result = p;
+					max_dist = currentDist;
+				}
+			}
+			result = new_result;
+		}
+
+		if (!State.PanicMode && result != nullptr && State.AutoKill && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
+			if (IsInGame()) State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+			else State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+		}
+		KillButton_SetTarget(__this, result, NULL);
+	}
+	else if (amImpostor) KillButton_SetTarget(__this, result, NULL);
+	else KillButton_SetTarget(__this, NULL, NULL);
 }
 
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {

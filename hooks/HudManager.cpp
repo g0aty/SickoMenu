@@ -75,19 +75,28 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 				}
 				else
 				{
-					app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents || (((*Game::pLocalPlayer)->fields.inVent && role == RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal) && !State.PanicMode), nullptr);
+					app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents && !State.PanicMode) || (((*Game::pLocalPlayer)->fields.inVent && role == RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal), nullptr);
 				}
 
-				if ((IsInGame() || IsInLobby()) && !State.PanicMode) {
+				if ((IsInGame() || IsInLobby())) {
 					for (auto player : GetAllPlayerControl())
 					{
 						auto playerInfo = GetPlayerData(player);
 						if (!playerInfo) break; //This happens sometimes during loading
 
-						if (State.KillImpostors && !playerInfo->fields.IsDead && PlayerIsImpostor(localData))
+						if (!State.PanicMode && State.KillImpostors && !playerInfo->fields.IsDead && PlayerIsImpostor(localData))
 							playerInfo->fields.Role->fields.CanBeKilled = true;
 						else if (PlayerIsImpostor(playerInfo))
 							playerInfo->fields.Role->fields.CanBeKilled = false;
+					}
+					GameObject* KillButton = app::Component_get_gameObject((Component_1*)__this->fields.KillButton, NULL);
+					if ((!State.PanicMode && State.UnlockKillButton && !localData->fields.IsDead) || PlayerIsImpostor(localData)) {
+						app::GameObject_SetActive(KillButton, true, nullptr);
+						playerRole->fields.CanUseKillButton = true;
+					}
+					else {
+						app::GameObject_SetActive(KillButton, false, nullptr);
+						playerRole->fields.CanUseKillButton = false;
 					}
 				}
 			}
@@ -134,7 +143,7 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 			std::string hostText = State.ShowHost ?
 				(IsHost() ? "\nYou are Host" : std::format("\nHost: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format("\nVote Kicks: {}", State.VoteKicks) : "";
-			std::string pingText = std::format("<#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ {}<size=50%>{}{}{}{}{}{}</size>", State.SickoVersion, ping, fpsText, hostText, autoKill, noClip, freeCam, spectating);
+			std::string pingText = std::format("<#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ {}<size=50%>{}{}{}{}{}{}</size>", State.SickoVersion, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
 			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopRight, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}

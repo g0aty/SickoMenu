@@ -236,6 +236,10 @@ namespace SelfTab {
                 State.Save();
             }
 
+            if (ToggleButton("Unlock Kill Button", &State.UnlockKillButton)) {
+                State.Save();
+            }
+            ImGui::SameLine();
             if (ToggleButton("Shapeshift without Animation", &State.AnimationlessShapeshift)) {
                 State.Save();
             }
@@ -284,7 +288,7 @@ namespace SelfTab {
             if (!State.SafeMode && ToggleButton("Hold ALT to Teleport Everyone", &State.TeleportEveryone)) {
                 State.Save();
             }
-            if (ToggleButton("Rotate Everyone", &State.RotateEveryone)) {
+            if (ToggleButton((State.SafeMode ? "Rotate Everyone (Client-sided ONLY)" : "Rotate Everyone"), &State.RotateEveryone)) {
                 State.Save();
             }
             if (!State.SafeMode) ImGui::SameLine();
@@ -448,16 +452,16 @@ namespace SelfTab {
 
 
             if (ImGui::CollapsingHeader("Cycler Name Options")) {
-                if (CustomListBoxInt("Random Name Generation###Cycler", &State.cyclerNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
+                if (CustomListBoxInt("Cycler Name Generation", &State.cyclerNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
                     State.Save();
                 }
                 if (State.cyclerNameGeneration == 2) {
                     if (State.cyclerUserNames.empty())
                         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username generation will fall back to word combo as you have no names in the cycler.");
                     static std::string newName = "";
-                    InputString("New Name###Cycler", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
+                    InputString("New Name", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     ImGui::SameLine();
-                    if (ImGui::Button("Add Name###Cycler")) {
+                    if (ImGui::Button("Add Name")) {
                         State.cyclerUserNames.push_back(newName);
                         State.Save();
                         newName = "";
@@ -472,9 +476,9 @@ namespace SelfTab {
                         for (size_t i = 0; i < State.cyclerUserNames.size(); i++) {
                             nameVector[i] = State.cyclerUserNames[i].c_str();
                         }
-                        CustomListBoxInt("Select Name to Delete###Cycler", &selectedNameIndex, nameVector);
+                        CustomListBoxInt("Cycler Name to Delete", &selectedNameIndex, nameVector);
                         ImGui::SameLine();
-                        if (ImGui::Button("Delete###Cycler"))
+                        if (ImGui::Button("Delete"))
                             State.cyclerUserNames.erase(State.cyclerUserNames.begin() + selectedNameIndex);
                     }
                 }
@@ -548,16 +552,16 @@ namespace SelfTab {
                 }
             }
             if (ImGui::CollapsingHeader("Confuser Name Options")) {
-                if (CustomListBoxInt("Random Name Generation###Cycler", &State.confuserNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
+                if (CustomListBoxInt("Confuser Name Generation", &State.confuserNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
                     State.Save();
                 }
                 if (State.confuserNameGeneration == 2) {
                     if (State.cyclerUserNames.empty())
                         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username generation will fall back to word combo as you have no names in the cycler.");
                     static std::string newName = "";
-                    InputString("New Name###Cycler", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
+                    InputString("New Name ", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     ImGui::SameLine();
-                    if (ImGui::Button("Add Name###Cycler")) {
+                    if (ImGui::Button("Add Name ")) {
                         State.cyclerUserNames.push_back(newName);
                         State.Save();
                         newName = "";
@@ -572,9 +576,9 @@ namespace SelfTab {
                         for (size_t i = 0; i < State.cyclerUserNames.size(); i++) {
                             nameVector[i] = State.cyclerUserNames[i].c_str();
                         }
-                        CustomListBoxInt("Select Name to Delete###Cycler", &selectedNameIndex, nameVector);
+                        CustomListBoxInt("Confuser Name to Delete", &selectedNameIndex, nameVector);
                         ImGui::SameLine();
-                        if (ImGui::Button("Delete###Cycler"))
+                        if (ImGui::Button("Delete "))
                             State.cyclerUserNames.erase(State.cyclerUserNames.begin() + selectedNameIndex);
                     }
                 }

@@ -164,13 +164,6 @@ namespace PlayersTab {
 					}
 				}
 				std::string platformText = std::format("Platform: {}", platform);
-				ImGui::Text(const_cast<char*>(platformText.c_str()));
-				if (convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode) != "" && ImGui::Button("Set as Fake Friend Code")) {
-					State.FakeFriendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
-					State.Save();
-				}
-				if (convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode) != "" || convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid) != "")
-					ImGui::Text("These friend codes and product\nuser ID's will only be applied\nafter restarting the game.");
 			}
 
 			ImGui::EndChild();
@@ -188,14 +181,16 @@ namespace PlayersTab {
 			if (State.DisableMeetings && IsHost())
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Meetings have been disabled.");
 			GameOptions options;
-			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings && IsHost())) { //Player selection doesn't matter
+			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings || !IsHost())) { //Player selection doesn't matter
 				if (!State.InMeeting) {
 					if (ImGui::Button("Call Meeting")) {
+						RepairSabotage(*Game::pLocalPlayer);
 						State.rpcQueue.push(new RpcReportBody({}));
 					}
 				}
 				else {
 					if (ImGui::Button("Call Meeting")) {
+						RepairSabotage(*Game::pLocalPlayer);
 						State.rpcQueue.push(new RpcForceMeeting(*Game::pLocalPlayer, {}));
 					}
 				}
@@ -208,7 +203,6 @@ namespace PlayersTab {
 						}*/
 						State.rpcQueue.push(new RpcVotePlayer(player, player, true));
 					}
-					State.rpcQueue.push(new RpcEndMeeting());
 					State.InMeeting = false;
 				}
 			}
@@ -302,31 +296,37 @@ namespace PlayersTab {
 					}
 				}
 
-				if (IsHost() && ImGui::Button("Kick")) {
-					app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl()->fields._.OwnerId, false, NULL);
-				}
-				if (ImGui::Button("Votekick")) {
-					if (IsInGame()) {
-						State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
+				if ((IsInMultiplayerGame() || IsInLobby()) && !selectedPlayer.is_LocalPlayer()) {
+					if (IsHost() && ImGui::Button("Kick")) {
+						app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl()->fields._.OwnerId, false, NULL);
 					}
-					else if (IsInLobby()) {
-						State.lobbyRpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
-					}
-				}
-				if (!State.SafeMode) {
-					ImGui::SameLine();
-					if (ImGui::Button("Kick Exploit")) {
+					if (ImGui::Button("Votekick")) {
 						if (IsInGame()) {
-							State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl(), true));
+							State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
 						}
 						else if (IsInLobby()) {
-							State.lobbyRpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl(), true));
+							State.lobbyRpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl()));
 						}
 					}
-				}
-				if (IsHost()) ImGui::SameLine();
-				if (IsHost() && ImGui::Button("Ban")) {
-					app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl()->fields._.OwnerId, true, NULL);
+					if (!State.SafeMode) {
+						if (ImGui::Button("Kick Exploit")) {
+							if (IsInGame()) {
+								State.rpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl(), true));
+							}
+							else if (IsInLobby()) {
+								State.lobbyRpcQueue.push(new RpcVoteKick(selectedPlayer.get_PlayerControl(), true));
+							}
+						}
+					}
+					else if (IsInGame()) {
+						if (ImGui::Button("Attempt to Ban")) {
+							State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 200, true));
+						}
+					}
+					if (IsHost()) ImGui::SameLine();
+					if (IsHost() && ImGui::Button("Ban")) {
+						app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl()->fields._.OwnerId, true, NULL);
+					}
 				}
 
 				if (framesPassed == 0)
@@ -352,7 +352,7 @@ namespace PlayersTab {
 							State.lobbyRpcQueue.push(new RpcShapeshift(*Game::pLocalPlayer, State.selectedPlayer, !State.AnimationlessShapeshift));
 					}
 				}
-				else if (role == RoleTypes__Enum::Shapeshifter) {
+				else if (State.RealRole == RoleTypes__Enum::Shapeshifter && role == RoleTypes__Enum::Shapeshifter) {
 					app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
 					if (shapeshifterRole->fields.cooldownSecondsRemaining <= 0 && ImGui::Button("Shift"))
 					{
@@ -366,7 +366,7 @@ namespace PlayersTab {
 				if (IsHost() || !State.SafeMode)
 				{
 					if (ImGui::Button("Protect Player")) {
-						app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+						app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
 						auto colorId = outfit->fields.ColorId;
 						if (IsInGame())
 							State.rpcQueue.push(new RpcProtectPlayer(*Game::pLocalPlayer, State.selectedPlayer, colorId));
@@ -374,7 +374,7 @@ namespace PlayersTab {
 							State.lobbyRpcQueue.push(new RpcProtectPlayer(*Game::pLocalPlayer, State.selectedPlayer, colorId));
 					}
 				}
-				else if (role == RoleTypes__Enum::GuardianAngel) {
+				else if (State.RealRole == RoleTypes__Enum::GuardianAngel && role == RoleTypes__Enum::GuardianAngel) {
 					app::GuardianAngelRole* guardianAngelRole = (app::GuardianAngelRole*)playerRole;
 					if (guardianAngelRole->fields.cooldownSecondsRemaining <= 0 && ImGui::Button("Protect Player")) {
 						if (IsInGame())
@@ -451,8 +451,11 @@ namespace PlayersTab {
 					ImGui::SameLine();
 					if (!State.InMeeting) {
 						if (ImGui::Button("Self-Report")) {
-							if (!(IsHost() || !State.SafeMode)) State.rpcQueue.push(new RpcReportBody(State.selectedPlayer));
-							State.rpcQueue.push(new RpcForceMeeting(selectedPlayer.get_PlayerControl(), State.selectedPlayer));
+							if (IsHost() || !State.SafeMode) State.rpcQueue.push(new RpcForceReportBody(selectedPlayer.get_PlayerControl(), selectedPlayer));
+							else {
+								State.rpcQueue.push(new RpcReportBody(selectedPlayer));
+								State.rpcQueue.push(new RpcForceMeeting(selectedPlayer.get_PlayerControl(), selectedPlayer));
+							}
 						}
 					}
 					else {
@@ -544,7 +547,6 @@ namespace PlayersTab {
 					}
 				}
 
-
 				if (!State.SafeMode && ImGui::Button("Impersonate Everyone To")) {
 					app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
 					auto petId = outfit->fields.PetId;
@@ -601,6 +603,14 @@ namespace PlayersTab {
 						}
 					}
 				}
+
+				if (IsInLobby() && ImGui::Button("Allow Player to NoClip")) {
+					if (selectedPlayer.is_LocalPlayer()) State.NoClip = true;
+					else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 1, true));
+					ShowHudNotification(std::format("Allowed {} to NoClip!", 
+						convert_from_string(GameData_PlayerInfo_get_PlayerName(selectedPlayer.get_PlayerData(), NULL))));
+				}
+
 				if (!State.SafeMode) {
 					if (ImGui::Button("Suicide")) {
 						if (IsInGame()) {
@@ -758,16 +768,16 @@ namespace PlayersTab {
 					}
 				}
 
-				if ((IsInGame() || IsInLobby()) && !selectedPlayer.is_Disconnected() && selectedPlayer.has_value())
+				if ((IsInGame() || IsInLobby()) && selectedPlayer.has_value())
 				{
-					if (State.playerToAttach.equals(State.selectedPlayer) && State.ActiveAttach && (selectedPlayer.is_LocalPlayer() && selectedPlayer.has_value())) {
+					if ((State.playerToAttach.equals(State.selectedPlayer) && State.ActiveAttach) || (selectedPlayer.is_LocalPlayer() && selectedPlayer.has_value())) {
 						if (ImGui::Button("Stop Attaching")) {
 							State.playerToAttach = {};
 							State.ActiveAttach = false;
 						}
 					}
 					else {
-						if (ImGui::Button("Attach To")) {
+						if (ImGui::Button("Attach To") && !selectedPlayer.is_LocalPlayer()) {
 							State.playerToAttach = State.selectedPlayer;
 							State.ActiveAttach = true;
 						}

@@ -72,6 +72,7 @@ public:
     float PrevCycleTimer = 0.5f;
     float CycleDuration = CycleTimer * 50;
     bool UnlockVents = false;
+    bool UnlockKillButton = false;
     bool ShowGhosts = false;
     int FakeRole = 0;
     bool AutoFakeRole = false;
@@ -350,7 +351,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.3.1";
+    std::string SickoVersion = "v3.4";
 
     void Load();
     void Save();

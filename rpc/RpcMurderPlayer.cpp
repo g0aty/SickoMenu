@@ -39,6 +39,48 @@ void RpcMurderPlayer::Process()
 	}
 }
 
+RpcMurderLoop::RpcMurderLoop(PlayerControl* Player, PlayerControl* target, int count, bool onlyOnTarget)
+{
+	this->Player = Player;
+	this->target = target;
+	this->count = count;
+	this->onlyOnTarget = onlyOnTarget;
+}
+
+void RpcMurderLoop::Process()
+{
+	if (onlyOnTarget && (IsInMultiplayerGame() || IsInLobby())) {
+		for (size_t i = 1; i <= (size_t)count; ++i) {
+			if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) break;
+			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
+				uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::None, target->fields._.OwnerId, NULL);
+			MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+			MessageWriter_WriteInt32(writer, int32_t(MurderResultFlags__Enum::Succeeded), NULL);
+			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+		}
+	}
+	else if (IsInLobby() && target == *Game::pLocalPlayer) {
+		for (size_t i = 1; i <= (size_t)count; ++i) {
+			if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) break;
+			for (auto p : GetAllPlayerControl()) {
+				if (p != *Game::pLocalPlayer) {
+					auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
+						uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::None, p->fields._.OwnerId, NULL);
+					MessageWriter_WriteInt32(writer, int32_t(MurderResultFlags__Enum::Succeeded), NULL);
+					MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+					InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+				}
+			}
+		}
+	}
+	else {
+		for (size_t i = 1; i <= (size_t)count; ++i) {
+			if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) break;
+			PlayerControl_RpcMurderPlayer(Player, target, true, NULL);
+		}
+	}
+}
+
 //damn im too lazy to add new files
 
 RpcShapeshift::RpcShapeshift(PlayerControl* Player, const PlayerSelection& target, bool animate)
@@ -301,7 +343,7 @@ void RpcForceAumChat::Process()
 	std::string chatVisual = "<#f55><b>[AUM Chat]</b></color>\n" + msg;
 	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(chatVisual), false, NULL);
 }
-
+/*
 RpcSyncSettings::RpcSyncSettings() {
 
 }
@@ -312,4 +354,4 @@ void RpcSyncSettings::Process()
 	GameOptionsFactory* gameOptionsFactory = (GameOptionsFactory*)((InnerNetClient*)(*Game::pAmongUsClient))->fields.gameOptionsFactory;
 	Byte__Array* arr = GameOptionsFactory_ToBytes(gameOptionsFactory, iGameOptions, false, NULL);
 	for (auto p : GetAllPlayerControl()) PlayerControl_RpcSyncSettings(p, arr, NULL);
-}
+}*/

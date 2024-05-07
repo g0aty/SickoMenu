@@ -187,6 +187,34 @@ namespace GameTab {
 					State.rpcQueue.push(new RpcVent(*Game::pLocalPlayer, 1, true));
 				}*/
 
+				if (IsInLobby() && ImGui::Button("Allow Everyone to NoClip")) {
+					for (auto p : GetAllPlayerControl())
+						State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
+					State.NoClip = true;
+					ShowHudNotification("Allowed everyone to NoClip!");
+				}
+				ImGui::SameLine();
+				if ((IsInGame() || IsInLobby()) && ImGui::Button("Kill Everyone")) {
+					for (auto player : GetAllPlayerControl()) {
+						if (IsInGame())
+							State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
+						else if (IsInLobby())
+							State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
+					}
+				}
+				if ((IsInGame() || IsInLobby()) && (IsHost() || !State.SafeMode)) {
+					ImGui::SameLine();
+					if (ImGui::Button("Protect Everyone")) {
+						for (auto player : GetAllPlayerControl()) {
+							uint8_t colorId = GetPlayerOutfit(GetPlayerData(player))->fields.ColorId;
+							if (IsInGame())
+								State.rpcQueue.push(new RpcProtectPlayer(*Game::pLocalPlayer, PlayerSelection(player), colorId));
+							else if (IsInLobby())
+								State.lobbyRpcQueue.push(new RpcProtectPlayer(*Game::pLocalPlayer, PlayerSelection(player), colorId));
+						}
+					}
+				}
+
 				if (IsInGame() && ToggleButton("Disable Venting", &State.DisableVents)) {
 					State.Save();
 				}

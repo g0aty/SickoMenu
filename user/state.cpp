@@ -120,6 +120,7 @@ void Settings::Load() {
         JSON_TRYGET("FreeCamSpeed", this->FreeCamSpeed);
         JSON_TRYGET("ZoomLevel", this->CameraHeight);
         JSON_TRYGET("UnlockVents", this->UnlockVents);
+        JSON_TRYGET("UnlockKillButton", this->UnlockKillButton);
         JSON_TRYGET("ChatPaste", this->ChatPaste);
         JSON_TRYGET("RevealRoles", this->RevealRoles);
         JSON_TRYGET("AbbreviatedRoleNames", this->AbbreviatedRoleNames);
@@ -301,6 +302,7 @@ void Settings::Save() {
             { "FreeCamSpeed", this->FreeCamSpeed },
             { "ZoomLevel", this->CameraHeight },
             { "UnlockVents", this->UnlockVents },
+            { "UnlockKillButton", this->UnlockKillButton },
             { "ChatPaste", this->ChatPaste },
             { "RevealRoles", this->RevealRoles },
             { "AbbreviatedRoleNames", this->AbbreviatedRoleNames },

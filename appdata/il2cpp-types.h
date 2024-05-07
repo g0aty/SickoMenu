@@ -7758,7 +7758,7 @@ namespace app
         void* shhhEmblem;
         void* IntroPrefab;
         void* GameMenu;
-        void* Notifier;
+        struct NotificationPopper* Notifier;
         void* roomTracker;
         void* TaskCompleteSound;
         void* TaskUpdateSound;
@@ -8234,8 +8234,6 @@ namespace app
 #endif
 #pragma endregion
 
-    typedef Il2CppObject GameOptionsFactory;
-
 #pragma region InnerNetClient
 
 #if defined(_CPLUSPLUS_)
@@ -8355,7 +8353,7 @@ namespace app
         void* LastMatchmakerError;
         void* PreSpawnDispatcher;
         void* Dispatcher;
-        GameOptionsFactory* gameOptionsFactory;
+        void* gameOptionsFactory;
         bool _IsGamePublic_k__BackingField;
 #if defined(_CPLUSPLUS_)
         InnerNetClient_GameStates__Enum GameState;
@@ -11550,6 +11548,46 @@ namespace app
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct Activity_1__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region NotificationPopper
+    struct NotificationPopper__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* TextArea;
+        float zPos;
+        float alphaTimer;
+        float ShowDuration;
+        float FadeDuration;
+        struct Color textColor;
+        struct AudioClip* NotificationSound;
+        struct Camera* mainCamera;
+        struct StringBuilder* builder;
+    };
+
+    struct NotificationPopper {
+        struct NotificationPopper__Class* klass;
+        MonitorData* monitor;
+        struct NotificationPopper__Fields fields;
+    };
+
+    struct NotificationPopper__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct NotificationPopper__StaticFields {
+    };
+
+    struct NotificationPopper__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct NotificationPopper__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct NotificationPopper__VTable vtable;
     };
 #pragma endregion
 

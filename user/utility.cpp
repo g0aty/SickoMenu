@@ -2,7 +2,7 @@
 #include "utility.h"
 #include "state.hpp"
 #include "game.h"
-#include "gitparams.h"
+//#include "gitparams.h"
 #include "logger.h"
 #include "profiler.h"
 #include <random>
@@ -105,11 +105,12 @@ int GetMaxImpostorAmount(int playerAmount)
 	if (State.CustomImpostorAmount)
 		return State.ImpostorCount;
 	if (options.GetGameMode() == GameModes__Enum::HideNSeek)
-		return 1;
+		return 1; //pointless to use min here
 	if (playerAmount >= 9)
-		return 3;
+		return min(options.GetNumImpostors(), 3);
 	if (playerAmount >= 7)
-		return 2;
+		return min(options.GetNumImpostors(), 2);
+	//fix issue #9
 	return 1;
 }
 
@@ -697,7 +698,7 @@ std::string ToString(__maybenull GameData_PlayerInfo* data) {
 
 #define ADD_QUOTES_HELPER(s) #s
 #define ADD_QUOTES(s) ADD_QUOTES_HELPER(s)
-
+/*
 std::string GetGitCommit()
 {
 #ifdef GIT_CUR_COMMIT
@@ -712,7 +713,7 @@ std::string GetGitBranch()
 	return ADD_QUOTES(GIT_BRANCH);
 #endif
 	return "unavailable";
-}
+}*/
 
 std::string operator*(std::string const& in, size_t m) { //python style string multiplication
 	std::string ret;
@@ -1146,6 +1147,11 @@ float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2)
 {
 	float dx = p1.x - p2.x, dy = p1.y - p2.y;
 	return sqrtf(dx * dx + dy * dy);
+}
+
+void ShowHudNotification(std::string text) {
+	std::string notificationText = "<#fb0>[<#0f0>Sicko</color><#f00>Menu</color>]</color> " + text;
+	if (IsInGame() || IsInLobby()) NotificationPopper_AddItem(Game::HudManager.GetInstance()->fields.Notifier, convert_to_string(notificationText), NULL);
 }
 
 void DoPolylineSimplification(std::vector<ImVec2>& inPoints, std::vector<std::chrono::system_clock::time_point>& inTimeStamps, std::vector<ImVec2>& outPoints, std::vector<std::chrono::system_clock::time_point>& outTimeStamps, float sqDistanceThreshold, bool clearInputs)

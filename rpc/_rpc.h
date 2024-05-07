@@ -171,6 +171,16 @@ public:
 	virtual void Process() override;
 };
 
+class RpcMurderLoop : public RPCInterface {
+	PlayerControl* Player;
+	PlayerControl* target;
+	int count;
+	bool onlyOnTarget;
+public:
+	RpcMurderLoop(PlayerControl* Player, PlayerControl* target, int count = 30, bool onlyOnTarget = true);
+	virtual void Process() override;
+};
+
 class RpcShapeshift : public RPCInterface {
 	PlayerControl* Player;
 	PlayerSelection target;
@@ -395,8 +405,8 @@ public:
 	virtual void Process() override;
 };
 
-class RpcSyncSettings : public RPCInterface {
+/*class RpcSyncSettings : public RPCInterface {
 public:
 	RpcSyncSettings();
 	virtual void Process() override;
-};
+};*/

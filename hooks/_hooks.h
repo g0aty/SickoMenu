@@ -98,6 +98,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 //void dActivityManager_UpdateActivity(void* __this, Activity_1 activity, void* callback, MethodInfo* method);
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method);
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, GameData_PlayerInfo* killer, GameData_PlayerInfo* victim, MethodInfo* method);
+void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method);
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method);
 void dMushroomDoorSabotageMinigame_Begin(MushroomDoorSabotageMinigame* __this, PlayerTask* task, MethodInfo* method);
 //void* dAmongUsClient_CoStartGameHost(AmongUsClient* __this, MethodInfo* method);

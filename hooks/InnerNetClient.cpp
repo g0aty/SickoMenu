@@ -252,7 +252,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     }
                     if (IsInGame()) {
                         (*Game::pLocalPlayer)->fields.RemainingEmergencies = 69420;
-                        (*Game::pShipStatus)->fields.EmergencyCooldown = 0.f;
+                        //if (GameOptions().HasOptions())
+                            //(*Game::pShipStatus)->fields.EmergencyCooldown = (float)GameOptions().GetInt(app::Int32OptionNames__Enum::EmergencyCooldown);
                     }
                 }
             }
@@ -363,10 +364,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             static int nameChangeCycleDelay = 0; //If we spam too many name changes, we're banned
-            if ((nameChangeCycleDelay <= 0 && State.SetName && !State.activeImpersonation && !State.ServerSideCustomName) || onStart) {
+            if (nameChangeCycleDelay <= 0 && State.SetName && !State.activeImpersonation && !State.ServerSideCustomName) {
                 if ((((IsInGame() || IsInLobby()) && (convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer)), nullptr)) != State.userName))
                     || ((!IsInGame() && !IsInLobby()) && GetPlayerName() != State.userName))
-                    && !State.userName.empty() && (!IsNameValid(State.userName) || (IsHost() || !State.SafeMode))) {
+                    && !State.userName.empty() && (IsNameValid(State.userName) || (IsHost() || !State.SafeMode))) {
                     SetPlayerName(State.userName);
                     LOG_INFO("Name mismatch, setting name to \"" + State.userName + "\"");
                     if (IsInGame())
@@ -651,18 +652,14 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.RgbColor.z = color_b;
             }
 
-            static int attachDelay = 0; //If we spam too many name changes, we're banned
+            //static int attachDelay = 0; //If we spam too many name changes, we're banned
             auto playerToAttach = State.playerToAttach.validate();
 
-            if (attachDelay <= 0 && State.ActiveAttach && State.playerToAttach.has_value()) {
+            if (State.ActiveAttach && State.playerToAttach.has_value()) {
                 if (IsInGame())
                     State.rpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(playerToAttach.get_PlayerControl())));
                 else if (IsInLobby())
                     State.lobbyRpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(playerToAttach.get_PlayerControl())));
-                attachDelay = 25; //Should be approximately 0.5 second
-            }
-            else {
-                attachDelay--;
             }
 
             // Shift + Right-click Teleport
