@@ -58,6 +58,9 @@
 - **Spam** Spams chat with your desired message
 - **Spam by Everyone** *(Only with Safe Mode disabled)* Spams the chat as all players with your desired message (Default: OFF)
 - **Console** Shows a console window that tracks all game events (Default: OFF)
+- **Allow Everyone to NoClip** Allows every player to walk through walls provided they're not a cheater as well
+- **Kill Everyone** Kills all players as yourself
+- **Protect Everyone** *(Only as host/Safe Mode disabled)* Casts a guardian angel shield with the same color as the player around them 
 - **Disable Venting** Instantly kicks anyone in the vents out (Default: OFF)
 - **Spam Report** Spams dead body reports (Default: OFF)
 - **Kill All Crewmates** Kills all crewmates as yourself
@@ -170,12 +173,14 @@ A dedicated player menu for viewing and manipulating players
 - **Kick** *(Only as Host)* Kicks the selected player
 - **Votekick** Votekicks the selected player (2 more are required to actually kick the player)
 - **Kick Exploit** *(Only with Safe Mode disabled)* Attempts to kick the player using an exploit
+- **Attempt to Ban** *(Only with an anticheat)* Attempts to ban the player for hacking
 - **Ban** *(Only as Host)* Bans the selected player
 - **Shift** *(Only as Shapeshifter/Safe Mode disabled)* Shapeshifts you into the selected player
 - **Protect** *(Only as Guardian Angel/Host/Safe Mode disabled)* Casts a guardian angel protection on the selected player
 - View the player's tasks (and complete them with Safe Mode disabled)
 
 ### Trolling
+- **Allow Player to NoClip** Allows the selected player to walk through walls
 - **Force Meeting By** Forces an emergency meeting by the selected player
 - **Self-Report** Forces the selected player to report their own body
 - **Impersonate** Copies the player's cosmetics
