@@ -65,11 +65,21 @@ namespace HostTab {
 								State.assignedRoles[index] = RoleType::Random;
 						} //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps.
 
+						if (options.GetGameMode() == GameModes__Enum::HideNSeek)
+						{
+							if (State.assignedRoles[index] == RoleType::Shapeshifter)
+								State.assignedRoles[index] = RoleType::Random;
+							else if (State.assignedRoles[index] == RoleType::Scientist)
+								State.assignedRoles[index] = RoleType::Engineer;
+							else if (State.assignedRoles[index] == RoleType::Crewmate)
+								State.assignedRoles[index] = RoleType::Engineer;
+						} //Assign other roles in hidenseek causes game bug.
+						//These are organized. Do not change the order unless you find it necessary.
 						if (!IsInGame()) {
 							if (options.GetGameMode() == GameModes__Enum::HideNSeek)
 								SetRoleAmount(RoleTypes__Enum::Engineer, 15);
 							else
-								SetRoleAmount(RoleTypes__Enum::Engineer, State.engineers_amount);
+							SetRoleAmount(RoleTypes__Enum::Engineer, State.engineers_amount);
 							SetRoleAmount(RoleTypes__Enum::Scientist, State.scientists_amount);
 							SetRoleAmount(RoleTypes__Enum::Shapeshifter, State.shapeshifters_amount);
 							if (options.GetNumImpostors() <= State.impostors_amount + State.shapeshifters_amount)
