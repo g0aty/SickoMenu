@@ -55,7 +55,7 @@ namespace PlayersTab {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::BeginChild("players#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 			auto selectedPlayer = State.selectedPlayer.validate();
-			bool shouldEndListBox = ImGui::ListBoxHeader("###players#list", ImVec2(200, 150) * State.dpiScale);
+			bool shouldEndListBox = ImGui::ListBoxHeader("###players#list", ImVec2(200, 230) * State.dpiScale);
 			auto localData = GetPlayerData(*Game::pLocalPlayer);
 			for (auto playerCtrl : GetAllPlayerControl()) {
 				const auto& player = PlayerSelection(playerCtrl).validate();

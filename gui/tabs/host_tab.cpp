@@ -26,7 +26,7 @@ namespace HostTab {
 			if (IsInLobby()) {
 				ImGui::SameLine(100 * State.dpiScale);
 				ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-				bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 150) * State.dpiScale);
+				bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 230) * State.dpiScale);
 				auto allPlayers = GetAllPlayerData();
 				auto playerAmount = allPlayers.size();
 				auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
@@ -79,7 +79,7 @@ namespace HostTab {
 							if (options.GetGameMode() == GameModes__Enum::HideNSeek)
 								SetRoleAmount(RoleTypes__Enum::Engineer, 15);
 							else
-							SetRoleAmount(RoleTypes__Enum::Engineer, State.engineers_amount);
+								SetRoleAmount(RoleTypes__Enum::Engineer, State.engineers_amount);
 							SetRoleAmount(RoleTypes__Enum::Scientist, State.scientists_amount);
 							SetRoleAmount(RoleTypes__Enum::Shapeshifter, State.shapeshifters_amount);
 							if (options.GetNumImpostors() <= State.impostors_amount + State.shapeshifters_amount)
@@ -115,10 +115,10 @@ namespace HostTab {
 					options.SetByte(app::ByteOptionNames__Enum::MapId, id);
 				}
 			}
-			if (IsInLobby() && ToggleButton("Custom Impostor Amount", &State.CustomImpostorAmount))
+			if (IsHost() && IsInLobby() && ToggleButton("Custom Impostor Amount", &State.CustomImpostorAmount))
 				State.Save();
 			State.ImpostorCount = std::clamp(State.ImpostorCount, 0, int(Game::MAX_PLAYERS));
-			if (IsInLobby() && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
+			if (IsHost() && IsInLobby() && State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
 				State.Save();
 			/*int32_t maxPlayers = options.GetMaxPlayers();
 			maxPlayers = std::clamp(maxPlayers, 0, int(Game::MAX_PLAYERS));
