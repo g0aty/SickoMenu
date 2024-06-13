@@ -217,7 +217,7 @@
     <ClCompile Include="hooks\AirshipStatus.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
-	<ClCompile Include="hooks\FungleShipStatus.cpp">
+    <ClCompile Include="hooks\FungleShipStatus.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
     <ClCompile Include="hooks\PlainDoor.cpp">
@@ -310,10 +310,14 @@
     <ClCompile Include="hooks\SabotageSystemType.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
-    <ClCompile Include="rpc\CmdCheckMurder.cpp" />
-    <ClCompile Include="appdata\il2cpp-functions.cpp" />
     <ClCompile Include="rpc\CmdCheckMurder.cpp">
       <Filter>rpc</Filter>
+    </ClCompile>
+    <ClCompile Include="rpc\CmdCheckMurder.cpp">
+      <Filter>rpc</Filter>
+    </ClCompile>
+    <ClCompile Include="appdata\il2cpp-functions.cpp">
+      <Filter>appdata</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -500,6 +504,9 @@
     <ClInclude Include="user\DestroyableSingleton.h">
       <Filter>user</Filter>
     </ClInclude>
+    <ClInclude Include="gui\tabs\about_tab.h">
+      <Filter>gui\tabs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\mira_hq.png">
@@ -514,7 +521,7 @@
     <Image Include="resources\airship.png">
       <Filter>resources</Filter>
     </Image>
-	<Image Include="resources\fungle.png">
+    <Image Include="resources\fungle.png">
       <Filter>resources</Filter>
     </Image>
     <Image Include="resources\vent_in.png">
@@ -535,7 +542,7 @@
     <Image Include="resources\player.png">
       <Filter>resources</Filter>
     </Image>
-	<Image Include="resources\player_visor.png">
+    <Image Include="resources\player_visor.png">
       <Filter>resources</Filter>
     </Image>
     <Image Include="resources\cross.png">

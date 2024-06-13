@@ -26,7 +26,7 @@ namespace HostTab {
 			if (IsInLobby()) {
 				ImGui::SameLine(100 * State.dpiScale);
 				ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-				bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 150) * State.dpiScale);
+				bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 230) * State.dpiScale);
 				auto allPlayers = GetAllPlayerData();
 				auto playerAmount = allPlayers.size();
 				auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
@@ -65,6 +65,16 @@ namespace HostTab {
 								State.assignedRoles[index] = RoleType::Random;
 						} //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps.
 
+						if (options.GetGameMode() == GameModes__Enum::HideNSeek)
+						{
+							if (State.assignedRoles[index] == RoleType::Shapeshifter)
+								State.assignedRoles[index] = RoleType::Random;
+							else if (State.assignedRoles[index] == RoleType::Scientist)
+								State.assignedRoles[index] = RoleType::Engineer;
+							else if (State.assignedRoles[index] == RoleType::Crewmate)
+								State.assignedRoles[index] = RoleType::Engineer;
+						} //Assign other roles in hidenseek causes game bug.
+						//These are organized. Do not change the order unless you find it necessary.
 						if (!IsInGame()) {
 							if (options.GetGameMode() == GameModes__Enum::HideNSeek)
 								SetRoleAmount(RoleTypes__Enum::Engineer, 15);
@@ -105,10 +115,10 @@ namespace HostTab {
 					options.SetByte(app::ByteOptionNames__Enum::MapId, id);
 				}
 			}
-			if (IsInLobby() && ToggleButton("Custom Impostor Amount", &State.CustomImpostorAmount))
+			if (IsHost() && IsInLobby() && ToggleButton("Custom Impostor Amount", &State.CustomImpostorAmount))
 				State.Save();
 			State.ImpostorCount = std::clamp(State.ImpostorCount, 0, int(Game::MAX_PLAYERS));
-			if (IsInLobby() && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
+			if (IsHost() && IsInLobby() && State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
 				State.Save();
 			/*int32_t maxPlayers = options.GetMaxPlayers();
 			maxPlayers = std::clamp(maxPlayers, 0, int(Game::MAX_PLAYERS));
