@@ -10,7 +10,29 @@ Settings State;
 
 void Settings::Load() {
     auto path = getModulePath(hModule);
-    auto settingsPath = path.parent_path() / "sicko-settings.json";
+    auto configPath = path.parent_path() / "sicko-settings.json";
+
+    if (!std::filesystem::exists(configPath))
+        return;
+
+    try {
+        std::ifstream inConfig(configPath);
+        nlohmann::ordered_json j = nlohmann::ordered_json::parse(inConfig, NULL, false);
+
+#define JSON_TRYGET(key, value) \
+        try { \
+            j.at(key).get_to(value); \
+        } catch (nlohmann::detail::out_of_range& e) { \
+            Log.Info(e.what()); \
+        }
+
+        JSON_TRYGET("SelectedConfig", this->selectedConfig);
+    }
+    catch (...) {
+        Log.Info("Unable to load sicko-settings.json");
+    }
+
+    auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
 
     if (!std::filesystem::exists(settingsPath))
         return;
@@ -197,7 +219,7 @@ void Settings::Load() {
 
         JSON_TRYGET("SickoDetection", this->SickoDetection);
     } catch (...) {
-        Log.Info("Unable to load sicko-settings.json");
+        Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
 
     //Do not do any IL2CPP stuff here!  The constructors of most classes have not run yet!
@@ -205,7 +227,22 @@ void Settings::Load() {
 
 void Settings::Save() {
     auto path = getModulePath(hModule);
-    auto settingsPath = path.parent_path() / "sicko-settings.json";
+    std::filesystem::create_directory(path.parent_path() / "sicko-config");
+
+    auto configPath = path.parent_path() / "sicko-settings.json";
+
+    try {
+        nlohmann::ordered_json j = nlohmann::ordered_json{
+            { "SelectedConfig", this->selectedConfig }
+        };
+
+        std::ofstream outConfig(configPath);
+        outConfig << std::setw(4) << j << std::endl;
+    }
+    catch (...) {
+        Log.Info("Unable to save sicko-settings.json");
+    }
+    auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
 
     try {
         nlohmann::ordered_json j = nlohmann::ordered_json {
@@ -381,6 +418,6 @@ void Settings::Save() {
         std::ofstream outSettings(settingsPath);
         outSettings << std::setw(4) << j << std::endl;
     } catch (...) {
-        Log.Info("Unable to save sicko-settings.json");
+        Log.Info("Unable to save " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
 }

@@ -56,7 +56,7 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 				}
 				if (State.CustomName && !State.ServerSideCustomName && playerData == GetPlayerData(*Game::pLocalPlayer)) {
 					if (State.ColoredName && !State.RgbName) {
-						playerName = convert_to_string(GetGradientUsername(RemoveHtmlTags(convert_from_string(playerName)), true));
+						playerName = convert_to_string(GetGradientUsername(convert_from_string(playerName)));
 					}
 					//we don't want to hide our own chat messages
 					/*if (State.ResizeName)

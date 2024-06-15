@@ -48,7 +48,7 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 			//State.FlipSkeld = true; fix later
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in ShipStatus_OnEnable (ShipStatus)");
+		LOG_ERROR("Exception occurred in ShipStatus_OnEnable (ShipStatus)");
 	}
 	ShipStatus_OnEnable(__this, method);
 }
@@ -85,7 +85,7 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in GameStartManager_Update (ShipStatus)");
+		LOG_ERROR("Exception occurred in GameStartManager_Update (ShipStatus)");
 	}
 	GameStartManager_Update(__this, method);
 }

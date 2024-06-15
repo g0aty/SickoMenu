@@ -11,6 +11,6 @@ void dGameOptionsManager_set_CurrentGameOptions(GameOptionsManager* __this, IGam
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in GameOptionsManager_set_CurrentGameOptions (GameOptionsManager)");
+		LOG_ERROR("Exception occurred in GameOptionsManager_set_CurrentGameOptions (GameOptionsManager)");
 	}
 }

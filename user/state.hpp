@@ -29,6 +29,8 @@ public:
         VK_PAUSE //toggle SickoMenu
     };
 
+    std::string selectedConfig = "sicko-settings.json";
+
     bool ImGuiInitialized = false;
     bool HasOpenedMenuBefore = false;
     bool ShowMenuOnStartup = true;
@@ -121,6 +123,7 @@ public:
     bool RandomNamePlate = false;
     bool CycleForEveryone = false;
     bool ForceNameForEveryone = false;
+    bool CustomNameForEveryone = false;
     bool ForceColorForEveryone = false;
     bool CustomName = false;
     bool RgbName = false;
@@ -160,6 +163,7 @@ public:
     bool AlwaysUseKillExploit = false;
 
     PlayerSelection selectedPlayer;
+    std::vector<uint8_t> selectedPlayers = {};
     std::queue<RPCInterface*> rpcQueue;
     std::queue<RPCInterface*> lobbyRpcQueue;
 
@@ -329,7 +333,10 @@ public:
     bool RgbLobbyCode = false;
 
     bool PanicMode = false;
+    bool TempPanicMode = false; //prevent instant crash on joining lobby
     bool SickoDetection = true;
+    bool ForceLoginAsGuest = false;
+    bool DisableHostAnticheat = false;
 
     enum class MapType : uint8_t
     {
@@ -343,6 +350,9 @@ public:
     bool CanChangeOutfit = false;
     uint8_t OutfitCooldown = 50;
     RoleTypes__Enum RealRole = RoleTypes__Enum::Crewmate;
+    DisconnectReasons__Enum LastDisconnectReason = DisconnectReasons__Enum::Unknown;
+    std::string LastLobbyJoined = "";
+    bool IsPreHosting = false;
 
     bool AutoOpenDoors = false;
 
@@ -351,7 +361,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.4";
+    std::string SickoVersion = "v4.0_pr4";
 
     void Load();
     void Save();

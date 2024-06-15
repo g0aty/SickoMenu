@@ -34,13 +34,20 @@ static void onGameEnd() {
         State.CanChangeOutfit = false;
         State.RealRole = RoleTypes__Enum::Crewmate;
 
+        if (State.PanicMode && State.TempPanicMode) {
+            State.PanicMode = false;
+            State.TempPanicMode = false;
+        }
+
+        State.selectedPlayers = {};
+
         drawing_t& instance = Esp::GetDrawing();
         synchronized(instance.m_DrawingMutex) {
             instance.m_Players = {};
         }
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in onGameEnd (InnerNetClient)");
+        LOG_ERROR("Exception occurred in onGameEnd (InnerNetClient)");
     }
 }
 
@@ -66,7 +73,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 }
             }
 
-            if (IsInGame() || IsInLobby()) { //removed hotkeynoclip cuz even if noclip setting is saved and turned on it doesn't work
+            if ((IsInGame() || IsInLobby()) && State.CanChangeOutfit) { //removed hotkeynoclip cuz even if noclip setting is saved and turned on it doesn't work
                 if (!(GetPlayerData(*Game::pLocalPlayer)->fields.IsDead)) {
                     if (State.NoClip || State.IsRevived)
                         app::GameObject_set_layer(app::Component_get_gameObject((Component_1*)(*Game::pLocalPlayer), NULL), app::LayerMask_NameToLayer(convert_to_string("Ghost"), NULL), NULL);
@@ -381,6 +388,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 nameChangeCycleDelay--;
             }
 
+            if (!IsInGame() && !IsInLobby() && !IsHost() && GameOptions().HasOptions()) {
+                GameOptions options;
+                float speedMod = options.GetFloat(FloatOptionNames__Enum::PlayerSpeedMod, 1.f);
+                if (speedMod <= 0.f) options.SetFloat(FloatOptionNames__Enum::PlayerSpeedMod, 1.f);
+                if (speedMod > 3.f) options.SetFloat(FloatOptionNames__Enum::PlayerSpeedMod, 3.f);
+            }
 
             static int nameCtr = 1;
 
@@ -725,7 +738,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         LOG_DEBUG("InnerNetClient_Update Exception " + convert_from_string(ex->fields._message));
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in InnerNetClient_Update (InnerNetClient)");
+        LOG_ERROR("Exception occurred in InnerNetClient_Update (InnerNetClient)");
     }
     InnerNetClient_Update(__this, method);
 }
@@ -734,11 +747,16 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
     try {
         if (!State.PanicMode) {
             Log.Debug("Joined lobby " + convert_from_string(gameIdString));
+            State.LastLobbyJoined = convert_from_string(gameIdString);
+            if (!State.PanicMode) {
+                State.PanicMode = true;
+                State.TempPanicMode = true;
+            }
         }
         RefreshChat();
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in AmongUsClient_OnGameJoined (InnerNetClient)");
+        LOG_ERROR("Exception occurred in AmongUsClient_OnGameJoined (InnerNetClient)");
     }
     AmongUsClient_OnGameJoined(__this, gameIdString, method);
 }
@@ -768,6 +786,11 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 if (it != State.sickoUsers.end())
                     State.sickoUsers.erase(it);
 
+                auto playerId = data->fields.Character->fields.PlayerId;
+                auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);
+                if (itSel != State.selectedPlayers.end())
+                    State.selectedPlayers.erase(itSel);
+
                 if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                     synchronized(Replay::replayEventMutex) {
                         State.liveReplayEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
@@ -781,7 +804,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
         }
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in AmongUsClient_OnPlayerLeft (InnerNetClient)");
+        LOG_ERROR("Exception occurred in AmongUsClient_OnPlayerLeft (InnerNetClient)");
     }
     AmongUsClient_OnPlayerLeft(__this, data, reason, method);
 }
@@ -841,7 +864,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
         }
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in CustomNetworkTransform_SnapTo (InnerNetClient)");
+        LOG_ERROR("Exception occurred in CustomNetworkTransform_SnapTo (InnerNetClient)");
     }*/
     CustomNetworkTransform_SnapTo(__this, position, minSid, method);
 }
@@ -851,7 +874,7 @@ void dAmongUsClient_OnGameEnd(AmongUsClient* __this, Object* endGameResult, Meth
         onGameEnd();
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in AmongUsClient_OnGameEnd (InnerNetClient)");
+        LOG_ERROR("Exception occurred in AmongUsClient_OnGameEnd (InnerNetClient)");
     }
     AmongUsClient_OnGameEnd(__this, endGameResult, method);
 }
@@ -863,10 +886,11 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
             || __this->fields.GameState == InnerNetClient_GameStates__Enum::Joined
             || __this->fields.NetworkMode == NetworkModes__Enum::FreePlay) {
             onGameEnd();
+            State.LastDisconnectReason = reason;
         }
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in InnerNetClient_DisconnectInternal (InnerNetClient)");
+        LOG_ERROR("Exception occurred in InnerNetClient_DisconnectInternal (InnerNetClient)");
     }
     InnerNetClient_DisconnectInternal(__this, reason, stringReason, method);
 }
@@ -877,7 +901,7 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
         onGameEnd(); //removed antiban cuz it glitches the game
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in InnerNetClient_EnqueueDisconnect (InnerNetClient)");
+        LOG_ERROR("Exception occurred in InnerNetClient_EnqueueDisconnect (InnerNetClient)");
     }
     return InnerNetClient_EnqueueDisconnect(__this, reason, stringReason, method);
 }
@@ -888,7 +912,7 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
             return;
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
+        LOG_ERROR("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
     }
     return GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
@@ -915,7 +939,7 @@ float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
         }
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in LogicOptions_GetKillDistance (InnerNetClient)");
+        LOG_ERROR("Exception occurred in LogicOptions_GetKillDistance (InnerNetClient)");
     }
     return LogicOptions_GetKillDistance(__this, method);
 }
@@ -956,12 +980,13 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
             if (p->fields._.OwnerId == srcClient) sourcePlayer = p;
             if (p->fields._.OwnerId == clientId) affectedPlayer = p;
         }
+        if (IsHost() && sourcePlayer == *Game::pLocalPlayer) return; //anti kick as host
         std::string sourceplayerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(sourcePlayer)), nullptr));
         std::string affectedplayerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(affectedPlayer)), nullptr));
         LOG_DEBUG(sourceplayerName + " attempted to votekick " + affectedplayerName);
     }
     catch (...) {
-        LOG_DEBUG("Exception occurred in VoteBanSystem_AddVote (InnerNetClient)");
+        LOG_ERROR("Exception occurred in VoteBanSystem_AddVote (InnerNetClient)");
     }
     return VoteBanSystem_AddVote(__this, srcClient, clientId, method);
 }
@@ -970,3 +995,24 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
     //this might flip the skeld
     return AmongUsClient_CoStartGameHost(__this, method);
 }*/
+
+void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
+    if (!State.PanicMode) {
+        switch (State.LastDisconnectReason) {
+        case DisconnectReasons__Enum::Hacking: {
+            TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
+                convert_to_string("You were banned for hacking.\n\nLast Lobby Code: " + State.LastLobbyJoined),
+                NULL);
+        }
+                                             break;
+        default: {
+            std::string prevText = convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields._textArea, NULL));
+            TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
+                convert_to_string(prevText + " Last Lobby Code: " + State.LastLobbyJoined),
+                NULL);
+        }
+               break;
+        }
+    }
+    DisconnectPopup_DoShow(__this, method);
+}

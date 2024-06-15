@@ -37,6 +37,6 @@ void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in FungleShipStatus_OnEnable (FungleShipStatus)");
+		LOG_ERROR("Exception occurred in FungleShipStatus_OnEnable (FungleShipStatus)");
 	}
 }

@@ -58,6 +58,31 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
+
+			static int selectedConfig = 0;
+			static std::string newConfigName = "";
+			//if (!GetAllConfigs().empty() && 
+				//std::find(GetAllConfigs().begin(), GetAllConfigs().end(), State.selectedConfig.c_str()) == GetAllConfigs().end())
+				//State.selectedConfig = GetAllConfigs()[0];
+			if (!GetAllConfigs().empty() && CustomListBoxInt("Config", &selectedConfig, GetAllConfigs(), 75.f)) {
+				State.selectedConfig = GetAllConfigs()[selectedConfig];
+				State.Save();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Load Config"))
+			{
+				State.Load();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Save Config"))
+			{
+				State.Save();
+			}
+			
+			if (InputString("New Config Name", &newConfigName)) {
+				State.selectedConfig = newConfigName;
+			}
+
 			if (ToggleButton("Adjust by DPI", &State.AdjustByDPI)) {
 				if (!State.AdjustByDPI) {
 					State.dpiScale = 1.0f;
@@ -182,6 +207,9 @@ namespace SettingsTab {
 			}
 			ImGui::Text("Guest friend code should be <= 10 characters long and cannot have a hashtag.");
 			ImGui::Text("It will only apply after restarting the game. For best results, use version.dll!");
+			if (ImGui::Button("Force Login as Guest")) {
+				State.ForceLoginAsGuest = true;
+			}
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
 			}
@@ -202,6 +230,8 @@ namespace SettingsTab {
 			ImGui::SameLine();
 			if (CustomListBoxInt("Platform", &State.FakePlatform, PLATFORMS))
 				State.Save();
+
+			if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
 		}
 
 		if (openKeybinds) {

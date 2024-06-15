@@ -17,7 +17,7 @@ Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo*
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in Camera_ScreenToWorldPoint (Camera)"); //better safe than sorry
+		LOG_ERROR("Exception occurred in Camera_ScreenToWorldPoint (Camera)"); //better safe than sorry
 	}
 
 	return Camera_ScreenToWorldPoint(__this, position, method);
@@ -37,7 +37,7 @@ void dFollowerCamera_Update(FollowerCamera* __this, MethodInfo* method) {
 		else __this->fields.Target = (MonoBehaviour*)(*Game::pLocalPlayer);
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in FollowerCamera_Update (Camera)");
+		LOG_ERROR("Exception occurred in FollowerCamera_Update (Camera)");
 	}
 	FollowerCamera_Update(__this, method);
 }

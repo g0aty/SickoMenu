@@ -305,7 +305,7 @@ DO_APP_FUNC(void, TextBoxTMP_SetText, (TextBoxTMP* __this, String* input, String
 DO_APP_FUNC(void, GameManager_RpcEndGame, (GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method), "Assembly-CSharp, System.Void GameManager::RpcEndGame(GameOverReason, System.Boolean)");
 DO_APP_FUNC(void, KillOverlay_ShowKillAnimation_1, (KillOverlay* __this, GameData_PlayerInfo* killer, GameData_PlayerInfo* victim, MethodInfo* method), "Assembly-CSharp, System.Void KillOverlay::ShowKillAnimation(GameData.PlayerInfo, GameData.PlayerInfo)");
 DO_APP_FUNC(String*, EOSManager_get_FriendCode, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.String EOSManager::get_FriendCode()");
-DO_APP_FUNC(void, EOSManager_set_FriendCode, (EOSManager* __this, String* value, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::set_FriendCode(System.String)");
+//DO_APP_FUNC(void, EOSManager_set_FriendCode, (EOSManager* __this, String* value, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::set_FriendCode(System.String)"); crashes epic games when run
 DO_APP_FUNC(float, LogicOptions_GetKillDistance, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, System.Single LogicOptions::GetKillDistance()");
 //DO_APP_FUNC(TaskBarMode__Enum, LogicOptions_GetTaskBarMode, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, TaskbarMode LogicOptions::GetTaskBarMode()");
 DO_APP_FUNC(void, KillButton_SetTarget, (KillButton* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::SetTarget(PlayerControl)");
@@ -321,5 +321,14 @@ DO_APP_FUNC(bool, LogicGameFlowNormal_IsGameOverDueToDeath, (LogicGameFlowNormal
 DO_APP_FUNC(bool, LogicGameFlowHnS_IsGameOverDueToDeath, (LogicGameFlowHnS* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean LogicGameFlowHnS::IsGameOverDueToDeath()");
 DO_APP_FUNC(void, ChatController_OnResolutionChanged, (ChatController* __this, float aspectRatio, int32_t width, int32_t height, bool fullscreen, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::OnResolutionChanged(System.Single, System.Int32, System.Int32, System.Boolean)");
 DO_APP_FUNC(void, ChatController_ForceClosed, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::ForceClosed()");
-//DO_APP_FUNC(Byte__Array*, GameOptionsFactory_ToBytes, (GameOptionsFactory* __this, IGameOptions* data, bool forceAprilFoolsMode, MethodInfo* method), "Assembly-CSharp, System.Byte[] AmongUs.GameOptions.GameOptionsFactory::ToBytes(AmongUs.GameOptions.IGameOptions, System.Boolean)");
+DO_APP_FUNC(Byte__Array*, GameOptionsFactory_ToBytes, (GameOptionsFactory* __this, IGameOptions* data, bool forceAprilFoolsMode, MethodInfo* method), "Assembly-CSharp, System.Byte[] AmongUs.GameOptions.GameOptionsFactory::ToBytes(AmongUs.GameOptions.IGameOptions, System.Boolean)");
 DO_APP_FUNC(void, NotificationPopper_AddItem, (NotificationPopper* __this, String* item, MethodInfo* method), "Assembly-CSharp, System.Void NotificationPopper::AddItem(System.String)");
+DO_APP_FUNC(bool, GameData_Serialize, (GameData* __this, MessageWriter* writer, bool initialState, MethodInfo* method), "Assembly-CSharp, System.Boolean GameData::Serialize(Hazel.MessageWriter, System.Boolean)");
+DO_APP_FUNC(void, InnerNetClient_SendOrDisconnect, (InnerNetClient* __this, MessageWriter* msg, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::SendOrDisconnect(Hazel.MessageWriter)");
+DO_APP_FUNC(void, MessageWriter_Recycle, (MessageWriter* __this, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Recycle()");
+DO_APP_FUNC(void, GameData_PlayerInfo_Serialize, (GameData_PlayerInfo* __this, MessageWriter* writer, MethodInfo* method), "Assembly-CSharp, System.Void GameData+PlayerInfo::Serialize(Hazel.MessageWriter)");
+DO_APP_FUNC(void, ClipboardHelper_PutClipboardString, (String* str, MethodInfo* method), "Assembly-CSharp, System.Void ClipboardHelper::PutClipboardString(System.String)");
+DO_APP_FUNC(void, GameOptionsManager_set_GameHostOptions, (GameOptionsManager* __this, IGameOptions* value, MethodInfo* method), "Assembly-CSharp, System.Void GameOptionsManager::set_GameHostOptions(AmongUs.GameOptions.IGameOptions)");
+DO_APP_FUNC(void, LogicOptions_SyncOptions, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, System.Void LogicOptions::SyncOptions()");
+DO_APP_FUNC(void, EOSManager_PlayOffline, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::PlayOffline()");
+DO_APP_FUNC(void, DisconnectPopup_DoShow, (DisconnectPopup* __this, MethodInfo* method), "Assembly-CSharp, System.Void DisconnectPopup::DoShow()");

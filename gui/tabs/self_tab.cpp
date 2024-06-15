@@ -101,18 +101,25 @@ namespace SelfTab {
                 if (ToggleButton("Custom Name", &State.CustomName)) {
                     State.Save();
                 }
+                ImGui::SameLine();
+                if (ToggleButton("Custom Name for Everyone", &State.CustomNameForEveryone)) {
+                    State.Save();
+                }
             }
             else {
                 if (ToggleButton("Custom Name (Client-sided ONLY)", &State.CustomName)) {
                     State.Save();
                 }
+                ImGui::SameLine();
+                if (ToggleButton("Custom Name for Everyone (Client-sided ONLY)", &State.CustomNameForEveryone)) {
+                    State.Save();
+                }
             }
 
-            if ((IsHost() || !State.SafeMode))
-                ImGui::SameLine();
-
-            if ((IsHost() || !State.SafeMode)&& ToggleButton("Server-sided Custom Name", &State.ServerSideCustomName)) {
-                State.Save();
+            if ((IsHost() || !State.SafeMode)) {
+                if (ToggleButton("Server-sided Custom Name", &State.ServerSideCustomName)) {
+                    State.Save();
+                }
             }
 
             if (State.CustomName && ImGui::CollapsingHeader("Custom Name Options"))

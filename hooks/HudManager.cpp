@@ -48,10 +48,19 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 					(State.PanicMode || (!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
 					&& !localData->fields.IsDead,
 					NULL);
+				
 				if (State.OutfitCooldown == 0) {
 					if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin)
 						ControlAppearance(true);
 					State.CanChangeOutfit = true;
+				}
+				else if (State.OutfitCooldown == 25 && State.PanicMode) {
+					if (State.TempPanicMode) {
+						State.PanicMode = false;
+						State.TempPanicMode = false;
+					}
+					State.OutfitCooldown--;
+					ChatController_SetVisible(__this->fields.Chat, true, NULL);
 				}
 				else State.OutfitCooldown--;
 			}
@@ -103,7 +112,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in HudManager_Update (HudManager)");
+		LOG_ERROR("Exception occurred in HudManager_Update (HudManager)");
 	}
 	HudManager_Update(__this, method);
 }
@@ -154,7 +163,7 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PingTracker_Update (HudManager)");
+		LOG_ERROR("Exception occurred in PingTracker_Update (HudManager)");
 	}
 }
 

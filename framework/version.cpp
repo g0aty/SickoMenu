@@ -82,7 +82,25 @@ DWORD WINAPI Load(LPVOID lpParam) {
 
 	if (applicationPath.filename() != "Among Us.exe") return 0;
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+	// Wait for Unity.InitializeEngineNoGraphics().
+	HWND hWnd = nullptr;
+	while (true) {
+		hWnd = FindWindowEx(nullptr, hWnd, TEXT("UnityWndClass"), nullptr);
+		if (hWnd) {
+			DWORD pid = 0;
+			GetWindowThreadProcessId(hWnd, &pid);
+			if (pid == GetCurrentProcessId()) {
+				break;
+			}
+			continue;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	}
+	// Wait for Unity.InitializeEngineGraphics().
+	while (!IsWindowVisible(hWnd)) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	}
+	//std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 	Run(lpParam);
 
 	return 0;

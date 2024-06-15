@@ -38,7 +38,7 @@ void dPolusShipStatus_OnEnable(PolusShipStatus* __this, MethodInfo* method)
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PolusShipStatus_OnEnable (PolusShipStatus)");
+		LOG_ERROR("Exception occurred in PolusShipStatus_OnEnable (PolusShipStatus)");
 	}
 	PolusShipStatus_OnEnable(__this, method);
 }

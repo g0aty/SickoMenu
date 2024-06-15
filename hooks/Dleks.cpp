@@ -16,11 +16,11 @@
 
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
 	int32_t orig_return = Constants_1_GetBroadcastVersion(method);
-	if (IsModdedHost()) orig_return += 25;
+	if (State.DisableHostAnticheat) orig_return += 25;
 	return orig_return;
 }
 
 bool dConstants_1_IsVersionModded(MethodInfo* method) {
-	if (IsModdedHost()) return true; //this helps to bypass anticheat in our hosted lobbies
+	if (State.DisableHostAnticheat) return true; //this helps to bypass anticheat in our hosted lobbies
 	return false;
 }

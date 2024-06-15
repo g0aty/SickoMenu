@@ -18,7 +18,7 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 			ControlAppearance(true);
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in MeetingHud_Awake (MeetingHud)");
+		LOG_ERROR("Exception occurred in MeetingHud_Awake (MeetingHud)");
 	}
 	MeetingHud_Awake(__this, method);
 }
@@ -33,7 +33,7 @@ void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in MeetingHud_Close (MeetingHud)");
+		LOG_ERROR("Exception occurred in MeetingHud_Close (MeetingHud)");
 	}
 	MeetingHud_Close(__this, method);
 }
@@ -120,7 +120,7 @@ void dMeetingHud_PopulateResults(MeetingHud* __this, Il2CppArraySize* states, Me
 		options.SetBool(app::BoolOptionNames__Enum::AnonymousVotes, prevAnonymousVotes);
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in MeetingHud_PopulateResults (MeetingHud)");
+		LOG_ERROR("Exception occurred in MeetingHud_PopulateResults (MeetingHud)");
 	}
 	MeetingHud_PopulateResults(__this, states, method);
 }
@@ -162,7 +162,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 				if (playerData == GetPlayerData(*Game::pLocalPlayer) && State.CustomName && (!State.ServerSideCustomName || State.ServerSideCustomName && (!IsHost() || State.SafeMode)) && !State.userName.empty()) {
 					if (State.CustomName && !State.ServerSideCustomName) {
 						if (State.ColoredName && !State.RgbName) {
-							playerName = GetGradientUsername(RemoveHtmlTags(playerName), true);
+							playerName = GetGradientUsername(playerName);
 						}
 						//we don't want a big name hiding everything in the meeting
 						/*if (State.ResizeName)
@@ -309,7 +309,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in MeetingHud_Update (MeetingHud)");
+		LOG_ERROR("Exception occurred in MeetingHud_Update (MeetingHud)");
 	}
 	app::MeetingHud_Update(__this, method);
 }

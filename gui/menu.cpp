@@ -183,7 +183,7 @@ namespace Menu {
 			ImGui::End();
 		}
 		catch (...) {
-			LOG_DEBUG("Exception occurred when rendering menu");
+			LOG_ERROR("Exception occurred when rendering menu");
 		}
 	}
 }

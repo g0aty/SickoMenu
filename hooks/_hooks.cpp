@@ -201,6 +201,8 @@ void DetourInitilization() {
 	HOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
 	HOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
 	HOOKFUNC(PlayerControl_SetRole);
+	HOOKFUNC(GameData_PlayerInfo_Serialize);
+	HOOKFUNC(DisconnectPopup_DoShow);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -322,6 +324,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
 	UNHOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
 	UNHOOKFUNC(PlayerControl_SetRole);
+	UNHOOKFUNC(GameData_PlayerInfo_Serialize);
+	UNHOOKFUNC(DisconnectPopup_DoShow);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

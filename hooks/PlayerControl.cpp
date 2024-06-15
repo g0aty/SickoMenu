@@ -23,7 +23,7 @@ void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_CompleteTask (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_CompleteTask (PlayerControl)");
 	}
 	PlayerControl_CompleteTask(__this, idx, method);
 }
@@ -87,56 +87,25 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 			static int nameDelay = 0;
 
-			if (__this == *Game::pLocalPlayer && !State.userName.empty() &&
-				!((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode) {
-				if (State.CustomName) {
-					std::string opener = "";
-					std::string closer = "";
-					if (State.ColoredName && !State.RgbName && !State.ServerSideCustomName) {
-						playerName = GetGradientUsername(RemoveHtmlTags(playerName), true);
-					}
-					if (State.RgbName) {
-						const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
-						auto color_r = calculate(State.RgbNameColor + 0.f);
-						auto color_g = calculate(State.RgbNameColor + 4.f);
-						auto color_b = calculate(State.RgbNameColor + 2.f);
-						std::string rgbCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255), int((State.NameColor1.w + State.NameColor2.w) * 255 / 2));
-						opener += rgbCode;
-						closer += "</color>";
-					}
-					if (State.ResizeName) {
-						opener += std::format("<size={}%>", State.NameSize * 100);
-						closer += "</size>";
-					}
-					if (State.ItalicName) {
-						opener += "<i>";
-						closer += "</i>";
-					}
-					if (State.UnderlineName && (!State.ColoredName || State.RgbName)) {
-						opener += "<u>";
-						closer += "</u>";
-					}
-					if (State.StrikethroughName && (!State.ColoredName || State.RgbName)) {
-						opener += "<s>";
-						closer += "</s>";
-					}
-
-					playerName = opener + playerName + closer;
-
-					if (nameDelay <= 0 && State.ServerSideCustomName &&
-						convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer)), nullptr)) != ((State.ColoredName && !State.RgbName) ? GetGradientUsername(RemoveHtmlTags(playerName), true) : playerName)) {
-						std::string username = (State.ColoredName && !State.RgbName) ? GetGradientUsername(RemoveHtmlTags(State.userName), true) : State.userName;
-						if (IsInGame()) {
-							State.rpcQueue.push(new RpcSetName(opener + username + closer));
-							nameDelay = 5;
+			if (!State.PanicMode && State.CustomName) {
+				if ((IsHost() || !State.SafeMode) && State.ServerSideCustomName) {
+					if (nameDelay <= 0) {
+						for (auto p : GetAllPlayerControl()) {
+							auto customName = GetCustomName(convert_from_string(GameData_PlayerInfo_get_PlayerName(GetPlayerData(p), nullptr)));
+							if (State.ForceNameForEveryone) customName = GetCustomName(State.hostUserName, true, p->fields.PlayerId);
+							if ((p == *Game::pLocalPlayer || State.CustomNameForEveryone) &&
+								customName != convert_from_string(GameData_PlayerInfo_get_PlayerName(GetPlayerData(p), nullptr))) {
+								if (IsInGame()) State.rpcQueue.push(new RpcForceName(p, customName));
+								if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(p, customName));
+							}
+							nameDelay = int(0.5 * GetFps()); //0.5 seconds
 						}
-						else if (IsInLobby()) {
-							State.lobbyRpcQueue.push(new RpcSetName(opener + username + closer));
-							nameDelay = 5;
-						}
-						nameDelay = 0;
 					}
 					else nameDelay--;
+				}
+				else {
+					if (__this == *Game::pLocalPlayer || State.CustomNameForEveryone)
+						playerName = GetCustomName(playerName);
 				}
 			}
 
@@ -412,10 +381,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					static float forceNameDelay = 0;
 					if (forceNameDelay <= 0) {
 						for (auto player : GetAllPlayerControl()) {
-							if (player != *Game::pLocalPlayer || !(State.CustomName && ((IsHost() || !State.SafeMode) && State.ServerSideCustomName))) {
+							if (!(State.CustomName && State.ServerSideCustomName && (player == *Game::pLocalPlayer || State.CustomNameForEveryone))) {
 								app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
 								std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
-								std::string playerId = std::format("{}", player->fields.PlayerId);
+								std::string playerId = std::format("<{}>", player->fields.PlayerId);
 								std::string newName = State.hostUserName + "<size=0>" + playerId + "</size>";
 								if (IsInGame() && playerName != newName)
 									State.rpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
@@ -722,7 +691,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_FixedUpdate (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_FixedUpdate (PlayerControl)");
 	}
 	PlayerControl_FixedUpdate(__this, method);
 }
@@ -732,9 +701,9 @@ void dPlayerControl_RpcSyncSettings(PlayerControl* __this, Byte__Array* optionsB
 		SaveGameOptions();
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in RpcSyncSettings (PlayerControl)");
+		LOG_ERROR("Exception occurred in RpcSyncSettings (PlayerControl)");
 	}
-	PlayerControl_RpcSyncSettings(__this, optionsByteArray, method);
+	//PlayerControl_RpcSyncSettings(__this, optionsByteArray, method);
 }
 
 bool dPlayerControl_get_CanMove(PlayerControl* __this, MethodInfo* method) {
@@ -755,7 +724,7 @@ void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method) {
 		SaveGameOptions();
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_OnGameStart (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_OnGameStart (PlayerControl)");
 	}
 	PlayerControl_OnGameStart(__this, method);
 }
@@ -809,7 +778,7 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 			ControlAppearance(true);
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_MurderPlayer (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_MurderPlayer (PlayerControl)");
 	}
 	PlayerControl_MurderPlayer(__this, target, resultFlags, method);
 }
@@ -862,7 +831,7 @@ void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate
 			PlayerControl_RpcShapeshift(__this, __this, !State.AnimationlessShapeshift, method); //cuz game kicks u if u shapeshift in the lobby
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_RpcRevertShapeshift (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_RpcRevertShapeshift (PlayerControl)");
 	}
 }*/
 
@@ -879,7 +848,7 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, GameData_PlayerInfo* tar
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_StartMeeting (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_StartMeeting (PlayerControl)");
 	}
 	PlayerControl_StartMeeting(__this, target, method);
 }
@@ -904,7 +873,7 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_HandleRpc (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_HandleRpc (PlayerControl)");
 	}
 	PlayerControl_HandleRpc(__this, callId, reader, NULL);
 }
@@ -944,7 +913,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in Renderer_set_enabled (PlayerControl)");
+		LOG_ERROR("Exception occurred in Renderer_set_enabled (PlayerControl)");
 	}
 	Renderer_set_enabled(__this, value, method);
 }
@@ -977,7 +946,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in GameObject_SetActive (PlayerControl)");
+		LOG_ERROR("Exception occurred in GameObject_SetActive (PlayerControl)");
 	}
 	GameObject_SetActive(__this, value, method);
 }
@@ -1013,7 +982,7 @@ void dPlayerControl_Shapeshift(PlayerControl* __this, PlayerControl* target, boo
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_Shapeshift (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_Shapeshift (PlayerControl)");
 	}
 	PlayerControl_Shapeshift(__this, target, animate, method);
 }
@@ -1028,7 +997,7 @@ void dPlayerControl_ProtectPlayer(PlayerControl* __this, PlayerControl* target, 
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_ProtectPlayer (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_ProtectPlayer (PlayerControl)");
 	}
 	PlayerControl_ProtectPlayer(__this, target, colorId, method);
 }
@@ -1042,7 +1011,7 @@ void dPlayerControl_TurnOnProtection(PlayerControl* __this, bool visible, int32_
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in PlayerControl_TurnOnProtection (PlayerControl)");
+		LOG_ERROR("Exception occurred in PlayerControl_TurnOnProtection (PlayerControl)");
 		app::PlayerControl_TurnOnProtection(__this, visible, colorId, guardianPlayerId, method);
 	}
 }
@@ -1140,7 +1109,7 @@ float dConsole_1_CanUse(Console_1* __this, GameData_PlayerInfo* pc, bool* canUse
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in Console_1_CanUse (PlayerControl)");
+		LOG_ERROR("Exception occurred in Console_1_CanUse (PlayerControl)");
 	}
 	return Console_1_CanUse(__this, pc, canUse, couldUse, method);
 }
@@ -1159,4 +1128,11 @@ void dPlayerControl_SetRole(PlayerControl* __this, RoleTypes__Enum role, MethodI
 		else role = (RoleTypes__Enum)State.FakeRole;
 	}
 	PlayerControl_SetRole(__this, role, method);
+}
+
+void dGameData_PlayerInfo_Serialize(GameData_PlayerInfo* __this, MessageWriter* writer, MethodInfo* method) {
+	if (GetPlayerData(*Game::pLocalPlayer) == __this) {
+		if (State.SpoofFriendCode) __this->fields.FriendCode = convert_to_string(State.FakeFriendCode);
+	}
+	GameData_PlayerInfo_Serialize(__this, writer, NULL);
 }

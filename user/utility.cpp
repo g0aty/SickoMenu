@@ -8,6 +8,7 @@
 #include <random>
 #include <regex>
 #include <shellapi.h> //open links
+#include "main.h" //hModule
 
 using namespace std::string_view_literals;
 
@@ -254,7 +255,7 @@ bool IsHost() {
 }
 
 bool IsModdedHost() {
-	return IsHost() && (IsInGame() || State.SpoofModdedHost);
+	return State.DisableHostAnticheat;
 }
 
 bool IsInGame() {
@@ -825,24 +826,18 @@ Game::ColorId GetRandomColorId()
 	return colorId;
 }
 
-std::string GetGradientUsername(std::string str, bool useState, bool underline, bool strike, ImVec4 color1, ImVec4 color2) {
-	if (useState) {
-		underline = State.UnderlineName;
-		strike = State.StrikethroughName;
-		color1 = State.NameColor1;
-		color2 = State.NameColor2;
-	}
+std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2) {
 	std::vector<int> hex1 = { int(color1.x * 255), int(color1.y * 255), int(color1.z * 255), int(color1.w * 255) };
 	std::vector<int> hex2 = { int(color2.x * 255), int(color2.y * 255), int(color2.z * 255), int(color2.w * 255) };
 
 	//names look ugly af with white strikethrough
 	std::string opener = "";
-	if (underline) opener += "<u>";
-	if (strike) opener += "<s>";
+	if (State.UnderlineName) opener += "<u>";
+	if (State.StrikethroughName) opener += "<s>";
 
 	std::string closer = "";
-	if (underline) closer += "</s>";
-	if (strike) closer += "</u>";
+	if (State.UnderlineName) closer += "</s>";
+	if (State.StrikethroughName) closer += "</u>";
 
 	if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
 		return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
@@ -1235,6 +1230,54 @@ void SetPlayerName(std::string_view name) {
 	auto customization = il2cpp_field_get_value_object(field, player);
 	LOG_ASSERT(customization != nullptr);
 	app::PlayerCustomizationData_set_Name(customization, convert_to_string(name), nullptr);
+}
+
+std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
+	name = RemoveHtmlTags(name);
+	std::string opener = "", closer = "";
+	if (State.RgbName) {
+		opener = State.rgbCode;
+		closer = "</color>";
+	}
+
+	if (State.ColoredName && !State.RgbName) {
+		name = GetGradientUsername(name, State.NameColor1, State.NameColor2);
+	}
+
+	if (State.ItalicName) {
+		opener += "<i>";
+		closer += "</i>";
+	}
+
+	if (State.UnderlineName && (!State.ColoredName || State.RgbName)) {
+		opener += "<u>";
+		closer += "</u>";
+	}
+
+	if (State.StrikethroughName && (!State.ColoredName || State.RgbName)) {
+		opener += "<s>";
+		closer += "</s>";
+	}
+
+	if (State.ResizeName) {
+		opener += std::format("<size={}%>", State.NameSize * 100);
+		closer += "</size>";
+	}
+	if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
+
+	return opener + name + closer;
+}
+
+std::vector<const char*> GetAllConfigs() {
+	auto path = getModulePath(hModule);
+	auto configPath = path.parent_path() / "sicko-config/";
+	auto ext = ".json";
+	std::vector<const char*> ret = {};
+	for (auto& f : std::filesystem::recursive_directory_iterator(configPath)) {
+		if (f.path().extension().string() == ext)
+			ret.push_back(f.path().filename().string().c_str());
+	}
+	return ret;
 }
 
 //TODO: Workaround

@@ -114,3 +114,5 @@ void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter
 bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, MethodInfo* method);
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method);
 void dPlayerControl_SetRole(PlayerControl* __this, RoleTypes__Enum role, MethodInfo* method);
+void dGameData_PlayerInfo_Serialize(GameData_PlayerInfo* __this, MessageWriter* writer, MethodInfo* method);
+void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method);

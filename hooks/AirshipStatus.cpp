@@ -36,7 +36,7 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in AirshipStatus_OnEnable (AirshipStatus)");
+		LOG_ERROR("Exception occurred in AirshipStatus_OnEnable (AirshipStatus)");
 	}
 }
 

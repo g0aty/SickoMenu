@@ -11591,6 +11591,130 @@ namespace app
     };
 #pragma endregion
 
+#pragma region GameOptionsFactory
+    struct __declspec(align(4)) GameOptionsFactory__Fields {
+        struct ILogger_1* logger;
+    };
+
+    struct GameOptionsFactory {
+        struct GameOptionsFactory__Class* klass;
+        MonitorData* monitor;
+        struct GameOptionsFactory__Fields fields;
+    };
+#pragma endregion
+
+#pragma region List_1_GameLogicComponent_
+    struct __declspec(align(4)) List_1_GameLogicComponent___Fields {
+        struct GameLogicComponent__Array* _items;
+        int32_t _size;
+        int32_t _version;
+        struct Object* _syncRoot;
+    };
+
+    struct List_1_GameLogicComponent_ {
+        struct List_1_GameLogicComponent___Class* klass;
+        MonitorData* monitor;
+        struct List_1_GameLogicComponent___Fields fields;
+    };
+#pragma endregion
+
+#pragma region GameLogicComponent__Array
+    struct GameLogicComponent__Array {
+        struct GameLogicComponent__Array__Class* klass;
+        MonitorData* monitor;
+        Il2CppArrayBounds* bounds;
+        il2cpp_array_size_t max_length;
+        struct GameLogicComponent* vector[32];
+    };
+
+    struct GameLogicComponent__Array__VTable {
+    };
+
+    struct GameLogicComponent__Array__StaticFields {
+    };
+
+    struct GameLogicComponent__Array__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct GameLogicComponent__Array__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct GameLogicComponent__Array__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region DisconnectPopup
+
+    struct DestroyableSingleton_1_DisconnectPopup___Fields {
+        struct MonoBehaviour__Fields _;
+        bool DontDestroy;
+    };
+
+    struct DestroyableSingleton_1_DisconnectPopup_ {
+        struct DestroyableSingleton_1_DisconnectPopup___Class* klass;
+        MonitorData* monitor;
+        struct DestroyableSingleton_1_DisconnectPopup___Fields fields;
+    };
+
+    struct DestroyableSingleton_1_DisconnectPopup___VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData OnDestroy;
+    };
+
+    struct DestroyableSingleton_1_DisconnectPopup___StaticFields {
+        struct DisconnectPopup* _instance;
+    };
+
+    struct DestroyableSingleton_1_DisconnectPopup___Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct DestroyableSingleton_1_DisconnectPopup___StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct DestroyableSingleton_1_DisconnectPopup___VTable vtable;
+    };
+
+    struct DisconnectPopup__Fields {
+        struct DestroyableSingleton_1_DisconnectPopup___Fields _;
+        struct TextMeshPro* _textArea;
+        struct StringNames__Enum__Array* QuickChatNames;
+        struct UiElement* BackButton;
+        struct List_1_SelectableHyperLink_* selectableHyperLinks;
+    };
+
+    struct DisconnectPopup {
+        struct DisconnectPopup__Class* klass;
+        MonitorData* monitor;
+        struct DisconnectPopup__Fields fields;
+    };
+    struct DisconnectPopup__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData OnDestroy;
+    };
+
+    struct DisconnectPopup__StaticFields {
+        void* ErrorMessages;
+        void* SanctionMessages;
+    };
+
+    struct DisconnectPopup__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct DisconnectPopup__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct DisconnectPopup__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ActivityManager;

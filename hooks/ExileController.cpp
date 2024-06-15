@@ -20,6 +20,6 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 		}
 	}
 	catch (...) {
-		LOG_DEBUG("Exception occurred in ExileController_ReEnableGameplay (ExileController)");
+		LOG_ERROR("Exception occurred in ExileController_ReEnableGameplay (ExileController)");
 	}
 }

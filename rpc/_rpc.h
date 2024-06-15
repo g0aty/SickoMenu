@@ -405,8 +405,8 @@ public:
 	virtual void Process() override;
 };
 
-/*class RpcSyncSettings : public RPCInterface {
+class RpcSyncSettings : public RPCInterface {
 public:
 	RpcSyncSettings();
 	virtual void Process() override;
-};*/
+};
