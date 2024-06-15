@@ -1,4 +1,4 @@
-# 👺 SickoMenu v3.3.1: The Enhancements Update (Hotfix)
+# 👺 SickoMenu v3.4
 A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
 
 Join our very own [Discord](https://dsc.gg/sickos) server for support, bug reports, and sneak peeks!
@@ -8,6 +8,9 @@ This project is intended for Educational Use only. I do not condone this softwar
 
 ## ⚙️ Features
 A huge collection of various utilities and cheats such as
+- Generate a brand new guest account every time the game is launched
+- Allow other players to no-clip
+- Ban other players without hosting
 - Fake Roles
 - NoClip
 - Move in Vents
