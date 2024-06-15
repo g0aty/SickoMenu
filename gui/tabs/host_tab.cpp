@@ -26,7 +26,7 @@ namespace HostTab {
 			if (IsInLobby()) {
 				ImGui::SameLine(100 * State.dpiScale);
 				ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-				bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 230) * State.dpiScale);
+				bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
 				auto allPlayers = GetAllPlayerData();
 				auto playerAmount = allPlayers.size();
 				auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
