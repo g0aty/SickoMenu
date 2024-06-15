@@ -64,12 +64,8 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 	//		return; //Skip assigns when pre assigned enough imps.
 	//}
 
-	if (options.GetGameMode() == GameModes__Enum::HideNSeek) {
-		if (role == RoleTypes__Enum::Impostor)
-			roleCount = maxImpostorAmount; //Sometime the game would accidently make imp amount > what we want.
-		if (role == RoleTypes__Enum::Engineer)
-			roleCount = playerAmount - maxImpostorAmount; //For unknown reason Game simply set engineer amount in hidenseek to 0.
-	}
+	if (options.GetGameMode() == GameModes__Enum::HideNSeek && role == RoleTypes__Enum::Engineer)
+		roleCount = allPlayers.size() - 1;
 
 	if (role == RoleTypes__Enum::Shapeshifter && roleCount >= maxImpostorAmount)
 		roleCount = maxImpostorAmount; //In previous version, aum would assign more imps than MaxImpostorAmount based on shapeshifter amount.
