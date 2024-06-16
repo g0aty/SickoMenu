@@ -10,7 +10,7 @@ Settings State;
 
 void Settings::Load() {
     auto path = getModulePath(hModule);
-    auto configPath = path.parent_path() / "sicko-settings.json";
+    auto configPath = path.parent_path() / "sicko-selected-config.json";
 
     if (!std::filesystem::exists(configPath))
         return;
@@ -26,10 +26,10 @@ void Settings::Load() {
             Log.Info(e.what()); \
         }
 
-        JSON_TRYGET("SelectedConfig", this->selectedConfig);
+        if (State.selectedConfig == "") JSON_TRYGET("SelectedConfig", this->selectedConfig);
     }
     catch (...) {
-        Log.Info("Unable to load sicko-settings.json");
+        //Log.Info("Unable to load sicko-selected-config.json");
     }
 
     auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
@@ -229,195 +229,198 @@ void Settings::Save() {
     auto path = getModulePath(hModule);
     std::filesystem::create_directory(path.parent_path() / "sicko-config");
 
-    auto configPath = path.parent_path() / "sicko-settings.json";
+    auto configPath = path.parent_path() / "sicko-selected-config.json";
 
-    try {
-        nlohmann::ordered_json j = nlohmann::ordered_json{
-            { "SelectedConfig", this->selectedConfig }
-        };
+    if (this->selectedConfig != "") {
+        try {
+            nlohmann::ordered_json j = nlohmann::ordered_json{
+                { "SelectedConfig", this->selectedConfig }
+            };
 
-        std::ofstream outConfig(configPath);
-        outConfig << std::setw(4) << j << std::endl;
-    }
-    catch (...) {
-        Log.Info("Unable to save sicko-settings.json");
-    }
-    auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
+            std::ofstream outConfig(configPath);
+            outConfig << std::setw(4) << j << std::endl;
+        }
+        catch (...) {
+            //Log.Info("Unable to save sicko-selected-config.json");
+        }
+        auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
 
-    try {
-        nlohmann::ordered_json j = nlohmann::ordered_json {
-            { "HasOpenedMenuBefore", this->HasOpenedMenuBefore },
-            { "ShowMenuOnStartup", this->ShowMenuOnStartup },
-            { "ShowMenu", this->ShowMenu },
-            { "KeyBinds", this->KeyBinds },
-    #ifdef _DEBUG
-            { "ShowDebug", this->showDebugTab },
-    #endif
-            { "RgbTheme", this->RgbMenuTheme },
-            { "SetName", this->SetName },
-            { "MenuThemeColor_R", this->MenuThemeColor.x },
-            { "MenuThemeColor_G", this->MenuThemeColor.y },
-            { "MenuThemeColor_B", this->MenuThemeColor.z },
-            { "MenuThemeColor_A", this->MenuThemeColor.w },
-            { "UnlockCosmetics", this->UnlockCosmetics },
-            { "ShowKeybinds", this->ShowKeybinds },
-            { "KeybindsWhileChatting", this->KeybindsWhileChatting },
-            { "SpoofLevel", this->SpoofLevel },
-            { "FakeLevel", this->FakeLevel },
-            { "SpoofFriendCode", this->SpoofFriendCode },
-            { "UseGuestFriendCode", this->UseGuestFriendCode },
-            { "GuestFriendCode", this->GuestFriendCode },
-            { "FakeFriendCode", this->FakeFriendCode },
-            { "SpoofPlatform", this->SpoofPlatform },
-            { "FakePlatform", this->FakePlatform },
-            { "SpoofGuestAccount", this->SpoofGuestAccount },
-            //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
+        try {
+            nlohmann::ordered_json j = nlohmann::ordered_json{
+                { "HasOpenedMenuBefore", this->HasOpenedMenuBefore },
+                { "ShowMenuOnStartup", this->ShowMenuOnStartup },
+                { "ShowMenu", this->ShowMenu },
+                { "KeyBinds", this->KeyBinds },
+        #ifdef _DEBUG
+                { "ShowDebug", this->showDebugTab },
+        #endif
+                { "RgbTheme", this->RgbMenuTheme },
+                { "SetName", this->SetName },
+                { "MenuThemeColor_R", this->MenuThemeColor.x },
+                { "MenuThemeColor_G", this->MenuThemeColor.y },
+                { "MenuThemeColor_B", this->MenuThemeColor.z },
+                { "MenuThemeColor_A", this->MenuThemeColor.w },
+                { "UnlockCosmetics", this->UnlockCosmetics },
+                { "ShowKeybinds", this->ShowKeybinds },
+                { "KeybindsWhileChatting", this->KeybindsWhileChatting },
+                { "SpoofLevel", this->SpoofLevel },
+                { "FakeLevel", this->FakeLevel },
+                { "SpoofFriendCode", this->SpoofFriendCode },
+                { "UseGuestFriendCode", this->UseGuestFriendCode },
+                { "GuestFriendCode", this->GuestFriendCode },
+                { "FakeFriendCode", this->FakeFriendCode },
+                { "SpoofPlatform", this->SpoofPlatform },
+                { "FakePlatform", this->FakePlatform },
+                { "SpoofGuestAccount", this->SpoofGuestAccount },
+                //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
 
-            { "NoAbilityCD", this->NoAbilityCD },
-            { "SelectedColorId", this->SelectedColorId },
-            { "SnipeColor", this->SnipeColor },
-            { "CycleBetweenPlayers", this->CycleBetweenPlayers },
-            { "CycleInMeeting", this->CycleInMeeting },
-            { "CycleTimer", this->CycleTimer },
-            { "CyclerUserNames", this->cyclerUserNames },
-            { "HostUsername", this->hostUserName },
-            { "ChatMessage", this->chatMessage },
-            { "CycleName", this->CycleName },
-            { "CycleColor", this->RandomColor },
-            { "CycleHat", this->RandomHat },
-            { "CycleVisor", this->RandomVisor },
-            { "CycleSkin", this->RandomSkin },
-            { "CyclePet", this->RandomPet },
-            { "CycleNamePlate", this->RandomNamePlate },
+                { "NoAbilityCD", this->NoAbilityCD },
+                { "SelectedColorId", this->SelectedColorId },
+                { "SnipeColor", this->SnipeColor },
+                { "CycleBetweenPlayers", this->CycleBetweenPlayers },
+                { "CycleInMeeting", this->CycleInMeeting },
+                { "CycleTimer", this->CycleTimer },
+                { "CyclerUserNames", this->cyclerUserNames },
+                { "HostUsername", this->hostUserName },
+                { "ChatMessage", this->chatMessage },
+                { "CycleName", this->CycleName },
+                { "CycleColor", this->RandomColor },
+                { "CycleHat", this->RandomHat },
+                { "CycleVisor", this->RandomVisor },
+                { "CycleSkin", this->RandomSkin },
+                { "CyclePet", this->RandomPet },
+                { "CycleNamePlate", this->RandomNamePlate },
 
-            { "PlayerSpeed", this->PlayerSpeed },
-            { "MultiplySpeed", this->MultiplySpeed },
-            { "KillDistance", this->KillDistance },
-            { "ModifyKillDistance", this->ModifyKillDistance },
-            { "ModifyTaskBarUpdates", this->ModifyTaskBarUpdates },
-            { "UserName", this->userName },
-            { "ShowGhosts", this->ShowGhosts },
-            { "FakeRole", this->FakeRole },
-            { "AutoFakeRole", this->AutoFakeRole },
-            { "ShowRadar", this->ShowRadar },
-            { "ShowRadar_DeadBodies", this->ShowRadar_DeadBodies },
-            { "ShowRadar_Ghosts", this->ShowRadar_Ghosts },
-            { "HideRadar_During_Meetings", this->HideRadar_During_Meetings },
-            { "LockRadar", this->LockRadar },
-            { "ShowRadar_RightClickTP", this->ShowRadar_RightClickTP },
-            { "RadarColor_R", this->SelectedColor.x },
-            { "RadarColor_G", this->SelectedColor.y },
-            { "RadarColor_B", this->SelectedColor.z },
-            { "RadarColor_A", this->SelectedColor.w },
-            { "RadarDrawIcons", this->RadarDrawIcons },
-            { "RadarVisorRoleColor", this->RadarVisorRoleColor },
-            { "RadarBorder", this->RadarBorder },
-            { "RadarExtraWidth", this->RadarExtraWidth },
-            { "RadarExtraHeight", this->RadarExtraHeight },
+                { "PlayerSpeed", this->PlayerSpeed },
+                { "MultiplySpeed", this->MultiplySpeed },
+                { "KillDistance", this->KillDistance },
+                { "ModifyKillDistance", this->ModifyKillDistance },
+                { "ModifyTaskBarUpdates", this->ModifyTaskBarUpdates },
+                { "UserName", this->userName },
+                { "ShowGhosts", this->ShowGhosts },
+                { "FakeRole", this->FakeRole },
+                { "AutoFakeRole", this->AutoFakeRole },
+                { "ShowRadar", this->ShowRadar },
+                { "ShowRadar_DeadBodies", this->ShowRadar_DeadBodies },
+                { "ShowRadar_Ghosts", this->ShowRadar_Ghosts },
+                { "HideRadar_During_Meetings", this->HideRadar_During_Meetings },
+                { "LockRadar", this->LockRadar },
+                { "ShowRadar_RightClickTP", this->ShowRadar_RightClickTP },
+                { "RadarColor_R", this->SelectedColor.x },
+                { "RadarColor_G", this->SelectedColor.y },
+                { "RadarColor_B", this->SelectedColor.z },
+                { "RadarColor_A", this->SelectedColor.w },
+                { "RadarDrawIcons", this->RadarDrawIcons },
+                { "RadarVisorRoleColor", this->RadarVisorRoleColor },
+                { "RadarBorder", this->RadarBorder },
+                { "RadarExtraWidth", this->RadarExtraWidth },
+                { "RadarExtraHeight", this->RadarExtraHeight },
 
-            { "ShowReplay", this->ShowReplay },
-            { "ReplayColor_R", this->SelectedReplayMapColor.x },
-            { "ReplayColor_G", this->SelectedReplayMapColor.y },
-            { "ReplayColor_B", this->SelectedReplayMapColor.z },
-            { "ReplayColor_A", this->SelectedReplayMapColor.w },
-            { "ReplayShowOnlyLastSeconds", this->Replay_ShowOnlyLastSeconds },
-            { "ReplayLastSecondsValue", this->Replay_LastSecondsValue },
-            { "ReplayClearAfterMeeting", this->Replay_ClearAfterMeeting },
+                { "ShowReplay", this->ShowReplay },
+                { "ReplayColor_R", this->SelectedReplayMapColor.x },
+                { "ReplayColor_G", this->SelectedReplayMapColor.y },
+                { "ReplayColor_B", this->SelectedReplayMapColor.z },
+                { "ReplayColor_A", this->SelectedReplayMapColor.w },
+                { "ReplayShowOnlyLastSeconds", this->Replay_ShowOnlyLastSeconds },
+                { "ReplayLastSecondsValue", this->Replay_LastSecondsValue },
+                { "ReplayClearAfterMeeting", this->Replay_ClearAfterMeeting },
 
-            { "ShowEsp", this->ShowEsp },
-            { "ShowEsp_Ghosts", this->ShowEsp_Ghosts },
-            { "ShowEsp_Box", this->ShowEsp_Box },
-            { "ShowEsp_Tracers", this->ShowEsp_Tracers },
-            { "ShowEsp_Distance", this->ShowEsp_Distance },
-            { "HideEsp_During_Meetings", this->HideEsp_During_Meetings },
-            { "ShowEsp_RoleBased", this->ShowEsp_RoleBased },
-            { "ShowEsp_Crew", this->ShowEsp_Crew },
-            { "ShowEsp_Imp", this->ShowEsp_Imp },
+                { "ShowEsp", this->ShowEsp },
+                { "ShowEsp_Ghosts", this->ShowEsp_Ghosts },
+                { "ShowEsp_Box", this->ShowEsp_Box },
+                { "ShowEsp_Tracers", this->ShowEsp_Tracers },
+                { "ShowEsp_Distance", this->ShowEsp_Distance },
+                { "HideEsp_During_Meetings", this->HideEsp_During_Meetings },
+                { "ShowEsp_RoleBased", this->ShowEsp_RoleBased },
+                { "ShowEsp_Crew", this->ShowEsp_Crew },
+                { "ShowEsp_Imp", this->ShowEsp_Imp },
 
-            { "MaxVision", this->MaxVision },
-            { "Wallhack", this->Wallhack },
-            { "FreeCamSpeed", this->FreeCamSpeed },
-            { "ZoomLevel", this->CameraHeight },
-            { "UnlockVents", this->UnlockVents },
-            { "UnlockKillButton", this->UnlockKillButton },
-            { "ChatPaste", this->ChatPaste },
-            { "RevealRoles", this->RevealRoles },
-            { "AbbreviatedRoleNames", this->AbbreviatedRoleNames },
-            { "PlayerColoredDots", this->PlayerColoredDots },
-            { "ShowPlayerInfo", this->ShowPlayerInfo },
-            { "ChatAlwaysActive", this->ChatAlwaysActive },
-            { "ReadGhostMessages", this->ReadGhostMessages },
-            { "ReadAndSendAumChat", this->ReadAndSendAumChat },
-            { "CustomName", this->CustomName },
-            { "RgbName", this->RgbName },
-            { "ResizeName", this->ResizeName },
-            { "NameSize", this->NameSize },
-            { "ItalicName", this->ItalicName },
-            { "UnderlineName", this->UnderlineName },
-            { "StrikethroughName", this->StrikethroughName },
-            { "ColoredName", this->ColoredName },
-            { "NameColor1_R", this->NameColor1.x },
-            { "NameColor1_G", this->NameColor1.y },
-            { "NameColor1_B", this->NameColor1.z },
-            { "NameColor1_A", this->NameColor1.w },
-            { "NameColor2_R", this->NameColor2.x },
-            { "NameColor2_G", this->NameColor2.y },
-            { "NameColor2_B", this->NameColor2.z },
-            { "NameColor2_A", this->NameColor2.w },
-            { "AutoOpenDoors", this->AutoOpenDoors },
-            { "MoveInVentAndShapeshift", this->MoveInVentAndShapeshift },
-            { "AlwaysMove", this->AlwaysMove },
-            { "AnimationlessShapeshift", this->AnimationlessShapeshift },
-            { "DisableKillAnimation", this->DisableKillAnimation },
-            { "KillImpostors", this->KillImpostors },
-            { "BypassAngelProt", this->BypassAngelProt },
-            { "InfiniteKillRange", this->InfiniteKillRange },
-            { "AutoKill", this->AutoKill },
-            { "FakeAlive", this->FakeAlive },
-            { "ShowHost", this->ShowHost },
-            { "ShowVoteKicks", this->ShowVoteKicks },
-            { "ShowFps", this->ShowFps },
-            { "DoTasksAsImpostor", this->DoTasksAsImpostor },
-            { "AlwaysUseKillExploit", this->AlwaysUseKillExploit },
-            { "NoClip", this->NoClip },
+                { "MaxVision", this->MaxVision },
+                { "Wallhack", this->Wallhack },
+                { "FreeCamSpeed", this->FreeCamSpeed },
+                { "ZoomLevel", this->CameraHeight },
+                { "UnlockVents", this->UnlockVents },
+                { "UnlockKillButton", this->UnlockKillButton },
+                { "ChatPaste", this->ChatPaste },
+                { "RevealRoles", this->RevealRoles },
+                { "AbbreviatedRoleNames", this->AbbreviatedRoleNames },
+                { "PlayerColoredDots", this->PlayerColoredDots },
+                { "ShowPlayerInfo", this->ShowPlayerInfo },
+                { "ChatAlwaysActive", this->ChatAlwaysActive },
+                { "ReadGhostMessages", this->ReadGhostMessages },
+                { "ReadAndSendAumChat", this->ReadAndSendAumChat },
+                { "CustomName", this->CustomName },
+                { "RgbName", this->RgbName },
+                { "ResizeName", this->ResizeName },
+                { "NameSize", this->NameSize },
+                { "ItalicName", this->ItalicName },
+                { "UnderlineName", this->UnderlineName },
+                { "StrikethroughName", this->StrikethroughName },
+                { "ColoredName", this->ColoredName },
+                { "NameColor1_R", this->NameColor1.x },
+                { "NameColor1_G", this->NameColor1.y },
+                { "NameColor1_B", this->NameColor1.z },
+                { "NameColor1_A", this->NameColor1.w },
+                { "NameColor2_R", this->NameColor2.x },
+                { "NameColor2_G", this->NameColor2.y },
+                { "NameColor2_B", this->NameColor2.z },
+                { "NameColor2_A", this->NameColor2.w },
+                { "AutoOpenDoors", this->AutoOpenDoors },
+                { "MoveInVentAndShapeshift", this->MoveInVentAndShapeshift },
+                { "AlwaysMove", this->AlwaysMove },
+                { "AnimationlessShapeshift", this->AnimationlessShapeshift },
+                { "DisableKillAnimation", this->DisableKillAnimation },
+                { "KillImpostors", this->KillImpostors },
+                { "BypassAngelProt", this->BypassAngelProt },
+                { "InfiniteKillRange", this->InfiniteKillRange },
+                { "AutoKill", this->AutoKill },
+                { "FakeAlive", this->FakeAlive },
+                { "ShowHost", this->ShowHost },
+                { "ShowVoteKicks", this->ShowVoteKicks },
+                { "ShowFps", this->ShowFps },
+                { "DoTasksAsImpostor", this->DoTasksAsImpostor },
+                { "AlwaysUseKillExploit", this->AlwaysUseKillExploit },
+                { "NoClip", this->NoClip },
 
-            { "RevealVotes", this->RevealVotes },
-            { "RevealAnonymousVotes", this->RevealAnonymousVotes },
-            { "AdjustByDPI", this->AdjustByDPI },
-            { "ShowProtections", this->ShowProtections },
+                { "RevealVotes", this->RevealVotes },
+                { "RevealAnonymousVotes", this->RevealAnonymousVotes },
+                { "AdjustByDPI", this->AdjustByDPI },
+                { "ShowProtections", this->ShowProtections },
 
-            { "CustomImpostorAmount", this->CustomImpostorAmount },
-            { "ImpostorCount", this->ImpostorCount },
+                { "CustomImpostorAmount", this->CustomImpostorAmount },
+                { "ImpostorCount", this->ImpostorCount },
 
-            { "ShowConsole", this->ShowConsole },
-            { "ShowUnityLogs", this->ShowUnityLogs },
+                { "ShowConsole", this->ShowConsole },
+                { "ShowUnityLogs", this->ShowUnityLogs },
 
-            { "ShiftRightClickTP", this->ShiftRightClickTP },
-            { "RotateRadius", this->RotateRadius },
-            { "RelativeTeleport", this->RelativeTeleport },
-            { "ShowKillCD", this->ShowKillCD },
+                { "ShiftRightClickTP", this->ShiftRightClickTP },
+                { "RotateRadius", this->RotateRadius },
+                { "RelativeTeleport", this->RelativeTeleport },
+                { "ShowKillCD", this->ShowKillCD },
 
-            { "Confuser", this->confuser },
-            { "ConfuseOnJoin", this->confuseOnJoin },
-            { "ConfuseOnStart", this->confuseOnStart },
-            { "ConfuseOnKill", this->confuseOnKill },
-            { "ConfuseOnVent", this->confuseOnVent },
-            { "ConfuseOnMeeting", this->confuseOnMeeting },
+                { "Confuser", this->confuser },
+                { "ConfuseOnJoin", this->confuseOnJoin },
+                { "ConfuseOnStart", this->confuseOnStart },
+                { "ConfuseOnKill", this->confuseOnKill },
+                { "ConfuseOnVent", this->confuseOnVent },
+                { "ConfuseOnMeeting", this->confuseOnMeeting },
 
-            { "CyclerNameGeneration", this->cyclerNameGeneration },
-            { "ConfuserNameGeneration", this->confuserNameGeneration },
+                { "CyclerNameGeneration", this->cyclerNameGeneration },
+                { "ConfuserNameGeneration", this->confuserNameGeneration },
 
-            { "CustomCode", this->customCode },
-            { "HideCode", this->HideCode },
-            { "RgbLobbyCode", this->RgbLobbyCode },
+                { "CustomCode", this->customCode },
+                { "HideCode", this->HideCode },
+                { "RgbLobbyCode", this->RgbLobbyCode },
 
 
-            { "SickoDetection", this->SickoDetection },
-        };
+                { "SickoDetection", this->SickoDetection },
+            };
 
-        std::ofstream outSettings(settingsPath);
-        outSettings << std::setw(4) << j << std::endl;
-    } catch (...) {
-        Log.Info("Unable to save " + std::format("sicko-config/{}.json", this->selectedConfig));
+            std::ofstream outSettings(settingsPath);
+            outSettings << std::setw(4) << j << std::endl;
+        }
+        catch (...) {
+            Log.Info("Unable to save " + std::format("sicko-config/{}.json", this->selectedConfig));
+        }
     }
 }

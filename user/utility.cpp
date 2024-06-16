@@ -1268,16 +1268,10 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 	return opener + name + closer;
 }
 
-std::vector<const char*> GetAllConfigs() {
+bool CheckConfigExists(std::string configName) {
 	auto path = getModulePath(hModule);
-	auto configPath = path.parent_path() / "sicko-config/";
-	auto ext = ".json";
-	std::vector<const char*> ret = {};
-	for (auto& f : std::filesystem::recursive_directory_iterator(configPath)) {
-		if (f.path().extension().string() == ext)
-			ret.push_back(f.path().filename().string().c_str());
-	}
-	return ret;
+	auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", State.selectedConfig);
+	return std::filesystem::exists(settingsPath);
 }
 
 //TODO: Workaround

@@ -29,7 +29,7 @@ public:
         VK_PAUSE //toggle SickoMenu
     };
 
-    std::string selectedConfig = "sicko-settings.json";
+    std::string selectedConfig = "";
 
     bool ImGuiInitialized = false;
     bool HasOpenedMenuBefore = false;

@@ -220,7 +220,7 @@ float GetDistanceBetweenPoints_Unity(const Vector2& p1, const Vector2& p2);
 float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2);
 void ShowHudNotification(std::string text);
 std::string GetCustomName(std::string name, bool forceUnique = false, uint8_t id = 0);
-std::vector<const char*> GetAllConfigs();
+bool CheckConfigExists(std::string configName);
 
 /// <summary>
 /// Simplifies a list of points by ensuring the distance between consecutive points is greater than the squared distance threshold; all other points are discarded.

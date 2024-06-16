@@ -58,29 +58,22 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-
-			static int selectedConfig = 0;
-			static std::string newConfigName = "";
-			//if (!GetAllConfigs().empty() && 
-				//std::find(GetAllConfigs().begin(), GetAllConfigs().end(), State.selectedConfig.c_str()) == GetAllConfigs().end())
-				//State.selectedConfig = GetAllConfigs()[0];
-			if (!GetAllConfigs().empty() && CustomListBoxInt("Config", &selectedConfig, GetAllConfigs(), 75.f)) {
-				State.selectedConfig = GetAllConfigs()[selectedConfig];
-				State.Save();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Load Config"))
+			
+			InputString("Config Name", &State.selectedConfig);
+			
+			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
 			{
 				State.Load();
+				State.Save(); //actually save the selected config
 			}
-			ImGui::SameLine();
+			if (CheckConfigExists(State.selectedConfig)) ImGui::SameLine();
 			if (ImGui::Button("Save Config"))
 			{
 				State.Save();
 			}
-			
-			if (InputString("New Config Name", &newConfigName)) {
-				State.selectedConfig = newConfigName;
+			if (!CheckConfigExists(State.selectedConfig)) {
+				ImGui::Text("Config name not found!");
+				ImGui::SameLine();
 			}
 
 			if (ToggleButton("Adjust by DPI", &State.AdjustByDPI)) {
