@@ -55,7 +55,7 @@ namespace HostTab {
 			if (openUtils) {
 				if (IsInLobby()) {
 					ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-					bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 150) * State.dpiScale);
+					bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
 					auto allPlayers = GetAllPlayerData();
 					auto playerAmount = allPlayers.size();
 					auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
@@ -93,6 +93,17 @@ namespace HostTab {
 								if (State.engineers_amount + State.scientists_amount + State.crewmates_amount >= (int)playerAmount)
 									State.assignedRoles[index] = RoleType::Random;
 							} //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps.
+							
+							if (options.GetGameMode() == GameModes__Enum::HideNSeek)
+							{
+								if (State.assignedRoles[index] == RoleType::Shapeshifter)
+									State.assignedRoles[index] = RoleType::Random;
+								else if (State.assignedRoles[index] == RoleType::Scientist)
+									State.assignedRoles[index] = RoleType::Engineer;
+								else if (State.assignedRoles[index] == RoleType::Crewmate)
+									State.assignedRoles[index] = RoleType::Engineer;
+							} //Assign other roles in hidenseek causes game bug.
+							//These are organized. Do not change the order unless you find it necessary.
 
 							if (!IsInGame()) {
 								if (options.GetGameMode() == GameModes__Enum::HideNSeek)
@@ -116,7 +127,7 @@ namespace HostTab {
 				if (IsInLobby() && ToggleButton("Custom Impostor Amount", &State.CustomImpostorAmount))
 					State.Save();
 				State.ImpostorCount = std::clamp(State.ImpostorCount, 0, int(Game::MAX_PLAYERS));
-				if (IsInLobby() && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
+				if (IsInLobby() && State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
 					State.Save();
 
 				/*int32_t maxPlayers = options.GetMaxPlayers();
