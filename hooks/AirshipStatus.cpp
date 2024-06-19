@@ -40,7 +40,7 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 	}
 }
 
-float dAirshipStatus_CalculateLightRadius(AirshipStatus* __this, GameData_PlayerInfo* player, MethodInfo* method)
+float dAirshipStatus_CalculateLightRadius(AirshipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method)
 {
 	if (!State.PanicMode && State.MaxVision)
 		return 420.F;

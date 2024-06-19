@@ -157,8 +157,8 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 				auto localData = GetPlayerData(*Game::pLocalPlayer);
 				auto playerControl = GetPlayerControlById(playerVoteArea->fields.TargetPlayerId);
 				auto playerNameTMP = playerVoteArea->fields.NameText;
-				app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
-				std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+				std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr));
 				if (playerData == GetPlayerData(*Game::pLocalPlayer) && State.CustomName && (!State.ServerSideCustomName || State.ServerSideCustomName && (!IsHost() || State.SafeMode)) && !State.userName.empty()) {
 					if (State.CustomName && !State.ServerSideCustomName) {
 						if (State.ColoredName && !State.RgbName) {

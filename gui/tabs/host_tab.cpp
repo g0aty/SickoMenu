@@ -68,9 +68,9 @@ namespace HostTab {
 						if (State.assignedRolesPlayer[index] == nullptr)
 							continue;
 
-						app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+						app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
 						if (outfit == NULL) continue;
-						const std::string& playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+						const std::string& playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr));
 						//player colors in host tab by gdjkhp (https://github.com/GDjkhp/AmongUsMenu/commit/53b017183bac503c546f198e2bc03539a338462c)
 						if (CustomListBoxInt(playerName.c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId))))
 						{
@@ -202,7 +202,7 @@ namespace HostTab {
 
 				if (IsHost() && IsInGame() && !isReviving && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
 				{
-					app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+					app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
 					State.rpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
 					State.rpcQueue.push(new RpcForceColor(*Game::pLocalPlayer, outfit->fields.ColorId));
 					framesPassed = 100;

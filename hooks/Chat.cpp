@@ -7,16 +7,17 @@
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
 	if (!State.PanicMode && State.ReadGhostMessages) {
 		bool wasDead = false;
-		GameData_PlayerInfo* player = GetPlayerData(sourcePlayer);
-		GameData_PlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
+		NetworkedPlayerInfo* player = GetPlayerData(sourcePlayer);
+		NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
 
 		if (player != NULL && player->fields.IsDead && local != NULL && !local->fields.IsDead) {
 			local->fields.IsDead = true;
 			wasDead = true;
 		}
-		auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
-		std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+		
+		std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
 		std::string message = convert_from_string(chatText);
+		auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
 		uint32_t colorId = outfit->fields.ColorId;
 		ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
 		if (wasDead) {
@@ -24,9 +25,9 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 		}
 	}
 	else {
-		auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
-		std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+		std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
 		std::string message = convert_from_string(chatText);
+		auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
 		uint32_t colorId = outfit->fields.ColorId;
 		ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
 	}
@@ -45,9 +46,9 @@ void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo
 void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {
 	if (!State.PanicMode && (IsInGame() || IsInLobby())) {
 		for (auto playerData : GetAllPlayerData()) {
-			app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+			app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
 			if (outfit == NULL) continue;
-			if (playerName == GameData_PlayerOutfit_get_PlayerName(outfit, nullptr)) {
+			if (playerName == NetworkedPlayerInfo_get_PlayerName(playerData, nullptr)) {
 				auto localData = GetPlayerData(*Game::pLocalPlayer);
 				color = State.RevealRoles ? GetRoleColor(playerData->fields.Role) : 
 					(PlayerIsImpostor(localData) && PlayerIsImpostor(playerData) ? Palette__TypeInfo->static_fields->ImpostorRed : Palette__TypeInfo->static_fields->White);
@@ -161,7 +162,7 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,
 				State.playerToWhisper.get_PlayerControl().value_or(nullptr)->fields._.OwnerId, NULL);
 			std::string whisperMsg = std::format("{} whispers to you:\n{}", 
-				RemoveHtmlTags(convert_from_string(GameData_PlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
+				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
 				convert_from_string(chatText));
 			if (whisperMsg.length() <= 100 || !State.SafeMode)
 				MessageWriter_WriteString(writer, convert_to_string(whisperMsg), NULL);
@@ -169,7 +170,7 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 
 			std::string whisperMsgSelf = std::format("You whisper to {}:\n{}",
-				RemoveHtmlTags(convert_from_string(GameData_PlayerInfo_get_PlayerName(State.playerToWhisper.get_PlayerData().value_or(nullptr), NULL))),
+				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(State.playerToWhisper.get_PlayerData().value_or(nullptr), NULL))),
 				convert_from_string(chatText));
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, playerToChatAs, convert_to_string(whisperMsgSelf), false, NULL);
 		}

@@ -142,11 +142,11 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 			std::string freeCam = State.FreeCam ? "\nFreecam" : "";
 			std::string spectating = "";
 			if (State.playerToFollow.has_value()) {
-				app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())));
+				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())));
 				Color32 playerColor = GetPlayerColor(outfit->fields.ColorId);
 				std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>",
 					playerColor.r, playerColor.g, playerColor.b, playerColor.a);
-				spectating = "\nNow Spectating: " + colorCode + RemoveHtmlTags(convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr)));
+				spectating = "\nNow Spectating: " + colorCode + RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())), nullptr)));
 			}
 			else spectating = "";
 			std::string hostText = State.ShowHost ?

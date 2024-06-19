@@ -34,7 +34,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 			uint32_t colorId = MessageReader_ReadInt32(reader, NULL);
 			if (message.size() == 0) break;
 			if (!State.PanicMode && State.ReadAndSendAumChat) {
-				GameData_PlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
+				NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
 				bool wasDead = false;
 				if (player != NULL && GetPlayerData(player)->fields.IsDead && local != NULL && !local->fields.IsDead) {
 					local->fields.IsDead = true; //see aum chat of ghosts

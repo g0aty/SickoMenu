@@ -369,7 +369,7 @@ namespace GameTab {
                         ImGui::Text("Impostor: Round-robin");
                     }
                     else {
-                        std::string ImpostorName = std::format("Selected Impostor: {}", convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerDataById(ImpostorId)), nullptr)));
+                        std::string ImpostorName = std::format("Selected Impostor: {}", convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerDataById(ImpostorId), nullptr)));
                         ImGui::Text(const_cast<char*>(ImpostorName.c_str()));
                     }
                     ImGui::Text("Flashlight Mode: %s", (options.GetBool(app::BoolOptionNames__Enum::UseFlashlight) ? "On" : "Off"));

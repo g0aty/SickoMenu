@@ -80,10 +80,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			if (!playerData || !localData)
 				return;
 
-			app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData, true);
+			app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData, true);
 			std::string playerName = "<Unknown>";
 			if (outfit != NULL)
-				playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+				playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr));
 
 			static int nameDelay = 0;
 
@@ -91,10 +91,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if ((IsHost() || !State.SafeMode) && State.ServerSideCustomName) {
 					if (nameDelay <= 0) {
 						for (auto p : GetAllPlayerControl()) {
-							auto customName = GetCustomName(convert_from_string(GameData_PlayerInfo_get_PlayerName(GetPlayerData(p), nullptr)));
+							auto customName = GetCustomName(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(p), nullptr)));
 							if (State.ForceNameForEveryone) customName = GetCustomName(State.hostUserName, true, p->fields.PlayerId);
 							if ((p == *Game::pLocalPlayer || State.CustomNameForEveryone) &&
-								customName != convert_from_string(GameData_PlayerInfo_get_PlayerName(GetPlayerData(p), nullptr))) {
+								customName != convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(p), nullptr))) {
 								if (IsInGame()) State.rpcQueue.push(new RpcForceName(p, customName));
 								if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(p, customName));
 							}
@@ -111,7 +111,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 			if (State.PlayerColoredDots && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
 			{
-				app::GameData_PlayerOutfit* realOutfit = GetPlayerOutfit(playerData);
+				app::NetworkedPlayerInfo_PlayerOutfit* realOutfit = GetPlayerOutfit(playerData);
 				Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
 				std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}> ●</color>",
 					nameColor.r, nameColor.g, nameColor.b,
@@ -132,7 +132,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				uint32_t playerLevel = playerData->fields.PlayerLevel + 1;
 				uint8_t playerId = GetPlayerControlById(playerData->fields.PlayerId)->fields._.OwnerId;
 				ClientData* host = InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL);
-				ClientData* client = InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), (InnerNetObject*)__this, NULL);
+				ClientData* client = InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), __this, NULL);
 				std::string platformId = "Unknown";
 				if (client != NULL) {
 					auto platform = client->fields.PlatformData->fields.Platform;
@@ -346,7 +346,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					static float forceColorDelay = 0;
 					for (auto player : GetAllPlayerControl()) {
 						if (forceColorDelay <= 0) {
-							app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
+							app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
 							auto colorId = outfit->fields.ColorId;
 							if (IsInGame() && colorId != State.HostSelectedColorId)
 								State.rpcQueue.push(new RpcForceColor(player, State.HostSelectedColorId));
@@ -382,8 +382,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					if (forceNameDelay <= 0) {
 						for (auto player : GetAllPlayerControl()) {
 							if (!(State.CustomName && State.ServerSideCustomName && (player == *Game::pLocalPlayer || State.CustomNameForEveryone))) {
-								app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
-								std::string playerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+								app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
+								std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(player), nullptr));
 								std::string playerId = std::format("<{}>", player->fields.PlayerId);
 								std::string newName = State.hostUserName + "<size=0>" + playerId + "</size>";
 								if (IsInGame() && playerName != newName)
@@ -642,7 +642,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 				Profiler::EndSample("WalkEventCreation");
 			}
-			app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+			app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
 			EspPlayerData espPlayerData;
 			espPlayerData.Position = WorldToScreen(playerPos);
 			if (outfit != NULL)
@@ -660,7 +660,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					espPlayerData.Color = AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId));
 				}
 
-				espPlayerData.Name = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+				espPlayerData.Name = convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr));
 			}
 			else
 			{
@@ -835,7 +835,7 @@ void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate
 	}
 }*/
 
-void dPlayerControl_StartMeeting(PlayerControl* __this, GameData_PlayerInfo* target, MethodInfo* method)
+void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method)
 {
 	try {
 		if (!State.PanicMode && State.DisableMeetings) {
@@ -951,7 +951,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 	GameObject_SetActive(__this, value, method);
 }
 
-void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, GameData_PlayerInfo* target, MethodInfo* method) {
+void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method) {
 	try {
 		if (!State.PanicMode && State.DisableMeetings) {
 			return;
@@ -963,7 +963,7 @@ void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, GameData_PlayerInfo
 	PlayerControl_CmdReportDeadBody(__this, target, method);
 }
 
-void dPlayerControl_RpcStartMeeting(PlayerControl* __this, GameData_PlayerInfo* target, MethodInfo* method) {
+void dPlayerControl_RpcStartMeeting(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method) {
 	try {
 		if (State.DisableMeetings) {
 			return;
@@ -1098,7 +1098,7 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 	return result;
 }
 
-float dConsole_1_CanUse(Console_1* __this, GameData_PlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
+float dConsole_1_CanUse(Console_1* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
 	try {
 		if (!State.PanicMode) {
 			std::vector<int> sabotageTaskIds = { 0, 1, 2 }; //don't prevent impostor from fixing sabotages
@@ -1114,10 +1114,10 @@ float dConsole_1_CanUse(Console_1* __this, GameData_PlayerInfo* pc, bool* canUse
 	return Console_1_CanUse(__this, pc, canUse, couldUse, method);
 }
 
-void dPlayerControl_SetRole(PlayerControl* __this, RoleTypes__Enum role, MethodInfo* method) {
+void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method) {
 	if (__this == *Game::pLocalPlayer) State.RealRole = role;
 	if (!IsInMultiplayerGame() || __this != *Game::pLocalPlayer) {
-		PlayerControl_SetRole(__this, role, method);
+		PlayerControl_CoSetRole(__this, role, canOverride, method);
 		return;
 	}
 	bool hasAlreadySetRole = role == RoleTypes__Enum::GuardianAngel || role == RoleTypes__Enum::CrewmateGhost || role == RoleTypes__Enum::ImpostorGhost;
@@ -1127,12 +1127,12 @@ void dPlayerControl_SetRole(PlayerControl* __this, RoleTypes__Enum role, MethodI
 
 		else role = (RoleTypes__Enum)State.FakeRole;
 	}
-	PlayerControl_SetRole(__this, role, method);
+	PlayerControl_CoSetRole(__this, role, canOverride, method);
 }
 
-void dGameData_PlayerInfo_Serialize(GameData_PlayerInfo* __this, MessageWriter* writer, MethodInfo* method) {
+void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* writer, bool initialState, MethodInfo* method) {
 	if (GetPlayerData(*Game::pLocalPlayer) == __this) {
 		if (State.SpoofFriendCode) __this->fields.FriendCode = convert_to_string(State.FakeFriendCode);
 	}
-	GameData_PlayerInfo_Serialize(__this, writer, NULL);
+	NetworkedPlayerInfo_Serialize(__this, writer, initialState, NULL);
 }

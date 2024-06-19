@@ -332,9 +332,9 @@ RpcForceAumChat::RpcForceAumChat(const PlayerSelection& target, std::string_view
 void RpcForceAumChat::Process()
 {
 	PlayerControl* player = target.validate().get_PlayerControl();
-	auto outfit = GetPlayerOutfit(target.validate().get_PlayerData());
-	String* playerName = GameData_PlayerOutfit_get_PlayerName(outfit, NULL);
+	String* playerName = NetworkedPlayerInfo_get_PlayerName(target.validate().get_PlayerData(), NULL);
 	MessageWriter* rpcMessage = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), (completeForce ? player : *Game::pLocalPlayer)->fields._.NetId, 101, SendOption__Enum::Reliable, NULL);
+	auto outfit = GetPlayerOutfit(GetPlayerData(player));
 	//aum only checks for the player name and color, so we can send in anything we want (even as ourselves)
 	MessageWriter_WriteString(rpcMessage, playerName, NULL);
 	MessageWriter_WriteString(rpcMessage, convert_to_string(msg), NULL);

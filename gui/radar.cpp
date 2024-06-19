@@ -6,14 +6,14 @@
 #include "gui-helpers.hpp"
 
 namespace Radar {
-	ImU32 GetRadarPlayerColor(GameData_PlayerInfo* playerData) {
-		app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+	ImU32 GetRadarPlayerColor(NetworkedPlayerInfo* playerData) {
+		auto outfit = GetPlayerOutfit(playerData);
 		if (outfit == NULL) return ImU32(0);
 
 		return ImGui::ColorConvertFloat4ToU32(AmongUsColorToImVec4((GetPlayerColor(outfit->fields.ColorId))));
 	}
 
-	ImU32 GetRadarPlayerColorStatus(GameData_PlayerInfo* playerData) {
+	ImU32 GetRadarPlayerColorStatus(NetworkedPlayerInfo* playerData) {
 		if (State.RevealRoles && playerData->fields.Role != nullptr)
 			return ImGui::ColorConvertFloat4ToU32(AmongUsColorToImVec4(GetRoleColor(playerData->fields.Role)));
 		else if (playerData->fields.IsDead)

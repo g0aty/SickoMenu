@@ -184,9 +184,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             if (IsInLobby()) {
                 if (State.originalName == "-") {
-                    app::GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+                    app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
                     if (outfit != NULL) {
-                        State.originalName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(outfit, nullptr));
+                        State.originalName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), nullptr));
                         auto petId = outfit->fields.PetId;
                         auto skinId = outfit->fields.SkinId;
                         auto hatId = outfit->fields.HatId;
@@ -372,7 +372,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             static int nameChangeCycleDelay = 0; //If we spam too many name changes, we're banned
             if (nameChangeCycleDelay <= 0 && State.SetName && !State.activeImpersonation && !State.ServerSideCustomName) {
-                if ((((IsInGame() || IsInLobby()) && (convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer)), nullptr)) != State.userName))
+                if ((((IsInGame() || IsInLobby()) && (convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), nullptr)) != State.userName))
                     || ((!IsInGame() && !IsInLobby()) && GetPlayerName() != State.userName))
                     && !State.userName.empty() && (IsNameValid(State.userName) || (IsHost() || !State.SafeMode))) {
                     SetPlayerName(State.userName);
@@ -635,7 +635,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         playerCycleDelay = State.CycleDuration;
                     else if (IsInGame() || IsInLobby()) {
                         int rand = randi(0, (int)players.size() - 1);
-                        GameData_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(players[rand]));
+                        NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(players[rand]));
                         ImpersonateName(GetPlayerData(players[rand]));
                         ImpersonateOutfit(outfit);
                         State.rpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, GetPlayerData(players[rand])->fields.PlayerLevel));
@@ -917,7 +917,7 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
     return GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
 
-void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, GameData_PlayerInfo* killer, GameData_PlayerInfo* victim, MethodInfo* method) {
+void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* killer, NetworkedPlayerInfo* victim, MethodInfo* method) {
     try {
         if (!State.PanicMode && State.DisableKillAnimation)
             return;
@@ -981,8 +981,8 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
             if (p->fields._.OwnerId == clientId) affectedPlayer = p;
         }
         if (IsHost() && sourcePlayer == *Game::pLocalPlayer) return; //anti kick as host
-        std::string sourceplayerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(sourcePlayer)), nullptr));
-        std::string affectedplayerName = convert_from_string(GameData_PlayerOutfit_get_PlayerName(GetPlayerOutfit(GetPlayerData(affectedPlayer)), nullptr));
+        std::string sourceplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
+        std::string affectedplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(affectedPlayer), nullptr));
         LOG_DEBUG(sourceplayerName + " attempted to votekick " + affectedplayerName);
     }
     catch (...) {

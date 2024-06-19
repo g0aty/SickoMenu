@@ -7,7 +7,7 @@
 #include "profiler.h"
 #include "game.h"
 
-float dShipStatus_CalculateLightRadius(ShipStatus* __this, GameData_PlayerInfo* player, MethodInfo* method) {
+float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
 	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
 	else
