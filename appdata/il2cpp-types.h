@@ -4662,6 +4662,7 @@ namespace app
         struct ContinuanceToken* continuanceToken;
         struct String* exchangeToken;
         struct String* platformAuthToken;
+        void* serverTimeOnLaunch;
         bool authExpiredCallbackTriggered;
         bool silentLoginFailed;
         struct CompletionToken_1_PurchaseStates_* validateOldDLC;
@@ -4795,8 +4796,7 @@ namespace app
 
 #endif
 
-    struct InnerNetObject__Fields
-    {
+    struct InnerNetObject__Fields {
         struct MonoBehaviour__Fields _;
         uint32_t SpawnId;
         uint32_t NetId;
@@ -5005,34 +5005,34 @@ namespace app
 
 #pragma region PlayerVoteArea
     struct PlayerVoteArea__Fields {
-        struct MonoBehaviour__Fields _;
-        struct MeetingHud* _Parent_k__BackingField;
-        uint8_t TargetPlayerId;
-        struct GameObject* Buttons;
-        void* ConfirmButton;
-        void* CancelButton;
-        void* PlayerButton;
-        struct SpriteRenderer* Background;
-        struct SpriteRenderer* MaskArea;
-        struct SpriteRenderer* Flag;
-        struct SpriteRenderer* Megaphone;
-        struct SpriteRenderer* Overlay;
-        struct SpriteRenderer* XMark;
-        struct SpriteRenderer* GAIcon;
-        struct SpriteRenderer* ThumbsDown;
-        struct SpriteRenderer* HighlightedFX;
-        struct TextMeshPro* NameText;
-        struct TextMeshPro* LevelNumberText;
-        struct TextMeshPro* ColorBlindName;
-        bool AnimateButtonsFromLeft;
-        bool AmDead;
-        bool DidReport;
-        uint8_t VotedFor;
-        bool voteComplete;
-        bool resultsShowing;
-        void* PlayerIcon;
-        int32_t _MaskLayer_k__BackingField;
-    };
+    struct MonoBehaviour__Fields _;
+    struct MeetingHud *_Parent_k__BackingField;
+    uint8_t TargetPlayerId;
+    struct GameObject *Buttons;
+    struct UiElement *ConfirmButton;
+    struct UiElement *CancelButton;
+    struct UiElement *PlayerButton;
+    struct SpriteRenderer *Background;
+    struct SpriteRenderer *MaskArea;
+    struct SpriteRenderer *Flag;
+    struct SpriteRenderer *Megaphone;
+    struct SpriteRenderer *Overlay;
+    struct SpriteRenderer *XMark;
+    struct SpriteRenderer *GAIcon;
+    struct SpriteRenderer *ThumbsDown;
+    struct SpriteRenderer *HighlightedFX;
+    struct TextMeshPro *NameText;
+    struct TextMeshPro *LevelNumberText;
+    struct TextMeshPro *ColorBlindName;
+    bool AnimateButtonsFromLeft;
+    bool AmDead;
+    bool DidReport;
+    uint8_t VotedFor;
+    bool voteComplete;
+    bool resultsShowing;
+    struct PoolablePlayer *PlayerIcon;
+    int32_t _MaskLayer_k__BackingField;
+};
 
     struct PlayerVoteArea {
         struct PlayerVoteArea__Class* klass;
@@ -6121,6 +6121,9 @@ enum RoleTypes__Enum {
 #else
         int32_t BlurbNameLong;
 #endif
+        struct Sprite* RoleIconSolid;
+        struct Sprite* RoleIconWhite;
+        struct Sprite* RoleScreenshot;
         struct Color NameColor;
         bool TasksCountTowardProgress;
         bool CanUseKillButton;
@@ -6133,7 +6136,7 @@ enum RoleTypes__Enum {
 #else
         int32_t TeamType;
 #endif
-        struct AbilityButtonSettings* Ability;
+        void* Ability;
 #if defined(_CPLUSPLUS_)
         RoleTypes__Enum DefaultGhostRole;
 #else
@@ -6142,7 +6145,7 @@ enum RoleTypes__Enum {
         struct AudioClip* UseSound;
         struct AudioClip* IntroSound;
         struct PlayerControl* Player;
-        void* buttonManager;
+        struct AbilityButton* buttonManager;
     };
 
     struct RoleBehaviour
@@ -6780,6 +6783,9 @@ enum RoleTypes__Enum {
         Default = 0x00000000,
         ProtectLoop = 0x00000001,
         Shapeshift = 0x00000002,
+        Vanish_Charge = 0x00000003,
+        Vanish_Poof = 0x00000004,
+        Appear_Poof = 0x00000005,
     };
 
 #else
@@ -6787,6 +6793,9 @@ enum RoleTypes__Enum {
         RoleEffectAnimation_EffectType__Enum_Default = 0x00000000,
         RoleEffectAnimation_EffectType__Enum_ProtectLoop = 0x00000001,
         RoleEffectAnimation_EffectType__Enum_Shapeshift = 0x00000002,
+        RoleEffectAnimation_EffectType__Enum_Vanish_Charge = 0x00000003,
+        RoleEffectAnimation_EffectType__Enum_Vanish_Poof = 0x00000004,
+        RoleEffectAnimation_EffectType__Enum_Appear_Poof = 0x00000005,
     };
 
 #endif
@@ -7170,7 +7179,7 @@ enum RoleTypes__Enum {
 
     struct ChatController__Fields {
         struct MonoBehaviour__Fields _;
-        struct GameObject* chatButton;
+        struct PassiveButton* chatButton;
         struct AspectPosition* chatButtonAspectPosition;
         struct BanMenu* banButton;
         struct GameObject* openKeyboardButton;
@@ -7192,6 +7201,7 @@ enum RoleTypes__Enum {
         struct UiElement* backButton;
         struct UiElement* defaultButtonSelected;
         struct List_1_UiElement_* controllerSelectable;
+        void* chatNotification;
 #if defined(_CPLUSPLUS_)
         ChatControllerState__Enum state;
 #else
@@ -8477,6 +8487,7 @@ enum RoleTypes__Enum {
         struct String* OnlineScene;
         struct String* MainMenuScene;
         struct GameData* GameDataPrefab;
+        struct VoteBanSystem* VoteBanPrefab;
         struct PlayerControl* PlayerPrefab;
         void* ShipPrefabs;
         int32_t TutorialMapId;
@@ -8493,7 +8504,6 @@ enum RoleTypes__Enum {
 #else
         int32_t CrossplayPrivilegeError;
 #endif
-        int32_t MAX_CLIENT_WAIT_TIME;
         void* logger;
         struct AsyncOperationHandle_1_UnityEngine_GameObject_ ShipLoadingAsyncHandle;
     };
@@ -8545,12 +8555,12 @@ enum RoleTypes__Enum {
 #pragma endregion
 
 #pragma region ClientData
-    struct __declspec(align(4)) ClientData__Fields
-    {
+    struct __declspec(align(4)) ClientData__Fields {
         int32_t Id;
         bool InScene;
         bool IsReady;
         bool HasBeenReported;
+        bool IsBeingCreated;
         struct PlayerControl* Character;
         uint32_t PlayerLevel;
         struct PlatformSpecificData* PlatformData;
@@ -9024,23 +9034,27 @@ enum RoleTypes__Enum {
 
     struct GameStartManager__Fields {
         struct DestroyableSingleton_1_GameStartManager___Fields _;
+        struct List_1_MapIconByName_* AllMapIcons;
+        struct IGameOptions* cachedData;
         int32_t MinPlayers;
         struct TextMeshPro* PlayerCounter;
         int32_t LastPlayerCount;
         struct GameObject* GameSizePopup;
         struct GameObject* GameRoomButton;
-        struct TextMeshPro* GameRoomNameInfo;
+        struct GameObject* RoomCodeHeader;
+        struct GameObject* LocalLabel;
         struct TextMeshPro* GameRoomNameCode;
+        struct SpriteRenderer* MapImage;
         struct LobbyBehaviour* LobbyPrefab;
+        struct GameObject* GameStartTextParent;
         struct TextMeshPro* GameStartText;
-        struct TextMeshPro* startLabelText;
-        struct SpriteRenderer* StartButton;
+        struct SpriteRenderer* StartButtonClient;
         struct ActionMapGlyphDisplay* StartButtonGlyph;
-        struct SpriteRenderer* MakePublicButton;
-        struct ControllerHeldButtonBehaviour* MakePublicButtonBehaviour;
-        struct Sprite* PublicGameImage;
-        struct Sprite* PrivateGameImage;
-        struct TextMeshPro* privatePublicText;
+        struct GameObject* StartButtonGlyphContainer;
+        struct TextMeshPro* RulesPresetText;
+        struct GameObject* HostInfoPanelButtons;
+        struct GameObject* ClientInfoPanelButtons;
+        struct TextMeshPro* privatePublicPanelText;
         struct SpriteRenderer* ShareOnDiscordButton;
         struct GameObject* InviteFriendsButton;
 #if defined(_CPLUSPLUS_)
@@ -9049,8 +9063,22 @@ enum RoleTypes__Enum {
         int32_t startState;
 #endif
         float countDownTimer;
-        struct IEnumerator* copyGameCodeCoroutine;
-        struct ImageTranslator* publicButtonTranslator;
+        void* StartButton;
+        struct GameObject* RulesViewPanel;
+        void* HostInfoPanel;
+        struct PassiveButton* EditButton;
+        struct Vector3 GameOptionsPosition;
+        struct GameObject* PlayerOptionsMenu;
+        struct GameObject* HostPrivacyButtons;
+        void* HostPublicButton;
+        void* HostPrivateButton;
+        struct GameObject* ClientPrivacyValue;
+        void* LobbyInfoPane;
+        struct AudioClip* lobbyViewPanelOpenSound;
+        struct AudioClip* lobbyViewPanelCloseSound;
+        struct AudioClip* gameStartSound;
+        void* HostViewButton;
+        void* ClientViewButton;
     };
 
     struct GameStartManager {
@@ -9159,6 +9187,9 @@ enum RoleTypes__Enum {
     struct PingTracker__Fields {
         struct MonoBehaviour__Fields _;
         struct TextMeshPro* text;
+        struct AspectPosition* aspectPosition;
+        struct Vector3 lobbyPos;
+        struct Vector3 gamePos;
     };
 
     struct PingTracker {
@@ -9685,6 +9716,12 @@ enum RoleTypes__Enum {
         ScientistBatteryCharge = 0x000004b1,
         EngineerCooldown = 0x00000514,
         EngineerInVentMaxTime = 0x00000515,
+        PhantomCooldown = 0x000005dc,
+        PhantomDuration = 0x000005dd,
+        TrackerCooldown = 0x0000060e,
+        TrackerDuration = 0x0000060f,
+        TrackerDelay = 0x00000610,
+        NoisemakerAlertDuration = 0x00000640,
     };
 
 #else
@@ -9709,6 +9746,12 @@ enum RoleTypes__Enum {
         FloatOptionNames__Enum_ScientistBatteryCharge = 0x000004b1,
         FloatOptionNames__Enum_EngineerCooldown = 0x00000514,
         FloatOptionNames__Enum_EngineerInVentMaxTime = 0x00000515,
+        FloatOptionNames__Enum_PhantomCooldown = 0x000005dc,
+        FloatOptionNames__Enum_PhantomDuration = 0x000005dd,
+        FloatOptionNames__Enum_TrackerCooldown = 0x0000060e,
+        FloatOptionNames__Enum_TrackerDuration = 0x0000060f,
+        FloatOptionNames__Enum_TrackerDelay = 0x00000610,
+        FloatOptionNames__Enum_NoisemakerAlertDuration = 0x00000640,
     };
 
 #endif
@@ -9728,6 +9771,7 @@ enum RoleTypes__Enum {
         ShowCrewmateNames = 0x0000000a,
         ShapeshifterLeaveSkin = 0x000003e8,
         ImpostorsCanSeeProtect = 0x0000044c,
+        NoisemakerImpostorAlert = 0x00000514,
     };
 
 #else
@@ -9745,7 +9789,8 @@ enum RoleTypes__Enum {
         BoolOptionNames__Enum_ShowCrewmateNames = 0x0000000a,
         BoolOptionNames__Enum_ShapeshifterLeaveSkin = 0x000003e8,
         BoolOptionNames__Enum_ImpostorsCanSeeProtect = 0x0000044c,
-    };
+        BoolOptionNames__Enum_NoisemakerImpostorAlert = 0x00000514,
+};
 
 #endif
 
@@ -9768,6 +9813,7 @@ enum RoleTypes__Enum {
         CrewmatesRemainingForVitals = 0x00000064,
         CrewmateVentUses = 0x00000065,
         ImpostorPlayerID = 0x00000066,
+        RulePreset = 0x000000c8,
     };
 
 #else
@@ -9789,7 +9835,8 @@ enum RoleTypes__Enum {
         Int32OptionNames__Enum_CrewmatesRemainingForVitals = 0x00000064,
         Int32OptionNames__Enum_CrewmateVentUses = 0x00000065,
         Int32OptionNames__Enum_ImpostorPlayerID = 0x00000066,
-    };
+        Int32OptionNames__Enum_RulePreset = 0x000000c8,
+};
 
 #endif
 
@@ -9990,72 +10037,6 @@ enum RoleTypes__Enum {
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct RoleTypes__Enum__Array__VTable vtable;
-    };
-#pragma endregion
-
-#pragma region List_1_RoleTypes_
-    struct __declspec(align(4)) List_1_AmongUs_GameOptions_RoleTypes___Fields {
-        struct RoleTypes__Enum__Array* _items;
-        int32_t _size;
-        int32_t _version;
-        struct Object* _syncRoot;
-    };
-
-    struct List_1_AmongUs_GameOptions_RoleTypes_ {
-        struct List_1_AmongUs_GameOptions_RoleTypes___Class* klass;
-        MonitorData* monitor;
-        struct List_1_AmongUs_GameOptions_RoleTypes___Fields fields;
-    };
-
-    struct List_1_AmongUs_GameOptions_RoleTypes___VTable {
-        VirtualInvokeData Equals;
-        VirtualInvokeData Finalize;
-        VirtualInvokeData GetHashCode;
-        VirtualInvokeData ToString;
-        VirtualInvokeData get_Item;
-        VirtualInvokeData set_Item;
-        VirtualInvokeData IndexOf;
-        VirtualInvokeData Insert;
-        VirtualInvokeData RemoveAt;
-        VirtualInvokeData get_Count;
-        VirtualInvokeData System_Collections_Generic_ICollection_T__get_IsReadOnly;
-        VirtualInvokeData Add;
-        VirtualInvokeData Clear;
-        VirtualInvokeData Contains;
-        VirtualInvokeData CopyTo;
-        VirtualInvokeData Remove;
-        VirtualInvokeData System_Collections_Generic_IEnumerable_T__GetEnumerator;
-        VirtualInvokeData System_Collections_IEnumerable_GetEnumerator;
-        VirtualInvokeData System_Collections_IList_get_Item;
-        VirtualInvokeData System_Collections_IList_set_Item;
-        VirtualInvokeData System_Collections_IList_Add;
-        VirtualInvokeData System_Collections_IList_Contains;
-        VirtualInvokeData Clear_1;
-        VirtualInvokeData System_Collections_IList_get_IsReadOnly;
-        VirtualInvokeData System_Collections_IList_get_IsFixedSize;
-        VirtualInvokeData System_Collections_IList_IndexOf;
-        VirtualInvokeData System_Collections_IList_Insert;
-        VirtualInvokeData System_Collections_IList_Remove;
-        VirtualInvokeData RemoveAt_1;
-        VirtualInvokeData System_Collections_ICollection_CopyTo;
-        VirtualInvokeData get_Count_1;
-        VirtualInvokeData System_Collections_ICollection_get_SyncRoot;
-        VirtualInvokeData System_Collections_ICollection_get_IsSynchronized;
-        VirtualInvokeData get_Item_1;
-        VirtualInvokeData get_Count_2;
-    };
-
-    struct List_1_AmongUs_GameOptions_RoleTypes___StaticFields {
-        struct RoleTypes__Enum__Array* _emptyArray;
-    };
-
-    struct List_1_AmongUs_GameOptions_RoleTypes___Class {
-        Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
-        struct List_1_AmongUs_GameOptions_RoleTypes___StaticFields* static_fields;
-        const Il2CppRGCTXData* rgctx_data;
-        Il2CppClass_1 _1;
-        struct List_1_AmongUs_GameOptions_RoleTypes___VTable vtable;
     };
 #pragma endregion
 
@@ -10564,6 +10545,17 @@ enum RoleTypes__Enum {
         struct Color Brown;
         struct Color CrewmateBlue;
         struct Color ImpostorRed;
+        struct Color CrewmateRoleBlue;
+        struct Color CrewmateRoleHeaderBlue;
+        struct Color CrewmateRoleHeaderTextBlue;
+        struct Color CrewmateRoleHeaderDarkBlue;
+        struct Color CrewmateRoleHeaderVeryDarkBlue;
+        struct Color CrewmateSettingChangeText;
+        struct Color ImpostorRoleRed;
+        struct Color ImpostorRoleHeaderRed;
+        struct Color ImpostorRoleHeaderTextRed;
+        struct Color ImpostorRoleHeaderDarkRed;
+        struct Color ImpostorRoleHeaderVeryDarkRed;
         struct Color CosmicubeCellUnlockedColor;
         struct Color CosmicubeCellLockedColor;
         struct Color CosmicubeQuality_NamePlate;
@@ -10580,6 +10572,8 @@ enum RoleTypes__Enum {
         struct StringNames__Enum__Array* ColorNames;
         struct Color32__Array* PlayerColors;
         struct Color32__Array* ShadowColors;
+        struct Color32__Array* TextColors;
+        struct Color32__Array* TextOutlineColors;
         struct Color32 VisorColor;
     };
 
@@ -10966,13 +10960,15 @@ enum RoleTypes__Enum {
 #pragma endregion
 
 #pragma region RoleManager
-    struct RoleManager__Fields
-    {
+    struct RoleManager__Fields {
         struct DestroyableSingleton_1_RoleManager___Fields _;
-        void* AllRoles;
-        void* shapeshiftAnim;
-        void* protectAnim;
-        void* protectLoopAnim;
+        struct RoleBehaviour__Array* AllRoles;
+        struct RoleEffectAnimation* shapeshiftAnim;
+        struct RoleEffectAnimation* protectAnim;
+        struct RoleEffectAnimation* protectLoopAnim;
+        struct RoleEffectAnimation* vanish_ChargeAnim;
+        struct RoleEffectAnimation* vanish_PoofAnim;
+        struct RoleEffectAnimation* appear_PoofAnim;
     };
 
     struct RoleManager
