@@ -222,20 +222,6 @@ namespace HostTab {
 						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
 					}
 				}
-
-				if (isReviving && framesPassed == 50)
-				{
-					State.rpcQueue.push(new RpcVent(*Game::pLocalPlayer, 1, false));
-					framesPassed--;
-				}
-				else if (isReviving && framesPassed <= 0 && (*Game::pLocalPlayer)->fields.inVent) {
-					State.rpcQueue.push(new RpcVent(*Game::pLocalPlayer, 1, true)); //for showing you as alive to ALL players
-					framesPassed = -1;
-					isReviving = false;
-				}
-				else if (isReviving) framesPassed--;
-
-				ImGui::EndChild();
 			}
 
 			if (openSettings) {
