@@ -63,6 +63,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
+			if (!playerData || !localData)
+				return;
+
 			if (IsInGame() && State.DisableVents && __this->fields.inVent) {
 				if (State.rpcCooldown == 0) {
 					//copy rpc code so that we don't spam the rpc queue
@@ -77,13 +80,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			if (!playerData || !localData)
-				return;
-
-			app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData, true);
+			auto outfit = GetPlayerOutfit(playerData, true);
 			std::string playerName = "<Unknown>";
 			if (outfit != NULL)
-				playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr));
+				playerName = convert_from_string(outfit->fields.PlayerName);
 
 			static int nameDelay = 0;
 

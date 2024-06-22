@@ -997,7 +997,7 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
 }*/
 
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
-    if (!State.PanicMode) {
+    /*if (!State.PanicMode) {
         switch (State.LastDisconnectReason) {
         case DisconnectReasons__Enum::Hacking: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
@@ -1013,6 +1013,6 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
         }
                break;
         }
-    }
+    }*/
     DisconnectPopup_DoShow(__this, method);
 }

@@ -21,6 +21,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 			__this->fields.Chat->fields.freeChatField->fields.textArea->fields.AllowPaste = State.ChatPaste && !State.PanicMode;
 		}
 
+		/*
 		static bool DisableActivation = false; //so a ghost seek button doesn't show up
 
 		if (State.InMeeting)
@@ -34,7 +35,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 				HudManager_SetHudActive(__this, true, NULL);
 				DisableActivation = true;
 			}
-		}
+		}*/
 
 		if ((IsInGame() || IsInLobby())) {
 			auto localData = GetPlayerData(*Game::pLocalPlayer);
@@ -44,10 +45,11 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 			}
 			GameObject* shadowLayerObject = Component_get_gameObject((Component_1*)__this->fields.ShadowQuad, NULL);
 			if (IsInGame() || IsInLobby()) {
-				GameObject_SetActive(shadowLayerObject,
-					(State.PanicMode || (!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
-					&& !localData->fields.IsDead,
-					NULL);
+				if (shadowLayerObject != NULL)
+					GameObject_SetActive(shadowLayerObject,
+						(State.PanicMode || (!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
+						&& !localData->fields.IsDead,
+						NULL);
 				
 				if (State.OutfitCooldown == 0) {
 					if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin)
@@ -71,20 +73,22 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 				app::RoleTypes__Enum role = playerRole != nullptr ? playerRole->fields.Role : app::RoleTypes__Enum::Crewmate;
 				GameObject* ImpostorVentButton = app::Component_get_gameObject((Component_1*)__this->fields.ImpostorVentButton, NULL);
 
-				if (role == RoleTypes__Enum::Engineer && State.UnlockVents && !State.PanicMode)
-				{
-					app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
-					if (engineerRole->fields.cooldownSecondsRemaining > 0.0f)
-						engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-					engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
-				}
-				else if ((GetPlayerData(*Game::pLocalPlayer)->fields.IsDead || IsInLobby()))
-				{
-					app::GameObject_SetActive(ImpostorVentButton, false, nullptr);
-				}
-				else
-				{
-					app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents && !State.PanicMode) || (((*Game::pLocalPlayer)->fields.inVent && role == RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal), nullptr);
+				if (ImpostorVentButton != NULL) {
+					if (role == RoleTypes__Enum::Engineer && State.UnlockVents && !State.PanicMode)
+					{
+						app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
+						if (engineerRole->fields.cooldownSecondsRemaining > 0.0f)
+							engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+						engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
+					}
+					else if ((GetPlayerData(*Game::pLocalPlayer)->fields.IsDead || IsInLobby()))
+					{
+						app::GameObject_SetActive(ImpostorVentButton, false, nullptr);
+					}
+					else
+					{
+						app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents && !State.PanicMode) || (((*Game::pLocalPlayer)->fields.inVent && role == RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal), nullptr);
+					}
 				}
 
 				if ((IsInGame() || IsInLobby())) {
@@ -99,13 +103,15 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 							playerInfo->fields.Role->fields.CanBeKilled = false;
 					}
 					GameObject* KillButton = app::Component_get_gameObject((Component_1*)__this->fields.KillButton, NULL);
-					if ((!State.PanicMode && State.UnlockKillButton && !localData->fields.IsDead) || PlayerIsImpostor(localData)) {
-						app::GameObject_SetActive(KillButton, true, nullptr);
-						playerRole->fields.CanUseKillButton = true;
-					}
-					else {
-						app::GameObject_SetActive(KillButton, false, nullptr);
-						playerRole->fields.CanUseKillButton = false;
+					if (KillButton != NULL) {
+						if ((!State.PanicMode && State.UnlockKillButton && !localData->fields.IsDead) || PlayerIsImpostor(localData)) {
+							app::GameObject_SetActive(KillButton, true, nullptr);
+							playerRole->fields.CanUseKillButton = true;
+						}
+						else {
+							app::GameObject_SetActive(KillButton, false, nullptr);
+							playerRole->fields.CanUseKillButton = false;
+						}
 					}
 				}
 			}
@@ -158,7 +164,7 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 		}
 		else {
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
-			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopRight, nullptr);
+			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::BaselineGeoAligned, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(ping), nullptr);
 		}
 	}

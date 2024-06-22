@@ -186,7 +186,7 @@ namespace SettingsTab {
 
 			ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
 		}
-		if (openSpoofing) {
+		if (openSpoofing) {/*
 			if (ToggleButton("Spoof Guest Account", &State.SpoofGuestAccount)) {
 				State.Save();
 			}
@@ -202,7 +202,7 @@ namespace SettingsTab {
 			ImGui::Text("It will only apply after restarting the game. For best results, use version.dll!");
 			if (ImGui::Button("Force Login as Guest")) {
 				State.ForceLoginAsGuest = true;
-			}
+			}*/
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
 			}

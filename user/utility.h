@@ -35,8 +35,11 @@ enum class RoleType
 	Crewmate = 1,
 	Scientist = 2,
 	Engineer = 3,
-	Impostor = 4,
-	Shapeshifter = 5,
+	Noisemaker = 4,
+	Tracker = 5,
+	Impostor = 6,
+	Shapeshifter = 7,
+	Phantom = 8,
 };
 
 class RoleRates {

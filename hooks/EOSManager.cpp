@@ -19,21 +19,21 @@ void fakeSuccessfulLogin(EOSManager* eosManager)
 }
 
 void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
-	if (!State.SpoofGuestAccount) {
+	//if (!State.SpoofGuestAccount) {
 		EOSManager_StartInitialLoginFlow(__this, method);
-		return;
-	}
-	EOSManager_StartTempAccountFlow(__this, method);
-	EOSManager_CloseStartupWaitScreen(__this, method);
+		//return;
+	//}
+	//EOSManager_StartTempAccountFlow(__this, method);
+	//EOSManager_CloseStartupWaitScreen(__this, method);
 }
 
 void dEOSManager_LoginFromAccountTab(EOSManager* __this, MethodInfo* method)
 {
 	EOSManager_LoginFromAccountTab(__this, method);
-	if (State.SpoofGuestAccount) {
+	/*if (State.SpoofGuestAccount) {
 		LOG_DEBUG("Faking login");
 		fakeSuccessfulLogin(__this);
-	}
+	}*/
 }
 
 void dEOSManager_InitializePlatformInterface(EOSManager* __this, MethodInfo* method)
@@ -54,23 +54,23 @@ bool dEOSManager_IsFriendsListAllowed(EOSManager* __this, MethodInfo* method)
 }
 
 void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, MethodInfo* method) {
-	Il2CppClass* klass = get_class("Assembly-CSharp, EOSManager");
+	/*Il2CppClass* klass = get_class("Assembly-CSharp, EOSManager");
 	LOG_ASSERT(klass);
 	FieldInfo* field = il2cpp_class_get_field_from_name(klass, "isKWSMinor");
 	LOG_ASSERT(field);
 	bool value = false;
-	il2cpp_field_set_value((Il2CppObject*)__this, field, &value);
+	il2cpp_field_set_value((Il2CppObject*)__this, field, &value);*/
 
 	app::EOSManager_UpdatePermissionKeys(__this, callback, method);
 }
 
 void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
-	static bool hasDeletedDeviceId = false;
-	__this->fields.ageOfConsent = 0; //why tf does amogus have an age of consent lmao
-	if (State.SpoofFriendCode && IsHost()) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
+	//static bool hasDeletedDeviceId = false;
+	//__this->fields.ageOfConsent = 0; //why tf does amogus have an age of consent lmao
+	//if (State.SpoofFriendCode && IsHost()) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
 	EOSManager_Update(__this, method);
 	//EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
-	if (State.SpoofGuestAccount) {
+	/*if (State.SpoofGuestAccount) {
 		auto player = app::DataManager_get_Player(nullptr);
 		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
 		LOG_ASSERT(field != nullptr);
@@ -91,9 +91,9 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 			LOG_DEBUG("Successfully deleted device ID!");
 			hasDeletedDeviceId = true;
 		}
-	}
+	}*/
 
-	if (State.ForceLoginAsGuest) {
+	/*if (State.ForceLoginAsGuest) {
 		EOSManager_PlayOffline(__this, NULL);
 		EOSManager_StartTempAccountFlow(__this, NULL);
 		auto player = app::DataManager_get_Player(nullptr);
@@ -112,12 +112,12 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 			//EditAccountUsername_SaveUsername(username, NULL);
 		}
 		State.ForceLoginAsGuest = false; //button behavior
-	}
+	}*/
 
-	if (!IsHost() && (IsInLobby() || IsInGame())) {
+	/*if (!IsHost() && (IsInLobby() || IsInGame())) {
 		auto friendCode = (*Game::pLocalPlayer)->fields.FriendCode;
 		__this->fields.friendCode = friendCode;
-	}
+	}*/
 }
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {

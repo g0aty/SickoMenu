@@ -1161,7 +1161,7 @@ float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2)
 
 void ShowHudNotification(std::string text) {
 	std::string notificationText = "<#fb0>[<#0f0>Sicko</color><#f00>Menu</color>]</color> " + text;
-	if (IsInGame() || IsInLobby()) NotificationPopper_AddDisconnectMessage(Game::HudManager.GetInstance()->fields.Notifier, convert_to_string(notificationText), NULL);
+	if (IsInGame() || IsInLobby()) NotificationPopper_AddDisconnectMessage((NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier), convert_to_string(notificationText), NULL);
 }
 
 void DoPolylineSimplification(std::vector<ImVec2>& inPoints, std::vector<std::chrono::system_clock::time_point>& inTimeStamps, std::vector<ImVec2>& outPoints, std::vector<std::chrono::system_clock::time_point>& outTimeStamps, float sqDistanceThreshold, bool clearInputs)
