@@ -42,9 +42,9 @@ namespace PlayersTab {
 				auto playerData = GetPlayerData(playerCtrl);
 				if (playerData->fields.Disconnected)
 					continue;
-				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+				auto outfit = GetPlayerOutfit(playerData);
 				if (outfit == NULL) continue;
-				std::string playerName = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr)));
+				std::string playerName = RemoveHtmlTags(convert_from_string(outfit->fields.PlayerName));
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0) * State.dpiScale);
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0) * State.dpiScale);
 				bool isSelected = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId()) != State.selectedPlayers.end();
@@ -391,7 +391,7 @@ namespace PlayersTab {
 				{
 					if (ImGui::Button("Protect")) {
 						for (auto p : selectedPlayers) {
-							app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(p.validate().get_PlayerData());
+							auto outfit = GetPlayerOutfit(p.validate().get_PlayerData());
 							auto colorId = outfit->fields.ColorId;
 							if (IsInGame())
 								State.rpcQueue.push(new RpcProtectPlayer(*Game::pLocalPlayer, p, colorId));
@@ -505,7 +505,7 @@ namespace PlayersTab {
 				}
 
 				if (!selectedPlayer.is_LocalPlayer() && selectedPlayers.size() == 1) {
-					app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
+					auto outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
 					if (outfit != NULL) {
 						auto petId = outfit->fields.PetId;
 						auto skinId = outfit->fields.SkinId;
@@ -587,7 +587,7 @@ namespace PlayersTab {
 				}
 
 				if (!State.SafeMode && ImGui::Button("Impersonate Everyone To") && selectedPlayers.size() == 1) {
-					app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
+					auto outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
 					auto petId = outfit->fields.PetId;
 					auto skinId = outfit->fields.SkinId;
 					auto hatId = outfit->fields.HatId;
@@ -647,8 +647,8 @@ namespace PlayersTab {
 					for (auto p : selectedPlayers) {
 						if (p.has_value() && p.validate().is_LocalPlayer()) State.NoClip = true;
 						else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 1, true));
-						ShowHudNotification(std::format("Allowed {} to NoClip!",
-							convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL))));
+						//ShowHudNotification(std::format("Allowed {} to NoClip!",
+							//convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL))));
 					}
 				}
 
@@ -856,12 +856,12 @@ namespace PlayersTab {
 					if (ImGui::Button("Revive"))
 					{
 						if (IsInGame()) {
-							app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
+							auto outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
 							State.rpcQueue.push(new RpcRevive(selectedPlayer.get_PlayerControl()));
 							State.rpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), outfit->fields.ColorId));
 						}
 						else if (IsInLobby()) {
-							app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
+							auto outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
 							State.lobbyRpcQueue.push(new RpcRevive(selectedPlayer.get_PlayerControl()));
 							State.lobbyRpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), outfit->fields.ColorId));
 						}

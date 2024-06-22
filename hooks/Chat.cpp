@@ -7,8 +7,8 @@
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
 	if (!State.PanicMode && State.ReadGhostMessages) {
 		bool wasDead = false;
-		NetworkedPlayerInfo* player = GetPlayerData(sourcePlayer);
-		NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
+		auto player = GetPlayerData(sourcePlayer);
+		auto local = GetPlayerData(*Game::pLocalPlayer);
 
 		if (player != NULL && player->fields.IsDead && local != NULL && !local->fields.IsDead) {
 			local->fields.IsDead = true;
@@ -46,7 +46,7 @@ void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo
 void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {
 	if (!State.PanicMode && (IsInGame() || IsInLobby())) {
 		for (auto playerData : GetAllPlayerData()) {
-			app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+			auto outfit = GetPlayerOutfit(playerData);
 			if (outfit == NULL) continue;
 			if (playerName == NetworkedPlayerInfo_get_PlayerName(playerData, nullptr)) {
 				auto localData = GetPlayerData(*Game::pLocalPlayer);

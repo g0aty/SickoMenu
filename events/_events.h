@@ -59,11 +59,11 @@ struct EVENT_PLAYER {
 	EVENT_PLAYER(NetworkedPlayerInfo* playerInfo) {
 		playerId = playerInfo->fields.PlayerId;
 
-		NetworkedPlayerInfo_PlayerOutfit* outfit = app::NetworkedPlayerInfo_get_DefaultOutfit(playerInfo, nullptr);
+		auto outfit = app::NetworkedPlayerInfo_get_DefaultOutfit(playerInfo, nullptr);
 		if (outfit != nullptr)
 		{
 			colorId = outfit->fields.ColorId;
-			playerName = convert_from_string(app::NetworkedPlayerInfo_get_PlayerName(playerInfo, nullptr));
+			playerName = convert_from_string(outfit->fields.PlayerName);
 		}
 		else
 		{
@@ -74,7 +74,7 @@ struct EVENT_PLAYER {
 		isDead = playerInfo->fields.IsDead;
 		isAngel = (playerInfo->fields.Role) ? playerInfo->fields.Role->fields.Role == RoleTypes__Enum::GuardianAngel : false;
 		
-		if (auto object = playerInfo->fields._object)
+		if (auto object = app::NetworkedPlayerInfo_get_Object(playerInfo, NULL))
 			isProtected = (object->fields.protectedByGuardianId >= 0);
 		else
 			isProtected = false;

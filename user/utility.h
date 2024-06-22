@@ -47,8 +47,14 @@ public:
 	int ImpostorCount = 0;
 	int ShapeshifterCount = 0;
 	int ShapeshifterChance = 0;
+	int PhantomCount = 0;
+	int PhantomChance = 0;
 	int ScientistCount = 0;
 	int ScientistChance = 0;
+	int TrackerCount = 0;
+	int TrackerChance = 0;
+	int NoisemakerCount = 0;
+	int NoisemakerChance = 0;
 	int EngineerCount = 0;
 	int EngineerChance = 0;
 	int GuardianAngelCount = 0;

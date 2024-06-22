@@ -68,29 +68,36 @@ namespace HostTab {
 						if (State.assignedRolesPlayer[index] == nullptr)
 							continue;
 
-						app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+						auto outfit = GetPlayerOutfit(playerData);
 						if (outfit == NULL) continue;
-						const std::string& playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr));
+						const std::string& playerName = convert_from_string(outfit->fields.PlayerName);
 						//player colors in host tab by gdjkhp (https://github.com/GDjkhp/AmongUsMenu/commit/53b017183bac503c546f198e2bc03539a338462c)
 						if (CustomListBoxInt(playerName.c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId))))
 						{
 							State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
 							State.scientists_amount = (int)GetRoleCount(RoleType::Scientist);
+							State.trackers_amount = (int)GetRoleCount(RoleType::Tracker);
+							State.noisemakers_amount = (int)GetRoleCount(RoleType::Noisemaker);
 							State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
+							State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
 							State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
-							if (State.impostors_amount + State.shapeshifters_amount > maxImpostorAmount)
+							if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount > maxImpostorAmount)
 							{
-								if (State.assignedRoles[index] == RoleType::Shapeshifter)
+								if (State.assignedRoles[index] == RoleType::Impostor)
 									State.assignedRoles[index] = RoleType::Random;
-								else if (State.assignedRoles[index] == RoleType::Impostor)
+								else if (State.assignedRoles[index] == RoleType::Shapeshifter)
+									State.assignedRoles[index] = RoleType::Random;
+								else if (State.assignedRoles[index] == RoleType::Tracker)
 									State.assignedRoles[index] = RoleType::Random;
 								State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
 								State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
 								State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
 							}
 
-							if (State.assignedRoles[index] == RoleType::Engineer || State.assignedRoles[index] == RoleType::Scientist || State.assignedRoles[index] == RoleType::Crewmate) {
-								if (State.engineers_amount + State.scientists_amount + State.crewmates_amount >= (int)playerAmount)
+							if (State.assignedRoles[index] == RoleType::Engineer || State.assignedRoles[index] == RoleType::Scientist || 
+								State.assignedRoles[index] == RoleType::Tracker || State.assignedRoles[index] == RoleType::Noisemaker || 
+								State.assignedRoles[index] == RoleType::Crewmate) {
+								if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.crewmates_amount >= (int)playerAmount)
 									State.assignedRoles[index] = RoleType::Random;
 							} //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps.
 							
@@ -98,7 +105,11 @@ namespace HostTab {
 							{
 								if (State.assignedRoles[index] == RoleType::Shapeshifter)
 									State.assignedRoles[index] = RoleType::Random;
-								else if (State.assignedRoles[index] == RoleType::Scientist)
+								else if (State.assignedRoles[index] == RoleType::Phantom)
+									State.assignedRoles[index] = RoleType::Random;
+								else if (State.assignedRoles[index] == RoleType::Tracker)
+									State.assignedRoles[index] = RoleType::Engineer;
+								else if (State.assignedRoles[index] == RoleType::Noisemaker)
 									State.assignedRoles[index] = RoleType::Engineer;
 								else if (State.assignedRoles[index] == RoleType::Crewmate)
 									State.assignedRoles[index] = RoleType::Engineer;
@@ -111,9 +122,12 @@ namespace HostTab {
 								else
 									SetRoleAmount(RoleTypes__Enum::Engineer, State.engineers_amount);
 								SetRoleAmount(RoleTypes__Enum::Scientist, State.scientists_amount);
+								SetRoleAmount(RoleTypes__Enum::Tracker, State.trackers_amount);
+								SetRoleAmount(RoleTypes__Enum::Noisemaker, State.noisemakers_amount);
 								SetRoleAmount(RoleTypes__Enum::Shapeshifter, State.shapeshifters_amount);
-								if (options.GetNumImpostors() <= State.impostors_amount + State.shapeshifters_amount)
-									options.SetInt(app::Int32OptionNames__Enum::NumImpostors, State.impostors_amount + State.shapeshifters_amount);
+								SetRoleAmount(RoleTypes__Enum::Phantom, State.phantoms_amount);
+								if (options.GetNumImpostors() <= State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount)
+									options.SetInt(app::Int32OptionNames__Enum::NumImpostors, State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount);
 							}
 						}
 					}
@@ -197,33 +211,16 @@ namespace HostTab {
 					State.Save();
 				}
 
-				static int framesPassed = -1;
-				static bool isReviving = false;
-
-				if (IsHost() && IsInGame() && !isReviving && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
+				if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
 				{
-					app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
-					State.rpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
-					State.rpcQueue.push(new RpcForceColor(*Game::pLocalPlayer, outfit->fields.ColorId));
-					framesPassed = 100;
-					switch (State.mapType) {
-					case Settings::MapType::Ship:
-						State.rpcQueue.push(new RpcSnapTo({ 9.3840f, -6.0744f }));
-						break;
-					case Settings::MapType::Hq:
-						State.rpcQueue.push(new RpcSnapTo({ 23.7700f, -1.5764f }));
-						break;
-					case Settings::MapType::Pb:
-						State.rpcQueue.push(new RpcSnapTo({ 6.9000f, -14.0464f }));
-						break;
-					case Settings::MapType::Airship:
-						State.rpcQueue.push(new RpcSnapTo({ -22.0990f, -1.1484f }));
-						break;
-					case Settings::MapType::Fungle:
-						State.rpcQueue.push(new RpcSnapTo({ -15.3590f, -9.4194f }));
-						break;
+					if (PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))) {
+						if (IsInGame()) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
+						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
 					}
-					isReviving = true;
+					else {
+						if (IsInGame()) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
+						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
+					}
 				}
 
 				if (isReviving && framesPassed == 50)

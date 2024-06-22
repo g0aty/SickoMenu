@@ -139,27 +139,27 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 			int fps = GetFps();
 			std::string fpsText = "";
 			if (State.ShowFps) {
-				if (fps <= 20) fpsText = std::format("\nFPS: <#f00>{}</color>", fps);
-				else if (fps <= 40) fpsText = std::format("\n<#ff0>FPS: {}</color>", fps);
-				else fpsText = std::format("\n<#0f0>FPS: {}</color>", fps);
+				if (fps <= 20) fpsText = std::format(" FPS: <#f00>{}</color>", fps);
+				else if (fps <= 40) fpsText = std::format(" <#ff0>FPS: {}</color>", fps);
+				else fpsText = std::format(" <#0f0>FPS: {}</color>", fps);
 			}
-			std::string autoKill = State.AutoKill ? "\n<#f00>Autokill</color>" : "";
-			std::string noClip = State.NoClip ? "\nNoClip" : "";
-			std::string freeCam = State.FreeCam ? "\nFreecam" : "";
+			std::string autoKill = State.AutoKill ? " <#f00>Autokill</color>" : "";
+			std::string noClip = State.NoClip ? " NoClip" : "";
+			std::string freeCam = State.FreeCam ? " Freecam" : "";
 			std::string spectating = "";
 			if (State.playerToFollow.has_value()) {
 				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())));
 				Color32 playerColor = GetPlayerColor(outfit->fields.ColorId);
 				std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>",
 					playerColor.r, playerColor.g, playerColor.b, playerColor.a);
-				spectating = "\nNow Spectating: " + colorCode + RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())), nullptr)));
+				spectating = " Now Spectating: " + colorCode + RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())), nullptr)));
 			}
 			else spectating = "";
 			std::string hostText = State.ShowHost ?
-				(IsHost() ? "\nYou are Host" : std::format("\nHost: {}", GetHostUsername(true))) : "";
-			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format("\nVote Kicks: {}", State.VoteKicks) : "";
-			std::string pingText = std::format("<#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ {}<size=50%>{}{}{}{}{}{}</size>", State.SickoVersion, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
-			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopRight, nullptr);
+				(IsHost() ? " You are Host" : std::format(" Host: {}", GetHostUsername(true))) : "";
+			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
+			std::string pingText = std::format("<#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ {}<size=50%>{}\n{}{}{}{}{}</size>", State.SickoVersion, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
+			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::BaselineGeoAligned, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}
 		else {

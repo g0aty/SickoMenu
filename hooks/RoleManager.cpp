@@ -16,8 +16,11 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 
 	AssignPreChosenRoles(roleRates, assignedPlayers);
 	AssignRoles(roleRates, roleRates.ShapeshifterChance, RoleTypes__Enum::Shapeshifter, allPlayers, assignedPlayers);
+	AssignRoles(roleRates, roleRates.TrackerChance, RoleTypes__Enum::Tracker, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, 100, RoleTypes__Enum::Impostor, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.ScientistChance, RoleTypes__Enum::Scientist, allPlayers, assignedPlayers);
+	AssignRoles(roleRates, roleRates.TrackerChance, RoleTypes__Enum::Tracker, allPlayers, assignedPlayers);
+	AssignRoles(roleRates, roleRates.NoisemakerChance, RoleTypes__Enum::Noisemaker, allPlayers, assignedPlayers);
 	if (options.GetGameMode() == GameModes__Enum::HideNSeek) {
 		AssignRoles(roleRates, 100, RoleTypes__Enum::Engineer, allPlayers, assignedPlayers);
 	}
@@ -26,14 +29,6 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 		AssignRoles(roleRates, 100, RoleTypes__Enum::Crewmate, allPlayers, assignedPlayers);
 	}
 }
-
-/*void dRoleManager_AssignRolesForTeam(List_1_GameData_PlayerInfo_* players, RoleOptionsData* opts, RoleTeamTypes__Enum team, int32_t teamMax, Nullable_1_RoleTypes_ defaultRole, MethodInfo* method) {
-	return RoleManager_AssignRolesForTeam(players, opts, team, teamMax, defaultRole, method);
-}
-
-void dRoleManager_AssignRolesFromList(List_1_GameData_PlayerInfo_* players, int32_t teamMax, List_1_RoleTypes_* roleList, int32_t* rolesAssigned, MethodInfo* method) {
-	return RoleManager_AssignRolesFromList(players, teamMax, roleList, rolesAssigned, method);
-}*/
 
 void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPlayers)
 {
@@ -67,8 +62,12 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 	if (options.GetGameMode() == GameModes__Enum::HideNSeek && role == RoleTypes__Enum::Engineer)
 		roleCount = allPlayers.size() - 1;
 
-	if (role == RoleTypes__Enum::Shapeshifter && roleCount >= maxImpostorAmount)
-		roleCount = maxImpostorAmount; //In previous version, aum would assign more imps than MaxImpostorAmount based on shapeshifter amount.
+	if (roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter) + roleRates.GetRoleCount(RoleTypes__Enum::Phantom) > maxImpostorAmount) {
+		if (role == RoleTypes__Enum::Shapeshifter && roleCount >= maxImpostorAmount)
+			roleCount = int(maxImpostorAmount / 2);
+		if (role == RoleTypes__Enum::Phantom && roleCount >= maxImpostorAmount)
+			roleCount = maxImpostorAmount - int(maxImpostorAmount / 2);
+	}
 
 	if (roleCount < 1)
 		return;

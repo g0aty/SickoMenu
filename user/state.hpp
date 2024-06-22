@@ -249,8 +249,11 @@ public:
     int mapHostChoice = -1;
     int impostors_amount = 0;
     int shapeshifters_amount = 0;
+    int phantoms_amount = 0;
     int engineers_amount = 0;
     int scientists_amount = 0;
+    int trackers_amount = 0;
+    int noisemakers_amount = 0;
     int crewmates_amount = 0;
 
     bool Wallhack = false;
@@ -361,7 +364,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.5_tr0.11";
+    std::string SickoVersion = "v3.5";
 
     void Load();
     void Save();

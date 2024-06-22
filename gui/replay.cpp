@@ -330,7 +330,7 @@ namespace Replay
 				ImGui::GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerDataById(plrLineData.playerId)->fields.Role))) :
 				ImGui::GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->VisorColor)));
 
-			app::NetworkedPlayerInfo* plrInfo = GetPlayerDataById(plrLineData.playerId);
+			auto plrInfo = GetPlayerDataById(plrLineData.playerId);
 			if ((plrInfo != NULL) &&
 				((plrInfo->fields.IsDead) ||
 					((plrInfo->fields.Role != NULL) &&

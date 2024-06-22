@@ -9945,6 +9945,119 @@ namespace app
 #endif
 #pragma endregion
 
+#pragma region TrackerRole
+    struct TrackerRole__Fields {
+        void* _;
+        struct PlayerControl* currentTarget;
+        float cooldownSecondsRemaining;
+        float durationSecondsRemaining;
+        float delaySecondsRemaining;
+        bool pauseTrackingTime;
+        struct AudioClip* cancelSound;
+        bool isTrackingActive;
+    };
+
+    struct TrackerRole {
+        struct TrackerRole__Class* klass;
+        MonitorData* monitor;
+        struct TrackerRole__Fields fields;
+    };
+
+    struct TrackerRole__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_IsDead;
+        VirtualInvokeData get_IsAffectedByComms;
+        VirtualInvokeData CanUse;
+        VirtualInvokeData DidWin;
+        VirtualInvokeData Deinitialize;
+        VirtualInvokeData SpawnTaskHeader;
+        VirtualInvokeData UseAbility;
+        VirtualInvokeData OnMeetingStart;
+        VirtualInvokeData OnVotingComplete;
+        VirtualInvokeData OnDeath;
+        VirtualInvokeData Initialize;
+        VirtualInvokeData SetUsableTarget;
+        VirtualInvokeData SetPlayerTarget;
+        VirtualInvokeData SetCooldown;
+        VirtualInvokeData IsValidTarget;
+        VirtualInvokeData FindClosestTarget;
+        VirtualInvokeData GetAbilityDistance;
+        VirtualInvokeData AdjustTasks;
+        VirtualInvokeData AppendTaskHint;
+    };
+
+    struct TrackerRole__StaticFields {
+    };
+
+    struct TrackerRole__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct TrackerRole__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct TrackerRole__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region PhantomRole
+    struct PhantomRole__Fields {
+        void* _;
+        struct AudioClip* appearSound;
+        float cooldownSecondsRemaining;
+        float durationSecondsRemaining;
+        bool isInvisible;
+        bool fading;
+        bool serverApproved;
+    };
+
+    struct PhantomRole {
+        struct PhantomRole__Class* klass;
+        MonitorData* monitor;
+        struct PhantomRole__Fields fields;
+    };
+
+    struct PhantomRole__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_IsDead;
+        VirtualInvokeData get_IsAffectedByComms;
+        VirtualInvokeData CanUse;
+        VirtualInvokeData DidWin;
+        VirtualInvokeData Deinitialize;
+        VirtualInvokeData SpawnTaskHeader;
+        VirtualInvokeData UseAbility;
+        VirtualInvokeData OnMeetingStart;
+        VirtualInvokeData OnVotingComplete;
+        VirtualInvokeData OnDeath;
+        VirtualInvokeData Initialize;
+        VirtualInvokeData SetUsableTarget;
+        VirtualInvokeData SetPlayerTarget;
+        VirtualInvokeData SetCooldown;
+        VirtualInvokeData IsValidTarget;
+        VirtualInvokeData FindClosestTarget;
+        VirtualInvokeData GetAbilityDistance;
+        VirtualInvokeData AdjustTasks;
+        VirtualInvokeData AppendTaskHint;
+    };
+
+    struct PhantomRole__StaticFields {
+    };
+
+    struct PhantomRole__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct PhantomRole__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PhantomRole__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region PingTracker
     struct PingTracker__Fields {
         struct MonoBehaviour__Fields _;

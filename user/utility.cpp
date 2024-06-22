@@ -37,7 +37,10 @@ RoleRates::RoleRates(const class GameOptions& gameOptions, int playerAmount) {
 
 	GET_ROLE_RATE(Engineer);
 	GET_ROLE_RATE(Scientist);
+	GET_ROLE_RATE(Tracker);
+	GET_ROLE_RATE(Noisemaker);
 	GET_ROLE_RATE(Shapeshifter);
+	GET_ROLE_RATE(Phantom);
 	GET_ROLE_RATE(GuardianAngel);
 #undef GET_ROLE_RATE
 }
@@ -47,20 +50,26 @@ int RoleRates::GetRoleCount(RoleTypes__Enum role) {
 	{
 		case RoleTypes__Enum::Shapeshifter:
 			return this->ShapeshifterCount;
+		case RoleTypes__Enum::Phantom:
+			return this->PhantomCount;
 		case RoleTypes__Enum::Impostor:
 			return this->ImpostorCount;
 		case RoleTypes__Enum::Scientist:
 			return this->ScientistCount;
 		case RoleTypes__Enum::Engineer:
 			return this->EngineerCount;
+		case RoleTypes__Enum::Tracker:
+			return this->TrackerCount;
+		case RoleTypes__Enum::Noisemaker:
+			return this->NoisemakerCount;
 		case RoleTypes__Enum::GuardianAngel:
 			return this->GuardianAngelCount;
 		case RoleTypes__Enum::Crewmate:
 			return this->MaxCrewmates;
 		default:
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 			assert(false);
-#endif
+#endif*/
 			return 0;
 	}
 }
@@ -73,12 +82,20 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
 		this->ShapeshifterCount--;
 		this->ImpostorCount--;
 	}
+	else if (role == RoleTypes__Enum::Phantom)
+	{
+		if (this->PhantomCount < 1)
+			return;
+		this->ImpostorCount--;
+		this->PhantomCount--;
+	}
 	else if (role == RoleTypes__Enum::Impostor)
 	{
 		if (this->ImpostorCount < 1)
 			return;
 		this->ImpostorCount--;
 		this->ShapeshifterCount--;
+		this->PhantomCount--;
 	}
 	else if (role == RoleTypes__Enum::Scientist)
 	{
@@ -91,6 +108,18 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
 		if (this->EngineerCount < 1)
 			return;
 		this->EngineerCount--;
+	}
+	else if (role == RoleTypes__Enum::Tracker)
+	{
+		if (this->TrackerCount < 1)
+			return;
+		this->TrackerCount--;
+	}
+	else if (role == RoleTypes__Enum::Noisemaker)
+	{
+		if (this->NoisemakerCount < 1)
+			return;
+		this->NoisemakerCount--;
 	}
 	else if (role == RoleTypes__Enum::GuardianAngel)
 	{
@@ -1135,6 +1164,9 @@ RoleTypes__Enum GetRoleTypesEnum(RoleType role)
 	if (role == RoleType::Shapeshifter) {
 		return RoleTypes__Enum::Shapeshifter;
 	}
+	else if (role == RoleType::Tracker) {
+		return RoleTypes__Enum::Tracker;
+	}
 	else if (role == RoleType::Impostor) {
 		return RoleTypes__Enum::Impostor;
 	}
@@ -1143,6 +1175,12 @@ RoleTypes__Enum GetRoleTypesEnum(RoleType role)
 	}
 	else if (role == RoleType::Scientist) {
 		return RoleTypes__Enum::Scientist;
+	}
+	else if (role == RoleType::Tracker) {
+		return RoleTypes__Enum::Tracker;
+	}
+	else if (role == RoleType::Noisemaker) {
+		return RoleTypes__Enum::Noisemaker;
 	}
 	return RoleTypes__Enum::Crewmate;
 }

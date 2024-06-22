@@ -360,7 +360,7 @@ namespace SelfTab {
                 State.Save();
             ImGui::SameLine();
             if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && ImGui::Button("Set Role")) {
-                State.FakeRole = std::clamp(State.FakeRole, 0, 7);
+                State.FakeRole = std::clamp(State.FakeRole, 0, 10);
                 if (IsInGame())
                     State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum(State.FakeRole)));
                 else if (IsInLobby())
@@ -368,6 +368,7 @@ namespace SelfTab {
             }
             if (IsHost() || !State.SafeMode) ImGui::SameLine();
             if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && ImGui::Button("Set for Everyone")) {
+                State.FakeRole = std::clamp(State.FakeRole, 0, 10);
                 if (IsInGame()) {
                     for (auto player : GetAllPlayerControl())
                         State.rpcQueue.push(new RpcSetRole(player, RoleTypes__Enum(State.FakeRole)));
@@ -379,7 +380,7 @@ namespace SelfTab {
             }
             if ((IsInGame() || IsInLobby()) && ImGui::Button("Set Fake Role")) {
                 auto localData = GetPlayerData(*Game::pLocalPlayer);
-                State.FakeRole = std::clamp(State.FakeRole, 0, 7);
+                State.FakeRole = std::clamp(State.FakeRole, 0, 10);
                 if (IsInGame())
                     State.rpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRole)));
                 else if (IsInLobby())

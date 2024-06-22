@@ -184,9 +184,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             if (IsInLobby()) {
                 if (State.originalName == "-") {
-                    app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+                    auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
                     if (outfit != NULL) {
-                        State.originalName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), nullptr));
+                        State.originalName = convert_from_string(outfit->fields.PlayerName);
                         auto petId = outfit->fields.PetId;
                         auto skinId = outfit->fields.SkinId;
                         auto hatId = outfit->fields.HatId;
@@ -234,6 +234,20 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                             scientistRole->fields.currentCooldown = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         scientistRole->fields.currentCharge = 69420.0f + 1.0f; //Can be anything as it will always be written
                     }
+                    if (role == RoleTypes__Enum::Tracker)
+                    {
+                        app::TrackerRole* trackerRole = (app::TrackerRole*)playerRole;
+                        if (trackerRole->fields.cooldownSecondsRemaining > 0.0f)
+                            trackerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+                        trackerRole->fields.delaySecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+                        trackerRole->fields.durationSecondsRemaining = 69420.f; //Can be anything as it will always be written
+                    }
+                    if (role == RoleTypes__Enum::Scientist) {
+                        app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
+                        if (scientistRole->fields.currentCooldown > 0.0f)
+                            scientistRole->fields.currentCooldown = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+                        scientistRole->fields.currentCharge = 69420.0f + 1.0f; //Can be anything as it will always be written
+                    }
                     if (GameLogicOptions().GetKillCooldown() > 0)
                         (*Game::pLocalPlayer)->fields.killTimer = 0;
                     else
@@ -241,11 +255,19 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     if (IsHost() || !State.SafeMode) {
                         if (IsHost()) {
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
+                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 0); //force set cooldown, otherwise u get kicked
                         }
                         else {
-                            app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
-                            if (shapeshifterRole->fields.cooldownSecondsRemaining > 0.0f)
-                                shapeshifterRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+                            if (role == RoleTypes__Enum::Shapeshifter) {
+                                app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
+                                if (shapeshifterRole->fields.cooldownSecondsRemaining > 0.0f)
+                                    shapeshifterRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+                            }
+                            if (role == RoleTypes__Enum::Phantom) {
+                                app::PhantomRole* phantomRole = (app::PhantomRole*)playerRole;
+                                if (phantomRole->fields.cooldownSecondsRemaining > 0.0f)
+                                    phantomRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+                            }
                         }
                         if (role == RoleTypes__Enum::GuardianAngel) {
                             app::GuardianAngelRole* guardianAngelRole = (app::GuardianAngelRole*)playerRole;
@@ -256,6 +278,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     if (role == RoleTypes__Enum::Shapeshifter) {
                         app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
                         shapeshifterRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
+                    }
+                    if (role == RoleTypes__Enum::Phantom) {
+                        app::PhantomRole* phantomRole = (app::PhantomRole*)playerRole;
+                        phantomRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
                     }
                     if (IsInGame()) {
                         (*Game::pLocalPlayer)->fields.RemainingEmergencies = 69420;

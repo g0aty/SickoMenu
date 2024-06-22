@@ -262,9 +262,8 @@ DO_APP_FUNC(bool, PlayerControl_get_IsKillTimerEnabled, (PlayerControl* __this, 
 DO_APP_FUNC(void, ExileController_ReEnableGameplay, (ExileController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ExileController::ReEnableGameplay()");
 DO_APP_FUNC(void, SabotageSystemType_SetInitialSabotageCooldown, (SabotageSystemType* __this, MethodInfo* method), "Assembly-CSharp, System.Void SabotageSystemType::SetInitialSabotageCooldown()");
 
-DO_APP_FUNC(PlayerControl*, NetworkedPlayerInfo_Object, (NetworkedPlayerInfo* __this, MethodInfo* method), "Assembly-CSharp, PlayerControl NetworkedPlayerInfo::get_Object()");
+DO_APP_FUNC(PlayerControl*, NetworkedPlayerInfo_get_Object, (NetworkedPlayerInfo* __this, MethodInfo* method), "Assembly-CSharp, PlayerControl NetworkedPlayerInfo::get_Object()");
 DO_APP_FUNC(NetworkedPlayerInfo_PlayerOutfit*, NetworkedPlayerInfo_get_DefaultOutfit, (NetworkedPlayerInfo* __this, MethodInfo* method), "Assembly-CSharp, NetworkedPlayerInfo.PlayerOutfit NetworkedPlayerInfo::get_DefaultOutfit()");
-//DO_APP_FUNC(String*, GameData_PlayerOutfit_get_PlayerName, (GameData_PlayerOutfit* __this, MethodInfo* method), "Assembly-CSharp, System.String NetworkedPlayerInfo::get_PlayerName()");
 DO_APP_FUNC(String*, NetworkedPlayerInfo_get_PlayerName, (NetworkedPlayerInfo* __this, MethodInfo* method), "Assembly-CSharp, System.String NetworkedPlayerInfo::get_PlayerName()");
 
 DO_APP_FUNC(void, AccountManager_UpdateKidAccountDisplay, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void AccountManager::UpdateKidAccountDisplay()");

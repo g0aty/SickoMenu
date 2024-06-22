@@ -111,7 +111,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 			if (State.PlayerColoredDots && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
 			{
-				app::NetworkedPlayerInfo_PlayerOutfit* realOutfit = GetPlayerOutfit(playerData);
+				auto realOutfit = GetPlayerOutfit(playerData);
 				Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
 				std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}> ●</color>",
 					nameColor.r, nameColor.g, nameColor.b,
@@ -346,7 +346,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					static float forceColorDelay = 0;
 					for (auto player : GetAllPlayerControl()) {
 						if (forceColorDelay <= 0) {
-							app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
+							auto outfit = GetPlayerOutfit(GetPlayerData(player));
 							auto colorId = outfit->fields.ColorId;
 							if (IsInGame() && colorId != State.HostSelectedColorId)
 								State.rpcQueue.push(new RpcForceColor(player, State.HostSelectedColorId));
@@ -382,7 +382,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					if (forceNameDelay <= 0) {
 						for (auto player : GetAllPlayerControl()) {
 							if (!(State.CustomName && State.ServerSideCustomName && (player == *Game::pLocalPlayer || State.CustomNameForEveryone))) {
-								app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
+								auto outfit = GetPlayerOutfit(GetPlayerData(player));
 								std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(player), nullptr));
 								std::string playerId = std::format("<{}>", player->fields.PlayerId);
 								std::string newName = State.hostUserName + "<size=0>" + playerId + "</size>";
@@ -642,7 +642,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 				Profiler::EndSample("WalkEventCreation");
 			}
-			app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+			auto outfit = GetPlayerOutfit(playerData);
 			EspPlayerData espPlayerData;
 			espPlayerData.Position = WorldToScreen(playerPos);
 			if (outfit != NULL)

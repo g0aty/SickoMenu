@@ -6,7 +6,7 @@
 
 float dVent_CanUse(Vent* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
 	if (!State.PanicMode && (State.UnlockVents || (*Game::pLocalPlayer)->fields.inVent)) {
-		auto object = pc->fields._object;
+		auto object = NetworkedPlayerInfo_get_Object(pc, nullptr);
 		if (!object) {
 			LOG_ERROR(ToString(pc) + " _object is null");
 			return app::Vent_CanUse(__this, pc, canUse, couldUse, method);
