@@ -7705,6 +7705,7 @@ enum RoleTypes__Enum {
         ServerNotFound = 0x000000d6,
         ClientTimeout = 0x000000d7,
         ErrorAuthNonceFailure = 0x000000d8,
+        //UnableToGetHowStupidYoAre = 0x123456a7
         Unknown = 0x000000ff,
     };
 
