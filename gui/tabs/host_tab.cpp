@@ -222,6 +222,8 @@ namespace HostTab {
 						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
 					}
 				}
+
+				ImGui::EndChild();
 			}
 
 			if (openSettings) {
