@@ -21,7 +21,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 			__this->fields.Chat->fields.freeChatField->fields.textArea->fields.AllowPaste = State.ChatPaste && !State.PanicMode;
 		}
 
-		/*
+		
 		static bool DisableActivation = false; //so a ghost seek button doesn't show up
 
 		if (State.InMeeting)
@@ -35,7 +35,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 				HudManager_SetHudActive(__this, true, NULL);
 				DisableActivation = true;
 			}
-		}*/
+		}
 
 		if ((IsInGame() || IsInLobby())) {
 			auto localData = GetPlayerData(*Game::pLocalPlayer);

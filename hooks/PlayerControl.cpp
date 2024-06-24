@@ -788,9 +788,20 @@ void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target,
 	if (!State.PanicMode) {
 		if (State.DisableKills || (State.GodMode && __this == *Game::pLocalPlayer)) return;
 
-		if (State.AlwaysUseKillExploit || State.NoAbilityCD)
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-		else if (IsInLobby())
+		if (IsInLobby() && __this == *Game::pLocalPlayer) {
+			for (auto p : GetAllPlayerControl()) {
+				if (p != *Game::pLocalPlayer) {
+					auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
+						uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::None, p->fields._.OwnerId, NULL);
+					MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+					MessageWriter_WriteInt32(writer, int32_t(target->fields.protectedByGuardianId < 0 || State.BypassAngelProt ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
+					InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+				}
+				__this->fields.moveable = true;
+				//prevent not moving when you murder
+			}
+		}
+		else if (State.AlwaysUseKillExploit || State.NoAbilityCD)
 			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
 		else if (State.RealRole != RoleTypes__Enum::Impostor && State.RealRole != RoleTypes__Enum::Shapeshifter)
 			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);

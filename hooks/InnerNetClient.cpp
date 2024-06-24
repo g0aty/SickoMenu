@@ -779,7 +779,6 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
                 State.TempPanicMode = true;
             }
         }
-        RefreshChat();
     }
     catch (...) {
         LOG_ERROR("Exception occurred in AmongUsClient_OnGameJoined (InnerNetClient)");

@@ -34,7 +34,8 @@ void RpcMurderPlayer::Process()
 				MessageWriter_WriteInt32(writer, int32_t(success ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
 				InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 			}
-			if (success) GetPlayerData(*Game::pLocalPlayer)->fields.IsDead = true;
+			Player->fields.moveable = true;
+			//prevent not moving when you murder
 		}
 	}
 }
