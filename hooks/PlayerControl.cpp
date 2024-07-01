@@ -1133,7 +1133,10 @@ void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool 
 	}
 	bool hasAlreadySetRole = role == RoleTypes__Enum::GuardianAngel || role == RoleTypes__Enum::CrewmateGhost || role == RoleTypes__Enum::ImpostorGhost;
 	if (State.AutoFakeRole && !hasAlreadySetRole) {
-		if (State.RealRole != RoleTypes__Enum::Shapeshifter && State.FakeRole == 5 && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead)
+		if (State.RealRole != RoleTypes__Enum::Shapeshifter && State.FakeRole == 5)
+			role = RoleTypes__Enum::Impostor;
+
+		else if (State.RealRole != RoleTypes__Enum::Phantom && State.FakeRole == 9)
 			role = RoleTypes__Enum::Impostor;
 
 		else role = (RoleTypes__Enum)State.FakeRole;

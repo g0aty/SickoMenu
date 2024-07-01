@@ -113,7 +113,7 @@ namespace GameTab {
             }
 
 
-            if ((IsInGame() || IsInLobby()) && ImGui::Button("Kill Everyone")) {
+            if (IsInGame() && ImGui::Button("Kill Everyone")) {
                 for (auto player : GetAllPlayerControl()) {
                     if (IsInGame())
                         State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
@@ -150,7 +150,7 @@ namespace GameTab {
                 State.Save();
             }
 
-            if ((IsInGame() || IsInLobby())) {
+            if (IsInGame()) {
                 if (ImGui::Button("Kill All Crewmates")) {
                     for (auto player : GetAllPlayerControl()) {
                         if (!PlayerIsImpostor(GetPlayerData(player))) {
@@ -202,7 +202,9 @@ namespace GameTab {
                         }
                     }
                 }
+            }
 
+            if (IsInGame() || IsInLobby()) {
                 if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && ImGui::Button("Scan Everyone")) {
                     for (auto p : GetAllPlayerControl()) {
                         if (IsInGame()) State.rpcQueue.push(new RpcForceScanner(p, true));

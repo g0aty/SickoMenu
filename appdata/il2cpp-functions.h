@@ -309,7 +309,6 @@ DO_APP_FUNC(float, LogicOptions_GetKillDistance, (LogicOptions* __this, MethodIn
 //DO_APP_FUNC(TaskBarMode__Enum, LogicOptions_GetTaskBarMode, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, TaskbarMode LogicOptions::GetTaskBarMode()");
 DO_APP_FUNC(void, KillButton_SetTarget, (KillButton* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::SetTarget(PlayerControl)");
 DO_APP_FUNC(PlayerControl*, ImpostorRole_FindClosestTarget, (ImpostorRole* __this, MethodInfo* method), "Assembly-CSharp, PlayerControl ImpostorRole::FindClosestTarget()");
-DO_APP_FUNC(void*, AmongUsClient_CoStartGameHost, (AmongUsClient* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoStartGameHost()");
 //DO_APP_FUNC(AsyncOperationHandle_1_UnityEngine_GameObject_, AssetReference_InstantiateAsync_1, (AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle UnityEngine.AddressableAssets.AssetReference::InstantiateAsync(UnityEngine.Transform, System.Boolean)");
 DO_APP_FUNC(float, Console_1_CanUse, (Console_1* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method), "Assembly-CSharp, System.Single Console::CanUse(NetworkedPlayerInfo, System.Boolean&, System.Boolean&)");
 DO_APP_FUNC(void, Ladder_SetDestinationCooldown, (Ladder* __this, MethodInfo* method), "Assembly-CSharp, System.Void Ladder::SetDestinationCooldown()");

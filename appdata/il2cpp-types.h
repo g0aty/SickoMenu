@@ -4610,8 +4610,8 @@ namespace app
     //sicko
     struct EOSManager__Fields {
         void* _;
-        struct CallResult_1_EncryptedAppTicketResponse_t_* OnEncryptedAppTicketResponseCallResult;
-        struct OnLoginCallback* successCallback;
+        void* OnEncryptedAppTicketResponseCallResult;
+        void* successCallback;
         struct Action* onLoginFailedCallback;
         struct String* productName;
         struct String* productVersion;
@@ -4636,7 +4636,7 @@ namespace app
         bool announcementsVisible;
         bool attemptAuthAgain;
         uint32_t numLinkedAccounts;
-        struct List_1_Epic_OnlineServices_Connect_ExternalAccountInfo_* linkedExternalAccounts;
+        void* linkedExternalAccounts;
         struct EditAccountUsername* editAccountUsername;
         struct AskToMergeGuest* askToMergeAccount;
         struct String* freeChatKey;

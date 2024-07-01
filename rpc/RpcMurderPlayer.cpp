@@ -221,7 +221,11 @@ void RpcRevive::Process()
 {
 	if (!PlayerSelection(Player).has_value()) return;
 
-	PlayerControl_Revive(Player, NULL);
+	//PlayerControl_Revive(Player, NULL);
+	if (PlayerIsImpostor(GetPlayerData(Player)))
+		PlayerControl_RpcSetRole(Player, RoleTypes__Enum::Impostor, true, NULL);
+	else
+		PlayerControl_RpcSetRole(Player, RoleTypes__Enum::Crewmate, true, NULL);
 }
 
 RpcVent::RpcVent(PlayerControl* Player, int32_t ventId, bool exit)

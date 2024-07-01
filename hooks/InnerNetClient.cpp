@@ -256,6 +256,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         if (IsHost()) {
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 0); //force set cooldown, otherwise u get kicked
+                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomDuration, 0); //force set cooldown, otherwise u get kicked
                         }
                         else {
                             if (role == RoleTypes__Enum::Shapeshifter) {
@@ -281,7 +282,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     }
                     if (role == RoleTypes__Enum::Phantom) {
                         app::PhantomRole* phantomRole = (app::PhantomRole*)playerRole;
-                        phantomRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
+                        //phantomRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
                     }
                     if (IsInGame()) {
                         (*Game::pLocalPlayer)->fields.RemainingEmergencies = 69420;
@@ -372,7 +373,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.GodMode = false;
             }
 
-            if (State.CycleTimer <= 0.19f) {
+            if (State.CycleTimer < 0.2f) {
                 State.CycleTimer = 0.2f;
                 State.Save();
             }
@@ -932,13 +933,13 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
 }
 
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method) {
-    try {
+    /*try {
         if (!State.PanicMode && IsHost() && State.NoGameEnd)
             return;
     }
     catch (...) {
         LOG_ERROR("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
-    }
+    }*/
     return GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
 

@@ -116,3 +116,4 @@ bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo
 void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method);
 void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* writer, bool initialState, MethodInfo* method);
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method);
+void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method);
