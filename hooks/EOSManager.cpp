@@ -67,7 +67,7 @@ void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, Method
 void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	static bool hasDeletedDeviceId = false;
 	//__this->fields.ageOfConsent = 0; //why tf does amogus have an age of consent lmao
-	//if (State.SpoofFriendCode && IsHost()) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
+	if (State.SpoofFriendCode) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
 	EOSManager_Update(__this, method);
 	//EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
 	if (State.SpoofGuestAccount) {
@@ -93,9 +93,7 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		}
 	}
 
-	/*if (State.ForceLoginAsGuest) {
-		EOSManager_PlayOffline(__this, NULL);
-		EOSManager_StartTempAccountFlow(__this, NULL);
+	if (State.ForceLoginAsGuest) {
 		auto player = app::DataManager_get_Player(nullptr);
 		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
 		LOG_ASSERT(field != nullptr);
@@ -106,13 +104,18 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		auto loggedOut = EOSManager_AccountLoginStatus__Enum::Offline;
 		if ((int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) != (int)loggedOut)
 			il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
-		if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
+		/*if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
 			auto username = __this->fields.editAccountUsername;
 			TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
 			//EditAccountUsername_SaveUsername(username, NULL);
+		}*/
+		if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
+			EOSManager_DeleteDeviceID(__this, NULL, NULL);
+			LOG_DEBUG("Successfully deleted device ID!");
+			hasDeletedDeviceId = true;
 		}
 		State.ForceLoginAsGuest = false; //button behavior
-	}*/
+	}
 
 	/*if (!IsHost() && (IsInLobby() || IsInGame())) {
 		auto friendCode = (*Game::pLocalPlayer)->fields.FriendCode;

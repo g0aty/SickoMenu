@@ -10,7 +10,7 @@ ImGuiWindow* CurrentWindow = nullptr;
 
 static void RenderText(std::string_view text, const ImVec2& pos, const ImVec4& color, const bool outlined = true, const bool centered = true)
 {
-	if (text.empty()) return;
+	if (text.empty() || State.PanicMode) return;
 	ImVec2 ImScreen = pos;
 	if (centered)
 	{
@@ -31,6 +31,8 @@ static void RenderText(std::string_view text, const ImVec2& pos, const ImVec4& c
 
 static void RenderLine(const ImVec2& start, const ImVec2& end, const ImVec4& color, bool shadow = false) noexcept
 {
+	if (State.PanicMode) return;
+
 	if (shadow)
 	{
 		CurrentWindow->DrawList->AddLine(
@@ -44,6 +46,8 @@ static void RenderLine(const ImVec2& start, const ImVec2& end, const ImVec4& col
 
 static void RenderBox(const ImVec2& top, const ImVec2& bottom, const float height, const float width, const ImVec4& color, const bool wantsShadow = true)
 {
+	if (State.PanicMode) return;
+
 	const ImVec2 points[] = {
 		bottom, { bottom.x, ((float)(int)(bottom.y * 0.75f + top.y * 0.25f)) },
 		{ bottom.x - 0.5f * State.dpiScale, bottom.y }, { ((float)(int)(bottom.x * 0.75f + top.x * 0.25f)), bottom.y },
@@ -73,6 +77,8 @@ bool renderPlayerEsp = false;
 
 void Esp::Render()
 {
+	if (State.PanicMode) return;
+
 	CurrentWindow = ImGui::GetCurrentWindow();
 
 	drawing_t& instance = Esp::GetDrawing();

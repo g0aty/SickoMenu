@@ -118,30 +118,6 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 					}
 				}
 			}
-
-			static bool didSabotage = false;
-			static int sabotageDelay = 50;
-			if (IsHost() && IsInGame()) {
-				if (*Game::pLocalPlayer != NULL && !didSabotage) {
-					if (sabotageDelay == 50) {
-						if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle)
-							State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128));
-						else if (State.mapType == Settings::MapType::Pb)
-							State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 128));
-						else if (State.mapType == Settings::MapType::Airship)
-							State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 128));
-					}
-					if (sabotageDelay == 0) {
-						RepairSabotage(*Game::pLocalPlayer);
-						didSabotage = true;
-					}
-					else sabotageDelay--;
-				}
-			}
-			else {
-				didSabotage = false;
-				sabotageDelay = 50;
-			}
 		}
 	}
 	catch (...) {
@@ -179,20 +155,20 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 				Color32 playerColor = GetPlayerColor(outfit->fields.ColorId);
 				std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>",
 					playerColor.r, playerColor.g, playerColor.b, playerColor.a);
-				spectating = " ~ Now Spectating: " + colorCode + RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())), nullptr)));
+				spectating = " ~ Now Spectating: " + colorCode + RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())), nullptr))) + "</color>";
 			}
 			else spectating = "";
 			std::string hostText = State.ShowHost && IsInGame() ?
 				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
-			std::string pingText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ {}{}{}{}{}{}{}</size>{}", spectating == "" ? 100 : 50,
-				State.SickoVersion, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating, IsInGame() ? "\n<#0000>0</color>" : "");
-			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::BaselineGeoAligned, nullptr);
+			std::string pingText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ {}{}{}{}{}{}{}{}</size>", spectating == "" ? 100 : 50,
+				State.SickoVersion, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating, IsInGame() ? "" : "");
+			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopGeoAligned, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}
 		else {
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
-			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::BaselineGeoAligned, nullptr);
+			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopGeoAligned, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(ping), nullptr);
 		}
 	}

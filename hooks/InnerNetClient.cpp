@@ -895,7 +895,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
     CustomNetworkTransform_SnapTo(__this, position, minSid, method);
 }
 
-void dAmongUsClient_OnGameEnd(AmongUsClient* __this, Object* endGameResult, MethodInfo* method) {
+void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
     try {
         onGameEnd();
     }
@@ -933,13 +933,13 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
 }
 
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method) {
-    /*try {
+    try {
         if (!State.PanicMode && IsHost() && State.NoGameEnd)
             return;
     }
     catch (...) {
         LOG_ERROR("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
-    }*/
+    }
     return GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
 
@@ -1041,4 +1041,8 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
         }
     }*/
     DisconnectPopup_DoShow(__this, method);
+}
+
+bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method) {
+    return GameManager_DidImpostorsWin(__this, reason, method);
 }

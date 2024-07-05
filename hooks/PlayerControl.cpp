@@ -1073,16 +1073,17 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 		}
 
 		if (!State.PanicMode && result != nullptr && State.AutoKill && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
-			if (IsInGame()) State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
-			else State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+			State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 		}
 		KillButton_SetTarget(__this, result, NULL);
 	}
+	if (IsInLobby()) result = NULL;
 	else if (amImpostor) KillButton_SetTarget(__this, result, NULL);
 	else KillButton_SetTarget(__this, NULL, NULL);
 }
 
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
+	if (IsInLobby()) return nullptr;
 	auto result = ImpostorRole_FindClosestTarget(__this, method);
 	if (!State.PanicMode && result == nullptr && State.InfiniteKillRange) {
 		PlayerControl* new_result = nullptr;
@@ -1104,7 +1105,6 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 
 	if (!State.PanicMode && result != nullptr && State.AutoKill && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
 		if (IsInGame()) State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
-		else State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 	}
 	return result;
 }

@@ -204,6 +204,7 @@ void DetourInitilization() {
 	HOOKFUNC(NetworkedPlayerInfo_Serialize);
 	HOOKFUNC(DisconnectPopup_DoShow);
 	HOOKFUNC(EditAccountUsername_SaveUsername);
+	HOOKFUNC(GameManager_DidImpostorsWin);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -328,6 +329,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(NetworkedPlayerInfo_Serialize);
 	UNHOOKFUNC(DisconnectPopup_DoShow);
 	UNHOOKFUNC(EditAccountUsername_SaveUsername);
+	UNHOOKFUNC(GameManager_DidImpostorsWin);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

@@ -23,6 +23,9 @@ namespace PlayersTab {
 		openTrolling = group == Groups::Trolling;
 	}
 
+	static bool murderLoop = false;
+	static bool suicideLoop = false;
+
 	void Render() {
 		if (IsInGame() || IsInLobby()) {
 			ImGui::SameLine(100 * State.dpiScale);
@@ -669,9 +672,8 @@ namespace PlayersTab {
 				}
 
 				static int murderCount = 0;
-				static bool murderLoop = false;
 				static int murderDelay = 0;
-				if (ImGui::Button("Murder Loop")) {
+				if (IsInGame() && ImGui::Button("Murder Loop")) {
 					murderLoop = true;
 					murderCount = 20; //controls how many times the player is to be murdered
 				}
@@ -700,9 +702,8 @@ namespace PlayersTab {
 				else murderDelay--;
 
 				static int suicideCount = 0;
-				static bool suicideLoop = false;
 				static int suicideDelay = 0;
-				if (!State.SafeMode) {
+				if (!State.SafeMode && IsInGame()) {
 					ImGui::SameLine();
 					if (ImGui::Button("Suicide Loop")) {
 						suicideLoop = true;
@@ -1014,6 +1015,11 @@ namespace PlayersTab {
 			}
 
 			ImGui::EndChild();
+		}
+
+		if (openPlayer || State.selectedPlayers.size() == 0 || IsInLobby()) { //clear murder/suicide loops
+			murderLoop = false;
+			suicideLoop = false;
 		}
 	}
 }

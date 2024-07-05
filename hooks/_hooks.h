@@ -89,7 +89,7 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method);
 bool dSaveManager_GetPurchase(String* itemKey, String* bundleKey, MethodInfo* method);
 void dPlayerControl_TurnOnProtection(PlayerControl* __this, bool visible, int32_t colorId, int32_t guardianPlayerId, MethodInfo* method);
 void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method);
-void dAmongUsClient_OnGameEnd(AmongUsClient* __this, Object* endGameResult, MethodInfo* method);
+void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method);
 void dAccountManager_UpdateKidAccountDisplay(AccountManager* __this, MethodInfo* method);
 void dPlayerStorageManager_OnReadPlayerPrefsComplete(PlayerStorageManager* __this, void* data, MethodInfo* method);
 bool dPlayerPurchasesData_GetPurchase(PlayerPurchasesData* __this, String* itemKey, String* bundleKey, MethodInfo* method);
@@ -117,3 +117,4 @@ void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool 
 void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* writer, bool initialState, MethodInfo* method);
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method);
 void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method);
+bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method);
