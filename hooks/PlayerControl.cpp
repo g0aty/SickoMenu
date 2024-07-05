@@ -1076,6 +1076,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 			State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 		}
 		KillButton_SetTarget(__this, result, NULL);
+		return;
 	}
 	if (IsInLobby()) result = NULL;
 	else if (amImpostor) KillButton_SetTarget(__this, result, NULL);
