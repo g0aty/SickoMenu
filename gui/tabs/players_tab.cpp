@@ -102,7 +102,7 @@ namespace PlayersTab {
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
 
 				if (State.Friends.contains(convert_from_string(playerData->fields.Puid))) {
-					playerName += " [FRIEND]";
+					playerName += " [F]";
 				}
 
 				ImGui::TextColored(nameColor, playerName.c_str());
