@@ -422,5 +422,20 @@ void Settings::Save() {
         catch (...) {
             Log.Info("Unable to save " + std::format("sicko-config/{}.json", this->selectedConfig));
         }
+
+        std::filesystem::path friendsPath = path.parent_path() / "friends.json";
+        try
+        {
+            nlohmann::ordered_json j = nlohmann::ordered_json{
+                { "Friends", this->Friends },
+            };
+
+            std::ofstream outFriends(friendsPath);
+            outFriends << std::setw(4) << j << std::endl;
+        }
+        catch (...)
+        {
+            Log.Info("Unable to save friends.json");
+        }
     }
 }
