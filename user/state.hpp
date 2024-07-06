@@ -1,6 +1,7 @@
 #pragma once
 #include <bitset>
 #include <queue>
+#include <unordered_set>
 #include "_events.h"
 #include "_rpc.h"
 #include "keybinds.h"
@@ -343,7 +344,7 @@ public:
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
 
-    std::vector<std::string> Friends; // todo: use std::set instead at some point
+    std::unordered_set<std::string> Friends;
 
     enum class MapType : uint8_t
     {

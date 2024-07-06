@@ -468,11 +468,11 @@ il2cpp::List<List_1_PlayerControl_> GetAllPlayerControl(bool includeFriends) {
 		if (State.Friends.size() == 0) {
 			return *Game::pAllPlayerControls;
 		}
-		// TODO: optimize this.
+
 		il2cpp::List<List_1_PlayerControl_> ret = *Game::pAllPlayerControls;
-		for (size_t i = 0; i < ret.size(); i++) {
-			auto p = ret[i];
-			if (std::count(State.Friends.begin(), State.Friends.end(), convert_from_string(p->fields.Puid)) > 0) {
+		size_t max = GetAllPlayerControl(true).size();
+		for (size_t i = 0; i < max; i++) {
+			if (State.Friends.contains(convert_from_string(ret[i]->fields.Puid))) {
 				ret.erase(i);
 			}
 		}

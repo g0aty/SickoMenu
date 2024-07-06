@@ -101,7 +101,7 @@ namespace PlayersTab {
 				if (playerData->fields.IsDead)
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
 
-				if (std::count(State.Friends.begin(), State.Friends.end(), convert_from_string(playerData->fields.Puid)) > 0) {
+				if (State.Friends.contains(convert_from_string(playerData->fields.Puid))) {
 					playerName += " [FRIEND]";
 				}
 
@@ -363,24 +363,19 @@ namespace PlayersTab {
 						auto p = selectedPlayers[0];
 						if (p.has_value() && !p.validate().is_LocalPlayer()) {
 							std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
-							if (std::count(State.Friends.begin(), State.Friends.end(), puid) > 0)
-								State.Friends.erase(std::find(State.Friends.begin(), State.Friends.end(), puid));
-							else
-								State.Friends.push_back(puid);
+							if (State.Friends.contains(puid)) State.Friends.erase(puid);
+							else State.Friends.insert(puid);
 						}
 						State.Save();
 					}
 					if (selectedPlayers.size() > 1 && ImGui::Button("Toggle Friends"))
 					{
 						for (auto p : selectedPlayers) {
-							if (!p.has_value()) continue;
 							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-							std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
 
-							if (std::count(State.Friends.begin(), State.Friends.end(), puid) > 0)
-								State.Friends.erase(std::find(State.Friends.begin(), State.Friends.end(), puid));
-							else
-								State.Friends.push_back(puid);
+							std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
+							if (State.Friends.contains(puid)) State.Friends.erase(puid);
+							else State.Friends.insert(puid);
 						}
 						State.Save();
 					}
