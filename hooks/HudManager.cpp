@@ -103,7 +103,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 							playerInfo->fields.Role->fields.CanBeKilled = false;
 					}
 					GameObject* KillButton = app::Component_get_gameObject((Component_1*)__this->fields.KillButton, NULL);
-					if (KillButton != NULL && (IsInGame() || (State.KillInLobbies && IsInLobby()))) {
+					if (KillButton != NULL && (IsInGame())) {
 						if ((!State.PanicMode && State.UnlockKillButton && !localData->fields.IsDead) || PlayerIsImpostor(localData)) {
 							app::GameObject_SetActive(KillButton, true, nullptr);
 							playerRole->fields.CanUseKillButton = true;
