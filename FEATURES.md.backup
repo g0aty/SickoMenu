@@ -59,7 +59,6 @@
 - **Spam by Everyone** *(Only with Safe Mode disabled)* Spams the chat as all players with your desired message (Default: OFF)
 - **Console** Shows a console window that tracks all game events (Default: OFF)
 - **Allow Everyone to NoClip** Allows every player to walk through walls provided they're not a cheater as well
-- **Allow Friends to NoClip** Same as "Allow Everyone to NoClip", but for your friends only
 - **Kill Everyone** Kills all players as yourself
 - **Protect Everyone** *(Only as host/Safe Mode disabled)* Casts a guardian angel shield with the same color as the player around them 
 - **Disable Venting** Instantly kicks anyone in the vents out (Default: OFF)
