@@ -89,7 +89,7 @@ namespace PlayersTab {
 				ImVec4 nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
 				if (State.RevealRoles && IsInGame())
 				{
-					std::string roleName = GetRoleName(playerData->fields.Role);
+					std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
 					playerName = playerName + " (" + roleName + ")";
 					nameColor = AmongUsColorToImVec4(GetRoleColor(playerData->fields.Role));
 				}
