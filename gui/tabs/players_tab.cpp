@@ -373,7 +373,7 @@ namespace PlayersTab {
 						for (auto p : selectedPlayers) {
 							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
 
-							std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
+							std::string puid = convert_from_string(p.get_PlayerData().value()->fields.Puid);
 							if (State.Friends.contains(puid)) State.Friends.erase(puid);
 							else State.Friends.insert(puid);
 						}

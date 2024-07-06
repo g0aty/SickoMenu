@@ -159,7 +159,7 @@ public:
     bool AutoKill = false;
     bool FakeAlive = false;
     bool ShowHost = false;
-    bool ShowWatermark = false;
+    bool HideWatermark = false;
     bool ShowVoteKicks = false;
     bool ShowFps = false;
     bool DoTasksAsImpostor = false;

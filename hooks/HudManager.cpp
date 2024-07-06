@@ -128,7 +128,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 	VersionShower_Start(__this, method);
-	const auto& versionText = !State.PanicMode && State.ShowWatermark ? std::format("<size=75%>{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color></size>",
+	const auto& versionText = !State.PanicMode && State.HideWatermark ? std::format("<size=75%>{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color></size>",
 		convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)), State.SickoVersion) :
 		convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
 	app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(versionText), nullptr);
@@ -162,7 +162,7 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
 			std::string watermarkText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ ", spectating == "" ? 100 : 50, State.SickoVersion);
-			std::string pingText = std::format("{}{}{}{}{}{}{}{}{}</size>", State.ShowWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating, IsInGame() ? "" : "");
+			std::string pingText = std::format("{}{}{}{}{}{}{}{}{}</size>", State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating, IsInGame() ? "" : "");
 			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopGeoAligned, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}

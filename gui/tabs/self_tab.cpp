@@ -213,7 +213,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Show Watermark", &State.ShowWatermark)) {
+            if (ToggleButton("Hide Watermark", &State.HideWatermark)) {
                 State.Save();
             }
             ImGui::SameLine();
