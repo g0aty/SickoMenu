@@ -213,6 +213,10 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
+            if (ToggleButton("Hide Watermark", &State.HideWatermark)) {
+                State.Save();
+            }
+            ImGui::SameLine();
             if (ToggleButton("Show Vote Kicks", &State.ShowVoteKicks)) {
                 State.Save();
             }
@@ -254,7 +258,10 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-
+            ImGui::SameLine();
+            if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
+                State.Save();
+            }
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
             }

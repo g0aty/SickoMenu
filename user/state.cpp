@@ -178,6 +178,7 @@ void Settings::Load() {
         JSON_TRYGET("AutoKill", this->AutoKill);
         JSON_TRYGET("FakeAlive", this->FakeAlive);
         JSON_TRYGET("ShowHost", this->ShowHost);
+        JSON_TRYGET("HideWatermark", this->HideWatermark);
         JSON_TRYGET("ShowVoteKicks", this->ShowVoteKicks);
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
@@ -375,12 +376,14 @@ void Settings::Save() {
                 { "InfiniteKillRange", this->InfiniteKillRange },
                 { "AutoKill", this->AutoKill },
                 { "FakeAlive", this->FakeAlive },
+                { "HideWatermark", this->HideWatermark },
                 { "ShowHost", this->ShowHost },
                 { "ShowVoteKicks", this->ShowVoteKicks },
                 { "ShowFps", this->ShowFps },
                 { "DoTasksAsImpostor", this->DoTasksAsImpostor },
                 { "AlwaysUseKillExploit", this->AlwaysUseKillExploit },
                 { "NoClip", this->NoClip },
+                { "KillInLobbies", this->KillInLobbies },
 
                 { "RevealVotes", this->RevealVotes },
                 { "RevealAnonymousVotes", this->RevealAnonymousVotes },
@@ -421,6 +424,21 @@ void Settings::Save() {
         }
         catch (...) {
             Log.Info("Unable to save " + std::format("sicko-config/{}.json", this->selectedConfig));
+        }
+
+        std::filesystem::path friendsPath = path.parent_path() / "friends.json";
+        try
+        {
+            nlohmann::ordered_json j = nlohmann::ordered_json{
+                { "Friends", this->Friends },
+            };
+
+            std::ofstream outFriends(friendsPath);
+            outFriends << std::setw(4) << j << std::endl;
+        }
+        catch (...)
+        {
+            Log.Info("Unable to save friends.json");
         }
     }
 }

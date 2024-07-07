@@ -13,6 +13,7 @@ namespace HostTab {
 
 	static bool openUtils = true; //default to utils tab group
 	static bool openSettings = false;
+	static bool openRoles = false;
 
 	void CloseOtherGroups(Groups group) {
 		openUtils = group == Groups::Utils;
@@ -50,6 +51,9 @@ namespace HostTab {
 				if (TabGroup("Settings", openSettings)) {
 					CloseOtherGroups(Groups::Settings);
 				}
+			}
+			if (TabGroup("Utils", openUtils)) {
+				CloseOtherGroups(Groups::Utils);
 			}
 			GameOptions options;
 			if (openUtils) {
@@ -251,6 +255,30 @@ namespace HostTab {
 				}
 				auto gamemode = options.GetGameMode();
 
+				auto MakeBool = [&](const char* str, bool& v, BoolOptionNames__Enum opt) {
+					if (ToggleButton(str, &v)) {
+						options.SetBool(opt, v);
+						SyncAllSettings();
+					}
+					else v = options.GetBool(opt);
+				};
+
+				auto MakeInt = [&](const char* str, int& v, Int32OptionNames__Enum opt) {
+					if (ImGui::InputInt(str, &v)) {
+						options.SetInt(opt, v);
+						SyncAllSettings();
+					}
+					else v = options.GetInt(opt);
+				};
+
+				auto MakeFloat = [&](const char* str, float& v, FloatOptionNames__Enum opt) {
+					if (ImGui::InputFloat(str, &v)) {
+						options.SetFloat(opt, v);
+						SyncAllSettings();
+					}
+					else v = options.GetFloat(opt);
+				};
+
 				if (gamemode == GameModes__Enum::Normal || gamemode == GameModes__Enum::NormalFools) {
 					static int emergencyMeetings = 1, emergencyCooldown = 1, discussionTime = 1, 
 						votingTime = 1, killDistance = 1, commonTasks = 1, shortTasks = 1, longTasks = 1, taskBarMode = 1;
@@ -259,177 +287,58 @@ namespace HostTab {
 					
 					static bool ejects = false, anonVotes = false, visualTasks = false;
 
-					if (ToggleButton("Confirm Ejects", &ejects)) {
-						options.SetBool(BoolOptionNames__Enum::ConfirmImpostor, ejects);
-						SyncAllSettings();
-					}
-					else ejects = options.GetBool(BoolOptionNames__Enum::ConfirmImpostor);
-
-					if (ImGui::InputInt("# Emergency Meetings", &emergencyMeetings)) {
-						options.SetInt(Int32OptionNames__Enum::NumEmergencyMeetings, emergencyMeetings);
-						SyncAllSettings();
-					}
-					else emergencyMeetings = options.GetInt(Int32OptionNames__Enum::NumEmergencyMeetings);
-
-					if (ToggleButton("Anonymous Votes", &anonVotes)) {
-						options.SetBool(BoolOptionNames__Enum::AnonymousVotes, anonVotes);
-						SyncAllSettings();
-					}
-					else anonVotes = options.GetBool(BoolOptionNames__Enum::AnonymousVotes);
-
-					if (ImGui::InputInt("Emergency Cooldown", &emergencyCooldown)) {
-						options.SetInt(Int32OptionNames__Enum::EmergencyCooldown, emergencyCooldown);
-						SyncAllSettings();
-					}
-					else emergencyCooldown = options.GetInt(Int32OptionNames__Enum::EmergencyCooldown);
-
-					if (ImGui::InputInt("Discussion Time", &discussionTime)) {
-						options.SetInt(Int32OptionNames__Enum::DiscussionTime, discussionTime);
-						SyncAllSettings();
-					}
-					else discussionTime = options.GetInt(Int32OptionNames__Enum::DiscussionTime);
-
-					if (ImGui::InputInt("Voting Time", &votingTime)) {
-						options.SetInt(Int32OptionNames__Enum::VotingTime, votingTime);
-						SyncAllSettings();
-					}
-					else votingTime = options.GetInt(Int32OptionNames__Enum::VotingTime);
-
-					if (ImGui::InputFloat("Player Speed", &playerSpeed)) {
-						options.SetFloat(FloatOptionNames__Enum::PlayerSpeedMod, playerSpeed);
-						SyncAllSettings();
-					}
-					else playerSpeed = options.GetFloat(FloatOptionNames__Enum::PlayerSpeedMod);
-
-					if (ImGui::InputInt("Task Bar Updates", &taskBarMode)) {
-						options.SetInt(Int32OptionNames__Enum::TaskBarMode, taskBarMode);
-						SyncAllSettings();
-					}
-					else taskBarMode = options.GetInt(Int32OptionNames__Enum::TaskBarMode);
-
-					if (ToggleButton("Visual Tasks", &visualTasks)) {
-						options.SetBool(BoolOptionNames__Enum::VisualTasks, visualTasks);
-						SyncAllSettings();
-					}
-					else visualTasks = options.GetBool(BoolOptionNames__Enum::VisualTasks);
-
-					if (ImGui::InputFloat("Crewmate Vision", &crewVision)) {
-						options.SetFloat(FloatOptionNames__Enum::CrewLightMod, crewVision);
-						SyncAllSettings();
-					}
-					else crewVision = options.GetFloat(FloatOptionNames__Enum::CrewLightMod);
-
-					if (ImGui::InputFloat("Impostor Vision", &impVision)) {
-						options.SetFloat(FloatOptionNames__Enum::ImpostorLightMod, impVision);
-						SyncAllSettings();
-					}
-					else impVision = options.GetFloat(FloatOptionNames__Enum::ImpostorLightMod);
-
-					if (ImGui::InputFloat("Kill Cooldown", &killCooldown)) {
-						options.SetFloat(FloatOptionNames__Enum::KillCooldown, killCooldown);
-						SyncAllSettings();
-					}
-					else killCooldown = options.GetFloat(FloatOptionNames__Enum::KillCooldown);
-
-					if (ImGui::InputInt("Kill Distance", &killDistance)) {
-						options.SetInt(Int32OptionNames__Enum::KillDistance, killDistance);
-						SyncAllSettings();
-					}
-					else killDistance = options.GetInt(Int32OptionNames__Enum::KillDistance);
-
-					if (ImGui::InputInt("# Common Tasks", &commonTasks)) {
-						options.SetInt(Int32OptionNames__Enum::NumCommonTasks, commonTasks);
-						SyncAllSettings();
-					}
-					else commonTasks = options.GetInt(Int32OptionNames__Enum::NumCommonTasks);
-
-					if (ImGui::InputInt("# Long Tasks", &longTasks)) {
-						options.SetInt(Int32OptionNames__Enum::NumLongTasks, longTasks);
-						SyncAllSettings();
-					}
-					else longTasks = options.GetInt(Int32OptionNames__Enum::NumLongTasks);
-
-					if (ImGui::InputInt("# Short Tasks", &shortTasks)) {
-						options.SetInt(Int32OptionNames__Enum::NumShortTasks, shortTasks);
-						SyncAllSettings();
-					}
-					else shortTasks = options.GetInt(Int32OptionNames__Enum::NumShortTasks);
-
+#pragma region General
+					MakeBool("Confirm Ejects", ejects, BoolOptionNames__Enum::ConfirmImpostor);
+					MakeInt("# Emergency Meetings", emergencyMeetings, Int32OptionNames__Enum::NumEmergencyMeetings);
+					MakeBool("Anonymous Votes", anonVotes, BoolOptionNames__Enum::AnonymousVotes);
+					MakeInt("Emergency Cooldown", emergencyCooldown, Int32OptionNames__Enum::EmergencyCooldown);
+					MakeInt("Discussion Time", discussionTime, Int32OptionNames__Enum::DiscussionTime);
+					MakeInt("Voting Time", votingTime, Int32OptionNames__Enum::VotingTime);
+					MakeFloat("Player Speed", playerSpeed, FloatOptionNames__Enum::PlayerSpeedMod);
+					MakeInt("Task Bar Updates", taskBarMode, Int32OptionNames__Enum::TaskBarMode);
+					MakeBool("Visual Tasks", visualTasks, BoolOptionNames__Enum::VisualTasks);
+					MakeFloat("Crewmate Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
+					MakeFloat("Impostor Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
+					MakeFloat("Kill Cooldown", killCooldown, FloatOptionNames__Enum::KillCooldown);
+					MakeInt("Kill Distance", killDistance, Int32OptionNames__Enum::KillDistance);
+					MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
+					MakeInt("# Common Tasks", commonTasks, Int32OptionNames__Enum::NumCommonTasks);
+					MakeInt("# Long Tasks", longTasks, Int32OptionNames__Enum::NumLongTasks);
+#pragma endregion
+#pragma region Scientist
 					ImGui::Text("Scientist");
 					static float vitalsCooldown = 1.f, batteryDuration = 1.f;
 
-					if (ImGui::InputFloat("Vitals Display Cooldown", &vitalsCooldown)) {
-						options.SetFloat(FloatOptionNames__Enum::ScientistCooldown, vitalsCooldown);
-						SyncAllSettings();
-					}
-					else vitalsCooldown = options.GetFloat(FloatOptionNames__Enum::ScientistCooldown);
-
-					if (ImGui::InputFloat("Battery Duration", &batteryDuration)) {
-						options.SetFloat(FloatOptionNames__Enum::ScientistBatteryCharge, batteryDuration);
-						SyncAllSettings();
-					}
-					else batteryDuration = options.GetFloat(FloatOptionNames__Enum::ScientistBatteryCharge);
-
+					MakeFloat("Vitals Display Cooldown", vitalsCooldown, FloatOptionNames__Enum::ScientistCooldown);
+					MakeFloat("Battery Duration", batteryDuration, FloatOptionNames__Enum::ScientistBatteryCharge);
+#pragma endregion
+#pragma region Engineer
 					ImGui::Text("Engineer");
 					static float ventCooldown = 1.f, ventDuration = 1.f;
 
-					if (ImGui::InputFloat("Vent Use Cooldown", &ventCooldown)) {
-						options.SetFloat(FloatOptionNames__Enum::EngineerCooldown, ventCooldown);
-						SyncAllSettings();
-					}
-					else ventCooldown = options.GetFloat(FloatOptionNames__Enum::EngineerCooldown);
-
-					if (ImGui::InputFloat("Max Time in Vents", &ventDuration)) {
-						options.SetFloat(FloatOptionNames__Enum::EngineerInVentMaxTime, ventDuration);
-						SyncAllSettings();
-					}
-					else ventDuration = options.GetFloat(FloatOptionNames__Enum::EngineerInVentMaxTime);
-
+					MakeFloat("Vent Use Cooldown", ventCooldown, FloatOptionNames__Enum::EngineerCooldown);
+					MakeFloat("Max Time in Vents", ventDuration, FloatOptionNames__Enum::EngineerInVentMaxTime);
+#pragma endregion
+#pragma region Guardian Angel
 					ImGui::Text("Guardian Angel");
 					static float protectCooldown = 1.f, protectDuration = 1.f;
 					static bool protectVisible = false;
 
-					if (ImGui::InputFloat("Protect Cooldown", &protectCooldown)) {
-						options.SetFloat(FloatOptionNames__Enum::GuardianAngelCooldown, protectCooldown);
-						SyncAllSettings();
-					}
-					else protectCooldown = options.GetFloat(FloatOptionNames__Enum::GuardianAngelCooldown);
-
-					if (ImGui::InputFloat("Protection Duration", &protectDuration)) {
-						options.SetFloat(FloatOptionNames__Enum::ProtectionDurationSeconds, protectDuration);
-						SyncAllSettings();
-					}
-					else protectDuration = options.GetFloat(FloatOptionNames__Enum::ProtectionDurationSeconds);
-
-					if (ToggleButton("Protect Visible to Impostors", &protectVisible)) {
-						options.SetBool(BoolOptionNames__Enum::ImpostorsCanSeeProtect, protectVisible);
-						SyncAllSettings();
-					}
-					else protectVisible = options.GetBool(BoolOptionNames__Enum::ImpostorsCanSeeProtect);
-
+					MakeFloat("Protect Cooldown", protectCooldown, FloatOptionNames__Enum::GuardianAngelCooldown);
+					MakeFloat("Protection Duration", protectCooldown, FloatOptionNames__Enum::ProtectionDurationSeconds);
+					MakeBool("Protect Visible to Impostors", protectVisible, BoolOptionNames__Enum::ImpostorsCanSeeProtect);
+#pragma endregion
+#pragma region Shapeshifter
 					ImGui::Text("Shapeshifter");
 					static float shapeshiftDuration = 1.f, shapeshiftCooldown = 1.f;
 					static bool shapeshiftEvidence = false;
 
-					if (ImGui::InputFloat("Shapeshift Duration", &shapeshiftDuration)) {
-						options.SetFloat(FloatOptionNames__Enum::ShapeshifterDuration, shapeshiftDuration);
-						SyncAllSettings();
-					}
-					else shapeshiftDuration = options.GetFloat(FloatOptionNames__Enum::ShapeshifterDuration);
-
-					if (ImGui::InputFloat("Shapesift Cooldown", &shapeshiftCooldown)) {
-						options.SetFloat(FloatOptionNames__Enum::ShapeshifterCooldown, shapeshiftCooldown);
-						SyncAllSettings();
-					}
-					else shapeshiftCooldown = options.GetFloat(FloatOptionNames__Enum::ShapeshifterCooldown);
-
-					if (ToggleButton("Leave Shapeshifting Evidence", &shapeshiftEvidence)) {
-						options.SetBool(BoolOptionNames__Enum::ShapeshifterLeaveSkin, shapeshiftEvidence);
-						SyncAllSettings();
-					}
-					else shapeshiftEvidence = options.GetBool(BoolOptionNames__Enum::ShapeshifterLeaveSkin);
+					MakeFloat("Shapeshift Duration", shapeshiftDuration, FloatOptionNames__Enum::ShapeshifterDuration);
+					MakeFloat("Shapeshift Cooldown", shapeshiftCooldown, FloatOptionNames__Enum::ShapeshifterCooldown);
+					MakeBool("Leave Shapeshifting Evidence", shapeshiftEvidence, BoolOptionNames__Enum::ShapeshifterLeaveSkin);
+#pragma endregion
 				}
-				
+#pragma region Hide and Seek
 				if (gamemode == GameModes__Enum::HideNSeek || gamemode == GameModes__Enum::SeekFools) {
 					static int killDistance = 1, commonTasks = 1, shortTasks = 1, longTasks = 1, maxVents = 1;
 
@@ -439,128 +348,29 @@ namespace HostTab {
 					
 					static bool flashlight = false, seekMap = false, hidePings = false, showNames = false;
 
-					if (ImGui::InputFloat("Crewmate Vision", &crewVision)) {
-						options.SetFloat(FloatOptionNames__Enum::CrewLightMod, crewVision);
-						SyncAllSettings();
-					}
-					else crewVision = options.GetFloat(FloatOptionNames__Enum::CrewLightMod);
-
-					if (ImGui::InputFloat("Impostor Vision", &impVision)) {
-						options.SetFloat(FloatOptionNames__Enum::ImpostorLightMod, impVision);
-						SyncAllSettings();
-					}
-					else impVision = options.GetFloat(FloatOptionNames__Enum::ImpostorLightMod);
-
-					if (ImGui::InputFloat("Kill Cooldown", &killCooldown)) {
-						options.SetFloat(FloatOptionNames__Enum::KillCooldown, killCooldown);
-						SyncAllSettings();
-					}
-					else killCooldown = options.GetFloat(FloatOptionNames__Enum::KillCooldown);
-
-					if (ImGui::InputInt("Kill Distance", &killDistance)) {
-						options.SetInt(Int32OptionNames__Enum::KillDistance, killDistance);
-						SyncAllSettings();
-					}
-					else killDistance = options.GetInt(Int32OptionNames__Enum::KillDistance);
-
-					if (ImGui::InputInt("# Common Tasks", &commonTasks)) {
-						options.SetInt(Int32OptionNames__Enum::NumCommonTasks, commonTasks);
-						SyncAllSettings();
-					}
-					else commonTasks = options.GetInt(Int32OptionNames__Enum::NumCommonTasks);
-
-					if (ImGui::InputInt("# Long Tasks", &longTasks)) {
-						options.SetInt(Int32OptionNames__Enum::NumLongTasks, longTasks);
-						SyncAllSettings();
-					}
-					else longTasks = options.GetInt(Int32OptionNames__Enum::NumLongTasks);
-
-					if (ImGui::InputInt("# Short Tasks", &shortTasks)) {
-						options.SetInt(Int32OptionNames__Enum::NumShortTasks, shortTasks);
-						SyncAllSettings();
-					}
-					else shortTasks = options.GetInt(Int32OptionNames__Enum::NumShortTasks);
-
-					if (ImGui::InputFloat("Player Speed", &playerSpeed)) {
-						options.SetFloat(FloatOptionNames__Enum::PlayerSpeedMod, playerSpeed);
-						SyncAllSettings();
-					}
-					else playerSpeed = options.GetFloat(FloatOptionNames__Enum::PlayerSpeedMod);
-
-					if (ImGui::InputFloat("Hiding Time", &hidingTime)) {
-						options.SetFloat(FloatOptionNames__Enum::EscapeTime, hidingTime);
-						SyncAllSettings();
-					}
-					else hidingTime = options.GetFloat(FloatOptionNames__Enum::EscapeTime);
-
-					if (ImGui::InputFloat("Final Hide Time", &finalHideTime)) {
-						options.SetFloat(FloatOptionNames__Enum::FinalEscapeTime, finalHideTime);
-						SyncAllSettings();
-					}
-					else finalHideTime = options.GetFloat(FloatOptionNames__Enum::FinalEscapeTime);
-
-					if (ImGui::InputInt("Max Vent Uses", &maxVents)) {
-						options.SetInt(Int32OptionNames__Enum::CrewmateVentUses, maxVents);
-						SyncAllSettings();
-					}
-					else maxVents = options.GetInt(Int32OptionNames__Enum::CrewmateVentUses);
-
-					if (ImGui::InputFloat("Max Time in Vent", &ventTime)) {
-						options.SetFloat(FloatOptionNames__Enum::CrewmateTimeInVent, ventTime);
-						SyncAllSettings();
-					}
-					else ventTime = options.GetFloat(FloatOptionNames__Enum::CrewmateTimeInVent);
-
-					if (ToggleButton("Flashlight Mode", &flashlight)) {
-						options.SetBool(BoolOptionNames__Enum::UseFlashlight, flashlight);
-						SyncAllSettings();
-					}
-					else flashlight = options.GetBool(BoolOptionNames__Enum::UseFlashlight);
-
-					if (ImGui::InputFloat("Crewmate Flashlight Size", &crewLight)) {
-						options.SetFloat(FloatOptionNames__Enum::CrewmateFlashlightSize, crewLight);
-						SyncAllSettings();
-					}
-					else crewLight = options.GetFloat(FloatOptionNames__Enum::CrewmateFlashlightSize);
-
-					if (ImGui::InputFloat("Impostor Flashlight Size", &impLight)) {
-						options.SetFloat(FloatOptionNames__Enum::ImpostorFlashlightSize, impLight);
-						SyncAllSettings();
-					}
-					else impLight = options.GetFloat(FloatOptionNames__Enum::ImpostorFlashlightSize);
-
-					if (ImGui::InputFloat("Final Hide Impostor Speed", &finalImpSpeed)) {
-						options.SetFloat(FloatOptionNames__Enum::SeekerFinalSpeed, finalImpSpeed);
-						SyncAllSettings();
-					}
-					else finalImpSpeed = options.GetFloat(FloatOptionNames__Enum::SeekerFinalSpeed);
-
-					if (ToggleButton("Final Hide Seek Map", &seekMap)) {
-						options.SetBool(BoolOptionNames__Enum::SeekerFinalMap, seekMap);
-						SyncAllSettings();
-					}
-					else seekMap = options.GetBool(BoolOptionNames__Enum::SeekerFinalMap);
-
-					if (ToggleButton("Final Hide Pings", &hidePings)) {
-						options.SetBool(BoolOptionNames__Enum::SeekerPings, hidePings);
-						SyncAllSettings();
-					}
-					else hidePings = options.GetBool(BoolOptionNames__Enum::SeekerPings);
-
-					if (ImGui::InputFloat("Ping Interval", &pingInterval)) {
-						options.SetFloat(FloatOptionNames__Enum::MaxPingTime, pingInterval);
-						SyncAllSettings();
-					}
-					else pingInterval = options.GetFloat(FloatOptionNames__Enum::MaxPingTime);
-
-					if (ToggleButton("Show Names", &showNames)) {
-						options.SetBool(BoolOptionNames__Enum::ShowCrewmateNames, showNames);
-						SyncAllSettings();
-					}
-					else showNames = options.GetBool(BoolOptionNames__Enum::ShowCrewmateNames);
+					MakeFloat("Crewmate Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
+					MakeFloat("Impostor Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
+					MakeFloat("Kill Cooldown", killCooldown, FloatOptionNames__Enum::KillCooldown);
+					MakeInt("Kill Distance", killDistance, Int32OptionNames__Enum::KillDistance);
+					MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
+					MakeInt("# Common Tasks", commonTasks, Int32OptionNames__Enum::NumCommonTasks);
+					MakeInt("# Long Tasks", longTasks, Int32OptionNames__Enum::NumLongTasks);
+					MakeFloat("Player Speed", playerSpeed, FloatOptionNames__Enum::PlayerSpeedMod);
+					MakeFloat("Hiding Time", hidingTime, FloatOptionNames__Enum::EscapeTime);
+					MakeFloat("Final Hide Time", finalHideTime, FloatOptionNames__Enum::FinalEscapeTime);
+					MakeInt("Max Vent Uses", maxVents, Int32OptionNames__Enum::CrewmateVentUses);
+					MakeFloat("Max Time In Vent", ventTime, FloatOptionNames__Enum::CrewmateTimeInVent);
+					MakeBool("Flashlight Mode", flashlight, BoolOptionNames__Enum::UseFlashlight);
+					MakeFloat("Crewmate Flashlight Size", crewLight, FloatOptionNames__Enum::CrewmateFlashlightSize);
+					MakeFloat("Impostor Flashlight Size", impLight, FloatOptionNames__Enum::ImpostorFlashlightSize);
+					MakeFloat("Final Hide Impostor Speed", finalImpSpeed, FloatOptionNames__Enum::SeekerFinalSpeed);
+					MakeBool("Final Hide Seek Map", seekMap, BoolOptionNames__Enum::SeekerFinalMap);
+					MakeBool("Final Hide Pings", hidePings, BoolOptionNames__Enum::SeekerPings);
+					MakeFloat("Ping Interval", pingInterval, FloatOptionNames__Enum::MaxPingTime);
+					MakeBool("Show Names", showNames, BoolOptionNames__Enum::ShowCrewmateNames);
 				}
 			}
-
+#pragma endregion
 			ImGui::EndChild();
 		}
 	}

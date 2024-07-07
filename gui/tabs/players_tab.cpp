@@ -37,7 +37,7 @@ namespace PlayersTab {
 			for (auto id : State.selectedPlayers) {
 				selectedPlayers.push_back(PlayerSelection(GetPlayerControlById(id)));
 			}
-			for (auto playerCtrl : GetAllPlayerControl()) {
+			for (auto playerCtrl : GetAllPlayerControl(true)) {
 				const auto& player = PlayerSelection(playerCtrl);
 				const auto& validPlayer = PlayerSelection(playerCtrl).validate();
 				if (!validPlayer.has_value())
@@ -89,7 +89,7 @@ namespace PlayersTab {
 				ImVec4 nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
 				if (State.RevealRoles && IsInGame())
 				{
-					std::string roleName = GetRoleName(playerData->fields.Role);
+					std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
 					playerName = playerName + " (" + roleName + ")";
 					nameColor = AmongUsColorToImVec4(GetRoleColor(playerData->fields.Role));
 				}
@@ -100,6 +100,10 @@ namespace PlayersTab {
 
 				if (playerData->fields.IsDead)
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
+
+				if (State.Friends.contains(convert_from_string(playerData->fields.Puid))) {
+					playerName += " [F]";
+				}
 
 				ImGui::TextColored(nameColor, playerName.c_str());
 			}
@@ -202,7 +206,7 @@ namespace PlayersTab {
 			}
 			if ((!selectedPlayer.has_value() || selectedPlayer.is_LocalPlayer()) || !State.SafeMode) {
 				if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("Skip Vote by All")) {
-					for (auto player : GetAllPlayerControl()) {
+					for (auto player : GetAllPlayerControl(true)) {
 						/*if (player != selectedPlayer.get_PlayerControl()) {
 							State.rpcQueue.push(new RpcClearVote(player));
 						}*/
@@ -353,6 +357,27 @@ namespace PlayersTab {
 							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
 							app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
 						}
+					}
+					if (selectedPlayers.size() == 1 && ImGui::Button("Toggle Friend"))
+					{
+						auto p = selectedPlayers[0];
+						if (p.has_value() && !p.validate().is_LocalPlayer()) {
+							std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
+							if (State.Friends.contains(puid)) State.Friends.erase(puid);
+							else State.Friends.insert(puid);
+						}
+						State.Save();
+					}
+					if (selectedPlayers.size() > 1 && ImGui::Button("Toggle Friends"))
+					{
+						for (auto p : selectedPlayers) {
+							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
+
+							std::string puid = convert_from_string(p.get_PlayerData().value()->fields.Puid);
+							if (State.Friends.contains(puid)) State.Friends.erase(puid);
+							else State.Friends.insert(puid);
+						}
+						State.Save();
 					}
 				}
 

@@ -1040,7 +1040,7 @@ void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method) 
 void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method) {
 	auto result = target;
 	bool amImpostor = PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer));
-	if (State.UnlockKillButton && !amImpostor) {
+	if (State.UnlockKillButton && (!amImpostor)) {
 		if (!State.PanicMode && result == nullptr) {
 			PlayerControl* new_result = nullptr;
 			float defaultKillDist = 2.5f;
@@ -1072,7 +1072,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 			result = new_result;
 		}
 
-		if (!State.PanicMode && result != nullptr && State.AutoKill && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
+		if (!State.PanicMode && result != nullptr && (State.AutoKill && (IsInLobby() ? State.KillInLobbies : true)) && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
 			State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 		}
 		KillButton_SetTarget(__this, result, NULL);
