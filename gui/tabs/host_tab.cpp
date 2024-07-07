@@ -8,8 +8,7 @@
 namespace HostTab {
 	enum Groups {
 		Utils,
-		Settings,
-		Roles
+		Settings
 	};
 
 	static bool openUtils = true; //default to utils tab group
