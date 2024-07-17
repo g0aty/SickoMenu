@@ -96,12 +96,11 @@ jobs:
           name: Debug
       
       - name: Automatic Releases
-        uses: marvinpinto/action-automatic-releases@latest #maybe this fixed auto release versioning?
-        id: "automatic_releases"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}" #this is gonna give me a stroke
-          automatic_release_tag: "latest"
-          prerelease: false
-          files: |
-            Release.zip
-            Debug.zip
+        uses: appleboy/discord-action@master
+          with:
+            webhook_id: ${{ secrets.WEBHOOK_ID }}
+            webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
+            file: |
+                Release.zip
+                Debug.zip
+            message: "@everyone A new pre-release has been released!"
