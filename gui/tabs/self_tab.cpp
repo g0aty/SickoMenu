@@ -213,6 +213,10 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
+            if (ToggleButton("Hide Watermark", &State.HideWatermark)) {
+                State.Save();
+            }
+            ImGui::SameLine();
             if (ToggleButton("Show Vote Kicks", &State.ShowVoteKicks)) {
                 State.Save();
             }
@@ -254,7 +258,10 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-
+            ImGui::SameLine();
+            if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
+                State.Save();
+            }
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
             }
@@ -381,6 +388,11 @@ namespace SelfTab {
             if ((IsInGame() || IsInLobby()) && ImGui::Button("Set Fake Role")) {
                 auto localData = GetPlayerData(*Game::pLocalPlayer);
                 State.FakeRole = std::clamp(State.FakeRole, 0, 10);
+                if (State.RealRole != RoleTypes__Enum::Shapeshifter && State.FakeRole == 5)
+                    State.FakeRole = 1;
+                else if (State.RealRole != RoleTypes__Enum::Phantom && State.FakeRole == 9)
+                    State.FakeRole = 1;
+
                 if (IsInGame())
                     State.rpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRole)));
                 else if (IsInLobby())

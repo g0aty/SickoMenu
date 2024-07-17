@@ -1040,7 +1040,7 @@ void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method) 
 void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method) {
 	auto result = target;
 	bool amImpostor = PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer));
-	if (State.UnlockKillButton && !amImpostor) {
+	if (State.UnlockKillButton && (!amImpostor)) {
 		if (!State.PanicMode && result == nullptr) {
 			PlayerControl* new_result = nullptr;
 			float defaultKillDist = 2.5f;
@@ -1072,17 +1072,19 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 			result = new_result;
 		}
 
-		if (!State.PanicMode && result != nullptr && State.AutoKill && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
-			if (IsInGame()) State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
-			else State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+		if (!State.PanicMode && result != nullptr && (State.AutoKill && (IsInLobby() ? State.KillInLobbies : true)) && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
+			State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 		}
 		KillButton_SetTarget(__this, result, NULL);
+		return;
 	}
+	if (IsInLobby()) result = NULL;
 	else if (amImpostor) KillButton_SetTarget(__this, result, NULL);
 	else KillButton_SetTarget(__this, NULL, NULL);
 }
 
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
+	if (IsInLobby()) return nullptr;
 	auto result = ImpostorRole_FindClosestTarget(__this, method);
 	if (!State.PanicMode && result == nullptr && State.InfiniteKillRange) {
 		PlayerControl* new_result = nullptr;
@@ -1104,7 +1106,6 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 
 	if (!State.PanicMode && result != nullptr && State.AutoKill && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
 		if (IsInGame()) State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
-		else State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
 	}
 	return result;
 }
@@ -1133,7 +1134,10 @@ void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool 
 	}
 	bool hasAlreadySetRole = role == RoleTypes__Enum::GuardianAngel || role == RoleTypes__Enum::CrewmateGhost || role == RoleTypes__Enum::ImpostorGhost;
 	if (State.AutoFakeRole && !hasAlreadySetRole) {
-		if (State.RealRole != RoleTypes__Enum::Shapeshifter && State.FakeRole == 5 && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead)
+		if (State.RealRole != RoleTypes__Enum::Shapeshifter && State.FakeRole == 5)
+			role = RoleTypes__Enum::Impostor;
+
+		else if (State.RealRole != RoleTypes__Enum::Phantom && State.FakeRole == 9)
 			role = RoleTypes__Enum::Impostor;
 
 		else role = (RoleTypes__Enum)State.FakeRole;

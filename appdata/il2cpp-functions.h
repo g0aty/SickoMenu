@@ -209,7 +209,7 @@ DO_APP_FUNC(void, NetHelpers_WriteVector2, (Vector2 vec, MessageWriter* writer, 
 DO_APP_FUNC(void, AccountTab_Open, (AccountTab* __this, MethodInfo* method), "Assembly-CSharp, System.Void AccountTab::Open()");
 DO_APP_FUNC(void, FullAccount_CanSetCustomName, (FullAccount* __this, bool canSetName, MethodInfo* method), "Assembly-CSharp, System.Void FullAccount::CanSetCustomName(System.Boolean)");
 DO_APP_FUNC(void, FollowerCamera_Update, (FollowerCamera* __this, MethodInfo* method), "Assembly-CSharp, System.Void FollowerCamera::Update()");
-DO_APP_FUNC(void, AmongUsClient_OnGameEnd, (AmongUsClient* __this, Object* endGameResult, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnGameEnd(EndGameResult)");
+DO_APP_FUNC(void, AmongUsClient_OnGameEnd, (AmongUsClient* __this, void* endGameResult, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnGameEnd(EndGameResult)");
 
 DO_APP_FUNC(void, Debug_Log, (Object* message, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Debug::Log(System.Object)");
 DO_APP_FUNC(void, Debug_LogError, (Object* message, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Debug::LogError(System.Object)");
@@ -309,7 +309,6 @@ DO_APP_FUNC(float, LogicOptions_GetKillDistance, (LogicOptions* __this, MethodIn
 //DO_APP_FUNC(TaskBarMode__Enum, LogicOptions_GetTaskBarMode, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, TaskbarMode LogicOptions::GetTaskBarMode()");
 DO_APP_FUNC(void, KillButton_SetTarget, (KillButton* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::SetTarget(PlayerControl)");
 DO_APP_FUNC(PlayerControl*, ImpostorRole_FindClosestTarget, (ImpostorRole* __this, MethodInfo* method), "Assembly-CSharp, PlayerControl ImpostorRole::FindClosestTarget()");
-DO_APP_FUNC(void*, AmongUsClient_CoStartGameHost, (AmongUsClient* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoStartGameHost()");
 //DO_APP_FUNC(AsyncOperationHandle_1_UnityEngine_GameObject_, AssetReference_InstantiateAsync_1, (AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle UnityEngine.AddressableAssets.AssetReference::InstantiateAsync(UnityEngine.Transform, System.Boolean)");
 DO_APP_FUNC(float, Console_1_CanUse, (Console_1* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method), "Assembly-CSharp, System.Single Console::CanUse(NetworkedPlayerInfo, System.Boolean&, System.Boolean&)");
 DO_APP_FUNC(void, Ladder_SetDestinationCooldown, (Ladder* __this, MethodInfo* method), "Assembly-CSharp, System.Void Ladder::SetDestinationCooldown()");
@@ -331,3 +330,4 @@ DO_APP_FUNC(void, LogicOptions_SyncOptions, (LogicOptions* __this, MethodInfo* m
 DO_APP_FUNC(void, EOSManager_PlayOffline, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::PlayOffline()");
 DO_APP_FUNC(void, DisconnectPopup_DoShow, (DisconnectPopup* __this, MethodInfo* method), "Assembly-CSharp, System.Void DisconnectPopup::DoShow()");
 DO_APP_FUNC(bool, NetworkedPlayerInfo_Serialize, (NetworkedPlayerInfo* __this, MessageWriter* writer, bool initialState, MethodInfo* method), "Assembly-CSharp, System.Boolean NetworkedPlayerInfo::Serialize(Hazel.MessageWriter, System.Boolean)");
+DO_APP_FUNC(bool, GameManager_DidImpostorsWin, (GameManager* __this, GameOverReason__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Boolean GameManager::DidImpostorsWin(GameOverReason)");

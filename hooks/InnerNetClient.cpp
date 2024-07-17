@@ -256,6 +256,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         if (IsHost()) {
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 0); //force set cooldown, otherwise u get kicked
+                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomDuration, 0); //force set cooldown, otherwise u get kicked
                         }
                         else {
                             if (role == RoleTypes__Enum::Shapeshifter) {
@@ -281,7 +282,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     }
                     if (role == RoleTypes__Enum::Phantom) {
                         app::PhantomRole* phantomRole = (app::PhantomRole*)playerRole;
-                        phantomRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
+                        //phantomRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
                     }
                     if (IsInGame()) {
                         (*Game::pLocalPlayer)->fields.RemainingEmergencies = 69420;
@@ -372,7 +373,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.GodMode = false;
             }
 
-            if (State.CycleTimer <= 0.19f) {
+            if (State.CycleTimer < 0.2f) {
                 State.CycleTimer = 0.2f;
                 State.Save();
             }
@@ -894,7 +895,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
     CustomNetworkTransform_SnapTo(__this, position, minSid, method);
 }
 
-void dAmongUsClient_OnGameEnd(AmongUsClient* __this, Object* endGameResult, MethodInfo* method) {
+void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
     try {
         onGameEnd();
     }
@@ -1040,4 +1041,8 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
         }
     }*/
     DisconnectPopup_DoShow(__this, method);
+}
+
+bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method) {
+    return GameManager_DidImpostorsWin(__this, reason, method);
 }

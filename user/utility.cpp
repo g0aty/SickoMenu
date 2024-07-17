@@ -461,8 +461,23 @@ il2cpp::Array<OpenableDoor__Array> GetAllOpenableDoors() {
 	return (*Game::pShipStatus)->fields.AllDoors;
 }
 
-il2cpp::List<List_1_PlayerControl_> GetAllPlayerControl() {
-	return *Game::pAllPlayerControls;
+il2cpp::List<List_1_PlayerControl_> GetAllPlayerControl(bool includeFriends) {
+	if (includeFriends)
+		return *Game::pAllPlayerControls;
+	else {
+		if (State.Friends.size() == 0) {
+			return *Game::pAllPlayerControls;
+		}
+
+		il2cpp::List<List_1_PlayerControl_> ret = *Game::pAllPlayerControls;
+		size_t max = GetAllPlayerControl(true).size();
+		for (size_t i = 0; i < max; i++) {
+			if (State.Friends.contains(convert_from_string(ret[i]->fields.Puid))) {
+				ret.erase(i);
+			}
+		}
+		return ret;
+	}
 }
 
 il2cpp::List<List_1_NetworkedPlayerInfo_> GetAllPlayerData() {

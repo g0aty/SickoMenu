@@ -13,7 +13,6 @@ RpcMurderPlayer::RpcMurderPlayer(PlayerControl* Player, PlayerControl* target, b
 void RpcMurderPlayer::Process()
 {
 	if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) return;
-
 	if (IsInGame() && !IsInMultiplayerGame()) PlayerControl_RpcMurderPlayer(Player, target, success, NULL);
 	else if (target != *Game::pLocalPlayer || IsInGame()) {
 		PlayerControl_RpcMurderPlayer(Player, target, success, NULL);
@@ -34,8 +33,7 @@ void RpcMurderPlayer::Process()
 				MessageWriter_WriteInt32(writer, int32_t(success ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
 				InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 			}
-			Player->fields.moveable = true;
-			//prevent not moving when you murder
+			if (success) GetPlayerData(*Game::pLocalPlayer)->fields.IsDead = true;
 		}
 	}
 }
@@ -222,6 +220,11 @@ void RpcRevive::Process()
 	if (!PlayerSelection(Player).has_value()) return;
 
 	PlayerControl_Revive(Player, NULL);
+	PlayerControl_RpcSetColor(Player, GetPlayerOutfit(GetPlayerData(Player))->fields.ColorId, NULL);
+	if (PlayerIsImpostor(GetPlayerData(Player)))
+		PlayerControl_RpcSetRole(Player, RoleTypes__Enum::Impostor, true, NULL);
+	else
+		PlayerControl_RpcSetRole(Player, RoleTypes__Enum::Crewmate, true, NULL);
 }
 
 RpcVent::RpcVent(PlayerControl* Player, int32_t ventId, bool exit)

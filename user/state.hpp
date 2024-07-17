@@ -1,6 +1,7 @@
 #pragma once
 #include <bitset>
 #include <queue>
+#include <unordered_set>
 #include "_events.h"
 #include "_rpc.h"
 #include "keybinds.h"
@@ -154,9 +155,11 @@ public:
     bool OnlyProtectCrewmates = false;
     bool BypassAngelProt = false;
     bool InfiniteKillRange = false;
+    bool KillInLobbies = false;
     bool AutoKill = false;
     bool FakeAlive = false;
     bool ShowHost = false;
+    bool HideWatermark = false;
     bool ShowVoteKicks = false;
     bool ShowFps = false;
     bool DoTasksAsImpostor = false;
@@ -345,6 +348,8 @@ public:
     bool DisableHostAnticheat = false;
     bool canDisableHostAnticheat;
 
+    std::unordered_set<std::string> Friends;
+
     enum class MapType : uint8_t
     {
         Ship = 0,
@@ -369,7 +374,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.5.1";
+    std::string SickoVersion = "v3.5.2";
 
     void Load();
     void Save();

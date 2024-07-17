@@ -113,7 +113,7 @@ namespace GameTab {
             }
 
 
-            if ((IsInGame() || IsInLobby()) && ImGui::Button("Kill Everyone")) {
+            if (IsInGame() && ImGui::Button("Kill Everyone")) {
                 for (auto player : GetAllPlayerControl()) {
                     if (IsInGame())
                         State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
@@ -123,11 +123,17 @@ namespace GameTab {
             }
             if (IsInLobby()) ImGui::SameLine();
             if (IsInLobby() && ImGui::Button("Allow Everyone to NoClip")) {
-                for (auto p : GetAllPlayerControl()) {
+                for (auto p : GetAllPlayerControl(true)) {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
 				}
                 State.NoClip = true;
                 //ShowHudNotification("Allowed everyone to NoClip!");
+            }
+            if (IsInLobby() && ImGui::Button("Allow Friends to NoClip")) {
+                for (auto p : GetAllPlayerControl(true)) {
+                    if (!State.Friends.contains(convert_from_string(p->fields.Puid))) continue; // only friends
+                    if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
+                }
             }
             if ((IsInGame() || IsInLobby()) && (IsHost() || !State.SafeMode)) {
                 ImGui::SameLine();
@@ -150,7 +156,7 @@ namespace GameTab {
                 State.Save();
             }
 
-            if ((IsInGame() || IsInLobby())) {
+            if (IsInGame()) {
                 if (ImGui::Button("Kill All Crewmates")) {
                     for (auto player : GetAllPlayerControl()) {
                         if (!PlayerIsImpostor(GetPlayerData(player))) {
@@ -202,7 +208,9 @@ namespace GameTab {
                         }
                     }
                 }
+            }
 
+            if (IsInGame() || IsInLobby()) {
                 if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && ImGui::Button("Scan Everyone")) {
                     for (auto p : GetAllPlayerControl()) {
                         if (IsInGame()) State.rpcQueue.push(new RpcForceScanner(p, true));
