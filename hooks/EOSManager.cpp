@@ -116,11 +116,6 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		}
 		State.ForceLoginAsGuest = false; //button behavior
 	}
-
-	/*if (!IsHost() && (IsInLobby() || IsInGame())) {
-		auto friendCode = (*Game::pLocalPlayer)->fields.FriendCode;
-		__this->fields.friendCode = friendCode;
-	}*/
 }
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {

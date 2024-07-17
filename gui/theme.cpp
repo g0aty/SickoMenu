@@ -8,7 +8,7 @@ ImVec4 HI(float v) {
 	if (State.RgbMenuTheme)
 		vec = State.RgbColor;
 	else
-		vec = State.MenuThemeColor;
+		vec = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 	return ImVec4(vec.x, vec.y, vec.z, v * State.MenuThemeColor.w);
 }
 
@@ -17,7 +17,7 @@ ImVec4 MED(float v) {
 	if (State.RgbMenuTheme)
 		vec = State.RgbColor;
 	else
-		vec = State.MenuThemeColor;
+		vec = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 	return ImVec4((float)(vec.x / 1.25), (float)(vec.y / 1.25), (float)(vec.z / 1.25), v * State.MenuThemeColor.w);
 }
 
@@ -26,11 +26,22 @@ ImVec4 LOW(float v) {
 	if (State.RgbMenuTheme)
 		vec = State.RgbColor;
 	else
-		vec = State.MenuThemeColor;
+		vec = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 	return ImVec4((float)(vec.x / 1.5625), (float)(vec.y / 1.5625), (float)(vec.z / 1.5625), v * State.MenuThemeColor.w);
 }
 
-#define BG(v)   ImVec4(0.230f, 0.230f, 0.230f, v * State.MenuThemeColor.w)
+ImVec4 BG(float bg, float v = 1) {
+	if (!State.MatchBackgroundWithTheme) return ImVec4(bg, bg, bg, v * State.MenuThemeColor.w);
+	else {
+		static ImVec4 vec = State.MenuThemeColor;
+		if (State.RgbMenuTheme)
+			vec = State.RgbColor;
+		else
+			vec = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
+		return ImVec4((float)(vec.x / 2), (float)(vec.y / 2), (float)(vec.z / 2), v * State.MenuThemeColor.w);
+	}
+}
+
 #define IMGUI_TEXT(v) ImVec4(1.f, 1.f, 1.f, v * State.MenuThemeColor.w)
 
 void ApplyTheme()
@@ -41,35 +52,35 @@ void ApplyTheme()
 	style = defaultStyle;
 	style.Colors[ImGuiCol_Text] = IMGUI_TEXT(0.78f);
 	style.Colors[ImGuiCol_TextDisabled] = IMGUI_TEXT(0.28f);
-	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.15f, 0.15f, 0.15f, State.MenuThemeColor.w);
-	style.Colors[ImGuiCol_ChildBg] = ImVec4(0.15f, 0.15f, 0.15f, State.MenuThemeColor.w);
-	style.Colors[ImGuiCol_PopupBg] = BG(0.9f);
+	style.Colors[ImGuiCol_WindowBg] = BG(0.15f);
+	style.Colors[ImGuiCol_ChildBg] = BG(0.15f);
+	style.Colors[ImGuiCol_PopupBg] = BG(0.230f, 0.9f);
 	style.Colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 	style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-	style.Colors[ImGuiCol_FrameBg] = BG(1.00f);
+	style.Colors[ImGuiCol_FrameBg] = BG(0.230f, 1.00f);
 	style.Colors[ImGuiCol_FrameBgHovered] = MED(0.78f);
 	style.Colors[ImGuiCol_FrameBgActive] = MED(1.00f);
-	style.Colors[ImGuiCol_TitleBg] = ImVec4(0.15f, 0.15f, 0.15f, State.MenuThemeColor.w);
-	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.15f, 0.15f, State.MenuThemeColor.w);
-	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15f, 0.15f, 0.15f, State.MenuThemeColor.w);
+	style.Colors[ImGuiCol_TitleBg] = BG(0.15f);
+	style.Colors[ImGuiCol_TitleBgActive] = BG(0.15f);
+	style.Colors[ImGuiCol_TitleBgCollapsed] = BG(0.15f);
 	style.Colors[ImGuiCol_Tab] = MED(0.76f);
 	style.Colors[ImGuiCol_TabHovered] = MED(0.86f);
 	style.Colors[ImGuiCol_TabActive] = HI(1.00f);
-	style.Colors[ImGuiCol_MenuBarBg] = BG(0.47f);
-	style.Colors[ImGuiCol_ScrollbarBg] = BG(1.00f);
-	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.13f, 0.13f, 0.13f, State.MenuThemeColor.w);
+	style.Colors[ImGuiCol_MenuBarBg] = BG(0.230f, 0.47f);
+	style.Colors[ImGuiCol_ScrollbarBg] = BG(0.230f, 1.00f);
+	style.Colors[ImGuiCol_ScrollbarGrab] = BG(0.13f);
 	style.Colors[ImGuiCol_ScrollbarGrabHovered] = MED(0.78f);
 	style.Colors[ImGuiCol_ScrollbarGrabActive] = MED(1.00f);
 	style.Colors[ImGuiCol_CheckMark] = HI(1.00f);
 	style.Colors[ImGuiCol_SliderGrab] = MED(0.78f);
 	style.Colors[ImGuiCol_SliderGrabActive] = MED(1.00f);
-	style.Colors[ImGuiCol_Button] = BG(1.00f);
+	style.Colors[ImGuiCol_Button] = BG(0.230f, 1.00f);
 	style.Colors[ImGuiCol_ButtonHovered] = MED(0.86f);
 	style.Colors[ImGuiCol_ButtonActive] = MED(1.00f);
 	style.Colors[ImGuiCol_Header] = MED(0.76f);
 	style.Colors[ImGuiCol_HeaderHovered] = MED(0.86f);
 	style.Colors[ImGuiCol_HeaderActive] = HI(1.00f);
-	style.Colors[ImGuiCol_ResizeGrip] = BG(0.04f);
+	style.Colors[ImGuiCol_ResizeGrip] = BG(0.230f, 0.04f);
 	style.Colors[ImGuiCol_ResizeGripHovered] = MED(0.78f);
 	style.Colors[ImGuiCol_ResizeGripActive] = MED(1.00f);
 	style.Colors[ImGuiCol_PlotLines] = IMGUI_TEXT(0.63f);
@@ -77,7 +88,7 @@ void ApplyTheme()
 	style.Colors[ImGuiCol_PlotHistogram] = IMGUI_TEXT(0.63f);
 	style.Colors[ImGuiCol_PlotHistogramHovered] = MED(1.00f);
 	style.Colors[ImGuiCol_TextSelectedBg] = MED(0.43f);
-	style.Colors[ImGuiCol_ModalWindowDarkening] = BG(0.73f);
+	style.Colors[ImGuiCol_ModalWindowDarkening] = BG(0.230f, 0.73f);
 
 	style.WindowPadding = ImVec2(6, 4);
 	style.WindowRounding = 4.0f;

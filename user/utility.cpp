@@ -462,22 +462,22 @@ il2cpp::Array<OpenableDoor__Array> GetAllOpenableDoors() {
 }
 
 il2cpp::List<List_1_PlayerControl_> GetAllPlayerControl(bool includeFriends) {
-	if (includeFriends)
-		return *Game::pAllPlayerControls;
-	else {
-		if (State.Friends.size() == 0) {
+	//if (includeFriends)
+	return *Game::pAllPlayerControls;
+	/*else {
+		if (State.InGameFriends.size() == 0) {
 			return *Game::pAllPlayerControls;
 		}
 
 		il2cpp::List<List_1_PlayerControl_> ret = *Game::pAllPlayerControls;
 		size_t max = GetAllPlayerControl(true).size();
 		for (size_t i = 0; i < max; i++) {
-			if (State.Friends.contains(convert_from_string(ret[i]->fields.Puid))) {
+			if (State.InGameFriends.contains(ret[i]->fields.PlayerId)) {
 				ret.erase(i);
 			}
 		}
 		return ret;
-	}
+	}*/
 }
 
 il2cpp::List<List_1_NetworkedPlayerInfo_> GetAllPlayerData() {
@@ -958,7 +958,7 @@ void SaveOriginalAppearance()
 void ResetOriginalAppearance()
 {
 	try {
-		LOG_DEBUG("Reset appearance values to invalid");
+		LOG_DEBUG("Reset appearance values");
 		auto player = app::DataManager_get_Player(nullptr);
 		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "customization");
 		LOG_ASSERT(field != nullptr);

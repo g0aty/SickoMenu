@@ -35,8 +35,6 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 
 		std::sort(State.mapDoors.begin(), State.mapDoors.end());
 
-		State.mapType = State.mapDoors.empty() ? Settings::MapType::Hq : Settings::MapType::Ship; //exploit the fact that MiraHQ has no doors and all other maps have their own shipstatus
-
 		if (!State.PanicMode && State.confuser && State.confuseOnStart)
 			ControlAppearance(true);
 

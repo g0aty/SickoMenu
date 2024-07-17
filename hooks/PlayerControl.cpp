@@ -63,6 +63,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
+			if (!State.InGameFriends.contains(__this->fields.PlayerId) &&
+				State.Friends.contains(convert_from_string(__this->fields.Puid)))
+				State.InGameFriends.insert(__this->fields.PlayerId);
+
 			if (!playerData || !localData)
 				return;
 
@@ -577,6 +581,23 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 
 				Transform_set_position(cameraTransform, { State.camPos.x, State.camPos.y }, NULL);
+			}
+
+			if (IsInLobby() && GameOptions().HasOptions()) {
+				switch (GameOptions().GetByte(app::ByteOptionNames__Enum::MapId)) {
+				case 0:
+					State.mapType = Settings::MapType::Ship;
+				case 1:
+					State.mapType = Settings::MapType::Hq;
+				case 2:
+					State.mapType = Settings::MapType::Pb;
+				case 3:
+					State.mapType = Settings::MapType::Ship;
+				case 4:
+					State.mapType = Settings::MapType::Airship;
+				case 5:
+					State.mapType = Settings::MapType::Fungle;
+				}
 			}
 		}
 		auto playerData = GetPlayerData(__this);

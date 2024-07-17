@@ -39,7 +39,11 @@ namespace ConsoleGui
 	void Render() {
 		ConsoleGui::Init();
 		ImGui::Begin("###Console", &State.ShowConsole, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar);
-		auto titleCol = State.RgbMenuTheme ? State.RgbColor : State.MenuThemeColor;
+		static ImVec4 titleCol = State.MenuThemeColor;
+		if (State.RgbMenuTheme)
+			titleCol = State.RgbColor;
+		else
+			titleCol = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 		titleCol.w = 1.f;
 		ImGui::TextColored(titleCol, "Console");
 		ImGui::SameLine(ImGui::GetWindowWidth() - 20 * State.dpiScale);

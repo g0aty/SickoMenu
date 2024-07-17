@@ -57,11 +57,21 @@ void Settings::Load() {
         JSON_TRYGET("ShowDebug", this->showDebugTab);
 #endif
         JSON_TRYGET("RgbTheme", this->RgbMenuTheme);
+        JSON_TRYGET("GradientTheme", this->GradientMenuTheme);
+        JSON_TRYGET("MatchBackgroundWithTheme", this->MatchBackgroundWithTheme);
         JSON_TRYGET("SetName", this->SetName);
         JSON_TRYGET("MenuThemeColor_R", this->MenuThemeColor.x);
         JSON_TRYGET("MenuThemeColor_G", this->MenuThemeColor.y);
         JSON_TRYGET("MenuThemeColor_B", this->MenuThemeColor.z);
         JSON_TRYGET("MenuThemeColor_A", this->MenuThemeColor.w);
+        JSON_TRYGET("MenuGradientColor1_R", this->MenuGradientColor1.x);
+        JSON_TRYGET("MenuGradientColor1_G", this->MenuGradientColor1.y);
+        JSON_TRYGET("MenuGradientColor1_B", this->MenuGradientColor1.z);
+        JSON_TRYGET("MenuGradientColor1_A", this->MenuGradientColor1.w);
+        JSON_TRYGET("MenuGradientColor2_R", this->MenuGradientColor2.x);
+        JSON_TRYGET("MenuGradientColor2_G", this->MenuGradientColor2.y);
+        JSON_TRYGET("MenuGradientColor2_B", this->MenuGradientColor2.z);
+        JSON_TRYGET("MenuGradientColor2_A", this->MenuGradientColor2.w);
         JSON_TRYGET("UnlockCosmetics", this->UnlockCosmetics);
         JSON_TRYGET("ShowKeybinds", this->ShowKeybinds);
         JSON_TRYGET("KeybindsWhileChatting", this->KeybindsWhileChatting);
@@ -256,11 +266,21 @@ void Settings::Save() {
                 { "ShowDebug", this->showDebugTab },
         #endif
                 { "RgbTheme", this->RgbMenuTheme },
+                { "GradientTheme", this->GradientMenuTheme },
+                { "MatchBackgroundWithTheme", this->MatchBackgroundWithTheme },
                 { "SetName", this->SetName },
                 { "MenuThemeColor_R", this->MenuThemeColor.x },
                 { "MenuThemeColor_G", this->MenuThemeColor.y },
                 { "MenuThemeColor_B", this->MenuThemeColor.z },
                 { "MenuThemeColor_A", this->MenuThemeColor.w },
+                { "MenuGradientColor1_R", this->MenuGradientColor1.x },
+                { "MenuGradientColor1_G", this->MenuGradientColor1.y },
+                { "MenuGradientColor1_B", this->MenuGradientColor1.z },
+                { "MenuGradientColor1_A", this->MenuGradientColor1.w },
+                { "MenuGradientColor2_R", this->MenuGradientColor2.x },
+                { "MenuGradientColor2_G", this->MenuGradientColor2.y },
+                { "MenuGradientColor2_B", this->MenuGradientColor2.z },
+                { "MenuGradientColor2_A", this->MenuGradientColor2.w },
                 { "UnlockCosmetics", this->UnlockCosmetics },
                 { "ShowKeybinds", this->ShowKeybinds },
                 { "KeybindsWhileChatting", this->KeybindsWhileChatting },

@@ -113,6 +113,8 @@ namespace DebugTab {
 			ImGui::TextUnformatted(statStream.str().c_str());
 		}
 
+		ImGui::Text(std::format("Active Scene: {}", State.CurrentScene).c_str());
+
 		ImGui::EndChild();
 	}
 }

@@ -97,15 +97,33 @@ namespace SettingsTab {
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (ImGui::ColorEdit3("Menu Theme Color", (float*)&State.MenuThemeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+			if (!State.GradientMenuTheme) {
+				if (ImGui::ColorEdit3("Menu Theme Color", (float*)&State.MenuThemeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+			}
+			else {
+				if (ImGui::ColorEdit3("Gradient Color 1", (float*)&State.MenuGradientColor1, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+				ImGui::SameLine();
+				if (ImGui::ColorEdit3("Gradient Color 2", (float*)&State.MenuGradientColor2, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+			}
+			ImGui::SameLine();
+			if (ToggleButton("Gradient Theme", &State.GradientMenuTheme))
+				State.Save();
+
+			if (ToggleButton("Match Background with Theme", &State.MatchBackgroundWithTheme)) {
 				State.Save();
 			}
-
+			ImGui::SameLine();
 			if (ToggleButton("RGB Menu Theme", &State.RgbMenuTheme)) {
 				State.Save();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("Reset Menu Theme Color"))
+			if (ImGui::Button("Reset Menu Theme"))
 			{
 				State.MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
 			}

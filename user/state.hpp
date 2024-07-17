@@ -41,6 +41,8 @@ public:
     bool showDebugTab = false;
 #endif
     bool RgbMenuTheme = false;
+    bool GradientMenuTheme = false;
+    bool MatchBackgroundWithTheme = false;
     bool SetName = false;
     bool SafeMode = true;
     bool UnlockCosmetics = true;
@@ -276,6 +278,9 @@ public:
     bool FakeCameraUsage = false;
 
     ImVec4 MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
+    ImVec4 MenuGradientColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
+    ImVec4 MenuGradientColor1 = ImVec4(1.f, 0.f, 0.424f, 1.f);
+    ImVec4 MenuGradientColor2 = ImVec4(1.f, 0.f, 0.424f, 1.f);
     ImVec4 RgbColor = ImVec4(1.f, 0.071f, 0.f, 1.f);
     ImVec4 SelectedColor = ImVec4(1.f, 1.f, 1.f, 0.75f);
     ImVec4 SelectedReplayMapColor = ImVec4(1.f, 1.f, 1.f, 0.75f);
@@ -345,6 +350,7 @@ public:
     bool DisableHostAnticheat = false;
 
     std::unordered_set<std::string> Friends;
+    std::unordered_set<Game::PlayerId> InGameFriends;
 
     enum class MapType : uint8_t
     {
@@ -369,7 +375,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.5.2";
+    std::string SickoVersion = "v4.0_pr5";
 
     void Load();
     void Save();

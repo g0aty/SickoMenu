@@ -52,9 +52,6 @@ namespace HostTab {
 					CloseOtherGroups(Groups::Settings);
 				}
 			}
-			if (TabGroup("Utils", openUtils)) {
-				CloseOtherGroups(Groups::Utils);
-			}
 			GameOptions options;
 			if (openUtils) {
 				if (IsInLobby()) {

@@ -55,6 +55,15 @@ namespace PlayersTab {
 					bool isShifted = ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT);
 					bool isCtrl = ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3);
 					if (isCtrl) {
+						if (isShifted && ImGui::IsKeyDown(0x41)) {
+							State.selectedPlayers = {};
+						}
+						else if (ImGui::IsKeyDown(0x41)) {
+							State.selectedPlayers = {};
+							for (auto p : GetAllPlayerControl()) {
+								State.selectedPlayers.push_back(p->fields.PlayerId);
+							}
+						}
 						auto it = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId());
 						if (it != State.selectedPlayers.end()) {
 							State.selectedPlayers.erase(it);
@@ -101,7 +110,7 @@ namespace PlayersTab {
 				if (playerData->fields.IsDead)
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
 
-				if (State.Friends.contains(convert_from_string(playerData->fields.Puid))) {
+				if (State.InGameFriends.contains(playerData->fields.PlayerId)) {
 					playerName += " [F]";
 				}
 
@@ -358,13 +367,19 @@ namespace PlayersTab {
 							app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
 						}
 					}
-					if (selectedPlayers.size() == 1 && ImGui::Button("Toggle Friend"))
+					/*if (selectedPlayers.size() == 1 && ImGui::Button("Toggle Friend"))
 					{
 						auto p = selectedPlayers[0];
 						if (p.has_value() && !p.validate().is_LocalPlayer()) {
 							std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
-							if (State.Friends.contains(puid)) State.Friends.erase(puid);
-							else State.Friends.insert(puid);
+							if (State.Friends.contains(puid)) {
+								State.Friends.erase(puid);
+								State.InGameFriends.erase(selectedPlayer.get_PlayerData()->fields.PlayerId);
+							}
+							else {
+								State.Friends.insert(puid);
+								State.InGameFriends.insert(selectedPlayer.get_PlayerData()->fields.PlayerId);
+							}
 						}
 						State.Save();
 					}
@@ -374,11 +389,17 @@ namespace PlayersTab {
 							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
 
 							std::string puid = convert_from_string(p.get_PlayerData().value()->fields.Puid);
-							if (State.Friends.contains(puid)) State.Friends.erase(puid);
-							else State.Friends.insert(puid);
+							if (State.Friends.contains(puid)) {
+								State.Friends.erase(puid);
+								State.InGameFriends.erase(p.get_PlayerData().value()->fields.PlayerId);
+							}
+							else {
+								State.Friends.insert(puid);
+								State.InGameFriends.insert(p.get_PlayerData().value()->fields.PlayerId);
+							}
 						}
 						State.Save();
-					}
+					}*/
 				}
 
 				if (framesPassed == 0)
@@ -649,25 +670,7 @@ namespace PlayersTab {
 				{
 					if (ImGui::Button("Reset Impersonation"))
 					{
-						std::queue<RPCInterface*>* queue = nullptr;
-
-						if (IsInGame())
-							queue = &State.rpcQueue;
-						else if (IsInLobby())
-							queue = &State.lobbyRpcQueue;
-						if (queue != nullptr) {
-							if (IsHost() || !State.SafeMode)
-								queue->push(new RpcForceColor(*Game::pLocalPlayer, State.originalColor));
-							else
-								queue->push(new RpcSetColor(State.originalColor));
-							queue->push(new RpcSetPet(State.originalPet));
-							queue->push(new RpcSetSkin(State.originalSkin));
-							queue->push(new RpcSetHat(State.originalHat));
-							queue->push(new RpcSetVisor(State.originalVisor));
-							queue->push(new RpcSetNamePlate(State.originalNamePlate));
-							queue->push(new RpcSetName(State.originalName));
-							State.activeImpersonation = false;
-						}
+						ResetOriginalAppearance();
 					}
 				}
 

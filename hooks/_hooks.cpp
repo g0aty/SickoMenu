@@ -143,6 +143,7 @@ void DetourInitilization() {
 	HOOKFUNC(AmongUsClient_OnGameJoined);
 	HOOKFUNC(PlayerControl_OnGameStart);
 	HOOKFUNC(AmongUsClient_OnPlayerLeft);
+	HOOKFUNC(AmongUsClient_OnPlayerJoined);
 	HOOKFUNC(CustomNetworkTransform_SnapTo);
 	HOOKFUNC(LobbyBehaviour_Start);
 	HOOKFUNC(GameObject_SetActive);
@@ -271,6 +272,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(AmongUsClient_OnGameJoined);
 	UNHOOKFUNC(PlayerControl_OnGameStart);
 	UNHOOKFUNC(AmongUsClient_OnPlayerLeft);
+	UNHOOKFUNC(AmongUsClient_OnPlayerJoined);
 	UNHOOKFUNC(CustomNetworkTransform_SnapTo);
 	UNHOOKFUNC(LobbyBehaviour_Start);
 	//UNHOOKFUNC(NoShadowBehaviour_LateUpdate);

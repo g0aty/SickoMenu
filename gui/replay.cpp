@@ -471,7 +471,11 @@ namespace Replay
 		const auto& map = maps[(size_t)State.mapType];
 		ImGui::SetNextWindowSize(ImVec2((map.mapImage.imageWidth * 0.5f) + 50.0f, (map.mapImage.imageHeight * 0.5f) + 90.f) * State.dpiScale, ImGuiCond_None);
 		ImGui::Begin("###Replay", &State.ShowReplay, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-		auto titleCol = State.RgbMenuTheme ? State.RgbColor : State.MenuThemeColor;
+		static ImVec4 titleCol = State.MenuThemeColor;
+		if (State.RgbMenuTheme)
+			titleCol = State.RgbColor;
+		else
+			titleCol = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 		titleCol.w = 1.f;
 		ImGui::TextColored(titleCol, "Replay");
 		ImGui::SameLine(ImGui::GetWindowWidth() - 20 * State.dpiScale);
