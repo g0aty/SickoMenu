@@ -97,10 +97,10 @@ jobs:
       
       - name: Automatic Releases
         uses: appleboy/discord-action@master
-          with:
-            webhook_id: ${{ secrets.WEBHOOK_ID }}
-            webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
-            file: |
-                Release.zip
-                Debug.zip
-            message: "@everyone A new pre-release has been released!"
+        with:
+          webhook_id: ${{ secrets.WEBHOOK_ID }}
+          webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
+          file: |
+              Release.zip
+              Debug.zip
+          message: "@everyone A new pre-release has been released!"
