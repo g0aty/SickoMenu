@@ -105,14 +105,18 @@ namespace HostTab {
 							if (options.GetGameMode() == GameModes__Enum::HideNSeek)
 							{
 								if (State.assignedRoles[index] == RoleType::Shapeshifter)
-									State.assignedRoles[index] = RoleType::Random;
+									State.assignedRoles[index] = RoleType::Impostor;
 								else if (State.assignedRoles[index] == RoleType::Phantom)
-									State.assignedRoles[index] = RoleType::Random;
+									State.assignedRoles[index] = RoleType::Impostor;
 								else if (State.assignedRoles[index] == RoleType::Tracker)
 									State.assignedRoles[index] = RoleType::Engineer;
 								else if (State.assignedRoles[index] == RoleType::Noisemaker)
 									State.assignedRoles[index] = RoleType::Engineer;
+								else if (State.assignedRoles[index] == RoleType::Scientist)
+									State.assignedRoles[index] = RoleType::Engineer;
 								else if (State.assignedRoles[index] == RoleType::Crewmate)
+									State.assignedRoles[index] = RoleType::Engineer;
+								else if (State.assignedRoles[index] == RoleType::Engineer) // what?! lmao (see line 98)
 									State.assignedRoles[index] = RoleType::Engineer;
 							} //Assign other roles in hidenseek causes game bug.
 							//These are organized. Do not change the order unless you find it necessary.
