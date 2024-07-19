@@ -462,3 +462,11 @@ void Settings::Save() {
         }
     }
 }
+
+void Settings::Delete() {
+    auto path = getModulePath(hModule);
+
+    auto configPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
+
+    std::filesystem::remove(configPath);
+}

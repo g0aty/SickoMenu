@@ -31,6 +31,7 @@ public:
     };
 
     std::string selectedConfig = "";
+    int selectedConfigInt = 0;
 
     bool ImGuiInitialized = false;
     bool HasOpenedMenuBefore = false;
@@ -379,6 +380,7 @@ public:
 
     void Load();
     void Save();
+    void Delete();
 };
 
 extern Settings State;

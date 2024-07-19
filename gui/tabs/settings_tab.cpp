@@ -59,21 +59,49 @@ namespace SettingsTab {
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			
-			InputString("Config Name", &State.selectedConfig);
-			
-			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
-			{
-				State.Load();
-				State.Save(); //actually save the selected config
+			// sorry to anyone trying to read this code it is pretty messy
+			std::vector<std::string> CONFIGS = GetAllConfigs();
+			CONFIGS.push_back("[New]");
+			CONFIGS.push_back("[Delete]");
+
+			std::vector<const char*> CONFIGS_CHAR;
+
+			for (const std::string& str : CONFIGS) {
+				char* ch = new char[str.size() + 1];
+				std::copy(str.begin(), str.end(), ch);
+				ch[str.size()] = '\0';
+				CONFIGS_CHAR.push_back(ch);
 			}
-			if (CheckConfigExists(State.selectedConfig)) ImGui::SameLine();
-			if (ImGui::Button("Save Config"))
-			{
-				State.Save();
+
+			bool isNewConfig = CONFIGS.size() == 1;
+			bool isDelete = false;
+
+			int& selectedConfigInt = State.selectedConfigInt;
+			std::string selectedConfig = CONFIGS[selectedConfigInt];
+
+			if (CustomListBoxInt("Configs", &selectedConfigInt, CONFIGS_CHAR), 100 * State.dpiScale, ImVec4(0,0,0,0), ImGuiComboFlags_NoArrowButton) {
+				isNewConfig = selectedConfigInt == CONFIGS.size() - 2;
+				isDelete = selectedConfigInt == CONFIGS.size() - 1;
+				if (!isNewConfig && !isDelete) State.selectedConfig = CONFIGS[selectedConfigInt]; State.Load();
 			}
-			if (!CheckConfigExists(State.selectedConfig)) {
-				ImGui::Text("Config name not found!");
-				ImGui::SameLine();
+
+			if (isNewConfig || isDelete) {
+				InputString("Name", &State.selectedConfig);
+				if (isNewConfig && (ImGui::Button(CheckConfigExists(State.selectedConfig) ? "Overwrite" : "Save"))) {
+					State.Save();
+					CONFIGS = GetAllConfigs();
+
+					selectedConfigInt = std::distance(CONFIGS.begin(), std::find(CONFIGS.begin(), CONFIGS.end(), State.selectedConfig));
+				}
+
+				if (isDelete && CheckConfigExists(State.selectedConfig)) {
+					if (ImGui::Button("Delete")) {
+						selectedConfigInt--;
+						State.Delete();
+						CONFIGS = GetAllConfigs();
+						if (selectedConfigInt < 0) selectedConfigInt = 0;
+					}
+				}
 			}
 
 			if (ToggleButton("Adjust by DPI", &State.AdjustByDPI)) {

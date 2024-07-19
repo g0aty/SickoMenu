@@ -229,6 +229,7 @@ float GetDistanceBetweenPoints_Unity(const Vector2& p1, const Vector2& p2);
 float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2);
 void ShowHudNotification(std::string text);
 std::string GetCustomName(std::string name, bool forceUnique = false, uint8_t id = 0);
+std::vector<std::string> GetAllConfigs();
 bool CheckConfigExists(std::string configName);
 
 /// <summary>
