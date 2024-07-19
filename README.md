@@ -1,4 +1,4 @@
-# 👺 SickoMenu v3.4
+# 👺 SickoMenu v4.0
 A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
 
 Join our very own [Discord](https://dsc.gg/sickos) server for support, bug reports, and sneak peeks!
