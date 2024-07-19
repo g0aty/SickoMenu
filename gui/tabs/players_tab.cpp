@@ -677,7 +677,7 @@ namespace PlayersTab {
 				if (IsInLobby() && ImGui::Button("Allow Player(s) to NoClip")) {
 					for (auto p : selectedPlayers) {
 						if (p.has_value() && p.validate().is_LocalPlayer()) State.NoClip = true;
-						else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 1, true));
+						else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 1, true, true));
 						//ShowHudNotification(std::format("Allowed {} to NoClip!",
 							//convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL))));
 					}

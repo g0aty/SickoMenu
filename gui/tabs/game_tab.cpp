@@ -124,7 +124,7 @@ namespace GameTab {
             if (IsInLobby()) ImGui::SameLine();
             if (IsInLobby() && ImGui::Button("Allow Everyone to NoClip")) {
                 for (auto p : GetAllPlayerControl(true)) {
-                    if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
+                    if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true, true));
 				}
                 State.NoClip = true;
                 //ShowHudNotification("Allowed everyone to NoClip!");

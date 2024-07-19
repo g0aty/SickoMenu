@@ -176,8 +176,9 @@ class RpcMurderLoop : public RPCInterface {
 	PlayerControl* target;
 	int count;
 	bool onlyOnTarget;
+	bool force;
 public:
-	RpcMurderLoop(PlayerControl* Player, PlayerControl* target, int count = 30, bool onlyOnTarget = true);
+	RpcMurderLoop(PlayerControl* Player, PlayerControl* target, int count = 30, bool onlyOnTarget = true, bool force = false);
 	virtual void Process() override;
 };
 
