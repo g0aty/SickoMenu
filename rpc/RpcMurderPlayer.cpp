@@ -39,18 +39,17 @@ void RpcMurderPlayer::Process()
 	}
 }
 
-RpcMurderLoop::RpcMurderLoop(PlayerControl* Player, PlayerControl* target, int count, bool onlyOnTarget, bool force)
+RpcMurderLoop::RpcMurderLoop(PlayerControl* Player, PlayerControl* target, int count, bool onlyOnTarget)
 {
 	this->Player = Player;
 	this->target = target;
 	this->count = count;
 	this->onlyOnTarget = onlyOnTarget;
-	this->force = force;
 }
 
 void RpcMurderLoop::Process()
 {
-	if (onlyOnTarget && (IsInMultiplayerGame() || ((IsInLobby() && State.KillInLobbies) || force))) {
+	if (onlyOnTarget && (IsInMultiplayerGame() || IsInLobby())) {
 		for (size_t i = 1; i <= (size_t)count; ++i) {
 			if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) break;
 			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
@@ -60,7 +59,7 @@ void RpcMurderLoop::Process()
 			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 		}
 	}
-	else if (((IsInLobby() && State.KillInLobbies) || force) && target == *Game::pLocalPlayer) {
+	else if ((IsInLobby() && State.KillInLobbies) && target == *Game::pLocalPlayer) {
 		for (size_t i = 1; i <= (size_t)count; ++i) {
 			if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) break;
 			for (auto p : GetAllPlayerControl()) {
