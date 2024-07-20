@@ -145,6 +145,8 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 	app::PingTracker_Update(__this, method);
+	app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopGeoAligned, nullptr);
+	//center the ping text when panic is enabled
 	try {
 		if (!IsStreamerMode() && !State.PanicMode) {
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
@@ -177,7 +179,6 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 		}
 		else {
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
-			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopGeoAligned, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(ping), nullptr);
 		}
 	}

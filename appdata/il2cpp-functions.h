@@ -332,3 +332,8 @@ DO_APP_FUNC(void, DisconnectPopup_DoShow, (DisconnectPopup* __this, MethodInfo* 
 DO_APP_FUNC(bool, NetworkedPlayerInfo_Serialize, (NetworkedPlayerInfo* __this, MessageWriter* writer, bool initialState, MethodInfo* method), "Assembly-CSharp, System.Boolean NetworkedPlayerInfo::Serialize(Hazel.MessageWriter, System.Boolean)");
 DO_APP_FUNC(bool, GameManager_DidImpostorsWin, (GameManager* __this, GameOverReason__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Boolean GameManager::DidImpostorsWin(GameOverReason)");
 DO_APP_FUNC(void, AmongUsClient_OnPlayerJoined, (AmongUsClient* __this, ClientData* data, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnPlayerJoined(InnerNet.ClientData)");
+DO_APP_FUNC(void*, AmongUsClient_CoJoinOnlineGameFromCode, (AmongUsClient* __this, int32_t gameId, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoJoinOnlineGameFromCode(System.Int32)");
+DO_APP_FUNC(int32_t, GameCode_GameNameToInt, (String* gameId, MethodInfo* method), "Assembly-CSharp, System.Int32 InnerNet.GameCode::GameNameToInt(System.String)");
+DO_APP_FUNC(PlayerStatsData*, PlayerData_get_Stats, (PlayerData* __this, MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Player.PlayerData.PlayerStatsData AmongUs.Data.Player.PlayerData::get_Stats()");
+DO_APP_FUNC(void, FriendsListButton_Update, (FriendsListButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void FriendsListButton::Update()");
+DO_APP_FUNC(void, ChatController_Update, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void FriendsListButton::Update()");
