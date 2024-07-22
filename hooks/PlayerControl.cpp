@@ -582,23 +582,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 				Transform_set_position(cameraTransform, { State.camPos.x, State.camPos.y }, NULL);
 			}
-
-			if (IsInLobby() && GameOptions().HasOptions()) {
-				switch (GameOptions().GetByte(app::ByteOptionNames__Enum::MapId)) {
-				case 0:
-					State.mapType = Settings::MapType::Ship;
-				case 1:
-					State.mapType = Settings::MapType::Hq;
-				case 2:
-					State.mapType = Settings::MapType::Pb;
-				case 3:
-					State.mapType = Settings::MapType::Ship;
-				case 4:
-					State.mapType = Settings::MapType::Airship;
-				case 5:
-					State.mapType = Settings::MapType::Fungle;
-				}
-			}
 		}
 		auto playerData = GetPlayerData(__this);
 		// We should have this in a scope so that the lock guard only locks the right things
@@ -890,9 +873,13 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 		if (!State.PanicMode) {
 			HandleRpc(__this, callId, reader);
 			if (IsHost() && ((State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
-				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) ||
-				(State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder))) //we cannot prevent murderplayer because the player will force it
+				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
+				//we cannot prevent murderplayer because the player will force it
 				return;
+			if (State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder) {
+				PlayerControl* target = MessageExtensions_ReadNetObject_1(reader, NULL);
+				PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, target, GetPlayerOutfit(GetPlayerData(target))->fields.ColorId, NULL);
+			}
 			int crew = 0, imp = 0;
 			for (auto p : GetAllPlayerData()) {
 				if (p->fields.IsDead) continue;

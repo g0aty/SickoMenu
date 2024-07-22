@@ -206,6 +206,7 @@ void DetourInitilization() {
 	HOOKFUNC(DisconnectPopup_DoShow);
 	HOOKFUNC(EditAccountUsername_SaveUsername);
 	HOOKFUNC(GameManager_DidImpostorsWin);
+	HOOKFUNC(ShipStatus_HandleRpc);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -332,6 +333,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(DisconnectPopup_DoShow);
 	UNHOOKFUNC(EditAccountUsername_SaveUsername);
 	UNHOOKFUNC(GameManager_DidImpostorsWin);
+	UNHOOKFUNC(ShipStatus_HandleRpc);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

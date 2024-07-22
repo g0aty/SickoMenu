@@ -8,6 +8,16 @@
 #include "game.h"
 
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
+	switch (__this->fields.Type) {
+	case ShipStatus_MapType__Enum::Ship:
+		State.mapType = Settings::MapType::Ship;
+	case ShipStatus_MapType__Enum::Hq:
+		State.mapType = Settings::MapType::Hq;
+	case ShipStatus_MapType__Enum::Pb:
+		State.mapType = Settings::MapType::Pb;
+	case ShipStatus_MapType__Enum::Fungle:
+		State.mapType = Settings::MapType::Fungle;
+	}
 	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
 	else
@@ -86,4 +96,10 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 		LOG_ERROR("Exception occurred in GameStartManager_Update (ShipStatus)");
 	}
 	GameStartManager_Update(__this, method);
+}
+
+void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
+	if (IsHost() && !State.PanicMode && State.DisableSabotages && 
+		(callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) return;
+	ShipStatus_HandleRpc(__this, callId, reader, method);
 }

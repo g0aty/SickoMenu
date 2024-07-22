@@ -87,6 +87,7 @@ public:
     bool DisableMeetings = false;
     bool DisableSabotages = false;
     bool DisableKills = false;
+    bool BattleRoyale = false;
     bool NoGameEnd = false;
     bool ChatSpam = false;
     bool ChatSpamEveryone = false;
