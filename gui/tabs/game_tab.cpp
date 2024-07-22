@@ -107,6 +107,18 @@ namespace GameTab {
                 State.Save();
             }
 
+            /*if (ToggleButton("Auto-Join", &State.AutoJoinLobby))
+                State.Save();
+            ImGui::SameLine();
+            if (InputString("Lobby Code", &State.AutoJoinLobbyCode))
+                State.Save();
+
+            if (ImGui::Button("Join Lobby")) {
+                AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
+                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
+                    NULL);
+            }*/ //doesn't work as of now
+            if (IsInGame() || IsInLobby()) ImGui::SameLine();
             if ((IsInGame() || IsInLobby()) && ImGui::Button("Reset Appearance"))
             {
                 ControlAppearance(false);

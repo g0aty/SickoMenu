@@ -10331,42 +10331,6 @@ namespace app
     };
 #pragma endregion
 
-#pragma region FriendsListButton
-    struct FriendsListButton__Fields {
-        struct MonoBehaviour__Fields _;
-        struct GameObject* Button;
-        struct TextMeshPro* NotifCount;
-        struct GameObject* NotifCircle;
-        void* gamepadButton;
-        bool showInScene;
-    };
-
-    struct FriendsListButton {
-        struct FriendsListButton__Class* klass;
-        MonitorData* monitor;
-        struct FriendsListButton__Fields fields;
-    };
-
-    struct FriendsListButton__VTable {
-        VirtualInvokeData Equals;
-        VirtualInvokeData Finalize;
-        VirtualInvokeData GetHashCode;
-        VirtualInvokeData ToString;
-    };
-
-    struct FriendsListButton__StaticFields {
-    };
-
-    struct FriendsListButton__Class {
-        Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
-        struct FriendsListButton__StaticFields* static_fields;
-        const Il2CppRGCTXData* rgctx_data;
-        Il2CppClass_1 _1;
-        struct FriendsListButton__VTable vtable;
-    };
-#pragma endregion
-
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ActivityManager;
@@ -10386,4 +10350,5 @@ namespace app
     typedef Il2CppObject OverlayAnimation;
     typedef Il2CppObject OverlayKillAnimation;
     typedef Il2CppObject KillOverlay;
+    typedef Il2CppObject AbstractSaveData;
 }

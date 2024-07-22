@@ -90,6 +90,8 @@ public:
     bool NoGameEnd = false;
     bool ChatSpam = false;
     bool ChatSpamEveryone = false;
+    bool AutoJoinLobby = false;
+    std::string AutoJoinLobbyCode = "";
 
     bool ShowProtections = false;
     std::map<Game::PlayerId, std::pair<Game::ColorId, float/*Time*/>> protectMonitor;

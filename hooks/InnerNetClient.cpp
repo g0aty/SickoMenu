@@ -383,6 +383,17 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.Save();
             }
 
+            static int joinDelay = 500; //should be 10s
+            if (joinDelay <= 0 && State.AutoJoinLobby) {
+                AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
+                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
+                    NULL);
+                joinDelay = 500; //Should be approximately 10s
+            }
+            else {
+                joinDelay--;
+            }
+
             static int reportDelay = 0;
             if (reportDelay <= 0 && State.SpamReport && IsInGame()) {
                 for (auto p : GetAllPlayerControl()) {
@@ -757,6 +768,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
 void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, MethodInfo* method) {
     try {
+        State.AutoJoinLobby = false;
         if (!State.PanicMode) {
             Log.Debug("Joined lobby " + convert_from_string(gameIdString));
             State.LastLobbyJoined = convert_from_string(gameIdString);
@@ -902,6 +914,8 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
             || __this->fields.NetworkMode == NetworkModes__Enum::FreePlay) {
             onGameEnd();
             State.LastDisconnectReason = reason;
+            if (reason == DisconnectReasons__Enum::Banned || reason == DisconnectReasons__Enum::ConnectionLimit || reason == DisconnectReasons__Enum::GameNotFound || reason == DisconnectReasons__Enum::ServerError)
+                State.AutoJoinLobby = false;
         }
     }
     catch (...) {

@@ -43,14 +43,14 @@ void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo
 	}
 }
 
-void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {
+void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {	
 	if (!State.PanicMode && (IsInGame() || IsInLobby())) {
 		for (auto playerData : GetAllPlayerData()) {
 			auto outfit = GetPlayerOutfit(playerData);
 			if (outfit == NULL) continue;
 			if (playerName == NetworkedPlayerInfo_get_PlayerName(playerData, nullptr)) {
 				auto localData = GetPlayerData(*Game::pLocalPlayer);
-				color = State.RevealRoles ? GetRoleColor(playerData->fields.Role) : 
+				color = State.RevealRoles ? GetRoleColor(playerData->fields.Role) :
 					(PlayerIsImpostor(localData) && PlayerIsImpostor(playerData) ? Palette__TypeInfo->static_fields->ImpostorRed : Palette__TypeInfo->static_fields->White);
 				if (State.RevealRoles && IsInGame()) {
 					playerName = convert_to_string("<size=50%>" + GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames) + "</size> " + convert_from_string(playerName));
@@ -73,7 +73,7 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 						playerName = convert_to_string(State.rgbCode + convert_from_string(playerName) + "</color>");
 					}*/
 				}
-				
+
 				if (State.PlayerColoredDots) {
 					Color32&& nameColor = GetPlayerColor(outfit->fields.ColorId);
 					std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}>●</color>",
@@ -88,7 +88,6 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 			}
 		}
 	}
-	
 	ChatBubble_SetName(__this, playerName, isDead, voted, color, method);
 }
 

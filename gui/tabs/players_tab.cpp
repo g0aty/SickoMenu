@@ -815,7 +815,7 @@ namespace PlayersTab {
 						}
 					}
 				}
-
+				ImGui::NewLine();
 				if ((IsHost() || !State.SafeMode) && State.InMeeting && selectedPlayers.size() == 1) {
 					if (ImGui::Button("Vote Off")) {
 						for (auto player : GetAllPlayerControl()) {
