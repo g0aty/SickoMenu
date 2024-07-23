@@ -939,6 +939,14 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
     try {
         if (!State.PanicMode && IsHost() && State.NoGameEnd)
             return;
+        if (State.BattleRoyale) {
+            uint8_t aliveCount = 0;
+            for (auto p : GetAllPlayerData()) {
+                if (!p->fields.IsDead) aliveCount++;
+            }
+            if (aliveCount != 1) return;
+            else endReason = GameOverReason__Enum::ImpostorByKill;
+        }
     }
     catch (...) {
         LOG_ERROR("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
