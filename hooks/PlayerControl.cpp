@@ -870,26 +870,25 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 
 void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	try {
-		if (!State.PanicMode) {
-			HandleRpc(__this, callId, reader);
-			if (IsHost() && ((State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
-				(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
-				//we cannot prevent murderplayer because the player will force it
-				return;
-			if (State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder) {
-				PlayerControl* target = MessageExtensions_ReadNetObject_1(reader, NULL);
-				PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, target, GetPlayerOutfit(GetPlayerData(target))->fields.ColorId, NULL);
-			}
-			int crew = 0, imp = 0;
-			for (auto p : GetAllPlayerData()) {
-				if (p->fields.IsDead) continue;
-				PlayerIsImpostor(p) ? imp++ : crew++;
-			}
-			bool shouldCheckMeeting = (imp >= crew) || imp == 0;
-			if (State.NoGameEnd && shouldCheckMeeting && 
-				(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting))
-				return;
+		HandleRpc(__this, callId, reader);
+		if (IsHost() && ((((!State.PanicMode && State.DisableMeetings) || State.BattleRoyale) && 
+			(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
+			(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
+			//we cannot prevent murderplayer because the player will force it
+			return;
+		if (!State.PanicMode && State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder) {
+			//PlayerControl* target = MessageExtensions_ReadNetObject_1(reader, NULL);
+			//PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, target, GetPlayerOutfit(GetPlayerData(target))->fields.ColorId, NULL);
 		}
+		int crew = 0, imp = 0;
+		for (auto p : GetAllPlayerData()) {
+			if (p->fields.IsDead) continue;
+			PlayerIsImpostor(p) ? imp++ : crew++;
+		}
+		bool shouldCheckMeeting = (imp >= crew) || imp == 0;
+		if (State.NoGameEnd && shouldCheckMeeting && 
+			(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting))
+			return;
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in PlayerControl_HandleRpc (PlayerControl)");
@@ -1069,7 +1068,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 			for (auto p : GetAllPlayerControl()) {
 				if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 				auto pData = GetPlayerData(p);
-				if (PlayerIsImpostor(pData) && !State.KillImpostors) continue; //neither impostors
+				if (PlayerIsImpostor(pData) && !(State.KillImpostors || (IsHost() && State.BattleRoyale))) continue; //neither impostors
 				if (pData->fields.IsDead) continue; //nor ghosts
 				float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 				if (currentDist < max_dist) {
@@ -1101,7 +1100,7 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 		for (auto p : GetAllPlayerControl()) {
 			if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 			auto pData = GetPlayerData(p);
-			if (PlayerIsImpostor(pData) && !State.KillImpostors) continue; //neither impostors
+			if (PlayerIsImpostor(pData) && !(State.KillImpostors || (IsHost() && State.BattleRoyale))) continue; //neither impostors
 			if (pData->fields.IsDead) continue; //nor ghosts
 			float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 			if (currentDist < max_dist) {

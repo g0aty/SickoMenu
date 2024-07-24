@@ -943,6 +943,8 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
             uint8_t aliveCount = 0;
             for (auto p : GetAllPlayerData()) {
                 if (!p->fields.IsDead) aliveCount++;
+                else if (p->fields.RoleType == RoleTypes__Enum::ImpostorGhost)
+                    PlayerControl_RpcSetRole(p->fields._object, RoleTypes__Enum::CrewmateGhost, false, NULL);
             }
             if (aliveCount != 1) return;
             else endReason = GameOverReason__Enum::ImpostorByKill;

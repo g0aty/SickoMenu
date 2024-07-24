@@ -11,12 +11,16 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 	switch (__this->fields.Type) {
 	case ShipStatus_MapType__Enum::Ship:
 		State.mapType = Settings::MapType::Ship;
+		break;
 	case ShipStatus_MapType__Enum::Hq:
 		State.mapType = Settings::MapType::Hq;
+		break;
 	case ShipStatus_MapType__Enum::Pb:
 		State.mapType = Settings::MapType::Pb;
+		break;
 	case ShipStatus_MapType__Enum::Fungle:
 		State.mapType = Settings::MapType::Fungle;
+		break;
 	}
 	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
@@ -99,7 +103,7 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 }
 
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
-	if (IsHost() && !State.PanicMode && State.DisableSabotages && 
+	if (IsHost() && (!State.PanicMode || State.BattleRoyale) && State.DisableSabotages && 
 		(callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) return;
 	ShipStatus_HandleRpc(__this, callId, reader, method);
 }

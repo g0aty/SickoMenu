@@ -379,7 +379,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_pr5";
+    std::string SickoVersion = "v4.0_pr6";
 
     void Load();
     void Save();
