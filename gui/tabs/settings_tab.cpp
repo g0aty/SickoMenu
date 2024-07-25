@@ -60,6 +60,8 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			
 			// sorry to anyone trying to read this code it is pretty messy
+#pragma region New config menu, needs fixing
+			/*
 			std::vector<std::string> CONFIGS = GetAllConfigs();
 			CONFIGS.push_back("[New]");
 			CONFIGS.push_back("[Delete]");
@@ -102,6 +104,24 @@ namespace SettingsTab {
 						if (selectedConfigInt < 0) selectedConfigInt = 0;
 					}
 				}
+			}*/
+#pragma endregion
+
+			InputString("Config Name", &State.selectedConfig);
+
+			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
+			{
+				State.Load();
+				State.Save(); //actually save the selected config
+			}
+			if (CheckConfigExists(State.selectedConfig)) ImGui::SameLine();
+			if (ImGui::Button("Save Config"))
+			{
+				State.Save();
+			}
+			if (!CheckConfigExists(State.selectedConfig)) {
+				ImGui::Text("Config name not found!");
+				ImGui::SameLine();
 			}
 
 			if (ToggleButton("Adjust by DPI", &State.AdjustByDPI)) {

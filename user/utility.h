@@ -184,7 +184,7 @@ il2cpp::Array<OpenableDoor__Array> GetAllOpenableDoors();
 il2cpp::List<List_1_PlayerControl_> GetAllPlayerControl(bool includeFriends = false);
 il2cpp::List<List_1_NetworkedPlayerInfo_> GetAllPlayerData();
 il2cpp::Array<DeadBody__Array> GetAllDeadBodies();
-il2cpp::List<List_1_PlayerTask_> GetPlayerTasks(PlayerControl* player);
+std::optional<il2cpp::List<List_1_PlayerTask_> > GetPlayerTasks(PlayerControl* player);
 std::vector<NormalPlayerTask*> GetNormalPlayerTasks(PlayerControl* player);
 Object_1* GetSabotageTask(PlayerControl* player);
 void RepairSabotage(PlayerControl* player);

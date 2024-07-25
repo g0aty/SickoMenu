@@ -491,28 +491,45 @@ il2cpp::Array<DeadBody__Array> GetAllDeadBodies() {
 	return (DeadBody__Array*)app::Object_1_FindObjectsOfType(deadBody_Type, NULL);
 }
 
-il2cpp::List<List_1_PlayerTask_> GetPlayerTasks(PlayerControl* player) {
-	return player->fields.myTasks;
+std::optional<il2cpp::List<List_1_PlayerTask_> > GetPlayerTasks(PlayerControl* player) {
+	try {
+		return player->fields.myTasks;
+	}
+	catch (...) {
+		LOG_ERROR("Exception occured while fetching player tasks!");
+		return nullptr;
+	}
 }
 
 std::vector<NormalPlayerTask*> GetNormalPlayerTasks(PlayerControl* player) {
-	static std::string normalPlayerTaskType = translate_type_name("NormalPlayerTask");
+	try {
+		static std::string normalPlayerTaskType = translate_type_name("NormalPlayerTask");
 
-	auto playerTasks = GetPlayerTasks(player);
-	std::vector<NormalPlayerTask*> normalPlayerTasks;
-	normalPlayerTasks.reserve(playerTasks.size());
+		auto getPlayerTasksCall = GetPlayerTasks(player);
+		if (!getPlayerTasksCall.has_value()) return std::vector<NormalPlayerTask*>{};
+		il2cpp::List<List_1_PlayerTask_> playerTasks = getPlayerTasksCall.value();
 
-	for (auto playerTask : playerTasks)
-		if (normalPlayerTaskType == playerTask->klass->_0.name || normalPlayerTaskType == playerTask->klass->_0.parent->name)
-			normalPlayerTasks.push_back((NormalPlayerTask*)playerTask);
+		std::vector<NormalPlayerTask*> normalPlayerTasks;
+		normalPlayerTasks.reserve(playerTasks.size());
 
-	return normalPlayerTasks;
+		for (auto playerTask : playerTasks)
+			if (normalPlayerTaskType == playerTask->klass->_0.name || normalPlayerTaskType == playerTask->klass->_0.parent->name)
+				normalPlayerTasks.push_back((NormalPlayerTask*)playerTask);
+
+		return normalPlayerTasks;
+	}
+	catch (...) {
+		LOG_ERROR("Exception occured while feching normal player tasks!");
+		return std::vector<NormalPlayerTask*>{};
+	}
 }
 
 Object_1* GetSabotageTask(PlayerControl* player) {
 	static std::string sabotageTaskType = translate_type_name("SabotageTask");
 
-	auto playerTasks = GetPlayerTasks(player);
+	auto getPlayerTasksCall = GetPlayerTasks(player);
+	if (!getPlayerTasksCall.has_value()) return nullptr;
+	auto playerTasks = getPlayerTasksCall.value();
 
 	for (auto playerTask : playerTasks)
 		if (sabotageTaskType == playerTask->klass->_0.name

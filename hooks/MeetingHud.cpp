@@ -198,6 +198,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 							auto tasks = GetNormalPlayerTasks(playerControl);
 							for (auto task : tasks)
 							{
+								if (task == nullptr) continue;
 								if (task->fields.taskStep == task->fields.MaxStep) {
 									completedTasks++;
 									totalTasks++;
