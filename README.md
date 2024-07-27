@@ -2,8 +2,8 @@
 A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
-Vanity invite: https://discord.gg/sickos
-Permanent invite: https://dsc.gg/sickos
+### Vanity invite: https://discord.gg/sickos
+### Permanent invite: https://dsc.gg/sickos
 
 ## ⚠️ Disclaimer
 This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) am not responsible.
