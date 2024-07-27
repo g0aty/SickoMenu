@@ -52,9 +52,6 @@ namespace HostTab {
 					CloseOtherGroups(Groups::Settings);
 				}
 			}
-			if (TabGroup("Utils", openUtils)) {
-				CloseOtherGroups(Groups::Utils);
-			}
 			GameOptions options;
 			if (openUtils) {
 				if (IsInLobby()) {
@@ -108,9 +105,9 @@ namespace HostTab {
 							if (options.GetGameMode() == GameModes__Enum::HideNSeek)
 							{
 								if (State.assignedRoles[index] == RoleType::Shapeshifter)
-									State.assignedRoles[index] = RoleType::Random;
+									State.assignedRoles[index] = RoleType::Impostor;
 								else if (State.assignedRoles[index] == RoleType::Phantom)
-									State.assignedRoles[index] = RoleType::Random;
+									State.assignedRoles[index] = RoleType::Impostor;
 								else if (State.assignedRoles[index] == RoleType::Tracker)
 									State.assignedRoles[index] = RoleType::Engineer;
 								else if (State.assignedRoles[index] == RoleType::Noisemaker)
@@ -162,11 +159,11 @@ namespace HostTab {
 				}
 				if (ToggleButton("Disable Meetings", &State.DisableMeetings))
 					State.Save();
-				if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
-					State.Save();
-				if (ToggleButton("Disable Kills", &State.DisableKills))
-					State.Save();
-				if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
+				/*if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
+					State.Save();*/
+				/*if (ToggleButton("Disable Kills", &State.DisableKills))
+					State.Save();*/
+				//if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
 
 				/*if (ToggleButton("Disable Specific RPC Call ID", &State.DisableCallId))
 					State.Save();
@@ -215,16 +212,10 @@ namespace HostTab {
 					State.Save();
 				}
 
-				if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
+				if (IsHost() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
 				{
-					if (PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))) {
-						if (IsInGame()) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
-					}
-					else {
-						if (IsInGame()) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
-					}
+					if (IsInGame()) State.rpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
+					if (IsInLobby()) State.lobbyRpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
 				}
 
 				ImGui::EndChild();
@@ -336,6 +327,27 @@ namespace HostTab {
 					MakeFloat("Shapeshift Duration", shapeshiftDuration, FloatOptionNames__Enum::ShapeshifterDuration);
 					MakeFloat("Shapeshift Cooldown", shapeshiftCooldown, FloatOptionNames__Enum::ShapeshifterCooldown);
 					MakeBool("Leave Shapeshifting Evidence", shapeshiftEvidence, BoolOptionNames__Enum::ShapeshifterLeaveSkin);
+#pragma endregion
+#pragma region Noisemaker
+					ImGui::Text("Noisemaker");
+					static float alertDuration = 1.f;
+
+					MakeFloat("Alert Duration", alertDuration, FloatOptionNames__Enum::NoisemakerAlertDuration);
+#pragma endregion
+#pragma region Tracker
+					ImGui::Text("Tracker");
+					static float trackerDuration = 1.f, trackerCooldown = 1.f, trackerDelay = 1.f;
+
+					MakeFloat("Tracker Duration", trackerDuration, FloatOptionNames__Enum::TrackerDuration);
+					MakeFloat("Tracker Cooldown", trackerCooldown, FloatOptionNames__Enum::TrackerCooldown);
+					MakeFloat("Tracker Delay", trackerDelay, FloatOptionNames__Enum::TrackerDelay);
+#pragma endregion
+#pragma region Phantom
+					ImGui::Text("Phantom");
+					static float phantomDuration = 1.f, phantomCooldown = 1.f;
+
+					MakeFloat("Phantom Duration", phantomDuration, FloatOptionNames__Enum::PhantomDuration);
+					MakeFloat("Phantom Cooldown", phantomCooldown, FloatOptionNames__Enum::PhantomCooldown);
 #pragma endregion
 				}
 #pragma region Hide and Seek

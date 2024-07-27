@@ -16,7 +16,7 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 
 	AssignPreChosenRoles(roleRates, assignedPlayers);
 	AssignRoles(roleRates, roleRates.ShapeshifterChance, RoleTypes__Enum::Shapeshifter, allPlayers, assignedPlayers);
-	AssignRoles(roleRates, roleRates.TrackerChance, RoleTypes__Enum::Tracker, allPlayers, assignedPlayers);
+	AssignRoles(roleRates, roleRates.PhantomChance, RoleTypes__Enum::Phantom, allPlayers, assignedPlayers); //don't be sleep-deprived and mix-up phantom with tracker
 	AssignRoles(roleRates, 100, RoleTypes__Enum::Impostor, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.ScientistChance, RoleTypes__Enum::Scientist, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.TrackerChance, RoleTypes__Enum::Tracker, allPlayers, assignedPlayers);

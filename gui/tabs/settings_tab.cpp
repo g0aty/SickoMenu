@@ -209,13 +209,13 @@ namespace SettingsTab {
 			if (ImGui::InputInt("Level", &State.FakeLevel, 0, 1)) {
 				State.Save();
 			}
-			ImGui::Text("Spoofed friend code only applies as host!");
+			/*ImGui::Text("Spoofed friend code only applies as host!");
 			if (ToggleButton("Spoof Friend Code", &State.SpoofFriendCode)) {
 				State.Save();
 			}
 			if (InputString("Fake Friend Code", &State.FakeFriendCode)) {
 				State.Save();
-			}
+			}*/
 			if (ToggleButton("Spoof Platform", &State.SpoofPlatform)) {
 				State.Save();
 			}

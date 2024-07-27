@@ -37,7 +37,7 @@ namespace PlayersTab {
 			for (auto id : State.selectedPlayers) {
 				selectedPlayers.push_back(PlayerSelection(GetPlayerControlById(id)));
 			}
-			for (auto playerCtrl : GetAllPlayerControl(true)) {
+			for (auto playerCtrl : GetAllPlayerControl()) {
 				const auto& player = PlayerSelection(playerCtrl);
 				const auto& validPlayer = PlayerSelection(playerCtrl).validate();
 				if (!validPlayer.has_value())
@@ -101,9 +101,9 @@ namespace PlayersTab {
 				if (playerData->fields.IsDead)
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
 
-				if (State.Friends.contains(convert_from_string(playerData->fields.Puid))) {
+				/*if (State.Friends.contains(convert_from_string(playerData->fields.Puid))) {
 					playerName += " [F]";
-				}
+				}*/
 
 				ImGui::TextColored(nameColor, playerName.c_str());
 			}
@@ -206,7 +206,7 @@ namespace PlayersTab {
 			}
 			if ((!selectedPlayer.has_value() || selectedPlayer.is_LocalPlayer()) || !State.SafeMode) {
 				if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("Skip Vote by All")) {
-					for (auto player : GetAllPlayerControl(true)) {
+					for (auto player : GetAllPlayerControl()) {
 						/*if (player != selectedPlayer.get_PlayerControl()) {
 							State.rpcQueue.push(new RpcClearVote(player));
 						}*/
@@ -358,7 +358,7 @@ namespace PlayersTab {
 							app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
 						}
 					}
-					if (selectedPlayers.size() == 1 && ImGui::Button("Toggle Friend"))
+					/*if (selectedPlayers.size() == 1 && ImGui::Button("Toggle Friend"))
 					{
 						auto p = selectedPlayers[0];
 						if (p.has_value() && !p.validate().is_LocalPlayer()) {
@@ -378,7 +378,7 @@ namespace PlayersTab {
 							else State.Friends.insert(puid);
 						}
 						State.Save();
-					}
+					}*/
 				}
 
 				if (framesPassed == 0)

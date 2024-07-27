@@ -26,7 +26,7 @@ void Settings::Load() {
             Log.Info(e.what()); \
         }
 
-        if (State.selectedConfig == "") JSON_TRYGET("SelectedConfig", this->selectedConfig);
+        JSON_TRYGET("SelectedConfig", this->selectedConfig);
     }
     catch (...) {
         //Log.Info("Unable to load sicko-selected-config.json");
@@ -173,6 +173,7 @@ void Settings::Load() {
         JSON_TRYGET("AnimationlessShapeshift", this->AnimationlessShapeshift);
         JSON_TRYGET("DisableKillAnimation", this->DisableKillAnimation);
         JSON_TRYGET("KillImpostors", this->KillImpostors);
+        JSON_TRYGET("KillInVanish", this->KillInVanish);
         JSON_TRYGET("BypassAngelProt", this->BypassAngelProt);
         JSON_TRYGET("InfiniteKillRange", this->InfiniteKillRange);
         JSON_TRYGET("AutoKill", this->AutoKill);
@@ -372,6 +373,7 @@ void Settings::Save() {
                 { "AnimationlessShapeshift", this->AnimationlessShapeshift },
                 { "DisableKillAnimation", this->DisableKillAnimation },
                 { "KillImpostors", this->KillImpostors },
+                { "KillInVanish", this->KillInVanish },
                 { "BypassAngelProt", this->BypassAngelProt },
                 { "InfiniteKillRange", this->InfiniteKillRange },
                 { "AutoKill", this->AutoKill },
@@ -426,7 +428,7 @@ void Settings::Save() {
             Log.Info("Unable to save " + std::format("sicko-config/{}.json", this->selectedConfig));
         }
 
-        std::filesystem::path friendsPath = path.parent_path() / "friends.json";
+        /*std::filesystem::path friendsPath = path.parent_path() / "friends.json";
         try
         {
             nlohmann::ordered_json j = nlohmann::ordered_json{
@@ -439,6 +441,6 @@ void Settings::Save() {
         catch (...)
         {
             Log.Info("Unable to save friends.json");
-        }
+        }*/
     }
 }

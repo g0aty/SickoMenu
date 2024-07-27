@@ -201,6 +201,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				auto tasks = GetNormalPlayerTasks(__this);
 				for (auto task : tasks)
 				{
+					if (task == nullptr) continue;
 					if (task->fields.taskStep == task->fields.MaxStep) {
 						completedTasks++;
 						totalTasks++;
@@ -788,27 +789,33 @@ void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target,
 	if (!State.PanicMode) {
 		if (State.DisableKills || (State.GodMode && __this == *Game::pLocalPlayer)) return;
 
-		if (IsInLobby() && __this == *Game::pLocalPlayer) {
-			for (auto p : GetAllPlayerControl()) {
-				if (p != *Game::pLocalPlayer) {
-					auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
-						uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::None, p->fields._.OwnerId, NULL);
-					MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
-					MessageWriter_WriteInt32(writer, int32_t(target->fields.protectedByGuardianId < 0 || State.BypassAngelProt ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
-					InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-				}
-				__this->fields.moveable = true;
-				//prevent not moving when you murder
-			}
+		if (target->fields.protectedByGuardianId >= 0 && State.BypassAngelProt) {
+			while (!GetPlayerData(target)->fields.IsDead)
+				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, true, NULL);
 		}
-		else if (State.AlwaysUseKillExploit || State.NoAbilityCD)
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-		else if (State.RealRole != RoleTypes__Enum::Impostor && State.RealRole != RoleTypes__Enum::Shapeshifter)
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-		else if ((*Game::pLocalPlayer)->fields.killTimer > 0)
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-		else
-			PlayerControl_CmdCheckMurder(*Game::pLocalPlayer, target, NULL);
+		else {
+			if (IsInLobby() && __this == *Game::pLocalPlayer) {
+				for (auto p : GetAllPlayerControl()) {
+					if (p != *Game::pLocalPlayer) {
+						auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
+							uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::None, p->fields._.OwnerId, NULL);
+						MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+						MessageWriter_WriteInt32(writer, int32_t(MurderResultFlags__Enum::Succeeded), NULL);
+						InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+					}
+					__this->fields.moveable = true;
+					//prevent not moving when you murder
+				}
+			}
+			else if (State.AlwaysUseKillExploit || State.NoAbilityCD)
+				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, true, NULL);
+			else if (State.RealRole != RoleTypes__Enum::Impostor && State.RealRole != RoleTypes__Enum::Shapeshifter)
+				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, true, NULL);
+			else if ((*Game::pLocalPlayer)->fields.killTimer > 0)
+				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, true, NULL);
+			else
+				PlayerControl_CmdCheckMurder(*Game::pLocalPlayer, target, NULL);
+		}
 	}
 	else PlayerControl_CmdCheckMurder(__this, target, method);
 }
@@ -1046,14 +1053,14 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 			float defaultKillDist = 2.5f;
 			auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
 			switch (killDistSetting) {
-			case 0: 
-				defaultKillDist = 1.f; 
+			case 0:
+				defaultKillDist = 1.f;
 				break; //short
-			case 1: 
-				defaultKillDist = 1.8f; 
+			case 1:
+				defaultKillDist = 1.8f;
 				break; //medium
-			case 2: 
-				defaultKillDist = 2.5f; 
+			case 2:
+				defaultKillDist = 2.5f;
 				break; //long
 			}
 			float max_dist = State.InfiniteKillRange ? FLT_MAX : defaultKillDist; //medium kill distance is 1.8
@@ -1061,7 +1068,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 			for (auto p : GetAllPlayerControl()) {
 				if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 				auto pData = GetPlayerData(p);
-				if (PlayerIsImpostor(pData) && !State.KillImpostors) continue; //neither impostors
+				if (PlayerIsImpostor(pData) && !(State.KillImpostors || IsHost())) continue; //neither impostors
 				if (pData->fields.IsDead) continue; //nor ghosts
 				float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 				if (currentDist < max_dist) {
@@ -1086,14 +1093,27 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
 	if (IsInLobby()) return nullptr;
 	auto result = ImpostorRole_FindClosestTarget(__this, method);
-	if (!State.PanicMode && result == nullptr && State.InfiniteKillRange) {
+	if (!State.PanicMode && result == nullptr && (State.InfiniteKillRange || State.KillInVanish)) {
 		PlayerControl* new_result = nullptr;
-		float max_dist = FLT_MAX;
+		float defaultKillDist = 2.5f;
+		auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
+		switch (killDistSetting) {
+		case 0:
+			defaultKillDist = 1.f;
+			break; //short
+		case 1:
+			defaultKillDist = 1.8f;
+			break; //medium
+		case 2:
+			defaultKillDist = 2.5f;
+			break; //long
+		}
+		float max_dist = State.InfiniteKillRange ? FLT_MAX : defaultKillDist; //medium kill distance is 1.8
 		auto localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
 		for (auto p : GetAllPlayerControl()) {
 			if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 			auto pData = GetPlayerData(p);
-			if (PlayerIsImpostor(pData) && !State.KillImpostors) continue; //neither impostors
+			if (PlayerIsImpostor(pData) && !(State.KillImpostors || IsHost())) continue; //neither impostors
 			if (pData->fields.IsDead) continue; //nor ghosts
 			float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 			if (currentDist < max_dist) {

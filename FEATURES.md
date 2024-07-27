@@ -26,7 +26,6 @@
 - **Spoof Guest Account** Spoofs your account to be a new guest account everytime you log in *(Works best with version.dll)* (Default: OFF)
 - **Use Custom Guest Friend Code** Changes your new friend code to whatever you want as long as it's valid (Default: OFF)
 - **Spoof Level** Spoofs your level in game (Default: OFF)
-- **Spoof Friend Code** *(Note: This only works as host due to Innersloth patches)* Spoofs your friend code  (Default: OFF)
 - **Spoof Platform** Spoofs your platform to whatever you choose (Default: OFF)
 ### Keybinds
 - **Show/Hide Menu** (Default: DELETE)
@@ -102,6 +101,7 @@ View the game options!
 - **See Kill Cooldown** Shows the kill cooldown of an impostor below their name (Default: OFF)
 - **Disable Kill Animation** Disables the kill animation (Default: OFF)
 - **Show Host** Shows the host below ping (Default: OFF)
+- **Hide Watermark** Hides the watermark, useful for streaming (Default: OFF)
 - **Show Vote Kicks** Shows your vote kicks below ping (Default: OFF)
 - **Show FPS** Shows the FPS below ping (Default: OFF)
 - **Move in Meeting** Ends the meeting for yourself
@@ -114,6 +114,7 @@ View the game options!
 - **NoClip** Allows you to walk through walls (Default: OFF)
 - **Kill Other Impostors** Allows you to kill fellow impostors (Default: OFF)
 - **Infinite Kill Range** Extends your kill reach (Default: OFF)
+- **Kill During Vanish** Allows you to kill while vanished as a Phantom (Default: OFF)
 - **Bypass Guardian Angel Protections** Allows you to kill protected players (Default: OFF)
 - **Do Tasks as Impostor** Allows you to complete tasks as impostor (Default: OFF)
 - **Always Use Kill Exploit** Forces the kill exploit to always be used, thus bypassing Disable Kills (Default: OFF)

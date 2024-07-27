@@ -71,7 +71,7 @@ namespace GameTab {
                 CustomListBoxInt(" ", &State.SelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
             }
             else {
-                State.SelectedColorId = std::clamp(State.SelectedColorId, 0, int(COLORS.size()));
+                if (State.SelectedColorId >= (int)COLORS.size()) State.SelectedColorId = 0;
                 CustomListBoxInt(" ", &State.SelectedColorId, COLORS, 85.0f * State.dpiScale);
             }
             ImGui::SameLine();
@@ -123,18 +123,18 @@ namespace GameTab {
             }
             if (IsInLobby()) ImGui::SameLine();
             if (IsInLobby() && ImGui::Button("Allow Everyone to NoClip")) {
-                for (auto p : GetAllPlayerControl(true)) {
+                for (auto p : GetAllPlayerControl()) {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
 				}
                 State.NoClip = true;
                 //ShowHudNotification("Allowed everyone to NoClip!");
             }
-            if (IsInLobby() && ImGui::Button("Allow Friends to NoClip")) {
-                for (auto p : GetAllPlayerControl(true)) {
+            /*if (IsInLobby() && ImGui::Button("Allow Friends to NoClip")) {
+                for (auto p : GetAllPlayerControl()) {
                     if (!State.Friends.contains(convert_from_string(p->fields.Puid))) continue; // only friends
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
                 }
-            }
+            }*/
             if ((IsInGame() || IsInLobby()) && (IsHost() || !State.SafeMode)) {
                 ImGui::SameLine();
                 if (ImGui::Button("Protect Everyone")) {

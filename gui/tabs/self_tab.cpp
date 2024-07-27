@@ -258,10 +258,10 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-            ImGui::SameLine();
+            /*ImGui::SameLine();
             if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
                 State.Save();
-            }
+            }*/
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
             }
@@ -269,8 +269,12 @@ namespace SelfTab {
             if (ToggleButton("Infinite Kill Range", &State.InfiniteKillRange)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("Kill During Vanish", &State.KillInVanish)) {
+                State.Save();
+            }
 
-            if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
+            if (ToggleButton("Bypass Angel Protections", &State.BypassAngelProt)) {
                 State.Save();
             }
             ImGui::SameLine();

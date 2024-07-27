@@ -149,10 +149,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 if (State.AlwaysMove && !State.ChatFocused)
                     (*Game::pLocalPlayer)->fields.moveable = true;
                 if (State.FakeAlive && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) {
-                    if (IsInGame())
-                        State.rpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
-                    else if (IsInLobby())
-                        State.lobbyRpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
+                    GetPlayerData(*Game::pLocalPlayer)->fields.IsDead = false;
                 }
             }
 
@@ -897,6 +894,9 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
 
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
     try {
+        if (GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
+            RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
+        //fixes game crashing on ending with shapeshifter
         onGameEnd();
     }
     catch (...) {

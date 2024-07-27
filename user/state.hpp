@@ -30,7 +30,7 @@ public:
         VK_PAUSE //toggle SickoMenu
     };
 
-    std::string selectedConfig = "";
+    std::string selectedConfig = "default";
 
     bool ImGuiInitialized = false;
     bool HasOpenedMenuBefore = false;
@@ -152,6 +152,7 @@ public:
     bool AnimationlessShapeshift = false;
     bool DisableKillAnimation = false;
     bool KillImpostors = false;
+    bool KillInVanish = false;
     bool OnlyProtectCrewmates = false;
     bool BypassAngelProt = false;
     bool InfiniteKillRange = false;
@@ -344,7 +345,7 @@ public:
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
 
-    std::unordered_set<std::string> Friends;
+    //std::unordered_set<std::string> Friends;
 
     enum class MapType : uint8_t
     {
