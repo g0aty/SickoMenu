@@ -264,7 +264,7 @@ public:
     bool FreeCam = false;
     float FreeCamSpeed = 1.f;
 
-    float CameraHeight = 3.0;
+    float CameraHeight = 4.0f;
     Camera* FollowerCam = nullptr;
     bool EnableZoom = false;
 
@@ -313,6 +313,8 @@ public:
     Vector3 prevCamPos = { NULL, NULL, NULL };
 
     bool FlipSkeld = false;
+    bool lapsTimesEValue;
+    int lapstimeEValueInt;
     bool CustomImpostorAmount = false;
     int ImpostorCount = 1;
     bool DisableCallId = false;
@@ -327,6 +329,7 @@ public:
     bool MessageSent = false;
     bool ChatFocused = false;
     bool IsRevived = false;
+    bool canRevive = true;
 
     std::string chatMessage = "";
     std::string userName = "";
@@ -344,6 +347,7 @@ public:
     bool SickoDetection = true;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
+    bool canDisableHostAnticheat;
 
     //std::unordered_set<std::string> Friends;
 
@@ -351,6 +355,7 @@ public:
     {
         Ship = 0,
         Hq = 1,
+        //Dleks = 2,
         Pb = 2,
         Airship = 3,
         Fungle = 4

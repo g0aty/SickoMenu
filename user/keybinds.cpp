@@ -205,7 +205,10 @@ void KeyBinds::to_json(nlohmann::ordered_json& j, KeyBinds::Config value)
         {"Randomize_Appearance", value.Randomize_Appearance},
         {"Complete_Tasks", value.Complete_Tasks},
         {"Toggle_Sicko", value.Toggle_Sicko},
-    };
+        //{TogleSafeModeSafeMode, *},
+        //{ShowKillMenu(like The Menu Of Shape Shifting And Will Be A TeleKill)}
+        //i Want to add more
+    }; 
 }
 
 void KeyBinds::from_json(const nlohmann::ordered_json& j, KeyBinds::Config& value)
