@@ -898,6 +898,9 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
 
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
     try {
+        if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
+            RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
+        //fixes game crashing on ending with shapeshifter
         onGameEnd();
     }
     catch (...) {
@@ -948,6 +951,45 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
             }
             if (aliveCount != 1) return;
             else endReason = GameOverReason__Enum::ImpostorByKill;
+        }
+        if (IsHost() && State.TournamentMode) {
+            bool impostorWin = false;
+            switch (endReason) {
+            case GameOverReason__Enum::HideAndSeek_ByKills:
+            case GameOverReason__Enum::ImpostorByKill:
+            case GameOverReason__Enum::ImpostorBySabotage:
+            case GameOverReason__Enum::ImpostorByVote:
+            case GameOverReason__Enum::HumansDisconnect:
+                impostorWin = true;
+                break;
+            }
+            for (auto p : GetAllPlayerData()) {
+                auto friendCode = convert_from_string(p->fields.FriendCode);
+                if (impostorWin) {
+                    if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
+                        UpdateTournamentPoints(p, 2); //AllImpsWin
+                        State.tournamentWinPoints[friendCode] += 1;
+                    }
+                    else if (PlayerIsImpostor(p)) {
+                        UpdateTournamentPoints(p, 1); //ImpWin
+                        State.tournamentWinPoints[friendCode] += 1;
+                    }
+                }
+                else {
+                    if (PlayerIsImpostor(p))
+                        UpdateTournamentPoints(p, 10); //ImpLose
+                    else {
+                        UpdateTournamentPoints(p, 7); //CrewWin
+                        State.tournamentWinPoints[friendCode] += 1;
+                    }
+                }
+            }
+            State.tournamentKillCaps.clear();
+            State.tournamentAssignedImpostors.clear();
+            State.tournamentAliveImpostors.clear();
+            State.tournamentCallers.clear();
+            State.tournamentCalledOut.clear();
+            State.tournamentFirstMeetingOver = false;
         }
     }
     catch (...) {
@@ -1019,7 +1061,13 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
             if (p->fields._.OwnerId == srcClient) sourcePlayer = p;
             if (p->fields._.OwnerId == clientId) affectedPlayer = p;
         }
-        if (IsHost() && sourcePlayer == *Game::pLocalPlayer) return; //anti kick as host
+        if (IsHost()) {
+            if (affectedPlayer == *Game::pLocalPlayer) return; //anti kick as host
+            if (sourcePlayer == *Game::pLocalPlayer) {
+                InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), clientId, false, NULL);
+                return;
+            }
+        }
         std::string sourceplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
         std::string affectedplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(affectedPlayer), nullptr));
         LOG_DEBUG(sourceplayerName + " attempted to votekick " + affectedplayerName);

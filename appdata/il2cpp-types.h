@@ -3535,35 +3535,37 @@ namespace app
     };
 
     struct TextBoxTMP__Fields {
-        void* m_CachePtr;
+        struct MonoBehaviour__Fields _;
         bool allowAllCharacters;
-        struct System_String_o* text;
-        struct System_String_o* compoText;
+        struct String* text;
+        struct String* compoText;
         int32_t characterLimit;
-        struct TMPro_TextMeshPro_o* outputText;
-        struct UnityEngine_SpriteRenderer_o* Background;
-        struct UnityEngine_MeshRenderer_o* Pipe;
+        struct TextMeshPro* outputText;
+        struct SpriteRenderer* Background;
+        struct MeshRenderer* Pipe;
         float pipeBlinkTimer;
         bool ClearOnFocus;
         bool ForceUppercase;
-        struct UnityEngine_UI_Button_ButtonClickedEvent_o* OnEnter;
-        struct UnityEngine_UI_Button_ButtonClickedEvent_o* OnChange;
-        struct UnityEngine_UI_Button_ButtonClickedEvent_o* OnFocusLost;
-        struct UnityEngine_TouchScreenKeyboard_o* keyboard;
+        struct Button_ButtonClickedEvent* OnEnter;
+        struct Button_ButtonClickedEvent* OnChange;
+        struct Button_ButtonClickedEvent* OnFocusLost;
+        struct TouchScreenKeyboard* keyboard;
         bool AllowSymbols;
         bool AllowEmail;
         bool IpMode;
         bool AllowPaste;
         bool Hidden;
-        struct UnityEngine_Collider2D_array* colliders;
+        struct Collider2D__Array* colliders;
         bool hasFocus;
-        struct System_Text_StringBuilder_o* tempTxt;
-        struct UnityEngine_SpriteRenderer_o* sendButtonGlyph;
+        int32_t caretPos;
+        float caretRepeatTimer;
+        struct StringBuilder* tempTxt;
+        struct SpriteRenderer* sendButtonGlyph;
     };
 
     struct TextBoxTMP {
-        void* klass;
-        void* monitor;
+        struct TextBoxTMP__Class* klass;
+        MonitorData* monitor;
         struct TextBoxTMP__Fields fields;
     };
 
@@ -6350,7 +6352,7 @@ namespace app
         void* aspectPosition;
         struct FreeChatInputField* freeChatField;
         void* quickChatMenu;
-        void* quickChatField;
+        struct QuickChatPreviewField* quickChatField;
         void* messageSound;
         void* warningSound;
         void* chatAnimationIn;
@@ -10328,6 +10330,51 @@ namespace app
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct PlayerStatsData__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region QuickChatPreviewField
+    struct QuickChatPreviewField__Fields {
+        struct AbstractChatInputField__Fields _;
+        struct ChatInputFieldButton* clearButton;
+        struct ChatInputFieldButton* undoButton;
+        struct TextMeshPro* warningText;
+        struct TextMeshPro* text;
+        struct TextMeshPro* placeholderText;
+        struct Action* OnClearPressedEvent;
+        struct Action* OnUndoPressedEvent;
+    };
+
+    struct QuickChatPreviewField {
+        struct QuickChatPreviewField__Class* klass;
+        MonitorData* monitor;
+        struct QuickChatPreviewField__Fields fields;
+    };
+
+    struct QuickChatPreviewField__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData Start;
+        VirtualInvokeData OnTextFieldTransformChanged;
+        VirtualInvokeData SetVisible;
+        VirtualInvokeData SetButtonsEnabled;
+        VirtualInvokeData Clear;
+        VirtualInvokeData Submit;
+    };
+
+    struct QuickChatPreviewField__StaticFields {
+    };
+
+    struct QuickChatPreviewField__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct QuickChatPreviewField__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct QuickChatPreviewField__VTable vtable;
     };
 #pragma endregion
 

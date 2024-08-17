@@ -30,7 +30,7 @@ public:
         VK_PAUSE //toggle SickoMenu
     };
 
-    std::string selectedConfig = "";
+    std::string selectedConfig = "default";
     int selectedConfigInt = 0;
 
     bool ImGuiInitialized = false;
@@ -145,6 +145,7 @@ public:
     float RgbNameColor = 0.f;
     bool ServerSideCustomName = false;
     bool NoAbilityCD = false;
+    bool DarkMode = false;
     bool CycleInMeeting = true;
     bool CycleBetweenPlayers = false;
 
@@ -162,6 +163,7 @@ public:
     bool BypassAngelProt = false;
     bool InfiniteKillRange = false;
     bool KillInLobbies = false;
+    bool KillInVanish = false;
     bool AutoKill = false;
     bool FakeAlive = false;
     bool ShowHost = false;
@@ -352,9 +354,21 @@ public:
     bool SickoDetection = true;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
+    bool TournamentMode = false;
 
     std::unordered_set<std::string> Friends;
     std::unordered_set<Game::PlayerId> InGameFriends;
+    std::vector<std::string /*friendcode*/> tournamentFriendCodes;
+    std::map<std::string /*friendcode*/, float /*points*/> tournamentPoints;
+    std::map<std::string /*friendcode*/, float /*points*/> tournamentWinPoints;
+    std::map<std::string /*friendcode*/, float /*points*/> tournamentCalloutPoints;
+    std::map<std::string /*friendcode*/, float /*points*/> tournamentEarlyDeathPoints;
+    std::map<std::string /*friendcode*/, float /*points*/> tournamentKillCaps;
+    std::vector<std::string> tournamentAssignedImpostors;
+    std::vector<std::string> tournamentAliveImpostors;
+    std::vector<std::string> tournamentCallers;
+    std::vector<std::string> tournamentCalledOut;
+    bool tournamentFirstMeetingOver = false;
 
     enum class MapType : uint8_t
     {
@@ -364,6 +378,21 @@ public:
         Airship = 3,
         Fungle = 4
     } mapType = MapType::Ship;
+
+    enum class PointReason : uint8_t
+    {
+        ImpKill = 0,
+        ImpWin = 1,
+        AllImpsWin = 2,
+        ImpVoteOut = 3,
+        CrewVoteOut = 4,
+        ImpVoteOutCorrect = 5,
+        ImpVoteOutIncorrect = 6,
+        CrewWin = 7,
+        CorrectCallout = 8,
+        IncorrectCallout = 9,
+        ImpLose = 10,
+    };
 
     bool CanChangeOutfit = false;
     uint8_t OutfitCooldown = 50;
@@ -379,7 +408,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_pr6";
+    std::string SickoVersion = "v4.0_pr8";
 
     void Load();
     void Save();

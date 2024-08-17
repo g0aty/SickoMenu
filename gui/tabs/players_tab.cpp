@@ -140,48 +140,52 @@ namespace PlayersTab {
 				std::string levelText = std::format("Level: {}", playerLevel);
 				ImGui::Text(const_cast<char*>(levelText.c_str()));
 				std::string platform = "Unknown";
-				for (auto client : GetAllClients()) {
-					if (GetPlayerControlById(selectedPlayer.get_PlayerData()->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
-						switch (client->fields.PlatformData->fields.Platform) {
-						case Platforms__Enum::StandaloneEpicPC:
-							platform = "Epic Games (PC)";
-							break;
-						case Platforms__Enum::StandaloneSteamPC:
-							platform = "Steam (PC)";
-							break;
-						case Platforms__Enum::StandaloneMac:
-							platform = "Mac";
-							break;
-						case Platforms__Enum::StandaloneWin10:
-							platform = "Microsoft Store (PC)";
-							break;
-						case Platforms__Enum::StandaloneItch:
-							platform = "itch.io (PC)";
-							break;
-						case Platforms__Enum::IPhone:
-							platform = "iOS/iPadOS (Mobile)";
-							break;
-						case Platforms__Enum::Android:
-							platform = "Android (Mobile)";
-							break;
-						case Platforms__Enum::Switch:
-							platform = "Nintendo Switch (Console)";
-							break;
-						case Platforms__Enum::Xbox:
-							platform = "Xbox (Console)";
-							break;
-						case Platforms__Enum::Playstation:
-							platform = "Playstation (Console)";
-							break;
-						default:
-							platform = "Unknown";
-							break;
-						}
+				auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl(), NULL);
+				if (GetPlayerControlById(selectedPlayer.get_PlayerData()->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
+					switch (client->fields.PlatformData->fields.Platform) {
+					case Platforms__Enum::StandaloneEpicPC:
+						platform = "Epic Games (PC)";
+						break;
+					case Platforms__Enum::StandaloneSteamPC:
+						platform = "Steam (PC)";
+						break;
+					case Platforms__Enum::StandaloneMac:
+						platform = "Mac";
+						break;
+					case Platforms__Enum::StandaloneWin10:
+						platform = "Microsoft Store (PC)";
+						break;
+					case Platforms__Enum::StandaloneItch:
+						platform = "itch.io (PC)";
+						break;
+					case Platforms__Enum::IPhone:
+						platform = "iOS/iPadOS (Mobile)";
+						break;
+					case Platforms__Enum::Android:
+						platform = "Android (Mobile)";
+						break;
+					case Platforms__Enum::Switch:
+						platform = "Nintendo Switch (Console)";
+						break;
+					case Platforms__Enum::Xbox:
+						platform = "Xbox (Console)";
+						break;
+					case Platforms__Enum::Playstation:
+						platform = "Playstation (Console)";
+						break;
+					default:
+						platform = "Unknown";
 						break;
 					}
 				}
 				std::string platformText = std::format("Platform: {}", platform);
 				ImGui::Text(platformText.c_str());
+				uint64_t psnId = client->fields.PlatformData->fields.PsnPlatformId;
+				std::string psnText = std::format("PSN Platform ID: {}", psnId);
+				if (psnId != 0) ImGui::Text(const_cast<char*>(psnText.c_str()));
+				uint64_t xboxId = client->fields.PlatformData->fields.XboxPlatformId;
+				std::string xboxText = std::format("Xbox Platform ID: {}", xboxId);
+				if (xboxId != 0) ImGui::Text(const_cast<char*>(xboxText.c_str()));
 			}
 
 			ImGui::EndChild();
@@ -269,7 +273,7 @@ namespace PlayersTab {
 					}
 				}
 				else {// if (!State.SafeMode)*/
-				if (IsInGame() && ImGui::Button("Kill"))
+				if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && ImGui::Button("Kill"))
 				{
 					for (PlayerSelection p : selectedPlayers) {
 						auto validPlayer = p.validate();
@@ -284,7 +288,7 @@ namespace PlayersTab {
 					}
 				}
 				//}
-				if (IsInGame() && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
+				if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
 					&& !selectedPlayer.get_PlayerData()->fields.IsDead
 					&& !selectedPlayer.get_PlayerControl()->fields.inVent
 					&& !selectedPlayer.get_PlayerControl()->fields.inMovingPlat
@@ -301,7 +305,7 @@ namespace PlayersTab {
 						framesPassed = 40;
 					}
 				}
-				else if (IsInGame()) {// if (!State.SafeMode)
+				else if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {// if (!State.SafeMode)
 					ImGui::SameLine();
 					if (ImGui::Button("Telekill"))
 					{
@@ -701,7 +705,7 @@ namespace PlayersTab {
 
 				static int murderCount = 0;
 				static int murderDelay = 0;
-				if (IsInGame() && ImGui::Button("Murder Loop")) {
+				if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && ImGui::Button("Murder Loop")) {
 					murderLoop = true;
 					murderCount = 20; //controls how many times the player is to be murdered
 				}
@@ -762,7 +766,7 @@ namespace PlayersTab {
 					else suicideDelay--;
 				}
 
-				if (!State.SafeMode && selectedPlayers.size() == 1 && IsInGame()) {
+				if (!State.SafeMode && selectedPlayers.size() == 1 && (IsInGame() || (IsInLobby() && State.KillInLobbies))) {
 					if (ImGui::Button("Kill Crewmates By")) {
 						for (auto player : GetAllPlayerControl()) {
 							if (!PlayerIsImpostor(GetPlayerData(player))) {

@@ -120,3 +120,5 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method);
 void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method);
 bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method);
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method);
+void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method);
+void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method);

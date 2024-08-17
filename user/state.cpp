@@ -26,7 +26,8 @@ void Settings::Load() {
             Log.Info(e.what()); \
         }
 
-        if (State.selectedConfig == "") JSON_TRYGET("SelectedConfig", this->selectedConfig);
+        if (State.selectedConfig != "") JSON_TRYGET("SelectedConfig", this->selectedConfig);
+        JSON_TRYGET("SelectedConfigInt", this->selectedConfigInt);
     }
     catch (...) {
         //Log.Info("Unable to load sicko-selected-config.json");
@@ -87,6 +88,7 @@ void Settings::Load() {
         //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
 
         JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
+        JSON_TRYGET("DarkMode", this->DarkMode);
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
         JSON_TRYGET("CycleBetweenPlayers", this->CycleBetweenPlayers);
@@ -194,6 +196,8 @@ void Settings::Load() {
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
         JSON_TRYGET("AlwaysUseKillExploit", this->AlwaysUseKillExploit);
         JSON_TRYGET("NoClip", this->NoClip);
+        JSON_TRYGET("KillInLobbies", this->KillInLobbies);
+        JSON_TRYGET("KillInVanish", this->KillInVanish);
 
         JSON_TRYGET("AdjustByDPI", this->AdjustByDPI);
 
@@ -229,6 +233,8 @@ void Settings::Load() {
         JSON_TRYGET("RgbLobbyCode", this->RgbLobbyCode);
 
         JSON_TRYGET("SickoDetection", this->SickoDetection);
+        JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
+        JSON_TRYGET("TournamentMode", this->TournamentMode);
     } catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
@@ -245,7 +251,8 @@ void Settings::Save() {
     if (this->selectedConfig != "") {
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{
-                { "SelectedConfig", this->selectedConfig }
+                { "SelectedConfig", this->selectedConfig },
+                { "SelectedConfigInt", this->selectedConfigInt },
             };
 
             std::ofstream outConfig(configPath);
@@ -254,7 +261,8 @@ void Settings::Save() {
         catch (...) {
             //Log.Info("Unable to save sicko-selected-config.json");
         }
-        auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
+        auto settingsPath = path.parent_path() / 
+            std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? GetAllConfigs()[this->selectedConfigInt] : "default");
 
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{
@@ -296,6 +304,7 @@ void Settings::Save() {
                 //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
 
                 { "NoAbilityCD", this->NoAbilityCD },
+                { "DarkMode", this->DarkMode },
                 { "SelectedColorId", this->SelectedColorId },
                 { "SnipeColor", this->SnipeColor },
                 { "CycleBetweenPlayers", this->CycleBetweenPlayers },
@@ -404,6 +413,7 @@ void Settings::Save() {
                 { "AlwaysUseKillExploit", this->AlwaysUseKillExploit },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
+                { "KillInVanish", this->KillInVanish },
 
                 { "RevealVotes", this->RevealVotes },
                 { "RevealAnonymousVotes", this->RevealAnonymousVotes },
@@ -437,6 +447,8 @@ void Settings::Save() {
 
 
                 { "SickoDetection", this->SickoDetection },
+                { "DisableHostAnticheat", this->DisableHostAnticheat },
+                { "TournamentMode", this->TournamentMode },
             };
 
             std::ofstream outSettings(settingsPath);

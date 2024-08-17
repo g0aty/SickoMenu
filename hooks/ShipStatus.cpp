@@ -10,7 +10,7 @@
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
 	switch (__this->fields.Type) {
 	case ShipStatus_MapType__Enum::Ship:
-		State.mapType = Settings::MapType::Ship;
+		if (State.mapType != Settings::MapType::Airship) State.mapType = Settings::MapType::Ship;
 		break;
 	case ShipStatus_MapType__Enum::Hq:
 		State.mapType = Settings::MapType::Hq;

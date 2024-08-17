@@ -207,6 +207,8 @@ void DetourInitilization() {
 	HOOKFUNC(EditAccountUsername_SaveUsername);
 	HOOKFUNC(GameManager_DidImpostorsWin);
 	HOOKFUNC(ShipStatus_HandleRpc);
+	HOOKFUNC(ExileController_BeginForGameplay);
+	HOOKFUNC(ChatBubble_SetText);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -334,6 +336,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(EditAccountUsername_SaveUsername);
 	UNHOOKFUNC(GameManager_DidImpostorsWin);
 	UNHOOKFUNC(ShipStatus_HandleRpc);
+	UNHOOKFUNC(ExileController_BeginForGameplay);
+	UNHOOKFUNC(ChatBubble_SetText);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

@@ -8,6 +8,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
     app::ExileController_ReEnableGameplay(__this, method);
 
 	try {// ESP: Reset Kill Cooldown
+		if (IsHost() && State.TournamentMode && !State.tournamentFirstMeetingOver) State.tournamentFirstMeetingOver = true;
 		for (auto pc : GetAllPlayerControl()) {
 			if (auto player = PlayerSelection(pc).validate();
 				player.has_value() && !player.is_LocalPlayer() && !player.is_Disconnected()) {
@@ -21,5 +22,31 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in ExileController_ReEnableGameplay (ExileController)");
+	}
+}
+
+void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method) {
+	ExileController_BeginForGameplay(__this, exiled, voteTie, method);
+	try {
+		if (IsHost() && State.TournamentMode && !voteTie && exiled != NULL) {
+			if (PlayerIsImpostor(exiled)) {
+				UpdateTournamentPoints(exiled, 3); //ImpVoteOut
+				for (auto p : GetAllPlayerData()) {
+					if (!PlayerIsImpostor(p)) UpdateTournamentPoints(exiled, 5); //ImpVoteOutCorrect
+				}
+				auto exiledFc = convert_from_string(exiled->fields.FriendCode);
+				auto pos = std::find(State.tournamentAliveImpostors.begin(), State.tournamentAliveImpostors.end(), exiledFc);
+				if (pos != State.tournamentAliveImpostors.end()) State.tournamentAliveImpostors.erase(pos);
+			}
+			else {
+				UpdateTournamentPoints(exiled, 4); //CrewVoteOut
+				for (auto p : GetAllPlayerData()) {
+					if (!PlayerIsImpostor(p)) UpdateTournamentPoints(exiled, 6); //ImpVoteOutIncorrect
+				}
+			}
+		}
+	}
+	catch (...) {
+		LOG_ERROR("Exception occurred in ExileController_Begin (ExileController)");
 	}
 }

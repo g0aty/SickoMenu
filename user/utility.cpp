@@ -1120,9 +1120,8 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour) {
 
 	app::Color c;
 	switch (roleBehaviour->fields.Role) {
-	default:
 	case RoleTypes__Enum::CrewmateGhost:
-		c = Palette__TypeInfo->static_fields->HalfWhite;
+		c.r = 170; c.g = 170, c.b = 170; c.a = 255; //light gray (grey?)
 		break;
 	case RoleTypes__Enum::Crewmate:
 		c = Palette__TypeInfo->static_fields->White;
@@ -1146,13 +1145,16 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour) {
 		c = Palette__TypeInfo->static_fields->DisabledGrey;
 		break;
 	case RoleTypes__Enum::Noisemaker:
-		c = Palette__TypeInfo->static_fields->Purple;
+		c.r = 177; c.g = 0; c.b = 255; c.a = 255; //violet
 		break;
 	case RoleTypes__Enum::Tracker:
 		c = Palette__TypeInfo->static_fields->AcceptedGreen;
 		break;
 	case RoleTypes__Enum::Phantom:
-		c = Palette__TypeInfo->static_fields->Brown;
+		c.r = 255; c.g = 0; c.b = 203; c.a = 255; //pink
+		break;
+	default:
+		c = Palette__TypeInfo->static_fields->White;
 		break;
 	}
 	return c;
@@ -1196,8 +1198,8 @@ RoleTypes__Enum GetRoleTypesEnum(RoleType role)
 	if (role == RoleType::Shapeshifter) {
 		return RoleTypes__Enum::Shapeshifter;
 	}
-	else if (role == RoleType::Tracker) {
-		return RoleTypes__Enum::Tracker;
+	else if (role == RoleType::Phantom) {
+		return RoleTypes__Enum::Phantom;
 	}
 	else if (role == RoleType::Impostor) {
 		return RoleTypes__Enum::Impostor;
@@ -1372,6 +1374,53 @@ bool CheckConfigExists(std::string configName) {
 	auto path = getModulePath(hModule);
 	auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", State.selectedConfig);
 	return std::filesystem::exists(settingsPath);
+}
+
+void UpdateTournamentPoints(NetworkedPlayerInfo* playerData, int reason) {
+	if (!IsHost() || !State.TournamentMode) return;
+	std::string friendCode = convert_from_string(playerData->fields.FriendCode);
+	switch (reason) {
+	case 0://Settings::PointReason::ImpKill:
+		if (State.tournamentKillCaps[friendCode] < 3.f) {
+			State.tournamentPoints[friendCode] += 1.f;
+			State.tournamentKillCaps[friendCode] += 1.f;
+		}
+		break;
+	case 1://Settings::PointReason::ImpWin:
+		State.tournamentPoints[friendCode] += 1.f;
+		break;
+	case 2://Settings::PointReason::AllImpsWin:
+		State.tournamentPoints[friendCode] += 2.f;
+		break;
+	case 3://Settings::PointReason::ImpVoteOut:
+		State.tournamentPoints[friendCode] -= 1.f;
+		break;
+	case 4://Settings::PointReason::CrewVoteOut:
+		State.tournamentPoints[friendCode] += 1.f;
+		break;
+	case 5://Settings::PointReason::ImpVoteOutCorrect:
+		State.tournamentPoints[friendCode] += 1.f;
+		break;
+	case 6://Settings::PointReason::ImpVoteOutIncorrect:
+		State.tournamentPoints[friendCode] -= 1.f;
+		break;
+	case 7://Settings::PointReason::CrewWin:
+		State.tournamentPoints[friendCode] += 1.f;
+		break;
+	case 8://Settings::PointReason::CorrectCallout:
+		if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), friendCode) != State.tournamentCallers.end()) {
+			State.tournamentPoints[friendCode] += 1.5f;
+		}
+		break;
+	case 9://Settings::PointReason::IncorrectCallout:
+		if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), friendCode) != State.tournamentCallers.end()) {
+			State.tournamentPoints[friendCode] -= 1.5f;
+		}
+		break;
+	case 10://Settings::PointReason::ImpLose:
+		State.tournamentPoints[friendCode] -= 1.f;
+		break;
+	}
 }
 
 //TODO: Workaround

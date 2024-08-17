@@ -84,7 +84,9 @@ namespace SettingsTab {
 			if (CustomListBoxInt("Configs", &selectedConfigInt, CONFIGS_CHAR), 100 * State.dpiScale, ImVec4(0,0,0,0), ImGuiComboFlags_NoArrowButton) {
 				isNewConfig = selectedConfigInt == CONFIGS.size() - 2;
 				isDelete = selectedConfigInt == CONFIGS.size() - 1;
-				if (!isNewConfig && !isDelete) State.selectedConfig = CONFIGS[selectedConfigInt]; State.Load();
+				if (!isNewConfig && !isDelete) State.selectedConfig = CONFIGS[selectedConfigInt];
+				State.Save();
+				State.Load();
 			}
 
 			if (isNewConfig || isDelete) {

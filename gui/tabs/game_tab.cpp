@@ -125,7 +125,7 @@ namespace GameTab {
             }
 
 
-            if (IsInGame() && ImGui::Button("Kill Everyone")) {
+            if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && ImGui::Button("Kill Everyone")) {
                 for (auto player : GetAllPlayerControl()) {
                     if (IsInGame())
                         State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
@@ -168,7 +168,7 @@ namespace GameTab {
                 State.Save();
             }
 
-            if (IsInGame()) {
+            if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
                 if (ImGui::Button("Kill All Crewmates")) {
                     for (auto player : GetAllPlayerControl()) {
                         if (!PlayerIsImpostor(GetPlayerData(player))) {

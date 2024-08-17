@@ -7,7 +7,7 @@
 Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo* method)
 {
 	try {
-		if (!State.PanicMode && State.EnableZoom)
+		if (!State.PanicMode && State.EnableZoom && !State.InMeeting)
 		{	//Figured it is better to restore the current camera height than using state
 			float orthographicSize = Camera_get_orthographicSize(__this, NULL);
 			Camera_set_orthographicSize(__this, 3.0f, NULL);

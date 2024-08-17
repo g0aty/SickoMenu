@@ -208,6 +208,8 @@ namespace SelfTab {
             if (ToggleButton("Disable Kill Animation", &State.DisableKillAnimation)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("Dark Mode (Chat Only)", &State.DarkMode)) State.Save();
 
             if (ToggleButton("Show Host", &State.ShowHost)) {
                 State.Save();
@@ -260,6 +262,10 @@ namespace SelfTab {
             }
             ImGui::SameLine();
             if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Kill While Vanished", &State.KillInVanish)) {
                 State.Save();
             }
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {

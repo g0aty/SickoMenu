@@ -16,7 +16,7 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 
 	AssignPreChosenRoles(roleRates, assignedPlayers);
 	AssignRoles(roleRates, roleRates.ShapeshifterChance, RoleTypes__Enum::Shapeshifter, allPlayers, assignedPlayers);
-	AssignRoles(roleRates, roleRates.TrackerChance, RoleTypes__Enum::Tracker, allPlayers, assignedPlayers);
+	AssignRoles(roleRates, roleRates.PhantomChance, RoleTypes__Enum::Phantom, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, 100, RoleTypes__Enum::Impostor, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.ScientistChance, RoleTypes__Enum::Scientist, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.TrackerChance, RoleTypes__Enum::Tracker, allPlayers, assignedPlayers);
@@ -44,6 +44,21 @@ void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPl
 		roleRates.SubtractRole(trueRole);
 
 		PlayerControl_RpcSetRole(player, trueRole, false, NULL);
+		if (State.TournamentMode) {
+			auto friendCode = convert_from_string(GetPlayerData(player)->fields.FriendCode);
+			if (std::find(State.tournamentFriendCodes.begin(), State.tournamentFriendCodes.end(), friendCode) == State.tournamentFriendCodes.end()) {
+				State.tournamentFriendCodes.push_back(friendCode);
+				State.tournamentPoints[friendCode] = 0.f;
+				State.tournamentWinPoints[friendCode] = 0.f;
+				State.tournamentCalloutPoints[friendCode] = 0.f;
+				State.tournamentEarlyDeathPoints[friendCode] = 0.f;
+				State.tournamentKillCaps[friendCode] = 0.f;
+			}
+			if (trueRole == RoleTypes__Enum::Impostor || trueRole == RoleTypes__Enum::Shapeshifter || trueRole == RoleTypes__Enum::Phantom) {
+				State.tournamentAssignedImpostors.push_back(friendCode);
+				State.tournamentAliveImpostors.push_back(friendCode);
+			}
+		}
 		assignedPlayers.push_back(player->fields.PlayerId);
 	}
 }
@@ -92,6 +107,23 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 				{
 					roleRates.SubtractRole(role);
 					PlayerControl_RpcSetRole(player, role, false, NULL);
+
+					if (State.TournamentMode) {
+						auto friendCode = convert_from_string(GetPlayerData(player)->fields.FriendCode);
+						if (std::find(State.tournamentFriendCodes.begin(), State.tournamentFriendCodes.end(), friendCode) == State.tournamentFriendCodes.end()) {
+							State.tournamentFriendCodes.push_back(friendCode);
+							State.tournamentPoints[friendCode] = 0.f;
+							State.tournamentWinPoints[friendCode] = 0.f;
+							State.tournamentCalloutPoints[friendCode] = 0.f;
+							State.tournamentEarlyDeathPoints[friendCode] = 0.f;
+							State.tournamentKillCaps[friendCode] = 0.f;
+						}
+						if (role == RoleTypes__Enum::Impostor || role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Phantom) {
+							State.tournamentAssignedImpostors.push_back(friendCode);
+							State.tournamentAliveImpostors.push_back(friendCode);
+						}
+					}
+
 					assignedPlayers.push_back(player->fields.PlayerId);
 					break;
 				}

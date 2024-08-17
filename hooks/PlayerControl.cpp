@@ -40,6 +40,10 @@ static Color32 GetKillCooldownColor(float killTimer) {
 	}
 }
 
+static std::string DisplayScore(float f) {
+	return std::format("{}", f == (int)f ? (int)f : f);
+}
+
 float dPlayerControl_fixedUpdateTimer = 50;
 float dPlayerControl_fixedUpdateCount = 0;
 void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
@@ -129,6 +133,32 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
 					roleColor.r, roleColor.g, roleColor.b,
 					roleColor.a, playerName);
+			}
+
+			if (IsHost() && State.TournamentMode && 
+				std::find(State.tournamentFriendCodes.begin(), State.tournamentFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.tournamentFriendCodes.end()) {
+				auto fc = convert_from_string(playerData->fields.FriendCode);
+				float points = State.tournamentPoints[fc], win = State.tournamentWinPoints[fc],
+					callout = State.tournamentCalloutPoints[fc], death = State.tournamentEarlyDeathPoints[fc];
+				std::string pointsHeader = std::format("Your Points: <#0f0>{} Normal</color>, <#9ef>{} +W, {} +C, {} +D</color>", DisplayScore(points),
+					DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
+				if (IsInLobby()) {
+					if (__this != *Game::pLocalPlayer) {
+						std::string pointsName = std::format("{}\n{}\n<#0000>0</color>", pointsHeader,
+							convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
+						auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
+							uint8_t(RpcCalls__Enum::SetName), SendOption__Enum::None, __this->fields._.OwnerId, NULL);
+						MessageWriter_WriteString(writer, convert_to_string(pointsName), NULL);
+						InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+					}
+					else {
+						playerName = std::format("<size=50%>{}</size>\n{}\n<size=50%><#0000>0</color></size>", pointsHeader, playerName);
+					}
+				}
+				else {
+					auto publicPlayerName = convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName);
+					PlayerControl_RpcSetName(__this, convert_to_string(publicPlayerName), NULL);
+				}
 			}
 
 			if (State.ShowPlayerInfo && IsInLobby() && !State.PanicMode)
@@ -390,9 +420,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 								std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(player), nullptr));
 								std::string playerId = std::format("<{}>", player->fields.PlayerId);
 								std::string newName = State.hostUserName + "<size=0>" + playerId + "</size>";
-								if (IsInGame() && playerName != newName)
+								if (IsInGame() && playerName != newName && playerName != "")
 									State.rpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
-								else if (IsInLobby() && playerName != newName)
+								else if (IsInLobby() && playerName != newName && playerName != "")
 									State.lobbyRpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
 							}
 						}
@@ -755,6 +785,16 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 			}
 		}
 
+		auto killerFc = convert_from_string(GetPlayerData(__this)->fields.FriendCode);
+		auto targetData = GetPlayerData(target);
+
+		if (std::find(State.tournamentAliveImpostors.begin(), State.tournamentAliveImpostors.end(), killerFc) != State.tournamentAliveImpostors.end()) {
+			UpdateTournamentPoints(GetPlayerData(__this), 0); //ImpKill
+		}
+		if (!State.tournamentFirstMeetingOver) {
+			State.tournamentEarlyDeathPoints[convert_from_string(target->fields.FriendCode)] += 1.f;
+		}
+
 		// ESP: Reset Kill Cooldown
 		if (__this->fields._.OwnerId != (*Game::pAmongUsClient)->fields._.ClientId) {
 			if (!target || target->fields.protectedByGuardianId < 0)
@@ -1093,14 +1133,27 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
 	if (IsInLobby()) return nullptr;
 	auto result = ImpostorRole_FindClosestTarget(__this, method);
-	if (!State.PanicMode && result == nullptr && State.InfiniteKillRange) {
+	if (!State.PanicMode && result == nullptr && (State.InfiniteKillRange || State.KillInVanish)) {
 		PlayerControl* new_result = nullptr;
-		float max_dist = FLT_MAX;
+		float defaultKillDist = 2.5f;
+		auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
+		switch (killDistSetting) {
+		case 0:
+			defaultKillDist = 1.f;
+			break; //short
+		case 1:
+			defaultKillDist = 1.8f;
+			break; //medium
+		case 2:
+			defaultKillDist = 2.5f;
+			break; //long
+		}
+		float max_dist = State.InfiniteKillRange ? FLT_MAX : defaultKillDist; //medium kill distance is 1.8
 		auto localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
 		for (auto p : GetAllPlayerControl()) {
 			if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 			auto pData = GetPlayerData(p);
-			if (PlayerIsImpostor(pData) && !(State.KillImpostors || (IsHost() && State.BattleRoyale))) continue; //neither impostors
+			if (PlayerIsImpostor(pData) && !(State.KillImpostors || IsHost())) continue; //neither impostors
 			if (pData->fields.IsDead) continue; //nor ghosts
 			float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 			if (currentDist < max_dist) {

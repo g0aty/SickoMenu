@@ -8,16 +8,30 @@
 namespace HostTab {
 	enum Groups {
 		Utils,
-		Settings
+		Settings,
+		Tournaments
 	};
 
 	static bool openUtils = true; //default to utils tab group
 	static bool openSettings = false;
-	static bool openRoles = false;
+	static bool openTournaments = false;
 
 	void CloseOtherGroups(Groups group) {
 		openUtils = group == Groups::Utils;
 		openSettings = group == Groups::Settings;
+		openTournaments = group == Groups::Tournaments;
+	}
+
+	/*std::string GetPlayerNameFromFriendCode(std::string friendCode) {
+		for (auto p : GetAllPlayerData()) {
+			if (p->fields.FriendCode == convert_to_string(friendCode))
+				return convert_from_string(GetPlayerOutfit(p)->fields.PlayerName);
+		}
+		return "";
+	}*/ //use if needed
+
+	std::string DisplayScore(float f) {
+		return std::format("{}", f == (int)f ? (int)f : f);
 	}
 
 	static void SetRoleAmount(RoleTypes__Enum type, int amount) {
@@ -46,10 +60,16 @@ namespace HostTab {
 			if (TabGroup("Utils", openUtils)) {
 				CloseOtherGroups(Groups::Utils);
 			}
-			if ((IsInGame() || IsInLobby()) && GameOptions().HasOptions()) {
+			if (GameOptions().HasOptions()) {
 				ImGui::SameLine();
 				if (TabGroup("Settings", openSettings)) {
 					CloseOtherGroups(Groups::Settings);
+				}
+			}
+			if (State.TournamentMode) {
+				ImGui::SameLine();
+				if (TabGroup("Tournaments", openTournaments)) {
+					CloseOtherGroups(Groups::Tournaments);
 				}
 			}
 			GameOptions options;
@@ -88,7 +108,7 @@ namespace HostTab {
 									State.assignedRoles[index] = RoleType::Random;
 								else if (State.assignedRoles[index] == RoleType::Shapeshifter)
 									State.assignedRoles[index] = RoleType::Random;
-								else if (State.assignedRoles[index] == RoleType::Tracker)
+								else if (State.assignedRoles[index] == RoleType::Phantom)
 									State.assignedRoles[index] = RoleType::Random;
 								State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
 								State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
@@ -372,6 +392,19 @@ namespace HostTab {
 				}
 			}
 #pragma endregion
+			if (openTournaments && State.TournamentMode) {
+				if (ImGui::Button("Clear All Data")) {
+					State.tournamentPoints.clear();
+					State.tournamentKillCaps.clear();
+				}
+
+				for (auto i : State.tournamentFriendCodes) {
+					float points = State.tournamentPoints[i], win = State.tournamentWinPoints[i],
+						callout = State.tournamentCalloutPoints[i], death = State.tournamentEarlyDeathPoints[i];
+					ImGui::Text(std::format("{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
+						DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str());
+				}
+			}
 			ImGui::EndChild();
 		}
 	}
