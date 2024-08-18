@@ -223,7 +223,7 @@ namespace SettingsTab {
 			if (CustomListBoxInt("Platform", &State.FakePlatform, PLATFORMS))
 				State.Save();
 
-			//if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
+			if (ToggleButton("Disable Host Anticheat (juakin castillo is newebie)", &State.DisableHostAnticheat)) State.Save();
 		}
 
 		if (openKeybinds) {
