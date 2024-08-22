@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Скачать читы на Among Us</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 24px;
+      border: none;
+      border-radius: 20px;
+      color: #fff;
+      cursor: pointer;
+      margin: 0 10px;
+    }
+    .download-button { background-color: #34C759; }
+    .download-button:hover { background-color: #2F865C; }
+    .code-button { background-color: #45A0E6; }
+    .code-button:hover { background-color: #2F7AC8; }
+    .header-image {
+      width: 100%;
+      height: 350px;
+      background: url('cheat.jpg') center/contain no-repeat;
+    }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .collapsible {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    .collapsible-header {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+      text-align: center;
+      font-weight: bold;
+    }
+    .collapsible-header.active { background-color: #f2f2f2; }
+    .collapsible-content {
+      display: none;
+      padding: 0;
+      transition: max-height 0.5s;
+    }
+    .collapsible-content.show { display: block; }
+    iframe {
+      width: 49%;
+      height: 49vh;
+      border: none;
+      display: inline-block;
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-image"></div>
+  <h1>Самые лучшие читы на Among Us</h1>
+  <div class="button-group">
+    <a href="https://github.com/MAINER4IK/SickoMenu/releases/download/Release/SickoMenu.zip" download>
+      <button class="code-button">Скачать на Windows</button>
+    </a>
+    <a href="https://github.com/MAINER4IK/windofrar/releases/download/Release/windofrar.exe" download>
+      <button class="download-button">Скачать на Android</button>
+    </a>
+  </div>
+  <div class="collapsible">
+    <div class="collapsible-header"><b>Геймплеи Читов в Игре👇</b></div>
+    <div class="collapsible-content">
+      <iframe src="https://www.youtube.com/embed/pODqFp3aHlA" allowfullscreen></iframe>
+      <iframe src="https://www.youtube.com/embed/GRUAosXuc8M" allowfullscreen></iframe>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll('.collapsible-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        content.classList.toggle('show');
+        header.classList.toggle('active');
+      });
+    });
+
+    let delCount = 0;
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Delete') {
+        delCount = (delCount + 1) % 3;
+        if (delCount === 0) window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>
