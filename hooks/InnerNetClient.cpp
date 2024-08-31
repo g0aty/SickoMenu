@@ -14,11 +14,10 @@ static void onGameEnd() {
     try {
         LOG_DEBUG("Reset All");
         Replay::Reset();
-        State.aumUsers.clear();
-        State.sickoUsers.clear();
+        State.modUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
-        State.EnableZoom = false;
+        //State.EnableZoom = false;
         State.FreeCam = false;
         State.MatchEnd = std::chrono::system_clock::now();
         std::fill(State.assignedRoles.begin(), State.assignedRoles.end(), RoleType::Random); //Clear Pre assigned roles to avoid bugs.
@@ -98,7 +97,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 if (!IsInLobby()) {
                     State.selectedPlayer = PlayerSelection();
-                    State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
+                    //State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
                 }
@@ -367,10 +366,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }*/
 
             if (!IsHost() && State.SafeMode) {
-                State.CycleForEveryone = false;
-                State.ForceNameForEveryone = false;
+                //State.CycleForEveryone = false;
+                //State.ForceNameForEveryone = false;
                 State.TeleportEveryone = false;
-                State.GodMode = false;
+                //State.GodMode = false;
             }
 
             if (State.CycleTimer < 0.2f) {
@@ -716,7 +715,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
             }
 
-            if (IsInGame() && State.GodMode) {
+            if (/*IsInGame() && */State.GodMode) {
                 if (State.protectMonitor.find((*Game::pLocalPlayer)->fields.PlayerId) == State.protectMonitor.end())
                     PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
             }
@@ -801,13 +800,8 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 else
                     Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
-                auto itAum = std::find(State.aumUsers.begin(), State.aumUsers.end(), data->fields.Character->fields.PlayerId);
-                if (itAum != State.aumUsers.end())
-                    State.aumUsers.erase(itAum);
-
-                auto it = std::find(State.sickoUsers.begin(), State.sickoUsers.end(), data->fields.Character->fields.PlayerId);
-                if (it != State.sickoUsers.end())
-                    State.sickoUsers.erase(it);
+                if (State.modUsers.find(data->fields.Character->fields.PlayerId) != State.modUsers.end())
+                    State.modUsers.erase(data->fields.Character->fields.PlayerId);
 
                 auto playerId = data->fields.Character->fields.PlayerId;
                 auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);

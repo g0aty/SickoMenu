@@ -173,58 +173,59 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					if (client->fields.Character == *Game::pLocalPlayer && State.SpoofPlatform) platform = Platforms__Enum(State.FakePlatform + 1); //fix incorrect platform showing for yourself
 					switch (platform) {
 					case Platforms__Enum::StandaloneEpicPC:
-						platformId = "Epic Games - PC";
+						platformId = "Epic Games";
 						break;
 					case Platforms__Enum::StandaloneSteamPC:
-						platformId = "Steam - PC";
+						platformId = "Steam";
 						break;
 					case Platforms__Enum::StandaloneMac:
 						platformId = "Mac";
 						break;
 					case Platforms__Enum::StandaloneWin10:
-						platformId = "Microsoft Store - PC";
+						platformId = "Microsoft Store";
 						break;
 					case Platforms__Enum::StandaloneItch:
-						platformId = "itch.io - PC";
+						platformId = "itch.io";
 						break;
 					case Platforms__Enum::IPhone:
-						platformId = "iOS/iPadOS - Mobile";
+						platformId = "iOS/iPadOS";
 						break;
 					case Platforms__Enum::Android:
-						platformId = "Android - Mobile";
+						platformId = "Android";
 						break;
 					case Platforms__Enum::Switch:
-						platformId = "Nintendo Switch - Console";
+						platformId = "Nintendo Switch";
 						break;
 					case Platforms__Enum::Xbox:
-						platformId = "Xbox - Console";
+						platformId = "Xbox";
 						break;
 					case Platforms__Enum::Playstation:
-						platformId = "Playstation - Console";
+						platformId = "Playstation";
 						break;
 					default:
-						platformId = "Unknown Platform";
+						platformId = "Unknown";
 						break;
 					}
 				}
-				std::string isAum = std::count(State.aumUsers.begin(), State.aumUsers.end(), playerData->fields.PlayerId) ? " <#f55>[AUM]</color>" : "";
-				std::string isSicko = (playerData == localData || std::count(State.sickoUsers.begin(), State.sickoUsers.end(), playerData->fields.PlayerId)) ? " <#afa>[SICKO]</color>" : "";
-				std::string levelText = std::format("<#9ef>Level <#0f0>{}</color> ({}){}{}</color>", playerLevel, platformId, isSicko, isAum);
+				std::string modUsage = __this == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
+					std::format(" <#fb0>[{} User]</color>", 
+						__this == *Game::pLocalPlayer ? "<#0f0>Sicko</color><#f00>Menu</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
+				std::string levelText = std::format("<#f00>ID {}</color> <#0f0>Level {}</color> <#b0f>({})</color>{}</color>", playerData->fields.PlayerId, playerLevel, platformId, modUsage);
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				if (IsStreamerMode())
 					friendCode = "Friend Code Hidden";
 				std::string hostFriendCode = convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.FriendCode);
 				if (client != NULL && client == host) {
 					if (friendCode == "" && !IsStreamerMode())
-						playerName = "<size=1.4><#0f0>[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#9ef>No Friend Code</color><#0000>0</color>";
+						playerName = "<size=1.4><#fb0>[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>No Friend Code</color><#0000>0</color>";
 					else
-						playerName = "<size=1.4><#0f0>[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#9ef>" + friendCode + "</color><#0000>0</color>";
+						playerName = "<size=1.4><#fb0>[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>" + friendCode + "</color><#0000>0</color>";
 				}
 				else {
 					if (friendCode == "" && !IsStreamerMode())
-						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#9ef>No Friend Code</color><#0000>0</color>";
+						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>No Friend Code</color><#0000>0</color>";
 					else
-						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#9ef>" + friendCode + "</color><#0000>0</color>";
+						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>" + friendCode + "</color><#0000>0</color>";
 				}
 			}
 			if (IsInGame() && State.RevealRoles && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
@@ -537,7 +538,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						}
 					};
 				}
-				if (State.FollowerCam != nullptr) {
+				/*if (State.FollowerCam != nullptr) {
 					if (State.EnableZoom && !State.InMeeting && (IsInGame() || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
 						Camera_set_orthographicSize(State.FollowerCam, State.CameraHeight * 3, NULL);
 					else
@@ -547,7 +548,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					Vector3 cameraVector3 = Transform_get_position(cameraTransform, NULL);
 					if (State.EnableZoom && !State.InMeeting && State.CameraHeight > 3.0f)
 						Transform_set_position(cameraTransform, { cameraVector3.x, cameraVector3.y, 100 }, NULL);
-				}
+				}*/
 			}
 			else if (auto role = playerData->fields.Role) {
 				// ESP: Calculate Kill Cooldown
@@ -773,11 +774,15 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 		}
 		auto killer = GetEventPlayerControl(__this);
 		auto victim = GetEventPlayerControl(target);
+		auto killerData = GetPlayerData(__this);
+		auto victimData = GetPlayerData(target);
 		if (killer && victim) {
-			if (PlayerIsImpostor(GetPlayerData(__this)) && PlayerIsImpostor(GetPlayerData(target))) {
+			if (!PlayerIsImpostor(killerData) || (PlayerIsImpostor(killerData) && (killerData->fields.IsDead || (victimData->fields.IsDead || PlayerIsImpostor(victimData))))) {
 				synchronized(Replay::replayEventMutex) {
 					State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(killer.value(), CHEAT_ACTIONS::CHEAT_KILL_IMPOSTOR));
 				}
+				if (State.SafeMode && State.Enable_SMAC && State.SMAC_CheckMurder)
+					SMAC_OnCheatDetected(__this, "Abnormal Murder Player");
 			}
 			synchronized(Replay::replayEventMutex) {
 				State.liveReplayEvents.emplace_back(std::make_unique<KillEvent>(killer.value(), victim.value(), PlayerControl_GetTruePosition(__this, NULL), PlayerControl_GetTruePosition(target, NULL)));
@@ -911,6 +916,7 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	try {
 		HandleRpc(__this, callId, reader);
+		SMAC_HandleRpc(__this, callId, reader);
 		if (IsHost() && ((((!State.PanicMode && State.DisableMeetings) || State.BattleRoyale) && 
 			(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
 			(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))

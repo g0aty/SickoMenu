@@ -22,12 +22,11 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 			local->fields.IsDead = true;
 			wasDead = true;
 		}
+		ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
 		
 		std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
 		auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
 		uint32_t colorId = outfit->fields.ColorId;
-		ChatController_AddChat(__this, sourcePlayer, 
-			State.DarkMode ? convert_to_string("<#fff>" + convert_from_string(chatText) + "</color>") : chatText, censor, method);
 		std::string message = RemoveHtmlTags(convert_from_string(chatText));
 		if (wasDead) {
 			local->fields.IsDead = false;
@@ -146,19 +145,37 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	if (!State.SafeMode)
 		__this->fields.timeSinceLastMessage = 420.69f; //we can set this to anything more than or equal to 3 and it'll work
 
-	if (!State.PanicMode && State.DarkMode && (__this->fields.state == ChatControllerState__Enum::Open ||__this->fields.state == ChatControllerState__Enum::Opening)) {
+	if (State.DarkMode) {
+		auto gray32 = Color32();
+		gray32.r = 34; gray32.g = 34; gray32.b = 34; gray32.a = 255;
+		auto gray = Color32_op_Implicit_1(gray32, NULL);
 		if (__this->fields.freeChatField != NULL) {
 			auto compoText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText);
 			compoText = "<#fff>" + compoText + "</color>";
 			__this->fields.freeChatField->fields.textArea->fields.compoText = convert_to_string(compoText);
 			auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
 			TMP_Text_set_color((app::TMP_Text*)outputText, Palette__TypeInfo->static_fields->White, NULL);
-			SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, Palette__TypeInfo->static_fields->Black, NULL);
+			SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, gray, NULL);
 		}
 		if (__this->fields.quickChatField != NULL) {
 			auto text = __this->fields.quickChatField->fields.text;
 			TMP_Text_set_color((app::TMP_Text*)text, Palette__TypeInfo->static_fields->White, NULL);
-			SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, Palette__TypeInfo->static_fields->Black, NULL);
+			SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, gray, NULL);
+		}
+	}
+	else {
+		if (__this->fields.freeChatField != NULL) {
+			auto compoText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText);
+			compoText = RemoveHtmlTags(compoText);
+			__this->fields.freeChatField->fields.textArea->fields.compoText = convert_to_string(compoText);
+			auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
+			TMP_Text_set_color((app::TMP_Text*)outputText, Palette__TypeInfo->static_fields->Black, NULL);
+			SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, Palette__TypeInfo->static_fields->White, NULL);
+		}
+		if (__this->fields.quickChatField != NULL) {
+			auto text = __this->fields.quickChatField->fields.text;
+			TMP_Text_set_color((app::TMP_Text*)text, Palette__TypeInfo->static_fields->Black, NULL);
+			SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, Palette__TypeInfo->static_fields->White, NULL);
 		}
 	}
 
@@ -176,7 +193,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	State.ChatCooldown = __this->fields.timeSinceLastMessage;
 	State.ChatFocused = __this->fields.freeChatField->fields.textArea->fields.hasFocus;
 
-	if (State.FollowerCam != nullptr && !State.PanicMode && State.EnableZoom && 
+	/*if (State.FollowerCam != nullptr && !State.PanicMode && State.EnableZoom &&
 		(__this->fields.state == ChatControllerState__Enum::Closed || (__this->fields.state == ChatControllerState__Enum::Closing && State.EnableZoom))) {
 		Camera_set_orthographicSize(State.FollowerCam, 3.f, NULL);
 		int32_t width = Screen_get_width(NULL);
@@ -185,7 +202,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		ChatController_OnResolutionChanged(__this, (float)(width / height), width, height, fullscreen, NULL);
 		if (__this->fields.state == ChatControllerState__Enum::Closing && State.EnableZoom) ChatController_ForceClosed(__this, NULL); //force close the chat as it stays open otherwise
 		Camera_set_orthographicSize(State.FollowerCam, 3.f * (State.EnableZoom ? State.CameraHeight : 1.f), NULL);
-	}
+	}*/
 
 	if (!State.PanicMode && State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby()) && __this->fields.timeSinceLastMessage >= 3.5f) {
 		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(State.chatMessage), NULL);
@@ -263,10 +280,10 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 }
 
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method) {
-	if (!State.PanicMode && State.DarkMode) {
-		auto black = __this->fields.playerInfo->fields.IsDead ? 
-			Palette__TypeInfo->static_fields->DisabledClear : Palette__TypeInfo->static_fields->Black;
-		SpriteRenderer_set_color(__this->fields.Background, Palette__TypeInfo->static_fields->Black, NULL);
+	if (State.DarkMode) {
+		auto black = Palette__TypeInfo->static_fields->Black;
+		if (__this->fields.playerInfo->fields.IsDead) black.a *= 0.75f;
+		SpriteRenderer_set_color(__this->fields.Background, black, NULL);
 		auto textArea = __this->fields.TextArea;
 		TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
 	}

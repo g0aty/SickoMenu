@@ -126,11 +126,11 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                     State.rpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
             }
         }
-        if ((ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3)) && State.EnableZoom && (IsInGame() || IsInLobby())) {
+        if (State.EnableZoom && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f)  State.CameraHeight += 0.1f;
-            if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.1f >= 0.5f) State.CameraHeight -= 0.1f;
+            if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.1f >= 1.f) State.CameraHeight -= 0.1f;
         }
-        if (State.FreeCam && (IsInGame() || IsInLobby())) {
+        if ((ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT)) && State.FreeCam && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f ) State.FreeCamSpeed += 0.05f;
             if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.05f >= 0.05f) State.FreeCamSpeed -= 0.05f;
         }

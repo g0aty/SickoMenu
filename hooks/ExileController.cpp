@@ -31,17 +31,22 @@ void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerI
 		if (IsHost() && State.TournamentMode && !voteTie && exiled != NULL) {
 			if (PlayerIsImpostor(exiled)) {
 				UpdateTournamentPoints(exiled, 3); //ImpVoteOut
-				for (auto p : GetAllPlayerData()) {
-					if (!PlayerIsImpostor(p)) UpdateTournamentPoints(exiled, 5); //ImpVoteOutCorrect
+				for (auto i : State.voteMonitor) {
+					if (i.second == exiled->fields.PlayerId && !PlayerIsImpostor(GetPlayerDataById(i.first)))
+						UpdateTournamentPoints(GetPlayerDataById(i.first), 5); //ImpVoteOutCorrect
 				}
 				auto exiledFc = convert_from_string(exiled->fields.FriendCode);
 				auto pos = std::find(State.tournamentAliveImpostors.begin(), State.tournamentAliveImpostors.end(), exiledFc);
 				if (pos != State.tournamentAliveImpostors.end()) State.tournamentAliveImpostors.erase(pos);
 			}
 			else {
-				UpdateTournamentPoints(exiled, 4); //CrewVoteOut
 				for (auto p : GetAllPlayerData()) {
-					if (!PlayerIsImpostor(p)) UpdateTournamentPoints(exiled, 6); //ImpVoteOutIncorrect
+					if (PlayerIsImpostor(p))
+						UpdateTournamentPoints(exiled, 4); //CrewVoteOut
+				}
+				for (auto i : State.voteMonitor) {
+					if (i.second == exiled->fields.PlayerId && !PlayerIsImpostor(GetPlayerDataById(i.first)))
+						UpdateTournamentPoints(GetPlayerDataById(i.first), 6); //ImpVoteOutIncorrect
 				}
 			}
 		}

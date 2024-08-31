@@ -21,7 +21,7 @@ int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
 }
 
 bool dConstants_1_IsVersionModded(MethodInfo* method) {
-	//if (State.DisableHostAnticheat) return true; //this helps to bypass anticheat in our hosted lobbies
+	if (State.DisableHostAnticheat) return true; //this helps to bypass anticheat in our hosted lobbies
 	//return false;
 	return Constants_1_IsVersionModded(method);
 }

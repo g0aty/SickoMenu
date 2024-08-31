@@ -10,16 +10,19 @@ namespace GameTab {
     enum Groups {
         General,
         Chat,
+        Anticheat,
         Options
     };
 
     static bool openGeneral = true; //default to visual tab group
     static bool openChat = false;
+    static bool openAnticheat = false;
     static bool openOptions = false;
 
     void CloseOtherGroups(Groups group) {
         openGeneral = group == Groups::General;
         openChat = group == Groups::Chat;
+        openAnticheat = group == Groups::Anticheat;
         openOptions = group == Groups::Options;
     }
 
@@ -32,6 +35,10 @@ namespace GameTab {
         ImGui::SameLine();
         if (TabGroup("Chat", openChat)) {
             CloseOtherGroups(Groups::Chat);
+        }
+        ImGui::SameLine();
+        if (TabGroup("Anticheat", openAnticheat)) {
+            CloseOtherGroups(Groups::Anticheat);
         }
         if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
             ImGui::SameLine();
@@ -147,7 +154,7 @@ namespace GameTab {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
                 }
             }*/
-            if ((IsInGame() || IsInLobby()) && (IsHost() || !State.SafeMode)) {
+            if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
                 if (ImGui::Button("Protect Everyone")) {
                     for (auto player : GetAllPlayerControl()) {
@@ -303,6 +310,68 @@ namespace GameTab {
             {
                 State.Save();
             }
+        }
+
+        if (openAnticheat) {
+            if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
+
+            if (IsHost()) CustomListBoxInt("Host Punishment­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+            else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+
+            if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
+            if (ToggleButton("Punish Blacklisted Players", &State.SMAC_PunishBlacklist)) State.Save();
+            if (State.SMAC_PunishBlacklist) {
+                if (State.SMAC_Blacklist.empty())
+                    ImGui::Text("No users in blacklist!");
+                static std::string newPuid = "";
+                static std::string newName = "";
+                InputString("New Name", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
+                InputString("New PUID", &newPuid, ImGuiInputTextFlags_EnterReturnsTrue);
+                ImGui::SameLine();
+                if (newPuid != "" && ImGui::Button("Add PUID")) {
+                    State.SMAC_Blacklist[newPuid] = newName != "" ? newName : "No Name";
+                    State.Save();
+                    newName = "";
+                    newPuid = "";
+                }
+                if (!State.SMAC_Blacklist.empty()) {
+                    static int selectedPuidIndex = 0;
+                    selectedPuidIndex = std::clamp(selectedPuidIndex, 0, (int)State.SMAC_Blacklist.size() - 1);
+                    std::vector<const char*> puidUserVector(State.SMAC_Blacklist.size(), nullptr);
+                    std::vector<const char*> puidVector(State.SMAC_Blacklist.size(), nullptr);
+                    for (auto i : State.SMAC_Blacklist) {
+                        puidUserVector.push_back(std::format("{} ({})", i.second, i.first).c_str());
+                        puidVector.push_back(i.first.c_str());
+                    }
+                    CustomListBoxInt("Player to Delete", &selectedPuidIndex, puidUserVector);
+                    ImGui::SameLine();
+                    if (ImGui::Button("Delete"))
+                        State.SMAC_Blacklist.erase((std::string)puidVector[selectedPuidIndex]);
+                }
+            }
+            ImGui::NewLine();
+            if (ToggleButton("Detect AUM Usage", &State.SMAC_CheckAUM)) State.Save();
+            if (ToggleButton("Detect SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
+            if (ToggleButton("Detect Abnormal Names", &State.SMAC_CheckBadNames)) State.Save();
+            if (ToggleButton("Detect Abnormal Set Color", &State.SMAC_CheckColor)) State.Save();
+            if (ToggleButton("Detect Abnormal Set Cosmetics", &State.SMAC_CheckCosmetics)) State.Save();
+            if (ToggleButton("Detect Abnormal Chat Note", &State.SMAC_CheckChatNote)) State.Save();
+            if (ToggleButton("Detect Abnormal Scanner", &State.SMAC_CheckScanner)) State.Save();
+            if (ToggleButton("Detect Abnormal Animation", &State.SMAC_CheckAnimation)) State.Save();
+            if (ToggleButton("Detect Setting Tasks", &State.SMAC_CheckTasks)) State.Save();
+            if (ToggleButton("Detect Setting Roles", &State.SMAC_CheckRole)) State.Save();
+            if (ToggleButton("Detect Abnormal Chat", &State.SMAC_CheckChat)) State.Save();
+            if (ToggleButton("Detect Abnormal Meetings", &State.SMAC_CheckMeeting)) State.Save();
+            if (ToggleButton("Detect Abnormal Body Reports", &State.SMAC_CheckReport)) State.Save();
+            if (ToggleButton("Detect Abnormal Murders", &State.SMAC_CheckMurder)) State.Save();
+            if (ToggleButton("Detect Abnormal Shapeshift", &State.SMAC_CheckShapeshift)) State.Save();
+            if (ToggleButton("Detect Abnormal Vanish", &State.SMAC_CheckVanish)) State.Save();
+            if (ToggleButton("Detect Abnormal Player Levels", &State.SMAC_CheckLevel)) State.Save();
+            if (State.SMAC_CheckLevel && ImGui::InputInt("Minimum Level to Detect", &State.SMAC_HighLevel)) {
+                State.Save();
+            }
+            if (ToggleButton("Detect Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
+            if (ToggleButton("Detect Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
         }
 
         if (openOptions) {

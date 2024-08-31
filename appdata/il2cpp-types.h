@@ -10378,6 +10378,60 @@ namespace app
     };
 #pragma endregion
 
+#pragma region Mushroom
+    struct Mushroom__Fields {
+        struct MonoBehaviour__Fields _;
+        struct Collider2D* mushroomCollider;
+        struct SpriteRenderer* mushroom;
+        struct SpriteRenderer* spores;
+        struct GameObject* sporeMask;
+        int32_t id;
+        struct SpriteAnim* mushroomAnimator;
+        struct AnimationClip* mushroomIdle;
+        struct AnimationClip* mushroomAppear;
+        struct AnimationClip* mushroomSteppedOn;
+        struct SpriteAnim* sporeCloudAnimator;
+        struct SpriteAnim* sporeCloudMaskAnimator;
+        struct AnimationClip* sporeCloudIdle;
+        struct AnimationClip* sporeCloudAppear;
+        struct AnimationClip* sporeCloudDisappear;
+        float secondsBetweenSporeReleases;
+        float secondsSporeIsActive;
+        float secondsSporeReappearsFor;
+        float secondsSporeFade;
+        struct AudioClip* spawnSound;
+        struct AudioClip* activateSporeSound;
+        void* filter;
+        struct Vector3 origPosition;
+    };
+
+    struct Mushroom {
+        struct Mushroom__Class* klass;
+        MonitorData* monitor;
+        struct Mushroom__Fields fields;
+    };
+
+    struct Mushroom__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct Mushroom__StaticFields {
+        struct Collider2D__Array* Hits;
+    };
+
+    struct Mushroom__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct Mushroom__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct Mushroom__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ActivityManager;
@@ -10398,4 +10452,5 @@ namespace app
     typedef Il2CppObject OverlayKillAnimation;
     typedef Il2CppObject KillOverlay;
     typedef Il2CppObject AbstractSaveData;
+    typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
 }

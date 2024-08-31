@@ -250,8 +250,9 @@ public:
 
     std::map<Game::Voter, Game::VotedFor> voteMonitor;
 
-    std::vector<Game::PlayerId> aumUsers;
-    std::vector<Game::PlayerId> sickoUsers;
+    //std::vector<Game::PlayerId> aumUsers;
+    //std::vector<Game::PlayerId> sickoUsers;
+    std::map<Game::PlayerId, std::string> modUsers;
     int32_t rpcCooldown = 15;
     int32_t playerKilledId = 0;
 
@@ -409,6 +410,34 @@ public:
     }
 
     std::string SickoVersion = "v4.0_pr8";
+
+    bool Enable_SMAC = false;
+    int SMAC_Punishment = 0;
+    int SMAC_HostPunishment = 0;
+    bool SMAC_AddToBlacklist = false;
+    bool SMAC_PunishBlacklist = false;
+    bool SMAC_CheckAUM = true;
+    bool SMAC_CheckSicko = true;
+    bool SMAC_CheckBadNames = true;
+    bool SMAC_CheckColor = true;
+    bool SMAC_CheckCosmetics = true;
+    bool SMAC_CheckChatNote = true;
+    bool SMAC_CheckScanner = true;
+    bool SMAC_CheckAnimation = true;
+    bool SMAC_CheckTasks = true;
+    bool SMAC_CheckRole = true;
+    bool SMAC_CheckChat = true;
+    bool SMAC_CheckMeeting = true;
+    bool SMAC_CheckReport = true;
+    bool SMAC_CheckMurder = true;
+    bool SMAC_CheckShapeshift = true;
+    bool SMAC_CheckVanish = true;
+    bool SMAC_CheckLevel = true;
+    bool SMAC_CheckVent = true;
+    bool SMAC_CheckSabotage = true;
+    int SMAC_HighLevel = 1000;
+    std::map<std::string /*puid*/, std::string> SMAC_Blacklist = {};
+    std::vector<uint8_t> SMAC_AttemptBanLobby = {};
 
     void Load();
     void Save();

@@ -414,6 +414,7 @@ void Settings::Save() {
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
                 { "KillInVanish", this->KillInVanish },
+                { "GodMode", this->GodMode },
 
                 { "RevealVotes", this->RevealVotes },
                 { "RevealAnonymousVotes", this->RevealAnonymousVotes },
@@ -445,10 +446,35 @@ void Settings::Save() {
                 { "HideCode", this->HideCode },
                 { "RgbLobbyCode", this->RgbLobbyCode },
 
-
                 { "SickoDetection", this->SickoDetection },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
+
+                { "Enable_SMAC", this->Enable_SMAC },
+                { "SMAC_Punishment", this->SMAC_Punishment },
+                { "SMAC_HostPunishment", this->SMAC_HostPunishment },
+                { "SMAC_AddToBlacklist", this->SMAC_AddToBlacklist },
+                { "SMAC_PunishBlacklist", this->SMAC_PunishBlacklist },
+                { "SMAC_CheckAUM", this->SMAC_CheckAUM },
+                { "SMAC_CheckSicko", this->SMAC_CheckSicko },
+                { "SMAC_CheckBadNames", this->SMAC_CheckBadNames },
+                { "SMAC_CheckColor", this->SMAC_CheckColor },
+                { "SMAC_CheckCosmetics", this->SMAC_CheckCosmetics },
+                { "SMAC_CheckChatNote", this->SMAC_CheckChatNote },
+                { "SMAC_CheckScanner", this->SMAC_CheckScanner },
+                { "SMAC_CheckAnimation", this->SMAC_CheckAnimation },
+                { "SMAC_CheckTasks", this->SMAC_CheckTasks },
+                { "SMAC_CheckRole", this->SMAC_CheckRole },
+                { "SMAC_CheckChat", this->SMAC_CheckChat },
+                { "SMAC_CheckMeeting", this->SMAC_CheckMeeting },
+                { "SMAC_CheckReport", this->SMAC_CheckReport },
+                { "SMAC_CheckMurder", this->SMAC_CheckMurder },
+                { "SMAC_CheckShapeshift", this->SMAC_CheckShapeshift },
+                { "SMAC_CheckVanish", this->SMAC_CheckVanish },
+                { "SMAC_CheckLevel", this->SMAC_CheckLevel },
+                { "SMAC_CheckVent", this->SMAC_CheckVent },
+                { "SMAC_CheckSabotage", this->SMAC_CheckSabotage },
+                { "SMAC_Blacklist", this->SMAC_Blacklist },
             };
 
             std::ofstream outSettings(settingsPath);

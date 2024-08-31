@@ -115,6 +115,11 @@ namespace DebugTab {
 
 		ImGui::Text(std::format("Active Scene: {}", State.CurrentScene).c_str());
 
+		if (ImGui::CollapsingHeader("Experiments##debug")) {
+			if (ToggleButton("Disable Host Anticheat (+25 Mode)", &State.DisableHostAnticheat)) State.Save();
+			if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
+		}
+
 		ImGui::EndChild();
 	}
 }

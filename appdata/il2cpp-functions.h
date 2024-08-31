@@ -197,6 +197,7 @@ DO_APP_FUNC(float, MessageReader_ReadSingle, (MessageReader* __this, MethodInfo*
 DO_APP_FUNC(String*, MessageReader_ReadString, (MessageReader* __this, MethodInfo* method), "Hazel, System.String Hazel.MessageReader::ReadString()");
 DO_APP_FUNC(Byte__Array*, MessageReader_ReadBytesAndSize, (MessageReader* __this, MethodInfo* method), "Hazel, System.Byte[] Hazel.MessageReader::ReadBytesAndSize()");
 DO_APP_FUNC(Byte__Array*, MessageReader_ReadBytes, (MessageReader* __this, int32_t length, MethodInfo* method), "Hazel, System.Byte[] Hazel.MessageReader::ReadBytes(System.Int32)");
+DO_APP_FUNC(int32_t, MessageReader_get_BytesRemaining, (MessageReader* __this, MethodInfo* method), "Hazel, System.Int32 Hazel.MessageReader::get_BytesRemaining()");
 DO_APP_FUNC(void, MessageWriter_WriteBoolean, (MessageWriter* __this, bool value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Boolean)");
 DO_APP_FUNC(void, MessageWriter_WriteByte, (MessageWriter* __this, uint8_t value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Byte)");
 DO_APP_FUNC(void, MessageWriter_WriteUShort, (MessageWriter* __this, uint16_t value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.UInt16)");
@@ -241,6 +242,7 @@ DO_APP_FUNC(void, TMP_Text_set_alignment, (TMP_Text* __this, TextAlignmentOption
 DO_APP_FUNC(String*, TMP_Text_get_text, (TMP_Text* __this, MethodInfo* method), "Unity.TextMeshPro, System.String TMPro.TMP_Text::get_text()");
 DO_APP_FUNC(void, TMP_Text_set_text, (TMP_Text* __this, String* value, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TMP_Text::set_text(System.String)");
 DO_APP_FUNC(Color32, Color32_op_Implicit, (Color c, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Color32 UnityEngine.Color32::op_Implicit(UnityEngine.Color)");
+DO_APP_FUNC(Color, Color32_op_Implicit_1, (Color32 c, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Color UnityEngine.Color32::op_Implicit(UnityEngine.Color32)");
 
 DO_APP_FUNC(void, RoleManager_SelectRoles, (RoleManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void RoleManager::SelectRoles()");
 //DO_APP_FUNC(void, RoleManager_AssignRolesForTeam, (List_1_GameData_PlayerInfo_* players, RoleOptionsData* opts, RoleTeamTypes__Enum team, int32_t teamMax, Nullable_1_RoleTypes_ defaultRole, MethodInfo* method), "Assembly-CSharp, System.Void RoleManager::AssignRolesForTeam(System.Collections.Generic.List<GameData.PlayerInfo>, RoleOptionsData, RoleTeamTypes, System.Int32, System.Nullable<RoleTypes>)");
@@ -342,3 +344,5 @@ DO_APP_FUNC(void, AbstractSaveData_Save, (AbstractSaveData* __this, MethodInfo* 
 DO_APP_FUNC(void, ShipStatus_HandleRpc, (ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void ShipStatus::HandleRpc(System.Byte, Hazel.MessageReader)");
 DO_APP_FUNC(void, TMP_Text_set_color, (TMP_Text* __this, Color value, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TMP_Text::set_color(UnityEngine.Color)");
 DO_APP_FUNC(void, ChatBubble_SetText, (ChatBubble* __this, String* chatText, MethodInfo* method), "Assembly-CSharp, System.Void ChatBubble::SetText(System.String)");
+DO_APP_FUNC(void, Mushroom_FixedUpdate, (Mushroom* __this, MethodInfo* method), "Assembly-CSharp, System.Void Mushroom::FixedUpdate()");
+DO_APP_FUNC(void, Screen_SetResolution_1, (int32_t width, int32_t height, bool fullscreen, int32_t preferredRefreshRate, MethodInfo * method), "UnityEngine.CoreModule, System.Void UnityEngine.Screen::SetResolution(System.Int32, System.Int32, System.Boolean, System.Int32)");

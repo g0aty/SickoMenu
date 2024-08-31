@@ -232,6 +232,7 @@ std::string GetCustomName(std::string name, bool forceUnique = false, uint8_t id
 std::vector<std::string> GetAllConfigs();
 bool CheckConfigExists(std::string configName);
 void UpdateTournamentPoints(NetworkedPlayerInfo* playerData, int reason);
+void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason);
 
 /// <summary>
 /// Simplifies a list of points by ensuring the distance between consecutive points is greater than the squared distance threshold; all other points are discarded.

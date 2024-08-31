@@ -295,11 +295,11 @@ namespace SelfTab {
             if (ToggleButton("Fake Alive", &State.FakeAlive)) {
                 State.Save();
             }
-            if (IsHost() || !State.SafeMode) {
+            //if (IsHost() || !State.SafeMode) {
                 ImGui::SameLine();
                 if (ToggleButton("God Mode", &State.GodMode))
                     State.Save();
-            }
+            //}
 
             if (ToggleButton("(Shift + Right Click) to Teleport", &State.ShiftRightClickTP)) {
                 State.Save();

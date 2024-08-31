@@ -1,7 +1,9 @@
 # 👺 SickoMenu v4.0
-A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
+A powerful utility for Among Us that aims to enhance the game experience for all players!
 
-Join our very own [Discord](https://dsc.gg/sickos) server for support, bug reports, and sneak peeks!
+Join our very own Discord server for support, bug reports, and sneak peeks!
+### Vanity invite: https://discord.gg/sickos
+### Permanent invite: https://dsc.gg/sickos
 
 ## ⚠️ Disclaimer
 This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) am not responsible.
@@ -62,7 +64,7 @@ First you will need protontricks, you can install it with your packager of choic
 - Show Replay - END
 - Repair Sabotage - PAGE DOWN (PgDn)
 - NoClip - CTRL
-- Panic / Disable SIckoMenu - PAUSE BREAK (Break)
+- Panic / Disable SickoMenu - PAUSE BREAK (Break)
 
 ## ⚒️ Compile (Configurations)
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
@@ -85,6 +87,10 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * [tomsa000](https://github.com/tomsa000) (Helped with fixing memory leaks and smart pointers)
 * [cddjr](https://github.com/cddjr) (Helped in updating to the Fungle map, saved a lot of my time)
 * Everyone else who contributed to the code and I couldn't list here. Thank you!
+
+## ✨ Inspiration
+* [DarkModeAU by the-real-techiee](https://github.com/the-real-techiee/DarkModeAU)
+* [YuEzTools by Team-Yu](https://github.com/Team-YuTeam/YuEzTools)
 
 ## 💁 Contributing
 1. Fork it [here](<https://github.com/g0aty/SickoMenu/fork>)

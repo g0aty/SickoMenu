@@ -1120,42 +1120,60 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour) {
 
 	app::Color c;
 	switch (roleBehaviour->fields.Role) {
-	case RoleTypes__Enum::CrewmateGhost:
-		c.r = 170; c.g = 170, c.b = 170; c.a = 255; //light gray (grey?)
+	case RoleTypes__Enum::CrewmateGhost: {
+		auto col = Color32();
+		col.r = 170; col.g = 170, col.b = 170; col.a = 255; //light gray (grey?)
+		c = Color32_op_Implicit_1(col, NULL);
 		break;
-	case RoleTypes__Enum::Crewmate:
+	}
+	case RoleTypes__Enum::Crewmate: {
 		c = Palette__TypeInfo->static_fields->White;
 		break;
-	case RoleTypes__Enum::Engineer:
+	}
+	case RoleTypes__Enum::Engineer: {
 		c = Palette__TypeInfo->static_fields->CrewmateBlue;
 		break;
-	case RoleTypes__Enum::GuardianAngel:
+	}
+	case RoleTypes__Enum::GuardianAngel: {
 		c = Palette__TypeInfo->static_fields->White_75Alpha;
 		break;
-	case RoleTypes__Enum::Scientist:
+	}
+	case RoleTypes__Enum::Scientist: {
 		c = Palette__TypeInfo->static_fields->Blue;
 		break;
-	case RoleTypes__Enum::Impostor:
+	}
+	case RoleTypes__Enum::Impostor: {
 		c = Palette__TypeInfo->static_fields->ImpostorRed;
 		break;
-	case RoleTypes__Enum::Shapeshifter:
+	}
+	case RoleTypes__Enum::Shapeshifter: {
 		c = Palette__TypeInfo->static_fields->Orange;
 		break;
-	case RoleTypes__Enum::ImpostorGhost:
+	}
+	case RoleTypes__Enum::ImpostorGhost: {
 		c = Palette__TypeInfo->static_fields->DisabledGrey;
 		break;
-	case RoleTypes__Enum::Noisemaker:
-		c.r = 177; c.g = 0; c.b = 255; c.a = 255; //violet
+	}
+	case RoleTypes__Enum::Noisemaker: {
+		auto col = Color32();
+		col.r = 177; col.g = 0; col.b = 255; col.a = 255; //violet
+		c = Color32_op_Implicit_1(col, NULL);
 		break;
-	case RoleTypes__Enum::Tracker:
+	}
+	case RoleTypes__Enum::Tracker: {
 		c = Palette__TypeInfo->static_fields->AcceptedGreen;
 		break;
-	case RoleTypes__Enum::Phantom:
-		c.r = 255; c.g = 0; c.b = 203; c.a = 255; //pink
+	}
+	case RoleTypes__Enum::Phantom: {
+		auto col = Color32();
+		col.r = 255; col.g = 0; col.b = 203; col.a = 255; //pink
+		c = Color32_op_Implicit_1(col, NULL);
 		break;
-	default:
+	}
+	default: {
 		c = Palette__TypeInfo->static_fields->White;
 		break;
+	}
 	}
 	return c;
 }
@@ -1420,6 +1438,84 @@ void UpdateTournamentPoints(NetworkedPlayerInfo* playerData, int reason) {
 	case 10://Settings::PointReason::ImpLose:
 		State.tournamentPoints[friendCode] -= 1.f;
 		break;
+	}
+}
+
+void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
+	auto pData = GetPlayerData(pCtrl);
+	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
+	if (State.SMAC_AddToBlacklist) {
+		std::string puid = convert_from_string(pData->fields.Puid);
+		State.SMAC_Blacklist[puid] = name;
+	}
+	std::string cheaterMessage = "Player " + name + " has been caught cheating! Reason: " + reason;
+	LOG_INFO(cheaterMessage);
+	if (IsHost()) {
+		switch (State.SMAC_HostPunishment) {
+		case 0:
+			break;
+		case 1:
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+			break;
+		case 2:
+			if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+			else {
+				if (cheaterMessage.size() > 120) {
+					cheaterMessage = "<#f00>Failed to send message to all players because message is too long.</color>\n" + cheaterMessage;
+					ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+				}
+				else {
+					while (State.ChatCooldown < 3.f) continue;
+					PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+				}
+			}
+			break;
+		case 3:
+		{
+			String* newName = convert_to_string(name + " has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
+			PlayerControl_CmdCheckName(pCtrl, newName, NULL);
+			InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
+			break;
+		}
+		case 4:
+		{
+			String* newName = convert_to_string(name + " has been banned by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
+			PlayerControl_CmdCheckName(pCtrl, newName, NULL);
+			InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
+			break;
+		}
+		}
+	}
+	else {
+		switch (State.SMAC_Punishment) {
+		case 0:
+			break;
+		case 1:
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+			break;
+		case 2:
+			if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+			else {
+				if (cheaterMessage.size() > 120) {
+					cheaterMessage = "<#f00>Failed to send message to all players because message is too long.</color>\n" + cheaterMessage;
+					ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+				}
+				else {
+					while (State.ChatCooldown < 3.f) continue;
+					PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+				}
+			}
+			break;
+		case 3:
+			if (State.SafeMode) {
+				if (IsInGame()) State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, pCtrl, 200, true));
+				else State.SMAC_AttemptBanLobby.push_back(pCtrl->fields.PlayerId);
+			}
+			else {
+				if (IsInGame()) State.rpcQueue.push(new RpcVoteKick(pCtrl, true));
+				else State.lobbyRpcQueue.push(new RpcVoteKick(pCtrl, true));
+			}
+		}
 	}
 }
 
