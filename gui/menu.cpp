@@ -164,7 +164,6 @@ namespace Menu {
 				firstRender = false;
 				CloseAllOtherTabs(Tabs::About); //welcome the user on startup
 			}
-
 			//ImGui::EndTabBar();
 			ImGui::EndChild();
 

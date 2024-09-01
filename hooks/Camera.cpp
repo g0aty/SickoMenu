@@ -5,6 +5,7 @@
 #include <iostream>
 
 static float camHeight = 3.f;
+static bool refreshChat = true;
 
 Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo* method)
 {
@@ -25,12 +26,6 @@ Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo*
 				Camera_set_orthographicSize(__this, camHeight, NULL);
 				Camera_set_orthographicSize(hudCamera, camHeight, NULL);
 				Screen_SetResolution_1(Screen_get_width(NULL), Screen_get_height(NULL), Screen_get_fullScreen(NULL), 165, NULL);
-			}
-			if (chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing) {
-				int32_t width = Screen_get_width(NULL);
-				int32_t height = Screen_get_height(NULL);
-				bool fullscreen = Screen_get_fullScreen(NULL);
-				ChatController_OnResolutionChanged(Game::HudManager.GetInstance()->fields.Chat, (float)(width / height), width, height, fullscreen, NULL);
 			}
 		}
 	}

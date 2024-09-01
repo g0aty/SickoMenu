@@ -10170,49 +10170,6 @@ namespace app
     };
 #pragma endregion
 
-#pragma region NotificationPopper
-    struct NotificationPopper__Fields {
-        struct MonoBehaviour__Fields _;
-        struct LobbyNotificationMessage* notificationMessageOrigin;
-        struct Sprite* playerDisconnectSprite;
-        struct Sprite* settingsChangeSprite;
-        void* playerDisconnectSound;
-        void* settingsChangeSound;
-        float spacingY;
-        int32_t maxMessages;
-        struct Color disconnectColor;
-        struct Color settingsChangeColor;
-        struct AspectPosition* aspectPosition;
-        struct List_1_LobbyNotificationMessage_* activeMessages;
-        int32_t lastMessageKey;
-    };
-
-    struct NotificationPopper {
-        struct NotificationPopper__Class* klass;
-        MonitorData* monitor;
-        struct NotificationPopper__Fields fields;
-    };
-
-    struct NotificationPopper__VTable {
-        VirtualInvokeData Equals;
-        VirtualInvokeData Finalize;
-        VirtualInvokeData GetHashCode;
-        VirtualInvokeData ToString;
-    };
-
-    struct NotificationPopper__StaticFields {
-    };
-
-    struct NotificationPopper__Class {
-        Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
-        struct NotificationPopper__StaticFields* static_fields;
-        const Il2CppRGCTXData* rgctx_data;
-        Il2CppClass_1 _1;
-        struct NotificationPopper__VTable vtable;
-    };
-#pragma endregion
-
 #pragma region DisconnectPopup
 
     struct DestroyableSingleton_1_DisconnectPopup___Fields {
@@ -10453,4 +10410,5 @@ namespace app
     typedef Il2CppObject KillOverlay;
     typedef Il2CppObject AbstractSaveData;
     typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
+    typedef Il2CppObject NotificationPopper;
 }

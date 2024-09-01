@@ -346,3 +346,4 @@ DO_APP_FUNC(void, TMP_Text_set_color, (TMP_Text* __this, Color value, MethodInfo
 DO_APP_FUNC(void, ChatBubble_SetText, (ChatBubble* __this, String* chatText, MethodInfo* method), "Assembly-CSharp, System.Void ChatBubble::SetText(System.String)");
 DO_APP_FUNC(void, Mushroom_FixedUpdate, (Mushroom* __this, MethodInfo* method), "Assembly-CSharp, System.Void Mushroom::FixedUpdate()");
 DO_APP_FUNC(void, Screen_SetResolution_1, (int32_t width, int32_t height, bool fullscreen, int32_t preferredRefreshRate, MethodInfo * method), "UnityEngine.CoreModule, System.Void UnityEngine.Screen::SetResolution(System.Int32, System.Int32, System.Boolean, System.Int32)");
+DO_APP_FUNC(void, GameData_ShowNotification, (GameData* __this, String* playerName, DisconnectReasons__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Void GameData::ShowNotification(System.String, DisconnectReasons)");

@@ -687,8 +687,13 @@ namespace PlayersTab {
 					for (auto p : selectedPlayers) {
 						if (p.has_value() && p.validate().is_LocalPlayer()) State.NoClip = true;
 						else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 1, true));
-						//ShowHudNotification(std::format("Allowed {} to NoClip!",
-							//convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL))));
+						if (selectedPlayers.size() == 1) {
+							ShowHudNotification(std::format("Allowed {} to NoClip!",
+								convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL))));
+						}
+						else {
+							ShowHudNotification(std::format("Allowed {} players to NoClip!", selectedPlayers.size()));
+						}
 					}
 				}
 
