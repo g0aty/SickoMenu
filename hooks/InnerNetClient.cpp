@@ -148,10 +148,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 if (State.AlwaysMove && !State.ChatFocused)
                     (*Game::pLocalPlayer)->fields.moveable = true;
                 if (State.FakeAlive && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) {
-                    if (IsInGame())
-                        State.rpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
-                    else if (IsInLobby())
-                        State.lobbyRpcQueue.push(new RpcRevive(*Game::pLocalPlayer));
+                    GetPlayerData(*Game::pLocalPlayer)->fields.IsDead = false;
                 }
             }
 
@@ -786,6 +783,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
     try {
         if (!State.PanicMode) {
+            State.BlinkPlayersTab = true;
             if (data->fields.Character) { // Don't use Object_1_IsNotNull().
                 auto playerInfo = GetPlayerData(data->fields.Character);
 

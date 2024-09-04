@@ -253,7 +253,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Shapeshift without Animation", &State.AnimationlessShapeshift)) {
+            if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) {
                 State.Save();
             }
 

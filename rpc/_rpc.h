@@ -156,6 +156,13 @@ public:
 	virtual void Process() override;
 };
 
+class RpcMeetingExploit : public RPCInterface {
+	PlayerControl* exploitedPlayer;
+public:
+	RpcMeetingExploit(PlayerControl* exploitedPlayer);
+	virtual void Process() override;
+};
+
 class CmdCheckMurder : public RPCInterface {
 	PlayerSelection target;
 public:

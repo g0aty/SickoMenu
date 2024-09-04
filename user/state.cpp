@@ -89,6 +89,7 @@ void Settings::Load() {
 
         JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
         JSON_TRYGET("DarkMode", this->DarkMode);
+        JSON_TRYGET("SeeVanishedPlayers", this->SeeVanishedPlayers);
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
         JSON_TRYGET("CycleBetweenPlayers", this->CycleBetweenPlayers);
@@ -235,6 +236,32 @@ void Settings::Load() {
         JSON_TRYGET("SickoDetection", this->SickoDetection);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
+
+        JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
+        JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
+        JSON_TRYGET("SMAC_HostPunishment", this->SMAC_HostPunishment);
+        JSON_TRYGET("SMAC_AddToBlacklist", this->SMAC_AddToBlacklist);
+        JSON_TRYGET("SMAC_PunishBlacklist", this->SMAC_PunishBlacklist);
+        JSON_TRYGET("SMAC_CheckAUM", this->SMAC_CheckAUM);
+        JSON_TRYGET("SMAC_CheckSicko", this->SMAC_CheckSicko);
+        JSON_TRYGET("SMAC_CheckBadNames", this->SMAC_CheckBadNames);
+        JSON_TRYGET("SMAC_CheckColor", this->SMAC_CheckColor);
+        JSON_TRYGET("SMAC_CheckCosmetics", this->SMAC_CheckCosmetics);
+        JSON_TRYGET("SMAC_CheckChatNote", this->SMAC_CheckChatNote);
+        JSON_TRYGET("SMAC_CheckScanner", this->SMAC_CheckScanner);
+        JSON_TRYGET("SMAC_CheckAnimation", this->SMAC_CheckAnimation);
+        JSON_TRYGET("SMAC_CheckTasks", this->SMAC_CheckTasks);
+        JSON_TRYGET("SMAC_CheckRole", this->SMAC_CheckRole);
+        JSON_TRYGET("SMAC_CheckChat", this->SMAC_CheckChat);
+        JSON_TRYGET("SMAC_CheckMeeting", this->SMAC_CheckMeeting);
+        JSON_TRYGET("SMAC_CheckReport", this->SMAC_CheckReport);
+        JSON_TRYGET("SMAC_CheckMurder", this->SMAC_CheckMurder);
+        JSON_TRYGET("SMAC_CheckShapeshift", this->SMAC_CheckShapeshift);
+        JSON_TRYGET("SMAC_CheckVanish", this->SMAC_CheckVanish);
+        JSON_TRYGET("SMAC_CheckLevel", this->SMAC_CheckLevel);
+        JSON_TRYGET("SMAC_CheckVent", this->SMAC_CheckVent);
+        JSON_TRYGET("SMAC_CheckSabotage", this->SMAC_CheckSabotage);
+        JSON_TRYGET("SMAC_Blacklist", this->SMAC_Blacklist);
     } catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
@@ -305,6 +332,7 @@ void Settings::Save() {
 
                 { "NoAbilityCD", this->NoAbilityCD },
                 { "DarkMode", this->DarkMode },
+                { "SeeVanishedPlayers", this->SeeVanishedPlayers },
                 { "SelectedColorId", this->SelectedColorId },
                 { "SnipeColor", this->SnipeColor },
                 { "CycleBetweenPlayers", this->CycleBetweenPlayers },

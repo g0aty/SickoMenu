@@ -209,6 +209,9 @@ void DetourInitilization() {
 	HOOKFUNC(ShipStatus_HandleRpc);
 	HOOKFUNC(ExileController_BeginForGameplay);
 	HOOKFUNC(ChatBubble_SetText);
+	HOOKFUNC(PlayerControl_CmdCheckVanish);
+	HOOKFUNC(PlayerControl_CmdCheckAppear);
+	HOOKFUNC(PlayerControl_SetRoleInvisibility);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -338,6 +341,9 @@ void DetourUninitialization()
 	UNHOOKFUNC(ShipStatus_HandleRpc);
 	UNHOOKFUNC(ExileController_BeginForGameplay);
 	UNHOOKFUNC(ChatBubble_SetText);
+	UNHOOKFUNC(PlayerControl_CmdCheckVanish);
+	UNHOOKFUNC(PlayerControl_CmdCheckAppear);
+	UNHOOKFUNC(PlayerControl_SetRoleInvisibility);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

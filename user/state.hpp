@@ -146,6 +146,7 @@ public:
     bool ServerSideCustomName = false;
     bool NoAbilityCD = false;
     bool DarkMode = false;
+    bool SeeVanishedPlayers = false;
     bool CycleInMeeting = true;
     bool CycleBetweenPlayers = false;
 
@@ -352,6 +353,7 @@ public:
 
     bool PanicMode = false;
     bool TempPanicMode = false; //prevent instant crash on joining lobby
+    bool BlinkPlayersTab = false; //prevent instant crash on player leaving
     bool SickoDetection = true;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;

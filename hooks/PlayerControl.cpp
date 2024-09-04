@@ -835,29 +835,39 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target, MethodInfo* method)
 {
 	if (!State.PanicMode) {
-		if (State.DisableKills || (State.GodMode && __this == *Game::pLocalPlayer)) return;
+		if (State.DisableKills || (IsHost() && State.GodMode && target == *Game::pLocalPlayer)) return;
 
-		if (IsInLobby() && __this == *Game::pLocalPlayer) {
-			for (auto p : GetAllPlayerControl()) {
-				if (p != *Game::pLocalPlayer) {
-					auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
-						uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::None, p->fields._.OwnerId, NULL);
-					MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
-					MessageWriter_WriteInt32(writer, int32_t(target->fields.protectedByGuardianId < 0 || State.BypassAngelProt ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
-					InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+		if (__this == *Game::pLocalPlayer) {
+			if (IsInLobby()) {
+				for (auto p : GetAllPlayerControl()) {
+					if (p != *Game::pLocalPlayer) {
+						auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
+							uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::None, p->fields._.OwnerId, NULL);
+						MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+						MessageWriter_WriteInt32(writer, int32_t(target->fields.protectedByGuardianId < 0 || State.BypassAngelProt ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
+						InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+					}
+					__this->fields.moveable = true;
+					GetPlayerData(target)->fields.IsDead = true;
+					//prevent not moving when you murder
 				}
-				__this->fields.moveable = true;
-				//prevent not moving when you murder
 			}
+			else if (State.AlwaysUseKillExploit || State.NoAbilityCD)
+				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+			else if (State.RealRole != RoleTypes__Enum::Impostor && State.RealRole != RoleTypes__Enum::Shapeshifter)
+				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+			else if ((*Game::pLocalPlayer)->fields.killTimer > 0)
+				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+			else
+				PlayerControl_CmdCheckMurder(*Game::pLocalPlayer, target, NULL);
 		}
-		else if (State.AlwaysUseKillExploit || State.NoAbilityCD)
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-		else if (State.RealRole != RoleTypes__Enum::Impostor && State.RealRole != RoleTypes__Enum::Shapeshifter)
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-		else if ((*Game::pLocalPlayer)->fields.killTimer > 0)
-			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-		else
-			PlayerControl_CmdCheckMurder(*Game::pLocalPlayer, target, NULL);
+		else {
+			auto targetData = GetPlayerData(target);
+			if (IsHost() && State.Enable_SMAC && State.SMAC_CheckMurder && 
+				((PlayerIsImpostor(targetData) && !State.BattleRoyale) || targetData->fields.IsDead || target->fields.protectedByGuardianId >= 0)) return;
+			PlayerControl_RpcMurderPlayer(__this, target, true, NULL);
+			LOG_DEBUG(std::format("Sent RpcMurderPlayer by {} because they attempted to murder {}!", ToString(targetData), ToString(GetPlayerData(*Game::pLocalPlayer))).c_str());
+		}
 	}
 	else PlayerControl_CmdCheckMurder(__this, target, method);
 }
@@ -1216,4 +1226,22 @@ void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* 
 		if (State.SpoofFriendCode) __this->fields.FriendCode = convert_to_string(State.FakeFriendCode);
 	}
 	NetworkedPlayerInfo_Serialize(__this, writer, initialState, NULL);
+}
+
+void dPlayerControl_CmdCheckVanish(PlayerControl* __this, float maxDuration, MethodInfo* method) {
+	//if (!State.PanicMode && State.AnimationlessVanish) maxDuration = 0.f; //doesn't work
+	PlayerControl_CmdCheckVanish(__this, maxDuration, method);
+}
+
+void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, MethodInfo* method) {
+	//if (!State.PanicMode && State.AnimationlessVanish) shouldAnimate = false; //doesn't work
+	PlayerControl_CmdCheckAppear(__this, shouldAnimate, method);
+}
+
+void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method) {
+	synchronized(Replay::replayEventMutex) {
+		State.liveReplayEvents.emplace_back(std::make_unique<PhantomEvent>(GetEventPlayerControl(__this).value(), 
+			isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));
+	}
+	PlayerControl_SetRoleInvisibility(__this, isActive, shouldAnimate, playFullAnimation, method);
 }

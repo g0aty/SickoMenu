@@ -122,3 +122,6 @@ bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reas
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method);
 void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method);
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method);
+void dPlayerControl_CmdCheckVanish(PlayerControl* __this, float maxDuration, MethodInfo* method);
+void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, MethodInfo* method);
+void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method);
