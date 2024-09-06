@@ -182,8 +182,13 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	auto chatText = (String*)(__this->fields.freeChatField->fields.textArea->fields.text);
 	bool isCtrl = ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3);
 	bool isCpressed = ImGui::IsKeyPressed(0x43) || ImGui::IsKeyDown(0x63);
-	if (State.ChatPaste && isCtrl && isCpressed && convert_from_string(chatText) != "") {
+	bool isXpressed = ImGui::IsKeyPressed(0x58) || ImGui::IsKeyDown(0x78);
+	if (State.ChatPaste && isCtrl && (isCpressed || isXpressed) && convert_from_string(chatText) != "") {
 		ClipboardHelper_PutClipboardString((String*)(__this->fields.freeChatField->fields.textArea->fields.text), NULL); //ctrl+c
+	}
+	if (State.ChatPaste && isCtrl && isXpressed && convert_from_string(chatText) != "") {
+		auto text = (String*)(__this->fields.freeChatField->fields.textArea->fields.text);
+		text = convert_to_string("");
 	}
 
 	if (State.MessageSent && State.SafeMode) {

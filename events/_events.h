@@ -157,6 +157,61 @@ public:
 	}
 };
 
+class SabotageEvent : public EventInterface {
+private:
+	SystemTypes__Enum systemType;
+	SABOTAGE_ACTIONS action;
+public:
+	SabotageEvent(const EVENT_PLAYER& source, SystemTypes__Enum systemType, SABOTAGE_ACTIONS action);
+	virtual void Output() override;
+	virtual void ColoredEventOutput() override;
+	SABOTAGE_ACTIONS GetEventActionEnum() { return this->action; }
+	std::string GetSystemType() {
+		switch (this->systemType) {
+		case SystemTypes__Enum::Electrical:
+			return "Lights";
+			break;
+		case SystemTypes__Enum::Reactor:
+			return "Reactor";
+			break;
+		case SystemTypes__Enum::Laboratory:
+			return "Seismic Stabilizers";
+			break;
+		case SystemTypes__Enum::HeliSabotage:
+			return "Crash Course";
+			break;
+		case SystemTypes__Enum::LifeSupp:
+			return "Oxygen";
+			break;
+		case SystemTypes__Enum::MushroomMixupSabotage:
+			return "Mushroom Mixup";
+			break;
+		case SystemTypes__Enum::Comms:
+			return "Comms";
+			break;
+		default:
+			return "Unknown";
+			break;
+		}
+	}
+	std::string GetEventActionString()
+	{
+		switch (this->action)
+		{
+		case SABOTAGE_ACTIONS::SABOTAGE_CALL:
+			return std::string("Sabotage");
+			break;
+
+		case SABOTAGE_ACTIONS::SABOTAGE_FIX:
+			return std::string("Repair");
+			break;
+
+		default:
+			break;
+		}
+	}
+};
+
 class TaskCompletedEvent : public EventInterface {
 private:
 	std::optional<TaskTypes__Enum> taskType;

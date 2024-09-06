@@ -22,7 +22,7 @@ static float GetScaleFromValue(float value)
 	float scale = DirectX::GetWindowSize().y / 1080.0f;
 
 	// If we enable zoom then we scale but otherwise don't
-	float cameraHeight = State.EnableZoom ? State.CameraHeight : 1.0f;
+	float cameraHeight = (State.EnableZoom && !State.InMeeting) ? State.CameraHeight : 1.0f;
 	return (value * scale) / cameraHeight;
 }
 

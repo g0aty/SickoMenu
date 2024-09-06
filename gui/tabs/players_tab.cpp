@@ -266,7 +266,7 @@ namespace PlayersTab {
 						}
 					}
 
-					/*if (IsInGame() && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
+					if (IsInGame() && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
 						&& !selectedPlayer.get_PlayerData()->fields.IsDead
 						&& !selectedPlayer.get_PlayerControl()->fields.inVent
 						&& !selectedPlayer.get_PlayerControl()->fields.inMovingPlat
@@ -279,22 +279,22 @@ namespace PlayersTab {
 							State.rpcQueue.push(new CmdCheckMurder(State.selectedPlayer));
 						}
 					}
-					else {// if (!State.SafeMode)*/
-					if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && ImGui::Button("Kill"))
-					{
-						for (PlayerSelection p : selectedPlayers) {
-							auto validPlayer = p.validate();
-							if (IsInGame()) {
-								State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, validPlayer.get_PlayerControl(),
-									validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
-							}
-							else if (IsInLobby()) {
-								State.lobbyRpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), validPlayer.get_PlayerControl(),
-									validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+					else if (IsHost() || !State.SafeMode) {
+						if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && ImGui::Button("Kill"))
+						{
+							for (PlayerSelection p : selectedPlayers) {
+								auto validPlayer = p.validate();
+								if (IsInGame()) {
+									State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, validPlayer.get_PlayerControl(),
+										validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+								}
+								else if (IsInLobby()) {
+									State.lobbyRpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), validPlayer.get_PlayerControl(),
+										validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+								}
 							}
 						}
 					}
-					//}
 					if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
 						&& !selectedPlayer.get_PlayerData()->fields.IsDead
 						&& !selectedPlayer.get_PlayerControl()->fields.inVent
@@ -312,7 +312,7 @@ namespace PlayersTab {
 							framesPassed = 40;
 						}
 					}
-					else if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {// if (!State.SafeMode)
+					else if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode)) {
 						ImGui::SameLine();
 						if (ImGui::Button("Telekill"))
 						{
@@ -363,15 +363,15 @@ namespace PlayersTab {
 								}
 							}
 						}
-						else if (IsInGame()) {
+						/*else if (IsInGame()) {
 							if (ImGui::Button("Attempt to Ban")) {
 								for (auto p : selectedPlayers) {
 									if (p.has_value() && p.validate().is_LocalPlayer()) continue;
 									State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 200, true));
 								}
 							}
-						}
-						if (ImGui::Button("Attempt to Ban v2")) {
+						}*/
+						if (ImGui::Button("Meeting Spam")) {
 							for (auto p : selectedPlayers) {
 								State.rpcQueue.push(new RpcMeetingExploit(p.validate().get_PlayerControl()));
 							}
@@ -689,7 +689,7 @@ namespace PlayersTab {
 						}
 					}
 
-					if (IsInLobby() && ImGui::Button(selectedPlayers.size() == 1 ? "Allow Player to NoClip" : "Allow Players to NoClip")) {
+					if ((IsHost() || !State.SafeMode) && IsInLobby() && ImGui::Button(selectedPlayers.size() == 1 ? "Allow Player to NoClip" : "Allow Players to NoClip")) {
 						for (auto p : selectedPlayers) {
 							if (p.has_value() && p.validate().is_LocalPlayer()) State.NoClip = true;
 							else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 1, true));
@@ -719,39 +719,41 @@ namespace PlayersTab {
 						}
 					}
 
-					static int murderCount = 0;
-					static int murderDelay = 0;
-					if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
-						if (!murderLoop && ImGui::Button("Murder Loop")) {
-							murderLoop = true;
-							murderCount = 200; //controls how many times the player is to be murdered
-						}
-						if (murderLoop && ImGui::Button(std::format("Stop Murder Loop ({})", 800 - murderCount * 4).c_str())) {
-							murderLoop = false;
-							murderCount = 0;
-						}
-					}
-
-					if (murderDelay <= 0) {
-						if (murderCount > 0 && selectedPlayer.has_value()) {
-							for (auto p : selectedPlayers) {
-								auto validPlayer = p.validate();
-								if (IsInGame()) {
-									State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 4, false));
-								}
-								else if (IsInLobby()) {
-									State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 4, false));
-								}
+					if (IsHost() || !State.SafeMode) {
+						static int murderCount = 0;
+						static int murderDelay = 0;
+						if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
+							if (!murderLoop && ImGui::Button("Murder Loop")) {
+								murderLoop = true;
+								murderCount = 200; //controls how many times the player is to be murdered
 							}
-							murderDelay = 5;
-							murderCount--;
+							if (murderLoop && ImGui::Button(std::format("Stop Murder Loop ({})", 800 - murderCount * 4).c_str())) {
+								murderLoop = false;
+								murderCount = 0;
+							}
 						}
-						else {
-							murderLoop = false;
-							murderCount = 0;
+
+						if (murderDelay <= 0) {
+							if (murderCount > 0 && selectedPlayer.has_value()) {
+								for (auto p : selectedPlayers) {
+									auto validPlayer = p.validate();
+									if (IsInGame()) {
+										State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 4, false));
+									}
+									else if (IsInLobby()) {
+										State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 4, false));
+									}
+								}
+								murderDelay = 5;
+								murderCount--;
+							}
+							else {
+								murderLoop = false;
+								murderCount = 0;
+							}
 						}
+						else murderDelay--;
 					}
-					else murderDelay--;
 
 					static int suicideCount = 0;
 					static int suicideDelay = 0;

@@ -76,7 +76,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Allow Paste in Chat", &State.ChatPaste)) { //add copying later
+            if (ToggleButton("Allow Ctrl+(C/V/X) in Chat", &State.ChatPaste)) { //add copying later
                 State.Save();
             }
             
@@ -248,11 +248,7 @@ namespace SelfTab {
             if (ToggleButton("Always Move", &State.AlwaysMove)) {
                 State.Save();
             }
-
-            if (ToggleButton("Unlock Kill Button", &State.UnlockKillButton)) {
-                State.Save();
-            }
-            ImGui::SameLine();
+            
             if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) {
                 State.Save();
             }
@@ -260,23 +256,12 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
-                State.Save();
-            }
-            ImGui::SameLine();
-            if (ToggleButton("Kill While Vanished", &State.KillInVanish)) {
-                State.Save();
-            }
+            
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
             }
             ImGui::SameLine();
             if (ToggleButton("Infinite Kill Range", &State.InfiniteKillRange)) {
-                State.Save();
-            }
-
-            if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
                 State.Save();
             }
             ImGui::SameLine();
@@ -287,10 +272,10 @@ namespace SelfTab {
             if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) {
                 State.Save();
             }
-            ImGui::SameLine();
+            /*ImGui::SameLine();
             if (ToggleButton("Always Use Kill Exploit", &State.AlwaysUseKillExploit)) {
                 State.Save();
-            }
+            }*/
 
             if (ToggleButton("Fake Alive", &State.FakeAlive)) {
                 State.Save();
@@ -391,14 +376,44 @@ namespace SelfTab {
                         State.lobbyRpcQueue.push(new RpcSetRole(player, RoleTypes__Enum(State.FakeRole)));
                 }
             }
-            if ((IsInGame() || IsInLobby()) && ImGui::Button("Set Fake Role")) {
-                auto localData = GetPlayerData(*Game::pLocalPlayer);
-                State.FakeRole = std::clamp(State.FakeRole, 0, 10);
-                if (State.RealRole != RoleTypes__Enum::Shapeshifter && State.FakeRole == 5)
-                    State.FakeRole = 1;
-                else if (State.RealRole != RoleTypes__Enum::Phantom && State.FakeRole == 9)
-                    State.FakeRole = 1;
-
+            bool roleAllowed = false;
+            switch (State.FakeRole) {
+            case (int)RoleTypes__Enum::Crewmate:
+            case (int)RoleTypes__Enum::Engineer:
+            case (int)RoleTypes__Enum::Scientist:
+            case (int)RoleTypes__Enum::Noisemaker:
+            case (int)RoleTypes__Enum::Tracker:
+            case (int)RoleTypes__Enum::CrewmateGhost:
+            case (int)RoleTypes__Enum::ImpostorGhost:
+            case (int)RoleTypes__Enum::GuardianAngel:
+                roleAllowed = true;
+                break;
+            case (int)RoleTypes__Enum::Impostor:
+                if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Impostor || State.RealRole != RoleTypes__Enum::Shapeshifter || State.RealRole != RoleTypes__Enum::Phantom) {
+                    roleAllowed = false;
+                    break;
+                }
+                roleAllowed = true;
+                break;
+            case (int)RoleTypes__Enum::Shapeshifter:
+                if (State.RealRole != RoleTypes__Enum::Shapeshifter) {
+                    roleAllowed = false;
+                    break;
+                }
+                roleAllowed = true;
+                break;
+            case (int)RoleTypes__Enum::Phantom:
+                if (State.RealRole != RoleTypes__Enum::Phantom) {
+                    roleAllowed = false;
+                    break;
+                }
+                roleAllowed = true;
+                break;
+            default:
+                roleAllowed = false;
+                break;
+            }
+            if ((IsInGame() || IsInLobby()) && roleAllowed && ImGui::Button("Set Fake Role")) {
                 if (IsInGame())
                     State.rpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRole)));
                 else if (IsInLobby())
@@ -412,6 +427,23 @@ namespace SelfTab {
                 ImGui::SameLine();
                 std::string roleText = FAKEROLES[int(State.RealRole)];
                 ImGui::Text(("Real Role: " + roleText).c_str());
+            }
+
+            if (!State.SafeMode) {
+                if (ToggleButton("Unlock Kill Button", &State.UnlockKillButton)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (ToggleButton("Kill While Vanished", &State.KillInVanish)) {
+                    State.Save();
+                }
+                /*if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
+                    State.Save();
+                }*/
             }
         }
 

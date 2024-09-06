@@ -757,6 +757,7 @@ bool dPlayerControl_get_CanMove(PlayerControl* __this, MethodInfo* method) {
 void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method) {
 	try {
 		SaveGameOptions();
+		State.GameLoaded = true;
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in PlayerControl_OnGameStart (PlayerControl)");
@@ -837,36 +838,12 @@ void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target,
 	if (!State.PanicMode) {
 		if (State.DisableKills || (IsHost() && State.GodMode && target == *Game::pLocalPlayer)) return;
 
-		if (__this == *Game::pLocalPlayer) {
-			if (IsInLobby()) {
-				for (auto p : GetAllPlayerControl()) {
-					if (p != *Game::pLocalPlayer) {
-						auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
-							uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::None, p->fields._.OwnerId, NULL);
-						MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
-						MessageWriter_WriteInt32(writer, int32_t(target->fields.protectedByGuardianId < 0 || State.BypassAngelProt ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
-						InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-					}
-					__this->fields.moveable = true;
-					GetPlayerData(target)->fields.IsDead = true;
-					//prevent not moving when you murder
-				}
-			}
-			else if (State.AlwaysUseKillExploit || State.NoAbilityCD)
-				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-			else if (State.RealRole != RoleTypes__Enum::Impostor && State.RealRole != RoleTypes__Enum::Shapeshifter)
-				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-			else if ((*Game::pLocalPlayer)->fields.killTimer > 0)
-				PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-			else
-				PlayerControl_CmdCheckMurder(*Game::pLocalPlayer, target, NULL);
+		if (IsHost() || !State.SafeMode) {
+			PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
+			//yay no more complicated checks, enough of me yapping here
 		}
 		else {
-			auto targetData = GetPlayerData(target);
-			if (IsHost() && State.Enable_SMAC && State.SMAC_CheckMurder && 
-				((PlayerIsImpostor(targetData) && !State.BattleRoyale) || targetData->fields.IsDead || target->fields.protectedByGuardianId >= 0)) return;
-			PlayerControl_RpcMurderPlayer(__this, target, true, NULL);
-			LOG_DEBUG(std::format("Sent RpcMurderPlayer by {} because they attempted to murder {}!", ToString(targetData), ToString(GetPlayerData(*Game::pLocalPlayer))).c_str());
+			PlayerControl_CmdCheckMurder(__this, target, NULL);
 		}
 	}
 	else PlayerControl_CmdCheckMurder(__this, target, method);
@@ -1136,7 +1113,14 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 		}
 
 		if (!State.PanicMode && result != nullptr && (State.AutoKill && (IsInLobby() ? State.KillInLobbies : true)) && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
-			State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+			std::queue<RPCInterface*>* queue = nullptr;
+			if (IsInGame())
+				queue = &State.rpcQueue;
+			else if (IsInLobby())
+				queue = &State.lobbyRpcQueue;
+
+			if (IsHost() || !State.SafeMode) queue->push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+			else queue->push(new CmdCheckMurder(PlayerSelection(result)));
 		}
 		KillButton_SetTarget(__this, result, NULL);
 		return;
@@ -1149,7 +1133,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
 	if (IsInLobby()) return nullptr;
 	auto result = ImpostorRole_FindClosestTarget(__this, method);
-	if (!State.PanicMode && result == nullptr && (State.InfiniteKillRange || State.KillInVanish)) {
+	if (!State.PanicMode && result == nullptr && (State.InfiniteKillRange || (State.KillInVanish && IsHost() || !State.SafeMode))) {
 		PlayerControl* new_result = nullptr;
 		float defaultKillDist = 2.5f;
 		auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
@@ -1180,8 +1164,15 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 		result = new_result;
 	}
 
-	if (!State.PanicMode && result != nullptr && State.AutoKill && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
-		if (IsInGame()) State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+	if (!State.PanicMode && result != nullptr && (State.AutoKill && (IsInLobby() ? State.KillInLobbies : true)) && (State.AlwaysMove || PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
+		std::queue<RPCInterface*>* queue = nullptr;
+		if (IsInGame())
+			queue = &State.rpcQueue;
+		else if (IsInLobby())
+			queue = &State.lobbyRpcQueue;
+
+		if (IsHost() || !State.SafeMode) queue->push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
+		else queue->push(new CmdCheckMurder(PlayerSelection(result)));
 	}
 	return result;
 }
@@ -1244,4 +1235,14 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
 			isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));
 	}
 	PlayerControl_SetRoleInvisibility(__this, isActive, shouldAnimate, playFullAnimation, method);
+}
+
+void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method) {
+	if (!State.PanicMode) {
+		if (State.RealRole != RoleTypes__Enum::GuardianAngel || State.NoAbilityCD)
+			PlayerControl_RpcProtectPlayer(__this, target, GetPlayerOutfit(GetPlayerData(__this))->fields.ColorId, NULL);
+		else
+			PlayerControl_CmdCheckProtect(__this, target, method);
+	}
+	else PlayerControl_CmdCheckProtect(__this, target, method);
 }

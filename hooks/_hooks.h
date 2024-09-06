@@ -125,3 +125,5 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 void dPlayerControl_CmdCheckVanish(PlayerControl* __this, float maxDuration, MethodInfo* method);
 void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, MethodInfo* method);
 void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method);
+void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method);
+void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method);

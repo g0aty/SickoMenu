@@ -1509,8 +1509,8 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 			break;
 		case 3:
 			if (State.SafeMode) {
-				if (IsInGame()) State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, pCtrl, 200, true));
-				else State.SMAC_AttemptBanLobby.push_back(pCtrl->fields.PlayerId);
+				//if (IsInGame()) State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, pCtrl, 200, true));
+				//else State.SMAC_AttemptBanLobby.push_back(pCtrl->fields.PlayerId);
 			}
 			else {
 				if (IsInGame()) State.rpcQueue.push(new RpcVoteKick(pCtrl, true));

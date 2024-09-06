@@ -19,6 +19,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 				}
 			}
 		}
+		if (State.GodMode) PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in ExileController_ReEnableGameplay (ExileController)");

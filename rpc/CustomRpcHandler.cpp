@@ -71,7 +71,7 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 			std::string nameStr = convert_from_string(name);
 			if (MessageReader_get_BytesRemaining(reader, NULL) > 0 || MessageReader_ReadBoolean(reader, NULL)) return false;
 			if (nameStr != RemoveHtmlTags(nameStr)) return true;
-			if (name->fields.m_stringLength > 13) return true;
+			if (!IsNameValid(nameStr)) return true;
 			SMAC_OnCheatDetected(player, "Abnormal Name");
 		}
 		break;
@@ -118,11 +118,11 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SendChat: {
-		auto msg = MessageReader_ReadString(reader, NULL);
+		/*auto msg = MessageReader_ReadString(reader, NULL);
 		if (State.SMAC_CheckChat && ((IsInGame() && !State.InMeeting && !pData->fields.IsDead) || msg->fields.m_stringLength > 120)) {
 			SMAC_OnCheatDetected(player, "Abnormal Chat");
 			return true;
-		}
+		}*/
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::StartMeeting: {

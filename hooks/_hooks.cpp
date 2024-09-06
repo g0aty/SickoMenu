@@ -212,6 +212,8 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerControl_CmdCheckVanish);
 	HOOKFUNC(PlayerControl_CmdCheckAppear);
 	HOOKFUNC(PlayerControl_SetRoleInvisibility);
+	HOOKFUNC(ShipStatus_UpdateSystem);
+	HOOKFUNC(PlayerControl_CmdCheckProtect);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -344,6 +346,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerControl_CmdCheckVanish);
 	UNHOOKFUNC(PlayerControl_CmdCheckAppear);
 	UNHOOKFUNC(PlayerControl_SetRoleInvisibility);
+	UNHOOKFUNC(ShipStatus_UpdateSystem);
+	UNHOOKFUNC(PlayerControl_CmdCheckProtect);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

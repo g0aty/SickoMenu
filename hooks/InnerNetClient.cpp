@@ -17,7 +17,7 @@ static void onGameEnd() {
         State.modUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
-        //State.EnableZoom = false;
+        State.EnableZoom = false;
         State.FreeCam = false;
         State.MatchEnd = std::chrono::system_clock::now();
         std::fill(State.assignedRoles.begin(), State.assignedRoles.end(), RoleType::Random); //Clear Pre assigned roles to avoid bugs.
@@ -31,6 +31,7 @@ static void onGameEnd() {
         State.VoteKicks = 0;
         State.OutfitCooldown = 50;
         State.CanChangeOutfit = false;
+        State.GameLoaded = false;
         State.RealRole = RoleTypes__Enum::Crewmate;
 
         if (State.PanicMode && State.TempPanicMode) {
@@ -97,7 +98,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 if (!IsInLobby()) {
                     State.selectedPlayer = PlayerSelection();
-                    //State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
+                    State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
                 }
@@ -244,11 +245,16 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                             scientistRole->fields.currentCooldown = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         scientistRole->fields.currentCharge = 69420.0f + 1.0f; //Can be anything as it will always be written
                     }
-                    if (GameLogicOptions().GetKillCooldown() > 0)
-                        (*Game::pLocalPlayer)->fields.killTimer = 0;
-                    else
-                        GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, 0.0042069f); //force cooldown > 0 as ur unable to kill otherwise
+                    if (role == RoleTypes__Enum::GuardianAngel) {
+                        app::GuardianAngelRole* guardianAngelRole = (app::GuardianAngelRole*)playerRole;
+                        if (guardianAngelRole->fields.cooldownSecondsRemaining > 0.0f)
+                            guardianAngelRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+                    }
                     if (IsHost() || !State.SafeMode) {
+                        if (GameLogicOptions().GetKillCooldown() > 0)
+                            (*Game::pLocalPlayer)->fields.killTimer = 0;
+                        else
+                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, 0.0042069f); //force cooldown > 0 as ur unable to kill otherwise
                         if (IsHost()) {
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 0); //force set cooldown, otherwise u get kicked
@@ -265,11 +271,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                 if (phantomRole->fields.cooldownSecondsRemaining > 0.0f)
                                     phantomRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                             }
-                        }
-                        if (role == RoleTypes__Enum::GuardianAngel) {
-                            app::GuardianAngelRole* guardianAngelRole = (app::GuardianAngelRole*)playerRole;
-                            if (guardianAngelRole->fields.cooldownSecondsRemaining > 0.0f)
-                                guardianAngelRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         }
                     }
                     if (role == RoleTypes__Enum::Shapeshifter) {

@@ -236,7 +236,7 @@ namespace HostTab {
 					State.Save();
 				}
 
-				if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
+				/*if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
 				{
 					if (PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))) {
 						if (IsInGame()) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
@@ -246,7 +246,23 @@ namespace HostTab {
 						if (IsInGame()) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
 						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
 					}
+				}*/
+
+				if (ToggleButton("Unlock Kill Button", &State.UnlockKillButton)) {
+					State.Save();
 				}
+
+				if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
+					State.Save();
+				}
+				
+				if (ToggleButton("Kill While Vanished", &State.KillInVanish)) {
+					State.Save();
+				}
+
+				/*if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
+					State.Save();
+				}*/
 
 				ImGui::EndChild();
 			}

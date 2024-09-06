@@ -403,6 +403,7 @@ public:
     DisconnectReasons__Enum LastDisconnectReason = DisconnectReasons__Enum::Unknown;
     std::string LastLobbyJoined = "";
     bool IsPreHosting = false;
+    bool GameLoaded = false;
 
     bool AutoOpenDoors = false;
 
@@ -411,7 +412,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_pr8";
+    std::string SickoVersion = "v4.0_pr10";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;

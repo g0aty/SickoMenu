@@ -132,7 +132,7 @@ namespace GameTab {
             }
 
 
-            if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && ImGui::Button("Kill Everyone")) {
+            if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode) && ImGui::Button("Kill Everyone")) {
                 for (auto player : GetAllPlayerControl()) {
                     if (IsInGame())
                         State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
@@ -141,7 +141,7 @@ namespace GameTab {
                 }
             }
             if (IsInLobby()) ImGui::SameLine();
-            if (IsInLobby() && ImGui::Button("Allow Everyone to NoClip")) {
+            if (IsInLobby() && (IsHost() || !State.SafeMode) && ImGui::Button("Allow Everyone to NoClip")) {
                 for (auto p : GetAllPlayerControl(true)) {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
 				}
@@ -175,7 +175,7 @@ namespace GameTab {
                 State.Save();
             }
 
-            if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
+            if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode)) {
                 if (ImGui::Button("Kill All Crewmates")) {
                     for (auto player : GetAllPlayerControl()) {
                         if (!PlayerIsImpostor(GetPlayerData(player))) {
