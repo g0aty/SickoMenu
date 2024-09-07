@@ -224,7 +224,7 @@ namespace HostTab {
 					}
 				}
 
-				CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
+				CustomListBoxInt(" Â­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
 
 				if (ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
 					State.Save();
@@ -334,23 +334,6 @@ namespace HostTab {
 						if (State.mapHostChoice > 3)
 							State.mapHostChoice--;
 						State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
-						if (IsInLobby() && CustomListBoxInt("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale)) {
-							//if (!IsInGame()) {
-								// disable flip
-								/*if (State.mapHostChoice == 3) {
-									options.SetByte(app::ByteOptionNames__Enum::MapId, 0);
-									State.FlipSkeld = true;
-								}
-								else {
-									options.SetByte(app::ByteOptionNames__Enum::MapId, State.mapHostChoice);
-									State.FlipSkeld = false;
-								}*/
-							auto id = State.mapHostChoice;
-							if (id >= 3) id++;
-							options.SetByte(app::ByteOptionNames__Enum::MapId, id);
-							SyncAllSettings();
-							//}
-						}
 						auto gamemode = options.GetGameMode();
 
 						auto MakeBool = [&](const char* str, bool& v, BoolOptionNames__Enum opt) {
