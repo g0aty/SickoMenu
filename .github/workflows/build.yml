@@ -64,7 +64,7 @@ jobs:
           path: Debug.zip
           
   AutoRelease:
-    runs-on: ubuntu-latest
+    runs-on: windows-2022
     needs: [Build_Release, Build_Debug]
     steps:
 #      - name: Parse tag semver
@@ -86,21 +86,22 @@ jobs:
 #            echo 'is pre-release: ${{ steps.semver_parser.outputs.prerelease != 0 }}'
       
       - name: Download Release Artifact
-        uses: actions/download-artifact@v2.0.9
+        uses: actions/download-artifact@v4.1.7
         with:
           name: Release
       
       - name: Download Debug Artifact
-        uses: actions/download-artifact@v2.0.9
+        uses: actions/download-artifact@v4.1.7
         with:
           name: Debug
       
       - name: Automatic Releases
-        uses: appleboy/discord-action@master
+        uses: marvinpinto/action-automatic-releases@latest #maybe this fixed auto release versioning?
+        id: "automatic_releases"
         with:
-          webhook_id: ${{ secrets.WEBHOOK_ID }}
-          webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
-          file: |
-              Release.zip
-              Debug.zip
-          message: "@everyone A new pre-release has been released!"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}" #this is gonna give me a stroke
+          automatic_release_tag: "latest"
+          prerelease: false
+          files: |
+            Release.zip
+            Debug.zip
