@@ -1,5 +1,5 @@
-# 👺 SickoMenu v4.0
-A powerful utility for Among Us that aims to enhance the game experience for all players!
+# 👺 SickoMenu v3.7
+A powerful utility for Among Us that aims to enhance the game experience!
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Vanity invite: https://discord.gg/sickos
@@ -8,18 +8,18 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 ## ⚠️ Disclaimer
 This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) am not responsible.
 
+This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.
+
 ## ⚙️ Features
 A huge collection of various utilities and cheats such as
 - Generate a brand new guest account every time the game is launched
-- Allow other players to no-clip
-- Ban other players without hosting
+- Allow other players to no-clip while hosting
 - Fake Roles
 - NoClip
 - Move in Vents
 - Zoom Out
 - Confuser
 - See Ghosts and Chat
-- Kill players even if you're not an impostor
 - Better AUM Chat (Type in regular chat: "/aum [insert message here]")
 - And much more! Check out the full list of features [here](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)!
 
@@ -88,13 +88,15 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * [cddjr](https://github.com/cddjr) (Helped in updating to the Fungle map, saved a lot of my time)
 * Everyone else who contributed to the code and I couldn't list here. Thank you!
 
-## ✨ Inspiration
-* [DarkModeAU by the-real-techiee](https://github.com/the-real-techiee/DarkModeAU)
-* [YuEzTools by Team-Yu](https://github.com/Team-YuTeam/YuEzTools)
-
 ## 💁 Contributing
 1. Fork it [here](<https://github.com/g0aty/SickoMenu/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
+
+## ✨ Inspiration
+* [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by the-real-techiee
+* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by Team-Yu
+* [BetterAmongUs-Public](https://github.com/D1GQ/BetterAmongUs-Public) by D1GQ
+* [MalumMenu](https://github.com/scp222thj/MalumMenu) by scp222thj

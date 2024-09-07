@@ -98,6 +98,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 if (!IsInLobby()) {
                     State.selectedPlayer = PlayerSelection();
+                    State.selectedPlayers = {};
                     State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
@@ -292,7 +293,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 auto localData = GetPlayerData(*Game::pLocalPlayer);
                 app::RoleBehaviour* playerRole = localData->fields.Role;
                 app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
-                (*Game::pLocalPlayer)->fields.killTimer = 0;
+                if (IsHost() || !State.SafeMode) (*Game::pLocalPlayer)->fields.killTimer = 0;
                 if (role == RoleTypes__Enum::Engineer)
                 {
                     app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
@@ -713,7 +714,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
             }
 
-            if (/*IsInGame() && */State.GodMode) {
+            if ((IsInGame() || IsInLobby()) && State.GodMode) {
                 if (State.protectMonitor.find((*Game::pLocalPlayer)->fields.PlayerId) == State.protectMonitor.end())
                     PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
             }
@@ -803,6 +804,8 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                     State.modUsers.erase(data->fields.Character->fields.PlayerId);
 
                 auto playerId = data->fields.Character->fields.PlayerId;
+                if (State.selectedPlayer.equals(PlayerSelection(data->fields.Character)))
+                    State.selectedPlayer = PlayerSelection();
                 auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);
                 if (itSel != State.selectedPlayers.end())
                     State.selectedPlayers.erase(itSel);

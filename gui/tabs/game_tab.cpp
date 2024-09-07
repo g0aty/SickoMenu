@@ -36,10 +36,14 @@ namespace GameTab {
         if (TabGroup("Chat", openChat)) {
             CloseOtherGroups(Groups::Chat);
         }
-        ImGui::SameLine();
-        if (TabGroup("Anticheat", openAnticheat)) {
-            CloseOtherGroups(Groups::Anticheat);
+
+        if (State.Enable_SMAC) {
+            ImGui::SameLine();
+            if (TabGroup("Anticheat", openAnticheat)) {
+                CloseOtherGroups(Groups::Anticheat);
+            }
         }
+
         if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
             ImGui::SameLine();
             if (TabGroup("Options", openOptions)) {
@@ -313,8 +317,6 @@ namespace GameTab {
         }
 
         if (openAnticheat) {
-            if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
-
             if (IsHost()) CustomListBoxInt("Host Punishment­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
             else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
@@ -443,14 +445,41 @@ namespace GameTab {
                     ImGui::Text("Guardian Angel Protect Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F));
                     ImGui::Text("Guardian Angel Protection Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, 1.0F));
 
-                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
                     ImGui::Separator();
-                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
 
                     ImGui::Text("Max Shapeshifters: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Shapeshifter));
                     ImGui::Text("Shapeshifter Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Shapeshifter));
                     ImGui::Text("Shapeshifter Shift Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 1.0F));
                     ImGui::Text("Shapeshifter Shift Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+
+                    ImGui::Text("Max Noisemakers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Noisemaker));
+                    ImGui::Text("Noisemaker Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Noisemaker));
+                    ImGui::Text("Noisemaker Alert Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::NoisemakerAlertDuration, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+
+                    ImGui::Text("Max Trackers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Tracker));
+                    ImGui::Text("Tracker Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Tracker));
+                    ImGui::Text("Tracking Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::TrackerDuration, 1.0F));
+                    ImGui::Text("Tracking Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::TrackerCooldown, 1.0F));
+                    ImGui::Text("Tracking Delay: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::TrackerDelay, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+
+                    ImGui::Text("Max Phantoms: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Phantom));
+                    ImGui::Text("Phantom Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Phantom));
+                    ImGui::Text("Phantom Vanish Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 1.0F));
+                    ImGui::Text("Phantom Vanish Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::PhantomDuration, 1.0F));
                 }
                 else if (options.GetGameMode() == GameModes__Enum::HideNSeek) {
 

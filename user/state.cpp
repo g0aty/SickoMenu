@@ -199,6 +199,7 @@ void Settings::Load() {
         JSON_TRYGET("NoClip", this->NoClip);
         JSON_TRYGET("KillInLobbies", this->KillInLobbies);
         JSON_TRYGET("KillInVanish", this->KillInVanish);
+        JSON_TRYGET("GodMode", this->GodMode);
 
         JSON_TRYGET("AdjustByDPI", this->AdjustByDPI);
 

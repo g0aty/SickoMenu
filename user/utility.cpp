@@ -1122,7 +1122,7 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour) {
 	switch (roleBehaviour->fields.Role) {
 	case RoleTypes__Enum::CrewmateGhost: {
 		auto col = Color32();
-		col.r = 170; col.g = 170, col.b = 170; col.a = 255; //light gray (grey?)
+		col.r = 255; col.g = 255, col.b = 255; col.a = 127; //half-white
 		c = Color32_op_Implicit_1(col, NULL);
 		break;
 	}
@@ -1131,11 +1131,15 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour) {
 		break;
 	}
 	case RoleTypes__Enum::Engineer: {
-		c = Palette__TypeInfo->static_fields->CrewmateBlue;
+		auto col = Color32();
+		col.r = 0; col.g = 255, col.b = 255; col.a = 255; //cyan
+		c = Color32_op_Implicit_1(col, NULL);
 		break;
 	}
 	case RoleTypes__Enum::GuardianAngel: {
-		c = Palette__TypeInfo->static_fields->White_75Alpha;
+		auto col = Color32();
+		col.r = 127; col.g = 127, col.b = 127; col.a = 127; //half-light-gray
+		c = Color32_op_Implicit_1(col, NULL);
 		break;
 	}
 	case RoleTypes__Enum::Scientist: {
@@ -1147,26 +1151,32 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour) {
 		break;
 	}
 	case RoleTypes__Enum::Shapeshifter: {
-		c = Palette__TypeInfo->static_fields->Orange;
+		auto col = Color32();
+		col.r = 255; col.g = 170, col.b = 0; col.a = 255; //orang
+		c = Color32_op_Implicit_1(col, NULL);
 		break;
 	}
 	case RoleTypes__Enum::ImpostorGhost: {
-		c = Palette__TypeInfo->static_fields->DisabledGrey;
+		auto col = Color32();
+		col.r = 63; col.g = 63, col.b = 63; col.a = 127; //half-dark-gray (grey?)
+		c = Color32_op_Implicit_1(col, NULL);
 		break;
 	}
 	case RoleTypes__Enum::Noisemaker: {
 		auto col = Color32();
-		col.r = 177; col.g = 0; col.b = 255; col.a = 255; //violet
+		col.r = 0; col.g = 255; col.b = 119; col.a = 255; //lime
 		c = Color32_op_Implicit_1(col, NULL);
 		break;
 	}
 	case RoleTypes__Enum::Tracker: {
-		c = Palette__TypeInfo->static_fields->AcceptedGreen;
+		auto col = Color32();
+		col.r = 167; col.g = 92, col.b = 255; col.a = 255; //purple
+		c = Color32_op_Implicit_1(col, NULL);
 		break;
 	}
 	case RoleTypes__Enum::Phantom: {
 		auto col = Color32();
-		col.r = 255; col.g = 0; col.b = 203; col.a = 255; //pink
+		col.r = 134; col.g = 0; col.b = 0; col.a = 255; //maroon
 		c = Color32_op_Implicit_1(col, NULL);
 		break;
 	}
@@ -1458,7 +1468,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 		case 1:
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
 			break;
-		case 2:
+		/*case 2:
 			if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
 			else {
 				if (cheaterMessage.size() > 120) {
@@ -1470,15 +1480,15 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 					PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
 				}
 			}
-			break;
-		case 3:
+			break;*/
+		case 2:
 		{
 			String* newName = convert_to_string(name + " has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
 			PlayerControl_CmdCheckName(pCtrl, newName, NULL);
 			InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
 			break;
 		}
-		case 4:
+		case 3:
 		{
 			String* newName = convert_to_string(name + " has been banned by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
 			PlayerControl_CmdCheckName(pCtrl, newName, NULL);
@@ -1494,7 +1504,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 		case 1:
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
 			break;
-		case 2:
+		/*case 2:
 			if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
 			else {
 				if (cheaterMessage.size() > 120) {
@@ -1516,6 +1526,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 				if (IsInGame()) State.rpcQueue.push(new RpcVoteKick(pCtrl, true));
 				else State.lobbyRpcQueue.push(new RpcVoteKick(pCtrl, true));
 			}
+			break;*/
 		}
 	}
 }

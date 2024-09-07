@@ -67,10 +67,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			if (!State.InGameFriends.contains(__this->fields.PlayerId) &&
-				State.Friends.contains(convert_from_string(__this->fields.Puid)))
-				State.InGameFriends.insert(__this->fields.PlayerId);
-
 			if (!playerData || !localData)
 				return;
 
@@ -135,7 +131,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					roleColor.a, playerName);
 			}
 
-			if (IsHost() && State.TournamentMode && 
+			if (IsHost() && State.TournamentMode &&
 				std::find(State.tournamentFriendCodes.begin(), State.tournamentFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.tournamentFriendCodes.end()) {
 				auto fc = convert_from_string(playerData->fields.FriendCode);
 				float points = State.tournamentPoints[fc], win = State.tournamentWinPoints[fc],
@@ -208,7 +204,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					}
 				}
 				std::string modUsage = __this == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
-					std::format(" <#fb0>[{} User]</color>", 
+					std::format(" <#fb0>[{} User]</color>",
 						__this == *Game::pLocalPlayer ? "<#0f0>Sicko</color><#f00>Menu</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
 				std::string levelText = std::format("<#f00>ID {}</color> <#0f0>Level {}</color> <#b0f>({})</color>{}</color>", playerData->fields.PlayerId, playerLevel, platformId, modUsage);
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
@@ -236,6 +232,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				auto tasks = GetNormalPlayerTasks(__this);
 				for (auto task : tasks)
 				{
+					if (task == nullptr) continue;
 					if (task->fields.taskStep == task->fields.MaxStep) {
 						completedTasks++;
 						totalTasks++;
@@ -421,9 +418,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 								std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(player), nullptr));
 								std::string playerId = std::format("<{}>", player->fields.PlayerId);
 								std::string newName = State.hostUserName + "<size=0>" + playerId + "</size>";
-								if (IsInGame() && playerName != newName && playerName != "")
+								if (IsInGame() && playerName != newName)
 									State.rpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
-								else if (IsInLobby() && playerName != newName && playerName != "")
+								else if (IsInLobby() && playerName != newName)
 									State.lobbyRpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
 							}
 						}
@@ -538,7 +535,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						}
 					};
 				}
-				/*if (State.FollowerCam != nullptr) {
+				if (State.FollowerCam != nullptr) {
 					if (State.EnableZoom && !State.InMeeting && (IsInGame() || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
 						Camera_set_orthographicSize(State.FollowerCam, State.CameraHeight * 3, NULL);
 					else
@@ -548,7 +545,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					Vector3 cameraVector3 = Transform_get_position(cameraTransform, NULL);
 					if (State.EnableZoom && !State.InMeeting && State.CameraHeight > 3.0f)
 						Transform_set_position(cameraTransform, { cameraVector3.x, cameraVector3.y, 100 }, NULL);
-				}*/
+				}
 			}
 			else if (auto role = playerData->fields.Role) {
 				// ESP: Calculate Kill Cooldown
@@ -1101,7 +1098,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 			for (auto p : GetAllPlayerControl()) {
 				if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 				auto pData = GetPlayerData(p);
-				if (PlayerIsImpostor(pData) && !(State.KillImpostors || (IsHost() && State.BattleRoyale))) continue; //neither impostors
+				if (PlayerIsImpostor(pData) && !((State.KillImpostors && (IsHost() || !State.SafeMode)) || (IsHost() && State.BattleRoyale))) continue; //neither impostors
 				if (pData->fields.IsDead) continue; //nor ghosts
 				float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 				if (currentDist < max_dist) {
@@ -1153,7 +1150,7 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 		for (auto p : GetAllPlayerControl()) {
 			if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 			auto pData = GetPlayerData(p);
-			if (PlayerIsImpostor(pData) && !(State.KillImpostors || IsHost())) continue; //neither impostors
+			if (PlayerIsImpostor(pData) && !((State.KillImpostors && (IsHost() || !State.SafeMode)) || (IsHost() && State.BattleRoyale))) continue; //neither impostors
 			if (pData->fields.IsDead) continue; //nor ghosts
 			float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 			if (currentDist < max_dist) {
@@ -1200,14 +1197,45 @@ void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool 
 		return;
 	}
 	bool hasAlreadySetRole = role == RoleTypes__Enum::GuardianAngel || role == RoleTypes__Enum::CrewmateGhost || role == RoleTypes__Enum::ImpostorGhost;
-	if (State.AutoFakeRole && !hasAlreadySetRole) {
-		if (State.RealRole != RoleTypes__Enum::Shapeshifter && State.FakeRole == 5)
-			role = RoleTypes__Enum::Impostor;
-
-		else if (State.RealRole != RoleTypes__Enum::Phantom && State.FakeRole == 9)
-			role = RoleTypes__Enum::Impostor;
-
-		else role = (RoleTypes__Enum)State.FakeRole;
+	bool roleAllowed = false;
+	switch (State.FakeRole) {
+	case (int)RoleTypes__Enum::Crewmate:
+	case (int)RoleTypes__Enum::Engineer:
+	case (int)RoleTypes__Enum::Scientist:
+	case (int)RoleTypes__Enum::Noisemaker:
+	case (int)RoleTypes__Enum::Tracker:
+	case (int)RoleTypes__Enum::CrewmateGhost:
+	case (int)RoleTypes__Enum::ImpostorGhost:
+	case (int)RoleTypes__Enum::GuardianAngel:
+		roleAllowed = true;
+		break;
+	case (int)RoleTypes__Enum::Impostor:
+		if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Impostor || State.RealRole != RoleTypes__Enum::Shapeshifter || State.RealRole != RoleTypes__Enum::Phantom) {
+			roleAllowed = false;
+			break;
+		}
+		roleAllowed = true;
+		break;
+	case (int)RoleTypes__Enum::Shapeshifter:
+		if (State.RealRole != RoleTypes__Enum::Shapeshifter) {
+			roleAllowed = false;
+			break;
+		}
+		roleAllowed = true;
+		break;
+	case (int)RoleTypes__Enum::Phantom:
+		if (State.RealRole != RoleTypes__Enum::Phantom) {
+			roleAllowed = false;
+			break;
+		}
+		roleAllowed = true;
+		break;
+	default:
+		roleAllowed = false;
+		break;
+	}
+	if (State.AutoFakeRole && !hasAlreadySetRole && !roleAllowed) {
+		role = (RoleTypes__Enum)State.FakeRole;
 	}
 	PlayerControl_CoSetRole(__this, role, canOverride, method);
 }

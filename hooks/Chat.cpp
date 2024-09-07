@@ -229,10 +229,13 @@ bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, Method
 
 void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, MethodInfo* method)
 {
-	if (!State.SafeMode)
-		__this->fields.characterLimit = 2147483647;
-	else
-		__this->fields.characterLimit = 120;
+	if (!State.PanicMode) {
+		if (!State.SafeMode)
+			__this->fields.characterLimit = 2147483647;
+		else
+			__this->fields.characterLimit = 120;
+	}
+	else __this->fields.characterLimit = 100;
 
 	TextBoxTMP_SetText(__this, input, inputCompo, method);
 	

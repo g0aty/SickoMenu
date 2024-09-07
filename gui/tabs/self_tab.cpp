@@ -257,10 +257,7 @@ namespace SelfTab {
                 State.Save();
             }
             
-            if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
-                State.Save();
-            }
-            ImGui::SameLine();
+            
             if (ToggleButton("Infinite Kill Range", &State.InfiniteKillRange)) {
                 State.Save();
             }
@@ -430,6 +427,10 @@ namespace SelfTab {
             }
 
             if (!State.SafeMode) {
+                if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
                 if (ToggleButton("Unlock Kill Button", &State.UnlockKillButton)) {
                     State.Save();
                 }
@@ -554,7 +555,7 @@ namespace SelfTab {
                     if (IsHost() || !State.SafeMode)
                         ImGui::SameLine();
                 }
-                if ((IsInGame() || IsInLobby()) && (IsHost() || !State.SafeMode) && ImGui::Button("Randomize Everyone")) {
+                if ((IsInGame() || IsInLobby()) && !State.SafeMode && ImGui::Button("Randomize Everyone")) {
                     std::queue<RPCInterface*>* queue = nullptr;
                     if (IsInGame())
                         queue = &State.rpcQueue;

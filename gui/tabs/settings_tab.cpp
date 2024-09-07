@@ -267,9 +267,9 @@ namespace SettingsTab {
 				State.Save();
 			}
 			ImGui::Text("Guest friend code should be <= 10 characters long and cannot have a hashtag.");
-			if (ImGui::Button("Force Login as Guest")) {
+			/*if (ImGui::Button("Force Login as Guest")) {
 				State.ForceLoginAsGuest = true;
-			}
+			}*/
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
 			}
@@ -278,12 +278,12 @@ namespace SettingsTab {
 				State.Save();
 			}
 			ImGui::Text("Spoofed friend code only applies as host!");
-			if (ToggleButton("Spoof Friend Code", &State.SpoofFriendCode)) {
+			/*if (ToggleButton("Spoof Friend Code", &State.SpoofFriendCode)) {
 				State.Save();
 			}
 			if (InputString("Fake Friend Code", &State.FakeFriendCode)) {
 				State.Save();
-			}
+			}*/
 			if (ToggleButton("Spoof Platform", &State.SpoofPlatform)) {
 				State.Save();
 			}

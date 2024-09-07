@@ -66,14 +66,14 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	case (uint8_t)RpcCalls__Enum::CheckName:
 	case (uint8_t)RpcCalls__Enum::SetName: {
 		if (IsHost()) break;
-		if (State.SMAC_CheckBadNames) {
+		/*if (State.SMAC_CheckBadNames) {
 			auto name = MessageReader_ReadString(reader, NULL);
 			std::string nameStr = convert_from_string(name);
 			if (MessageReader_get_BytesRemaining(reader, NULL) > 0 || MessageReader_ReadBoolean(reader, NULL)) return false;
 			if (nameStr != RemoveHtmlTags(nameStr)) return true;
 			if (!IsNameValid(nameStr)) return true;
 			SMAC_OnCheatDetected(player, "Abnormal Name");
-		}
+		}*/
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::CheckColor:

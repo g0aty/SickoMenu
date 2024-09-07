@@ -412,7 +412,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_pr10";
+    std::string SickoVersion = "v3.7";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
