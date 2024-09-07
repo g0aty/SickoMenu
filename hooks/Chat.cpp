@@ -14,22 +14,24 @@ static std::string strToLower(std::string str) {
 
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
 	if (!State.PanicMode) {
-		bool wasDead = false;
-		auto player = GetPlayerData(sourcePlayer);
-		auto local = GetPlayerData(*Game::pLocalPlayer);
+		if (State.ReadGhostMessages) {
+			bool wasDead = false;
+			auto player = GetPlayerData(sourcePlayer);
+			auto local = GetPlayerData(*Game::pLocalPlayer);
 
-		if (player != NULL && player->fields.IsDead && local != NULL && !local->fields.IsDead) {
-			local->fields.IsDead = true;
-			wasDead = true;
-		}
-		ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
-		
-		std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
-		auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
-		uint32_t colorId = outfit->fields.ColorId;
-		std::string message = RemoveHtmlTags(convert_from_string(chatText));
-		if (wasDead) {
-			local->fields.IsDead = false;
+			if (player != NULL && player->fields.IsDead && local != NULL && !local->fields.IsDead) {
+				local->fields.IsDead = true;
+				wasDead = true;
+			}
+			ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
+			
+			std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
+			auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
+			uint32_t colorId = outfit->fields.ColorId;
+			std::string message = RemoveHtmlTags(convert_from_string(chatText));
+			if (wasDead) {
+				local->fields.IsDead = false;
+			}
 		}
 
 		auto playerFc = convert_from_string(player->fields.FriendCode);

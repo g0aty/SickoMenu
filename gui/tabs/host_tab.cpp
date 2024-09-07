@@ -503,9 +503,9 @@ namespace HostTab {
 								DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str());
 						}
 					}
-					ImGui::EndChild();
 				}
 			}
+			ImGui::EndChild();
 		}
 	}
 }
