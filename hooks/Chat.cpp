@@ -16,6 +16,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 	if (!State.PanicMode) {
 		auto player = GetPlayerData(sourcePlayer);
 		auto local = GetPlayerData(*Game::pLocalPlayer);
+		std::string message = RemoveHtmlTags(convert_from_string(chatText));
 		if (State.ReadGhostMessages) {
 			bool wasDead = false;
 
@@ -28,7 +29,6 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 			std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
 			auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
 			uint32_t colorId = outfit->fields.ColorId;
-			std::string message = RemoveHtmlTags(convert_from_string(chatText));
 			if (wasDead) {
 				local->fields.IsDead = false;
 			}
