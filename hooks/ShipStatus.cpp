@@ -8,6 +8,20 @@
 #include "game.h"
 
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
+	switch (__this->fields.Type) {
+	case ShipStatus_MapType__Enum::Ship:
+		if (State.mapType != Settings::MapType::Airship) State.mapType = Settings::MapType::Ship;
+		break;
+	case ShipStatus_MapType__Enum::Hq:
+		State.mapType = Settings::MapType::Hq;
+		break;
+	case ShipStatus_MapType__Enum::Pb:
+		State.mapType = Settings::MapType::Pb;
+		break;
+	case ShipStatus_MapType__Enum::Fungle:
+		State.mapType = Settings::MapType::Fungle;
+		break;
+	}
 	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
 	else
@@ -34,8 +48,6 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 		}
 
 		std::sort(State.mapDoors.begin(), State.mapDoors.end());
-
-		State.mapType = State.mapDoors.empty() ? Settings::MapType::Hq : Settings::MapType::Ship; //exploit the fact that MiraHQ has no doors and all other maps have their own shipstatus
 
 		if (!State.PanicMode && State.confuser && State.confuseOnStart)
 			ControlAppearance(true);
@@ -88,4 +100,208 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 		LOG_ERROR("Exception occurred in GameStartManager_Update (ShipStatus)");
 	}
 	GameStartManager_Update(__this, method);
+}
+
+void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
+	if (IsHost() && (!State.PanicMode || State.BattleRoyale) && State.DisableSabotages && 
+		(callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) return;
+	ShipStatus_HandleRpc(__this, callId, reader, method);
+}
+
+void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method) {
+	if (State.mapType != Settings::MapType::Fungle && systemType == SystemTypes__Enum::Electrical) {
+		il2cpp::Dictionary<Dictionary_2_SystemTypes_ISystemType_> systems = (*Game::pShipStatus)->fields.Systems;
+
+		auto switchSystem = (SwitchSystem*)(systems[SystemTypes__Enum::Electrical]);
+		auto actualSwitches = switchSystem->fields.ActualSwitches;
+		auto expectedSwitches = switchSystem->fields.ExpectedSwitches;
+
+		auto switchMask = 1 << (amount & 0x1F);
+
+		synchronized(Replay::replayEventMutex) {
+			State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, 
+				(actualSwitches & switchMask) != (expectedSwitches & switchMask) ? SABOTAGE_ACTIONS::SABOTAGE_FIX : SABOTAGE_ACTIONS::SABOTAGE_CALL));
+		}
+
+		if (amount >= 5 && State.Enable_SMAC && State.SMAC_CheckSabotage)
+			SMAC_OnCheatDetected(player, "Bad Sabotage");
+	}
+	if (systemType == SystemTypes__Enum::Comms) {
+		if (amount == 128) {
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+			}
+			if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+		}
+		else {
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_FIX));
+			}
+		}
+	}
+	switch (State.mapType) {
+	case Settings::MapType::Pb:
+	{
+		switch (systemType) {
+		case SystemTypes__Enum::Laboratory:
+			if (amount == 128) {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+				}
+				if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			}
+			else {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_FIX));
+				}
+			}
+			break;
+		case SystemTypes__Enum::Comms:
+			break;
+		case SystemTypes__Enum::Electrical:
+			break;
+		default:
+			if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+		}
+	}
+	break;
+	case Settings::MapType::Airship:
+	{
+		switch (systemType) {
+		case SystemTypes__Enum::HeliSabotage:
+			if (amount == 128) {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+				}
+				if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			}
+			else {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_FIX));
+				}
+			}
+			break;
+		case SystemTypes__Enum::Comms:
+			break;
+		case SystemTypes__Enum::Electrical:
+			break;
+		default:
+			if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+		}
+	}
+	break;
+	case Settings::MapType::Fungle:
+	{
+		switch (systemType) {
+		case SystemTypes__Enum::Reactor:
+			if (amount == 128) {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+				}
+				if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			}
+			else {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_FIX));
+				}
+			}
+			break;
+		case SystemTypes__Enum::MushroomMixupSabotage:
+			if (amount == 1) {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+				}
+			}
+			if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			break;
+		case SystemTypes__Enum::Electrical:
+			break;
+		default:
+			if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+		}
+	}
+	break;
+	default: //skeld and mira have same sabotages
+	{
+		switch (systemType) {
+		case SystemTypes__Enum::Reactor:
+			if (amount == 128) {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+				}
+				if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			}
+			else {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_FIX));
+				}
+			}
+			break;
+		case SystemTypes__Enum::LifeSupp:
+			if (amount == 128) {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+				}
+				if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			}
+			else {
+				synchronized(Replay::replayEventMutex) {
+					State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), systemType, SABOTAGE_ACTIONS::SABOTAGE_FIX));
+				}
+			}
+			break;
+		case SystemTypes__Enum::Electrical:
+			break;
+		case SystemTypes__Enum::Comms:
+			break;
+		default:
+			if (State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+		}
+	}
+	break;
+	}
+
+	if (systemType == SystemTypes__Enum::Sabotage) {
+		switch (amount) {
+		case (int)SystemTypes__Enum::MushroomMixupSabotage:
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), SystemTypes__Enum::MushroomMixupSabotage, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+			}
+			if (State.mapType != Settings::MapType::Fungle && State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			break;
+		case (int)SystemTypes__Enum::Reactor:
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), SystemTypes__Enum::Reactor, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+			}
+			if (!(State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle)
+				&& State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			break;
+		case (int)SystemTypes__Enum::Laboratory:
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), SystemTypes__Enum::Laboratory, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+			}
+			if (State.mapType != Settings::MapType::Pb && State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			break;
+		case (int)SystemTypes__Enum::HeliSabotage:
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), SystemTypes__Enum::HeliSabotage, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+			}
+			if (State.mapType != Settings::MapType::Airship && State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			break;
+		case (int)SystemTypes__Enum::LifeSupp:
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), SystemTypes__Enum::LifeSupp, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+			}
+			if (!(State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq)
+				&& State.Enable_SMAC && State.SMAC_CheckSabotage) SMAC_OnCheatDetected(player, "Bad Sabotage");
+			break;
+		case (int)SystemTypes__Enum::Comms:
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.emplace_back(std::make_unique<SabotageEvent>(GetEventPlayerControl(player).value(), SystemTypes__Enum::Comms, SABOTAGE_ACTIONS::SABOTAGE_CALL));
+			}
+			break;
+		}
+	}
+	ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
+	LOG_DEBUG(std::format("SystemType {} updated with amount {}", (std::string)TranslateSystemTypes(systemType), amount).c_str());
 }

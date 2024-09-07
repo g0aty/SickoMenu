@@ -57,14 +57,13 @@
 - **Spam** Spams chat with your desired message
 - **Spam by Everyone** *(Only with Safe Mode disabled)* Spams the chat as all players with your desired message (Default: OFF)
 - **Console** Shows a console window that tracks all game events (Default: OFF)
-- **Allow Everyone to NoClip** Allows every player to walk through walls provided they're not a cheater as well
-- **Allow Friends to NoClip** Same as "Allow Everyone to NoClip", but for your friends only
-- **Kill Everyone** Kills all players as yourself
-- **Protect Everyone** *(Only as host/Safe Mode disabled)* Casts a guardian angel shield with the same color as the player around them 
+- **Allow Everyone to NoClip** *(Only as host/Safe Mode disabled)* Allows every player to walk through walls provided they're not a cheater as well
+- **Kill Everyone** *(Only as host/Safe Mode disabled)* Kills all players as yourself
+- **Protect Everyone** Casts a guardian angel shield with the same color as the player around them 
 - **Disable Venting** Instantly kicks anyone in the vents out (Default: OFF)
 - **Spam Report** Spams dead body reports (Default: OFF)
-- **Kill All Crewmates** Kills all crewmates as yourself
-- **Kill All Impostors** Kills all impostors as yourself
+- **Kill All Crewmates** *(Only as host/Safe Mode disabled)* Kills all crewmates as yourself
+- **Kill All Impostors** *(Only as host/Safe Mode disabled)* Kills all impostors as yourself
 - **Suicide All Crewmates** *(Only with Safe Mode disabled)* Kills all crewmates as themselves
 - **Suicide All Impostors** *(Only with Safe Mode disabled)* Kills all impostors as themselves
 - **Scan Everyone** *(Only with Safe Mode disabled and visual tasks enabled)* Forces everyone to medbay scan
@@ -85,7 +84,7 @@ View the game options!
 - **Freecam** Detach the camera from player and see everything (Default: OFF, Speed: 1x)
 - **Zoom** Zooms the camera out for more vision (Default: OFF, Zoom: 3x)
 - **Always show Chat Button** Always shows the chat button even in game (Default: OFF)
-- **Allow Paste in Chat** Allows you to paste text into chat (Default: OFF)
+- **Allow Copy/Paste in Chat** Allows you to copy, paste, or cut text into chat (Default: OFF)
 - **Read Messages by Ghosts** Allows you to read ghost messages (Default: OFF)
 - **Read and Send AUM Chat** Allows you to read AUM chat and send via "/aum [message]" (Default: OFF)
 - **Custom Name** Customize your name with effects such as gradient, RGB, size, italics, underline and strikethrough (Default: OFF)
@@ -99,6 +98,7 @@ View the game options!
 - **See Ghosts** Allows you to see ghosts (Default: OFF)
 - **See Protections** Shows the guardian angel protections on a player (Default: OFF)
 - **See Kill Cooldown** Shows the kill cooldown of an impostor below their name (Default: OFF)
+- **Dark Mode (Chat Only)** Enables dark mode while chatting (Default: OFF)
 - **Disable Kill Animation** Disables the kill animation (Default: OFF)
 - **Show Host** Shows the host below ping (Default: OFF)
 - **Hide Watermark** Hides the watermark, useful for streaming (Default: OFF)
@@ -112,14 +112,17 @@ View the game options!
 - **Always Move** Allows you to move in meetings and game menus such as tasks (Default: OFF)
 - **Shapeshift without Animation** Allows you to shapeshift without the animation (Default: OFF)
 - **NoClip** Allows you to walk through walls (Default: OFF)
-- **Kill Other Impostors** Allows you to kill fellow impostors (Default: OFF)
+- **Kill Other Impostors** *(Only with Safe Mode disabled)* Allows you to kill fellow impostors (Default: OFF)
+- **Unlock Kill Button** *(Only with Safe Mode disabled)* Allows you to use kill button at any time (Default: OFF)
+- **Allow Killing in Lobbies** *(Only with Safe Mode disabled)* Allows you to kill in lobbies (Default: OFF)
+- **Kill While Vanished** *(Only with Safe Mode disabled)* Allows you to kill while being vanished as a phantom (Default: OFF)
 - **Infinite Kill Range** Extends your kill reach (Default: OFF)
 - **Kill During Vanish** Allows you to kill while vanished as a Phantom (Default: OFF)
 - **Bypass Guardian Angel Protections** Allows you to kill protected players (Default: OFF)
 - **Do Tasks as Impostor** Allows you to complete tasks as impostor (Default: OFF)
 - **Always Use Kill Exploit** Forces the kill exploit to always be used, thus bypassing Disable Kills (Default: OFF)
 - **Fake Alive** Appear to yourself as alive even if you're dead (Default: OFF)
-- *(Only as host/Safe Mode disabled)* **God Mode** Prevents you from dying (Default: OFF)
+- **God Mode** Prevents you from dying (Default: OFF)
 - **(Shift + Right Click) to Teleport** Teleports you to wherever you clicked (Default: OFF)
 - **Rotate Everyone** Rotates everyone around you only for yourself based on the rotation radius (Default: OFF)
 - **Server-sided Rotation** *(Only with Safe Mode disabled)* Rotates everyone around you that can be seen by everyone (Default: OFF)
@@ -170,20 +173,18 @@ A dedicated player menu for viewing and manipulating players
 ### Player
 - **Report Body** Reports the selected player's body
 - **Spectate** Spectate the selected player
-- **Kill** Kills the selected player
-- **Telekill** Kills the selected player and teleports you to your previous location
+- **Kill** *(Only as host/Safe Mode disabled)* Kills the selected player
+- **Telekill** *(Only as host/Safe Mode disabled)* Kills the selected player and teleports you to your previous location
 - **Kick** *(Only as Host)* Kicks the selected player
 - **Votekick** Votekicks the selected player (2 more are required to actually kick the player)
 - **Kick Exploit** *(Only with Safe Mode disabled)* Attempts to kick the player using an exploit
-- **Attempt to Ban** *(Only with an anticheat)* Attempts to ban the player for hacking
-- **Toggle Friend(s)** Makes the selected player a friend, which won't get targeted by most features
 - **Ban** *(Only as Host)* Bans the selected player
 - **Shift** *(Only as Shapeshifter/Safe Mode disabled)* Shapeshifts you into the selected player
 - **Protect** *(Only as Guardian Angel/Host/Safe Mode disabled)* Casts a guardian angel protection on the selected player
 - View the player's tasks (and complete them with Safe Mode disabled)
 
 ### Trolling
-- **Allow Player to NoClip** Allows the selected player to walk through walls
+- **Allow Player to NoClip** *(Only as host/Safe Mode disabled)* Allows the selected player to walk through walls
 - **Force Meeting By** Forces an emergency meeting by the selected player
 - **Self-Report** Forces the selected player to report their own body
 - **Impersonate** Copies the player's cosmetics
@@ -191,7 +192,7 @@ A dedicated player menu for viewing and manipulating players
 - **Cosmetics Resetter** Individually select the cosmetics to reset to original
 - **Impersonate Everyone To** *(Only with Safe Mode disabled)* Makes everyone copy the selected player
 - **Suicide** *(Only with Safe Mode disabled)* Makes the selected player kill themselves
-- **Murder Loop** Kills the selected player 20 times
+- **Murder Loop** *(Only as host/Safe Mode disabled)* Kills the selected player 20 times
 - **Suicide Loop** *(Only with Safe Mode disabled)* Makes the selected player kill themselves 20 times
 - **Kill Crewmates By** *(Only with Safe Mode disabled)* Makes the selected player kill every crewmate
 - **Kill Impostors By** *(Only with Safe Mode disabled)* Makes the selected player kill every impostor
@@ -202,7 +203,6 @@ A dedicated player menu for viewing and manipulating players
 - **Teleport To You** *(Only with Safe Mode disabled)* Teleports the selected player to you
 - **Attach To** Attaches yourself to the selected player
 - **Turn into Ghost** *(Only as host/Safe Mode disabled)* Makes the selected player a ghost
-- **Revive** *(Only as host)* Brings back a player from the dead
 - **Set Role** *(Only as host/Safe Mode disabled)* Sets the selected player's role to whatever you choose
 - **Set Scanner** *(Only with Safe Mode disabled)* Makes the selected player medbay scan
 - **Stop Scanner** *(Only with Safe Mode disabled)* Makes the selected player stop medbay scanning
@@ -250,7 +250,10 @@ A dedicated player menu for viewing and manipulating players
 - **End Game** End the game at your own will for your desired reason
 - **Force Name for Everyone** Forces your desired name for everyone (Default: OFF)
 - **Force Color for Everyone** Forces your desired color for everyone (Default: OFF)
-- **Revive Yourself** Bring yourself back from the dead
+- **Kill Other Impostors** Allows you to kill fellow impostors (Default: OFF)
+- **Unlock Kill Button** Allows you to use kill button at any time (Default: OFF)
+- **Allow Killing in Lobbies** Allows you to kill in lobbies (Default: OFF)
+- **Kill While Vanished** Allows you to kill while being vanished as a phantom (Default: OFF)
 
 ## 🧑‍💻 Debug
 - **Enable Occlusion Culling** Allows culling of objects not in your field of view (Default: OFF)

@@ -14,8 +14,7 @@ static void onGameEnd() {
     try {
         LOG_DEBUG("Reset All");
         Replay::Reset();
-        State.aumUsers.clear();
-        State.sickoUsers.clear();
+        State.modUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
         State.EnableZoom = false;
@@ -32,6 +31,7 @@ static void onGameEnd() {
         State.VoteKicks = 0;
         State.OutfitCooldown = 50;
         State.CanChangeOutfit = false;
+        State.GameLoaded = false;
         State.RealRole = RoleTypes__Enum::Crewmate;
 
         if (State.PanicMode && State.TempPanicMode) {
@@ -98,6 +98,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 if (!IsInLobby()) {
                     State.selectedPlayer = PlayerSelection();
+                    State.selectedPlayers = {};
                     State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
@@ -245,11 +246,16 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                             scientistRole->fields.currentCooldown = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         scientistRole->fields.currentCharge = 69420.0f + 1.0f; //Can be anything as it will always be written
                     }
-                    if (GameLogicOptions().GetKillCooldown() > 0)
-                        (*Game::pLocalPlayer)->fields.killTimer = 0;
-                    else
-                        GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, 0.0042069f); //force cooldown > 0 as ur unable to kill otherwise
+                    if (role == RoleTypes__Enum::GuardianAngel) {
+                        app::GuardianAngelRole* guardianAngelRole = (app::GuardianAngelRole*)playerRole;
+                        if (guardianAngelRole->fields.cooldownSecondsRemaining > 0.0f)
+                            guardianAngelRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
+                    }
                     if (IsHost() || !State.SafeMode) {
+                        if (GameLogicOptions().GetKillCooldown() > 0)
+                            (*Game::pLocalPlayer)->fields.killTimer = 0;
+                        else
+                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, 0.0042069f); //force cooldown > 0 as ur unable to kill otherwise
                         if (IsHost()) {
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 0); //force set cooldown, otherwise u get kicked
@@ -266,11 +272,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                 if (phantomRole->fields.cooldownSecondsRemaining > 0.0f)
                                     phantomRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                             }
-                        }
-                        if (role == RoleTypes__Enum::GuardianAngel) {
-                            app::GuardianAngelRole* guardianAngelRole = (app::GuardianAngelRole*)playerRole;
-                            if (guardianAngelRole->fields.cooldownSecondsRemaining > 0.0f)
-                                guardianAngelRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                         }
                     }
                     if (role == RoleTypes__Enum::Shapeshifter) {
@@ -292,7 +293,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 auto localData = GetPlayerData(*Game::pLocalPlayer);
                 app::RoleBehaviour* playerRole = localData->fields.Role;
                 app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
-                (*Game::pLocalPlayer)->fields.killTimer = 0;
+                if (IsHost() || !State.SafeMode) (*Game::pLocalPlayer)->fields.killTimer = 0;
                 if (role == RoleTypes__Enum::Engineer)
                 {
                     app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
@@ -364,10 +365,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }*/
 
             if (!IsHost() && State.SafeMode) {
-                State.CycleForEveryone = false;
-                State.ForceNameForEveryone = false;
+                //State.CycleForEveryone = false;
+                //State.ForceNameForEveryone = false;
                 State.TeleportEveryone = false;
-                State.GodMode = false;
+                //State.GodMode = false;
             }
 
             if (State.CycleTimer < 0.2f) {
@@ -378,6 +379,17 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (State.CycleDuration <= 10) {
                 State.CycleDuration = 10;
                 State.Save();
+            }
+
+            static int joinDelay = 500; //should be 10s
+            if (joinDelay <= 0 && State.AutoJoinLobby) {
+                AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
+                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
+                    NULL);
+                joinDelay = 500; //Should be approximately 10s
+            }
+            else {
+                joinDelay--;
             }
 
             static int reportDelay = 0;
@@ -672,22 +684,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 else
                     playerCycleDelay = 0;
             }
-
-            State.RgbNameColor += 0.025f;
-            constexpr auto tau = 2.f * 3.14159265358979323846f;
-            while (State.RgbNameColor > tau) State.RgbNameColor -= tau;
-            const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
-            auto color_r = calculate(State.RgbNameColor + 0.f);
-            auto color_g = calculate(State.RgbNameColor + 4.f);
-            auto color_b = calculate(State.RgbNameColor + 2.f);
-            State.rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
             onStart = false;
-
-            if (State.RgbMenuTheme) {
-                State.RgbColor.x = color_r;
-                State.RgbColor.y = color_g;
-                State.RgbColor.z = color_b;
-            }
 
             //static int attachDelay = 0; //If we spam too many name changes, we're banned
             auto playerToAttach = State.playerToAttach.validate();
@@ -717,7 +714,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
             }
 
-            if (IsInGame() && State.GodMode) {
+            if ((IsInGame() || IsInLobby()) && State.GodMode) {
                 if (State.protectMonitor.find((*Game::pLocalPlayer)->fields.PlayerId) == State.protectMonitor.end())
                     PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
             }
@@ -769,6 +766,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
 void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, MethodInfo* method) {
     try {
+        State.AutoJoinLobby = false;
         if (!State.PanicMode) {
             Log.Debug("Joined lobby " + convert_from_string(gameIdString));
             State.LastLobbyJoined = convert_from_string(gameIdString);
@@ -787,6 +785,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
     try {
         if (!State.PanicMode) {
+            State.BlinkPlayersTab = true;
             if (data->fields.Character) { // Don't use Object_1_IsNotNull().
                 auto playerInfo = GetPlayerData(data->fields.Character);
 
@@ -801,15 +800,12 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 else
                     Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
-                auto itAum = std::find(State.aumUsers.begin(), State.aumUsers.end(), data->fields.Character->fields.PlayerId);
-                if (itAum != State.aumUsers.end())
-                    State.aumUsers.erase(itAum);
-
-                auto it = std::find(State.sickoUsers.begin(), State.sickoUsers.end(), data->fields.Character->fields.PlayerId);
-                if (it != State.sickoUsers.end())
-                    State.sickoUsers.erase(it);
+                if (State.modUsers.find(data->fields.Character->fields.PlayerId) != State.modUsers.end())
+                    State.modUsers.erase(data->fields.Character->fields.PlayerId);
 
                 auto playerId = data->fields.Character->fields.PlayerId;
+                if (State.selectedPlayer.equals(PlayerSelection(data->fields.Character)))
+                    State.selectedPlayer = PlayerSelection();
                 auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);
                 if (itSel != State.selectedPlayers.end())
                     State.selectedPlayers.erase(itSel);
@@ -830,6 +826,10 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
         LOG_ERROR("Exception occurred in AmongUsClient_OnPlayerLeft (InnerNetClient)");
     }
     AmongUsClient_OnPlayerLeft(__this, data, reason, method);
+}
+
+void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, MethodInfo* method) {
+    AmongUsClient_OnPlayerJoined(__this, data, method);
 }
 
 bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
@@ -894,7 +894,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
 
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
     try {
-        if (GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
+		if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
             RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
         //fixes game crashing on ending with shapeshifter
         onGameEnd();
@@ -913,6 +913,8 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
             || __this->fields.NetworkMode == NetworkModes__Enum::FreePlay) {
             onGameEnd();
             State.LastDisconnectReason = reason;
+            if (reason == DisconnectReasons__Enum::Banned || reason == DisconnectReasons__Enum::ConnectionLimit || reason == DisconnectReasons__Enum::GameNotFound || reason == DisconnectReasons__Enum::ServerError)
+                State.AutoJoinLobby = false;
         }
     }
     catch (...) {
@@ -936,6 +938,55 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
     try {
         if (!State.PanicMode && IsHost() && State.NoGameEnd)
             return;
+        if (State.BattleRoyale) {
+            uint8_t aliveCount = 0;
+            for (auto p : GetAllPlayerData()) {
+                if (!p->fields.IsDead) aliveCount++;
+                else if (p->fields.RoleType == RoleTypes__Enum::ImpostorGhost)
+                    PlayerControl_RpcSetRole(p->fields._object, RoleTypes__Enum::CrewmateGhost, false, NULL);
+            }
+            if (aliveCount != 1) return;
+            else endReason = GameOverReason__Enum::ImpostorByKill;
+        }
+        if (IsHost() && State.TournamentMode) {
+            bool impostorWin = false;
+            switch (endReason) {
+            case GameOverReason__Enum::HideAndSeek_ByKills:
+            case GameOverReason__Enum::ImpostorByKill:
+            case GameOverReason__Enum::ImpostorBySabotage:
+            case GameOverReason__Enum::ImpostorByVote:
+            case GameOverReason__Enum::HumansDisconnect:
+                impostorWin = true;
+                break;
+            }
+            for (auto p : GetAllPlayerData()) {
+                auto friendCode = convert_from_string(p->fields.FriendCode);
+                if (impostorWin) {
+                    if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
+                        UpdateTournamentPoints(p, 2); //AllImpsWin
+                        State.tournamentWinPoints[friendCode] += 1;
+                    }
+                    else if (PlayerIsImpostor(p)) {
+                        UpdateTournamentPoints(p, 1); //ImpWin
+                        State.tournamentWinPoints[friendCode] += 1;
+                    }
+                }
+                else {
+                    if (PlayerIsImpostor(p))
+                        UpdateTournamentPoints(p, 10); //ImpLose
+                    else {
+                        UpdateTournamentPoints(p, 7); //CrewWin
+                        State.tournamentWinPoints[friendCode] += 1;
+                    }
+                }
+            }
+            State.tournamentKillCaps.clear();
+            State.tournamentAssignedImpostors.clear();
+            State.tournamentAliveImpostors.clear();
+            State.tournamentCallers.clear();
+            State.tournamentCalledOut.clear();
+            State.tournamentFirstMeetingOver = false;
+        }
     }
     catch (...) {
         LOG_ERROR("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
@@ -1006,7 +1057,13 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
             if (p->fields._.OwnerId == srcClient) sourcePlayer = p;
             if (p->fields._.OwnerId == clientId) affectedPlayer = p;
         }
-        if (IsHost() && sourcePlayer == *Game::pLocalPlayer) return; //anti kick as host
+        if (IsHost()) {
+            if (affectedPlayer == *Game::pLocalPlayer) return; //anti kick as host
+            if (sourcePlayer == *Game::pLocalPlayer) {
+                InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), clientId, false, NULL);
+                return;
+            }
+        }
         std::string sourceplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
         std::string affectedplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(affectedPlayer), nullptr));
         LOG_DEBUG(sourceplayerName + " attempted to votekick " + affectedplayerName);

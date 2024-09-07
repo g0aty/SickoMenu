@@ -91,20 +91,29 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 					}
 				}
 
-				if ((IsInGame() || IsInLobby())) {
+				if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
+					bool amImpostor = false;
+					try {
+						amImpostor = PlayerIsImpostor(localData);
+					}
+					catch (...) {
+						LOG_ERROR("Exception occured while fetching whether player is impostor or not.");
+					}
+
 					for (auto player : GetAllPlayerControl())
 					{
 						auto playerInfo = GetPlayerData(player);
 						if (!playerInfo) break; //This happens sometimes during loading
 
-						if (!State.PanicMode && State.KillImpostors && !playerInfo->fields.IsDead && PlayerIsImpostor(localData))
+
+						if ((!IsInLobby()) && !State.PanicMode && State.KillImpostors && !playerInfo->fields.IsDead && amImpostor)
 							playerInfo->fields.Role->fields.CanBeKilled = true;
 						else if (PlayerIsImpostor(playerInfo))
 							playerInfo->fields.Role->fields.CanBeKilled = false;
 					}
 					GameObject* KillButton = app::Component_get_gameObject((Component_1*)__this->fields.KillButton, NULL);
 					if (KillButton != NULL && (IsInGame())) {
-						if ((!State.PanicMode && State.UnlockKillButton && !localData->fields.IsDead) || PlayerIsImpostor(localData)) {
+						if ((!State.PanicMode && State.UnlockKillButton && (IsHost() || !State.SafeMode) && !localData->fields.IsDead) || amImpostor) {
 							app::GameObject_SetActive(KillButton, true, nullptr);
 							playerRole->fields.CanUseKillButton = true;
 						}
@@ -128,15 +137,16 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 	VersionShower_Start(__this, method);
-	const auto& versionText = !State.PanicMode && !State.HideWatermark ? std::format("<size=75%>{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color></size>",
-		convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)), State.SickoVersion) :
+	const auto& versionText = !State.PanicMode && !State.HideWatermark ? std::format("<size=75%>{}{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>goaty</color></color></size>",
+		State.DarkMode ? "<#666>" : "<#fff>", convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)), State.SickoVersion) :
 		convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
 	app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(versionText), nullptr);
 }
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 	app::PingTracker_Update(__this, method);
-	app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::TopGeoAligned, nullptr);
+	app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
+	//center the ping text when panic is enabled
 	try {
 		if (!IsStreamerMode() && !State.PanicMode) {
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
@@ -161,9 +171,11 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 			else spectating = "";
 			std::string hostText = State.ShowHost && IsInGame() ?
 				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
-			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" ~ Vote Kicks: {}", State.VoteKicks) : "";
-			std::string watermarkText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#9ef>goaty</color> ~ ", spectating == "" ? 100 : 50, State.SickoVersion);
-			std::string pingText = std::format("{}{}{}{}{}{}{}{}{}</size>", State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating, IsInGame() ? "" : "");
+			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
+			std::string watermarkText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>goaty</color> ~ ", spectating == "" ? 100 : 50, State.SickoVersion);
+			std::string pingText = std::format("{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
+				State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
+			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}
 		else {

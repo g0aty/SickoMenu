@@ -117,10 +117,12 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		State.ForceLoginAsGuest = false; //button behavior
 	}
 
-	/*if (!IsHost() && (IsInLobby() || IsInGame())) {
-		auto friendCode = (*Game::pLocalPlayer)->fields.FriendCode;
-		__this->fields.friendCode = friendCode;
-	}*/
+	if (State.SpoofLevel) {
+		auto player = DataManager_get_Player(NULL);
+		auto stats = PlayerData_get_Stats(player, NULL);
+		stats->fields.level = State.FakeLevel - 1;
+		AbstractSaveData_Save((AbstractSaveData*)player, NULL);
+	}
 }
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {

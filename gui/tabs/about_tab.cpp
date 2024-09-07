@@ -26,7 +26,7 @@ namespace AboutTab {
 
     void Render() {
         ImGui::SameLine(100 * State.dpiScale);
-        ImGui::BeginChild("###About", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+        ImGui::BeginChild("###About", ImVec2(500 * State.dpiScale, 300), true, ImGuiWindowFlags_NoBackground);
         if (TabGroup("Welcome", openWelcome)) {
             CloseOtherGroups(Groups::Welcome);
         }
@@ -40,7 +40,6 @@ namespace AboutTab {
             ImGui::Text(welcomeText.c_str());
             ImGui::Text("SickoMenu is a highly sophisticated cheat menu for Among Us based on AmongUsMenu.");
             ImGui::Text("It promises more features and regular updates.");
-            ImGui::Text("Make sure to use the latest version of SickoMenu from the GitHub repository!");
             ImGui::Text("Use the \"Check for Updates\" button to download the latest release!");
             if (ImGui::Button("GitHub")) {
                 OpenLink("https://github.com/g0aty/SickoMenu");
@@ -54,7 +53,9 @@ namespace AboutTab {
                 OpenLink("https://dsc.gg/sickos"); //sickomenu discord invite
             }
             ImGui::Text("SickoMenu is a free and open-source software.");
-            ImGui::Text("If you've paid for this menu, demand a refund immediately.");
+            ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "If you've paid for this menu, demand a refund immediately.");
+            ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "Make sure you have downloaded the latest version of SickoMenu from GitHub or our");
+            ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "official Discord!");
             //hopefully stop people from reselling a foss menu for actual money
         }
 

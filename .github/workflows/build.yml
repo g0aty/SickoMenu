@@ -64,7 +64,7 @@ jobs:
           path: Debug.zip
           
   AutoRelease:
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     needs: [Build_Release, Build_Debug]
     steps:
 #      - name: Parse tag semver
@@ -96,12 +96,11 @@ jobs:
           name: Debug
       
       - name: Automatic Releases
-        uses: marvinpinto/action-automatic-releases@latest #maybe this fixed auto release versioning?
-        id: "automatic_releases"
+        uses: appleboy/discord-action@master
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}" #this is gonna give me a stroke
-          automatic_release_tag: "latest"
-          prerelease: false
-          files: |
-            Release.zip
-            Debug.zip
+          webhook_id: ${{ secrets.WEBHOOK_ID }}
+          webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
+          file: |
+              Release.zip
+              Debug.zip
+          message: "@everyone A new pre-release has been released!"

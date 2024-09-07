@@ -7,6 +7,7 @@
 void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 {
 	AirshipStatus_OnEnable(__this, method);
+	State.mapType = Settings::MapType::Airship;
 	try {
 		Replay::Reset();
 
@@ -26,8 +27,6 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 
 		std::sort(State.mapDoors.begin(), State.mapDoors.end());
 
-		State.mapType = Settings::MapType::Airship;
-
 		if (!State.PanicMode && State.confuser && State.confuseOnStart)
 			ControlAppearance(true);
 
@@ -40,8 +39,7 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 	}
 }
 
-float dAirshipStatus_CalculateLightRadius(AirshipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method)
-{
+float dAirshipStatus_CalculateLightRadius(AirshipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
 	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
 	return AirshipStatus_CalculateLightRadius(__this, player, method);

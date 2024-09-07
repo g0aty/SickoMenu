@@ -3535,35 +3535,37 @@ namespace app
     };
 
     struct TextBoxTMP__Fields {
-        void* m_CachePtr;
+        struct MonoBehaviour__Fields _;
         bool allowAllCharacters;
-        struct System_String_o* text;
-        struct System_String_o* compoText;
+        struct String* text;
+        struct String* compoText;
         int32_t characterLimit;
-        struct TMPro_TextMeshPro_o* outputText;
-        struct UnityEngine_SpriteRenderer_o* Background;
-        struct UnityEngine_MeshRenderer_o* Pipe;
+        struct TextMeshPro* outputText;
+        struct SpriteRenderer* Background;
+        struct MeshRenderer* Pipe;
         float pipeBlinkTimer;
         bool ClearOnFocus;
         bool ForceUppercase;
-        struct UnityEngine_UI_Button_ButtonClickedEvent_o* OnEnter;
-        struct UnityEngine_UI_Button_ButtonClickedEvent_o* OnChange;
-        struct UnityEngine_UI_Button_ButtonClickedEvent_o* OnFocusLost;
-        struct UnityEngine_TouchScreenKeyboard_o* keyboard;
+        struct Button_ButtonClickedEvent* OnEnter;
+        struct Button_ButtonClickedEvent* OnChange;
+        struct Button_ButtonClickedEvent* OnFocusLost;
+        struct TouchScreenKeyboard* keyboard;
         bool AllowSymbols;
         bool AllowEmail;
         bool IpMode;
         bool AllowPaste;
         bool Hidden;
-        struct UnityEngine_Collider2D_array* colliders;
+        struct Collider2D__Array* colliders;
         bool hasFocus;
-        struct System_Text_StringBuilder_o* tempTxt;
-        struct UnityEngine_SpriteRenderer_o* sendButtonGlyph;
+        int32_t caretPos;
+        float caretRepeatTimer;
+        struct StringBuilder* tempTxt;
+        struct SpriteRenderer* sendButtonGlyph;
     };
 
     struct TextBoxTMP {
-        void* klass;
-        void* monitor;
+        struct TextBoxTMP__Class* klass;
+        MonitorData* monitor;
         struct TextBoxTMP__Fields fields;
     };
 
@@ -6350,7 +6352,7 @@ namespace app
         void* aspectPosition;
         struct FreeChatInputField* freeChatField;
         void* quickChatMenu;
-        void* quickChatField;
+        struct QuickChatPreviewField* quickChatField;
         void* messageSound;
         void* warningSound;
         void* chatAnimationIn;
@@ -10168,49 +10170,6 @@ namespace app
     };
 #pragma endregion
 
-#pragma region NotificationPopper
-    struct NotificationPopper__Fields {
-        struct MonoBehaviour__Fields _;
-        struct LobbyNotificationMessage* notificationMessageOrigin;
-        struct Sprite* playerDisconnectSprite;
-        struct Sprite* settingsChangeSprite;
-        void* playerDisconnectSound;
-        void* settingsChangeSound;
-        float spacingY;
-        int32_t maxMessages;
-        struct Color disconnectColor;
-        struct Color settingsChangeColor;
-        struct AspectPosition* aspectPosition;
-        struct List_1_LobbyNotificationMessage_* activeMessages;
-        int32_t lastMessageKey;
-    };
-
-    struct NotificationPopper {
-        struct NotificationPopper__Class* klass;
-        MonitorData* monitor;
-        struct NotificationPopper__Fields fields;
-    };
-
-    struct NotificationPopper__VTable {
-        VirtualInvokeData Equals;
-        VirtualInvokeData Finalize;
-        VirtualInvokeData GetHashCode;
-        VirtualInvokeData ToString;
-    };
-
-    struct NotificationPopper__StaticFields {
-    };
-
-    struct NotificationPopper__Class {
-        Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
-        struct NotificationPopper__StaticFields* static_fields;
-        const Il2CppRGCTXData* rgctx_data;
-        Il2CppClass_1 _1;
-        struct NotificationPopper__VTable vtable;
-    };
-#pragma endregion
-
 #pragma region DisconnectPopup
 
     struct DestroyableSingleton_1_DisconnectPopup___Fields {
@@ -10284,6 +10243,152 @@ namespace app
     };
 #pragma endregion
 
+#pragma region PlayerStatsData
+    struct PlayerStatsData__Fields {
+        void* _;
+        uint32_t level;
+        uint32_t xp;
+        uint32_t xpForNextLevel;
+        void* OnLevelChanged;
+        void* OnXpChanged;
+        void* OnXpForNextLevelChanged;
+    };
+
+    struct PlayerStatsData {
+        struct PlayerStatsData__Class* klass;
+        MonitorData* monitor;
+        struct PlayerStatsData__Fields fields;
+    };
+
+    struct PlayerStatsData__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_SaveStart;
+        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_SaveComplete;
+        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_LoadStart;
+        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_LoadComplete;
+        VirtualInvokeData SetValue;
+        VirtualInvokeData HandleChange;
+        VirtualInvokeData OnSaveStart;
+        VirtualInvokeData OnSaveComplete;
+        VirtualInvokeData OnLoadStart;
+        VirtualInvokeData OnLoadComplete;
+    };
+
+    struct PlayerStatsData__StaticFields {
+    };
+
+    struct PlayerStatsData__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct PlayerStatsData__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PlayerStatsData__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region QuickChatPreviewField
+    struct QuickChatPreviewField__Fields {
+        struct AbstractChatInputField__Fields _;
+        struct ChatInputFieldButton* clearButton;
+        struct ChatInputFieldButton* undoButton;
+        struct TextMeshPro* warningText;
+        struct TextMeshPro* text;
+        struct TextMeshPro* placeholderText;
+        struct Action* OnClearPressedEvent;
+        struct Action* OnUndoPressedEvent;
+    };
+
+    struct QuickChatPreviewField {
+        struct QuickChatPreviewField__Class* klass;
+        MonitorData* monitor;
+        struct QuickChatPreviewField__Fields fields;
+    };
+
+    struct QuickChatPreviewField__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData Start;
+        VirtualInvokeData OnTextFieldTransformChanged;
+        VirtualInvokeData SetVisible;
+        VirtualInvokeData SetButtonsEnabled;
+        VirtualInvokeData Clear;
+        VirtualInvokeData Submit;
+    };
+
+    struct QuickChatPreviewField__StaticFields {
+    };
+
+    struct QuickChatPreviewField__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct QuickChatPreviewField__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct QuickChatPreviewField__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region Mushroom
+    struct Mushroom__Fields {
+        struct MonoBehaviour__Fields _;
+        struct Collider2D* mushroomCollider;
+        struct SpriteRenderer* mushroom;
+        struct SpriteRenderer* spores;
+        struct GameObject* sporeMask;
+        int32_t id;
+        struct SpriteAnim* mushroomAnimator;
+        struct AnimationClip* mushroomIdle;
+        struct AnimationClip* mushroomAppear;
+        struct AnimationClip* mushroomSteppedOn;
+        struct SpriteAnim* sporeCloudAnimator;
+        struct SpriteAnim* sporeCloudMaskAnimator;
+        struct AnimationClip* sporeCloudIdle;
+        struct AnimationClip* sporeCloudAppear;
+        struct AnimationClip* sporeCloudDisappear;
+        float secondsBetweenSporeReleases;
+        float secondsSporeIsActive;
+        float secondsSporeReappearsFor;
+        float secondsSporeFade;
+        struct AudioClip* spawnSound;
+        struct AudioClip* activateSporeSound;
+        void* filter;
+        struct Vector3 origPosition;
+    };
+
+    struct Mushroom {
+        struct Mushroom__Class* klass;
+        MonitorData* monitor;
+        struct Mushroom__Fields fields;
+    };
+
+    struct Mushroom__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct Mushroom__StaticFields {
+        struct Collider2D__Array* Hits;
+    };
+
+    struct Mushroom__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct Mushroom__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct Mushroom__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ActivityManager;
@@ -10303,4 +10408,7 @@ namespace app
     typedef Il2CppObject OverlayAnimation;
     typedef Il2CppObject OverlayKillAnimation;
     typedef Il2CppObject KillOverlay;
+    typedef Il2CppObject AbstractSaveData;
+    typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
+    typedef Il2CppObject NotificationPopper;
 }

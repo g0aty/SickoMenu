@@ -26,7 +26,8 @@ void Settings::Load() {
             Log.Info(e.what()); \
         }
 
-        JSON_TRYGET("SelectedConfig", this->selectedConfig);
+        if (State.selectedConfig != "") JSON_TRYGET("SelectedConfig", this->selectedConfig);
+        JSON_TRYGET("SelectedConfigInt", this->selectedConfigInt);
     }
     catch (...) {
         //Log.Info("Unable to load sicko-selected-config.json");
@@ -57,11 +58,21 @@ void Settings::Load() {
         JSON_TRYGET("ShowDebug", this->showDebugTab);
 #endif
         JSON_TRYGET("RgbTheme", this->RgbMenuTheme);
+        JSON_TRYGET("GradientTheme", this->GradientMenuTheme);
+        JSON_TRYGET("MatchBackgroundWithTheme", this->MatchBackgroundWithTheme);
         JSON_TRYGET("SetName", this->SetName);
         JSON_TRYGET("MenuThemeColor_R", this->MenuThemeColor.x);
         JSON_TRYGET("MenuThemeColor_G", this->MenuThemeColor.y);
         JSON_TRYGET("MenuThemeColor_B", this->MenuThemeColor.z);
         JSON_TRYGET("MenuThemeColor_A", this->MenuThemeColor.w);
+        JSON_TRYGET("MenuGradientColor1_R", this->MenuGradientColor1.x);
+        JSON_TRYGET("MenuGradientColor1_G", this->MenuGradientColor1.y);
+        JSON_TRYGET("MenuGradientColor1_B", this->MenuGradientColor1.z);
+        JSON_TRYGET("MenuGradientColor1_A", this->MenuGradientColor1.w);
+        JSON_TRYGET("MenuGradientColor2_R", this->MenuGradientColor2.x);
+        JSON_TRYGET("MenuGradientColor2_G", this->MenuGradientColor2.y);
+        JSON_TRYGET("MenuGradientColor2_B", this->MenuGradientColor2.z);
+        JSON_TRYGET("MenuGradientColor2_A", this->MenuGradientColor2.w);
         JSON_TRYGET("UnlockCosmetics", this->UnlockCosmetics);
         JSON_TRYGET("ShowKeybinds", this->ShowKeybinds);
         JSON_TRYGET("KeybindsWhileChatting", this->KeybindsWhileChatting);
@@ -77,6 +88,8 @@ void Settings::Load() {
         //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
 
         JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
+        JSON_TRYGET("DarkMode", this->DarkMode);
+        JSON_TRYGET("SeeVanishedPlayers", this->SeeVanishedPlayers);
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
         JSON_TRYGET("CycleBetweenPlayers", this->CycleBetweenPlayers);
@@ -185,6 +198,9 @@ void Settings::Load() {
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
         JSON_TRYGET("AlwaysUseKillExploit", this->AlwaysUseKillExploit);
         JSON_TRYGET("NoClip", this->NoClip);
+        JSON_TRYGET("KillInLobbies", this->KillInLobbies);
+        JSON_TRYGET("KillInVanish", this->KillInVanish);
+        JSON_TRYGET("GodMode", this->GodMode);
 
         JSON_TRYGET("AdjustByDPI", this->AdjustByDPI);
 
@@ -220,6 +236,34 @@ void Settings::Load() {
         JSON_TRYGET("RgbLobbyCode", this->RgbLobbyCode);
 
         JSON_TRYGET("SickoDetection", this->SickoDetection);
+        JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
+        JSON_TRYGET("TournamentMode", this->TournamentMode);
+
+        JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
+        JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
+        JSON_TRYGET("SMAC_HostPunishment", this->SMAC_HostPunishment);
+        JSON_TRYGET("SMAC_AddToBlacklist", this->SMAC_AddToBlacklist);
+        JSON_TRYGET("SMAC_PunishBlacklist", this->SMAC_PunishBlacklist);
+        JSON_TRYGET("SMAC_CheckAUM", this->SMAC_CheckAUM);
+        JSON_TRYGET("SMAC_CheckSicko", this->SMAC_CheckSicko);
+        JSON_TRYGET("SMAC_CheckBadNames", this->SMAC_CheckBadNames);
+        JSON_TRYGET("SMAC_CheckColor", this->SMAC_CheckColor);
+        JSON_TRYGET("SMAC_CheckCosmetics", this->SMAC_CheckCosmetics);
+        JSON_TRYGET("SMAC_CheckChatNote", this->SMAC_CheckChatNote);
+        JSON_TRYGET("SMAC_CheckScanner", this->SMAC_CheckScanner);
+        JSON_TRYGET("SMAC_CheckAnimation", this->SMAC_CheckAnimation);
+        JSON_TRYGET("SMAC_CheckTasks", this->SMAC_CheckTasks);
+        JSON_TRYGET("SMAC_CheckRole", this->SMAC_CheckRole);
+        JSON_TRYGET("SMAC_CheckChat", this->SMAC_CheckChat);
+        JSON_TRYGET("SMAC_CheckMeeting", this->SMAC_CheckMeeting);
+        JSON_TRYGET("SMAC_CheckReport", this->SMAC_CheckReport);
+        JSON_TRYGET("SMAC_CheckMurder", this->SMAC_CheckMurder);
+        JSON_TRYGET("SMAC_CheckShapeshift", this->SMAC_CheckShapeshift);
+        JSON_TRYGET("SMAC_CheckVanish", this->SMAC_CheckVanish);
+        JSON_TRYGET("SMAC_CheckLevel", this->SMAC_CheckLevel);
+        JSON_TRYGET("SMAC_CheckVent", this->SMAC_CheckVent);
+        JSON_TRYGET("SMAC_CheckSabotage", this->SMAC_CheckSabotage);
+        JSON_TRYGET("SMAC_Blacklist", this->SMAC_Blacklist);
     } catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
@@ -236,7 +280,8 @@ void Settings::Save() {
     if (this->selectedConfig != "") {
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{
-                { "SelectedConfig", this->selectedConfig }
+                { "SelectedConfig", this->selectedConfig },
+                { "SelectedConfigInt", this->selectedConfigInt },
             };
 
             std::ofstream outConfig(configPath);
@@ -245,7 +290,8 @@ void Settings::Save() {
         catch (...) {
             //Log.Info("Unable to save sicko-selected-config.json");
         }
-        auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
+        auto settingsPath = path.parent_path() / 
+            std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? GetAllConfigs()[this->selectedConfigInt] : "default");
 
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{
@@ -257,11 +303,21 @@ void Settings::Save() {
                 { "ShowDebug", this->showDebugTab },
         #endif
                 { "RgbTheme", this->RgbMenuTheme },
+                { "GradientTheme", this->GradientMenuTheme },
+                { "MatchBackgroundWithTheme", this->MatchBackgroundWithTheme },
                 { "SetName", this->SetName },
                 { "MenuThemeColor_R", this->MenuThemeColor.x },
                 { "MenuThemeColor_G", this->MenuThemeColor.y },
                 { "MenuThemeColor_B", this->MenuThemeColor.z },
                 { "MenuThemeColor_A", this->MenuThemeColor.w },
+                { "MenuGradientColor1_R", this->MenuGradientColor1.x },
+                { "MenuGradientColor1_G", this->MenuGradientColor1.y },
+                { "MenuGradientColor1_B", this->MenuGradientColor1.z },
+                { "MenuGradientColor1_A", this->MenuGradientColor1.w },
+                { "MenuGradientColor2_R", this->MenuGradientColor2.x },
+                { "MenuGradientColor2_G", this->MenuGradientColor2.y },
+                { "MenuGradientColor2_B", this->MenuGradientColor2.z },
+                { "MenuGradientColor2_A", this->MenuGradientColor2.w },
                 { "UnlockCosmetics", this->UnlockCosmetics },
                 { "ShowKeybinds", this->ShowKeybinds },
                 { "KeybindsWhileChatting", this->KeybindsWhileChatting },
@@ -277,6 +333,8 @@ void Settings::Save() {
                 //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
 
                 { "NoAbilityCD", this->NoAbilityCD },
+                { "DarkMode", this->DarkMode },
+                { "SeeVanishedPlayers", this->SeeVanishedPlayers },
                 { "SelectedColorId", this->SelectedColorId },
                 { "SnipeColor", this->SnipeColor },
                 { "CycleBetweenPlayers", this->CycleBetweenPlayers },
@@ -386,6 +444,8 @@ void Settings::Save() {
                 { "AlwaysUseKillExploit", this->AlwaysUseKillExploit },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
+                { "KillInVanish", this->KillInVanish },
+                { "GodMode", this->GodMode },
 
                 { "RevealVotes", this->RevealVotes },
                 { "RevealAnonymousVotes", this->RevealAnonymousVotes },
@@ -417,8 +477,35 @@ void Settings::Save() {
                 { "HideCode", this->HideCode },
                 { "RgbLobbyCode", this->RgbLobbyCode },
 
-
                 { "SickoDetection", this->SickoDetection },
+                { "DisableHostAnticheat", this->DisableHostAnticheat },
+                { "TournamentMode", this->TournamentMode },
+
+                { "Enable_SMAC", this->Enable_SMAC },
+                { "SMAC_Punishment", this->SMAC_Punishment },
+                { "SMAC_HostPunishment", this->SMAC_HostPunishment },
+                { "SMAC_AddToBlacklist", this->SMAC_AddToBlacklist },
+                { "SMAC_PunishBlacklist", this->SMAC_PunishBlacklist },
+                { "SMAC_CheckAUM", this->SMAC_CheckAUM },
+                { "SMAC_CheckSicko", this->SMAC_CheckSicko },
+                { "SMAC_CheckBadNames", this->SMAC_CheckBadNames },
+                { "SMAC_CheckColor", this->SMAC_CheckColor },
+                { "SMAC_CheckCosmetics", this->SMAC_CheckCosmetics },
+                { "SMAC_CheckChatNote", this->SMAC_CheckChatNote },
+                { "SMAC_CheckScanner", this->SMAC_CheckScanner },
+                { "SMAC_CheckAnimation", this->SMAC_CheckAnimation },
+                { "SMAC_CheckTasks", this->SMAC_CheckTasks },
+                { "SMAC_CheckRole", this->SMAC_CheckRole },
+                { "SMAC_CheckChat", this->SMAC_CheckChat },
+                { "SMAC_CheckMeeting", this->SMAC_CheckMeeting },
+                { "SMAC_CheckReport", this->SMAC_CheckReport },
+                { "SMAC_CheckMurder", this->SMAC_CheckMurder },
+                { "SMAC_CheckShapeshift", this->SMAC_CheckShapeshift },
+                { "SMAC_CheckVanish", this->SMAC_CheckVanish },
+                { "SMAC_CheckLevel", this->SMAC_CheckLevel },
+                { "SMAC_CheckVent", this->SMAC_CheckVent },
+                { "SMAC_CheckSabotage", this->SMAC_CheckSabotage },
+                { "SMAC_Blacklist", this->SMAC_Blacklist },
             };
 
             std::ofstream outSettings(settingsPath);
@@ -443,4 +530,12 @@ void Settings::Save() {
             Log.Info("Unable to save friends.json");
         }*/
     }
+}
+
+void Settings::Delete() {
+    auto path = getModulePath(hModule);
+
+    auto configPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
+
+    std::filesystem::remove(configPath);
 }

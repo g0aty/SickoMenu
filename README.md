@@ -1,5 +1,5 @@
-# 👺 SickoMenu v3.6
-A highly sophisticated cheat menu for Among Us based on AmongUsMenu which promises more features and regular updates.
+# 👺 SickoMenu v3.7
+A powerful utility for Among Us that aims to enhance the game experience!
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Vanity invite: https://discord.gg/sickos
@@ -8,18 +8,18 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 ## ⚠️ Disclaimer
 This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) am not responsible.
 
+This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.
+
 ## ⚙️ Features
 A huge collection of various utilities and cheats such as
 - Generate a brand new guest account every time the game is launched
-- Allow other players to no-clip
-- Ban other players without hosting
+- Allow other players to no-clip while hosting
 - Fake Roles
 - NoClip
 - Move in Vents
 - Zoom Out
 - Confuser
 - See Ghosts and Chat
-- Kill players even if you're not an impostor
 - Better AUM Chat (Type in regular chat: "/aum [insert message here]")
 - And much more! Check out the full list of features [here](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)!
 
@@ -64,7 +64,7 @@ First you will need protontricks, you can install it with your packager of choic
 - Show Replay - END
 - Repair Sabotage - PAGE DOWN (PgDn)
 - NoClip - CTRL
-- Panic / Disable SIckoMenu - PAUSE BREAK (Break)
+- Panic / Disable SickoMenu - PAUSE BREAK (Break)
 
 ## ⚒️ Compile (Configurations)
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
@@ -94,3 +94,9 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
+
+## ✨ Inspiration
+* [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by the-real-techiee
+* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by Team-Yu
+* [BetterAmongUs-Public](https://github.com/D1GQ/BetterAmongUs-Public) by D1GQ
+* [MalumMenu](https://github.com/scp222thj/MalumMenu) by scp222thj

@@ -59,8 +59,58 @@ namespace SettingsTab {
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			
+			// sorry to anyone trying to read this code it is pretty messy
+#pragma region New config menu, needs fixing
+			/*
+			std::vector<std::string> CONFIGS = GetAllConfigs();
+			CONFIGS.push_back("[New]");
+			CONFIGS.push_back("[Delete]");
+
+			std::vector<const char*> CONFIGS_CHAR;
+
+			for (const std::string& str : CONFIGS) {
+				char* ch = new char[str.size() + 1];
+				std::copy(str.begin(), str.end(), ch);
+				ch[str.size()] = '\0';
+				CONFIGS_CHAR.push_back(ch);
+			}
+
+			bool isNewConfig = CONFIGS.size() == 1;
+			bool isDelete = false;
+
+			int& selectedConfigInt = State.selectedConfigInt;
+			std::string selectedConfig = CONFIGS[selectedConfigInt];
+
+			if (CustomListBoxInt("Configs", &selectedConfigInt, CONFIGS_CHAR), 100 * State.dpiScale, ImVec4(0,0,0,0), ImGuiComboFlags_NoArrowButton) {
+				isNewConfig = selectedConfigInt == CONFIGS.size() - 2;
+				isDelete = selectedConfigInt == CONFIGS.size() - 1;
+				if (!isNewConfig && !isDelete) State.selectedConfig = CONFIGS[selectedConfigInt];
+				State.Save();
+				State.Load();
+			}
+
+			if (isNewConfig || isDelete) {
+				InputString("Name", &State.selectedConfig);
+				if (isNewConfig && (ImGui::Button(CheckConfigExists(State.selectedConfig) ? "Overwrite" : "Save"))) {
+					State.Save();
+					CONFIGS = GetAllConfigs();
+
+					selectedConfigInt = std::distance(CONFIGS.begin(), std::find(CONFIGS.begin(), CONFIGS.end(), State.selectedConfig));
+				}
+
+				if (isDelete && CheckConfigExists(State.selectedConfig)) {
+					if (ImGui::Button("Delete")) {
+						selectedConfigInt--;
+						State.Delete();
+						CONFIGS = GetAllConfigs();
+						if (selectedConfigInt < 0) selectedConfigInt = 0;
+					}
+				}
+			}*/
+#pragma endregion
+
 			InputString("Config Name", &State.selectedConfig);
-			
+
 			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
 			{
 				State.Load();
@@ -97,15 +147,33 @@ namespace SettingsTab {
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (ImGui::ColorEdit3("Menu Theme Color", (float*)&State.MenuThemeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+			if (!State.GradientMenuTheme) {
+				if (ImGui::ColorEdit3("Menu Theme Color", (float*)&State.MenuThemeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+			}
+			else {
+				if (ImGui::ColorEdit3("Gradient Color 1", (float*)&State.MenuGradientColor1, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+				ImGui::SameLine();
+				if (ImGui::ColorEdit3("Gradient Color 2", (float*)&State.MenuGradientColor2, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+			}
+			ImGui::SameLine();
+			if (ToggleButton("Gradient Theme", &State.GradientMenuTheme))
+				State.Save();
+
+			if (ToggleButton("Match Background with Theme", &State.MatchBackgroundWithTheme)) {
 				State.Save();
 			}
-
+			ImGui::SameLine();
 			if (ToggleButton("RGB Menu Theme", &State.RgbMenuTheme)) {
 				State.Save();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("Reset Menu Theme Color"))
+			if (ImGui::Button("Reset Menu Theme"))
 			{
 				State.MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
 			}
@@ -199,9 +267,9 @@ namespace SettingsTab {
 				State.Save();
 			}
 			ImGui::Text("Guest friend code should be <= 10 characters long and cannot have a hashtag.");
-			if (ImGui::Button("Force Login as Guest")) {
+			/*if (ImGui::Button("Force Login as Guest")) {
 				State.ForceLoginAsGuest = true;
-			}
+			}*/
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
 			}
@@ -209,13 +277,6 @@ namespace SettingsTab {
 			if (ImGui::InputInt("Level", &State.FakeLevel, 0, 1)) {
 				State.Save();
 			}
-			/*ImGui::Text("Spoofed friend code only applies as host!");
-			if (ToggleButton("Spoof Friend Code", &State.SpoofFriendCode)) {
-				State.Save();
-			}
-			if (InputString("Fake Friend Code", &State.FakeFriendCode)) {
-				State.Save();
-			}*/
 			if (ToggleButton("Spoof Platform", &State.SpoofPlatform)) {
 				State.Save();
 			}

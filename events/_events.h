@@ -18,6 +18,8 @@ using namespace app;
 	ADD_EVENT (DISCONNECT, "Disconnect"), \
 	ADD_EVENT (SHAPESHIFT, "Shapeshift"), \
 	ADD_EVENT (PROTECTPLAYER, "Protect"), \
+	ADD_EVENT (PHANTOM, "Vanish/Appear"), \
+	ADD_EVENT (SABOTAGE, "Sabotage"), \
 	ADD_EVENT (WALK, "Walk")
 
 enum class EVENT_TYPES {
@@ -35,6 +37,16 @@ enum class VENT_ACTIONS {
 enum class CHEAT_ACTIONS {
 	CHEAT_TELEPORT,
 	CHEAT_KILL_IMPOSTOR
+};
+
+enum class PHANTOM_ACTIONS {
+	PHANTOM_VANISH,
+	PHANTOM_APPEAR
+};
+
+enum class SABOTAGE_ACTIONS {
+	SABOTAGE_CALL,
+	SABOTAGE_FIX
 };
 
 const std::vector<const char*> CHEAT_ACTION_NAMES = { "Teleporting", "Killed abnormally" };
@@ -145,6 +157,61 @@ public:
 	}
 };
 
+class SabotageEvent : public EventInterface {
+private:
+	SystemTypes__Enum systemType;
+	SABOTAGE_ACTIONS action;
+public:
+	SabotageEvent(const EVENT_PLAYER& source, SystemTypes__Enum systemType, SABOTAGE_ACTIONS action);
+	virtual void Output() override;
+	virtual void ColoredEventOutput() override;
+	SABOTAGE_ACTIONS GetEventActionEnum() { return this->action; }
+	std::string GetSystemType() {
+		switch (this->systemType) {
+		case SystemTypes__Enum::Electrical:
+			return "Lights";
+			break;
+		case SystemTypes__Enum::Reactor:
+			return "Reactor";
+			break;
+		case SystemTypes__Enum::Laboratory:
+			return "Seismic Stabilizers";
+			break;
+		case SystemTypes__Enum::HeliSabotage:
+			return "Crash Course";
+			break;
+		case SystemTypes__Enum::LifeSupp:
+			return "Oxygen";
+			break;
+		case SystemTypes__Enum::MushroomMixupSabotage:
+			return "Mushroom Mixup";
+			break;
+		case SystemTypes__Enum::Comms:
+			return "Comms";
+			break;
+		default:
+			return "Unknown";
+			break;
+		}
+	}
+	std::string GetEventActionString()
+	{
+		switch (this->action)
+		{
+		case SABOTAGE_ACTIONS::SABOTAGE_CALL:
+			return std::string("Sabotage");
+			break;
+
+		case SABOTAGE_ACTIONS::SABOTAGE_FIX:
+			return std::string("Repair");
+			break;
+
+		default:
+			break;
+		}
+	}
+};
+
 class TaskCompletedEvent : public EventInterface {
 private:
 	std::optional<TaskTypes__Enum> taskType;
@@ -231,4 +298,30 @@ public:
 	virtual void Output() override;
 	virtual void ColoredEventOutput() override;
 	Vector2 GetPosition() { return this->position; }
+};
+
+class PhantomEvent : public EventInterface {
+private:
+	PHANTOM_ACTIONS action;
+public:
+	PhantomEvent(const EVENT_PLAYER& source, PHANTOM_ACTIONS action);
+	virtual void Output() override;
+	virtual void ColoredEventOutput() override;
+	PHANTOM_ACTIONS GetEventActionEnum() { return this->action; }
+	std::string GetEventActionString()
+	{
+		switch (this->action)
+		{
+		case PHANTOM_ACTIONS::PHANTOM_VANISH:
+			return std::string("Vanish");
+			break;
+
+		case PHANTOM_ACTIONS::PHANTOM_APPEAR:
+			return std::string("Appear");
+			break;
+
+		default:
+			break;
+		}
+	}
 };

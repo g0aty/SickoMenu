@@ -4,16 +4,32 @@
 #include "esp.hpp"
 #include <iostream>
 
+static float camHeight = 3.f;
+static bool refreshChat = true;
+
 Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo* method)
 {
 	try {
-		if (!State.PanicMode && State.EnableZoom)
-		{	//Figured it is better to restore the current camera height than using state
+		if (!State.PanicMode && (State.GameLoaded || IsInLobby()))
+		{
+			auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
+			bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
+			/*//Figured it is better to restore the current camera height than using state
 			float orthographicSize = Camera_get_orthographicSize(__this, NULL);
 			Camera_set_orthographicSize(__this, 3.0f, NULL);
 			Vector3 ret = Camera_ScreenToWorldPoint(__this, position, method);
 			Camera_set_orthographicSize(__this, orthographicSize, NULL);
-			return ret;
+			return ret;*/
+			float newCamHeight = 3.f * ((State.EnableZoom && !State.InMeeting && !chatOpen) ? State.CameraHeight : 1.f);
+			if (camHeight != newCamHeight) {
+				camHeight = newCamHeight;
+				float orthographicSize = Camera_get_orthographicSize(__this, NULL);
+				Camera_set_orthographicSize(__this, 3.0f, NULL);
+				Vector3 ret = Camera_ScreenToWorldPoint(__this, position, method);
+				Camera_set_orthographicSize(__this, camHeight, NULL);
+				Screen_SetResolution_1(Screen_get_width(NULL), Screen_get_height(NULL), Screen_get_fullScreen(NULL), 165, NULL);
+				return ret;
+			}
 		}
 	}
 	catch (...) {

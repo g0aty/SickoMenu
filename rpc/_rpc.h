@@ -2,6 +2,7 @@
 #include "utility.h"
 
 void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader);
+bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader);
 
 class RPCInterface {
 public:
@@ -152,6 +153,13 @@ class RpcForceMeeting : public RPCInterface {
 	PlayerSelection reportedPlayer;
 public:
 	RpcForceMeeting(PlayerControl* Player, const PlayerSelection& target);
+	virtual void Process() override;
+};
+
+class RpcMeetingExploit : public RPCInterface {
+	PlayerControl* exploitedPlayer;
+public:
+	RpcMeetingExploit(PlayerControl* exploitedPlayer);
 	virtual void Process() override;
 };
 
