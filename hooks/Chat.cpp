@@ -15,9 +15,9 @@ static std::string strToLower(std::string str) {
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
 	if (!State.PanicMode) {
 		if (State.ReadGhostMessages) {
-			bool wasDead = false;
 			auto player = GetPlayerData(sourcePlayer);
 			auto local = GetPlayerData(*Game::pLocalPlayer);
+			bool wasDead = false;
 
 			if (player != NULL && player->fields.IsDead && local != NULL && !local->fields.IsDead) {
 				local->fields.IsDead = true;
