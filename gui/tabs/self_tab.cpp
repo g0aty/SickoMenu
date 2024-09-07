@@ -240,7 +240,7 @@ namespace SelfTab {
             }
             ImGui::SameLine();
             if (ToggleButton("Move While in Vent & Shapeshifting", &State.MoveInVentAndShapeshift)) {
-                if (!State.MoveInVentAndShapeshift && (State.InMeeting || (*Game::pLocalPlayer)->fields.inVent)) {
+                if (!State.MoveInVentAndShapeshift && (IsInGame() || IsInLobby()) && (State.InMeeting || (*Game::pLocalPlayer)->fields.inVent)) {
                     (*Game::pLocalPlayer)->fields.moveable = false;
                 }
             }

@@ -1130,11 +1130,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
 	if (IsInLobby()) return nullptr;
 	auto result = ImpostorRole_FindClosestTarget(__this, method);
-<<<<<<< HEAD
-	if (!State.PanicMode && result == nullptr && (State.InfiniteKillRange || State.KillInVanish)) {
-=======
 	if (!State.PanicMode && result == nullptr && (State.InfiniteKillRange || (State.KillInVanish && IsHost() || !State.SafeMode))) {
->>>>>>> 3fe6c34af95fd8d5b0f294e5f896233d58dd01e4
 		PlayerControl* new_result = nullptr;
 		float defaultKillDist = 2.5f;
 		auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
@@ -1154,11 +1150,7 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 		for (auto p : GetAllPlayerControl()) {
 			if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 			auto pData = GetPlayerData(p);
-<<<<<<< HEAD
-			if (PlayerIsImpostor(pData) && !(State.KillImpostors || IsHost())) continue; //neither impostors
-=======
 			if (PlayerIsImpostor(pData) && !((State.KillImpostors && (IsHost() || !State.SafeMode)) || (IsHost() && State.BattleRoyale))) continue; //neither impostors
->>>>>>> 3fe6c34af95fd8d5b0f294e5f896233d58dd01e4
 			if (pData->fields.IsDead) continue; //nor ghosts
 			float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 			if (currentDist < max_dist) {

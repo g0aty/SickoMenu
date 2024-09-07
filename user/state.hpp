@@ -165,7 +165,6 @@ public:
     bool BypassAngelProt = false;
     bool InfiniteKillRange = false;
     bool KillInLobbies = false;
-    bool KillInVanish = false;
     bool AutoKill = false;
     bool FakeAlive = false;
     bool ShowHost = false;
