@@ -461,7 +461,7 @@ il2cpp::Array<OpenableDoor__Array> GetAllOpenableDoors() {
 	return (*Game::pShipStatus)->fields.AllDoors;
 }
 
-il2cpp::List<List_1_PlayerControl_> GetAllPlayerControl(bool includeFriends) {
+il2cpp::List<List_1_PlayerControl_> GetAllPlayerControl(/*bool includeFriends*/) {
 	//if (includeFriends)
 	return *Game::pAllPlayerControls;
 	/*else {
