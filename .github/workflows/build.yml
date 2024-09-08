@@ -31,7 +31,7 @@ jobs:
           tar -caf Release.zip SickoMenu.dll version.dll LICENSE
         
       - name: Upload Release Artifact
-        uses: actions/upload-artifact@v2.2.3
+        uses: actions/upload-artifact@v4.2.0
         with:
           name: Release
           path: Release.zip
@@ -58,7 +58,7 @@ jobs:
           tar -caf Debug.zip SickoMenu.dll version.dll LICENSE
         
       - name: Upload Debug Artifact
-        uses: actions/upload-artifact@v2.2.3
+        uses: actions/upload-artifact@v4.2.0
         with:
           name: Debug
           path: Debug.zip
