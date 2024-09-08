@@ -33,6 +33,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 				local->fields.IsDead = false;
 			}
 		}
+		else ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
 
 		auto playerFc = convert_from_string(player->fields.FriendCode);
 		if (!PlayerIsImpostor(player) && IsHost() && State.TournamentMode && message.substr(0, 9) == "/callout " &&
@@ -151,6 +152,9 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		auto gray32 = Color32();
 		gray32.r = 34; gray32.g = 34; gray32.b = 34; gray32.a = 255;
 		auto gray = Color32_op_Implicit_1(gray32, NULL);
+		auto green32 = Color32();
+		green32.r = 0; green32.g = 34; green32.b = 0; green32.a = 255;
+		auto green = Color32_op_Implicit_1(green32, NULL);
 		if (__this->fields.freeChatField != NULL) {
 			auto compoText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText);
 			compoText = "<#fff>" + compoText + "</color>";
