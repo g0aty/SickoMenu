@@ -1098,7 +1098,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 			for (auto p : GetAllPlayerControl()) {
 				if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 				auto pData = GetPlayerData(p);
-				if (PlayerIsImpostor(pData) && !((State.KillImpostors && (IsHost() || !State.SafeMode)) || (IsHost() && State.BattleRoyale))) continue; //neither impostors
+				if (PlayerIsImpostor(pData) && !(State.KillImpostors || (IsHost() && State.BattleRoyale))) continue; //neither impostors
 				if (pData->fields.IsDead) continue; //nor ghosts
 				float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 				if (currentDist < max_dist) {
@@ -1150,7 +1150,7 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 		for (auto p : GetAllPlayerControl()) {
 			if (p == *Game::pLocalPlayer) continue; //we don't want to kill ourselves
 			auto pData = GetPlayerData(p);
-			if (PlayerIsImpostor(pData) && !((State.KillImpostors && (IsHost() || !State.SafeMode)) || (IsHost() && State.BattleRoyale))) continue; //neither impostors
+			if (PlayerIsImpostor(pData) && !(State.KillImpostors || (IsHost() && State.BattleRoyale))) continue; //neither impostors
 			if (pData->fields.IsDead) continue; //nor ghosts
 			float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
 			if (currentDist < max_dist) {

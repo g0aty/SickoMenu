@@ -248,9 +248,6 @@ namespace HostTab {
 						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Crewmate));
 					}
 				}*/
-				if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
-					State.Save();
-				}
 
 				if (ToggleButton("Unlock Kill Button", &State.UnlockKillButton)) {
 					State.Save();
