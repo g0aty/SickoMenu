@@ -25,7 +25,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 				wasDead = true;
 			}
 			ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
-			
+
 			std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
 			auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
 			uint32_t colorId = outfit->fields.ColorId;
@@ -56,7 +56,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 						if (playerName.find(calledOutPlayer) != std::string::npos)
 							calloutResult.push_back(i.first);
 					}
-					if (calloutResult.size() == 1 && 
+					if (calloutResult.size() == 1 &&
 						std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), calloutResult[0]) == State.tournamentCalledOut.end()) {
 						if (std::find(State.tournamentAliveImpostors.begin(), State.tournamentAliveImpostors.end(), calloutResult[0]) != State.tournamentAliveImpostors.end()) {
 							//check if called-out player was an impostor
@@ -91,7 +91,7 @@ void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo
 	}
 }
 
-void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {	
+void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {
 	if (!State.PanicMode && (IsInGame() || IsInLobby())) {
 		for (auto playerData : GetAllPlayerData()) {
 			auto outfit = GetPlayerOutfit(playerData);
@@ -244,7 +244,7 @@ void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, 
 	else __this->fields.characterLimit = 100;
 
 	TextBoxTMP_SetText(__this, input, inputCompo, method);
-	
+
 }
 
 void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodInfo* method)
@@ -260,7 +260,7 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 			MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
 				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,
 				State.playerToWhisper.get_PlayerControl().value_or(nullptr)->fields._.OwnerId, NULL);
-			std::string whisperMsg = std::format("{} whispers to you:\n{}", 
+			std::string whisperMsg = std::format("{} whispers to you:\n{}",
 				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
 				convert_from_string(chatText));
 			if (whisperMsg.length() <= 100 || !State.SafeMode)

@@ -76,7 +76,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Allow Copy/Paste in Chat", &State.ChatPaste)) { //add copying later
+            if (ToggleButton("Allow Ctrl+(C/V/X) in Chat", &State.ChatPaste)) { //add copying later
                 State.Save();
             }
             
@@ -240,7 +240,7 @@ namespace SelfTab {
             }
             ImGui::SameLine();
             if (ToggleButton("Move While in Vent & Shapeshifting", &State.MoveInVentAndShapeshift)) {
-                if (!State.MoveInVentAndShapeshift && (IsInGame() || IsInLobby()) && (State.InMeeting || (*Game::pLocalPlayer)->fields.inVent)) {
+                if (!State.MoveInVentAndShapeshift && (State.InMeeting || (*Game::pLocalPlayer)->fields.inVent)) {
                     (*Game::pLocalPlayer)->fields.moveable = false;
                 }
             }
@@ -256,12 +256,21 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-            
-            
+            ImGui::SameLine();
+            if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
+                State.Save();
+            }
+            if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
+                State.Save();
+            }
+            ImGui::SameLine();
             if (ToggleButton("Infinite Kill Range", &State.InfiniteKillRange)) {
                 State.Save();
             }
 
+            if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
+                State.Save();
+            }
             ImGui::SameLine();
             if (ToggleButton("Autokill", &State.AutoKill)) {
                 State.Save();
@@ -411,7 +420,7 @@ namespace SelfTab {
                 roleAllowed = false;
                 break;
             }
-            if ((IsInGame() || IsInLobby()) && roleAllowed && ImGui::Button("Set Fake Role")) {
+            if ((IsInGame() || IsInLobby()) && (roleAllowed || (IsHost() || !State.SafeMode)) && ImGui::Button("Set Fake Role")) {
                 if (IsInGame())
                     State.rpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRole)));
                 else if (IsInLobby())

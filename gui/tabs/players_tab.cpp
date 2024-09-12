@@ -717,9 +717,9 @@ namespace PlayersTab {
 					if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
 						if (!murderLoop && ImGui::Button("Murder Loop")) {
 							murderLoop = true;
-							murderCount = 200; //controls how many times the player is to be murdered
+							murderCount = 1000; //controls how many times the player is to be murdered
 						}
-						if (murderLoop && ImGui::Button(std::format("Stop Murder Loop ({})", 800 - murderCount * 4).c_str())) {
+						if (murderLoop && ImGui::Button(std::format("Stop Murder Loop ({})", 1000 - murderCount).c_str())) {
 							murderLoop = false;
 							murderCount = 0;
 						}
@@ -730,10 +730,10 @@ namespace PlayersTab {
 							for (auto p : selectedPlayers) {
 								auto validPlayer = p.validate();
 								if (IsInGame()) {
-									State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 4, false));
+									State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
 								}
 								else if (IsInLobby()) {
-									State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 4, false));
+									State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
 								}
 							}
 							murderDelay = 5;
