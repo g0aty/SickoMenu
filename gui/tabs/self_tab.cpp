@@ -292,10 +292,6 @@ namespace SelfTab {
                 if (ToggleButton("God Mode", &State.GodMode))
                     State.Save();
             //}
-            ImGui::SameLine();
-            if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
-                State.Save();
-            }
 
             if (ToggleButton("(Shift + Right Click) to Teleport", &State.ShiftRightClickTP)) {
                 State.Save();
