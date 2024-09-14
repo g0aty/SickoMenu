@@ -4,6 +4,7 @@
 #include "state.hpp"
 
 void dAccountManager_UpdateKidAccountDisplay(AccountManager* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dAccountManager_UpdateKidAccountDisplay executed");
     // grant permissions
     if (!State.PanicMode) {
         __this->fields.freeChatAllowed = KWSPermissionStatus__Enum::Granted;

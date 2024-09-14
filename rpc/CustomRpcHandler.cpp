@@ -184,14 +184,16 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		break;
 	}
 	case (uint8_t)420: {
-		if (State.SMAC_CheckSicko && MessageReader_get_BytesRemaining(reader, NULL) == 0) {
+		auto playerId = player->fields.PlayerId;
+		if (State.SMAC_CheckSicko && MessageReader_get_BytesRemaining(reader, NULL) == 0 && State.modUsers.find(playerId) == State.modUsers.end()) {
 			SMAC_OnCheatDetected(player, "SickoMenu User");
 			return true;
 		}
 		break;
 	}
 	case (uint8_t)42069: {
-		if (State.SMAC_CheckAUM) {
+		auto playerId = player->fields.PlayerId;
+		if (State.SMAC_CheckAUM && State.modUsers.find(playerId) == State.modUsers.end()) {
 			SMAC_OnCheatDetected(player, "AmongUsMenu User");
 			return true;
 		}

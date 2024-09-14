@@ -42,7 +42,8 @@ namespace DebugTab {
 
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-		ToggleButton("Log Unity Debug Messages", &State.ShowUnityLogs);
+		if (ToggleButton("Log Unity Debug Messages", &State.ShowUnityLogs)) State.Save();
+		if (ToggleButton("Log Hook Debug Messages", &State.ShowHookLogs)) State.Save();
 
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 

@@ -1087,6 +1087,8 @@ void ControlAppearance(bool randomize)
 			queue->push(new RpcSetVisor(State.originalVisor));
 			queue->push(new RpcSetNamePlate(State.originalNamePlate));
 			queue->push(new RpcSetName(GetPlayerName()));
+
+			State.activeImpersonation = false;
 		}
 	}
 	catch (...) {

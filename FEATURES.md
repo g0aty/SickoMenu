@@ -111,6 +111,7 @@ View the game options!
 - **Move While in Vent & Shapeshifting** Allows you to move in vent and while shapeshifting (Default: OFF)
 - **Always Move** Allows you to move in meetings and game menus such as tasks (Default: OFF)
 - **Shapeshift without Animation** Allows you to shapeshift without the animation (Default: OFF)
+- **Copy Lobby Code on Disconnect** Automatically copies the lobby code to your clipboard when you get disconnected unintentionally (Default: OFF)
 - **NoClip** Allows you to walk through walls (Default: OFF)
 - **Kill Other Impostors** *(Only with Safe Mode disabled)* Allows you to kill fellow impostors (Default: OFF)
 - **Unlock Kill Button** *(Only with Safe Mode disabled)* Allows you to use kill button at any time (Default: OFF)

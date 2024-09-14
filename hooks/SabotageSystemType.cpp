@@ -2,8 +2,10 @@
 #include "_hooks.h"
 #include "utility.h"
 #include "logger.h"
+#include "state.hpp"
 
 void dSabotageSystemType_SetInitialSabotageCooldown(SabotageSystemType* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dSabotageSystemType_SetInitialSabotageCooldown executed");
 	app::SabotageSystemType_SetInitialSabotageCooldown(__this, method);
 
 	// ESP: Initialize Kill Cooldown

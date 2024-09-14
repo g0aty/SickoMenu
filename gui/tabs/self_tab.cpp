@@ -252,6 +252,10 @@ namespace SelfTab {
             if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("Copy Lobby Code on Disconnect", &State.AutoCopyLobbyCode)) {
+                State.Save();
+            }
 
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();

@@ -15,12 +15,14 @@
 }*/
 
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dConstants_1_GetBroadcastVersion executed");
 	int32_t orig_return = Constants_1_GetBroadcastVersion(method);
 	if (State.DisableHostAnticheat) orig_return += 25;
 	return orig_return;
 }
 
 bool dConstants_1_IsVersionModded(MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dConstants_1_IsVersionModded executed");
 	if (State.DisableHostAnticheat) return true; //this helps to bypass anticheat in our hosted lobbies
 	//return false;
 	return Constants_1_IsVersionModded(method);

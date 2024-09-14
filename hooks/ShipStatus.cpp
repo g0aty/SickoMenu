@@ -8,6 +8,7 @@
 #include "game.h"
 
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_CalculateLightRadius executed");
 	switch (__this->fields.Type) {
 	case ShipStatus_MapType__Enum::Ship:
 		if (State.mapType != Settings::MapType::Airship) State.mapType = Settings::MapType::Ship;
@@ -29,6 +30,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 }
 
 void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_OnEnable executed");
 	try {
 
 		Replay::Reset();
@@ -66,6 +68,7 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 }
 
 void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, int32_t amount, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_RpcUpdateSystem executed");
 	if (!State.PanicMode && IsHost() && State.DisableSabotages) {
 		return;
 	}
@@ -73,6 +76,7 @@ void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemTyp
 }
 
 void dShipStatus_RpcCloseDoorsOfType (ShipStatus* __this, SystemTypes__Enum type, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_RpcCloseDoorsOfType executed");
 	if (!State.PanicMode && State.DisableSabotages) {
 		return;
 	}
@@ -80,6 +84,7 @@ void dShipStatus_RpcCloseDoorsOfType (ShipStatus* __this, SystemTypes__Enum type
 }
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dGameStartManager_Update executed");
 	try {
 		if (State.HideCode && IsStreamerMode() && !State.PanicMode) {
 			std::string customCode = State.HideCode ? State.customCode : "******";
@@ -103,12 +108,14 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 }
 
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_HandleRpc executed");
 	if (IsHost() && (!State.PanicMode || State.BattleRoyale) && State.DisableSabotages && 
 		(callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) return;
 	ShipStatus_HandleRpc(__this, callId, reader, method);
 }
 
 void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_UpdateSystem executed");
 	if (State.mapType != Settings::MapType::Fungle && systemType == SystemTypes__Enum::Electrical) {
 		il2cpp::Dictionary<Dictionary_2_SystemTypes_ISystemType_> systems = (*Game::pShipStatus)->fields.Systems;
 

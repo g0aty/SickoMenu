@@ -7,6 +7,7 @@
 #include "game.h"
 
 void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dRoleManager_SelectRoles executed");
 	std::vector<uint8_t> assignedPlayers;
 	GameOptions options;
 	auto allPlayers = GetAllPlayerControl();

@@ -125,73 +125,84 @@ namespace PlayersTab {
 
 			if (selectedPlayer.has_value() && selectedPlayers.size() == 1) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
 			{
-				bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
-				ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
-				if (isUsingMod)
-					ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPlayer.get_PlayerData()->fields.PlayerId)).c_str());
-				std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
-				std::string playerIdText = std::format("Player ID: {}", playerId);
-				ImGui::Text(const_cast<char*>(playerIdText.c_str()));
-				std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
-				std::string friendCodeText = std::format("Friend Code: {}", (!IsStreamerMode()) ? friendCode : ((friendCode != "") ? friendCode.substr(0, 1) + "..." : ""));
-				if (friendCode != "") {
-					ImGui::Text(const_cast<char*>(friendCodeText.c_str()));
-				}
-				std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
-				std::string puidText = std::format("PUID:\n{}", (!IsStreamerMode()) ? puid : ((puid != "") ? puid.substr(0, 1) + "..." : ""));
-				if (puid != "") {
-					ImGui::Text(const_cast<char*>(puidText.c_str()));
-				}
-				uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
-				std::string levelText = std::format("Level: {}", playerLevel);
-				ImGui::Text(const_cast<char*>(levelText.c_str()));
-				std::string platform = "Unknown";
-				auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl(), NULL);
-				if (GetPlayerControlById(selectedPlayer.get_PlayerData()->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
-					switch (client->fields.PlatformData->fields.Platform) {
-					case Platforms__Enum::StandaloneEpicPC:
-						platform = "Epic Games (PC)";
-						break;
-					case Platforms__Enum::StandaloneSteamPC:
-						platform = "Steam (PC)";
-						break;
-					case Platforms__Enum::StandaloneMac:
-						platform = "Mac";
-						break;
-					case Platforms__Enum::StandaloneWin10:
-						platform = "Microsoft Store (PC)";
-						break;
-					case Platforms__Enum::StandaloneItch:
-						platform = "itch.io (PC)";
-						break;
-					case Platforms__Enum::IPhone:
-						platform = "iOS/iPadOS (Mobile)";
-						break;
-					case Platforms__Enum::Android:
-						platform = "Android (Mobile)";
-						break;
-					case Platforms__Enum::Switch:
-						platform = "Nintendo Switch (Console)";
-						break;
-					case Platforms__Enum::Xbox:
-						platform = "Xbox (Console)";
-						break;
-					case Platforms__Enum::Playstation:
-						platform = "Playstation (Console)";
-						break;
-					default:
-						platform = "Unknown";
-						break;
+				if ((IsInMultiplayerGame() || IsInLobby()) || (selectedPlayer.has_value() && selectedPlayer.is_LocalPlayer())) {
+					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
+					ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
+					if (isUsingMod)
+						ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPlayer.get_PlayerData()->fields.PlayerId)).c_str());
+					std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
+					std::string playerIdText = std::format("Player ID: {}", playerId);
+					ImGui::Text(const_cast<char*>(playerIdText.c_str()));
+					std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+					std::string friendCodeText = std::format("Friend Code: {}", (!IsStreamerMode()) ? friendCode : ((friendCode != "") ? friendCode.substr(0, 1) + "..." : ""));
+					if (friendCode != "") {
+						ImGui::Text(const_cast<char*>(friendCodeText.c_str()));
 					}
+					std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
+					std::string puidText = std::format("PUID:\n{}", (!IsStreamerMode()) ? puid : ((puid != "") ? puid.substr(0, 1) + "..." : ""));
+					if (puid != "") {
+						ImGui::Text(const_cast<char*>(puidText.c_str()));
+					}
+					uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
+					std::string levelText = std::format("Level: {}", playerLevel);
+					ImGui::Text(const_cast<char*>(levelText.c_str()));
+					std::string platform = "Unknown";
+					auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl(), NULL);
+					if (GetPlayerControlById(selectedPlayer.get_PlayerData()->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
+						switch (client->fields.PlatformData->fields.Platform) {
+						case Platforms__Enum::StandaloneEpicPC:
+							platform = "Epic Games (PC)";
+							break;
+						case Platforms__Enum::StandaloneSteamPC:
+							platform = "Steam (PC)";
+							break;
+						case Platforms__Enum::StandaloneMac:
+							platform = "Mac";
+							break;
+						case Platforms__Enum::StandaloneWin10:
+							platform = "Microsoft Store (PC)";
+							break;
+						case Platforms__Enum::StandaloneItch:
+							platform = "itch.io (PC)";
+							break;
+						case Platforms__Enum::IPhone:
+							platform = "iOS/iPadOS (Mobile)";
+							break;
+						case Platforms__Enum::Android:
+							platform = "Android (Mobile)";
+							break;
+						case Platforms__Enum::Switch:
+							platform = "Nintendo Switch (Console)";
+							break;
+						case Platforms__Enum::Xbox:
+							platform = "Xbox (Console)";
+							break;
+						case Platforms__Enum::Playstation:
+							platform = "Playstation (Console)";
+							break;
+						default:
+							platform = "Unknown";
+							break;
+						}
+					}
+					std::string platformText = std::format("Platform: {}", platform);
+					ImGui::Text(platformText.c_str());
+					uint64_t psnId = client->fields.PlatformData->fields.PsnPlatformId;
+					std::string psnText = std::format("PSN Platform ID: {}", psnId);
+					if (psnId != 0) ImGui::Text(const_cast<char*>(psnText.c_str()));
+					uint64_t xboxId = client->fields.PlatformData->fields.XboxPlatformId;
+					std::string xboxText = std::format("Xbox Platform ID: {}", xboxId);
+					if (xboxId != 0) ImGui::Text(const_cast<char*>(xboxText.c_str()));
 				}
-				std::string platformText = std::format("Platform: {}", platform);
-				ImGui::Text(platformText.c_str());
-				uint64_t psnId = client->fields.PlatformData->fields.PsnPlatformId;
-				std::string psnText = std::format("PSN Platform ID: {}", psnId);
-				if (psnId != 0) ImGui::Text(const_cast<char*>(psnText.c_str()));
-				uint64_t xboxId = client->fields.PlatformData->fields.XboxPlatformId;
-				std::string xboxText = std::format("Xbox Platform ID: {}", xboxId);
-				if (xboxId != 0) ImGui::Text(const_cast<char*>(xboxText.c_str()));
+				else {
+					ImGui::Text("Is using Modified Client: No");
+					std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
+					std::string playerIdText = std::format("Player ID: {}", playerId);
+					ImGui::Text(const_cast<char*>(playerIdText.c_str()));
+					uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
+					std::string levelText = std::format("Level: {}", playerLevel);
+					ImGui::Text(const_cast<char*>(levelText.c_str()));
+				}
 			}
 
 			ImGui::EndChild();
@@ -679,7 +690,7 @@ namespace PlayersTab {
 				{
 					if (ImGui::Button("Reset Impersonation"))
 					{
-						ResetOriginalAppearance();
+						ControlAppearance(false);
 					}
 				}
 
@@ -869,14 +880,14 @@ namespace PlayersTab {
 
 				if ((IsInGame() || IsInLobby()) && selectedPlayer.has_value() && selectedPlayers.size() == 1)
 				{
-					if ((State.playerToAttach.equals(State.selectedPlayer) && State.ActiveAttach) || (selectedPlayer.is_LocalPlayer() && selectedPlayer.has_value())) {
+					if (State.ActiveAttach && selectedPlayer.has_value() && (State.playerToAttach.equals(State.selectedPlayer) || selectedPlayer.is_LocalPlayer())) {
 						if (ImGui::Button("Stop Attaching")) {
 							State.playerToAttach = {};
 							State.ActiveAttach = false;
 						}
 					}
 					else {
-						if (ImGui::Button("Attach To") && !selectedPlayer.is_LocalPlayer()) {
+						if (!selectedPlayer.is_LocalPlayer() && ImGui::Button("Attach To")) {
 							State.playerToAttach = State.selectedPlayer;
 							State.ActiveAttach = true;
 						}

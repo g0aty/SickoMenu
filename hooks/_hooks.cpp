@@ -299,7 +299,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(EOSManager_IsFriendsListAllowed);
 	UNHOOKFUNC(ChatController_Update);
 	UNHOOKFUNC(TextBoxTMP_IsCharAllowed);
-	HOOKFUNC(TextBoxTMP_SetText);
+	UNHOOKFUNC(TextBoxTMP_SetText);
 	UNHOOKFUNC(ShipStatus_RpcUpdateSystem);
 	UNHOOKFUNC(ShipStatus_RpcCloseDoorsOfType);
 	UNHOOKFUNC(InnerNetClient_EnqueueDisconnect);

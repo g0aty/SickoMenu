@@ -5,6 +5,7 @@
 #include "game.h"
 
 void dHudManager_Update(HudManager* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dHudManager_Update executed");
 	try {
 		static bool bChatAlwaysActivePrevious = false;
 		if (bChatAlwaysActivePrevious != State.ChatAlwaysActive)
@@ -87,7 +88,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 					}
 					else
 					{
-						app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents && !State.PanicMode) || (((*Game::pLocalPlayer)->fields.inVent && role == RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal), nullptr);
+						app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents && !State.PanicMode) || (((*Game::pLocalPlayer)->fields.inVent && role != RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal), nullptr);
 					}
 				}
 
@@ -136,6 +137,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 }
 
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dVersionShower_Start executed");
 	VersionShower_Start(__this, method);
 	const auto& versionText = !State.PanicMode && !State.HideWatermark ? std::format("<size=75%>{}{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>goaty</color></color></size>",
 		State.DarkMode ? "<#666>" : "<#fff>", convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)), State.SickoVersion) :
@@ -144,6 +146,7 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 }
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dPingTracker_Update executed");
 	app::PingTracker_Update(__this, method);
 	app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
 	//center the ping text when panic is enabled
@@ -189,8 +192,10 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 }
 
 bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicGameFlowNormal_IsGameOverDueToDeath executed");
 	return false; //fix black screen when you set fake role
 }
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicGameFlowHnS_IsGameOverDueToDeath executed");
 	return false; //fix black screen when you set fake role
 }

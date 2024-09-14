@@ -196,7 +196,7 @@ void Settings::Load() {
         JSON_TRYGET("ShowVoteKicks", this->ShowVoteKicks);
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
-        JSON_TRYGET("AlwaysUseKillExploit", this->AlwaysUseKillExploit);
+        JSON_TRYGET("AutoCopyLobbyCode", this->AutoCopyLobbyCode);
         JSON_TRYGET("NoClip", this->NoClip);
         JSON_TRYGET("KillInLobbies", this->KillInLobbies);
         JSON_TRYGET("KillInVanish", this->KillInVanish);
@@ -213,6 +213,7 @@ void Settings::Load() {
         if (this->ShowMenuOnStartup)
             JSON_TRYGET("ShowConsole", this->ShowConsole);
         JSON_TRYGET("ShowUnityLogs", this->ShowUnityLogs);
+        //JSON_TRYGET("ShowHookLogs", this->ShowHookLogs);
 
         JSON_TRYGET("RevealAnonymousVotes", this->RevealAnonymousVotes);
 
@@ -441,7 +442,7 @@ void Settings::Save() {
                 { "ShowVoteKicks", this->ShowVoteKicks },
                 { "ShowFps", this->ShowFps },
                 { "DoTasksAsImpostor", this->DoTasksAsImpostor },
-                { "AlwaysUseKillExploit", this->AlwaysUseKillExploit },
+                { "AutoCopyLobbyCode", this->AutoCopyLobbyCode },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
                 { "KillInVanish", this->KillInVanish },
@@ -457,6 +458,7 @@ void Settings::Save() {
 
                 { "ShowConsole", this->ShowConsole },
                 { "ShowUnityLogs", this->ShowUnityLogs },
+                //{ "ShowHookLogs", this->ShowHookLogs },
 
                 { "ShiftRightClickTP", this->ShiftRightClickTP },
                 { "RotateRadius", this->RotateRadius },

@@ -1,5 +1,5 @@
-# 👺 SickoMenu v3.7
-A powerful utility for Among Us that aims to enhance the game experience!
+# 👺 SickoMenu v3.7.2
+A powerful utility for Among Us that aims to improve the game experience!
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Vanity invite: https://discord.gg/sickos

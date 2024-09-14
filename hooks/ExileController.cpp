@@ -5,6 +5,7 @@
 #include <state.hpp>
 
 void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dExileController_ReEnableGameplay executed");
     app::ExileController_ReEnableGameplay(__this, method);
 
 	try {// ESP: Reset Kill Cooldown
@@ -27,6 +28,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 }
 
 void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dExileController_BeginForGameplay executed");
 	ExileController_BeginForGameplay(__this, exiled, voteTie, method);
 	try {
 		if (IsHost() && State.TournamentMode && !voteTie && exiled != NULL) {

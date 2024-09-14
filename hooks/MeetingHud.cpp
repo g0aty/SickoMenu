@@ -8,6 +8,7 @@
 static app::Type* voteSpreaderType = nullptr;
 
 void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Awake executed");
 	try {
 		State.voteMonitor.clear();
 		State.InMeeting = true;
@@ -24,6 +25,7 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 }
 
 void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Close executed");
 	try {
 		State.InMeeting = false;
 
@@ -93,6 +95,7 @@ static void Transform_RevealAnonymousVotes(app::Transform* transform, Game::Vote
 }
 
 void dMeetingHud_PopulateResults(MeetingHud* __this, Il2CppArraySize* states, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_PopulateResults executed");
 	try {// remove all votes before populating results
 		for (auto votedForArea : il2cpp::Array(__this->fields.playerStates)) {
 			if (!votedForArea) {
@@ -144,6 +147,7 @@ void RevealAnonymousVotes() {
 }
 
 void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Update executed");
 	try {
 		if (!State.PanicMode) {
 			const bool isBeforeResultsState = __this->fields.state < app::MeetingHud_VoteStates__Enum::Results;

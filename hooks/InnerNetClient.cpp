@@ -53,6 +53,7 @@ static void onGameEnd() {
 
 void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dInnerNetClient_Update executed");
     try {
         if (!State.PanicMode) {
             static bool onStart = true;
@@ -765,6 +766,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 }
 
 void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnGameJoined executed");
     try {
         State.AutoJoinLobby = false;
         if (!State.PanicMode) {
@@ -783,6 +785,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 }
 
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerLeft executed");
     try {
         if (!State.PanicMode) {
             State.BlinkPlayersTab = true;
@@ -804,7 +807,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                     State.modUsers.erase(data->fields.Character->fields.PlayerId);
 
                 auto playerId = data->fields.Character->fields.PlayerId;
-                if (State.selectedPlayer.equals(PlayerSelection(data->fields.Character)))
+                if (PlayerSelection(data->fields.Character).equals(State.selectedPlayer))
                     State.selectedPlayer = PlayerSelection();
                 auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);
                 if (itSel != State.selectedPlayers.end())
@@ -829,6 +832,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
 }
 
 void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerJoined executed");
     AmongUsClient_OnPlayerJoined(__this, data, method);
 }
 
@@ -865,6 +869,7 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
 }
 
 void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dCustomNetworkTransform_SnapTo executed");
     /*try {//Leave this out until we fix it.
         if (!State.PanicMode) {
             if (!IsInGame()) {
@@ -893,6 +898,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
 }
 
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnGameEnd executed");
     try {
 		if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
             RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
@@ -906,6 +912,7 @@ void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, Method
 }
 
 void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dInnerNetClient_DisconnectInternal executed");
     try {
         // IsInGame() || IsInLobby()
         if (__this->fields.GameState == InnerNetClient_GameStates__Enum::Started
@@ -924,6 +931,7 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
 }
 
 void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dInnerNetClient_EnqueueDisconnect executed");
     try {
         State.FollowerCam = nullptr;
         onGameEnd(); //removed antiban cuz it glitches the game
@@ -935,6 +943,7 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
 }
 
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dGameManager_RpcEndGame executed");
     try {
         if (!State.PanicMode && IsHost() && State.NoGameEnd)
             return;
@@ -995,6 +1004,7 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
 }
 
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* killer, NetworkedPlayerInfo* victim, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dKillOverlay_ShowKillAnimation_1 executed");
     try {
         if (!State.PanicMode && State.DisableKillAnimation)
             return;
@@ -1006,6 +1016,7 @@ void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* 
 }
 
 float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicOptions_GetKillDistance executed");
     try {
         if (!State.PanicMode) {
             State.GameKillDistance = LogicOptions_GetKillDistance(__this, method);
@@ -1022,6 +1033,7 @@ float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
 }
 
 void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dLadder_SetDestinationCooldown executed");
     try {
         if (!State.PanicMode && State.NoAbilityCD) {
             __this->fields._CoolDown_k__BackingField = 0.f;
@@ -1035,6 +1047,7 @@ void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
 }
 
 void dZiplineConsole_SetDestinationCooldown(ZiplineConsole* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dZiplineConsole_SetDestinationCooldown executed");
     try {
         if (!State.PanicMode && State.NoAbilityCD) {
             __this->fields._CoolDown_k__BackingField = 0.f;
@@ -1048,6 +1061,7 @@ void dZiplineConsole_SetDestinationCooldown(ZiplineConsole* __this, MethodInfo* 
 }
 
 void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dVoteBanSystem_AddVote executed");
     try {
         if (clientId == (*Game::pLocalPlayer)->fields._.OwnerId)
             State.VoteKicks++;
@@ -1080,26 +1094,41 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
 }*/
 
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
-    /*if (!State.PanicMode) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dDisconnectPopup_DoShow executed");
+    DisconnectPopup_DoShow(__this, method);
+    if (!State.PanicMode) {
         switch (State.LastDisconnectReason) {
         case DisconnectReasons__Enum::Hacking: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string("You were banned for hacking.\n\nLast Lobby Code: " + State.LastLobbyJoined),
-                NULL);
+                convert_to_string(std::format("You were banned for hacking.\n\n{}",
+                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.")), NULL);
         }
-                                             break;
+        break;
+        case DisconnectReasons__Enum::Kicked: {
+            TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
+                convert_to_string(std::format("You were kicked from the lobby.\n\n{}",
+                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby if it hasn't started.")), NULL);
+        }
+        break;
+        case DisconnectReasons__Enum::Banned: {
+            TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
+                convert_to_string(std::format("You were banned from the lobby.\n\n{}",
+                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby by changing your IP address.")), NULL);
+        }
+        break;
         default: {
             std::string prevText = convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields._textArea, NULL));
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string(prevText + " Last Lobby Code: " + State.LastLobbyJoined),
-                NULL);
+                convert_to_string(std::format("{}{}", prevText,
+                    State.AutoCopyLobbyCode ? "\nLobby Code has been copied to the clipboard." : "")), NULL);
         }
-               break;
+        break;
         }
-    }*/
-    DisconnectPopup_DoShow(__this, method);
+        if (State.AutoCopyLobbyCode) ClipboardHelper_PutClipboardString(convert_to_string(State.LastLobbyJoined), NULL);
+    }
 }
 
 bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dGameManager_DidImpostorsWin executed");
     return GameManager_DidImpostorsWin(__this, reason, method);
 }

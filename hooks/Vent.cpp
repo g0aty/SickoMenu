@@ -5,6 +5,7 @@
 #include <memory>
 
 float dVent_CanUse(Vent* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dVent_CanUse executed");
 	if (!State.PanicMode && (State.UnlockVents || (*Game::pLocalPlayer)->fields.inVent)) {
 		auto object = NetworkedPlayerInfo_get_Object(pc, nullptr);
 		if (!object) {
@@ -33,6 +34,7 @@ float dVent_CanUse(Vent* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* co
 };
 
 void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo * method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dVent_EnterVent executed");
 	if (!State.PanicMode) {
 		auto ventVector = app::Transform_get_position(app::Component_get_transform((Component_1*)__this, NULL), NULL);
 		app::Vector2 ventVector2D = { ventVector.x, ventVector.y };
@@ -46,6 +48,7 @@ void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo * method) {
 }
 
 void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dVent_ExitVent executed");
 	if (!State.PanicMode) {
 		auto ventVector = app::Transform_get_position(app::Component_get_transform((Component_1*)__this, NULL), NULL);
 		app::Vector2 ventVector2D = { ventVector.x, ventVector.y };

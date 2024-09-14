@@ -173,6 +173,7 @@ public:
     bool ShowFps = false;
     bool DoTasksAsImpostor = false;
     bool AlwaysUseKillExploit = false;
+    bool AutoCopyLobbyCode = false;
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
@@ -333,6 +334,7 @@ public:
 
 	bool OcclusionCulling = false;
     bool ShowUnityLogs = true;
+    bool ShowHookLogs = false;
 
     int LobbyTimer = -1;
     float ChatCooldown = 0.f;
@@ -412,7 +414,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.7.1";
+    std::string SickoVersion = "v3.7.2";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;

@@ -13,6 +13,7 @@ static std::string strToLower(std::string str) {
 }
 
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_AddChat executed");
 	if (!State.PanicMode) {
 		auto player = GetPlayerData(sourcePlayer);
 		auto local = GetPlayerData(*Game::pLocalPlayer);
@@ -82,6 +83,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 }
 
 void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_SetVisible executed");
 	if (State.ChatAlwaysActive && !State.PanicMode)
 		ChatController_SetVisible(__this, true, method);
 	else
@@ -92,6 +94,7 @@ void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo
 }
 
 void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatBubble_SetName executed");
 	if (!State.PanicMode && (IsInGame() || IsInLobby())) {
 		for (auto playerData : GetAllPlayerData()) {
 			auto outfit = GetPlayerOutfit(playerData);
@@ -141,6 +144,7 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 
 void dChatController_Update(ChatController* __this, MethodInfo* method)
 {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_Update executed");
 	__this->fields.freeChatField->fields.textArea->fields.characterLimit = State.SafeMode ? 120 : 2147483647;
 	__this->fields.freeChatField->fields.textArea->fields.allowAllCharacters = true;
 	__this->fields.freeChatField->fields.textArea->fields.AllowEmail = true;
@@ -204,17 +208,6 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	State.ChatCooldown = __this->fields.timeSinceLastMessage;
 	State.ChatFocused = __this->fields.freeChatField->fields.textArea->fields.hasFocus;
 
-	/*if (State.FollowerCam != nullptr && !State.PanicMode && State.EnableZoom &&
-		(__this->fields.state == ChatControllerState__Enum::Closed || (__this->fields.state == ChatControllerState__Enum::Closing && State.EnableZoom))) {
-		Camera_set_orthographicSize(State.FollowerCam, 3.f, NULL);
-		int32_t width = Screen_get_width(NULL);
-		int32_t height = Screen_get_height(NULL);
-		bool fullscreen = Screen_get_fullScreen(NULL);
-		ChatController_OnResolutionChanged(__this, (float)(width / height), width, height, fullscreen, NULL);
-		if (__this->fields.state == ChatControllerState__Enum::Closing && State.EnableZoom) ChatController_ForceClosed(__this, NULL); //force close the chat as it stays open otherwise
-		Camera_set_orthographicSize(State.FollowerCam, 3.f * (State.EnableZoom ? State.CameraHeight : 1.f), NULL);
-	}*/
-
 	if (!State.PanicMode && State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby()) && __this->fields.timeSinceLastMessage >= 3.5f) {
 		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(State.chatMessage), NULL);
 		//remove rpc queue stuff cuz of delay and anticheat kick
@@ -227,6 +220,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 
 bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, MethodInfo* method)
 {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dTextBoxTMP_IsCharAllowed executed");
 	//0x08 is backspace, 0x0D is carriage return, 0x7F is delete character, 0x3C is <, 0x3E is >
 	//lobby codes force uppercase, and we don't change that to fix joining a lobby with code not working
 	if (!__this->fields.ForceUppercase) return (unicode_char != 0x08 && unicode_char != 0x0D && unicode_char != 0x7F && ((State.SafeMode && unicode_char != 0x3C && unicode_char != 0x3E) || !State.SafeMode));
@@ -235,6 +229,7 @@ bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, Method
 
 void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, MethodInfo* method)
 {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dTextBoxTMP_SetText executed");
 	if (!State.PanicMode) {
 		if (!State.SafeMode)
 			__this->fields.characterLimit = 2147483647;
@@ -249,6 +244,7 @@ void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, 
 
 void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodInfo* method)
 {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_RpcSendChat executed");
 	if (!State.PanicMode) {
 		auto playerToChatAs = (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
 		if (State.ReadAndSendAumChat && convert_from_string(chatText).substr(0, 5) == "/aum ") {
@@ -294,6 +290,7 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 }
 
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatBubble_SetText executed");
 	if (State.DarkMode) {
 		auto black = Palette__TypeInfo->static_fields->Black;
 		if (__this->fields.playerInfo->fields.IsDead) black.a *= 0.75f;
