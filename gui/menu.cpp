@@ -18,6 +18,9 @@
 #endif
 #include "state.hpp"
 #include "gui-helpers.hpp"
+#include <map>
+#include <vector>
+#include <string>
 
 namespace Menu {
 	static bool openAbout = false;
@@ -35,6 +38,41 @@ namespace Menu {
 #ifdef _DEBUG
 	static bool openDebug = false;
 #endif
+	static char searchQuery[128] = "";
+
+	std::map<std::string, std::vector<std::string>> categories = {
+		{"Settings", {"Show Keybinds", "Allow Activating Keybinds while Chatting", "Always Show Menu on Startup", "Panic (Disable SickoMenu)",
+					  "Config Name", "Load Config", "Save Config", "Adjust by DPI", "Menu Scale", "Menu Theme Color", "Gradient Theme", "Match Background with Theme",
+					  "RGB Menu Theme", "Reset Menu Theme", "Opacity", "Show Debug Tab", "Username", "Set as Account Name", "Automatically Set Name", "Custom Code",
+					  "Replace Streamer Mode Lobby Code", "RGB Lobby Code", "Unlock Cosmetics", "Safe Mode", "Allow other SickoMenu users to see you're using SickoMenu",
+					  "Spoof Guest Account", "Use Custom Guest Friend Code", "Spoof Level", "Spoof Platform"}},
+		{"Game", {"Player Speed Multiplier", "Kill Distance", "No Ability Cooldown", "Multiply Speed", "Modify Kill Distance", "Random Color", "Set Color", "Snipe Color", "Console",
+				  "Reset Appearance", "Kill Everyone", "Protect Everyone", "Disable Venting", "Spam Report", "Kill All Crewmates", "Kill All Impostors", "Kick Everyone From Vents",
+				  "Chat Message", "Send", "Send to AUM", "Spam"}},
+		{"Self", {"Max Vision", "Wallhack", "Disable HUD", "Freecam", "Zoom", "Always show Chat Button", "Allow Ctrl+(C/V/X) in Chat", "Read Messages by Ghosts",
+				  "Read and Send AUM Chat", "Custom Name", "Custom Name for Everyone", "Server-sided Custom Name", "Reveal Roles", "Abbrv. Role", "Player Colored Dots Next To Names",
+				  "Show Player Info in Lobby", "Reveal Votes", "See Ghosts", "See Protections", "See Kill Cooldown", "Disable Kill Animation", "Dark Mode (Chat Only)",
+				  "Show Host", "Hide Watermark", "Show Vote Kicks", "Show FPS",
+				  "Unlock Vents", "Move While in Vent & Shapeshifting", "Always Move", "No Shapeshift Animation", "Copy Lobby Code on Disconnect", "NoClip",
+				  "Allow Killing in Lobbies", "Kill Other Impostors", "Infinite Kill Range", "Bypass Guardian Angel Protections", "Autokill", "Do Tasks as Impostor",
+				  "Fake Alive", "God Mode", "Teleport", "Rotate everyone", "Select Role", "Set Role", "Set Fake Role", "Automatically Set Fake Role",
+				  "Cycler", "Cycle in Meeting", "Cycle Between Players", "Confuser (Randomize Appearance at Will"}},
+		{"Radar", {"Show Radar", "Show Dead Bodies", "Show Ghosts", "Right Click to Teleport", "Hide Radar During Meetings", "Draw Player Icons", "Lock Radar Position", "Show Border"}},
+		{"Replay", {"Show Replay", "Show Only last seconds", "Clear after meeting"}},
+		{"ESP", {"Enable", "Show Ghosts", "Hide During Meetings", "Show Boxes", "Show Tracers", "Show Distances", "Role-based"}},
+		{"Players", {"Players"}},
+		{"Tasks", {"Complete All Tasks", "Play Medbay Scan Animation"}},
+		{"Sabotage", {"Disable Sabotage", "Repair Sabotage", "Sabotage All", "Random Sabotage", "Sabotage Lights", "Sabotage Reactor", "Sabotage Oxygen", "Sabotage Comms", "Disable Lights",
+					  "Activate Mushroom Mixup"}},
+		{"Doors", {"Close All Doors", "Close Room Door", "Pin All Doors", "Unpin All Doors", "Auto Open Doors"}},
+		{"Host", {"Custom Impostor Amount", "Impostor Count", "Force Start of Game", "Disable Meetings", "Disable Sabotages", "Disable Game Ending", "End Game", "Force Color for Everyone",
+				  "Force Name for Everyone", "Unlock Kill Button", "Allow Killing in Lobbies", "Kill While Vanished"}},
+#ifdef _DEBUG
+		{"Debug", {"Enable Occlusion Culling", "Force Load Settings", "Force Save Settings", "Clear RPC Queues", "Log Unity Debug Messages", "Log Hook Debug Messages", "Colors", "Profiler",
+				   "Experiments", "Enable Anticheat (SMAC)", "Disable Host Anticheat (+25 Mode)", "Point System (Only for Hosting"}},
+#endif
+		// Add more settings here as needed
+	};
 
 	void CloseAllOtherTabs(Tabs openTab) {
 		openAbout = openTab == Tabs::About;
@@ -61,6 +99,28 @@ namespace Menu {
 
 	bool init = false;
 	bool firstRender = true;
+
+	std::string ToLower(const std::string& str) {
+		std::string lowerStr = str;
+		std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+		return lowerStr;
+	}
+
+	void RenderSearchResults() {
+		if (strlen(searchQuery) == 0) return;
+
+		std::string lowerQuery = ToLower(searchQuery);
+
+		for (const auto& category : categories) {
+			for (const auto& setting : category.second) {
+				if (ToLower(setting).find(lowerQuery) != std::string::npos) {
+					ImGui::Text("Found in:\n%s", category.first.c_str());
+					break;
+				}
+			}
+		}
+	}
+
 	void Render() {
 		State.RgbNameColor += 0.025f;
 		constexpr auto tau = 2.f * 3.14159265358979323846f;
@@ -159,6 +219,10 @@ namespace Menu {
 				CloseAllOtherTabs(Tabs::Debug);
 			}
 #endif
+			// Search field
+			ImGui::SetNextItemWidth(50 * State.dpiScale); // Adjust the width of the input box
+			ImGui::InputTextWithHint("##Search", "Search", searchQuery, IM_ARRAYSIZE(searchQuery));
+			RenderSearchResults();
 
 			if (firstRender) {
 				firstRender = false;
