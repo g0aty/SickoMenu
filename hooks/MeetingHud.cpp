@@ -12,7 +12,19 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 	try {
 		State.voteMonitor.clear();
 		State.InMeeting = true;
-
+		if (!State.PanicMode && IsHost() && State.TournamentMode) {
+			for (auto p : GetAllPlayerControl()) {
+				if (p != *Game::pLocalPlayer) {
+					auto playerData = GetPlayerData(p);
+					std::string pointsName = std::format("<size=50%><#0f0>Player ID {}</color></size>\n{}\n<size=50%><#0000>0</color></size>", p->fields.PlayerId,
+						convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
+					auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
+						uint8_t(RpcCalls__Enum::SetName), SendOption__Enum::None, __this->fields._.OwnerId, NULL);
+					MessageWriter_WriteString(writer, convert_to_string(pointsName), NULL);
+					InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+				}
+			}
+		}
 		static std::string strVoteSpreaderType = translate_type_name("VoteSpreader, Assembly-CSharp");
 		voteSpreaderType = app::Type_GetType(convert_to_string(strVoteSpreaderType), nullptr);
 		if (State.confuser && State.confuseOnMeeting && !State.PanicMode)
@@ -28,7 +40,14 @@ void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Close executed");
 	try {
 		State.InMeeting = false;
-
+		if (!State.PanicMode && IsHost() && State.TournamentMode) {
+			for (auto p : GetAllPlayerControl()) {
+				if (p != *Game::pLocalPlayer) {
+					auto playerData = GetPlayerData(p);
+					PlayerControl_CmdCheckName(p, GetPlayerOutfit(playerData)->fields.PlayerName, NULL);
+				}
+			}
+		}
 		if (State.Replay_ClearAfterMeeting)
 		{
 			Replay::Reset(false);
@@ -115,12 +134,6 @@ void dMeetingHud_PopulateResults(MeetingHud* __this, Il2CppArraySize* states, Me
 				State.replayDeathTimePerPlayer[exiled->fields.PlayerId] = std::chrono::system_clock::now();
 			}
 		}
-
-		GameOptions options;
-		const auto prevAnonymousVotes = options.GetBool(app::BoolOptionNames__Enum::AnonymousVotes);
-		if (prevAnonymousVotes && State.RevealAnonymousVotes)
-			options.SetBool(app::BoolOptionNames__Enum::AnonymousVotes, false);
-		options.SetBool(app::BoolOptionNames__Enum::AnonymousVotes, prevAnonymousVotes);
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in MeetingHud_PopulateResults (MeetingHud)");
@@ -245,10 +258,6 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 						STREAM_DEBUG(ToString(playerData) << " voted for " << ToString(playerVoteArea->fields.VotedFor));
 
 						// avoid duplicate votes
-						GameOptions options;
-						const auto prevAnonymousVotes = options.GetBool(app::BoolOptionNames__Enum::AnonymousVotes);
-						if (prevAnonymousVotes && State.RevealAnonymousVotes)
-							options.SetBool(app::BoolOptionNames__Enum::AnonymousVotes, false);
 
 						if (isBeforeResultsState) {
 							if (playerVoteArea->fields.VotedFor != Game::SkippedVote) {
@@ -264,7 +273,6 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 								auto transform = app::GameObject_get_transform(__this->fields.SkippedVoting, nullptr);
 								MeetingHud_BloopAVoteIcon(__this, playerData, 0, transform, nullptr);
 							}
-							options.SetBool(app::BoolOptionNames__Enum::AnonymousVotes, prevAnonymousVotes);
 						}
 					}
 					else if (!didVote && State.voteMonitor.find(playerData->fields.PlayerId) != State.voteMonitor.end())
@@ -312,9 +320,39 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 				}
 			}
 		}
+		il2cpp::Array playerStates(__this->fields.playerStates);
+		for (auto voteArea : playerStates) {
+			auto col = (!State.PanicMode && State.DarkMode)
+				? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
+			SpriteRenderer_set_color(voteArea->fields.Background, col, NULL);
+		}
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in MeetingHud_Update (MeetingHud)");
 	}
 	app::MeetingHud_Update(__this, method);
+}
+
+void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method) {
+	if (!State.PanicMode) {
+		if (State.VoteOffPlayerId == Game::SkippedVote || (State.GodMode && exiled == GetPlayerData(*Game::pLocalPlayer))) {
+			exiled = NULL;
+		}
+		else {
+			auto toExileData = GetPlayerDataById(State.VoteOffPlayerId);
+			if (toExileData != NULL) {
+				exiled = toExileData;
+				tie = false;
+			}
+		}
+		State.VoteOffPlayerId = Game::HasNotVoted;
+	}
+	MeetingHud_RpcVotingComplete(__this, states, exiled, tie, method);
+}
+
+bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
+	if (!State.PanicMode) {
+		if (State.InMeeting && State.RevealAnonymousVotes) return false;
+	}
+	return LogicOptions_GetAnonymousVotes(__this, method);
 }

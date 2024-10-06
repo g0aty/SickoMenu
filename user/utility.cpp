@@ -336,7 +336,7 @@ std::string RemoveHtmlTags(std::string html_str) {
 
 bool IsNameValid(std::string str) {
 	if (str == "") return false;
-	std::vector<std::string> properChars = {}; //check properly for length
+	/*(std::vector<std::string> properChars = {}; //check properly for length
 	String* blank = convert_to_string("");
 	std::string last_char = "";
 	for (size_t i = 0; i < str.length(); i++) {
@@ -346,9 +346,9 @@ bool IsNameValid(std::string str) {
 		}
 		properChars.push_back(last_char + str[i]);
 		last_char = "";
-	}
-	if (properChars.size() > 12) return false;
-	if (str.find("<") != std::string::npos || str.find(">") != std::string::npos || str.find("=") != std::string::npos) return false;
+	}*/
+	if (convert_to_string(str)->fields.m_stringLength > 12) return false;
+	if (str.find("<") != std::string::npos || str.find(">") != std::string::npos || str.find("=") != std::string::npos || str.find("-") != std::string::npos) return false;
 	return true;
 }
 
@@ -1439,14 +1439,10 @@ void UpdateTournamentPoints(NetworkedPlayerInfo* playerData, int reason) {
 		State.tournamentPoints[friendCode] += 1.f;
 		break;
 	case 8://Settings::PointReason::CorrectCallout:
-		if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), friendCode) != State.tournamentCallers.end()) {
-			State.tournamentPoints[friendCode] += 1.5f;
-		}
+		State.tournamentPoints[friendCode] += 1.5f;
 		break;
 	case 9://Settings::PointReason::IncorrectCallout:
-		if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), friendCode) != State.tournamentCallers.end()) {
-			State.tournamentPoints[friendCode] -= 1.5f;
-		}
+		State.tournamentPoints[friendCode] -= 1.5f;
 		break;
 	case 10://Settings::PointReason::ImpLose:
 		State.tournamentPoints[friendCode] -= 1.f;
@@ -1459,7 +1455,8 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
 	if (State.SMAC_AddToBlacklist) {
 		std::string puid = convert_from_string(pData->fields.Puid);
-		State.SMAC_Blacklist[puid] = name;
+		State.BlacklistPUID.push_back(puid);
+		State.Save();
 	}
 	std::string cheaterMessage = "Player " + name + " has been caught cheating! Reason: " + reason;
 	LOG_INFO(cheaterMessage);

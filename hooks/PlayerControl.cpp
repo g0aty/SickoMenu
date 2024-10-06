@@ -140,23 +140,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					callout = State.tournamentCalloutPoints[fc], death = State.tournamentEarlyDeathPoints[fc];
 				std::string pointsHeader = std::format("Your Points: <#0f0>{} Normal</color>, <#9ef>{} +W, {} +C, {} +D</color>", DisplayScore(points),
 					DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
-				if (IsInLobby()) {
-					/*if (__this != *Game::pLocalPlayer) {
-						std::string pointsName = std::format("{}\n{}\n<#0000>0</color>", pointsHeader,
-							convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
-						auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
-							uint8_t(RpcCalls__Enum::SetName), SendOption__Enum::None, __this->fields._.OwnerId, NULL);
-						MessageWriter_WriteString(writer, convert_to_string(pointsName), NULL);
-						InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-					}
-					else {*/
-					playerName = std::format("<size=50%>{}</size>\n{}\n<size=50%><#0000>0</color></size>", pointsHeader, playerName);
-					//}
-				}
-				else {
-					auto publicPlayerName = convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName);
-					PlayerControl_RpcSetName(__this, convert_to_string(publicPlayerName), NULL);
-				}
+				playerName = std::format("<size=50%>{}</size>\n{}\n<size=50%><#0000>0</color></size>", pointsHeader, playerName);
 			}
 
 			uint32_t playerLevel = playerData->fields.PlayerLevel + 1;
@@ -211,7 +195,12 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				std::string modUsage = __this == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
 					std::format(" <#fb0>[{} User]</color>",
 						__this == *Game::pLocalPlayer ? "<#0f0>Sicko</color><#f00>Menu</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
-				std::string levelText = std::format("<#f00>ID {}</color> <#0f0>Level {}</color> <#b0f>({})</color>{}</color>", playerData->fields.PlayerId, playerLevel, platformId, modUsage);
+				std::string listed = "";
+				if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerData->fields.PlayerId) != State.WhitelistPlayerID.end())
+					listed = "<#0ff>[+]</color> ";
+				else if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerData->fields.PlayerId) != State.BlacklistPlayerID.end())
+					listed = "<#f00>[-]</color> ";
+				std::string levelText = std::format("{}<#f00>ID {}</color> <#0f0>Level {}</color> <#b0f>({})</color>{}</color>", listed, playerData->fields.PlayerId, playerLevel, platformId, modUsage);
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				if (IsStreamerMode())
 					friendCode = "Friend Code Hidden";
@@ -363,14 +352,22 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						}
 					}
 				}
-				if (!State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby())) {
+				if (State.ChatSpam && (IsInGame() || IsInLobby())) {
 					static float spamDelay = 0;
-					auto player = State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+					auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
 					if (spamDelay <= 0) {
 						for (auto p : GetAllPlayerControl()) {
 							if (p == player || State.ChatSpamEveryone) {
-								if (IsInGame()) State.rpcQueue.push(new RpcSendChat(p, State.chatMessage));
-								if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChat(p, State.chatMessage));
+								if (!State.SafeMode && (State.ChatSpamMode == 0 || State.ChatSpamMode == 2)) {
+									auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), player->fields._.NetId,
+										uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+									MessageWriter_WriteString(writer, convert_to_string(State.chatMessage), NULL);
+									InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+									ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(State.chatMessage), false, NULL);
+								}
+								else if (State.ChatSpamMode == 1 || State.ChatSpamMode == 2) {
+									PlayerControl_RpcSendChatNote(player, p->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
+								}
 							}
 						}
 						spamDelay = 25 * float(GetAllPlayerControl().size());
@@ -423,13 +420,13 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 								std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(player), nullptr));
 								std::string playerId = std::format("<{}>", player->fields.PlayerId);
 								std::string newName = State.hostUserName + "<size=0>" + playerId + "</size>";
-								if (IsInGame() && playerName != newName)
-									State.rpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
-								else if (IsInLobby() && playerName != newName)
-									State.lobbyRpcQueue.push(new RpcForceName(player, State.hostUserName + "<size=0>" + playerId + "</size>"));
+								if (IsHost() && playerName != newName)
+									PlayerControl_RpcSetName(player, convert_to_string(State.hostUserName + "<size=0>" + playerId + "</size>"), NULL);
+								if (!State.SafeMode && !IsHost() && playerName != newName)
+									PlayerControl_CmdCheckName(player, convert_to_string(State.hostUserName + "<size=0>" + playerId + "</size>"), NULL);
 							}
 						}
-						forceNameDelay = State.CycleDuration * GetAllPlayerControl().size();
+						forceNameDelay = 5;
 					}
 					else {
 						forceNameDelay--;
@@ -566,6 +563,15 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 			if (playerData->fields.IsDead) {
 				PlayerControl_set_Visible(__this, State.ShowGhosts || localData->fields.IsDead, NULL);
+			}
+
+			bool shouldSeePhantom = PlayerIsImpostor(localData) || localData->fields.IsDead;
+
+			if ((State.ShowPhantoms || shouldSeePhantom) && __this->fields.invisibilityAlpha < 0.5f) {
+				__this->fields.invisibilityAlpha = 0.5f;
+			}
+			else if ((!State.ShowPhantoms && !shouldSeePhantom) && __this->fields.shouldAppearInvisible) {
+				__this->fields.invisibilityAlpha = 0.f;
 			}
 
 			if (!State.FreeCam && __this == *Game::pLocalPlayer && State.prevCamPos.x != NULL) {
@@ -765,6 +771,11 @@ void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method) {
 	try {
 		SaveGameOptions();
 		State.GameLoaded = true;
+		if (IsHost() && State.BattleRoyale) {
+			for (auto p : GetAllPlayerControl()) {
+				if (p != *Game::pLocalPlayer) RoleManager_SetRole(Game::RoleManager.GetInstance(), p, RoleTypes__Enum::Crewmate, NULL);
+			}
+		}
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in PlayerControl_OnGameStart (PlayerControl)");
@@ -993,7 +1004,8 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 				for (auto player : GetAllPlayerControl()) {
 					auto playerInfo = GetPlayerData(player);
 					if (!playerInfo || !player->fields.cosmetics) break; //This happens sometimes during loading
-					if ((playerInfo->fields.IsDead && State.ShowGhosts) || (State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false))
+					if (((playerInfo->fields.IsDead && State.ShowGhosts) || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible && State.ShowPhantoms)) ||
+						(!playerInfo->fields.IsDead && State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false))
 					{
 						auto nameObject = Component_get_gameObject((Component_1*)player->fields.cosmetics->fields.nameText, NULL);
 						if (nameObject == __this) {
@@ -1001,7 +1013,8 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 							break;
 						}
 					}
-					else if (!State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) {
+					else if ((playerInfo->fields.IsDead  || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible)) 
+						&& !State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) {
 						auto nameObject = Component_get_gameObject((Component_1*)player->fields.cosmetics->fields.nameText, NULL);
 						if (nameObject == __this) {
 							value = false;
@@ -1285,15 +1298,58 @@ void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* 
 	NetworkedPlayerInfo_Serialize(__this, writer, initialState, NULL);
 }
 
+void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader* reader, bool initialState, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dNetworkedPlayerInfo_Deserialize executed");
+	Game::PlayerId id = __this->fields.PlayerId;
+	std::string puid = convert_from_string(__this->fields.Puid);
+	if (std::find(State.BlacklistPUID.begin(), State.BlacklistPUID.end(), puid) != State.BlacklistPUID.end()) {
+		State.BlacklistPlayerID.push_back(id);
+		if (State.Enable_SMAC) {
+			std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(__this, NULL)));
+			switch (IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment) {
+			case 0:
+				break;
+			case 1: {
+				std::string message = std::format("Blacklisted player {} has joined the game", name);
+				ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, GetPlayerControlById(id), convert_to_string(message), false, NULL);
+				break;
+			}
+			case 2:
+			{
+				String* newName = convert_to_string(name + " has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
+				if (IsHost()) {
+					PlayerControl_CmdCheckName(GetPlayerControlById(id), newName, NULL);
+					InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(id)->fields._.OwnerId, false, NULL);
+				}
+				break;
+			}
+			case 3:
+			{
+				String* newName = convert_to_string(name + " has been banned by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
+				if (IsHost()) {
+					PlayerControl_CmdCheckName(GetPlayerControlById(id), newName, NULL);
+					InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(id)->fields._.OwnerId, true, NULL);
+				}
+				break;
+			}
+			}
+		}
+	}
+	else if(std::find(State.WhitelistPUID.begin(), State.WhitelistPUID.end(), puid) != State.WhitelistPUID.end()) {
+		State.WhitelistPlayerID.push_back(id);
+	} 
+	NetworkedPlayerInfo_Deserialize(__this, reader, initialState, NULL);
+}
+
 void dPlayerControl_CmdCheckVanish(PlayerControl* __this, float maxDuration, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdCheckVanish executed");
-	//if (!State.PanicMode && State.AnimationlessVanish) maxDuration = 0.f; //doesn't work
+	if (!State.PanicMode && State.AnimationlessShapeshift) maxDuration = 0.f;
 	PlayerControl_CmdCheckVanish(__this, maxDuration, method);
 }
 
 void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdCheckAppear executed");
-	//if (!State.PanicMode && State.AnimationlessVanish) shouldAnimate = false; //doesn't work
+	if (!State.PanicMode && State.AnimationlessShapeshift) shouldAnimate = false;
 	PlayerControl_CmdCheckAppear(__this, shouldAnimate, method);
 }
 

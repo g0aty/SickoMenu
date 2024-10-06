@@ -52,6 +52,7 @@ void dPolusShipStatus_OnEnable(PolusShipStatus* __this, MethodInfo* method);
 void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo* method);
 void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method);
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method);
+void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method);
 void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method);
 void dNoShadowBehaviour_LateUpdate(NoShadowBehaviour* __this, MethodInfo* method);
 void dFollowerCamera_Update(FollowerCamera* __this, MethodInfo* method);
@@ -116,6 +117,7 @@ bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, Meth
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method);
 void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method);
 void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* writer, bool initialState, MethodInfo* method);
+void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader* reader, bool initialState, MethodInfo* method);
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method);
 void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method);
 bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method);
@@ -127,3 +129,6 @@ void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, Me
 void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method);
 void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method);
 void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method);
+void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method);
+bool dAccountManager_CanPlayOnline(AccountManager* __this, MethodInfo* method);
+bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method);

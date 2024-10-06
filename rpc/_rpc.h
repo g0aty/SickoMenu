@@ -156,10 +156,18 @@ public:
 	virtual void Process() override;
 };
 
-class RpcMeetingExploit : public RPCInterface {
+class RpcSpamChatNote : public RPCInterface {
 	PlayerControl* exploitedPlayer;
 public:
-	RpcMeetingExploit(PlayerControl* exploitedPlayer);
+	RpcSpamChatNote(PlayerControl* exploitedPlayer);
+	virtual void Process() override;
+};
+
+class RpcSendChatNote : public RPCInterface {
+	PlayerControl* player;
+	int32_t type;
+public:
+	RpcSendChatNote(PlayerControl* player, int32_t type);
 	virtual void Process() override;
 };
 
@@ -204,6 +212,14 @@ class CmdCheckShapeshift : public RPCInterface {
 	bool animate;
 public:
 	CmdCheckShapeshift(PlayerControl* Player, const PlayerSelection& target, bool animate);
+	virtual void Process() override;
+};
+
+class RpcVanish : public RPCInterface {
+	PlayerControl* Player;
+	bool appear;
+public:
+	RpcVanish(PlayerControl* Player, bool appear = false);
 	virtual void Process() override;
 };
 

@@ -80,6 +80,7 @@ public:
     bool UnlockVents = false;
     bool UnlockKillButton = false;
     bool ShowGhosts = false;
+    bool ShowPhantoms = false;
     int FakeRole = 0;
     bool AutoFakeRole = false;
     bool DisableVents = false;
@@ -91,6 +92,7 @@ public:
     bool NoGameEnd = false;
     bool ChatSpam = false;
     bool ChatSpamEveryone = false;
+    int ChatSpamMode = 0;
     bool AutoJoinLobby = false;
     std::string AutoJoinLobbyCode = "";
 
@@ -174,6 +176,7 @@ public:
     bool DoTasksAsImpostor = false;
     bool AlwaysUseKillExploit = false;
     bool AutoCopyLobbyCode = false;
+    bool DisableLobbyMusic = false;
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
@@ -406,6 +409,7 @@ public:
     std::string LastLobbyJoined = "";
     bool IsPreHosting = false;
     bool GameLoaded = false;
+    Game::PlayerId VoteOffPlayerId = Game::HasNotVoted;
 
     bool AutoOpenDoors = false;
 
@@ -414,7 +418,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v3.7.2";
+    std::string SickoVersion = "v4.0_pr1";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
@@ -441,8 +445,12 @@ public:
     bool SMAC_CheckVent = true;
     bool SMAC_CheckSabotage = true;
     int SMAC_HighLevel = 1000;
-    std::map<std::string /*puid*/, std::string> SMAC_Blacklist = {};
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
+
+    std::vector<std::string> WhitelistPUID = {};
+    std::vector<Game::PlayerId> WhitelistPlayerID = {};
+    std::vector<std::string> BlacklistPUID = {};
+    std::vector<Game::PlayerId> BlacklistPlayerID = {};
 
     void Load();
     void Save();

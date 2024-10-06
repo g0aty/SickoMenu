@@ -186,8 +186,8 @@ namespace HostTab {
 				
 				if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
 					State.Save();
-				/*if (ToggleButton("Battle Royale", &State.BattleRoyale))
-					State.Save();*/
+				if (ToggleButton("Battle Royale", &State.BattleRoyale))
+					State.Save();
 				//if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
 
 				/*if (ToggleButton("Disable Specific RPC Call ID", &State.DisableCallId))
@@ -479,8 +479,15 @@ namespace HostTab {
 				for (auto i : State.tournamentFriendCodes) {
 					float points = State.tournamentPoints[i], win = State.tournamentWinPoints[i],
 						callout = State.tournamentCalloutPoints[i], death = State.tournamentEarlyDeathPoints[i];
-					ImGui::Text(std::format("{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
-						DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str());
+					std::string text = std::format("{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
+						DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
+					if (IsInLobby() && State.ChatCooldown >= 3.f && text.size() <= 120 && ImGui::Button("Send")) {
+						//in ideal conditions a message longer than 120 characters should not be possible
+						State.lobbyRpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, text));
+						State.MessageSent = true;
+					}
+					if (IsInLobby() && State.ChatCooldown >= 3.f && text.size() <= 120) ImGui::SameLine();
+					ImGui::Text(text.c_str());
 				}
 			}
 			ImGui::EndChild();

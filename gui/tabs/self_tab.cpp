@@ -174,6 +174,7 @@ namespace SelfTab {
             {
                 State.Save();
             }
+            ImGui::SameLine();
             if (ToggleButton("Show Player Info in Lobby", &State.ShowPlayerInfo))
             {
                 State.Save();
@@ -182,20 +183,19 @@ namespace SelfTab {
             if (ToggleButton("Reveal Votes", &State.RevealVotes)) {
                 State.Save();
             }
-            if (!IsInGame() && !IsInLobby()
-                || GameOptions().GetGameMode() != GameModes__Enum::Normal
-                || GameOptions().GetBool(app::BoolOptionNames__Enum::AnonymousVotes)) {
-                ImGui::SameLine();
-                if (ToggleButton("Reveal Anonymous Votes", &State.RevealAnonymousVotes)) {
-                    State.Save();
-                    RevealAnonymousVotes();
-                }
+            ImGui::SameLine();
+            if (ToggleButton("Reveal Anonymous Votes", &State.RevealAnonymousVotes)) {
+                State.Save();
             }
 
             if (ToggleButton("See Ghosts", &State.ShowGhosts)) {
                 State.Save();
             }
             ImGui::SameLine();
+            if (ToggleButton("See Phantoms", &State.ShowPhantoms)) {
+                State.Save();
+            }
+
             if (ToggleButton("See Protections", &State.ShowProtections))
             {
                 State.Save();
@@ -206,6 +206,10 @@ namespace SelfTab {
             }
 
             if (ToggleButton("Disable Kill Animation", &State.DisableKillAnimation)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Disable Lobby Music", &State.DisableLobbyMusic)) {
                 State.Save();
             }
             ImGui::SameLine();

@@ -122,51 +122,11 @@ namespace Menu {
 	}
 
 	void Render() {
-		State.RgbNameColor += 0.025f;
-		constexpr auto tau = 2.f * 3.14159265358979323846f;
-		while (State.RgbNameColor > tau) State.RgbNameColor -= tau;
-		const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
-		auto color_r = calculate(State.RgbNameColor + 0.f);
-		auto color_g = calculate(State.RgbNameColor + 4.f);
-		auto color_b = calculate(State.RgbNameColor + 2.f);
-		State.rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
-
-		if (State.RgbMenuTheme) {
-			State.RgbColor.x = color_r;
-			State.RgbColor.y = color_g;
-			State.RgbColor.z = color_b;
-		}
-
-		static uint8_t gradientStep = 1;
-		static bool gradientIncreasing = true;
-		if (gradientStep == 1) {
-			gradientStep++;
-			gradientIncreasing = true;
-		}
-		else if (gradientStep == 100) {
-			gradientStep--;
-			gradientIncreasing = false;
-		}
-		else {
-			if (gradientIncreasing) gradientStep++;
-			else gradientStep--;
-		}
-
-		if (State.GradientMenuTheme) {
-			float stepR = float((State.MenuGradientColor2.x - State.MenuGradientColor1.x) / 100);
-			float stepG = float((State.MenuGradientColor2.y - State.MenuGradientColor1.y) / 100);
-			float stepB = float((State.MenuGradientColor2.z - State.MenuGradientColor1.z) / 100);
-			State.MenuGradientColor = ImVec4(State.MenuGradientColor1.x + stepR * gradientStep, 
-				State.MenuGradientColor1.y + stepG * gradientStep,
-				State.MenuGradientColor1.z + stepB * gradientStep,
-				State.MenuThemeColor.w);
-		}
-
 		try {
 			if (!init)
 				Menu::Init();
 			std::string modText = "SickoMenu " + State.SickoVersion;
-			ImGui::Begin(const_cast<char*>(modText.c_str()), &State.ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+			ImGui::Begin("SickoMenu", &State.ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 			static ImVec4 titleCol = State.MenuThemeColor;
 			if (State.RgbMenuTheme)
 				titleCol = State.RgbColor;

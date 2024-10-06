@@ -5465,6 +5465,8 @@ namespace app
 #endif
 #pragma endregion
 
+    typedef Il2CppObject AudioClip;
+
 #pragma region RoleBehaviour
     struct RoleBehaviour__Fields {
         struct MonoBehaviour__Fields _;
@@ -7579,8 +7581,8 @@ namespace app
         void* SpawnSound;
         void* SpawnInClip;
         void* SpawnPositions;
-        void* DropShipSound;
-        void* MapTheme;
+        struct AudioClip* DropShipSound;
+        struct AudioClip* MapTheme;
         void* AllRooms;
         void* logger;
         float lastFriendsCheckTime;
@@ -10120,6 +10122,42 @@ namespace app
     };
 #pragma endregion
 
+#pragma region MeetingHud_VoterState
+    struct MeetingHud_VoterState {
+        uint8_t VoterId;
+        uint8_t VotedForId;
+    };
+#pragma endregion
+
+#pragma region MeetingHud_VoterState__Array
+    struct MeetingHud_VoterState__Array {
+        struct MeetingHud_VoterState__Array__Class* klass;
+        MonitorData* monitor;
+        Il2CppArrayBounds* bounds;
+        il2cpp_array_size_t max_length;
+        struct MeetingHud_VoterState vector[32];
+    };
+
+    struct MeetingHud_VoterState__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct MeetingHud_VoterState__StaticFields {
+    };
+
+    struct MeetingHud_VoterState__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct MeetingHud_VoterState__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct MeetingHud_VoterState__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region EditAccountUsername
     struct EditAccountUsername__Fields {
         struct MonoBehaviour__Fields _;
@@ -10386,6 +10424,62 @@ namespace app
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct Mushroom__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region ChatNoteTypes__Enum
+#if defined(_CPLUSPLUS_)
+    enum class ChatNoteTypes__Enum : int32_t {
+        DidVote = 0x00000000,
+    };
+
+#else
+    enum ChatNoteTypes__Enum {
+        ChatNoteTypes__Enum_DidVote = 0x00000000,
+    };
+
+#endif
+#pragma endregion
+
+#pragma region SoundManager
+    struct SoundManager__Fields {
+        struct MonoBehaviour__Fields _;
+        struct AudioMixer* mixer;
+        struct AudioMixerGroup* musicMixer;
+        struct AudioMixerGroup* ambienceMixer;
+        struct AudioMixerGroup* ambienceHighPassMixer;
+        struct AudioMixerGroup* sfxMixer;
+        struct Dictionary_2_UnityEngine_AudioClip_UnityEngine_AudioSource_* allSources;
+        struct List_1_ISoundPlayer_* soundPlayers;
+    };
+
+    struct SoundManager {
+        struct SoundManager__Class* klass;
+        MonitorData* monitor;
+        struct SoundManager__Fields fields;
+    };
+
+    struct SoundManager__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct SoundManager__StaticFields {
+        struct SoundManager* instance;
+        float musicVolume;
+        float sfxVolume;
+        float ambienceVolume;
+    };
+
+    struct SoundManager__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct SoundManager__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct SoundManager__VTable vtable;
     };
 #pragma endregion
 

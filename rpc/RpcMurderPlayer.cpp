@@ -112,6 +112,20 @@ void CmdCheckShapeshift::Process()
 	PlayerControl_CmdCheckShapeshift(Player, target.get_PlayerControl().value_or(nullptr), animate, NULL);
 }
 
+RpcVanish::RpcVanish(PlayerControl* Player, bool appear)
+{
+	this->Player = Player;
+	this->appear = appear;
+}
+
+void RpcVanish::Process()
+{
+	if (!PlayerSelection(Player).has_value()) return;
+
+	if (appear) PlayerControl_RpcAppear(Player, true, NULL);
+	else PlayerControl_RpcVanish(Player, NULL);
+}
+
 RpcSendChat::RpcSendChat(PlayerControl* Player, std::string_view msg)
 {
 	this->Player = Player;
@@ -129,6 +143,19 @@ void RpcSendChat::Process()
 	MessageWriter_WriteString(writer, convert_to_string(msg), NULL);
 	InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
+}
+
+RpcSendChatNote::RpcSendChatNote(PlayerControl* player, int32_t type)
+{
+	this->player = player;
+	this->type = type;
+}
+
+void RpcSendChatNote::Process()
+{
+	if (!PlayerSelection(player).has_value()) return;
+
+	PlayerControl_RpcSendChatNote(*Game::pLocalPlayer, player->fields.PlayerId, (ChatNoteTypes__Enum)type, NULL);
 }
 
 RpcVotePlayer::RpcVotePlayer(PlayerControl* Player, PlayerControl* target, bool skip)

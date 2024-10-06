@@ -309,11 +309,13 @@ namespace GameTab {
             {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (!State.SafeMode && ToggleButton("Spam by Everyone", &State.ChatSpamEveryone))
+            if (State.ChatSpamMode) ImGui::SameLine();
+            if (State.ChatSpamMode && ToggleButton("Spam by Everyone", &State.ChatSpamEveryone))
             {
                 State.Save();
             }
+            if (CustomListBoxInt("Chat Spam Mode", &State.ChatSpamMode, 
+                { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
         }
 
         if (openAnticheat) {
@@ -323,32 +325,27 @@ namespace GameTab {
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
             if (ToggleButton("Punish Blacklisted Players", &State.SMAC_PunishBlacklist)) State.Save();
             if (State.SMAC_PunishBlacklist) {
-                if (State.SMAC_Blacklist.empty())
+                if (State.BlacklistPUID.empty())
                     ImGui::Text("No users in blacklist!");
                 static std::string newPuid = "";
-                static std::string newName = "";
-                InputString("New Name", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                 InputString("New PUID", &newPuid, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
                 if (newPuid != "" && ImGui::Button("Add PUID")) {
-                    State.SMAC_Blacklist[newPuid] = newName != "" ? newName : "No Name";
+                    State.BlacklistPUID.push_back(newPuid);
                     State.Save();
-                    newName = "";
                     newPuid = "";
                 }
-                if (!State.SMAC_Blacklist.empty()) {
+                if (!State.BlacklistPUID.empty()) {
                     static int selectedPuidIndex = 0;
-                    selectedPuidIndex = std::clamp(selectedPuidIndex, 0, (int)State.SMAC_Blacklist.size() - 1);
-                    std::vector<const char*> puidUserVector(State.SMAC_Blacklist.size(), nullptr);
-                    std::vector<const char*> puidVector(State.SMAC_Blacklist.size(), nullptr);
-                    for (auto i : State.SMAC_Blacklist) {
-                        puidUserVector.push_back(std::format("{} ({})", i.second, i.first).c_str());
-                        puidVector.push_back(i.first.c_str());
+                    selectedPuidIndex = std::clamp(selectedPuidIndex, 0, (int)State.BlacklistPUID.size() - 1);
+                    std::vector<const char*> puidVector(State.BlacklistPUID.size(), nullptr);
+                    for (auto i : State.BlacklistPUID) {
+                        puidVector.push_back(i.c_str());
                     }
-                    CustomListBoxInt("Player to Delete", &selectedPuidIndex, puidUserVector);
+                    CustomListBoxInt("Player to Delete", &selectedPuidIndex, puidVector);
                     ImGui::SameLine();
                     if (ImGui::Button("Delete"))
-                        State.SMAC_Blacklist.erase((std::string)puidVector[selectedPuidIndex]);
+                        State.BlacklistPUID.erase(std::find(State.BlacklistPUID.begin(), State.BlacklistPUID.end(), State.BlacklistPUID[selectedPuidIndex]));
                 }
             }
             ImGui::NewLine();

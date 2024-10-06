@@ -39,27 +39,16 @@ void RpcForceMeeting::Process()
 	PlayerControl_RpcStartMeeting(Player, reportedPlayer.get_PlayerData().value_or(nullptr), nullptr);
 }
 
-RpcMeetingExploit::RpcMeetingExploit(PlayerControl* exploitedPlayer)
+RpcSpamChatNote::RpcSpamChatNote(PlayerControl* exploitedPlayer)
 {
 	this->exploitedPlayer = exploitedPlayer;
 }
 
-void RpcMeetingExploit::Process()
+void RpcSpamChatNote::Process()
 {
 	if (!PlayerSelection(exploitedPlayer).has_value()) return;
 
-	if (!State.InMeeting) {
-		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
-			uint8_t(RpcCalls__Enum::ReportDeadBody), SendOption__Enum::None, exploitedPlayer->fields._.OwnerId, NULL);
-		MessageWriter_WriteByte(writer, exploitedPlayer->fields.PlayerId, NULL);
-		MessageWriter_EndMessage(writer, NULL);
-		delete writer;
-	}
 	for (size_t i = 0; i <= 50; ++i) {
-		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), exploitedPlayer->fields._.NetId,
-			uint8_t(RpcCalls__Enum::StartMeeting), SendOption__Enum::None, exploitedPlayer->fields._.OwnerId, NULL);
-		MessageWriter_WriteByte(writer, exploitedPlayer->fields.PlayerId, NULL);
-		MessageWriter_EndMessage(writer, NULL);
+		PlayerControl_RpcSendChatNote(*Game::pLocalPlayer, exploitedPlayer->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
 	}
-	
 }

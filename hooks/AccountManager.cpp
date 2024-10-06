@@ -13,3 +13,7 @@ void dAccountManager_UpdateKidAccountDisplay(AccountManager* __this, MethodInfo*
     }
     app::AccountManager_UpdateKidAccountDisplay(__this, method);
 }
+
+bool dAccountManager_CanPlayOnline(AccountManager* __this, MethodInfo* method) {
+    return true;
+}

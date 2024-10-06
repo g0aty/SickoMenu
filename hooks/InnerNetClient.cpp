@@ -412,8 +412,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 if ((((IsInGame() || IsInLobby()) && (convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), nullptr)) != State.userName))
                     || ((!IsInGame() && !IsInLobby()) && GetPlayerName() != State.userName))
                     && !State.userName.empty() && (IsNameValid(State.userName) || (IsHost() || !State.SafeMode))) {
-                    SetPlayerName(State.userName);
-                    LOG_INFO("Name mismatch, setting name to \"" + State.userName + "\"");
+                    //SetPlayerName(State.userName);
+                    //LOG_INFO("Name mismatch, setting name to \"" + State.userName + "\"");
                     if (IsInGame())
                         State.rpcQueue.push(new RpcSetName(State.userName));
                     else if (IsInLobby())
@@ -806,6 +806,12 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 if (State.modUsers.find(data->fields.Character->fields.PlayerId) != State.modUsers.end())
                     State.modUsers.erase(data->fields.Character->fields.PlayerId);
 
+                if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), data->fields.Character->fields.PlayerId) != State.WhitelistPlayerID.end())
+                    State.WhitelistPlayerID.erase(std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), data->fields.Character->fields.PlayerId));
+
+                if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), data->fields.Character->fields.PlayerId) != State.BlacklistPlayerID.end())
+                    State.WhitelistPlayerID.erase(std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), data->fields.Character->fields.PlayerId));
+
                 auto playerId = data->fields.Character->fields.PlayerId;
                 if (PlayerSelection(data->fields.Character).equals(State.selectedPlayer))
                     State.selectedPlayer = PlayerSelection();
@@ -1100,8 +1106,9 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
         switch (State.LastDisconnectReason) {
         case DisconnectReasons__Enum::Hacking: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string(std::format("You were banned for hacking.\n\n{}",
-                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.")), NULL);
+                convert_to_string(std::format("You were banned for hacking.\n\n{}\n\n{}",
+                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.",
+                    State.SafeMode ? "Please report this bug in Safe Mode on GitHub/Discord!" : "Disabling safe mode isn't recommended on official servers!")), NULL);
         }
         break;
         case DisconnectReasons__Enum::Kicked: {

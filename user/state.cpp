@@ -112,6 +112,7 @@ void Settings::Load() {
         JSON_TRYGET("ModifyTaskBarUpdates", this->ModifyTaskBarUpdates);
         JSON_TRYGET("UserName", this->userName);
         JSON_TRYGET("ShowGhosts", this->ShowGhosts);
+        JSON_TRYGET("ShowPhantoms", this->ShowPhantoms);
         JSON_TRYGET("FakeRole", this->FakeRole);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
         JSON_TRYGET("ShowRadar", this->ShowRadar);
@@ -197,6 +198,7 @@ void Settings::Load() {
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
         JSON_TRYGET("AutoCopyLobbyCode", this->AutoCopyLobbyCode);
+        JSON_TRYGET("DisableLobbyMusic", this->DisableLobbyMusic);
         JSON_TRYGET("NoClip", this->NoClip);
         JSON_TRYGET("KillInLobbies", this->KillInLobbies);
         JSON_TRYGET("KillInVanish", this->KillInVanish);
@@ -264,7 +266,9 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckLevel", this->SMAC_CheckLevel);
         JSON_TRYGET("SMAC_CheckVent", this->SMAC_CheckVent);
         JSON_TRYGET("SMAC_CheckSabotage", this->SMAC_CheckSabotage);
-        JSON_TRYGET("SMAC_Blacklist", this->SMAC_Blacklist);
+        
+        JSON_TRYGET("WhitelistPUID", this->WhitelistPUID);
+        JSON_TRYGET("BlacklistPUID", this->BlacklistPUID);
     } catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
@@ -359,6 +363,7 @@ void Settings::Save() {
                 { "ModifyTaskBarUpdates", this->ModifyTaskBarUpdates },
                 { "UserName", this->userName },
                 { "ShowGhosts", this->ShowGhosts },
+                { "ShowPhantoms", this->ShowPhantoms },
                 { "FakeRole", this->FakeRole },
                 { "AutoFakeRole", this->AutoFakeRole },
                 { "ShowRadar", this->ShowRadar },
@@ -443,6 +448,7 @@ void Settings::Save() {
                 { "ShowFps", this->ShowFps },
                 { "DoTasksAsImpostor", this->DoTasksAsImpostor },
                 { "AutoCopyLobbyCode", this->AutoCopyLobbyCode },
+                { "DisableLobbyMusic", this->DisableLobbyMusic },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
                 { "KillInVanish", this->KillInVanish },
@@ -507,7 +513,8 @@ void Settings::Save() {
                 { "SMAC_CheckLevel", this->SMAC_CheckLevel },
                 { "SMAC_CheckVent", this->SMAC_CheckVent },
                 { "SMAC_CheckSabotage", this->SMAC_CheckSabotage },
-                { "SMAC_Blacklist", this->SMAC_Blacklist },
+                { "WhitelistPUID", this->WhitelistPUID },
+                { "BlacklistPUID", this->BlacklistPUID },
             };
 
             std::ofstream outSettings(settingsPath);

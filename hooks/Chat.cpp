@@ -12,6 +12,21 @@ static std::string strToLower(std::string str) {
 	return new_str;
 }
 
+void doSabotageFlash() {
+	if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle)
+		ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Reactor, 128, NULL);
+	else if (State.mapType == Settings::MapType::Pb)
+		ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Laboratory, 128, NULL);
+	else if (State.mapType == Settings::MapType::Airship)
+		ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::HeliSabotage, 128, NULL);
+
+	float timer = 0;
+	while (timer <= 1.f) {
+		timer += app::Time_get_fixedDeltaTime(nullptr);
+	}
+	RepairSabotage(*Game::pLocalPlayer);
+}
+
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_AddChat executed");
 	if (!State.PanicMode) {
@@ -35,45 +50,47 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 			}
 		}
 		else ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
-
 		auto playerFc = convert_from_string(player->fields.FriendCode);
-		if (!PlayerIsImpostor(player) && IsHost() && State.TournamentMode && message.substr(0, 9) == "/callout " &&
-			std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), playerFc) == State.tournamentCallers.end()) {
-			try {
-				if (!player->fields.IsDead) {
-					std::map<std::string, std::string> playerNames = {};
-					for (auto p : GetAllPlayerData()) {
-						if (!p->fields.IsDead) {
-							auto outfit = GetPlayerOutfit(p);
-							auto friendCode = convert_from_string(p->fields.FriendCode);
-							playerNames[friendCode] = strToLower(convert_from_string(outfit->fields.PlayerName));
-						}
-					}
-					State.tournamentCallers.push_back(playerFc);
-					std::string calledOutPlayer = strToLower(message.substr(9));
-					std::vector<std::string> calloutResult = {};
-					for (auto i : playerNames) {
-						std::string playerName = i.second;
-						if (playerName.find(calledOutPlayer) != std::string::npos)
-							calloutResult.push_back(i.first);
-					}
-					if (calloutResult.size() == 1 &&
-						std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), calloutResult[0]) == State.tournamentCalledOut.end()) {
-						if (std::find(State.tournamentAliveImpostors.begin(), State.tournamentAliveImpostors.end(), calloutResult[0]) != State.tournamentAliveImpostors.end()) {
-							//check if called-out player was an impostor
-							UpdateTournamentPoints(player, 8); //CorrectCallout
-							auto friendCode = convert_from_string(player->fields.FriendCode);
-							State.tournamentCalloutPoints[friendCode] += 1;
+		if (IsHost() && IsInGame() && State.TournamentMode && message.substr(0, 8) == "callout ") {
+			if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), playerFc) == State.tournamentCallers.end()) {
+				try {
+					uint8_t calledOutId = std::stoi(message.substr(8));
+					auto calledOutPlayer = GetPlayerControlById(calledOutId);
+					if (calledOutPlayer != NULL) {
+						std::string calledOutFc = convert_from_string(GetPlayerData(calledOutPlayer)->fields.FriendCode);
+						if (!PlayerIsImpostor(player) && std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), calledOutFc) == State.tournamentCalledOut.end()) {
+							if (PlayerIsImpostor(GetPlayerData(calledOutPlayer))) {
+								//check if called-out player was an impostor
+								UpdateTournamentPoints(player, 8); //CorrectCallout
+								State.tournamentCalloutPoints[playerFc] += 1;
+								LOG_DEBUG("Correct callout by " + ToString(GetPlayerDataById(calledOutId)));
+							}
+							else {
+								UpdateTournamentPoints(player, 9); //IncorrectCallout
+								LOG_DEBUG("Incorrect callout by " + ToString(GetPlayerDataById(calledOutId)));
+							}
+							State.tournamentCalledOut.push_back(calledOutFc);
+							State.tournamentCallers.push_back(calledOutFc);
+							PlayerControl_RpcSendChatNote(*Game::pLocalPlayer, player->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
 						}
 						else {
-							UpdateTournamentPoints(player, 9); //IncorrectCallout
+							doSabotageFlash();
+							LOG_DEBUG("Invalid callout by " + ToString(GetPlayerDataById(calledOutId)));
 						}
-						State.tournamentCalledOut.push_back(calloutResult[0]);
+					}
+					else {
+						doSabotageFlash();
+						LOG_DEBUG("Called out NULL player");
 					}
 				}
+				catch (...) {
+					doSabotageFlash();
+					LOG_DEBUG("Exception occured while executing callout");
+				}
 			}
-			catch (...) {
-				LOG_ERROR("Exception occurred while checking callout (Chat)");
+			else {
+				doSabotageFlash();
+				LOG_DEBUG("Invalid callout executed by player who already called out");
 			}
 		}
 	}
@@ -208,7 +225,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	State.ChatCooldown = __this->fields.timeSinceLastMessage;
 	State.ChatFocused = __this->fields.freeChatField->fields.textArea->fields.hasFocus;
 
-	if (!State.PanicMode && State.SafeMode && State.ChatSpam && (IsInGame() || IsInLobby()) && __this->fields.timeSinceLastMessage >= 3.5f) {
+	if (!State.PanicMode && State.SafeMode && State.ChatSpam && (State.ChatSpamMode == 0 || State.ChatSpamMode == 2) && (IsInGame() || IsInLobby()) && __this->fields.timeSinceLastMessage >= 3.5f) {
 		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(State.chatMessage), NULL);
 		//remove rpc queue stuff cuz of delay and anticheat kick
 		State.MessageSent = true;
@@ -267,21 +284,21 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 			std::string whisperMsgSelf = std::format("You whisper to {}:\n{}",
 				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(State.playerToWhisper.get_PlayerData().value_or(nullptr), NULL))),
 				convert_from_string(chatText));
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, playerToChatAs, convert_to_string(whisperMsgSelf), false, NULL);
+			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, playerToChatAs, convert_to_string(whisperMsgSelf), false, NULL);
 		}
 		else if (__this == *Game::pLocalPlayer && !State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) {
 			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(State.playerToChatAs.get_PlayerId())->fields._.NetId,
 				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
 			MessageWriter_WriteString(writer, chatText, NULL);
 			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, GetPlayerControlById(State.playerToChatAs.get_PlayerId()), chatText, false, NULL);
+			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, GetPlayerControlById(State.playerToChatAs.get_PlayerId()), chatText, false, NULL);
 		}
 		else {
 			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
 				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
 			MessageWriter_WriteString(writer, chatText, NULL);
 			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, __this, chatText, false, NULL);
+			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, __this, chatText, false, NULL);
 		}
 	}
 	else {
@@ -291,7 +308,7 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatBubble_SetText executed");
-	if (State.DarkMode) {
+	if ((!State.PanicMode || State.TempPanicMode) && State.DarkMode) {
 		auto black = Palette__TypeInfo->static_fields->Black;
 		if (__this->fields.playerInfo->fields.IsDead) black.a *= 0.75f;
 		SpriteRenderer_set_color(__this->fields.Background, black, NULL);

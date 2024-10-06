@@ -100,6 +100,14 @@ namespace PlayersTab {
 				ImGui::SameLine();
 
 				ImVec4 nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
+				if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerData->fields.PlayerId) != State.BlacklistPlayerID.end()) {
+					playerName = "[-] " + playerName;
+					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+				}
+				else if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerData->fields.PlayerId) != State.WhitelistPlayerID.end()) {
+					playerName = "[+] " + playerName;
+					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
+				}
 				if (State.RevealRoles && IsInGame())
 				{
 					std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
@@ -234,16 +242,15 @@ namespace PlayersTab {
 					}
 				}
 			}
-			if ((!selectedPlayer.has_value() || selectedPlayer.is_LocalPlayer()) || !State.SafeMode) {
-				if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("Skip Vote by All")) {
-					for (auto player : GetAllPlayerControl()) {
-						/*if (player != selectedPlayer.get_PlayerControl()) {
-							State.rpcQueue.push(new RpcClearVote(player));
-						}*/
-						State.rpcQueue.push(new RpcVotePlayer(player, player, true));
-					}
-					State.InMeeting = false;
+			if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("Skip Vote by All")) {
+				Game::PlayerId VoteOffPlayerId = Game::SkippedVote;
+				for (auto player : GetAllPlayerControl()) {
+					/*if (player != selectedPlayer.get_PlayerControl()) {
+						State.rpcQueue.push(new RpcClearVote(player));
+					}*/
+					State.rpcQueue.push(new RpcVotePlayer(player, player, true));
 				}
+				State.InMeeting = false;
 			}
 			if (openPlayer && selectedPlayer.has_value())
 			{
@@ -373,14 +380,6 @@ namespace PlayersTab {
 							}
 						}
 					}
-					/*else if (IsInGame()) {
-						if (ImGui::Button("Attempt to Ban")) {
-							for (auto p : selectedPlayers) {
-								if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-								State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 200, true));
-							}
-						}
-					}*/
 					
 					if (IsHost() && ImGui::Button("Ban")) {
 						for (auto p : selectedPlayers) {
@@ -388,39 +387,39 @@ namespace PlayersTab {
 							app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
 						}
 					}
-					/*if (selectedPlayers.size() == 1 && ImGui::Button("Toggle Friend"))
-					{
-						auto p = selectedPlayers[0];
-						if (p.has_value() && !p.validate().is_LocalPlayer()) {
-							std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
-							if (State.Friends.contains(puid)) {
-								State.Friends.erase(puid);
-								State.InGameFriends.erase(selectedPlayer.get_PlayerData()->fields.PlayerId);
+					
+					if (selectedPlayers.size() == 1 && !selectedPlayers[0].validate().is_LocalPlayer()) {
+						Game::PlayerId playerId = selectedPlayers[0].validate().get_PlayerControl()->fields.PlayerId;
+						std::string puid = convert_from_string(selectedPlayers[0].validate().get_PlayerData()->fields.Puid);
+						if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerId) == State.WhitelistPlayerID.end()) {
+							if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerId) != State.BlacklistPlayerID.end()) {
+								if (ImGui::Button("Remove from Blacklist")) {
+									State.BlacklistPlayerID.erase(std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerId));
+									State.BlacklistPUID.erase(std::find(State.BlacklistPUID.begin(), State.BlacklistPUID.end(), puid));
+									State.Save();
+								}
 							}
-							else {
-								State.Friends.insert(puid);
-								State.InGameFriends.insert(selectedPlayer.get_PlayerData()->fields.PlayerId);
+							else if (ImGui::Button("Add to Blacklist")) {
+								State.BlacklistPlayerID.push_back(playerId);
+								State.BlacklistPUID.push_back(puid);
+								State.Save();
 							}
 						}
-						State.Save();
+						if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerId) == State.BlacklistPlayerID.end()) {
+							if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerId) != State.WhitelistPlayerID.end()) {
+								if (ImGui::Button("Remove from Whitelist")) {
+									State.WhitelistPlayerID.erase(std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerId));
+									State.WhitelistPUID.erase(std::find(State.WhitelistPUID.begin(), State.WhitelistPUID.end(), puid));
+									State.Save();
+								}
+							}
+							else if (ImGui::Button("Add to Whitelist")) {
+								State.WhitelistPlayerID.push_back(playerId);
+								State.WhitelistPUID.push_back(puid);
+								State.Save();
+							}
+						}
 					}
-					if (selectedPlayers.size() > 1 && ImGui::Button("Toggle Friends"))
-					{
-						for (auto p : selectedPlayers) {
-							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-
-							std::string puid = convert_from_string(p.get_PlayerData().value()->fields.Puid);
-							if (State.Friends.contains(puid)) {
-								State.Friends.erase(puid);
-								State.InGameFriends.erase(p.get_PlayerData().value()->fields.PlayerId);
-							}
-							else {
-								State.Friends.insert(puid);
-								State.InGameFriends.insert(p.get_PlayerData().value()->fields.PlayerId);
-							}
-						}
-						State.Save();
-					}*/
 				}
 
 				if (framesPassed == 0)
@@ -538,6 +537,20 @@ namespace PlayersTab {
 			}
 
 			if (openTrolling && selectedPlayer.has_value()) {
+				if (ImGui::Button("Send Blank Chat As")) {
+					for (auto p : selectedPlayers) {
+						if (IsInGame()) State.rpcQueue.push(new RpcSendChatNote(p.validate().get_PlayerControl(), 1));
+						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChatNote(p.validate().get_PlayerControl(), 1));
+					}
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Spam Blank Chat As")) {
+					for (auto p : selectedPlayers) {
+						if (IsInGame()) State.rpcQueue.push(new RpcSpamChatNote(p.validate().get_PlayerControl()));
+						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpamChatNote(p.validate().get_PlayerControl()));
+					}
+				}
+
 				if (IsInGame() && !GetPlayerData(selectedPlayer.get_PlayerControl())->fields.IsDead && selectedPlayers.size() == 1) {
 					if (!State.InMeeting) {
 						if (ImGui::Button("Force Meeting By")) {
@@ -845,14 +858,37 @@ namespace PlayersTab {
 							}
 						}
 					}
+					if (ImGui::Button("Force Vanish"))
+					{
+						for (auto p : selectedPlayers) {
+							auto validPlayer = p.validate();
+							if (IsInGame()) {
+								State.rpcQueue.push(new RpcVanish(validPlayer.get_PlayerControl()));
+							}
+							else if (IsInLobby()) {
+								State.lobbyRpcQueue.push(new RpcVanish(validPlayer.get_PlayerControl()));
+							}
+						}
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("Force Appear"))
+					{
+						for (auto p : selectedPlayers) {
+							auto validPlayer = p.validate();
+							if (IsInGame()) {
+								State.rpcQueue.push(new RpcVanish(validPlayer.get_PlayerControl(), true));
+							}
+							else if (IsInLobby()) {
+								State.lobbyRpcQueue.push(new RpcVanish(validPlayer.get_PlayerControl(), true));
+							}
+						}
+					}
 				}
 				ImGui::NewLine();
 				if ((IsHost() || !State.SafeMode) && State.InMeeting && selectedPlayers.size() == 1) {
 					if (ImGui::Button("Vote Off")) {
+						State.VoteOffPlayerId = selectedPlayer.get_PlayerControl()->fields.PlayerId;
 						for (auto player : GetAllPlayerControl()) {
-							if (player != selectedPlayer.get_PlayerControl()) {
-								State.rpcQueue.push(new RpcClearVote(player));
-							}
 							State.rpcQueue.push(new RpcVotePlayer(player, selectedPlayer.get_PlayerControl()));
 						}
 					}

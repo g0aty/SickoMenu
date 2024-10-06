@@ -146,6 +146,7 @@ void DetourInitilization() {
 	HOOKFUNC(AmongUsClient_OnPlayerJoined);
 	HOOKFUNC(CustomNetworkTransform_SnapTo);
 	HOOKFUNC(LobbyBehaviour_Start);
+	HOOKFUNC(LobbyBehaviour_Update);
 	HOOKFUNC(GameObject_SetActive);
 	//HOOKFUNC(NoShadowBehaviour_LateUpdate);
 	HOOKFUNC(FollowerCamera_Update);
@@ -203,6 +204,7 @@ void DetourInitilization() {
 	HOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
 	HOOKFUNC(PlayerControl_CoSetRole);
 	HOOKFUNC(NetworkedPlayerInfo_Serialize);
+	HOOKFUNC(NetworkedPlayerInfo_Deserialize);
 	HOOKFUNC(DisconnectPopup_DoShow);
 	HOOKFUNC(EditAccountUsername_SaveUsername);
 	HOOKFUNC(GameManager_DidImpostorsWin);
@@ -214,6 +216,9 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerControl_SetRoleInvisibility);
 	HOOKFUNC(ShipStatus_UpdateSystem);
 	HOOKFUNC(PlayerControl_CmdCheckProtect);
+	HOOKFUNC(MeetingHud_RpcVotingComplete);
+	HOOKFUNC(AccountManager_CanPlayOnline);
+	HOOKFUNC(LogicOptions_GetAnonymousVotes);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -283,6 +288,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(AmongUsClient_OnPlayerJoined);
 	UNHOOKFUNC(CustomNetworkTransform_SnapTo);
 	UNHOOKFUNC(LobbyBehaviour_Start);
+	UNHOOKFUNC(LobbyBehaviour_Update);
 	//UNHOOKFUNC(NoShadowBehaviour_LateUpdate);
 	UNHOOKFUNC(FollowerCamera_Update);
 	UNHOOKFUNC(DoorBreakerGame_Start);
@@ -337,6 +343,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
 	UNHOOKFUNC(PlayerControl_CoSetRole);
 	UNHOOKFUNC(NetworkedPlayerInfo_Serialize);
+	UNHOOKFUNC(NetworkedPlayerInfo_Deserialize);
 	UNHOOKFUNC(DisconnectPopup_DoShow);
 	UNHOOKFUNC(EditAccountUsername_SaveUsername);
 	UNHOOKFUNC(GameManager_DidImpostorsWin);
@@ -348,6 +355,9 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerControl_SetRoleInvisibility);
 	UNHOOKFUNC(ShipStatus_UpdateSystem);
 	UNHOOKFUNC(PlayerControl_CmdCheckProtect);
+	UNHOOKFUNC(MeetingHud_RpcVotingComplete);
+	UNHOOKFUNC(AccountManager_CanPlayOnline);
+	UNHOOKFUNC(LogicOptions_GetAnonymousVotes);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

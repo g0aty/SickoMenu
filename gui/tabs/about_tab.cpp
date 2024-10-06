@@ -53,9 +53,15 @@ namespace AboutTab {
                 OpenLink("https://dsc.gg/sickos"); //sickomenu discord invite
             }
             ImGui::Text("SickoMenu is a free and open-source software.");
-            ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "If you've paid for this menu, demand a refund immediately.");
-            ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "Make sure you have downloaded the latest version of SickoMenu from GitHub or our");
-            ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "official Discord!");
+
+            if (State.SickoVersion.find("pr") != std::string::npos) {
+                ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "You have access to pre-releases, enjoy!");
+            }
+            else {
+                ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "If you've paid for this menu, demand a refund immediately.");
+                ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "Make sure you have downloaded the latest version of SickoMenu from GitHub or our");
+                ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "official Discord!");
+            }
             //hopefully stop people from reselling a foss menu for actual money
         }
 

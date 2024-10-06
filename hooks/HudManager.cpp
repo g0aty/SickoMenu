@@ -139,7 +139,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dVersionShower_Start executed");
 	VersionShower_Start(__this, method);
-	const auto& versionText = !State.PanicMode && !State.HideWatermark ? std::format("<size=75%>{}{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>goaty</color></color></size>",
+	const auto& versionText = !State.PanicMode && !State.HideWatermark ? std::format("<size=75%>{}{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color></color></size>",
 		State.DarkMode ? "<#666>" : "<#fff>", convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)), State.SickoVersion) :
 		convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
 	app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(versionText), nullptr);
@@ -175,16 +175,17 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 			std::string hostText = State.ShowHost && IsInGame() ?
 				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
-			std::string watermarkText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>goaty</color> ~ ", spectating == "" ? 100 : 50, State.SickoVersion);
-			std::string pingText = std::format("{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
+			std::string watermarkText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color> ~ ", spectating == "" ? 100 : 50, State.SickoVersion);
+			std::string pingText = std::format("<#0000>00 00</color>{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
 				State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
 			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}
 		else {
-			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
+			std::string ping = "<#0000>00 00</color>" + convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(ping), nullptr);
 		}
+		//"<#0000>00 00</color>" has been added to center the ping text
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in PingTracker_Update (HudManager)");

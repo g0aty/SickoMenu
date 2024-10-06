@@ -14,4 +14,5 @@ DO_APP_CLASS(PlayerPhysics, "Assembly-CSharp, PlayerPhysics");
 DO_APP_CLASS(GameManager, "Assembly-CSharp, GameManager");
 DO_APP_CLASS(AccountManager, "Assembly-CSharp, AccountManager");
 DO_APP_CLASS(EOSManager, "Assembly-CSharp, EOSManager");
+DO_APP_CLASS(SoundManager, "Assembly-CSharp, SoundManager");
 //DO_APP_CLASS(DestroyableSingleton_1_RoleManager_, "Assembly-CSharp, DestroyableSingleton_1_RoleManager_");
