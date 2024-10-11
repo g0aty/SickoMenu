@@ -270,25 +270,27 @@ namespace HostTab {
 
 			if (openSettings) {
 				// AU v2022.8.24 has been able to change maps in lobby.
-				State.mapHostChoice = options.GetByte(app::ByteOptionNames__Enum::MapId);
-				if (State.mapHostChoice > 3)
-					State.mapHostChoice--;
+				State.mapHostChoice = State.FlipSkeld ? 3 : options.GetByte(app::ByteOptionNames__Enum::MapId);
+				/*if (State.mapHostChoice > 3)
+					State.mapHostChoice--;*/
 				State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
 				if (IsInLobby() && CustomListBoxInt("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale)) {
 					//if (!IsInGame()) {
 						// disable flip
-						/*if (State.mapHostChoice == 3) {
-							options.SetByte(app::ByteOptionNames__Enum::MapId, 0);
-							State.FlipSkeld = true;
-						}
-						else {
-							options.SetByte(app::ByteOptionNames__Enum::MapId, State.mapHostChoice);
-							State.FlipSkeld = false;
-						}*/
-					auto id = State.mapHostChoice;
+					if (State.mapHostChoice == 3) {
+						options.SetByte(app::ByteOptionNames__Enum::MapId, 0);
+						State.FlipSkeld = true;
+						SyncAllSettings();
+					}
+					else {
+						options.SetByte(app::ByteOptionNames__Enum::MapId, State.mapHostChoice);
+						State.FlipSkeld = false;
+						SyncAllSettings();
+					}
+					/*auto id = State.mapHostChoice;
 					if (id >= 3) id++;
 					options.SetByte(app::ByteOptionNames__Enum::MapId, id);
-					SyncAllSettings();
+					SyncAllSettings();*/
 					//}
 				}
 				auto gamemode = options.GetGameMode();

@@ -296,7 +296,7 @@ void Settings::Save() {
             //Log.Info("Unable to save sicko-selected-config.json");
         }
         auto settingsPath = path.parent_path() / 
-            std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? GetAllConfigs()[this->selectedConfigInt] : "default");
+            std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? this->selectedConfig : "default");
 
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{

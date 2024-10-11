@@ -12,19 +12,6 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 	try {
 		State.voteMonitor.clear();
 		State.InMeeting = true;
-		if (!State.PanicMode && IsHost() && State.TournamentMode) {
-			for (auto p : GetAllPlayerControl()) {
-				if (p != *Game::pLocalPlayer) {
-					auto playerData = GetPlayerData(p);
-					std::string pointsName = std::format("<size=50%><#0f0>Player ID {}</color></size>\n{}\n<size=50%><#0000>0</color></size>", p->fields.PlayerId,
-						convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
-					auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
-						uint8_t(RpcCalls__Enum::SetName), SendOption__Enum::None, __this->fields._.OwnerId, NULL);
-					MessageWriter_WriteString(writer, convert_to_string(pointsName), NULL);
-					InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-				}
-			}
-		}
 		static std::string strVoteSpreaderType = translate_type_name("VoteSpreader, Assembly-CSharp");
 		voteSpreaderType = app::Type_GetType(convert_to_string(strVoteSpreaderType), nullptr);
 		if (State.confuser && State.confuseOnMeeting && !State.PanicMode)

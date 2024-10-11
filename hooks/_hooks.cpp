@@ -219,6 +219,7 @@ void DetourInitilization() {
 	HOOKFUNC(MeetingHud_RpcVotingComplete);
 	HOOKFUNC(AccountManager_CanPlayOnline);
 	HOOKFUNC(LogicOptions_GetAnonymousVotes);
+	HOOKFUNC(AssetReference_InstantiateAsync_1);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -358,6 +359,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(MeetingHud_RpcVotingComplete);
 	UNHOOKFUNC(AccountManager_CanPlayOnline);
 	UNHOOKFUNC(LogicOptions_GetAnonymousVotes);
+	UNHOOKFUNC(AssetReference_InstantiateAsync_1);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

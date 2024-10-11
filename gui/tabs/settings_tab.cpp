@@ -113,6 +113,7 @@ namespace SettingsTab {
 
 			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
 			{
+				State.Save(); //save previous settings
 				State.Load();
 				State.Save(); //actually save the selected config
 			}

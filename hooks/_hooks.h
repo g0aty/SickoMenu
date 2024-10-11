@@ -132,3 +132,4 @@ void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target
 void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method);
 bool dAccountManager_CanPlayOnline(AccountManager* __this, MethodInfo* method);
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method);
+AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_1(AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method);

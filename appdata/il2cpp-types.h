@@ -7458,7 +7458,7 @@ namespace app
         struct GameData* GameDataPrefab;
         void* VoteBanPrefab;
         struct PlayerControl* PlayerPrefab;
-        void* ShipPrefabs;
+        struct List_1_UnityEngine_AddressableAssets_AssetReference_* ShipPrefabs;
         int32_t TutorialMapId;
         float SpawnRadius;
 #if defined(_CPLUSPLUS_)
@@ -10480,6 +10480,149 @@ namespace app
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct SoundManager__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region AssetReference
+    struct __declspec(align(4)) AssetReference__Fields {
+        struct String* m_AssetGUID;
+        struct String* m_SubObjectName;
+        struct String* m_SubObjectType;
+        void* m_Operation;
+    };
+
+    struct AssetReference {
+        struct AssetReference__Class* klass;
+        MonitorData* monitor;
+        struct AssetReference__Fields fields;
+    };
+
+    struct AssetReference__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_RuntimeKey;
+        VirtualInvokeData RuntimeKeyIsValid;
+        VirtualInvokeData get_RuntimeKey_1;
+        VirtualInvokeData get_AssetGUID;
+        VirtualInvokeData get_SubObjectName;
+        VirtualInvokeData set_SubObjectName;
+        VirtualInvokeData get_SubOjbectType;
+        VirtualInvokeData get_Asset;
+        VirtualInvokeData LoadAssetAsync;
+        VirtualInvokeData LoadSceneAsync;
+        VirtualInvokeData UnLoadScene;
+        VirtualInvokeData InstantiateAsync;
+        VirtualInvokeData InstantiateAsync_1;
+        VirtualInvokeData RuntimeKeyIsValid_1;
+        VirtualInvokeData ReleaseAsset;
+        VirtualInvokeData ReleaseInstance;
+        VirtualInvokeData ValidateAsset;
+        VirtualInvokeData ValidateAsset_1;
+    };
+
+    struct AssetReference__StaticFields {
+    };
+
+    struct AssetReference__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AssetReference__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct AssetReference__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region AssetReference__Array
+    struct AssetReference__Array {
+        struct AssetReference__Array__Class* klass;
+        MonitorData* monitor;
+        Il2CppArrayBounds* bounds;
+        il2cpp_array_size_t max_length;
+        struct AssetReference* vector[32];
+    };
+
+    struct AssetReference__Array__VTable {
+    };
+
+    struct AssetReference__Array__StaticFields {
+    };
+
+    struct AssetReference__Array__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AssetReference__Array__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct AssetReference__Array__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region List_1_UnityEngine_AddressableAssets_AssetReference_
+    struct __declspec(align(4)) List_1_UnityEngine_AddressableAssets_AssetReference___Fields {
+        struct AssetReference__Array* _items;
+        int32_t _size;
+        int32_t _version;
+        struct Object* _syncRoot;
+    };
+
+    struct List_1_UnityEngine_AddressableAssets_AssetReference_ {
+        struct List_1_UnityEngine_AddressableAssets_AssetReference___Class* klass;
+        MonitorData* monitor;
+        struct List_1_UnityEngine_AddressableAssets_AssetReference___Fields fields;
+    };
+
+    struct List_1_UnityEngine_AddressableAssets_AssetReference___VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_Item;
+        VirtualInvokeData set_Item;
+        VirtualInvokeData IndexOf;
+        VirtualInvokeData Insert;
+        VirtualInvokeData RemoveAt;
+        VirtualInvokeData get_Count;
+        VirtualInvokeData System_Collections_Generic_ICollection_T__get_IsReadOnly;
+        VirtualInvokeData Add;
+        VirtualInvokeData Clear;
+        VirtualInvokeData Contains;
+        VirtualInvokeData CopyTo;
+        VirtualInvokeData Remove;
+        VirtualInvokeData System_Collections_Generic_IEnumerable_T__GetEnumerator;
+        VirtualInvokeData System_Collections_IEnumerable_GetEnumerator;
+        VirtualInvokeData System_Collections_IList_get_Item;
+        VirtualInvokeData System_Collections_IList_set_Item;
+        VirtualInvokeData System_Collections_IList_Add;
+        VirtualInvokeData System_Collections_IList_Contains;
+        VirtualInvokeData Clear_1;
+        VirtualInvokeData System_Collections_IList_get_IsReadOnly;
+        VirtualInvokeData System_Collections_IList_get_IsFixedSize;
+        VirtualInvokeData System_Collections_IList_IndexOf;
+        VirtualInvokeData System_Collections_IList_Insert;
+        VirtualInvokeData System_Collections_IList_Remove;
+        VirtualInvokeData RemoveAt_1;
+        VirtualInvokeData System_Collections_ICollection_CopyTo;
+        VirtualInvokeData get_Count_1;
+        VirtualInvokeData System_Collections_ICollection_get_SyncRoot;
+        VirtualInvokeData System_Collections_ICollection_get_IsSynchronized;
+        VirtualInvokeData get_Item_1;
+        VirtualInvokeData get_Count_2;
+    };
+
+    struct List_1_UnityEngine_AddressableAssets_AssetReference___StaticFields {
+        struct AssetReference__Array* _emptyArray;
+    };
+
+    struct List_1_UnityEngine_AddressableAssets_AssetReference___Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct List_1_UnityEngine_AddressableAssets_AssetReference___StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct List_1_UnityEngine_AddressableAssets_AssetReference___VTable vtable;
     };
 #pragma endregion
 

@@ -122,8 +122,8 @@ void RpcVanish::Process()
 {
 	if (!PlayerSelection(Player).has_value()) return;
 
-	if (appear) PlayerControl_RpcAppear(Player, true, NULL);
-	else PlayerControl_RpcVanish(Player, NULL);
+	if (appear) PlayerControl_CmdCheckAppear(Player, true, NULL);
+	else PlayerControl_CmdCheckVanish(Player, 1.f, NULL);
 }
 
 RpcSendChat::RpcSendChat(PlayerControl* Player, std::string_view msg)

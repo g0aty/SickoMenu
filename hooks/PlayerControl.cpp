@@ -567,11 +567,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 			bool shouldSeePhantom = PlayerIsImpostor(localData) || localData->fields.IsDead;
 
-			if ((State.ShowPhantoms || shouldSeePhantom) && __this->fields.invisibilityAlpha < 0.5f) {
+			if (__this->fields.shouldAppearInvisible && !playerData->fields.IsDead) {
 				__this->fields.invisibilityAlpha = 0.5f;
-			}
-			else if ((!State.ShowPhantoms && !shouldSeePhantom) && __this->fields.shouldAppearInvisible) {
-				__this->fields.invisibilityAlpha = 0.f;
+				PlayerControl_set_Visible(__this, State.ShowPhantoms || shouldSeePhantom, NULL);
 			}
 
 			if (!State.FreeCam && __this == *Game::pLocalPlayer && State.prevCamPos.x != NULL) {
@@ -929,6 +927,19 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 	try {
 		HandleRpc(__this, callId, reader);
 		SMAC_HandleRpc(__this, callId, reader);
+		if (!State.PanicMode && IsHost() && State.TournamentMode && !State.DisableMeetings && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) {
+			for (auto p : GetAllPlayerControl()) {
+				if (p != *Game::pLocalPlayer) {
+					auto playerData = GetPlayerData(p);
+					std::string pointsName = std::format("<size=50%><#0f0>Player ID {}</color></size>\n{}\n<size=50%><#0000>0</color></size>", p->fields.PlayerId,
+						convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
+					auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
+						uint8_t(RpcCalls__Enum::SetName), SendOption__Enum::None, __this->fields._.OwnerId, NULL);
+					MessageWriter_WriteString(writer, convert_to_string(pointsName), NULL);
+					InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+				}
+			}
+		}
 		if (IsHost() && ((((!State.PanicMode && State.DisableMeetings) || State.BattleRoyale) && 
 			(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
 			(State.DisableSabotages && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
@@ -1034,7 +1045,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdReportDeadBody executed");
 	try {
-		if (!State.PanicMode && State.DisableMeetings) {
+		if ((!State.PanicMode && State.DisableMeetings) || State.BattleRoyale) {
 			return;
 		}
 	}
@@ -1047,7 +1058,7 @@ void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, NetworkedPlayerInfo
 void dPlayerControl_RpcStartMeeting(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_RpcStartMeeting executed");
 	try {
-		if (State.DisableMeetings) {
+		if ((!State.PanicMode && State.DisableMeetings) || State.BattleRoyale) {
 			return;
 		}
 	}
@@ -1355,6 +1366,23 @@ void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, Me
 
 void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_SetRoleInvisibility executed");
+	if (!State.PanicMode && State.ShowPhantoms) {
+		bool wasDead = false;
+		auto local = GetPlayerData(*Game::pLocalPlayer);
+		if (__this != NULL && local != NULL && !local->fields.IsDead) {
+			local->fields.IsDead = true;
+			wasDead = true;
+		}
+		synchronized(Replay::replayEventMutex) {
+			State.liveReplayEvents.emplace_back(std::make_unique<PhantomEvent>(GetEventPlayerControl(__this).value(),
+				isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));
+		}
+		PlayerControl_SetRoleInvisibility(__this, isActive, shouldAnimate, playFullAnimation, method);
+		if (wasDead) {
+			local->fields.IsDead = false;
+		}
+		return;
+	}
 	synchronized(Replay::replayEventMutex) {
 		State.liveReplayEvents.emplace_back(std::make_unique<PhantomEvent>(GetEventPlayerControl(__this).value(), 
 			isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));

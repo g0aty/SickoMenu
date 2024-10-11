@@ -27,3 +27,18 @@ bool dConstants_1_IsVersionModded(MethodInfo* method) {
 	//return false;
 	return Constants_1_IsVersionModded(method);
 }
+
+AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_1(AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method) {
+	LOG_DEBUG(std::format("AssetReference_InstantiateAsync executed with scene {}", State.CurrentScene).c_str());
+	try {
+		if (IsHost() && !IsInGame() && (*Game::pAmongUsClient) != NULL && parent == NULL && !instantiateInWorldSpace) {
+			il2cpp::List shipPrefabs = (*Game::pAmongUsClient)->fields.ShipPrefabs;
+			if (__this == shipPrefabs[0] && State.FlipSkeld) {
+				(*Game::pAmongUsClient)->fields.ShipLoadingAsyncHandle = AssetReference_InstantiateAsync_1(shipPrefabs[3], parent, instantiateInWorldSpace, method);
+				return AssetReference_InstantiateAsync_1(shipPrefabs[3], parent, instantiateInWorldSpace, method);
+			}
+		}
+	}
+	catch (...) {}
+	return AssetReference_InstantiateAsync_1(__this, parent, instantiateInWorldSpace, method);
+}
