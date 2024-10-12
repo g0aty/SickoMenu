@@ -61,6 +61,7 @@ namespace Replay
 	void Reset(bool all /* = true */)
 	{
 		synchronized(Replay::replayEventMutex) {
+			State.liveReplayEvents.clear();
 			if (all) {
 				// free all storage
 				State.liveReplayEvents.shrink_to_fit();

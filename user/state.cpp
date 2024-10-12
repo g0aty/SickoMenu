@@ -77,11 +77,13 @@ void Settings::Load() {
         JSON_TRYGET("ShowKeybinds", this->ShowKeybinds);
         JSON_TRYGET("KeybindsWhileChatting", this->KeybindsWhileChatting);
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
+        JSON_TRYGET("SpoofCrashLevel", this->SpoofCrashLevel);
         JSON_TRYGET("FakeLevel", this->FakeLevel);
         JSON_TRYGET("SpoofFriendCode", this->SpoofFriendCode);
         JSON_TRYGET("UseGuestFriendCode", this->UseGuestFriendCode);
         JSON_TRYGET("GuestFriendCode", this->GuestFriendCode);
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
+        JSON_TRYGET("FakePuid", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
@@ -166,11 +168,21 @@ void Settings::Load() {
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
+        JSON_TRYGET("CustomRgbName", this->CustomRgbName);
         JSON_TRYGET("ResizeName", this->ResizeName);
+        JSON_TRYGET("IndentName", this->IndentName);
+        JSON_TRYGET("CspaceName", this->CspaceName);
+        JSON_TRYGET("MspaceName", this->MspaceName);
+        JSON_TRYGET("VoffsetName", this->VoffsetName);
+        JSON_TRYGET("RotateName", this->RotateName);
         JSON_TRYGET("NameSize", this->NameSize);
+        JSON_TRYGET("NameIndent", this->NameIndent);
+        JSON_TRYGET("NameCspace", this->NameIndent);
         JSON_TRYGET("ItalicName", this->ItalicName);
         JSON_TRYGET("UnderlineName", this->UnderlineName);
         JSON_TRYGET("StrikethroughName", this->StrikethroughName);
+        JSON_TRYGET("BoldName", this->BoldName);
+        JSON_TRYGET("NobrName", this->BoldName);
         JSON_TRYGET("ColoredName", this->ColoredName);
         JSON_TRYGET("NameColor1_R", this->NameColor1.x);
         JSON_TRYGET("NameColor1_G", this->NameColor1.y);
@@ -323,11 +335,14 @@ void Settings::Save() {
                 { "ShowKeybinds", this->ShowKeybinds },
                 { "KeybindsWhileChatting", this->KeybindsWhileChatting },
                 { "SpoofLevel", this->SpoofLevel },
+                { "SpoofCrashLevel", this->SpoofCrashLevel },
                 { "FakeLevel", this->FakeLevel },
+                { "CrashLevel", this->CrashLevel },
                 { "SpoofFriendCode", this->SpoofFriendCode },
                 { "UseGuestFriendCode", this->UseGuestFriendCode },
                 { "GuestFriendCode", this->GuestFriendCode },
                 { "FakeFriendCode", this->FakeFriendCode },
+                { "FakePuid", this->FakePuid },
                 { "SpoofPlatform", this->SpoofPlatform },
                 { "FakePlatform", this->FakePlatform },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
@@ -413,10 +428,22 @@ void Settings::Save() {
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
                 { "ResizeName", this->ResizeName },
+                { "IndentName", this->IndentName },
+                { "CspaceName", this->CspaceName },
+                { "MspaceName", this->MspaceName },
+                { "VoffsetName", this->VoffsetName },
+                { "RotateName", this->RotateName },
                 { "NameSize", this->NameSize },
+                { "NameIndent", this->NameIndent },
+                { "NameCspace", this->NameCspace },
+                { "NameMspace", this->NameMspace },
+                { "NameVoffset", this->NameVoffset },
+                { "NameRotate", this->NameRotate },
                 { "ItalicName", this->ItalicName },
                 { "UnderlineName", this->UnderlineName },
                 { "StrikethroughName", this->StrikethroughName },
+                { "BoldName", this->BoldName },
+                { "NobrName", this->NobrName },
                 { "ColoredName", this->ColoredName },
                 { "NameColor1_R", this->NameColor1.x },
                 { "NameColor1_G", this->NameColor1.y },

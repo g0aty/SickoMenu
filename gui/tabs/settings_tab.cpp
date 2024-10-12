@@ -58,7 +58,7 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-			
+
 			// sorry to anyone trying to read this code it is pretty messy
 #pragma region New config menu, needs fixing
 			/*
@@ -262,7 +262,7 @@ namespace SettingsTab {
 			if (ToggleButton("Use Custom Guest Friend Code", &State.UseGuestFriendCode)) {
 				State.Save();
 			}
-			
+
 			if (InputString("Guest Friend Code", &State.GuestFriendCode)) {
 				State.Save();
 			}
@@ -284,7 +284,7 @@ namespace SettingsTab {
 			if (CustomListBoxInt("Platform", &State.FakePlatform, PLATFORMS))
 				State.Save();
 
-			//if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
+			if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
 		}
 
 		if (openKeybinds) {
@@ -315,6 +315,22 @@ namespace SettingsTab {
 				State.Save();
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Replay");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_ChatAlwaysActive)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Show/Hide Chat");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_ReadGhostMessages)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Read Ghost Messages");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
@@ -404,6 +420,13 @@ namespace SettingsTab {
 			}
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Complete All Tasks");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.CrashSpamReport))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Crash Server");
 		}
 		ImGui::EndChild();
 	}

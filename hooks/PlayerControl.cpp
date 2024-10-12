@@ -104,7 +104,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 								if (IsInGame()) State.rpcQueue.push(new RpcForceName(p, customName));
 								if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(p, customName));
 							}
-							nameDelay = int(0.5 * GetFps()); //0.5 seconds
+							nameDelay = int(0.003 * GetFps()); //0.5 seconds
 						}
 					}
 					else nameDelay--;
