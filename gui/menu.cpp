@@ -48,7 +48,7 @@ namespace Menu {
 					  "Spoof Guest Account", "Use Custom Guest Friend Code", "Spoof Level", "Spoof Platform"}},
 		{"Game", {"Player Speed Multiplier", "Kill Distance", "No Ability Cooldown", "Multiply Speed", "Modify Kill Distance", "Random Color", "Set Color", "Snipe Color", "Console",
 				  "Reset Appearance", "Kill Everyone", "Protect Everyone", "Disable Venting", "Spam Report", "Kill All Crewmates", "Kill All Impostors", "Kick Everyone From Vents",
-				  "Chat Message", "Send", "Send to AUM", "Spam"}},
+				  "Chat Message", "Send", "Send to AUM", "Spam", "Crash Server"}},
 		{"Self", {"Max Vision", "Wallhack", "Disable HUD", "Freecam", "Zoom", "Always show Chat Button", "Allow Ctrl+(C/V/X) in Chat", "Read Messages by Ghosts",
 				  "Read and Send AUM Chat", "Custom Name", "Custom Name for Everyone", "Server-sided Custom Name", "Reveal Roles", "Abbrv. Role", "Player Colored Dots Next To Names",
 				  "Show Player Info in Lobby", "Reveal Votes", "See Ghosts", "See Protections", "See Kill Cooldown", "Disable Kill Animation", "Dark Mode (Chat Only)",
@@ -71,7 +71,7 @@ namespace Menu {
 		{"Debug", {"Enable Occlusion Culling", "Force Load Settings", "Force Save Settings", "Clear RPC Queues", "Log Unity Debug Messages", "Log Hook Debug Messages", "Colors", "Profiler",
 				   "Experiments", "Enable Anticheat (SMAC)", "Disable Host Anticheat (+25 Mode)", "Point System (Only for Hosting"}},
 #endif
-		// Add more settings here as needed
+				   // Add more settings here as needed
 	};
 
 	void CloseAllOtherTabs(Tabs openTab) {
@@ -156,7 +156,7 @@ namespace Menu {
 			float stepR = float((State.MenuGradientColor2.x - State.MenuGradientColor1.x) / 100);
 			float stepG = float((State.MenuGradientColor2.y - State.MenuGradientColor1.y) / 100);
 			float stepB = float((State.MenuGradientColor2.z - State.MenuGradientColor1.z) / 100);
-			State.MenuGradientColor = ImVec4(State.MenuGradientColor1.x + stepR * gradientStep, 
+			State.MenuGradientColor = ImVec4(State.MenuGradientColor1.x + stepR * gradientStep,
 				State.MenuGradientColor1.y + stepG * gradientStep,
 				State.MenuGradientColor1.z + stepB * gradientStep,
 				State.MenuThemeColor.w);

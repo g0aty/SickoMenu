@@ -59,14 +59,6 @@ namespace ConsoleGui
 			CustomListBoxPlayerSelectionMultiple("Players", &ConsoleGui::player_filter, 150.f * State.dpiScale);
 		}
 		ImGui::EndChild();
-		ImGui::BeginChild("console#clear", ImVec2(520, 40) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-		if (ImGui::Button("Clear Console")) {
-			synchronized(Replay::replayEventMutex) {
-				State.liveReplayEvents.clear();
-			}
-		}
-		ImGui::SameLine();
-		ImGui::EndChild();
 		ImGui::Separator();
 		ImGui::BeginChild("console#scroll", ImVec2(511, 270) * State.dpiScale, true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoBackground);
 
