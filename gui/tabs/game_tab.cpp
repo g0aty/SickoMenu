@@ -11,18 +11,21 @@ namespace GameTab {
         General,
         Chat,
         Anticheat,
+        Destruct,
         Options
     };
 
     static bool openGeneral = true; //default to visual tab group
     static bool openChat = false;
     static bool openAnticheat = false;
+    static bool openDestruct = false;
     static bool openOptions = false;
 
     void CloseOtherGroups(Groups group) {
         openGeneral = group == Groups::General;
         openChat = group == Groups::Chat;
         openAnticheat = group == Groups::Anticheat;
+        openDestruct = group == Groups::Destruct;
         openOptions = group == Groups::Options;
     }
 
@@ -36,11 +39,14 @@ namespace GameTab {
         if (TabGroup("Chat", openChat)) {
             CloseOtherGroups(Groups::Chat);
         }
-
-        if (State.Enable_SMAC) {
+        ImGui::SameLine();
+        if (TabGroup("Anticheat", openAnticheat)) {
+            CloseOtherGroups(Groups::Anticheat);
+        }
+        if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
             ImGui::SameLine();
-            if (TabGroup("Anticheat", openAnticheat)) {
-                CloseOtherGroups(Groups::Anticheat);
+            if (TabGroup("Destruct", openDestruct)) {
+                CloseOtherGroups(Groups::Destruct);
             }
         }
 
@@ -74,9 +80,9 @@ namespace GameTab {
                 State.Save();
             }
 
-            ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
+            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
             ImGui::Separator();
-            ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
+            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
             if (IsHost() || !State.SafeMode) {
                 CustomListBoxInt(" ", &State.SelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
@@ -148,16 +154,16 @@ namespace GameTab {
             if (IsInLobby() && (IsHost() || !State.SafeMode) && ImGui::Button("Allow Everyone to NoClip")) {
                 for (auto p : GetAllPlayerControl()) {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
-				}
+                }
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            /*if (IsInLobby() && ImGui::Button("Allow Friends to NoClip")) {
+            if (IsInLobby() && ImGui::Button("Allow Friends to NoClip")) {
                 for (auto p : GetAllPlayerControl()) {
                     if (!State.Friends.contains(convert_from_string(p->fields.Puid))) continue; // only friends
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
                 }
-            }*/
+            }
             if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
                 if (ImGui::Button("Protect Everyone")) {
@@ -317,6 +323,7 @@ namespace GameTab {
         }
 
         if (openAnticheat) {
+            if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC));
             if (IsHost()) CustomListBoxInt("Host Punishment­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
             else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
@@ -375,6 +382,33 @@ namespace GameTab {
             if (ToggleButton("Detect Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
             if (ToggleButton("Detect Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
         }
+
+        if (openDestruct) {
+
+            ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+            if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) State.Save(); {
+                if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
+                State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+            if (IsInGame() && ToggleButton("Attempt to Ban [Everyone]", &State.UltimateSpamReport)) State.Save(); {
+                if (State.UltimateSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Alt `Crash Server`!\nMay be cause crash of game!\nMay be works with delay!"));
+                State.Save();
+            }
+
+            /*ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+            if (IsInLobby() || IsInGame) ToggleButton("Destroy Game Logic", &State.CrashServerEvrhre); State.Save(); {
+                if (State.SetCrashServerEvrhre) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Empty"));
+                State.Save();
+            }*/
+            /* {
+                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale); 
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ("\nSoon will be added more features!"));
+                State.Save();
+
+            }
+        }*/
 
         if (openOptions) {
             if (GameOptions().HasOptions()) {
@@ -445,9 +479,9 @@ namespace GameTab {
                     ImGui::Text("Guardian Angel Protect Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F));
                     ImGui::Text("Guardian Angel Protection Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, 1.0F));
 
-                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
-                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
                     ImGui::Text("Max Shapeshifters: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Shapeshifter));
                     ImGui::Text("Shapeshifter Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Shapeshifter));
