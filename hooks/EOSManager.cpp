@@ -129,6 +129,13 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		auto stats = PlayerData_get_Stats(player, NULL);
 		stats->fields.level = State.FakeLevel - 1;
 		AbstractSaveData_Save((AbstractSaveData*)player, NULL);
+
+		if (State.SpoofCrashLevel) {
+			auto player = DataManager_get_Player(NULL);
+			auto stats = PlayerData_get_Stats(player, NULL);
+			stats->fields.level = State.CrashLevel - 1;
+			AbstractSaveData_Save((AbstractSaveData*)player, NULL);
+		}
 	}
 }
 
