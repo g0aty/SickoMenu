@@ -218,11 +218,7 @@ namespace SabotageTab {
             ImGui::SameLine(100 * State.dpiScale);
             ImGui::BeginChild("###Sabotage", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-            if (IsHost() && ToggleButton("Disable Sabotages", &State.DisableSabotages)) {
-                ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-                ImGui::Separator();
-                ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-            }
+
             if (ImGui::Button("Repair Sabotage")) {
                 RepairSabotage(*Game::pLocalPlayer);
             }
@@ -373,7 +369,7 @@ namespace SabotageTab {
                     }
                 }
             }
-            if (ImGui::Checkbox("Automatic movement of switches", &brokeSystemSwitchesToggled)) {
+            if (ImGui::Checkbox("Disable Lights [Alt]", &brokeSystemSwitchesToggled)) {
                 if (brokeSystemSwitchesToggled) {
                     if (State.mapType != Settings::MapType::Fungle) {
                         for (size_t i = 0; i < 5; i++) {
