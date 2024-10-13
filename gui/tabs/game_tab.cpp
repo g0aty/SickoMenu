@@ -387,13 +387,13 @@ namespace GameTab {
 
             ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
             if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) State.Save(); {
-                if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
+                if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Server crashes after starting a game-match!"));
                 State.Save();
             }
 
             ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
-            if (IsInGame() && ToggleButton("Attempt to Ban [Everyone]", &State.UltimateSpamReport)) State.Save(); {
-                if (State.UltimateSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Alt `Crash Server`!\nMay be cause crash of game!\nMay be works with delay!"));
+            if (IsInGame() && ToggleButton("Attempt to Crash", &State.UltimateSpamReport)) State.Save(); {
+                if (State.UltimateSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Alt `Crash Server`!\nMay be cause crash of game!"));
                 State.Save();
             }
 
