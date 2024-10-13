@@ -270,7 +270,7 @@ namespace GameTab {
                     State.Save();
                 }
 
-                if (!State.SafeMode) CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
+                if (!State.SafeMode) CustomListBoxInt(" Â­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
 
                 if (!State.SafeMode && ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
                     State.Save();
@@ -324,7 +324,7 @@ namespace GameTab {
 
         if (openAnticheat) {
             if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC));
-            if (IsHost()) CustomListBoxInt("Host Punishment­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+            if (IsHost()) CustomListBoxInt("Host PunishmentÂ­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
             else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
@@ -407,8 +407,8 @@ namespace GameTab {
                 ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ("\nSoon will be added more features!"));
                 State.Save();
 
-            }
-        }*/
+            }*/
+        }
 
         if (openOptions) {
             if (GameOptions().HasOptions()) {
