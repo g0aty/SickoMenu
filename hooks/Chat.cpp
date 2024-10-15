@@ -119,6 +119,10 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 						playerName = convert_to_string("<u>" + convert_from_string(playerName) + "</u>");
 					if (State.StrikethroughName && (!State.ColoredName || State.RgbName))
 						playerName = convert_to_string("<s>" + convert_from_string(playerName) + "</s>");
+					if (State.BoldName && (!State.ColoredName || State.RgbName))
+						playerName = convert_to_string("<b>" + convert_from_string(playerName) + "</b>");
+					if (State.NobrName && (!State.ColoredName || State.RgbName))
+						playerName = convert_to_string("<nobr>" + convert_from_string(playerName) + "</nobr>");
 					//rgb color doesn't change
 					/*if (State.RgbName) {
 						playerName = convert_to_string(State.rgbCode + convert_from_string(playerName) + "</color>");
@@ -256,15 +260,15 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 			MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
 				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,
 				State.playerToWhisper.get_PlayerControl().value_or(nullptr)->fields._.OwnerId, NULL);
-			std::string whisperMsg = std::format("{} whispers to you:\n{}",
+			std::string whisperMsg = std::format("{}",
 				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
 				convert_from_string(chatText));
 			if (whisperMsg.length() <= 100 || !State.SafeMode)
-				MessageWriter_WriteString(writer, convert_to_string(whisperMsg), NULL);
+				MessageWriter_WriteString(writer, chatText, NULL);
 			else MessageWriter_WriteString(writer, chatText, NULL);
 			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 
-			std::string whisperMsgSelf = std::format("You whisper to {}:\n{}",
+			std::string whisperMsgSelf = std::format("<#f00>You whisper to</color> {}:\n{}",
 				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(State.playerToWhisper.get_PlayerData().value_or(nullptr), NULL))),
 				convert_from_string(chatText));
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, playerToChatAs, convert_to_string(whisperMsgSelf), false, NULL);

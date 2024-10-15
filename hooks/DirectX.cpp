@@ -40,8 +40,8 @@ std::unordered_map<ICON_TYPES, IconTexture> icons;
 
 typedef struct Cache
 {
-	ImGuiWindow* Window = nullptr;  //Window instance
-	ImVec2       Winsize; //Size of the window
+    ImGuiWindow* Window = nullptr;  //Window instance
+    ImVec2       Winsize; //Size of the window
 } cache_t;
 
 static cache_t s_Cache;
@@ -62,12 +62,12 @@ ImVec2 DirectX::GetWindowSize()
 
 static bool CanDrawEsp()
 {
-	return (!State.PanicMode && IsInGame() || IsInLobby()) && State.ShowEsp && (!State.InMeeting || !State.HideEsp_During_Meetings);
+    return (!State.PanicMode && IsInGame() || IsInLobby()) && State.ShowEsp && (!State.InMeeting || !State.HideEsp_During_Meetings);
 }
 
 static bool CanDrawRadar()
 {
-	return !State.PanicMode && IsInGame() && State.ShowRadar && (!State.InMeeting || !State.HideRadar_During_Meetings);
+    return !State.PanicMode && IsInGame() && State.ShowRadar && (!State.InMeeting || !State.HideRadar_During_Meetings);
 }
 
 static bool CanDrawReplay()
@@ -116,6 +116,8 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         }
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Close_Current_Room_Door) && IsInGame()) State.rpcQueue.push(new RpcCloseDoorsOfType(GetSystemTypes(GetTrueAdjustedPosition(*Game::pLocalPlayer)), false));
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Replay)) State.ShowReplay = !State.ShowReplay;
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_ChatAlwaysActive) && (IsInGame() || IsInLobby())) State.ChatAlwaysActive = !State.ChatAlwaysActive;
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_ReadGhostMessages) && (IsInGame() || IsInLobby())) State.ReadGhostMessages = !State.ReadGhostMessages;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Hud) && (IsInGame() || IsInLobby())) State.DisableHud = !State.DisableHud;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Reset_Appearance) && (IsInGame() || IsInLobby())) ControlAppearance(false);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Randomize_Appearance)) ControlAppearance(true);
@@ -131,10 +133,11 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.1f >= 1.f) State.CameraHeight -= 0.1f;
         }
         if ((ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT)) && State.FreeCam && (IsInGame() || IsInLobby())) {
-            if (ImGui::GetIO().MouseWheel < 0.f ) State.FreeCamSpeed += 0.05f;
+            if (ImGui::GetIO().MouseWheel < 0.f) State.FreeCamSpeed += 0.05f;
             if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.05f >= 0.05f) State.FreeCamSpeed -= 0.05f;
         }
     }
+    if (KeyBinds::IsKeyPressed(State.KeyBinds.CrashSpamReport) && (IsInGame() || IsInLobby())) State.CrashSpamReport = !State.CrashSpamReport;
     if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) State.PanicMode = !State.PanicMode;
 
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
@@ -173,8 +176,8 @@ bool ImGuiInitialization(IDXGISwapChain* pSwapChain) {
         maps.push_back({ D3D11Image(Resource(IDB_PNG4), pDevice), 162.F, 107.F, 6.F });
         maps.push_back({ D3D11Image(Resource(IDB_PNG15), pDevice), 237.F, 140.F, 8.5F });
 
-        icons.insert({ ICON_TYPES::VENT_IN, { D3D11Image(Resource(IDB_PNG5), pDevice), 0.02f }});
-        icons.insert({ ICON_TYPES::VENT_OUT, { D3D11Image(Resource(IDB_PNG6), pDevice), 0.02f }});
+        icons.insert({ ICON_TYPES::VENT_IN, { D3D11Image(Resource(IDB_PNG5), pDevice), 0.02f } });
+        icons.insert({ ICON_TYPES::VENT_OUT, { D3D11Image(Resource(IDB_PNG6), pDevice), 0.02f } });
         icons.insert({ ICON_TYPES::KILL, { D3D11Image(Resource(IDB_PNG7), pDevice), 0.02f } });
         icons.insert({ ICON_TYPES::REPORT, { D3D11Image(Resource(IDB_PNG8), pDevice), 0.02f } });
         icons.insert({ ICON_TYPES::TASK, { D3D11Image(Resource(IDB_PNG9), pDevice), 0.02f } });
@@ -192,7 +195,7 @@ bool ImGuiInitialization(IDXGISwapChain* pSwapChain) {
             NULL);                                // unnamed semaphore);
         return true;
     }
-    
+
     return false;
 }
 
@@ -251,7 +254,7 @@ static void RebuildFont() {
                 if (dwTTFSize < dwSize) {
                     auto offsetTTF = dwSize - dwTTFSize;
                     int n = stbtt_GetNumberOfFonts((unsigned char*)fontData);
-                    for (int index = 0; index<n; index++) {
+                    for (int index = 0; index < n; index++) {
                         if (offsetTTF == ttULONG((unsigned char*)fontData + 12 + index * 4)) {
                             config.FontNo = index;
                             break;
@@ -279,8 +282,8 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
         {
             pDevice->GetImmediateContext(&pContext);
         }
-    });
-	if (!State.ImGuiInitialized) {
+        });
+    if (!State.ImGuiInitialized) {
         if (ImGuiInitialization(__this)) {
             ImVec2 size = DirectX::GetWindowSize();
             State.ImGuiInitialized = true;
@@ -288,7 +291,8 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
             STREAM_DEBUG("Fullscreen: " << Screen_get_fullScreen(nullptr));
             STREAM_DEBUG("Unity Window Resolution: " << +Screen_get_width(nullptr) << "x" << +Screen_get_height(nullptr));
             STREAM_DEBUG("DirectX Window Size: " << +size.x << "x" << +size.y);
-        } else {
+        }
+        else {
             ReleaseSemaphore(DirectX::hRenderSemaphore, 1, NULL);
             return oPresent(__this, SyncInterval, Flags);
         }
@@ -338,38 +342,38 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
     }
 
     if (CanDrawEsp())
-	{
-		ImGuiRenderer::Submit([&]()
-		{
-			//Push ImGui flags
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f * State.dpiScale);
-			ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
+    {
+        ImGuiRenderer::Submit([&]()
+            {
+                //Push ImGui flags
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f * State.dpiScale);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
 
-			//Setup BackBuffer
-			ImGui::Begin("BackBuffer", reinterpret_cast<bool*>(true),
-				ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoScrollbar);
+                //Setup BackBuffer
+                ImGui::Begin("BackBuffer", reinterpret_cast<bool*>(true),
+                    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoScrollbar);
 
-			s_Cache.Winsize = DirectX::GetWindowSize();
-			s_Cache.Window = ImGui::GetCurrentWindow();
+                s_Cache.Winsize = DirectX::GetWindowSize();
+                s_Cache.Window = ImGui::GetCurrentWindow();
 
-			//Set window properties
-			ImGui::SetWindowPos({ 0, 0 }, ImGuiCond_Always);
-			ImGui::SetWindowSize(s_Cache.Winsize, ImGuiCond_Always);
+                //Set window properties
+                ImGui::SetWindowPos({ 0, 0 }, ImGuiCond_Always);
+                ImGui::SetWindowSize(s_Cache.Winsize, ImGuiCond_Always);
 
-			Esp::Render();
+                Esp::Render();
 
-			s_Cache.Window->DrawList->PushClipRectFullScreen();
+                s_Cache.Window->DrawList->PushClipRectFullScreen();
 
-			ImGui::PopStyleColor();
-			ImGui::PopStyleVar();
-			ImGui::End();
-		});
-	}
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End();
+            });
+    }
 
-	if (CanDrawRadar())
-	{
-		ImGuiRenderer::Submit([]() { Radar::Render(); });
-	}
+    if (CanDrawRadar())
+    {
+        ImGuiRenderer::Submit([]() { Radar::Render(); });
+    }
 
     if (CanDrawReplay())
     {
@@ -377,7 +381,7 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
     }
 
     // Render in a separate thread
-	std::async(std::launch::async, ImGuiRenderer::ExecuteQueue).wait();
+    std::async(std::launch::async, ImGuiRenderer::ExecuteQueue).wait();
 
     ImGui::EndFrame();
     ImGui::Render();

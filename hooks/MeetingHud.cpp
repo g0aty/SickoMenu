@@ -177,6 +177,10 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 							playerName = "<u>" + playerName + "</u>";
 						if (State.StrikethroughName && (!State.ColoredName || State.RgbName))
 							playerName = "<s>" + playerName + "</s>";
+						if (State.BoldName && (!State.ColoredName || State.RgbName))
+							playerName = "<b>" + playerName + "</b>";
+						if (State.NobrName && (!State.ColoredName || State.RgbName))
+							playerName = "<nobr>" + playerName + "</nobr>";
 						if (State.RgbName) {
 							playerName = State.rgbCode + playerName + "</color>";
 						}
