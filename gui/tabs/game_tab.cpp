@@ -323,7 +323,7 @@ namespace GameTab {
         }
 
         if (openAnticheat) {
-            if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC));
+            if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC))
             if (IsHost()) CustomListBoxInt("Host Punishment­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
             else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
@@ -387,13 +387,13 @@ namespace GameTab {
 
             ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
             if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) State.Save(); {
-                if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Server crashes after starting a game-match!"));
+                if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
                 State.Save();
             }
 
             ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
-            if (IsInGame() && ToggleButton("Attempt to Crash", &State.UltimateSpamReport)) State.Save(); {
-                if (State.UltimateSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Alt `Crash Server`!\nMay be cause crash of game!"));
+            if (IsInGame() && ToggleButton("Attempt to Ban [Everyone]", &State.UltimateSpamReport)) State.Save(); {
+                if (State.UltimateSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Alt `Crash Server`!\nMay be cause crash of game!\nMay be works with delay!"));
                 State.Save();
             }
 
