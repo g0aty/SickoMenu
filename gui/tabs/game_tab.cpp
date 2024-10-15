@@ -323,7 +323,7 @@ namespace GameTab {
         }
 
         if (openAnticheat) {
-            if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC));
+            if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
             if (IsHost()) CustomListBoxInt("Host Punishment­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
             else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
