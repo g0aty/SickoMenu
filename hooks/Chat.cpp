@@ -42,35 +42,50 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 			}
 			ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
 
-			std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
-			auto outfit = GetPlayerOutfit(GetPlayerData(sourcePlayer));
+			std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(player, nullptr));
+			auto outfit = GetPlayerOutfit(player);
 			uint32_t colorId = outfit->fields.ColorId;
 			if (wasDead) {
 				local->fields.IsDead = false;
 			}
 		}
 		else ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
+		if (State.Enable_SMAC) {
+			if (State.SMAC_CheckChat && ((IsInGame() && !State.InMeeting && !player->fields.IsDead) || chatText->fields.m_stringLength > 120)) {
+				SMAC_OnCheatDetected(sourcePlayer, "Abnormal Chat");
+			}
+		}
 		auto playerFc = convert_from_string(player->fields.FriendCode);
 		if (IsHost() && IsInGame() && State.TournamentMode && message.substr(0, 8) == "callout ") {
-			if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), playerFc) == State.tournamentCallers.end()) {
+			uint8_t alivePlayers = 0;
+			for (auto p : GetAllPlayerData()) {
+				if (!p->fields.IsDead) alivePlayers++;
+			}
+			if (alivePlayers >= 7 && std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), playerFc) == State.tournamentCallers.end()) {
 				try {
 					uint8_t calledOutId = std::stoi(message.substr(8));
 					auto calledOutPlayer = GetPlayerControlById(calledOutId);
-					if (calledOutPlayer != NULL) {
+					if (calledOutPlayer != NULL && !GetPlayerData(calledOutPlayer)->fields.IsDead) {
 						std::string calledOutFc = convert_from_string(GetPlayerData(calledOutPlayer)->fields.FriendCode);
 						if (!PlayerIsImpostor(player) && std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), calledOutFc) == State.tournamentCalledOut.end()) {
 							if (PlayerIsImpostor(GetPlayerData(calledOutPlayer))) {
 								//check if called-out player was an impostor
-								UpdateTournamentPoints(player, 8); //CorrectCallout
+								UpdatePoints(player, 1.5); //CorrectCallout
 								State.tournamentCalloutPoints[playerFc] += 1;
 								LOG_DEBUG("Correct callout by " + ToString(GetPlayerDataById(calledOutId)));
+								State.tournamentCorrectCallers[playerFc] = calledOutId;
 							}
 							else {
-								UpdateTournamentPoints(player, 9); //IncorrectCallout
+								UpdatePoints(player, -1.5); //IncorrectCallout
 								LOG_DEBUG("Incorrect callout by " + ToString(GetPlayerDataById(calledOutId)));
 							}
+							State.tournamentCallers.push_back(playerFc);
 							State.tournamentCalledOut.push_back(calledOutFc);
-							State.tournamentCallers.push_back(calledOutFc);
+							PlayerControl_RpcSendChatNote(*Game::pLocalPlayer, player->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
+						}
+						else if (PlayerIsImpostor(player) && std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), calledOutFc) == State.tournamentCalledOut.end()) {
+							State.tournamentCallers.push_back(playerFc);
+							State.tournamentCalledOut.push_back(calledOutFc);
 							PlayerControl_RpcSendChatNote(*Game::pLocalPlayer, player->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
 						}
 						else {
@@ -80,7 +95,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 					}
 					else {
 						doSabotageFlash();
-						LOG_DEBUG("Called out NULL player");
+						LOG_DEBUG("Called out dead/NULL player");
 					}
 				}
 				catch (...) {

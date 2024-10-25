@@ -151,7 +151,7 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 	app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
 	//center the ping text when panic is enabled
 	try {
-		if (!IsStreamerMode() && !State.PanicMode) {
+		if (!IsStreamerMode() && (!State.PanicMode || State.TempPanicMode)) {
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
 			int fps = GetFps();
 			std::string fpsText = "";
@@ -160,6 +160,14 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 				else if (fps <= 40) fpsText = std::format(" ~ <#ff0>FPS: {}</color>", fps);
 				else fpsText = std::format(" ~ <#0f0>FPS: {}</color>", fps);
 			}
+			int LobbyTime = (int)State.LobbyTimer;
+			std::string lobbyTimeDisplay = "";
+			/*if (IsHost() && IsInLobby() && State.ShowLobbyTimer) {
+				if (LobbyTime <= 60) lobbyTimeDisplay = std::format(" ~ (<#f00>{}:{}{}</color>)", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+				else if (LobbyTime <= 180) lobbyTimeDisplay = std::format(" ~ (<#ff0>{}:{}{}</color>)", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+				else if (LobbyTime >= 0) lobbyTimeDisplay = std::format(" ~ ({}<#0f0>{}:{}{}</color>)", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+				else lobbyTimeDisplay = std::format(" ~ ({}<#0f0>0:00</color>)", State.JoinedAsHost ? "" : "~");
+			}*/
 			std::string autoKill = State.AutoKill ? " ~ <#f00>Autokill</color>" : "";
 			std::string noClip = State.NoClip ? " ~ NoClip" : "";
 			std::string freeCam = State.FreeCam ? " ~ Freecam" : "";
@@ -176,8 +184,8 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
 			std::string watermarkText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color> ~ ", spectating == "" ? 100 : 50, State.SickoVersion);
-			std::string pingText = std::format("<#0000>00 00</color>{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
-				State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
+			std::string pingText = std::format("<#0000>00 00</color>{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
+				State.HideWatermark ? "" : watermarkText, ping, lobbyTimeDisplay, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
 			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}
@@ -199,4 +207,14 @@ bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, Meth
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicGameFlowHnS_IsGameOverDueToDeath executed");
 	return false; //fix black screen when you set fake role
+}
+
+void dModManager_LateUpdate(ModManager* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dModManager_LateUpdate executed");
+	ModManager_LateUpdate(__this, method);
+}
+
+void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodInfo* method) {
+	EndGameNavigation_ShowDefaultNavigation(__this, method);
+	if (!State.PanicMode && State.AutoRejoin) EndGameNavigation_CoJoinGame(__this, NULL);
 }

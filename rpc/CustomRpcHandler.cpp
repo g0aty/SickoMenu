@@ -67,14 +67,16 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	case (uint8_t)RpcCalls__Enum::SetName: {
 		if ((IsHost() || !State.SafeMode) && (State.ForceNameForEveryone || State.CustomNameForEveryone || (State.Cycler && State.CycleName && State.CycleForEveryone)))
 			break;
-		if (State.SMAC_CheckBadNames) {
+		if (State.SMAC_CheckBadNames && IsInGame()) {
 			auto name = MessageReader_ReadString(reader, NULL);
 			std::string nameStr = convert_from_string(name);
+			if (nameStr == "") return false; //prevent false flags
 			if (MessageReader_get_BytesRemaining(reader, NULL) > 0 || MessageReader_ReadBoolean(reader, NULL)) return false;
 			if (nameStr != RemoveHtmlTags(nameStr)) return true;
 			if (!IsNameValid(nameStr)) return true;
 			SMAC_OnCheatDetected(player, "Abnormal Name");
 		}
+		return false;
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::CheckColor:
@@ -120,11 +122,6 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SendChat: {
-		auto msg = MessageReader_ReadString(reader, NULL);
-		if (State.SMAC_CheckChat && ((IsInGame() && !State.InMeeting && !pData->fields.IsDead) || msg->fields.m_stringLength > 120)) {
-			SMAC_OnCheatDetected(player, "Abnormal Chat");
-			return true;
-		}
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::StartMeeting: {
@@ -171,11 +168,11 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::SetLevel: {
-		uint32_t level = MessageReader_ReadUInt32(reader, NULL);
+		/*uint32_t level = MessageReader_ReadUInt32(reader, NULL);
 		if (State.SMAC_CheckLevel && (IsInGame() || level >= (uint32_t)State.SMAC_HighLevel)) {
 			SMAC_OnCheatDetected(player, "Abnormal Level");
 			return true;
-		}
+		}*/
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::EnterVent: {

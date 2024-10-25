@@ -152,15 +152,13 @@ namespace GameTab {
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            /*if (IsInLobby() && ImGui::Button("Allow Friends to NoClip")) {
-                for (auto p : GetAllPlayerControl()) {
-                    if (!State.Friends.contains(convert_from_string(p->fields.Puid))) continue; // only friends
-                    if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
-                }
+            /*if (ImGui::Button("Spawn Dummy")) {
+                if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy());
+                if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy());
             }*/
             if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
-                if (ImGui::Button("Protect Everyone")) {
+                if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
                     for (auto player : GetAllPlayerControl()) {
                         uint8_t colorId = GetPlayerOutfit(GetPlayerData(player))->fields.ColorId;
                         if (IsInGame())

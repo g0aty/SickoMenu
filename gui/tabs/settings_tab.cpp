@@ -181,6 +181,11 @@ namespace SettingsTab {
 
 			SteppedSliderFloat("Opacity", (float*)&State.MenuThemeColor.w, 0.1f, 1.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
+			if (ImGui::InputInt("FPS", &State.GameFPS)) {
+				State.GameFPS = std::clamp(State.GameFPS, 1, 2147483647);
+				State.Save();
+			}
+
 #ifdef _DEBUG
 			if (ToggleButton("Show Debug Tab", &State.showDebugTab)) {
 				State.Save();

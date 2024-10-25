@@ -93,11 +93,12 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 			TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
 			//EditAccountUsername_SaveUsername(username, NULL);
 		}*/
-		if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
-			EOSManager_DeleteDeviceID(__this, NULL, NULL);
-			LOG_DEBUG("Successfully deleted device ID!");
-			hasDeletedDeviceId = true;
-		}
+	}
+
+	if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
+		EOSManager_DeleteDeviceID(__this, NULL, NULL);
+		LOG_DEBUG("Successfully deleted device ID!");
+		hasDeletedDeviceId = true;
 	}
 
 	if (State.ForceLoginAsGuest) {
@@ -116,11 +117,6 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 			TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
 			//EditAccountUsername_SaveUsername(username, NULL);
 		}*/
-		if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
-			EOSManager_DeleteDeviceID(__this, NULL, NULL);
-			LOG_DEBUG("Successfully deleted device ID!");
-			hasDeletedDeviceId = true;
-		}
 		State.ForceLoginAsGuest = false; //button behavior
 	}
 

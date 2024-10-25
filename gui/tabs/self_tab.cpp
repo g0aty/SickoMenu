@@ -174,8 +174,13 @@ namespace SelfTab {
             {
                 State.Save();
             }
-            ImGui::SameLine();
+            
             if (ToggleButton("Show Player Info in Lobby", &State.ShowPlayerInfo))
+            {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Show Lobby Info", &State.ShowLobbyInfo))
             {
                 State.Save();
             }
@@ -287,6 +292,16 @@ namespace SelfTab {
             if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("Report Body on Murder", &State.ReportOnMurder)) {
+                State.Save();
+            }
+            if (State.ReportOnMurder) {
+                ImGui::SameLine();
+                if (ToggleButton("Prevent Self-Report", &State.PreventSelfReport)) {
+                    State.Save();
+                }
+            }
             /*ImGui::SameLine();
             if (ToggleButton("Always Use Kill Exploit", &State.AlwaysUseKillExploit)) {
                 State.Save();
@@ -295,11 +310,13 @@ namespace SelfTab {
             if (ToggleButton("Fake Alive", &State.FakeAlive)) {
                 State.Save();
             }
-            //if (IsHost() || !State.SafeMode) {
-                ImGui::SameLine();
-                if (ToggleButton("God Mode", &State.GodMode))
-                    State.Save();
-            //}
+            ImGui::SameLine();
+            if (ToggleButton(IsHost() ? "God Mode" : "Visual Protection", &State.GodMode))
+                State.Save();
+            /*ImGui::SameLine();
+            if (ToggleButton("Auto-Rejoin", &State.AutoRejoin)) {
+                State.Save();
+            }*/
 
             if (ToggleButton("(Shift + Right Click) to Teleport", &State.ShiftRightClickTP)) {
                 State.Save();
@@ -583,7 +600,7 @@ namespace SelfTab {
                     //help me out with the nameplates, couldn't find them in the game assets
                     for (auto player : GetAllPlayerControl()) {
                         std::string name = "";
-                        if (State.confuserNameGeneration == 0 || (State.cyclerNameGeneration == 2 && State.cyclerUserNames.empty()))
+                        if (State.confuserNameGeneration == 0 || (State.confuserNameGeneration == 2 && State.cyclerUserNames.empty()))
                             name = GenerateRandomString();
                         else if (State.confuserNameGeneration == 1)
                             name = GenerateRandomString(true);

@@ -156,6 +156,15 @@ public:
 	virtual void Process() override;
 };
 
+class RpcSpamMeeting : public RPCInterface {
+	PlayerControl* Player;
+	PlayerControl* target;
+	bool inMeeting;
+public:
+	RpcSpamMeeting(PlayerControl* Player, PlayerControl* target, bool inMeeting);
+	virtual void Process() override;
+};
+
 class RpcSpamChatNote : public RPCInterface {
 	PlayerControl* exploitedPlayer;
 public:
@@ -432,5 +441,13 @@ public:
 class RpcSyncSettings : public RPCInterface {
 public:
 	RpcSyncSettings();
+	virtual void Process() override;
+};
+
+class RpcSpawnDummy : public RPCInterface {
+	uint8_t colorId;
+	std::string name;
+public:
+	RpcSpawnDummy(uint8_t colorId = -1, std::string_view name = "");
 	virtual void Process() override;
 };

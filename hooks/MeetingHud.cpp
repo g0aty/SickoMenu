@@ -225,6 +225,10 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 							roleColor.a, playerName);
 					}
 
+					if (IsHost() && State.TournamentMode) {
+						playerName = std::format("{}\n<size=1.2><#0f0>Player ID {}</color></size>", playerName, playerData->fields.PlayerId);
+					}
+
 					String* playerNameStr = convert_to_string(playerName);
 					TMP_Text_set_text((app::TMP_Text*)playerNameTMP, playerNameStr, NULL);
 				}

@@ -9,6 +9,8 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dAirshipStatus_OnEnable executed");
 	AirshipStatus_OnEnable(__this, method);
 	State.mapType = Settings::MapType::Airship;
+	if (IsHost() && State.TaskSpeedrun && State.GameLoaded)
+		State.SpeedrunTimer += Time_get_deltaTime(NULL);
 	try {
 		Replay::Reset();
 

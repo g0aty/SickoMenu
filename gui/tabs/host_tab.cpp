@@ -186,8 +186,38 @@ namespace HostTab {
 				
 				if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
 					State.Save();
-				if (ToggleButton("Battle Royale", &State.BattleRoyale))
+
+				std::vector<const char*> GAMEMODES = { "Default", "Task Speedrun" };
+				if (State.DisableHostAnticheat) GAMEMODES = { "Default", "Task Speedrun", "Battle Royale" };
+				State.GameMode = std::clamp(State.GameMode, 0, State.DisableHostAnticheat ? 2 : 1);
+				if (IsInLobby() && CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 75 * State.dpiScale)) {
+					if (State.GameMode == 1) {
+						State.TaskSpeedrun = true;
+						State.BattleRoyale = false;
+					}
+					else if (State.GameMode == 2) {
+						State.TaskSpeedrun = false;
+						State.BattleRoyale = true;
+					}
+					else {
+						State.TaskSpeedrun = false;
+						State.BattleRoyale = false;
+					}
+				}
+
+				if (ToggleButton("Show Lobby Timer", &State.ShowLobbyTimer))
 					State.Save();
+
+				if (ToggleButton("Auto Start Game", &State.AutoStartGame))
+					State.Save();
+
+				if (State.AutoStartGame) {
+					ImGui::Text("Start After");
+					ImGui::SameLine();
+					if (ImGui::InputInt("sec", &State.AutoStartTimer))
+						State.Save();
+				}
+
 				//if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
 
 				/*if (ToggleButton("Disable Specific RPC Call ID", &State.DisableCallId))

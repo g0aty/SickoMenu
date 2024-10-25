@@ -37,6 +37,7 @@ void RpcMurderPlayer::Process()
 			if (success) GetPlayerData(target)->fields.IsDead = true;
 		}
 	}
+	State.LevelFarm = false;
 }
 
 RpcMurderLoop::RpcMurderLoop(PlayerControl* Player, PlayerControl* target, int count, bool onlyOnTarget)
@@ -387,4 +388,19 @@ void RpcSyncSettings::Process()
 	GameManager* gameManager = GameManager_get_Instance(NULL);
 	GameOptionsManager_set_GameHostOptions(gameOptionsManager, GameOptionsManager_get_CurrentGameOptions(gameOptionsManager, NULL), NULL);
 	LogicOptions_SyncOptions(GameManager_get_LogicOptions(gameManager, NULL), NULL);
+}
+
+RpcSpawnDummy::RpcSpawnDummy(uint8_t colorId, std::string_view name) {
+	this->colorId = colorId;
+	this->name = name;
+}
+
+void RpcSpawnDummy::Process()
+{
+	auto dummyPc = *Game::pLocalPlayer;
+	auto clientData = InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), dummyPc, NULL);
+	InnerNetClient_Spawn((InnerNetClient*)(*Game::pAmongUsClient), (InnerNetObject*)dummyPc, -2, SpawnFlags__Enum::None, NULL);
+	GameData_AddPlayer(*Game::pGameData, dummyPc, clientData, NULL);
+	if (colorId != -1) PlayerControl_RpcSetColor(dummyPc, colorId, NULL);
+	if (name != "") PlayerControl_RpcSetName(dummyPc, convert_to_string(name), NULL);
 }

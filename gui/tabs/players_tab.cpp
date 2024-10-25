@@ -25,10 +25,13 @@ namespace PlayersTab {
 
 	static bool murderLoop = false;
 	static bool suicideLoop = false;
+	static bool farmLoop = false;
 	static int murderCount = 0;
 	static int murderDelay = 0;
 	static int suicideCount = 0;
 	static int suicideDelay = 0;
+	static int farmCount = 0;
+	static int farmDelay = 0;
 
 	void Render() {
 		if (IsInGame() || IsInLobby()) {
@@ -131,7 +134,7 @@ namespace PlayersTab {
 			if (shouldEndListBox)
 				ImGui::ListBoxFooter();
 
-			if (selectedPlayer.has_value() && selectedPlayers.size() == 1) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
+			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1 && !selectedPlayers[0].validate().is_Disconnected()) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
 			{
 				if ((IsInMultiplayerGame() || IsInLobby()) || (selectedPlayer.has_value() && selectedPlayer.is_LocalPlayer())) {
 					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
@@ -351,12 +354,18 @@ namespace PlayersTab {
 
 				if ((IsInMultiplayerGame() || IsInLobby()) && (!selectedPlayer.is_LocalPlayer() || selectedPlayers.size() != 1)) {
 					if (IsHost() && ImGui::Button("Kick")) {
+						State.selectedPlayer = {};
+						State.selectedPlayers.clear();
 						for (auto p : selectedPlayers) {
 							if (p.has_value() && p.validate().get_PlayerControl() != *Game::pLocalPlayer)
 								app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, false, NULL);
 						}
 					}
 					if (ImGui::Button("Votekick")) {
+						if (IsHost()) {
+							State.selectedPlayer = {};
+							State.selectedPlayers.clear();
+						}
 						for (auto p : selectedPlayers) {
 							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
 							if (IsInGame()) {
@@ -368,7 +377,9 @@ namespace PlayersTab {
 						}
 					}
 					if (!State.SafeMode) {
-						if (ImGui::Button("Kick Exploit")) {
+						if (ImGui::Button("Attempt to Kick")) {
+							State.selectedPlayer = {};
+							State.selectedPlayers.clear();
 							for (auto p : selectedPlayers) {
 								if (p.has_value() && p.validate().is_LocalPlayer()) continue;
 								if (IsInGame()) {
@@ -380,8 +391,23 @@ namespace PlayersTab {
 							}
 						}
 					}
+					/*else if (IsInGame()) {
+						if (ImGui::Button("Attempt to Ban")) {
+							for (auto p : selectedPlayers) {
+								if (p.has_value() && p.validate().is_LocalPlayer()) continue;
+								if (IsInGame()) {
+									State.rpcQueue.push(new RpcSpamMeeting(*Game::pLocalPlayer, p.validate().get_PlayerControl(), State.InMeeting));
+								}
+								else if (IsInLobby()) {
+									State.lobbyRpcQueue.push(new RpcSpamMeeting(*Game::pLocalPlayer, p.validate().get_PlayerControl(), State.InMeeting));
+								}
+							}
+						}
+					}*/
 					
 					if (IsHost() && ImGui::Button("Ban")) {
+						State.selectedPlayer = {};
+						State.selectedPlayers.clear();
 						for (auto p : selectedPlayers) {
 							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
 							app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
@@ -741,9 +767,9 @@ namespace PlayersTab {
 					if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
 						if (!murderLoop && ImGui::Button("Murder Loop")) {
 							murderLoop = true;
-							murderCount = 1000; //controls how many times the player is to be murdered
+							murderCount = 200; //controls how many times the player is to be murdered
 						}
-						if (murderLoop && ImGui::Button(std::format("Stop Murder Loop ({})", 1000 - murderCount).c_str())) {
+						if (murderLoop && ImGui::Button(std::format("Stop Murder Loop ({})", 200 - murderCount).c_str())) {
 							murderLoop = false;
 							murderCount = 0;
 						}
@@ -769,6 +795,43 @@ namespace PlayersTab {
 						}
 					}
 					else murderDelay--;
+
+					if (IsInGame() && (State.RealRole == RoleTypes__Enum::Impostor || State.RealRole == RoleTypes__Enum::Shapeshifter || State.RealRole == RoleTypes__Enum::Phantom)) {
+						if (ImGui::Button("Level Farm")) {
+							State.LevelFarm = true;
+							for (auto p : selectedPlayers) {
+								auto validPlayer = p.validate();
+								State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 10000, false));
+							}
+						}
+					}
+
+					/*if (farmDelay <= 0) {
+						if (farmCount > 0 && selectedPlayer.has_value()) {
+							for (auto p : selectedPlayers) {
+								auto validPlayer = p.validate();
+								State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
+							}
+							farmDelay = 5;
+							farmCount--;
+							if (farmCount < 1000 && farmCount % 50 == 0) {
+								for (auto p : selectedPlayers) {
+									auto validPlayer = p.validate();
+									if (IsHost() || !State.SafeMode) State.rpcQueue.push(new RpcForceReportBody(validPlayer.get_PlayerControl(), validPlayer));
+									break;
+								}
+							}
+							if (State.InMeeting) {
+								State.rpcQueue.push(new RpcEndMeeting());
+								State.InMeeting = false;
+							}
+						}
+						else {
+							farmLoop = false;
+							farmCount = 0;
+						}
+					}
+					else farmDelay--;*/
 				}
 
 				if (!State.SafeMode && IsInGame()) {

@@ -1,6 +1,8 @@
 #include "pch-il2cpp.h"
 #include "_rpc.h"
 #include "game.h"
+#include "state.hpp"
+#include "utility.h"
 
 RpcUpdateSystem::RpcUpdateSystem(SystemTypes__Enum selectedSystem, SystemTypes__Enum amount)
 {
@@ -16,5 +18,6 @@ RpcUpdateSystem::RpcUpdateSystem(SystemTypes__Enum selectedSystem, uint32_t amou
 
 void RpcUpdateSystem::Process()
 {
+	if (IsHost() && !State.PanicMode && (State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun))) return;
 	ShipStatus_RpcUpdateSystem(*Game::pShipStatus, this->selectedSystem, this->amount, NULL);
 }

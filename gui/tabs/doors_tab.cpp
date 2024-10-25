@@ -60,7 +60,7 @@ namespace DoorsTab {
 			ImGui::SameLine();
 			ImGui::BeginChild("doors#options", ImVec2(300, 0) * State.dpiScale, false, ImGuiWindowFlags_NoBackground);
 
-			if (State.DisableSabotages) {
+			if (IsHost() && State.DisableSabotages) {
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Sabotages have been disabled.");
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Nothing can be sabotaged.");
 			}

@@ -133,3 +133,6 @@ void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Ar
 bool dAccountManager_CanPlayOnline(AccountManager* __this, MethodInfo* method);
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method);
 AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_1(AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method);
+void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method);
+void dModManager_LateUpdate(ModManager* __this, MethodInfo* method);
+void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodInfo* method);

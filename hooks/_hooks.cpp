@@ -220,6 +220,9 @@ void DetourInitilization() {
 	HOOKFUNC(AccountManager_CanPlayOnline);
 	HOOKFUNC(LogicOptions_GetAnonymousVotes);
 	HOOKFUNC(AssetReference_InstantiateAsync_1);
+	HOOKFUNC(MatchMakerGameButton_SetGame);
+	HOOKFUNC(ModManager_LateUpdate);
+	HOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -360,6 +363,9 @@ void DetourUninitialization()
 	UNHOOKFUNC(AccountManager_CanPlayOnline);
 	UNHOOKFUNC(LogicOptions_GetAnonymousVotes);
 	UNHOOKFUNC(AssetReference_InstantiateAsync_1);
+	UNHOOKFUNC(MatchMakerGameButton_SetGame);
+	UNHOOKFUNC(ModManager_LateUpdate);
+	UNHOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

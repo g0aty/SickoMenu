@@ -15,6 +15,9 @@ static void onGameEnd() {
         LOG_DEBUG("Reset All");
         Replay::Reset();
         State.modUsers.clear();
+        State.AllPlayersID.clear();
+        State.WhitelistPlayerID.clear();
+        State.BlacklistPlayerID.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
         State.EnableZoom = false;
@@ -33,11 +36,22 @@ static void onGameEnd() {
         State.CanChangeOutfit = false;
         State.GameLoaded = false;
         State.RealRole = RoleTypes__Enum::Crewmate;
+        State.mapType = Settings::MapType::Ship;
+        State.SpeedrunTimer = 0.f;
 
         if (State.PanicMode && State.TempPanicMode) {
             State.PanicMode = false;
             State.TempPanicMode = false;
         }
+
+        State.tournamentFirstMeetingOver = false;
+        State.tournamentKillCaps.clear();
+        State.tournamentAssignedImpostors.clear();
+        State.tournamentAliveImpostors.clear();
+        State.tournamentCallers.clear();
+        State.tournamentCalledOut.clear();
+        State.tournamentCorrectCallers.clear();
+        State.tournamentAllTasksCompleted.clear();
 
         State.selectedPlayers = {};
 
@@ -58,11 +72,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         if (!State.PanicMode) {
             static bool onStart = true;
             if (!IsInLobby()) {
-                State.LobbyTimer = -1;
-            }
-
-            if (IsInLobby() && State.LobbyTimer > 0) {
-                State.LobbyTimer--;
+                State.LobbyTimer = 600.f;
+                State.JoinedAsHost = false;
             }
 
             if (!IsInGame()) {
@@ -751,6 +762,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableMeetings = false;
                 State.DisableSabotages = false;
             }
+
+            if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer) {
+                InnerNetClient_SendStartGame(__this, NULL);
+            }
         }
     }
     catch (Exception* ex) {
@@ -762,6 +777,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     catch (...) {
         LOG_ERROR("Exception occurred in InnerNetClient_Update (InnerNetClient)");
     }
+    Application_set_targetFrameRate(State.GameFPS > 1 ? State.GameFPS : 60, NULL);
     InnerNetClient_Update(__this, method);
 }
 
@@ -787,48 +803,52 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerLeft executed");
     try {
-        if (!State.PanicMode) {
-            State.BlinkPlayersTab = true;
-            if (data->fields.Character) { // Don't use Object_1_IsNotNull().
-                auto playerInfo = GetPlayerData(data->fields.Character);
+        if (data->fields.Character) { // Don't use Object_1_IsNotNull().
+            auto playerInfo = GetPlayerData(data->fields.Character);
 
-                if (reason == DisconnectReasons__Enum::Banned)
-                    Log.Debug(ToString(data->fields.Character) + " has been banned by host (" + GetHostUsername() + ").");
-                else if (reason == DisconnectReasons__Enum::Kicked)
-                    Log.Debug(ToString(data->fields.Character) + " has been kicked by host (" + GetHostUsername() + ").");
-                else if (reason == DisconnectReasons__Enum::Hacking)
-                    Log.Debug(ToString(data->fields.Character) + " has been banned for hacking.");
-                else if (reason == DisconnectReasons__Enum::Error)
-                    Log.Debug(ToString(data->fields.Character) + " has been disconnected due to error.");
-                else
-                    Log.Debug(ToString(data->fields.Character) + " has left the game.");
+            if (reason == DisconnectReasons__Enum::Banned)
+                Log.Debug(ToString(data->fields.Character) + " has been banned by host (" + GetHostUsername() + ").");
+            else if (reason == DisconnectReasons__Enum::Kicked)
+                Log.Debug(ToString(data->fields.Character) + " has been kicked by host (" + GetHostUsername() + ").");
+            else if (reason == DisconnectReasons__Enum::Hacking)
+                Log.Debug(ToString(data->fields.Character) + " has been banned for hacking.");
+            else if (reason == DisconnectReasons__Enum::Error)
+                Log.Debug(ToString(data->fields.Character) + " has been disconnected due to error.");
+            else
+                Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
-                if (State.modUsers.find(data->fields.Character->fields.PlayerId) != State.modUsers.end())
-                    State.modUsers.erase(data->fields.Character->fields.PlayerId);
+            if (State.modUsers.find(data->fields.Character->fields.PlayerId) != State.modUsers.end())
+                State.modUsers.erase(data->fields.Character->fields.PlayerId);
 
-                if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), data->fields.Character->fields.PlayerId) != State.WhitelistPlayerID.end())
-                    State.WhitelistPlayerID.erase(std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), data->fields.Character->fields.PlayerId));
+            auto playerId = data->fields.Character->fields.PlayerId;
+            if (PlayerSelection(data->fields.Character).equals(State.selectedPlayer))
+                State.selectedPlayer = PlayerSelection();
 
-                if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), data->fields.Character->fields.PlayerId) != State.BlacklistPlayerID.end())
-                    State.WhitelistPlayerID.erase(std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), data->fields.Character->fields.PlayerId));
+            auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);
+            if (itSel != State.selectedPlayers.end())
+                State.selectedPlayers.erase(itSel);
 
-                auto playerId = data->fields.Character->fields.PlayerId;
-                if (PlayerSelection(data->fields.Character).equals(State.selectedPlayer))
-                    State.selectedPlayer = PlayerSelection();
-                auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);
-                if (itSel != State.selectedPlayers.end())
-                    State.selectedPlayers.erase(itSel);
+            auto playerSel = std::find(State.AllPlayersID.begin(), State.AllPlayersID.end(), playerId);
+            if (playerSel != State.AllPlayersID.end())
+                State.AllPlayersID.erase(playerSel);
 
-                if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
-                    synchronized(Replay::replayEventMutex) {
-                        State.liveReplayEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
-                    }
+            auto whitelistSel = std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerId);
+            if (whitelistSel != State.WhitelistPlayerID.end())
+                State.WhitelistPlayerID.erase(whitelistSel);
+
+            auto blacklistSel = std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerId);
+            if (blacklistSel != State.BlacklistPlayerID.end())
+                State.BlacklistPlayerID.erase(blacklistSel);
+
+            if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
+                synchronized(Replay::replayEventMutex) {
+                    State.liveReplayEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
                 }
             }
-            else {
-                //Found this happens on game ending occasionally
-                //Log.Info(std::format("Client {} has left the game.", data->fields.Id));
-            }
+        }
+        else {
+            //Found this happens on game ending occasionally
+            //Log.Info(std::format("Client {} has left the game.", data->fields.Id));
         }
     }
     catch (...) {
@@ -963,6 +983,7 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
             if (aliveCount != 1) return;
             else endReason = GameOverReason__Enum::ImpostorByKill;
         }
+        if (State.TaskSpeedrun) return;
         if (IsHost() && State.TournamentMode) {
             bool impostorWin = false;
             switch (endReason) {
@@ -978,19 +999,19 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
                 auto friendCode = convert_from_string(p->fields.FriendCode);
                 if (impostorWin) {
                     if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
-                        UpdateTournamentPoints(p, 2); //AllImpsWin
+                        UpdatePoints(p, 2); //AllImpsWin
                         State.tournamentWinPoints[friendCode] += 1;
                     }
                     else if (PlayerIsImpostor(p)) {
-                        UpdateTournamentPoints(p, 1); //ImpWin
+                        UpdatePoints(p, 1); //ImpWin
                         State.tournamentWinPoints[friendCode] += 1;
                     }
                 }
                 else {
                     if (PlayerIsImpostor(p))
-                        UpdateTournamentPoints(p, 10); //ImpLose
+                        UpdatePoints(p, -1); //ImpLose
                     else {
-                        UpdateTournamentPoints(p, 7); //CrewWin
+                        UpdatePoints(p, 2); //CrewWin
                         State.tournamentWinPoints[friendCode] += 1;
                     }
                 }

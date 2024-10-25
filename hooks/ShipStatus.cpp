@@ -9,9 +9,20 @@
 
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_CalculateLightRadius executed");
+	if (IsHost() && State.TaskSpeedrun && State.GameLoaded && State.mapType != Settings::MapType::Airship)
+		State.SpeedrunTimer += Time_get_deltaTime(NULL);
 	switch (__this->fields.Type) {
 	case ShipStatus_MapType__Enum::Ship:
 		if (State.mapType != Settings::MapType::Airship) State.mapType = Settings::MapType::Ship;
+		if (State.FlipSkeld) {
+			GameOptions().SetByte(app::ByteOptionNames__Enum::MapId, 3);
+			auto gameOptionsManager = GameOptionsManager_get_Instance(NULL);
+			GameManager* gameManager = GameManager_get_Instance(NULL);
+			GameOptionsManager_set_GameHostOptions(gameOptionsManager, GameOptionsManager_get_CurrentGameOptions(gameOptionsManager, NULL), NULL);
+			LogicOptions_SyncOptions(GameManager_get_LogicOptions(gameManager, NULL), NULL);
+		}
+		if (GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) State.FlipSkeld = true;
+		else State.FlipSkeld = false;
 		break;
 	case ShipStatus_MapType__Enum::Hq:
 		State.mapType = Settings::MapType::Hq;
@@ -69,7 +80,7 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 
 void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, int32_t amount, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_RpcUpdateSystem executed");
-	if (!State.PanicMode && IsHost() && State.DisableSabotages) {
+	if (!State.PanicMode && IsHost() && (State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun))) {
 		return;
 	}
 	ShipStatus_RpcUpdateSystem(__this, systemType, amount, method);
@@ -77,39 +88,15 @@ void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemTyp
 
 void dShipStatus_RpcCloseDoorsOfType (ShipStatus* __this, SystemTypes__Enum type, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_RpcCloseDoorsOfType executed");
-	if (!State.PanicMode && State.DisableSabotages) {
+	if (!State.PanicMode && (State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun))) {
 		return;
 	}
 	ShipStatus_RpcCloseDoorsOfType(__this, type, method);
 }
 
-void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dGameStartManager_Update executed");
-	try {
-		if (State.HideCode && IsStreamerMode() && !State.PanicMode) {
-			std::string customCode = State.HideCode ? State.customCode : "******";
-			if (State.RgbLobbyCode)
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + customCode), NULL);
-			else
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(customCode), NULL);
-		}
-		else {
-			std::string LobbyCode = convert_from_string(InnerNet_GameCode_IntToGameName((*Game::pAmongUsClient)->fields._.GameId, NULL));
-			if (State.RgbLobbyCode && !State.PanicMode)
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + LobbyCode), NULL);
-			else
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode), NULL);
-		}
-	}
-	catch (...) {
-		LOG_ERROR("Exception occurred in GameStartManager_Update (ShipStatus)");
-	}
-	GameStartManager_Update(__this, method);
-}
-
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_HandleRpc executed");
-	if (IsHost() && (!State.PanicMode || State.BattleRoyale) && State.DisableSabotages && 
+	if (IsHost() && (!State.PanicMode && State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun)) &&
 		(callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem)) return;
 	ShipStatus_HandleRpc(__this, callId, reader, method);
 }

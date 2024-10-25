@@ -83,16 +83,26 @@ class PlayerSelection {
 			return _playerData;
 		}
 		constexpr bool is_LocalPlayer() const {
-#if _CONTAINER_DEBUG_LEVEL > 0
+/*#if _CONTAINER_DEBUG_LEVEL > 0
 			assert(has_value() && "is_LocalPlayer() called on empty result");
-#endif
-			return _playerControl->fields._.OwnerId == (*Game::pAmongUsClient)->fields._.ClientId;
+#endif*/
+			try {
+				return _playerControl->fields._.OwnerId == (*Game::pAmongUsClient)->fields._.ClientId;
+			}
+			catch (...) {
+				return false;
+			}
 		}
 		constexpr bool is_Disconnected() const {
-#if _CONTAINER_DEBUG_LEVEL > 0
+/*#if _CONTAINER_DEBUG_LEVEL > 0
 			assert(has_value() && "is_Disconnected() called on empty result");
-#endif
-			return _playerData->fields.Disconnected;
+#endif*/
+			try {
+				return _playerData->fields.Disconnected;
+			}
+			catch (...) {
+				return true;
+			}
 		}
 		constexpr bool equals(const Result& _Right) const noexcept {
 			if (!this->has_value() || !_Right.has_value()) return false;
@@ -231,7 +241,7 @@ void ShowHudNotification(std::string text);
 std::string GetCustomName(std::string name, bool forceUnique = false, uint8_t id = 0);
 std::vector<std::string> GetAllConfigs();
 bool CheckConfigExists(std::string configName);
-void UpdateTournamentPoints(NetworkedPlayerInfo* playerData, int reason);
+void UpdatePoints(NetworkedPlayerInfo* playerData, float points);
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason);
 
 /// <summary>

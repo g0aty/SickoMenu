@@ -1315,8 +1315,7 @@ void DoPolylineSimplification(std::vector<ImVec2>& inPoints, std::vector<std::ch
 
 float getMapXOffsetSkeld(float x)
 {
-	GameOptions options;
-	return (options.GetByte(app::ByteOptionNames__Enum::MapId) == 3) ? (-1) * x : x;
+	return (State.FlipSkeld && GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) ? x - 50.0f : x;
 }
 
 bool Object_1_IsNotNull(app::Object_1* obj)
@@ -1407,47 +1406,10 @@ bool CheckConfigExists(std::string configName) {
 	return std::filesystem::exists(settingsPath);
 }
 
-void UpdateTournamentPoints(NetworkedPlayerInfo* playerData, int reason) {
+void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
 	if (!IsHost() || !State.TournamentMode) return;
 	std::string friendCode = convert_from_string(playerData->fields.FriendCode);
-	switch (reason) {
-	case 0://Settings::PointReason::ImpKill:
-		if (State.tournamentKillCaps[friendCode] < 3.f) {
-			State.tournamentPoints[friendCode] += 1.f;
-			State.tournamentKillCaps[friendCode] += 1.f;
-		}
-		break;
-	case 1://Settings::PointReason::ImpWin:
-		State.tournamentPoints[friendCode] += 1.f;
-		break;
-	case 2://Settings::PointReason::AllImpsWin:
-		State.tournamentPoints[friendCode] += 2.f;
-		break;
-	case 3://Settings::PointReason::ImpVoteOut:
-		State.tournamentPoints[friendCode] -= 1.f;
-		break;
-	case 4://Settings::PointReason::CrewVoteOut:
-		State.tournamentPoints[friendCode] += 1.f;
-		break;
-	case 5://Settings::PointReason::ImpVoteOutCorrect:
-		State.tournamentPoints[friendCode] += 1.f;
-		break;
-	case 6://Settings::PointReason::ImpVoteOutIncorrect:
-		State.tournamentPoints[friendCode] -= 1.f;
-		break;
-	case 7://Settings::PointReason::CrewWin:
-		State.tournamentPoints[friendCode] += 1.f;
-		break;
-	case 8://Settings::PointReason::CorrectCallout:
-		State.tournamentPoints[friendCode] += 1.5f;
-		break;
-	case 9://Settings::PointReason::IncorrectCallout:
-		State.tournamentPoints[friendCode] -= 1.5f;
-		break;
-	case 10://Settings::PointReason::ImpLose:
-		State.tournamentPoints[friendCode] -= 1.f;
-		break;
-	}
+	State.tournamentPoints[friendCode] += points;
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {

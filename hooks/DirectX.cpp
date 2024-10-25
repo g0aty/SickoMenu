@@ -176,7 +176,6 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         }
     }
     if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) State.PanicMode = !State.PanicMode;
-
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 

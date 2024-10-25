@@ -33,7 +33,7 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 
 void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPlayers)
 {
-	if (State.BattleRoyale) return;
+	if (State.BattleRoyale || State.TaskSpeedrun) return;
 	for (size_t i = 0; i < State.assignedRolesPlayer.size(); i++)
 	{
 		auto role = State.assignedRoles[i];
@@ -66,7 +66,30 @@ void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPl
 
 void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2cpp::List<List_1_PlayerControl_>& allPlayers, std::vector<uint8_t>& assignedPlayers)
 {
-	if (!State.BattleRoyale) {
+	if (State.BattleRoyale) {
+		for (auto sender : GetAllPlayerControl()) {
+			for (auto receiver : GetAllPlayerControl()) {
+				auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), sender->fields._.NetId,
+					uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::None, receiver->fields._.OwnerId, NULL);
+				MessageWriter_WriteUShort(writer, uint16_t((sender == receiver || receiver == *Game::pLocalPlayer) ?
+					RoleTypes__Enum::Impostor : RoleTypes__Enum::Crewmate), NULL);
+				MessageWriter_WriteBoolean(writer, false, NULL);
+				InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+			}
+		}
+	}
+	else if (State.TaskSpeedrun) {
+		for (auto sender : GetAllPlayerControl()) {
+			for (auto receiver : GetAllPlayerControl()) {
+				auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), sender->fields._.NetId,
+					uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::None, receiver->fields._.OwnerId, NULL);
+				MessageWriter_WriteUShort(writer, uint16_t(RoleTypes__Enum::Crewmate), NULL);
+				MessageWriter_WriteBoolean(writer, false, NULL);
+				InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+			}
+		}
+	}
+	else {
 		GameOptions options;
 		auto roleCount = roleRates.GetRoleCount(role);
 		auto playerAmount = allPlayers.size();
@@ -131,18 +154,6 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 			}
 			if (sanityCheck == 0)
 				STREAM_ERROR("Sanity check failed, could not assign roles to all players (roleCount " << roleCount << ", playerAmount " << playerAmount << ")");
-		}
-	}
-	else {
-		for (auto sender : GetAllPlayerControl()) {
-			for (auto receiver : GetAllPlayerControl()) {
-				auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), sender->fields._.NetId,
-					uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::None, receiver->fields._.OwnerId, NULL);
-				MessageWriter_WriteUShort(writer, uint16_t((sender == receiver || receiver == *Game::pLocalPlayer) ?
-					RoleTypes__Enum::Impostor : RoleTypes__Enum::Crewmate), NULL);
-				MessageWriter_WriteBoolean(writer, false, NULL);
-				InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-			}
 		}
 	}
 }

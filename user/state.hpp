@@ -47,6 +47,7 @@ public:
     bool SetName = false;
     bool SafeMode = true;
     bool UnlockCosmetics = true;
+    int GameFPS = 60;
     bool SpoofLevel = false;
     int FakeLevel = 1;
     bool ShowKeybinds = true;
@@ -89,6 +90,9 @@ public:
     bool DisableSabotages = false;
     bool DisableKills = false;
     bool BattleRoyale = false;
+    bool TaskSpeedrun = false;
+    float SpeedrunTimer = 0.f;
+    int GameMode = 0;
     bool NoGameEnd = false;
     bool ChatSpam = false;
     bool ChatSpamEveryone = false;
@@ -111,6 +115,7 @@ public:
     bool AbbreviatedRoleNames = false;
     bool PlayerColoredDots = false;
     bool ShowPlayerInfo = false;
+    bool ShowLobbyInfo = false;
     float PrevKillDistance = 0.f;
     float KillDistance = 0.f;
     float GameKillDistance = 0.f;
@@ -151,6 +156,7 @@ public:
     bool SeeVanishedPlayers = false;
     bool CycleInMeeting = true;
     bool CycleBetweenPlayers = false;
+    bool CycleBetweenOutfits = false;
 
     bool NoClip = false;
     bool HotkeyNoClip = false;
@@ -177,6 +183,9 @@ public:
     bool AlwaysUseKillExploit = false;
     bool AutoCopyLobbyCode = false;
     bool DisableLobbyMusic = false;
+    bool ReportOnMurder = false;
+    bool PreventSelfReport = true;
+    bool AutoRejoin = false;
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
@@ -339,7 +348,9 @@ public:
     bool ShowUnityLogs = true;
     bool ShowHookLogs = false;
 
-    int LobbyTimer = -1;
+    float LobbyTimer = 600.f;
+    bool ShowLobbyTimer = false;
+    bool JoinedAsHost = false;
     float ChatCooldown = 0.f;
     bool MessageSent = false;
     bool ChatFocused = false;
@@ -355,6 +366,7 @@ public:
     std::string customCode = "SICKOS";
     bool HideCode = false;
     bool RgbLobbyCode = false;
+    std::map<std::string, std::map<std::string, std::string>> playerOutfits = {};
 
     bool PanicMode = false;
     bool TempPanicMode = false; //prevent instant crash on joining lobby
@@ -376,6 +388,8 @@ public:
     std::vector<std::string> tournamentAliveImpostors;
     std::vector<std::string> tournamentCallers;
     std::vector<std::string> tournamentCalledOut;
+    std::map<std::string, Game::PlayerId> tournamentCorrectCallers;
+    std::vector<Game::PlayerId> tournamentAllTasksCompleted;
     bool tournamentFirstMeetingOver = false;
 
     enum class MapType : uint8_t
@@ -410,6 +424,9 @@ public:
     bool IsPreHosting = false;
     bool GameLoaded = false;
     Game::PlayerId VoteOffPlayerId = Game::HasNotVoted;
+    bool LevelFarm = false;
+    bool AutoStartGame = false;
+    int AutoStartTimer = 60;
 
     bool AutoOpenDoors = false;
 
@@ -418,7 +435,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_pr2";
+    std::string SickoVersion = "v4.0_rc1";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
@@ -451,6 +468,8 @@ public:
     std::vector<Game::PlayerId> WhitelistPlayerID = {};
     std::vector<std::string> BlacklistPUID = {};
     std::vector<Game::PlayerId> BlacklistPlayerID = {};
+
+    std::vector<Game::PlayerId> AllPlayersID = {};
 
     void Load();
     void Save();

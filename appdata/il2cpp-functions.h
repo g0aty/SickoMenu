@@ -359,3 +359,11 @@ DO_APP_FUNC(void, PlayerControl_RpcSendChatNote, (PlayerControl* __this, uint8_t
 DO_APP_FUNC(void, MeetingHud_RpcVotingComplete, (MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcVotingComplete(MeetingHud.VoterState[], NetworkedPlayerInfo, System.Boolean)");
 DO_APP_FUNC(bool, AccountManager_CanPlayOnline, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean AccountManager::CanPlayOnline()");
 DO_APP_FUNC(void, SoundManager_StopSound, (SoundManager* __this, AudioClip* clip, MethodInfo* method), "Assembly-CSharp, System.Void SoundManager::StopSound(UnityEngine.AudioClip)");
+DO_APP_FUNC(void, Application_set_targetFrameRate, (int32_t value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Application::set_targetFrameRate(System.Int32)");
+//DO_APP_FUNC(PlayerControl*, Object_1_Instantiate_29, (PlayerControl* original, MethodInfo* method), "UnityEngine.CoreModule, PlayerControl UnityEngine.Object::Instantiate<PlayerControl>(PlayerControl)");
+DO_APP_FUNC(NetworkedPlayerInfo*, GameData_AddPlayer, (GameData* __this, PlayerControl* pc, ClientData* client, MethodInfo* method), "Assembly-CSharp, NetworkedPlayerInfo GameData::AddPlayer(PlayerControl, InnerNet.ClientData)");
+DO_APP_FUNC(void, InnerNetClient_Spawn, (InnerNetClient* __this, InnerNetObject* netObjParent, int32_t ownerId, SpawnFlags__Enum flags, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::Spawn(InnerNet.InnerNetObject, System.Int32, InnerNet.SpawnFlags)");
+DO_APP_FUNC(void, MatchMakerGameButton_SetGame, (MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method), "Assembly-CSharp, System.Void MatchMakerGameButton::SetGame(InnerNet.GameListing)");
+DO_APP_FUNC(void, ModManager_LateUpdate, (ModManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void ModManager::LateUpdate()");
+DO_APP_FUNC(void, EndGameNavigation_ShowDefaultNavigation, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Void EndGameNavigation::ShowDefaultNavigation()");
+DO_APP_FUNC(void*, EndGameNavigation_CoJoinGame, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator EndGameNavigation::CoJoinGame()");

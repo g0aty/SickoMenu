@@ -10626,6 +10626,62 @@ namespace app
     };
 #pragma endregion
 
+#pragma region GameListing
+    struct GameListing {
+        uint32_t IP;
+        uint16_t Port;
+        int32_t GameId;
+        uint8_t PlayerCount;
+        struct String* HostName;
+        struct String* HostPlatformName;
+#if defined(_CPLUSPLUS_)
+        Platforms__Enum Platform;
+#else
+        int32_t Platform;
+#endif
+        int32_t Age;
+        int32_t MaxPlayers;
+        int32_t NumImpostors;
+        uint8_t MapId;
+        uint32_t Language;
+    };
+#pragma endregion
+
+#pragma region ModManager
+    struct ModManager__Fields {
+        void* _;
+        struct SpriteRenderer* ModStamp;
+        struct Camera* localCamera;
+    };
+
+    struct ModManager {
+        struct ModManager__Class* klass;
+        MonitorData* monitor;
+        struct ModManager__Fields fields;
+    };
+
+    struct ModManager__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData OnDestroy;
+    };
+
+    struct ModManager__StaticFields {
+    };
+
+    struct ModManager__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct ModManager__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ModManager__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ActivityManager;
@@ -10648,4 +10704,6 @@ namespace app
     typedef Il2CppObject AbstractSaveData;
     typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
     typedef Il2CppObject NotificationPopper;
+    typedef Il2CppObject MatchMakerGameButton;
+    typedef Il2CppObject EndGameNavigation;
 }

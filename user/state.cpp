@@ -74,6 +74,7 @@ void Settings::Load() {
         JSON_TRYGET("MenuGradientColor2_B", this->MenuGradientColor2.z);
         JSON_TRYGET("MenuGradientColor2_A", this->MenuGradientColor2.w);
         JSON_TRYGET("UnlockCosmetics", this->UnlockCosmetics);
+        JSON_TRYGET("GameFPS", this->GameFPS);
         JSON_TRYGET("ShowKeybinds", this->ShowKeybinds);
         JSON_TRYGET("KeybindsWhileChatting", this->KeybindsWhileChatting);
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
@@ -93,9 +94,11 @@ void Settings::Load() {
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
         JSON_TRYGET("CycleBetweenPlayers", this->CycleBetweenPlayers);
+        //JSON_TRYGET("CycleBetweenOutfits", this->CycleBetweenOutfits);
         JSON_TRYGET("CycleInMeeting", this->CycleInMeeting);
         JSON_TRYGET("CycleTimer", this->CycleTimer);
         JSON_TRYGET("CyclerUserNames", this->cyclerUserNames);
+        //JSON_TRYGET("playerOutfits", this->playerOutfits);
         JSON_TRYGET("HostUsername", this->hostUserName);
         JSON_TRYGET("ChatMessage", this->chatMessage);
         JSON_TRYGET("CycleName", this->CycleName);
@@ -162,6 +165,7 @@ void Settings::Load() {
         JSON_TRYGET("AbbreviatedRoleNames", this->AbbreviatedRoleNames);
         JSON_TRYGET("PlayerColoredDots", this->PlayerColoredDots);
         JSON_TRYGET("ShowPlayerInfo", this->ShowPlayerInfo);
+        JSON_TRYGET("ShowLobbyInfo", this->ShowLobbyInfo);
         JSON_TRYGET("ChatAlwaysActive", this->ChatAlwaysActive);
         JSON_TRYGET("ReadGhostMessages", this->ReadGhostMessages);
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
@@ -199,6 +203,9 @@ void Settings::Load() {
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
         JSON_TRYGET("AutoCopyLobbyCode", this->AutoCopyLobbyCode);
         JSON_TRYGET("DisableLobbyMusic", this->DisableLobbyMusic);
+        JSON_TRYGET("ReportOnMurder", this->ReportOnMurder);
+        JSON_TRYGET("PreventSelfReport", this->PreventSelfReport);
+        //JSON_TRYGET("AutoRejoin", this->AutoRejoin);
         JSON_TRYGET("NoClip", this->NoClip);
         JSON_TRYGET("KillInLobbies", this->KillInLobbies);
         JSON_TRYGET("KillInVanish", this->KillInVanish);
@@ -238,6 +245,7 @@ void Settings::Load() {
         JSON_TRYGET("HideCode", this->HideCode);
         JSON_TRYGET("RgbLobbyCode", this->RgbLobbyCode);
 
+        JSON_TRYGET("ShowLobbyTimer", this->ShowLobbyTimer);
         JSON_TRYGET("SickoDetection", this->SickoDetection);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
@@ -324,6 +332,7 @@ void Settings::Save() {
                 { "MenuGradientColor2_B", this->MenuGradientColor2.z },
                 { "MenuGradientColor2_A", this->MenuGradientColor2.w },
                 { "UnlockCosmetics", this->UnlockCosmetics },
+                { "GameFPS", this->GameFPS },
                 { "ShowKeybinds", this->ShowKeybinds },
                 { "KeybindsWhileChatting", this->KeybindsWhileChatting },
                 { "SpoofLevel", this->SpoofLevel },
@@ -343,9 +352,11 @@ void Settings::Save() {
                 { "SelectedColorId", this->SelectedColorId },
                 { "SnipeColor", this->SnipeColor },
                 { "CycleBetweenPlayers", this->CycleBetweenPlayers },
+                //{ "CycleBetweenOutfits", this->CycleBetweenOutfits },
                 { "CycleInMeeting", this->CycleInMeeting },
                 { "CycleTimer", this->CycleTimer },
                 { "CyclerUserNames", this->cyclerUserNames },
+                //{ "playerOutfits", this->playerOutfits },
                 { "HostUsername", this->hostUserName },
                 { "ChatMessage", this->chatMessage },
                 { "CycleName", this->CycleName },
@@ -412,6 +423,7 @@ void Settings::Save() {
                 { "AbbreviatedRoleNames", this->AbbreviatedRoleNames },
                 { "PlayerColoredDots", this->PlayerColoredDots },
                 { "ShowPlayerInfo", this->ShowPlayerInfo },
+                { "ShowLobbyInfo", this->ShowLobbyInfo },
                 { "ChatAlwaysActive", this->ChatAlwaysActive },
                 { "ReadGhostMessages", this->ReadGhostMessages },
                 { "ReadAndSendAumChat", this->ReadAndSendAumChat },
@@ -449,6 +461,9 @@ void Settings::Save() {
                 { "DoTasksAsImpostor", this->DoTasksAsImpostor },
                 { "AutoCopyLobbyCode", this->AutoCopyLobbyCode },
                 { "DisableLobbyMusic", this->DisableLobbyMusic },
+                { "ReportOnMurder", this->ReportOnMurder },
+                { "PreventSelfReport", this->PreventSelfReport },
+                //{ "AutoRejoin", this->AutoRejoin },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
                 { "KillInVanish", this->KillInVanish },
@@ -485,6 +500,9 @@ void Settings::Save() {
                 { "HideCode", this->HideCode },
                 { "RgbLobbyCode", this->RgbLobbyCode },
 
+                { "ShowLobbyTimer", this->ShowLobbyTimer },
+                { "AutoStartGame", this->AutoStartGame },
+                { "AutoStartTimer", this->AutoStartTimer },
                 { "SickoDetection", this->SickoDetection },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
