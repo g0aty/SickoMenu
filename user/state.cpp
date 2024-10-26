@@ -57,6 +57,7 @@ void Settings::Load() {
 #ifdef _DEBUG
         JSON_TRYGET("ShowDebug", this->showDebugTab);
 #endif
+        JSON_TRYGET("dpiScale", this->dpiScale);
         JSON_TRYGET("RgbTheme", this->RgbMenuTheme);
         JSON_TRYGET("GradientTheme", this->GradientMenuTheme);
         JSON_TRYGET("MatchBackgroundWithTheme", this->MatchBackgroundWithTheme);
@@ -251,6 +252,7 @@ void Settings::Load() {
         JSON_TRYGET("SickoDetection", this->SickoDetection);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
+        JSON_TRYGET("SpectatorMode", this->SpectatorMode);
 
         JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
@@ -278,6 +280,9 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckSabotage", this->SMAC_CheckSabotage);
         JSON_TRYGET("SMAC_HighLevel", this->SMAC_HighLevel);
         JSON_TRYGET("SMAC_LowLevel", this->SMAC_LowLevel);
+        JSON_TRYGET("SMAC_CheckBadWords", this->SMAC_CheckBadWords);
+        JSON_TRYGET("SMAC_BadWords", this->SMAC_BadWords);
+        JSON_TRYGET("ChatPresets", this->ChatPresets);
         
         JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
@@ -319,6 +324,7 @@ void Settings::Save() {
         #ifdef _DEBUG
                 { "ShowDebug", this->showDebugTab },
         #endif
+                { "dpiScale", this->dpiScale },
                 { "RgbTheme", this->RgbMenuTheme },
                 { "GradientTheme", this->GradientMenuTheme },
                 { "MatchBackgroundWithTheme", this->MatchBackgroundWithTheme },
@@ -512,6 +518,7 @@ void Settings::Save() {
                 { "SickoDetection", this->SickoDetection },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
+                { "SpectatorMode", this->SpectatorMode },
 
                 { "Enable_SMAC", this->Enable_SMAC },
                 { "SMAC_Punishment", this->SMAC_Punishment },
@@ -539,6 +546,9 @@ void Settings::Save() {
                 { "SMAC_CheckSabotage", this->SMAC_CheckSabotage },
                 { "SMAC_HighLevel", this->SMAC_HighLevel },
                 { "SMAC_LowLevel", this->SMAC_LowLevel },
+                { "SMAC_CheckBadWords", this->SMAC_CheckBadWords },
+                { "SMAC_BadWords", this->SMAC_BadWords },
+                { "ChatPresets", this->ChatPresets },
                 { "WhitelistFriendCodes", this->WhitelistFriendCodes },
                 { "BlacklistFriendCodes", this->BlacklistFriendCodes },
             };

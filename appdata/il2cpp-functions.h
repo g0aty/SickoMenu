@@ -366,6 +366,7 @@ DO_APP_FUNC(NetworkedPlayerInfo*, GameData_AddPlayer, (GameData* __this, PlayerC
 DO_APP_FUNC(void, InnerNetClient_Spawn, (InnerNetClient* __this, InnerNetObject* netObjParent, int32_t ownerId, SpawnFlags__Enum flags, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::Spawn(InnerNet.InnerNetObject, System.Int32, InnerNet.SpawnFlags)");
 DO_APP_FUNC(void, MatchMakerGameButton_SetGame, (MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method), "Assembly-CSharp, System.Void MatchMakerGameButton::SetGame(InnerNet.GameListing)");
 DO_APP_FUNC(void, ModManager_LateUpdate, (ModManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void ModManager::LateUpdate()");
+DO_APP_FUNC(void, ModManager_ShowModStamp, (ModManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void ModManager::ShowModStamp()");
 DO_APP_FUNC(void, EndGameNavigation_ShowDefaultNavigation, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Void EndGameNavigation::ShowDefaultNavigation()");
 DO_APP_FUNC(void*, EndGameNavigation_CoJoinGame, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator EndGameNavigation::CoJoinGame()");
 DO_APP_FUNC(PlayerBodyTypes__Enum, HideAndSeekManager_GetBodyType, (HideAndSeekManager* __this, PlayerControl* player, MethodInfo* method), "Assembly-CSharp, PlayerBodyTypes HideAndSeekManager::GetBodyType(PlayerControl)");

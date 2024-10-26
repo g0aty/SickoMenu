@@ -264,6 +264,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 								auto transform = app::GameObject_get_transform(__this->fields.SkippedVoting, nullptr);
 								MeetingHud_BloopAVoteIcon(__this, playerData, 0, transform, nullptr);
 							}
+							RevealAnonymousVotes();
 						}
 					}
 					else if (!didVote && State.voteMonitor.find(playerData->fields.PlayerId) != State.voteMonitor.end())
@@ -313,7 +314,8 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 		}
 		il2cpp::Array playerStates(__this->fields.playerStates);
 		for (auto voteArea : playerStates) {
-			auto col = (!State.PanicMode && State.DarkMode)
+			std::string namePlate = convert_from_string(GetPlayerOutfit(GetPlayerDataById(voteArea->fields.TargetPlayerId))->fields.NamePlateId);
+			auto col = (!State.PanicMode && State.DarkMode && (namePlate == "" || namePlate == "nameplate_NoPlate"))
 				? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
 			SpriteRenderer_set_color(voteArea->fields.Background, col, NULL);
 		}
@@ -342,8 +344,5 @@ void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Ar
 }
 
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
-	if (!State.PanicMode) {
-		if (State.InMeeting && State.RevealAnonymousVotes) return true;
-	}
 	return LogicOptions_GetAnonymousVotes(__this, method);
 }

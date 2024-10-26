@@ -92,6 +92,7 @@ public:
     bool BattleRoyale = false;
     bool TaskSpeedrun = false;
     float SpeedrunTimer = 0.f;
+    bool SpeedrunOver = false;
     int GameMode = 0;
     bool NoGameEnd = false;
     bool ChatSpam = false;
@@ -377,6 +378,7 @@ public:
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
     bool TournamentMode = false;
+    bool SpectatorMode = false;
 
     std::unordered_set<std::string> Friends;
     std::unordered_set<Game::PlayerId> InGameFriends;
@@ -419,6 +421,7 @@ public:
     };
 
     bool CanChangeOutfit = false;
+    bool MainMenuLoaded = false;
     uint8_t OutfitCooldown = 50;
     RoleTypes__Enum RealRole = RoleTypes__Enum::Crewmate;
     DisconnectReasons__Enum LastDisconnectReason = DisconnectReasons__Enum::Unknown;
@@ -437,7 +440,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_rc2";
+    std::string SickoVersion = "v4.0_rc3";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
@@ -466,6 +469,10 @@ public:
     int SMAC_HighLevel = 10000;
     int SMAC_LowLevel = 0;
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
+    bool SMAC_CheckBadWords = true;
+    std::vector<std::string> SMAC_BadWords = {};
+
+    std::vector<std::string> ChatPresets = {};
 
     std::vector<std::string> WhitelistFriendCodes = {};
     std::vector<std::string> BlacklistFriendCodes = {};

@@ -34,6 +34,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 		State.mapType = Settings::MapType::Fungle;
 		break;
 	}
+
 	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
 	else

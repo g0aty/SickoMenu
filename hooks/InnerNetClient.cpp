@@ -49,8 +49,7 @@ static void onGameEnd() {
         State.tournamentCalledOut.clear();
         State.tournamentCorrectCallers.clear();
         State.tournamentAllTasksCompleted.clear();
-
-        State.selectedPlayers = {};
+        State.SpeedrunOver = false;
 
         drawing_t& instance = Esp::GetDrawing();
         synchronized(instance.m_DrawingMutex) {

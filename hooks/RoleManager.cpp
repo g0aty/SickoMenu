@@ -103,12 +103,10 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		if (options.GetGameMode() == GameModes__Enum::HideNSeek && role == RoleTypes__Enum::Engineer)
 			roleCount = allPlayers.size() - 1;
 
-		if (roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter) + roleRates.GetRoleCount(RoleTypes__Enum::Phantom) > maxImpostorAmount) {
-			if (role == RoleTypes__Enum::Shapeshifter && roleCount >= maxImpostorAmount)
-				roleCount = int(maxImpostorAmount / 2);
-			if (role == RoleTypes__Enum::Phantom && roleCount >= maxImpostorAmount)
-				roleCount = maxImpostorAmount - int(maxImpostorAmount / 2);
-		}
+		if (role == RoleTypes__Enum::Shapeshifter && roleCount >= int(maxImpostorAmount / 2))
+			roleCount = maxImpostorAmount; //In previous version, sicko would assign more imps than MaxImposterAmount based on shapeshifter amount.
+		if (role == RoleTypes__Enum::Phantom && roleCount >= (maxImpostorAmount - int(maxImpostorAmount / 2)))
+			roleCount = maxImpostorAmount - int(maxImpostorAmount / 2); //In previous version, sicko would assign more imps than MaxImposterAmount based on phantom amount.
 
 		if (roleCount < 1)
 			return;

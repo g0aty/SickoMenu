@@ -205,6 +205,9 @@ namespace HostTab {
 					}
 				}
 
+				if (ToggleButton("Spectator Mode", &State.SpectatorMode))
+					State.Save();
+
 				if (ToggleButton("Show Lobby Timer", &State.ShowLobbyTimer))
 					State.Save();
 

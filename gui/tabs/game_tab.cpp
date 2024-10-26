@@ -274,7 +274,7 @@ namespace GameTab {
             if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) {
                 State.Save();
             }
-            if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f) {
+            if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && State.chatMessage.size() <= 120) {
                 ImGui::SameLine();
                 if (ImGui::Button("Send"))
                 {
@@ -314,6 +314,31 @@ namespace GameTab {
             }
             if (CustomListBoxInt("Chat Spam Mode", &State.ChatSpamMode, 
                 { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
+
+            if (std::find(State.ChatPresets.begin(), State.ChatPresets.end(), State.chatMessage) == State.ChatPresets.end() && ImGui::Button("Add Message as Preset")) {
+                State.ChatPresets.push_back(State.chatMessage);
+                State.Save();
+            }
+            if (!(IsHost() || !State.SafeMode) && State.chatMessage.size() > 120) {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Message will be detected by anticheat.");
+            }
+            if (!State.ChatPresets.empty()) {
+                static int selectedPresetIndex = 0;
+                selectedPresetIndex = std::clamp(selectedPresetIndex, 0, (int)State.ChatPresets.size() - 1);
+                std::vector<const char*> presetVector(State.ChatPresets.size(), nullptr);
+                for (size_t i = 0; i < State.ChatPresets.size(); i++) {
+                    presetVector[i] = State.ChatPresets[i].c_str();
+                }
+                CustomListBoxInt("Message to Send/Remove", &selectedPresetIndex, presetVector);
+                auto msg = State.ChatPresets[selectedPresetIndex];
+                if (ImGui::Button("Set as Chat Message"))
+                {
+                    State.chatMessage = msg;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Remove"))
+                    State.ChatPresets.erase(State.ChatPresets.begin() + selectedPresetIndex);
+            }
         }
 
         if (openAnticheat) {
@@ -372,6 +397,31 @@ namespace GameTab {
             }
             if (ToggleButton("Detect Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
             if (ToggleButton("Detect Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
+            if (ToggleButton("Detect Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
+            if (State.SMAC_CheckBadWords) {
+                if (State.SMAC_BadWords.empty())
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No bad words added!");
+                static std::string newWord = "";
+                InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
+                ImGui::SameLine();
+                if (ImGui::Button("Add Word")) {
+                    State.SMAC_BadWords.push_back(newWord);
+                    State.Save();
+                    newWord = "";
+                }
+                if (!State.SMAC_BadWords.empty()) {
+                    static int selectedWordIndex = 0;
+                    selectedWordIndex = std::clamp(selectedWordIndex, 0, (int)State.SMAC_BadWords.size() - 1);
+                    std::vector<const char*> wordVector(State.SMAC_BadWords.size(), nullptr);
+                    for (size_t i = 0; i < State.SMAC_BadWords.size(); i++) {
+                        wordVector[i] = State.SMAC_BadWords[i].c_str();
+                    }
+                    CustomListBoxInt("Word to Delete", &selectedWordIndex, wordVector);
+                    ImGui::SameLine();
+                    if (ImGui::Button("Delete"))
+                        State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
+                }
+            }
         }
 
         if (openOptions) {

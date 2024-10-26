@@ -219,7 +219,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Dark Mode (Chat Only)", &State.DarkMode)) State.Save();
+            if (ToggleButton("Dark Mode", &State.DarkMode)) State.Save();
 
             if (ToggleButton("Show Host", &State.ShowHost)) {
                 State.Save();

@@ -54,6 +54,16 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 			if (State.SMAC_CheckChat && ((IsInGame() && !State.InMeeting && !player->fields.IsDead) || chatText->fields.m_stringLength > 120)) {
 				SMAC_OnCheatDetected(sourcePlayer, "Abnormal Chat");
 			}
+			if (State.SMAC_CheckBadWords) {
+				std::string lowerMessage = strToLower(message);
+				for (auto word : State.SMAC_BadWords) {
+					std::string lowerWord = strToLower(word);
+					if (lowerMessage.starts_with(lowerWord) || lowerMessage.find(lowerWord) != std::string::npos || lowerMessage.ends_with(lowerWord)) {
+						SMAC_OnCheatDetected(sourcePlayer, "Bad Word: " + word);
+						break;
+					}
+				}
+			}
 		}
 		auto playerFc = convert_from_string(player->fields.FriendCode);
 		if (IsHost() && IsInGame() && State.TournamentMode && message.substr(0, 8) == "callout ") {

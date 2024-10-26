@@ -238,12 +238,19 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						UpdatePoints(playerData, 1);
 						State.tournamentAllTasksCompleted.push_back(playerData->fields.PlayerId);
 					}
-					if (IsHost() && State.TaskSpeedrun) {
-						PlayerControl_RpcSetRole(__this, RoleTypes__Enum::ImpostorGhost, false, NULL);
-						std::string playerName = convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName);
+					if (IsHost() && State.TaskSpeedrun && !State.SpeedrunOver) {
 						int speedrunTimer = int(State.SpeedrunTimer);
 						std::string timerDisplay = std::format("<#fff>{} <#0f0>({}:{}{})</color></color>", playerName, int(speedrunTimer / 60), speedrunTimer % 60 < 10 ? "0" : "", speedrunTimer % 60);
 						PlayerControl_RpcSetName(__this, convert_to_string(timerDisplay), NULL);
+						for (auto receiver : GetAllPlayerControl()) {
+							auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
+								uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::None, receiver->fields._.OwnerId, NULL);
+							MessageWriter_WriteUShort(writer, uint16_t(RoleTypes__Enum::ImpostorGhost), NULL);
+							MessageWriter_WriteBoolean(writer, false, NULL);
+							InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+						}
+						std::string playerName = convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName);
+						State.SpeedrunOver = true; //prevent duplicate timer
 						GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorByKill, false, NULL);
 					}
 				}
@@ -786,6 +793,11 @@ void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method) {
 			for (auto p : GetAllPlayerControl()) {
 				if (p != *Game::pLocalPlayer) RoleManager_SetRole(Game::RoleManager.GetInstance(), p, RoleTypes__Enum::Crewmate, NULL);
 			}
+		}
+
+		if (State.SpectatorMode && (GetNormalPlayerTasks(*Game::pLocalPlayer).size() != 0 || GetPlayerData(*Game::pLocalPlayer)->fields.RoleType != RoleTypes__Enum::CrewmateGhost)) {
+			PlayerControl_RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::ImpostorGhost, false, NULL);
+			PlayerControl_RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::CrewmateGhost, false, NULL);
 		}
 	}
 	catch (...) {
