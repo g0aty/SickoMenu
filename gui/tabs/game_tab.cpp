@@ -156,10 +156,10 @@ namespace GameTab {
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            if (ImGui::Button("Spawn Dummy")) {
+            /*if (ImGui::Button("Spawn Dummy")) {
                 if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy());
                 if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy());
-            }
+            }*/
             if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
                 if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
@@ -398,12 +398,6 @@ namespace GameTab {
                 if (State.SpoofCrashLevel) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Zero Level = Crash Server"));
                 State.Save();
             }*/
-            {
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ("\nFuck exploits is here!"));
-                State.Save();
-
-            }
         }
 
         if (openOptions) {
