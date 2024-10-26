@@ -104,51 +104,51 @@ void KeyBinds::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     PrevKeyState = KeyState;
     switch (uMsg) {
-        case WM_LBUTTONDOWN: case WM_LBUTTONDBLCLK:
-        case WM_RBUTTONDOWN: case WM_RBUTTONDBLCLK:
-        case WM_MBUTTONDOWN: case WM_MBUTTONDBLCLK:
-        case WM_XBUTTONDOWN: case WM_XBUTTONDBLCLK:
-        {
-            uint8_t mouseButton = 0;
+    case WM_LBUTTONDOWN: case WM_LBUTTONDBLCLK:
+    case WM_RBUTTONDOWN: case WM_RBUTTONDBLCLK:
+    case WM_MBUTTONDOWN: case WM_MBUTTONDBLCLK:
+    case WM_XBUTTONDOWN: case WM_XBUTTONDBLCLK:
+    {
+        uint8_t mouseButton = 0;
 
-            if (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK) { mouseButton = 0x01; }
-            if (uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONDBLCLK) { mouseButton = 0x02; }
-            if (uMsg == WM_MBUTTONDOWN || uMsg == WM_MBUTTONDBLCLK) { mouseButton = 0x04; }
-            if (uMsg == WM_XBUTTONDOWN || uMsg == WM_XBUTTONDBLCLK) { mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 0x05 : 0x06; }
-            KeyState[mouseButton] = true;
-            return;
-        }
-        case WM_LBUTTONUP:
-        case WM_RBUTTONUP:
-        case WM_MBUTTONUP:
-        case WM_XBUTTONUP:
-        {
-            uint8_t mouseButton = 0;
+        if (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK) { mouseButton = 0x01; }
+        if (uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONDBLCLK) { mouseButton = 0x02; }
+        if (uMsg == WM_MBUTTONDOWN || uMsg == WM_MBUTTONDBLCLK) { mouseButton = 0x04; }
+        if (uMsg == WM_XBUTTONDOWN || uMsg == WM_XBUTTONDBLCLK) { mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 0x05 : 0x06; }
+        KeyState[mouseButton] = true;
+        return;
+    }
+    case WM_LBUTTONUP:
+    case WM_RBUTTONUP:
+    case WM_MBUTTONUP:
+    case WM_XBUTTONUP:
+    {
+        uint8_t mouseButton = 0;
 
-            if (uMsg == WM_LBUTTONUP) { mouseButton = 0x01; }
-            if (uMsg == WM_RBUTTONUP) { mouseButton = 0x02; }
-            if (uMsg == WM_MBUTTONUP) { mouseButton = 0x04; }
-            if (uMsg == WM_XBUTTONUP) { mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 0x05 : 0x06; }
-            KeyState[mouseButton] = false;
-            return;
-        }
-        case WM_KEYDOWN:
-        case WM_SYSKEYDOWN:
-        {
-            if (wParam < 256)
-                KeyState[wParam] = true;
-            return;
-        }
-        case WM_KEYUP:
-        case WM_SYSKEYUP:
-        {
-            if (wParam < 256)
-                KeyState[wParam] = false;
-            return;
-        }
-        case WM_KILLFOCUS:
-            KeyState.reset();
-            break;
+        if (uMsg == WM_LBUTTONUP) { mouseButton = 0x01; }
+        if (uMsg == WM_RBUTTONUP) { mouseButton = 0x02; }
+        if (uMsg == WM_MBUTTONUP) { mouseButton = 0x04; }
+        if (uMsg == WM_XBUTTONUP) { mouseButton = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 0x05 : 0x06; }
+        KeyState[mouseButton] = false;
+        return;
+    }
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+    {
+        if (wParam < 256)
+            KeyState[wParam] = true;
+        return;
+    }
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+    {
+        if (wParam < 256)
+            KeyState[wParam] = false;
+        return;
+    }
+    case WM_KILLFOCUS:
+        KeyState.reset();
+        break;
     }
 }
 
@@ -200,6 +200,8 @@ void KeyBinds::to_json(nlohmann::ordered_json& j, KeyBinds::Config value)
         {"Toggle_Freecam", value.Toggle_Freecam},
         {"Close_Current_Room_Door", value.Close_Current_Room_Door},
         {"Toggle_Replay", value.Toggle_Replay},
+        {"Toggle_ChatAlwaysActive", value.Toggle_ChatAlwaysActive},
+        {"Toggle_ReadGhostMessages", value.Toggle_ReadGhostMessages},
         {"Toggle_Hud", value.Toggle_Hud},
         {"Reset_Appearance", value.Reset_Appearance},
         {"Randomize_Appearance", value.Randomize_Appearance},
@@ -221,6 +223,8 @@ void KeyBinds::from_json(const nlohmann::ordered_json& j, KeyBinds::Config& valu
     j.at("Toggle_Freecam").get_to(value.Toggle_Freecam);
     j.at("Close_Current_Room_Door").get_to(value.Close_Current_Room_Door);
     j.at("Toggle_Replay").get_to(value.Toggle_Replay);
+    j.at("Toggle_ChatAlwaysActive").get_to(value.Toggle_ChatAlwaysActive);
+    j.at("Toggle_ReadGhostMessages").get_to(value.Toggle_ReadGhostMessages);
     j.at("Toggle_Hud").get_to(value.Toggle_Hud);
     j.at("Reset_Appearance").get_to(value.Reset_Appearance);
     j.at("Randomize_Appearance").get_to(value.Randomize_Appearance);
