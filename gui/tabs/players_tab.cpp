@@ -1185,17 +1185,17 @@ namespace PlayersTab {
 			}
 			if (openPUID && selectedPlayer.has_value()) {
 				ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
-				if (convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid) != "" && ImGui::Button("Steal Data")) {
+				if (ImGui::Button("Steal Data")) {
 					State.FakePuid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
 					State.FakeFriendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
 					State.Save();
 				}
 				ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
-				if (InputString(" PUID", &State.FakePuid)) State.Save(); {
-					State.Save();
+				if (InputString(" PUID", &State.FakePuid)) {
+				}
+				{
 					ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
-					if (InputString(" Friend Code", &State.FakeFriendCode)) State.Save(); {
-						State.Save();
+					if (InputString(" Friend Code", &State.FakeFriendCode)) {
 					}
 				}
 			}
