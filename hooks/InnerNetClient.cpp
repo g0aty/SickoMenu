@@ -15,9 +15,6 @@ static void onGameEnd() {
         LOG_DEBUG("Reset All");
         Replay::Reset();
         State.modUsers.clear();
-        State.AllPlayersID.clear();
-        State.WhitelistPlayerID.clear();
-        State.BlacklistPlayerID.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
         State.EnableZoom = false;
@@ -802,6 +799,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerLeft executed");
+    State.BlinkPlayersTab = true;
     try {
         if (data->fields.Character) { // Don't use Object_1_IsNotNull().
             auto playerInfo = GetPlayerData(data->fields.Character);
@@ -821,24 +819,6 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 State.modUsers.erase(data->fields.Character->fields.PlayerId);
 
             auto playerId = data->fields.Character->fields.PlayerId;
-            if (PlayerSelection(data->fields.Character).equals(State.selectedPlayer))
-                State.selectedPlayer = PlayerSelection();
-
-            auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);
-            if (itSel != State.selectedPlayers.end())
-                State.selectedPlayers.erase(itSel);
-
-            auto playerSel = std::find(State.AllPlayersID.begin(), State.AllPlayersID.end(), playerId);
-            if (playerSel != State.AllPlayersID.end())
-                State.AllPlayersID.erase(playerSel);
-
-            auto whitelistSel = std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerId);
-            if (whitelistSel != State.WhitelistPlayerID.end())
-                State.WhitelistPlayerID.erase(whitelistSel);
-
-            auto blacklistSel = std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerId);
-            if (blacklistSel != State.BlacklistPlayerID.end())
-                State.BlacklistPlayerID.erase(blacklistSel);
 
             if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                 synchronized(Replay::replayEventMutex) {

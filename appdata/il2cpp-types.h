@@ -6499,8 +6499,7 @@ namespace app
 
 #pragma endregion
 
-#pragma region PlayerPhysics
-
+#pragma region PlayerBodyTypes__Enum
 #if defined(_CPLUSPLUS_)
     enum class PlayerBodyTypes__Enum : int32_t {
         Normal = 0x00000000,
@@ -6520,7 +6519,9 @@ namespace app
     };
 
 #endif
+#pragma endregion
 
+#pragma region PlayerPhysics
     struct PlayerPhysics__Fields {
         struct InnerNetObject__Fields _;
         uint8_t lastClimbLadderSid;
@@ -10706,4 +10707,6 @@ namespace app
     typedef Il2CppObject NotificationPopper;
     typedef Il2CppObject MatchMakerGameButton;
     typedef Il2CppObject EndGameNavigation;
+    typedef Il2CppObject HideAndSeekManager;
+    typedef Il2CppObject NormalGameManager;
 }

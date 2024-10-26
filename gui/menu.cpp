@@ -67,7 +67,7 @@ namespace Menu {
 					  "Activate Mushroom Mixup"}},
 		{"Doors", {"Close All Doors", "Close Room Door", "Pin All Doors", "Unpin All Doors", "Auto Open Doors"}},
 		{"Host", {"Custom Impostor Amount", "Impostor Count", "Force Start of Game", "Disable Meetings", "Disable Sabotages", "Disable Game Ending", "End Game", "Force Color for Everyone",
-				  "Force Name for Everyone", "Unlock Kill Button", "Allow Killing in Lobbies", "Kill While Vanished"}},
+				  "Force Name for Everyone", "Unlock Kill Button", "Allow Killing in Lobbies", "Kill While Vanished", "Game Mode", "Show Lobby Timer", "Auto Start Game"}},
 #ifdef _DEBUG
 		{"Debug", {"Enable Occlusion Culling", "Force Load Settings", "Force Save Settings", "Clear RPC Queues", "Log Unity Debug Messages", "Log Hook Debug Messages", "Colors", "Profiler",
 				   "Experiments", "Enable Anticheat (SMAC)", "Disable Host Anticheat (+25 Mode)", "Point System (Only for Hosting"}},

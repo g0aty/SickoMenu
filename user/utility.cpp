@@ -1417,7 +1417,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
 	if (State.SMAC_AddToBlacklist) {
 		std::string puid = convert_from_string(pData->fields.Puid);
-		State.BlacklistPUID.push_back(puid);
+		State.BlacklistFriendCodes.push_back(puid);
 		State.Save();
 	}
 	std::string cheaterMessage = "Player " + name + " has been caught cheating! Reason: " + reason;

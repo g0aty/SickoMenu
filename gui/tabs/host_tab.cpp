@@ -190,7 +190,7 @@ namespace HostTab {
 				std::vector<const char*> GAMEMODES = { "Default", "Task Speedrun" };
 				if (State.DisableHostAnticheat) GAMEMODES = { "Default", "Task Speedrun", "Battle Royale" };
 				State.GameMode = std::clamp(State.GameMode, 0, State.DisableHostAnticheat ? 2 : 1);
-				if (IsInLobby() && CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 75 * State.dpiScale)) {
+				if (IsInLobby() && CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 100 * State.dpiScale)) {
 					if (State.GameMode == 1) {
 						State.TaskSpeedrun = true;
 						State.BattleRoyale = false;

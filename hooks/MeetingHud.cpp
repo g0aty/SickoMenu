@@ -343,7 +343,7 @@ void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Ar
 
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
 	if (!State.PanicMode) {
-		if (State.InMeeting && State.RevealAnonymousVotes) return false;
+		if (State.InMeeting && State.RevealAnonymousVotes) return true;
 	}
 	return LogicOptions_GetAnonymousVotes(__this, method);
 }

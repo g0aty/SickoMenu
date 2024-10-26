@@ -95,6 +95,8 @@ void Settings::Load() {
         JSON_TRYGET("SnipeColor", this->SnipeColor);
         JSON_TRYGET("CycleBetweenPlayers", this->CycleBetweenPlayers);
         //JSON_TRYGET("CycleBetweenOutfits", this->CycleBetweenOutfits);
+        //JSON_TRYGET("ChangeBodyType", this->ChangeBodyType);
+        //JSON_TRYGET("BodyType", this->BodyType);
         JSON_TRYGET("CycleInMeeting", this->CycleInMeeting);
         JSON_TRYGET("CycleTimer", this->CycleTimer);
         JSON_TRYGET("CyclerUserNames", this->cyclerUserNames);
@@ -274,9 +276,11 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckLevel", this->SMAC_CheckLevel);
         JSON_TRYGET("SMAC_CheckVent", this->SMAC_CheckVent);
         JSON_TRYGET("SMAC_CheckSabotage", this->SMAC_CheckSabotage);
+        JSON_TRYGET("SMAC_HighLevel", this->SMAC_HighLevel);
+        JSON_TRYGET("SMAC_LowLevel", this->SMAC_LowLevel);
         
-        JSON_TRYGET("WhitelistPUID", this->WhitelistPUID);
-        JSON_TRYGET("BlacklistPUID", this->BlacklistPUID);
+        JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
+        JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
     } catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
@@ -353,6 +357,8 @@ void Settings::Save() {
                 { "SnipeColor", this->SnipeColor },
                 { "CycleBetweenPlayers", this->CycleBetweenPlayers },
                 //{ "CycleBetweenOutfits", this->CycleBetweenOutfits },
+                //{ "ChangeBodyType", this->ChangeBodyType },
+                //{ "BodyType", this->BodyType },
                 { "CycleInMeeting", this->CycleInMeeting },
                 { "CycleTimer", this->CycleTimer },
                 { "CyclerUserNames", this->cyclerUserNames },
@@ -531,8 +537,10 @@ void Settings::Save() {
                 { "SMAC_CheckLevel", this->SMAC_CheckLevel },
                 { "SMAC_CheckVent", this->SMAC_CheckVent },
                 { "SMAC_CheckSabotage", this->SMAC_CheckSabotage },
-                { "WhitelistPUID", this->WhitelistPUID },
-                { "BlacklistPUID", this->BlacklistPUID },
+                { "SMAC_HighLevel", this->SMAC_HighLevel },
+                { "SMAC_LowLevel", this->SMAC_LowLevel },
+                { "WhitelistFriendCodes", this->WhitelistFriendCodes },
+                { "BlacklistFriendCodes", this->BlacklistFriendCodes },
             };
 
             std::ofstream outSettings(settingsPath);

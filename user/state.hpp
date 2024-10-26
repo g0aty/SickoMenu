@@ -157,6 +157,8 @@ public:
     bool CycleInMeeting = true;
     bool CycleBetweenPlayers = false;
     bool CycleBetweenOutfits = false;
+    bool ChangeBodyType = false;
+    int BodyType = 0;
 
     bool NoClip = false;
     bool HotkeyNoClip = false;
@@ -435,7 +437,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_rc1";
+    std::string SickoVersion = "v4.0_rc2";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
@@ -461,15 +463,12 @@ public:
     bool SMAC_CheckLevel = true;
     bool SMAC_CheckVent = true;
     bool SMAC_CheckSabotage = true;
-    int SMAC_HighLevel = 1000;
+    int SMAC_HighLevel = 10000;
+    int SMAC_LowLevel = 0;
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
 
-    std::vector<std::string> WhitelistPUID = {};
-    std::vector<Game::PlayerId> WhitelistPlayerID = {};
-    std::vector<std::string> BlacklistPUID = {};
-    std::vector<Game::PlayerId> BlacklistPlayerID = {};
-
-    std::vector<Game::PlayerId> AllPlayersID = {};
+    std::vector<std::string> WhitelistFriendCodes = {};
+    std::vector<std::string> BlacklistFriendCodes = {};
 
     void Load();
     void Save();

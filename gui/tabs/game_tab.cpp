@@ -323,27 +323,27 @@ namespace GameTab {
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
             if (ToggleButton("Punish Blacklisted Players", &State.SMAC_PunishBlacklist)) State.Save();
             if (State.SMAC_PunishBlacklist) {
-                if (State.BlacklistPUID.empty())
+                if (State.BlacklistFriendCodes.empty())
                     ImGui::Text("No users in blacklist!");
                 static std::string newPuid = "";
                 InputString("New PUID", &newPuid, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
                 if (newPuid != "" && ImGui::Button("Add PUID")) {
-                    State.BlacklistPUID.push_back(newPuid);
+                    State.BlacklistFriendCodes.push_back(newPuid);
                     State.Save();
                     newPuid = "";
                 }
-                if (!State.BlacklistPUID.empty()) {
+                if (!State.BlacklistFriendCodes.empty()) {
                     static int selectedPuidIndex = 0;
-                    selectedPuidIndex = std::clamp(selectedPuidIndex, 0, (int)State.BlacklistPUID.size() - 1);
-                    std::vector<const char*> puidVector(State.BlacklistPUID.size(), nullptr);
-                    for (auto i : State.BlacklistPUID) {
+                    selectedPuidIndex = std::clamp(selectedPuidIndex, 0, (int)State.BlacklistFriendCodes.size() - 1);
+                    std::vector<const char*> puidVector(State.BlacklistFriendCodes.size(), nullptr);
+                    for (auto i : State.BlacklistFriendCodes) {
                         puidVector.push_back(i.c_str());
                     }
                     CustomListBoxInt("Player to Delete", &selectedPuidIndex, puidVector);
                     ImGui::SameLine();
                     if (ImGui::Button("Delete"))
-                        State.BlacklistPUID.erase(std::find(State.BlacklistPUID.begin(), State.BlacklistPUID.end(), State.BlacklistPUID[selectedPuidIndex]));
+                        State.BlacklistFriendCodes.erase(std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), State.BlacklistFriendCodes[selectedPuidIndex]));
                 }
             }
             ImGui::NewLine();
@@ -363,8 +363,11 @@ namespace GameTab {
             if (ToggleButton("Detect Abnormal Murders", &State.SMAC_CheckMurder)) State.Save();
             if (ToggleButton("Detect Abnormal Shapeshift", &State.SMAC_CheckShapeshift)) State.Save();
             if (ToggleButton("Detect Abnormal Vanish", &State.SMAC_CheckVanish)) State.Save();
-            if (ToggleButton("Detect Abnormal Player Levels", &State.SMAC_CheckLevel)) State.Save();
-            if (State.SMAC_CheckLevel && ImGui::InputInt("Minimum Level to Detect", &State.SMAC_HighLevel)) {
+            if (ToggleButton("Detect Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
+            if (State.SMAC_CheckLevel && ImGui::InputInt("Detect Level >=", &State.SMAC_HighLevel)) {
+                State.Save();
+            }
+            if (State.SMAC_CheckLevel && ImGui::InputInt("Detect Level <=", &State.SMAC_LowLevel)) {
                 State.Save();
             }
             if (ToggleButton("Detect Abnormal Venting", &State.SMAC_CheckVent)) State.Save();

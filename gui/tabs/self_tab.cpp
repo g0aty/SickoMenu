@@ -76,7 +76,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Allow Ctrl+(C/V/X) in Chat", &State.ChatPaste)) { //add copying later
+            if (ToggleButton("Allow Ctrl+(C/V) in Chat", &State.ChatPaste)) { //add copying later
                 State.Save();
             }
             
@@ -191,6 +191,7 @@ namespace SelfTab {
             ImGui::SameLine();
             if (ToggleButton("Reveal Anonymous Votes", &State.RevealAnonymousVotes)) {
                 State.Save();
+                RevealAnonymousVotes();
             }
 
             if (ToggleButton("See Ghosts", &State.ShowGhosts)) {
@@ -235,6 +236,15 @@ namespace SelfTab {
             if (ToggleButton("Show FPS", &State.ShowFps)) {
                 State.Save();
             }
+
+            /*if (ToggleButton("Change Body Type", &State.ChangeBodyType)) {
+                State.Save();
+            }
+            if (State.ChangeBodyType) {
+                ImGui::SameLine();
+                if (CustomListBoxInt("Type", &State.BodyType, BODYTYPES, 75.f * State.dpiScale))
+                    State.Save();
+            }*/
 
             if (State.InMeeting && ImGui::Button("Move in Meeting"))
             {

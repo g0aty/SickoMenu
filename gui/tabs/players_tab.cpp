@@ -34,7 +34,7 @@ namespace PlayersTab {
 	static int farmDelay = 0;
 
 	void Render() {
-		if (IsInGame() || IsInLobby()) {
+		if ((IsInGame() || IsInLobby()) && !State.BlinkPlayersTab) {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::BeginChild("players#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 			auto selectedPlayer = State.selectedPlayer.validate();
@@ -55,6 +55,7 @@ namespace PlayersTab {
 				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
 				if (outfit == NULL) continue;
 				std::string playerName = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr)));
+				std::string playerFc = convert_from_string(playerData->fields.FriendCode);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0) * State.dpiScale);
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0) * State.dpiScale);
 				bool isSelected = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId()) != State.selectedPlayers.end();
@@ -103,11 +104,11 @@ namespace PlayersTab {
 				ImGui::SameLine();
 
 				ImVec4 nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
-				if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerData->fields.PlayerId) != State.BlacklistPlayerID.end()) {
+				if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), playerFc) != State.BlacklistFriendCodes.end()) {
 					playerName = "[-] " + playerName;
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
 				}
-				else if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerData->fields.PlayerId) != State.WhitelistPlayerID.end()) {
+				else if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), playerFc) != State.WhitelistFriendCodes.end()) {
 					playerName = "[+] " + playerName;
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
 				}
@@ -416,32 +417,28 @@ namespace PlayersTab {
 					
 					if (selectedPlayers.size() == 1 && !selectedPlayers[0].validate().is_LocalPlayer()) {
 						Game::PlayerId playerId = selectedPlayers[0].validate().get_PlayerControl()->fields.PlayerId;
-						std::string puid = convert_from_string(selectedPlayers[0].validate().get_PlayerData()->fields.Puid);
-						if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerId) == State.WhitelistPlayerID.end()) {
-							if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerId) != State.BlacklistPlayerID.end()) {
+						std::string friendCode = convert_from_string(selectedPlayers[0].validate().get_PlayerData()->fields.FriendCode);
+						if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) == State.WhitelistFriendCodes.end()) {
+							if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end()) {
 								if (ImGui::Button("Remove from Blacklist")) {
-									State.BlacklistPlayerID.erase(std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerId));
-									State.BlacklistPUID.erase(std::find(State.BlacklistPUID.begin(), State.BlacklistPUID.end(), puid));
+									State.BlacklistFriendCodes.erase(std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode));
 									State.Save();
 								}
 							}
 							else if (ImGui::Button("Add to Blacklist")) {
-								State.BlacklistPlayerID.push_back(playerId);
-								State.BlacklistPUID.push_back(puid);
+								State.BlacklistFriendCodes.push_back(friendCode);
 								State.Save();
 							}
 						}
-						if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerId) == State.BlacklistPlayerID.end()) {
-							if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerId) != State.WhitelistPlayerID.end()) {
+						if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) == State.BlacklistFriendCodes.end()) {
+							if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end()) {
 								if (ImGui::Button("Remove from Whitelist")) {
-									State.WhitelistPlayerID.erase(std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerId));
-									State.WhitelistPUID.erase(std::find(State.WhitelistPUID.begin(), State.WhitelistPUID.end(), puid));
+									State.WhitelistFriendCodes.erase(std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode));
 									State.Save();
 								}
 							}
 							else if (ImGui::Button("Add to Whitelist")) {
-								State.WhitelistPlayerID.push_back(playerId);
-								State.WhitelistPUID.push_back(puid);
+								State.WhitelistFriendCodes.push_back(friendCode);
 								State.Save();
 							}
 						}
@@ -1182,18 +1179,18 @@ namespace PlayersTab {
 			suicideCount = 0;
 		}
 
-		/*static int blinkDelay = 0;
+		static int blinkDelay = 0;
 		static bool isBlinking = false;
 		if (State.BlinkPlayersTab && !isBlinking) {
-			blinkDelay = 20;
+			blinkDelay = 30;
 			isBlinking = true;
 		}
-		if (isBlinking) {
+		if (isBlinking && State.BlinkPlayersTab) {
 			if (blinkDelay >= 0) blinkDelay--;
 			if (blinkDelay == 0) {
 				State.BlinkPlayersTab = false;
 				isBlinking = false;
 			}
-		}*/
+		}
 	}
 }

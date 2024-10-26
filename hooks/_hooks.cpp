@@ -223,6 +223,7 @@ void DetourInitilization() {
 	HOOKFUNC(MatchMakerGameButton_SetGame);
 	HOOKFUNC(ModManager_LateUpdate);
 	HOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
+	HOOKFUNC(PlayerControl_SetLevel);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -366,6 +367,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(MatchMakerGameButton_SetGame);
 	UNHOOKFUNC(ModManager_LateUpdate);
 	UNHOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
+	UNHOOKFUNC(PlayerControl_SetLevel);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

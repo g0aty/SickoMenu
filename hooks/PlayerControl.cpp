@@ -72,50 +72,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			if (!playerData || !localData)
 				return;
 
-			auto playerId = __this->fields.PlayerId;
-			auto it = std::find(State.AllPlayersID.begin(), State.AllPlayersID.end(), playerId);
-			if (it == State.AllPlayersID.end()) {
-				State.AllPlayersID.push_back(playerId);
-				LOG_DEBUG(std::format("Player ID {} pushed back to State.AllPlayersID", playerId));
-				std::string puid = convert_from_string(__this->fields.Puid);
-				if (std::find(State.BlacklistPUID.begin(), State.BlacklistPUID.end(), puid) != State.BlacklistPUID.end()) {
-					State.BlacklistPlayerID.push_back(playerId);
-					if (State.Enable_SMAC) {
-						std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, NULL)));
-						switch (IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment) {
-						case 0:
-							break;
-						case 1: {
-							std::string message = std::format("Blacklisted player {} has joined the game", name);
-							ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, __this, convert_to_string(message), false, NULL);
-							break;
-						}
-						case 2:
-						{
-							String* newName = convert_to_string(name + " has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
-							if (IsHost()) {
-								PlayerControl_CmdCheckName(__this, newName, NULL);
-								InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.OwnerId, false, NULL);
-							}
-							break;
-						}
-						case 3:
-						{
-							String* newName = convert_to_string(name + " has been banned by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
-							if (IsHost()) {
-								PlayerControl_CmdCheckName(__this, newName, NULL);
-								InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.OwnerId, true, NULL);
-							}
-							break;
-						}
-						}
-					}
-				}
-				else if (std::find(State.WhitelistPUID.begin(), State.WhitelistPUID.end(), puid) != State.WhitelistPUID.end()) {
-					State.WhitelistPlayerID.push_back(playerId);
-				}
-			}
-
 			if (IsInGame() && State.DisableVents && __this->fields.inVent) {
 				if (State.rpcCooldown == 0) {
 					//copy rpc code so that we don't spam the rpc queue
@@ -236,13 +192,13 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				std::string modUsage = __this == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
 					std::format(" <#fb0>[{} User]</color>",
 						__this == *Game::pLocalPlayer ? "<#0f0>Sicko</color><#f00>Menu</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
+				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				std::string listed = "";
-				if (std::find(State.WhitelistPlayerID.begin(), State.WhitelistPlayerID.end(), playerData->fields.PlayerId) != State.WhitelistPlayerID.end())
+				if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end())
 					listed = "<#0ff>[+]</color> ";
-				else if (std::find(State.BlacklistPlayerID.begin(), State.BlacklistPlayerID.end(), playerData->fields.PlayerId) != State.BlacklistPlayerID.end())
+				else if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end())
 					listed = "<#f00>[-]</color> ";
 				std::string levelText = std::format("{}<#f00>ID {}</color> <#0f0>Level {}</color> <#b0f>({})</color>{}</color>", listed, playerData->fields.PlayerId, playerLevel, platformId, modUsage);
-				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				if (IsStreamerMode())
 					friendCode = "Friend Code Hidden";
 				std::string hostFriendCode = convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.FriendCode);
@@ -621,11 +577,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				PlayerControl_set_Visible(__this, State.ShowGhosts || localData->fields.IsDead, NULL);
 			}
 
-			bool shouldSeePhantom = PlayerIsImpostor(localData) || localData->fields.IsDead;
+			bool shouldSeePhantom = __this == *Game::pLocalPlayer || PlayerIsImpostor(localData) || localData->fields.IsDead;
 
-			if (__this->fields.shouldAppearInvisible && !playerData->fields.IsDead) {
-				__this->fields.invisibilityAlpha = 0.5f;
-				PlayerControl_set_Visible(__this, State.ShowPhantoms || shouldSeePhantom, NULL);
+			if (__this->fields.invisibilityAlpha <= 0.5f) {
+				__this->fields.invisibilityAlpha = State.ShowPhantoms || shouldSeePhantom ? 0.5f : 0.f;
 			}
 
 			if (!State.FreeCam && __this == *Game::pLocalPlayer && State.prevCamPos.x != NULL) {
@@ -1387,19 +1342,10 @@ void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* 
 
 void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader* reader, bool initialState, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dNetworkedPlayerInfo_Deserialize executed");
-	LOG_DEBUG("Hook dNetworkedPlayerInfo_Deserialize executed");
-	Game::PlayerId id = __this->fields.PlayerId;
-	uint32_t playerLevel = __this->fields.PlayerLevel + 1;
 
-	if (State.SMAC_CheckLevel && (IsInGame() || playerLevel >= (uint32_t)State.SMAC_HighLevel)) {
-		SMAC_OnCheatDetected(__this->fields._object, "Abnormal Level");
-	}
-
-	if (__this != GetPlayerData(*Game::pLocalPlayer) && __this->fields.PlayerLevel > 2147483647) __this->fields.PlayerLevel = 2147483647; //anti level 0 exploit
-
-	std::string puid = convert_from_string(__this->fields.Puid);
-	if (std::find(State.BlacklistPUID.begin(), State.BlacklistPUID.end(), puid) != State.BlacklistPUID.end()) {
-		State.BlacklistPlayerID.push_back(id);
+	std::string friendCode = convert_from_string(__this->fields.FriendCode);
+	uint8_t id = __this->fields.PlayerId;
+	if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end()) {
 		if (State.Enable_SMAC) {
 			std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(__this, NULL)));
 			switch (IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment) {
@@ -1430,9 +1376,6 @@ void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader
 			}
 			}
 		}
-	}
-	else if (std::find(State.WhitelistPUID.begin(), State.WhitelistPUID.end(), puid) != State.WhitelistPUID.end()) {
-		State.WhitelistPlayerID.push_back(id);
 	}
 	NetworkedPlayerInfo_Deserialize(__this, reader, initialState, NULL);
 }
@@ -1484,4 +1427,50 @@ void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target
 			PlayerControl_CmdCheckProtect(__this, target, method);
 	}
 	else PlayerControl_CmdCheckProtect(__this, target, method);
+}
+
+void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_SetLevel executed");
+
+	uint32_t playerLevel = level + 1;
+
+	if (State.SMAC_CheckLevel && (IsInGame() || 
+		(State.SMAC_HighLevel != 0 && playerLevel >= (uint32_t)State.SMAC_HighLevel || (State.SMAC_LowLevel != 0 && playerLevel <= (uint32_t)State.SMAC_LowLevel)))) {
+		SMAC_OnCheatDetected(__this, "Abnormal Level");
+	}
+
+	if (__this != *Game::pLocalPlayer && level > 2147483647) level = 2147483647; //anti level 0 exploit
+
+	PlayerControl_SetLevel(__this, level, method);
+}
+
+PlayerBodyTypes__Enum dHideAndSeekManager_GetBodyType(HideAndSeekManager* __this, PlayerControl* player, MethodInfo* method) {
+	if (!State.PanicMode && State.ChangeBodyType) {
+		bool isImpostor = PlayerIsImpostor(GetPlayerData(player));
+		switch (State.BodyType) {
+		case 0:
+			return isImpostor ? PlayerBodyTypes__Enum::Seeker : PlayerBodyTypes__Enum::Normal;
+		case 1:
+			return isImpostor ? PlayerBodyTypes__Enum::Seeker : PlayerBodyTypes__Enum::Horse;
+		case 2:
+			return isImpostor ? PlayerBodyTypes__Enum::LongSeeker : PlayerBodyTypes__Enum::Long;
+		default:
+			return isImpostor ? PlayerBodyTypes__Enum::Seeker : PlayerBodyTypes__Enum::Normal;
+		}
+	}
+	return HideAndSeekManager_GetBodyType(__this, player, method);
+}
+
+PlayerBodyTypes__Enum dNormalGameManager_GetBodyType(NormalGameManager* __this, PlayerControl* player, MethodInfo* method) {
+	if (!State.PanicMode && State.ChangeBodyType) {
+		switch (State.BodyType) {
+		case 0:
+			return PlayerBodyTypes__Enum::Normal;
+		case 1:
+			return PlayerBodyTypes__Enum::Horse;
+		case 2:
+			return PlayerBodyTypes__Enum::Long;
+		}
+	}
+	return NormalGameManager_GetBodyType(__this, player, method);
 }

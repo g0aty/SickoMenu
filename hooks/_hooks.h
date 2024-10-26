@@ -136,3 +136,6 @@ AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_
 void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method);
 void dModManager_LateUpdate(ModManager* __this, MethodInfo* method);
 void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodInfo* method);
+void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* method);
+PlayerBodyTypes__Enum dHideAndSeekManager_GetBodyType(HideAndSeekManager* __this, PlayerControl* player, MethodInfo* method);
+PlayerBodyTypes__Enum dNormalGameManager_GetBodyType(NormalGameManager* __this, PlayerControl* player, MethodInfo* method);
