@@ -393,7 +393,6 @@ public:
     bool BlinkPlayersTab = false; //prevent instant crash on player leaving
     bool SickoDetection = true;
     bool AmongUsMenuDetection = false;
-    bool BetterAmongUsDetection = false;
     bool KillNetworkDetection = false;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
