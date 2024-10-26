@@ -69,6 +69,30 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
+			if (State.AmongUsMenuDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 42069 call to detect usage
+				if (State.rpcCooldown == 0) {
+					//AUM users can detect this rpc
+					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)42069, (SendOption__Enum)1, NULL);
+					MessageWriter_EndMessage(writer, NULL);
+					State.rpcCooldown = 15;
+				}
+				else {
+					State.rpcCooldown--;
+				}
+			}
+
+			if (State.KillNetworkDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 250 call to detect usage
+				if (State.rpcCooldown == 0) {
+					//KillNetMenu users can detect this rpc
+					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)250, (SendOption__Enum)1, NULL);
+					MessageWriter_EndMessage(writer, NULL);
+					State.rpcCooldown = 15;
+				}
+				else {
+					State.rpcCooldown--;
+				}
+			}
+
 			if (!playerData || !localData)
 				return;
 
@@ -189,9 +213,28 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						break;
 					}
 				}
+				/*std::string rpcId = "Unknown";
+				if (client != NULL) {
+					auto rpc = client->fields.RPCData->fields.RPC;
+					if (client->fields.Character == *Game::pLocalPlayer && State.RPCSpoof) rpc = RPC__Enum(State.RPC);
+					switch (rpc) {
+					case RPC__Enum::SickoMenu:
+						platformId = "Epic Games";
+						break;
+					case Platforms__Enum::KillNetwork:
+						platformId = "Steam";
+						break;
+					case Platforms__Enum::AmongUsMenu:
+						platformId = "AmongUsMenu";
+						break;
+					case Platforms__Enum::BetterAmongUs:
+						platformId = "BetterAmongUs";
+						break;
+					}
+				}*/
 				std::string modUsage = __this == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
 					std::format(" <#fb0>[{} User]</color>",
-						__this == *Game::pLocalPlayer ? "<#0f0>Sicko</color><#f00>Menu</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
+						__this == *Game::pLocalPlayer ? "<#RRGGBB>Sicko-Fork</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				std::string listed = "";
 				if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end())

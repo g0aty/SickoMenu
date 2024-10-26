@@ -85,6 +85,7 @@ void Settings::Load() {
         JSON_TRYGET("GuestFriendCode", this->GuestFriendCode);
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
+        JSON_TRYGET("RPCSpoof", this->RPCSpoof);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
@@ -174,11 +175,21 @@ void Settings::Load() {
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
+        JSON_TRYGET("CustomRgbName", this->CustomRgbName);
         JSON_TRYGET("ResizeName", this->ResizeName);
+        JSON_TRYGET("IndentName", this->IndentName);
+        JSON_TRYGET("CspaceName", this->CspaceName);
+        JSON_TRYGET("MspaceName", this->MspaceName);
+        JSON_TRYGET("VoffsetName", this->VoffsetName);
+        JSON_TRYGET("RotateName", this->RotateName);
         JSON_TRYGET("NameSize", this->NameSize);
+        JSON_TRYGET("NameIndent", this->NameIndent);
+        JSON_TRYGET("NameCspace", this->NameIndent);
         JSON_TRYGET("ItalicName", this->ItalicName);
         JSON_TRYGET("UnderlineName", this->UnderlineName);
         JSON_TRYGET("StrikethroughName", this->StrikethroughName);
+        JSON_TRYGET("BoldName", this->BoldName);
+        JSON_TRYGET("NobrName", this->BoldName);
         JSON_TRYGET("ColoredName", this->ColoredName);
         JSON_TRYGET("NameColor1_R", this->NameColor1.x);
         JSON_TRYGET("NameColor1_G", this->NameColor1.y);
@@ -250,6 +261,8 @@ void Settings::Load() {
 
         JSON_TRYGET("ShowLobbyTimer", this->ShowLobbyTimer);
         JSON_TRYGET("SickoDetection", this->SickoDetection);
+        JSON_TRYGET("AmongUsMenuDetection", this->AmongUsMenuDetection);
+        JSON_TRYGET("KillNetworkDetection", this->KillNetworkDetection);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
         JSON_TRYGET("SpectatorMode", this->SpectatorMode);
@@ -351,8 +364,11 @@ void Settings::Save() {
                 { "UseGuestFriendCode", this->UseGuestFriendCode },
                 { "GuestFriendCode", this->GuestFriendCode },
                 { "FakeFriendCode", this->FakeFriendCode },
+                { "FakePuid", this->FakePuid },
                 { "SpoofPlatform", this->SpoofPlatform },
+                { "RPCSpoof", this->RPCSpoof },
                 { "FakePlatform", this->FakePlatform },
+                { "RPC", this->RPC },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
                 //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
 
@@ -442,10 +458,22 @@ void Settings::Save() {
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
                 { "ResizeName", this->ResizeName },
+                { "IndentName", this->IndentName },
+                { "CspaceName", this->CspaceName },
+                { "MspaceName", this->MspaceName },
+                { "VoffsetName", this->VoffsetName },
+                { "RotateName", this->RotateName },
                 { "NameSize", this->NameSize },
+                { "NameIndent", this->NameIndent },
+                { "NameCspace", this->NameCspace },
+                { "NameMspace", this->NameMspace },
+                { "NameVoffset", this->NameVoffset },
+                { "NameRotate", this->NameRotate },
                 { "ItalicName", this->ItalicName },
                 { "UnderlineName", this->UnderlineName },
                 { "StrikethroughName", this->StrikethroughName },
+                { "BoldName", this->BoldName },
+                { "NobrName", this->NobrName },
                 { "ColoredName", this->ColoredName },
                 { "NameColor1_R", this->NameColor1.x },
                 { "NameColor1_G", this->NameColor1.y },
@@ -516,6 +544,8 @@ void Settings::Save() {
                 { "AutoStartGame", this->AutoStartGame },
                 { "AutoStartTimer", this->AutoStartTimer },
                 { "SickoDetection", this->SickoDetection },
+                { "AmongUsMenuDetection", this->AmongUsMenuDetection },
+                { "KillNetworkDetection", this->KillNetworkDetection },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
                 { "SpectatorMode", this->SpectatorMode },

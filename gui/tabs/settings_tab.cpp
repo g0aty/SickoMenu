@@ -291,6 +291,35 @@ namespace SettingsTab {
 				State.Save();
 
 			//if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
+			if (ToggleButton("Disable Host Anticheat (+25 Mode)", &State.DisableHostAnticheat)) {
+				if (!State.DisableHostAnticheat && State.BattleRoyale) {
+					State.BattleRoyale = false;
+					State.GameMode = 0;
+				}
+				State.Save();
+			}
+			/*if (ToggleButton("Spoof RPC", &State.RPCSpoof)) {
+				State.Save();
+			}
+			if (CustomListBoxInt("RPC", &State.RPC, RPC))
+				State.Save();*/
+
+			ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+			if (ImGui::CollapsingHeader("RPC Spoofing"))
+			{
+				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+				if (ToggleButton("Change to SickoMenu RPC", &State.SickoDetection) && (!State.AmongUsMenuDetection && !State.KillNetworkDetection)) {
+					State.Save();
+				}
+				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+				if (ToggleButton("Change to AUM RPC", &State.AmongUsMenuDetection) && (!State.SickoDetection && !State.KillNetworkDetection)) {
+					State.Save();
+				}
+				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+				if (ToggleButton("Change to KillNetwork RPC", &State.KillNetworkDetection) && (!State.SickoDetection && !State.AmongUsMenuDetection)) {
+					State.Save();
+				}
+			}
 		}
 
 		if (openKeybinds) {
@@ -321,6 +350,22 @@ namespace SettingsTab {
 				State.Save();
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Replay");
+
+			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_ChatAlwaysActive)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Show/Hide Chat");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_ReadGhostMessages)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Read Ghost Messages");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 

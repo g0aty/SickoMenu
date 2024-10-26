@@ -11,18 +11,21 @@ namespace GameTab {
         General,
         Chat,
         Anticheat,
+        Destruct,
         Options
     };
 
     static bool openGeneral = true; //default to visual tab group
     static bool openChat = false;
     static bool openAnticheat = false;
+    static bool openDestruct = false;
     static bool openOptions = false;
 
     void CloseOtherGroups(Groups group) {
         openGeneral = group == Groups::General;
         openChat = group == Groups::Chat;
         openAnticheat = group == Groups::Anticheat;
+        openDestruct = group == Groups::Destruct;
         openOptions = group == Groups::Options;
     }
 
@@ -36,12 +39,13 @@ namespace GameTab {
         if (TabGroup("Chat", openChat)) {
             CloseOtherGroups(Groups::Chat);
         }
-
-        if (State.Enable_SMAC) {
-            ImGui::SameLine();
-            if (TabGroup("Anticheat", openAnticheat)) {
-                CloseOtherGroups(Groups::Anticheat);
-            }
+        ImGui::SameLine();
+        if (TabGroup("Anticheat", openAnticheat)) {
+            CloseOtherGroups(Groups::Anticheat);
+        }
+        ImGui::SameLine();
+        if (TabGroup("Destruct", openDestruct)) {
+            CloseOtherGroups(Groups::Destruct);
         }
 
         if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
@@ -262,7 +266,7 @@ namespace GameTab {
                     State.Save();
                 }
 
-                if (!State.SafeMode) CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
+                if (!State.SafeMode) CustomListBoxInt(" Â­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
 
                 if (!State.SafeMode && ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
                     State.Save();
@@ -342,7 +346,8 @@ namespace GameTab {
         }
 
         if (openAnticheat) {
-            if (IsHost()) CustomListBoxInt("Host Punishment­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+            if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
+            if (IsHost()) CustomListBoxInt("Host PunishmentÂ­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
             else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
@@ -422,6 +427,27 @@ namespace GameTab {
                         State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
                 }
             }
+        }
+
+        if (openDestruct) {
+
+            ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
+            if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) State.Save(); {
+                if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
+                State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
+            if (IsInGame() && ToggleButton("Attempt to Crash", &State.UltimateSpamReport)) State.Save(); {
+                if (State.UltimateSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Alt `Crash Server`!\nMay be cause crash of game!\nMay be works with delay!"));
+                State.Save();
+            }
+
+            /*ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+            if (IsInLobby() || IsInGame) ToggleButton("Destroy Game Logic", &State.SpoofCrashLevel) && (!State.SpoofLevel); {
+                if (State.SpoofCrashLevel) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Zero Level = Crash Server"));
+                State.Save();
+            }*/
         }
 
         if (openOptions) {

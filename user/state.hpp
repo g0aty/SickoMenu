@@ -56,8 +56,11 @@ public:
     bool UseGuestFriendCode = false;
     std::string GuestFriendCode = "";
     std::string FakeFriendCode = "";
+    std::string FakePuid = "";
     bool SpoofPlatform = false;
+    bool RPCSpoof = false;
     int FakePlatform = 0;
+    int RPC = 0;
     bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
 
@@ -86,6 +89,8 @@ public:
     bool AutoFakeRole = false;
     bool DisableVents = false;
     bool SpamReport = false;
+    bool CrashSpamReport = false;
+    bool UltimateSpamReport = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
     bool DisableKills = false;
@@ -142,11 +147,24 @@ public:
     bool ForceColorForEveryone = false;
     bool CustomName = false;
     bool RgbName = false;
+    bool CustomRgbName = false;
     bool ResizeName = false;
+    bool IndentName = false;
+    bool CspaceName = false;
+    bool MspaceName = false;
+    bool VoffsetName = false;
+    bool RotateName = false;
     float NameSize = 1.f;
+    float NameIndent = 0.f;
+    float NameCspace = 0.f;
+    float NameMspace = 0.f;
+    float NameVoffset = 0.f;
+    float NameRotate = 0.f;
     bool ItalicName = false;
     bool UnderlineName = false;
     bool StrikethroughName = false;
+    bool BoldName = false;
+    bool NobrName = false;
     bool ColoredName = false;
     ImVec4 NameColor1 = ImVec4(1.f, 1.f, 1.f, 1.f);
     ImVec4 NameColor2 = ImVec4(1.f, 1.f, 1.f, 1.f);
@@ -375,6 +393,8 @@ public:
     bool TempPanicMode = false; //prevent instant crash on joining lobby
     bool BlinkPlayersTab = false; //prevent instant crash on player leaving
     bool SickoDetection = true;
+    bool AmongUsMenuDetection = false;
+    bool KillNetworkDetection = false;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
     bool TournamentMode = false;

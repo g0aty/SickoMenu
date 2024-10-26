@@ -156,6 +156,8 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         }
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Close_Current_Room_Door) && IsInGame()) State.rpcQueue.push(new RpcCloseDoorsOfType(GetSystemTypes(GetTrueAdjustedPosition(*Game::pLocalPlayer)), false));
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Replay)) State.ShowReplay = !State.ShowReplay;
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_ChatAlwaysActive) && (IsInGame() || IsInLobby())) State.ChatAlwaysActive = !State.ChatAlwaysActive;
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_ReadGhostMessages) && (IsInGame() || IsInLobby())) State.ReadGhostMessages = !State.ReadGhostMessages;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Hud) && (IsInGame() || IsInLobby())) State.DisableHud = !State.DisableHud;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Reset_Appearance) && (IsInGame() || IsInLobby())) ControlAppearance(false);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Randomize_Appearance)) ControlAppearance(true);

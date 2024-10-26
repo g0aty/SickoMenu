@@ -8,31 +8,39 @@
 void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 	if (player == nullptr) return;
 	switch (callId) {
-		case (uint8_t)420:
-		{
-			uint8_t playerId = player->fields.PlayerId; //true SickoMenu detection
-			if (State.modUsers.find(playerId) == State.modUsers.end() && MessageReader_get_BytesRemaining(reader, NULL) == 0) {
-				State.modUsers.insert({ playerId, "<#0f0>Sicko</color><#f00>Menu</color>" });
-				STREAM_DEBUG("RPC Received for another SickoMenu user from " << ToString((Game::PlayerId)playerId));
-			}
+	case (uint8_t)420:
+	{
+		uint8_t playerId = player->fields.PlayerId; //true SickoMenu detection
+		if (State.modUsers.find(playerId) == State.modUsers.end() && MessageReader_get_BytesRemaining(reader, NULL) == 0) {
+			State.modUsers.insert({ playerId, "<#0f0>Sicko</color><#f00>Menu</color>" });
+			STREAM_DEBUG("RPC Received for another SickoMenu user from " << ToString((Game::PlayerId)playerId));
 		}
-		break;
-		case (uint8_t)42069:
-		{
-			uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
-			if (State.modUsers.find(playerId) == State.modUsers.end()) {
-				State.modUsers.insert({ playerId, "<#f55>AmongUsMenu</color>" });
-				STREAM_DEBUG("RPC Received for an AmongUsMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-			}
+	}
+	break;
+	case (uint8_t)42069:
+	{
+		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, "<#f55>AmongUsMenu</color>" });
+			STREAM_DEBUG("RPC Received for an AmongUsMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
-		case (uint8_t)150:
-		{
-			uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
-			if (State.modUsers.find(playerId) == State.modUsers.end()) {
-				State.modUsers.insert({ playerId, "<#5f5>BetterAmongUs</color>" });
-				STREAM_DEBUG("RPC Received for a BetterAmongUs user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-			}
+	}
+	case (uint8_t)150:
+	{
+		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, "<#5f5>BetterAmongUs</color>" });
+			STREAM_DEBUG("RPC Received for a BetterAmongUs user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
+	}
+	case (uint8_t)250:
+	{
+		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, "<#f00>KillNetwork</color>" });
+			STREAM_DEBUG("RPC Received for a KillNetwork user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+		}
+	}
 		break;
 		case (uint8_t)101:
 		{
