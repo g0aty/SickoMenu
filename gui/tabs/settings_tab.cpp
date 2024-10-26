@@ -308,15 +308,15 @@ namespace SettingsTab {
 			if (ImGui::CollapsingHeader("RPC Spoofing"))
 			{
 				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-				if (ToggleButton("Change to SickoMenu RPC", &State.SickoDetection) && (!State.BetterAmongUsDetection && !State.AmongUsMenuDetection && !State.KillNetworkDetection)) {
+				if (ToggleButton("Change to SickoMenu RPC", &State.SickoDetection) && (!State.AmongUsMenuDetection && !State.KillNetworkDetection)) {
 					State.Save();
 				}
 				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-				if (ToggleButton("Change to AUM RPC", &State.AmongUsMenuDetection) && (!State.SickoDetection && !State.BetterAmongUsDetection && !State.KillNetworkDetection)) {
+				if (ToggleButton("Change to AUM RPC", &State.AmongUsMenuDetection) && (!State.SickoDetection && !State.KillNetworkDetection)) {
 					State.Save();
 				}
 				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-				if (ToggleButton("Change to KillNetwork RPC", &State.KillNetworkDetection) && (!State.SickoDetection && !State.AmongUsMenuDetection && !State.BetterAmongUsDetection)) {
+				if (ToggleButton("Change to KillNetwork RPC", &State.KillNetworkDetection) && (!State.SickoDetection && !State.AmongUsMenuDetection)) {
 					State.Save();
 				}
 			}
