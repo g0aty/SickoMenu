@@ -81,18 +81,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			if (State.BetterAmongUsDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 150 call to detect usage
-				if (State.rpcCooldown == 0) {
-					//BAU users can detect this rpc
-					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)150, (SendOption__Enum)1, NULL);
-					MessageWriter_EndMessage(writer, NULL);
-					State.rpcCooldown = 15;
-				}
-				else {
-					State.rpcCooldown--;
-				}
-			}
-
 			if (State.KillNetworkDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 250 call to detect usage
 				if (State.rpcCooldown == 0) {
 					//KillNetMenu users can detect this rpc
