@@ -13,16 +13,19 @@ namespace SettingsTab {
 	enum Groups {
 		General,
 		Spoofing,
+		RPC,
 		Keybinds
 	};
 
 	static bool openGeneral = true; //default to general tab group
 	static bool openSpoofing = false;
+	static bool openRPC = false;
 	static bool openKeybinds = false;
 
 	void CloseOtherGroups(Groups group) {
 		openGeneral = group == Groups::General;
 		openSpoofing = group == Groups::Spoofing;
+		openRPC = group == Groups::RPC;
 		openKeybinds = group == Groups::Keybinds;
 	}
 
@@ -35,6 +38,10 @@ namespace SettingsTab {
 		ImGui::SameLine();
 		if (TabGroup("Spoofing", openSpoofing)) {
 			CloseOtherGroups(Groups::Spoofing);
+		}
+		ImGui::SameLine();
+		if (TabGroup("RPC", openRPC)) {
+			CloseOtherGroups(Groups::RPC);
 		}
 		ImGui::SameLine();
 		if (TabGroup("Keybinds", openKeybinds)) {
@@ -58,7 +65,7 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-			
+
 			// sorry to anyone trying to read this code it is pretty messy
 #pragma region New config menu, needs fixing
 			/*
@@ -113,7 +120,6 @@ namespace SettingsTab {
 
 			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
 			{
-				State.Save(); //save previous settings
 				State.Load();
 				State.Save(); //actually save the selected config
 			}
@@ -180,11 +186,6 @@ namespace SettingsTab {
 			}
 
 			SteppedSliderFloat("Opacity", (float*)&State.MenuThemeColor.w, 0.1f, 1.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
-
-			if (ImGui::InputInt("FPS", &State.GameFPS)) {
-				State.GameFPS = std::clamp(State.GameFPS, 1, 2147483647);
-				State.Save();
-			}
 
 #ifdef _DEBUG
 			if (ToggleButton("Show Debug Tab", &State.showDebugTab)) {
@@ -254,9 +255,6 @@ namespace SettingsTab {
 			if (ToggleButton("Spoof Modded Host", &State.SpoofModdedHost)) {
 				State.Save(); //haven't figured this out yet
 			}*/
-			if (ToggleButton("Allow other SickoMenu users to see you're using SickoMenu", &State.SickoDetection)) {
-				State.Save();
-			}
 
 			ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
 		}
@@ -268,7 +266,7 @@ namespace SettingsTab {
 			if (ToggleButton("Use Custom Guest Friend Code", &State.UseGuestFriendCode)) {
 				State.Save();
 			}
-			
+
 			if (InputString("Guest Friend Code", &State.GuestFriendCode)) {
 				State.Save();
 			}
@@ -290,7 +288,34 @@ namespace SettingsTab {
 			if (CustomListBoxInt("Platform", &State.FakePlatform, PLATFORMS))
 				State.Save();
 
-			//if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
+			/*if (ToggleButton("RPC Detection", &State.SpoofRPC)) {
+				State.Save();
+			}
+			ImGui::SameLine();
+			if (CustomListBoxInt("RPC Detection", &State.ChangeRPC, DETECTION))
+				State.Save();*/
+
+			if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
+		}
+
+
+			if (openRPC) {
+			ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+			if (ToggleButton("Change to SickoMenu RPC", &State.SickoDetection) && (!State.BetterAmongUsDetection && !State.AmongUsMenuDetection && !State.KillNetworkDetection)) {
+				State.Save();
+			}
+			ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+			if (ToggleButton("Change to AUM RPC", &State.AmongUsMenuDetection) && (!State.SickoDetection && !State.BetterAmongUsDetection && !State.KillNetworkDetection)) {
+				State.Save();
+			}
+			ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+			if (ToggleButton("Change to BAU RPC", &State.BetterAmongUsDetection) && (!State.SickoDetection && !State.AmongUsMenuDetection && !State.KillNetworkDetection)) {
+				State.Save();
+			}
+			ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+			if (ToggleButton("Change to KillNetwork RPC", &State.KillNetworkDetection) && (!State.SickoDetection && !State.AmongUsMenuDetection && !State.BetterAmongUsDetection)) {
+				State.Save();
+			}
 		}
 
 		if (openKeybinds) {
@@ -321,6 +346,22 @@ namespace SettingsTab {
 				State.Save();
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Replay");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_ChatAlwaysActive)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Show/Hide Chat");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.Toggle_ReadGhostMessages)) {
+				State.Save();
+			}
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Read Ghost Messages");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
@@ -410,6 +451,13 @@ namespace SettingsTab {
 			}
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Complete All Tasks");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (HotKey(State.KeyBinds.CrashSpamReport))
+				State.Save();
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Crash Server");
 		}
 		ImGui::EndChild();
 	}

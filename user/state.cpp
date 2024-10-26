@@ -74,17 +74,19 @@ void Settings::Load() {
         JSON_TRYGET("MenuGradientColor2_B", this->MenuGradientColor2.z);
         JSON_TRYGET("MenuGradientColor2_A", this->MenuGradientColor2.w);
         JSON_TRYGET("UnlockCosmetics", this->UnlockCosmetics);
-        JSON_TRYGET("GameFPS", this->GameFPS);
         JSON_TRYGET("ShowKeybinds", this->ShowKeybinds);
         JSON_TRYGET("KeybindsWhileChatting", this->KeybindsWhileChatting);
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
+        JSON_TRYGET("SpoofCrashLevel", this->SpoofCrashLevel);
         JSON_TRYGET("FakeLevel", this->FakeLevel);
         JSON_TRYGET("SpoofFriendCode", this->SpoofFriendCode);
         JSON_TRYGET("UseGuestFriendCode", this->UseGuestFriendCode);
         JSON_TRYGET("GuestFriendCode", this->GuestFriendCode);
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
+        JSON_TRYGET("FakePuid", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
+        JSON_TRYGET("SpoofRPC", this->SpoofRPC);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
 
@@ -94,13 +96,9 @@ void Settings::Load() {
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
         JSON_TRYGET("CycleBetweenPlayers", this->CycleBetweenPlayers);
-        //JSON_TRYGET("CycleBetweenOutfits", this->CycleBetweenOutfits);
-        //JSON_TRYGET("ChangeBodyType", this->ChangeBodyType);
-        //JSON_TRYGET("BodyType", this->BodyType);
         JSON_TRYGET("CycleInMeeting", this->CycleInMeeting);
         JSON_TRYGET("CycleTimer", this->CycleTimer);
         JSON_TRYGET("CyclerUserNames", this->cyclerUserNames);
-        //JSON_TRYGET("playerOutfits", this->playerOutfits);
         JSON_TRYGET("HostUsername", this->hostUserName);
         JSON_TRYGET("ChatMessage", this->chatMessage);
         JSON_TRYGET("CycleName", this->CycleName);
@@ -117,7 +115,6 @@ void Settings::Load() {
         JSON_TRYGET("ModifyTaskBarUpdates", this->ModifyTaskBarUpdates);
         JSON_TRYGET("UserName", this->userName);
         JSON_TRYGET("ShowGhosts", this->ShowGhosts);
-        JSON_TRYGET("ShowPhantoms", this->ShowPhantoms);
         JSON_TRYGET("FakeRole", this->FakeRole);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
         JSON_TRYGET("ShowRadar", this->ShowRadar);
@@ -167,17 +164,27 @@ void Settings::Load() {
         JSON_TRYGET("AbbreviatedRoleNames", this->AbbreviatedRoleNames);
         JSON_TRYGET("PlayerColoredDots", this->PlayerColoredDots);
         JSON_TRYGET("ShowPlayerInfo", this->ShowPlayerInfo);
-        JSON_TRYGET("ShowLobbyInfo", this->ShowLobbyInfo);
         JSON_TRYGET("ChatAlwaysActive", this->ChatAlwaysActive);
         JSON_TRYGET("ReadGhostMessages", this->ReadGhostMessages);
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
+        JSON_TRYGET("ReadAndSendKillNetChat", this->ReadAndSendKillNetChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
+        JSON_TRYGET("CustomRgbName", this->CustomRgbName);
         JSON_TRYGET("ResizeName", this->ResizeName);
+        JSON_TRYGET("IndentName", this->IndentName);
+        JSON_TRYGET("CspaceName", this->CspaceName);
+        JSON_TRYGET("MspaceName", this->MspaceName);
+        JSON_TRYGET("VoffsetName", this->VoffsetName);
+        JSON_TRYGET("RotateName", this->RotateName);
         JSON_TRYGET("NameSize", this->NameSize);
+        JSON_TRYGET("NameIndent", this->NameIndent);
+        JSON_TRYGET("NameCspace", this->NameIndent);
         JSON_TRYGET("ItalicName", this->ItalicName);
         JSON_TRYGET("UnderlineName", this->UnderlineName);
         JSON_TRYGET("StrikethroughName", this->StrikethroughName);
+        JSON_TRYGET("BoldName", this->BoldName);
+        JSON_TRYGET("NobrName", this->BoldName);
         JSON_TRYGET("ColoredName", this->ColoredName);
         JSON_TRYGET("NameColor1_R", this->NameColor1.x);
         JSON_TRYGET("NameColor1_G", this->NameColor1.y);
@@ -204,10 +211,6 @@ void Settings::Load() {
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
         JSON_TRYGET("AutoCopyLobbyCode", this->AutoCopyLobbyCode);
-        JSON_TRYGET("DisableLobbyMusic", this->DisableLobbyMusic);
-        JSON_TRYGET("ReportOnMurder", this->ReportOnMurder);
-        JSON_TRYGET("PreventSelfReport", this->PreventSelfReport);
-        //JSON_TRYGET("AutoRejoin", this->AutoRejoin);
         JSON_TRYGET("NoClip", this->NoClip);
         JSON_TRYGET("KillInLobbies", this->KillInLobbies);
         JSON_TRYGET("KillInVanish", this->KillInVanish);
@@ -247,8 +250,10 @@ void Settings::Load() {
         JSON_TRYGET("HideCode", this->HideCode);
         JSON_TRYGET("RgbLobbyCode", this->RgbLobbyCode);
 
-        JSON_TRYGET("ShowLobbyTimer", this->ShowLobbyTimer);
         JSON_TRYGET("SickoDetection", this->SickoDetection);
+        JSON_TRYGET("AmongUsMenuDetection", this->AmongUsMenuDetection);
+        JSON_TRYGET("BetterAmongUsDetection", this->AmongUsMenuDetection);
+        JSON_TRYGET("KillNetworkDetection", this->KillNetworkDetection);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
 
@@ -276,11 +281,7 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckLevel", this->SMAC_CheckLevel);
         JSON_TRYGET("SMAC_CheckVent", this->SMAC_CheckVent);
         JSON_TRYGET("SMAC_CheckSabotage", this->SMAC_CheckSabotage);
-        JSON_TRYGET("SMAC_HighLevel", this->SMAC_HighLevel);
-        JSON_TRYGET("SMAC_LowLevel", this->SMAC_LowLevel);
-        
-        JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
-        JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
+        JSON_TRYGET("SMAC_Blacklist", this->SMAC_Blacklist);
     } catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
@@ -308,7 +309,7 @@ void Settings::Save() {
             //Log.Info("Unable to save sicko-selected-config.json");
         }
         auto settingsPath = path.parent_path() / 
-            std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? this->selectedConfig : "default");
+            std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? GetAllConfigs()[this->selectedConfigInt] : "default");
 
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{
@@ -336,16 +337,19 @@ void Settings::Save() {
                 { "MenuGradientColor2_B", this->MenuGradientColor2.z },
                 { "MenuGradientColor2_A", this->MenuGradientColor2.w },
                 { "UnlockCosmetics", this->UnlockCosmetics },
-                { "GameFPS", this->GameFPS },
                 { "ShowKeybinds", this->ShowKeybinds },
                 { "KeybindsWhileChatting", this->KeybindsWhileChatting },
                 { "SpoofLevel", this->SpoofLevel },
+                { "SpoofCrashLevel", this->SpoofCrashLevel },
                 { "FakeLevel", this->FakeLevel },
+                { "CrashLevel", this->CrashLevel },
                 { "SpoofFriendCode", this->SpoofFriendCode },
                 { "UseGuestFriendCode", this->UseGuestFriendCode },
                 { "GuestFriendCode", this->GuestFriendCode },
                 { "FakeFriendCode", this->FakeFriendCode },
+                { "FakePuid", this->FakePuid },
                 { "SpoofPlatform", this->SpoofPlatform },
+                { "SpoofRPC", this->SpoofRPC },
                 { "FakePlatform", this->FakePlatform },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
                 //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
@@ -356,13 +360,9 @@ void Settings::Save() {
                 { "SelectedColorId", this->SelectedColorId },
                 { "SnipeColor", this->SnipeColor },
                 { "CycleBetweenPlayers", this->CycleBetweenPlayers },
-                //{ "CycleBetweenOutfits", this->CycleBetweenOutfits },
-                //{ "ChangeBodyType", this->ChangeBodyType },
-                //{ "BodyType", this->BodyType },
                 { "CycleInMeeting", this->CycleInMeeting },
                 { "CycleTimer", this->CycleTimer },
                 { "CyclerUserNames", this->cyclerUserNames },
-                //{ "playerOutfits", this->playerOutfits },
                 { "HostUsername", this->hostUserName },
                 { "ChatMessage", this->chatMessage },
                 { "CycleName", this->CycleName },
@@ -380,7 +380,6 @@ void Settings::Save() {
                 { "ModifyTaskBarUpdates", this->ModifyTaskBarUpdates },
                 { "UserName", this->userName },
                 { "ShowGhosts", this->ShowGhosts },
-                { "ShowPhantoms", this->ShowPhantoms },
                 { "FakeRole", this->FakeRole },
                 { "AutoFakeRole", this->AutoFakeRole },
                 { "ShowRadar", this->ShowRadar },
@@ -429,17 +428,29 @@ void Settings::Save() {
                 { "AbbreviatedRoleNames", this->AbbreviatedRoleNames },
                 { "PlayerColoredDots", this->PlayerColoredDots },
                 { "ShowPlayerInfo", this->ShowPlayerInfo },
-                { "ShowLobbyInfo", this->ShowLobbyInfo },
                 { "ChatAlwaysActive", this->ChatAlwaysActive },
                 { "ReadGhostMessages", this->ReadGhostMessages },
                 { "ReadAndSendAumChat", this->ReadAndSendAumChat },
+                { "ReadAndSendKillNetChat", this->ReadAndSendKillNetChat },
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
                 { "ResizeName", this->ResizeName },
+                { "IndentName", this->IndentName },
+                { "CspaceName", this->CspaceName },
+                { "MspaceName", this->MspaceName },
+                { "VoffsetName", this->VoffsetName },
+                { "RotateName", this->RotateName },
                 { "NameSize", this->NameSize },
+                { "NameIndent", this->NameIndent },
+                { "NameCspace", this->NameCspace },
+                { "NameMspace", this->NameMspace },
+                { "NameVoffset", this->NameVoffset },
+                { "NameRotate", this->NameRotate },
                 { "ItalicName", this->ItalicName },
                 { "UnderlineName", this->UnderlineName },
                 { "StrikethroughName", this->StrikethroughName },
+                { "BoldName", this->BoldName },
+                { "NobrName", this->NobrName },
                 { "ColoredName", this->ColoredName },
                 { "NameColor1_R", this->NameColor1.x },
                 { "NameColor1_G", this->NameColor1.y },
@@ -466,10 +477,6 @@ void Settings::Save() {
                 { "ShowFps", this->ShowFps },
                 { "DoTasksAsImpostor", this->DoTasksAsImpostor },
                 { "AutoCopyLobbyCode", this->AutoCopyLobbyCode },
-                { "DisableLobbyMusic", this->DisableLobbyMusic },
-                { "ReportOnMurder", this->ReportOnMurder },
-                { "PreventSelfReport", this->PreventSelfReport },
-                //{ "AutoRejoin", this->AutoRejoin },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
                 { "KillInVanish", this->KillInVanish },
@@ -506,10 +513,8 @@ void Settings::Save() {
                 { "HideCode", this->HideCode },
                 { "RgbLobbyCode", this->RgbLobbyCode },
 
-                { "ShowLobbyTimer", this->ShowLobbyTimer },
-                { "AutoStartGame", this->AutoStartGame },
-                { "AutoStartTimer", this->AutoStartTimer },
                 { "SickoDetection", this->SickoDetection },
+                { "KillNetworkDetection", this->KillNetworkDetection },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
 
@@ -537,10 +542,7 @@ void Settings::Save() {
                 { "SMAC_CheckLevel", this->SMAC_CheckLevel },
                 { "SMAC_CheckVent", this->SMAC_CheckVent },
                 { "SMAC_CheckSabotage", this->SMAC_CheckSabotage },
-                { "SMAC_HighLevel", this->SMAC_HighLevel },
-                { "SMAC_LowLevel", this->SMAC_LowLevel },
-                { "WhitelistFriendCodes", this->WhitelistFriendCodes },
-                { "BlacklistFriendCodes", this->BlacklistFriendCodes },
+                { "SMAC_Blacklist", this->SMAC_Blacklist },
             };
 
             std::ofstream outSettings(settingsPath);

@@ -47,17 +47,21 @@ public:
     bool SetName = false;
     bool SafeMode = true;
     bool UnlockCosmetics = true;
-    int GameFPS = 60;
     bool SpoofLevel = false;
+    bool SpoofCrashLevel = false;
     int FakeLevel = 1;
+    int CrashLevel = 0;
     bool ShowKeybinds = true;
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
     bool UseGuestFriendCode = false;
     std::string GuestFriendCode = "";
     std::string FakeFriendCode = "";
+    std::string FakePuid = "";
     bool SpoofPlatform = false;
+    bool SpoofRPC = false;
     int FakePlatform = 0;
+    int ChangeRPC = 0;
     bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
 
@@ -81,22 +85,19 @@ public:
     bool UnlockVents = false;
     bool UnlockKillButton = false;
     bool ShowGhosts = false;
-    bool ShowPhantoms = false;
     int FakeRole = 0;
     bool AutoFakeRole = false;
     bool DisableVents = false;
     bool SpamReport = false;
+    bool CrashSpamReport = false;
+    bool UltimateSpamReport = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
     bool DisableKills = false;
     bool BattleRoyale = false;
-    bool TaskSpeedrun = false;
-    float SpeedrunTimer = 0.f;
-    int GameMode = 0;
     bool NoGameEnd = false;
     bool ChatSpam = false;
     bool ChatSpamEveryone = false;
-    int ChatSpamMode = 0;
     bool AutoJoinLobby = false;
     std::string AutoJoinLobbyCode = "";
 
@@ -115,7 +116,6 @@ public:
     bool AbbreviatedRoleNames = false;
     bool PlayerColoredDots = false;
     bool ShowPlayerInfo = false;
-    bool ShowLobbyInfo = false;
     float PrevKillDistance = 0.f;
     float KillDistance = 0.f;
     float GameKillDistance = 0.f;
@@ -141,11 +141,24 @@ public:
     bool ForceColorForEveryone = false;
     bool CustomName = false;
     bool RgbName = false;
+    bool CustomRgbName = false;
     bool ResizeName = false;
+    bool IndentName = false;
+    bool CspaceName = false;
+    bool MspaceName = false;
+    bool VoffsetName = false;
+    bool RotateName = false;
     float NameSize = 1.f;
+    float NameIndent = 0.f;
+    float NameCspace = 0.f;
+    float NameMspace = 0.f;
+    float NameVoffset = 0.f;
+    float NameRotate = 0.f;
     bool ItalicName = false;
     bool UnderlineName = false;
     bool StrikethroughName = false;
+    bool BoldName = false;
+    bool NobrName = false;
     bool ColoredName = false;
     ImVec4 NameColor1 = ImVec4(1.f, 1.f, 1.f, 1.f);
     ImVec4 NameColor2 = ImVec4(1.f, 1.f, 1.f, 1.f);
@@ -156,9 +169,6 @@ public:
     bool SeeVanishedPlayers = false;
     bool CycleInMeeting = true;
     bool CycleBetweenPlayers = false;
-    bool CycleBetweenOutfits = false;
-    bool ChangeBodyType = false;
-    int BodyType = 0;
 
     bool NoClip = false;
     bool HotkeyNoClip = false;
@@ -184,10 +194,6 @@ public:
     bool DoTasksAsImpostor = false;
     bool AlwaysUseKillExploit = false;
     bool AutoCopyLobbyCode = false;
-    bool DisableLobbyMusic = false;
-    bool ReportOnMurder = false;
-    bool PreventSelfReport = true;
-    bool AutoRejoin = false;
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
@@ -224,6 +230,7 @@ public:
     bool ChatActiveOriginalState = false;
     bool ReadGhostMessages = false;
     bool ReadAndSendAumChat = false;
+    bool ReadAndSendKillNetChat = false;
     bool ShiftRightClickTP = false;
     bool TeleportEveryone = false;
     bool RotateEveryone = false;
@@ -350,9 +357,7 @@ public:
     bool ShowUnityLogs = true;
     bool ShowHookLogs = false;
 
-    float LobbyTimer = 600.f;
-    bool ShowLobbyTimer = false;
-    bool JoinedAsHost = false;
+    int LobbyTimer = -1;
     float ChatCooldown = 0.f;
     bool MessageSent = false;
     bool ChatFocused = false;
@@ -368,18 +373,22 @@ public:
     std::string customCode = "SICKOS";
     bool HideCode = false;
     bool RgbLobbyCode = false;
-    std::map<std::string, std::map<std::string, std::string>> playerOutfits = {};
 
     bool PanicMode = false;
     bool TempPanicMode = false; //prevent instant crash on joining lobby
     bool BlinkPlayersTab = false; //prevent instant crash on player leaving
     bool SickoDetection = true;
+    bool AmongUsMenuDetection = false;
+    bool BetterAmongUsDetection = false;
+    bool KillNetworkDetection = false;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
     bool TournamentMode = false;
 
     std::unordered_set<std::string> Friends;
     std::unordered_set<Game::PlayerId> InGameFriends;
+    std::unordered_set<std::string> Block;
+    std::unordered_set<Game::PlayerId> InGameBlock;
     std::vector<std::string /*friendcode*/> tournamentFriendCodes;
     std::map<std::string /*friendcode*/, float /*points*/> tournamentPoints;
     std::map<std::string /*friendcode*/, float /*points*/> tournamentWinPoints;
@@ -390,8 +399,6 @@ public:
     std::vector<std::string> tournamentAliveImpostors;
     std::vector<std::string> tournamentCallers;
     std::vector<std::string> tournamentCalledOut;
-    std::map<std::string, Game::PlayerId> tournamentCorrectCallers;
-    std::vector<Game::PlayerId> tournamentAllTasksCompleted;
     bool tournamentFirstMeetingOver = false;
 
     enum class MapType : uint8_t
@@ -425,10 +432,6 @@ public:
     std::string LastLobbyJoined = "";
     bool IsPreHosting = false;
     bool GameLoaded = false;
-    Game::PlayerId VoteOffPlayerId = Game::HasNotVoted;
-    bool LevelFarm = false;
-    bool AutoStartGame = false;
-    int AutoStartTimer = 60;
 
     bool AutoOpenDoors = false;
 
@@ -437,7 +440,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_rc2";
+    std::string SickoVersion = "v3.7.2";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
@@ -463,12 +466,9 @@ public:
     bool SMAC_CheckLevel = true;
     bool SMAC_CheckVent = true;
     bool SMAC_CheckSabotage = true;
-    int SMAC_HighLevel = 10000;
-    int SMAC_LowLevel = 0;
+    int SMAC_HighLevel = 1000;
+    std::map<std::string /*puid*/, std::string> SMAC_Blacklist = {};
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
-
-    std::vector<std::string> WhitelistFriendCodes = {};
-    std::vector<std::string> BlacklistFriendCodes = {};
 
     void Load();
     void Save();

@@ -33,22 +33,11 @@ static void onGameEnd() {
         State.CanChangeOutfit = false;
         State.GameLoaded = false;
         State.RealRole = RoleTypes__Enum::Crewmate;
-        State.mapType = Settings::MapType::Ship;
-        State.SpeedrunTimer = 0.f;
 
         if (State.PanicMode && State.TempPanicMode) {
             State.PanicMode = false;
             State.TempPanicMode = false;
         }
-
-        State.tournamentFirstMeetingOver = false;
-        State.tournamentKillCaps.clear();
-        State.tournamentAssignedImpostors.clear();
-        State.tournamentAliveImpostors.clear();
-        State.tournamentCallers.clear();
-        State.tournamentCalledOut.clear();
-        State.tournamentCorrectCallers.clear();
-        State.tournamentAllTasksCompleted.clear();
 
         State.selectedPlayers = {};
 
@@ -69,8 +58,11 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         if (!State.PanicMode) {
             static bool onStart = true;
             if (!IsInLobby()) {
-                State.LobbyTimer = 600.f;
-                State.JoinedAsHost = false;
+                State.LobbyTimer = -1;
+            }
+
+            if (IsInLobby() && State.LobbyTimer > 0) {
+                State.LobbyTimer--;
             }
 
             if (!IsInGame()) {
@@ -102,8 +94,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.InMeeting = false;
                 State.DisableLights = false;
                 State.CloseAllDoors = false;
-                State.SpamReport = false;
                 State.DisableVents = false;
+                State.UltimateSpamReport = false;
+                State.SpamReport = false;
 
                 if (!IsInLobby()) {
                     State.selectedPlayer = PlayerSelection();
@@ -111,6 +104,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
+                    State.SpoofCrashLevel = false;
                 }
             }
             else {
@@ -187,6 +181,13 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.rpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (State.FakeLevel - 1)));
                 else if (IsInLobby() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != State.FakeLevel)
                     State.lobbyRpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (State.FakeLevel - 1)));
+            }
+
+            if (State.SpoofCrashLevel && (IsInGame() || IsInLobby()) && !State.activeImpersonation) {
+                if (IsInGame() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != State.CrashLevel)
+                    State.rpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (State.CrashLevel - 1)));
+                else if (IsInLobby() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != State.CrashLevel)
+                    State.lobbyRpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (State.CrashLevel - 1)));
             }
 
             if (IsInLobby()) {
@@ -266,9 +267,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         else
                             GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, 0.0042069f); //force cooldown > 0 as ur unable to kill otherwise
                         if (IsHost()) {
-                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
-                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 0); //force set cooldown, otherwise u get kicked
-                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomDuration, 0); //force set cooldown, otherwise u get kicked
+                            //GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
+                            //GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 0); //force set cooldown, otherwise u get kicked
+                            //GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomDuration, 0); //force set cooldown, otherwise u get kicked
                         }
                         else {
                             if (role == RoleTypes__Enum::Shapeshifter) {
@@ -415,13 +416,51 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 reportDelay--;
             }
 
+            static int reportDelays = 0;
+            if (reportDelays <= 0 && State.UltimateSpamReport && IsInGame()) {
+                for (auto p : GetAllPlayerControl()) {
+                    if (State.InMeeting)
+                        State.rpcQueue.push(new RpcForceMeeting(p, PlayerSelection(p)));
+                    else
+                        State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
+                }
+                reportDelays = 1; //Should be approximately 1 second
+            }
+            else {
+                reportDelays--;
+            }
+
+            static int reportDelayss = 0;
+            if (reportDelayss <= 0 && State.CrashSpamReport && IsInGame()) {
+                for (auto p : GetAllPlayerControl()) {
+                    if (State.InMeeting)
+                        State.rpcQueue.push(new RpcForceMeeting(p, PlayerSelection(p)));
+                    else
+                        State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
+                }
+                reportDelayss = 1; //Should be approximately 1 second
+            }
+            else {
+                reportDelayss--;
+            }
+
+            State.RgbNameColor += 0.03f;
+            constexpr auto tau = 2.f * 3.14159265358979323846f;
+            while (State.RgbNameColor > tau) State.RgbNameColor -= tau;
+            const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
+            auto color_r = calculate(State.RgbNameColor + 0.f);
+            auto color_g = calculate(State.RgbNameColor + 4.f);
+            auto color_b = calculate(State.RgbNameColor + 2.f);
+            State.rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
+
+
             static int nameChangeCycleDelay = 0; //If we spam too many name changes, we're banned
             if (nameChangeCycleDelay <= 0 && State.SetName && !State.activeImpersonation && !State.ServerSideCustomName) {
                 if ((((IsInGame() || IsInLobby()) && (convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), nullptr)) != State.userName))
                     || ((!IsInGame() && !IsInLobby()) && GetPlayerName() != State.userName))
                     && !State.userName.empty() && (IsNameValid(State.userName) || (IsHost() || !State.SafeMode))) {
-                    //SetPlayerName(State.userName);
-                    //LOG_INFO("Name mismatch, setting name to \"" + State.userName + "\"");
+                    SetPlayerName(State.userName);
+                    LOG_INFO("Name mismatch, setting name to \"" + State.userName + "\"");
                     if (IsInGame())
                         State.rpcQueue.push(new RpcSetName(State.userName));
                     else if (IsInLobby())
@@ -759,10 +798,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableMeetings = false;
                 State.DisableSabotages = false;
             }
-
-            if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer) {
-                InnerNetClient_SendStartGame(__this, NULL);
-            }
         }
     }
     catch (Exception* ex) {
@@ -774,7 +809,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     catch (...) {
         LOG_ERROR("Exception occurred in InnerNetClient_Update (InnerNetClient)");
     }
-    Application_set_targetFrameRate(State.GameFPS > 1 ? State.GameFPS : 60, NULL);
     InnerNetClient_Update(__this, method);
 }
 
@@ -799,36 +833,43 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerLeft executed");
-    //State.BlinkPlayersTab = true;
     try {
-        if (data->fields.Character) { // Don't use Object_1_IsNotNull().
-            auto playerInfo = GetPlayerData(data->fields.Character);
+        if (!State.PanicMode) {
+            State.BlinkPlayersTab = true;
+            if (data->fields.Character) { // Don't use Object_1_IsNotNull().
+                auto playerInfo = GetPlayerData(data->fields.Character);
 
-            if (reason == DisconnectReasons__Enum::Banned)
-                Log.Debug(ToString(data->fields.Character) + " has been banned by host (" + GetHostUsername() + ").");
-            else if (reason == DisconnectReasons__Enum::Kicked)
-                Log.Debug(ToString(data->fields.Character) + " has been kicked by host (" + GetHostUsername() + ").");
-            else if (reason == DisconnectReasons__Enum::Hacking)
-                Log.Debug(ToString(data->fields.Character) + " has been banned for hacking.");
-            else if (reason == DisconnectReasons__Enum::Error)
-                Log.Debug(ToString(data->fields.Character) + " has been disconnected due to error.");
-            else
-                Log.Debug(ToString(data->fields.Character) + " has left the game.");
+                if (reason == DisconnectReasons__Enum::Banned)
+                    Log.Debug(ToString(data->fields.Character) + " has been banned by host (" + GetHostUsername() + ").");
+                else if (reason == DisconnectReasons__Enum::Kicked)
+                    Log.Debug(ToString(data->fields.Character) + " has been kicked by host (" + GetHostUsername() + ").");
+                else if (reason == DisconnectReasons__Enum::Hacking)
+                    Log.Debug(ToString(data->fields.Character) + " has been banned for hacking.");
+                else if (reason == DisconnectReasons__Enum::Error)
+                    Log.Debug(ToString(data->fields.Character) + " has been disconnected due to error.");
+                else
+                    Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
-            if (State.modUsers.find(data->fields.Character->fields.PlayerId) != State.modUsers.end())
-                State.modUsers.erase(data->fields.Character->fields.PlayerId);
+                if (State.modUsers.find(data->fields.Character->fields.PlayerId) != State.modUsers.end())
+                    State.modUsers.erase(data->fields.Character->fields.PlayerId);
 
-            auto playerId = data->fields.Character->fields.PlayerId;
+                auto playerId = data->fields.Character->fields.PlayerId;
+                if (PlayerSelection(data->fields.Character).equals(State.selectedPlayer))
+                    State.selectedPlayer = PlayerSelection();
+                auto itSel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), playerId);
+                if (itSel != State.selectedPlayers.end())
+                    State.selectedPlayers.erase(itSel);
 
-            if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
-                synchronized(Replay::replayEventMutex) {
-                    State.liveReplayEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
+                if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
+                    synchronized(Replay::replayEventMutex) {
+                        State.liveReplayEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
+                    }
                 }
             }
-        }
-        else {
-            //Found this happens on game ending occasionally
-            //Log.Info(std::format("Client {} has left the game.", data->fields.Id));
+            else {
+                //Found this happens on game ending occasionally
+                //Log.Info(std::format("Client {} has left the game.", data->fields.Id));
+            }
         }
     }
     catch (...) {
@@ -906,7 +947,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnGameEnd executed");
     try {
-		if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
+        if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
             RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
         //fixes game crashing on ending with shapeshifter
         onGameEnd();
@@ -963,7 +1004,6 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
             if (aliveCount != 1) return;
             else endReason = GameOverReason__Enum::ImpostorByKill;
         }
-        if (State.TaskSpeedrun) return;
         if (IsHost() && State.TournamentMode) {
             bool impostorWin = false;
             switch (endReason) {
@@ -979,19 +1019,19 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
                 auto friendCode = convert_from_string(p->fields.FriendCode);
                 if (impostorWin) {
                     if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
-                        UpdatePoints(p, 2); //AllImpsWin
+                        UpdateTournamentPoints(p, 2); //AllImpsWin
                         State.tournamentWinPoints[friendCode] += 1;
                     }
                     else if (PlayerIsImpostor(p)) {
-                        UpdatePoints(p, 1); //ImpWin
+                        UpdateTournamentPoints(p, 1); //ImpWin
                         State.tournamentWinPoints[friendCode] += 1;
                     }
                 }
                 else {
                     if (PlayerIsImpostor(p))
-                        UpdatePoints(p, -1); //ImpLose
+                        UpdateTournamentPoints(p, 10); //ImpLose
                     else {
-                        UpdatePoints(p, 2); //CrewWin
+                        UpdateTournamentPoints(p, 7); //CrewWin
                         State.tournamentWinPoints[friendCode] += 1;
                     }
                 }
@@ -1107,30 +1147,29 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
         switch (State.LastDisconnectReason) {
         case DisconnectReasons__Enum::Hacking: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string(std::format("You were banned for hacking.\n\n{}\n\n{}",
-                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.",
-                    State.SafeMode ? "Please report this bug in Safe Mode on GitHub/Discord!" : "Disabling safe mode isn't recommended on official servers!")), NULL);
+                convert_to_string(std::format("<font=\"Brook SDF\"><#F00><u><cspace=+0.1><voffset=-1><size=+0.05>You were banned for hacking!</voffset></size></u></color></font>\n\n{}",
+                    State.AutoCopyLobbyCode ? "<font=\"OCRAEXT SDF\"><#F60>Lobby Code has been <u>copied</u> to the clipboard.</color>" : "<font=\"OCRAEXT SDF\"><#F60>Please stop.</color></font>")), NULL);
         }
-        break;
+                                             break;
         case DisconnectReasons__Enum::Kicked: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string(std::format("You were kicked from the lobby.\n\n{}",
-                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby if it hasn't started.")), NULL);
+                convert_to_string(std::format("<font=\"Brook SDF\"><#F00><u><cspace=+0.1><voffset=-1><size=+0.05>You were kicked from the lobby!</voffset></size></u></color></font>\n\n{}",
+                    State.AutoCopyLobbyCode ? "<font=\"OCRAEXT SDF\"><#F60>Lobby Code has been <u>copied</u> to the clipboard.</color></font>" : "<font=\"OCRAEXT SDF\"><#F60>You can rejoin the lobby if it hasn't started.</color></font>")), NULL);
         }
-        break;
+                                            break;
         case DisconnectReasons__Enum::Banned: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string(std::format("You were banned from the lobby.\n\n{}",
-                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby by changing your IP address.")), NULL);
+                convert_to_string(std::format("<font=\"Brook SDF\"><#F00><u><cspace=+0.1><voffset=-1><size=+0.05>You were banned from the lobby!</voffset></size></u></color></font>\n\n{}",
+                    State.AutoCopyLobbyCode ? "<font=\"OCRAEXT SDF\"><#F60>Lobby Code has been copied to the clipboard.</color></font>" : "<font=\"OCRAEXT SDF\"><#F60>You can rejoin the lobby by changing your IP address.</color></font>")), NULL);
         }
-        break;
+                                            break;
         default: {
             std::string prevText = convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields._textArea, NULL));
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("{}{}", prevText,
-                    State.AutoCopyLobbyCode ? "\nLobby Code has been copied to the clipboard." : "")), NULL);
+                    State.AutoCopyLobbyCode ? "\n<font=\"OCRAEXT SDF\"><#F60>Lobby Code has been copied to the clipboard.</color></font>" : "")), NULL);
         }
-        break;
+               break;
         }
         if (State.AutoCopyLobbyCode) ClipboardHelper_PutClipboardString(convert_to_string(State.LastLobbyJoined), NULL);
     }

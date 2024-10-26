@@ -33,6 +33,14 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 				STREAM_DEBUG("RPC Received for a BetterAmongUs user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 			}
 		}
+		case (uint8_t)250:
+		{
+			uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
+			if (State.modUsers.find(playerId) == State.modUsers.end()) {
+				State.modUsers.insert({ playerId, "<#f00>KillNetwork</color>" });
+				STREAM_DEBUG("RPC Received for a KillNetwork user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			}
+		}
 		break;
 		case (uint8_t)101:
 		{
@@ -56,8 +64,32 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 			}
 		}
 		break;
+
+		case (uint8_t)360:
+		{
+			std::string playerName = convert_from_string(MessageReader_ReadString(reader, NULL));
+			//we have to get only the message, however KillNet sends the player's name before this
+			std::string message = convert_from_string(MessageReader_ReadString(reader, NULL));
+			uint32_t colorId = MessageReader_ReadInt32(reader, NULL);
+			if (message.size() == 0) break;
+			if (!State.PanicMode && State.ReadAndSendKillNetChat) {
+				NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
+				bool wasDead = false;
+				if (player != NULL && GetPlayerData(player)->fields.IsDead && local != NULL && !local->fields.IsDead) {
+					local->fields.IsDead = true; //see killnet chat of ghosts
+					wasDead = true;
+				}
+				ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#f00><b><font=\Barlow-BoldItalic SDF\" material=\"Barlow-Italic SDF Outline\">[KillNetwork Chat]</material></font></b></color>\n" + message), false, NULL);
+				if (wasDead) {
+					local->fields.IsDead = false;
+				}
+				STREAM_DEBUG("KillNetwork Chat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			}
+		}
+		break;
 	}
 }
+
 
 bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 	if (!State.Enable_SMAC || player == *Game::pLocalPlayer) return false;
@@ -65,23 +97,19 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	switch (callId) {
 	case (uint8_t)RpcCalls__Enum::CheckName:
 	case (uint8_t)RpcCalls__Enum::SetName: {
-		if ((IsHost() || !State.SafeMode) && (State.ForceNameForEveryone || State.CustomNameForEveryone || (State.Cycler && State.CycleName && State.CycleForEveryone)))
-			break;
-		if (State.SMAC_CheckBadNames && IsInGame()) {
+		if (IsHost()) break;
+		/*if (State.SMAC_CheckBadNames) {
 			auto name = MessageReader_ReadString(reader, NULL);
 			std::string nameStr = convert_from_string(name);
-			if (nameStr == "") return false; //prevent false flags
 			if (MessageReader_get_BytesRemaining(reader, NULL) > 0 || MessageReader_ReadBoolean(reader, NULL)) return false;
 			if (nameStr != RemoveHtmlTags(nameStr)) return true;
 			if (!IsNameValid(nameStr)) return true;
 			SMAC_OnCheatDetected(player, "Abnormal Name");
-		}
-		return false;
+		}*/
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::CheckColor:
-		if ((IsHost() || !State.SafeMode) && (State.ForceColorForEveryone || (State.Cycler && State.RandomColor && State.CycleForEveryone)))
-			break;
+		if (IsHost()) break;
 		if (State.SMAC_CheckColor && IsInGame()) {
 			SMAC_OnCheatDetected(player, "Abnormal Change Color");
 			return true;
@@ -122,6 +150,11 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SendChat: {
+		/*auto msg = MessageReader_ReadString(reader, NULL);
+		if (State.SMAC_CheckChat && ((IsInGame() && !State.InMeeting && !pData->fields.IsDead) || msg->fields.m_stringLength > 120)) {
+			SMAC_OnCheatDetected(player, "Abnormal Chat");
+			return true;
+		}*/
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::StartMeeting: {
@@ -168,11 +201,11 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::SetLevel: {
-		/*uint32_t level = MessageReader_ReadUInt32(reader, NULL);
+		uint32_t level = MessageReader_ReadUInt32(reader, NULL);
 		if (State.SMAC_CheckLevel && (IsInGame() || level >= (uint32_t)State.SMAC_HighLevel)) {
 			SMAC_OnCheatDetected(player, "Abnormal Level");
 			return true;
-		}*/
+		}
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::EnterVent: {

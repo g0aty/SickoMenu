@@ -76,7 +76,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Allow Ctrl+(C/V) in Chat", &State.ChatPaste)) { //add copying later
+            if (ToggleButton("Allow Ctrl+(C/V/X) in Chat", &State.ChatPaste)) { //add copying later
                 State.Save();
             }
             
@@ -88,6 +88,12 @@ namespace SelfTab {
                 State.Save();
             }
             if (State.ReadAndSendAumChat) ImGui::Text("Send AUM chat messages in regular chat by typing \"/aum [message]\"!");
+
+            if (ToggleButton("Read and Send KillNetwork Chat", &State.ReadAndSendKillNetChat)) {
+                State.Save();
+            }
+            if (State.ReadAndSendKillNetChat) ImGui::Text("Send KillNetwork chat messages in regular chat by typing \"/killnetwork [message]\"!");
+            ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
             /*static int framesPassed = 0;
             if (ImGui::Button("Refresh Chat Button")) {
                 State.RefreshChatButton = true;
@@ -124,10 +130,6 @@ namespace SelfTab {
 
             if (State.CustomName && ImGui::CollapsingHeader("Custom Name Options"))
             {
-                if (ToggleButton("Size", &State.ResizeName)) {
-                    State.Save();
-                }
-                ImGui::SameLine();
                 if (ToggleButton("Italics", &State.ItalicName)) {
                     State.Save();
                 }
@@ -137,6 +139,14 @@ namespace SelfTab {
                 }
                 ImGui::SameLine();
                 if (ToggleButton("Strikethrough", &State.StrikethroughName)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (ToggleButton("Bold", &State.BoldName)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (ToggleButton("Nobr", &State.NobrName)) {
                     State.Save();
                 }
 
@@ -156,11 +166,74 @@ namespace SelfTab {
                     State.Save();
                 }
                 ImGui::SameLine();
+                if (State.RgbName && ToggleButton("Custom Colors RGB", &State.CustomRgbName)) State.Save(); {
+                    ImGui::Dummy(ImVec2(-3, -3)* State.dpiScale);
+                    if (State.CustomRgbName) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("\nDoesn't work!"));
+                    State.Save();
+                }
+
+                ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
+                if (ToggleButton("Size", &State.ResizeName)) {
+                    State.Save();
+                }
+
+                ImGui::SameLine();
                 if (ImGui::InputFloat("Name Size", &State.NameSize)) {
+                    State.Save();
+                }
+
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+                if (ToggleButton("Indent", &State.IndentName)) {
+                    State.Save();
+                }
+
+                ImGui::SameLine();
+                if (ImGui::InputFloat("Name Indent", &State.NameIndent)) {
+                    State.Save();
+                }
+
+                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+                if (ToggleButton("Cspace", &State.CspaceName)) {
+                    State.Save();
+                }
+
+                ImGui::SameLine();
+                if (ImGui::InputFloat("Name Cspace", &State.NameCspace)) {
+                    State.Save();
+                }
+
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+                if (ToggleButton("Mspace", &State.MspaceName)) {
+                    State.Save();
+                }
+
+                ImGui::SameLine();
+                if (ImGui::InputFloat("Name Mspace", &State.NameMspace)) {
+                    State.Save();
+                }
+
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+                if (ToggleButton("Voffset", &State.VoffsetName)) {
+                    State.Save();
+                }
+
+                ImGui::SameLine();
+                if (ImGui::InputFloat("Name Voffset", &State.NameVoffset)) {
+                    State.Save();
+                }
+
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+                if (ToggleButton("Rotate", &State.RotateName)) {
+                    State.Save();
+                }
+
+                ImGui::SameLine();
+                if (ImGui::InputFloat("Name Rotate", &State.NameRotate)) {
                     State.Save();
                 }
             }
 
+            ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
             if (ToggleButton("Reveal Roles", &State.RevealRoles)) {
                 State.Save();
             }
@@ -174,13 +247,7 @@ namespace SelfTab {
             {
                 State.Save();
             }
-            
             if (ToggleButton("Show Player Info in Lobby", &State.ShowPlayerInfo))
-            {
-                State.Save();
-            }
-            ImGui::SameLine();
-            if (ToggleButton("Show Lobby Info", &State.ShowLobbyInfo))
             {
                 State.Save();
             }
@@ -188,20 +255,20 @@ namespace SelfTab {
             if (ToggleButton("Reveal Votes", &State.RevealVotes)) {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (ToggleButton("Reveal Anonymous Votes", &State.RevealAnonymousVotes)) {
-                State.Save();
-                RevealAnonymousVotes();
+            if (!IsInGame() && !IsInLobby()
+                || GameOptions().GetGameMode() != GameModes__Enum::Normal
+                || GameOptions().GetBool(app::BoolOptionNames__Enum::AnonymousVotes)) {
+                ImGui::SameLine();
+                if (ToggleButton("Reveal Anonymous Votes", &State.RevealAnonymousVotes)) {
+                    State.Save();
+                    RevealAnonymousVotes();
+                }
             }
 
             if (ToggleButton("See Ghosts", &State.ShowGhosts)) {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("See Phantoms", &State.ShowPhantoms)) {
-                State.Save();
-            }
-
             if (ToggleButton("See Protections", &State.ShowProtections))
             {
                 State.Save();
@@ -212,10 +279,6 @@ namespace SelfTab {
             }
 
             if (ToggleButton("Disable Kill Animation", &State.DisableKillAnimation)) {
-                State.Save();
-            }
-            ImGui::SameLine();
-            if (ToggleButton("Disable Lobby Music", &State.DisableLobbyMusic)) {
                 State.Save();
             }
             ImGui::SameLine();
@@ -236,15 +299,6 @@ namespace SelfTab {
             if (ToggleButton("Show FPS", &State.ShowFps)) {
                 State.Save();
             }
-
-            /*if (ToggleButton("Change Body Type", &State.ChangeBodyType)) {
-                State.Save();
-            }
-            if (State.ChangeBodyType) {
-                ImGui::SameLine();
-                if (CustomListBoxInt("Type", &State.BodyType, BODYTYPES, 75.f * State.dpiScale))
-                    State.Save();
-            }*/
 
             if (State.InMeeting && ImGui::Button("Move in Meeting"))
             {
@@ -302,16 +356,6 @@ namespace SelfTab {
             if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (ToggleButton("Report Body on Murder", &State.ReportOnMurder)) {
-                State.Save();
-            }
-            if (State.ReportOnMurder) {
-                ImGui::SameLine();
-                if (ToggleButton("Prevent Self-Report", &State.PreventSelfReport)) {
-                    State.Save();
-                }
-            }
             /*ImGui::SameLine();
             if (ToggleButton("Always Use Kill Exploit", &State.AlwaysUseKillExploit)) {
                 State.Save();
@@ -320,13 +364,11 @@ namespace SelfTab {
             if (ToggleButton("Fake Alive", &State.FakeAlive)) {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (ToggleButton(IsHost() ? "God Mode" : "Visual Protection", &State.GodMode))
-                State.Save();
-            /*ImGui::SameLine();
-            if (ToggleButton("Auto-Rejoin", &State.AutoRejoin)) {
-                State.Save();
-            }*/
+            //if (IsHost() || !State.SafeMode) {
+                ImGui::SameLine();
+                if (ToggleButton("God Mode", &State.GodMode))
+                    State.Save();
+            //}
 
             if (ToggleButton("(Shift + Right Click) to Teleport", &State.ShiftRightClickTP)) {
                 State.Save();
@@ -610,7 +652,7 @@ namespace SelfTab {
                     //help me out with the nameplates, couldn't find them in the game assets
                     for (auto player : GetAllPlayerControl()) {
                         std::string name = "";
-                        if (State.confuserNameGeneration == 0 || (State.confuserNameGeneration == 2 && State.cyclerUserNames.empty()))
+                        if (State.confuserNameGeneration == 0 || (State.cyclerNameGeneration == 2 && State.cyclerUserNames.empty()))
                             name = GenerateRandomString();
                         else if (State.confuserNameGeneration == 1)
                             name = GenerateRandomString(true);

@@ -9,16 +9,19 @@ namespace HostTab {
 	enum Groups {
 		Utils,
 		Settings,
+		Extra,
 		Tournaments
 	};
 
 	static bool openUtils = true; //default to utils tab group
 	static bool openSettings = false;
+	static bool openExtra = false;
 	static bool openTournaments = false;
 
 	void CloseOtherGroups(Groups group) {
 		openUtils = group == Groups::Utils;
 		openSettings = group == Groups::Settings;
+		openExtra = group == Groups::Extra;
 		openTournaments = group == Groups::Tournaments;
 	}
 
@@ -64,6 +67,12 @@ namespace HostTab {
 				ImGui::SameLine();
 				if (TabGroup("Settings", openSettings)) {
 					CloseOtherGroups(Groups::Settings);
+				}
+			}
+			if (GameOptions().HasOptions()) {
+				ImGui::SameLine();
+				if (TabGroup("Extra", openExtra)) {
+					CloseOtherGroups(Groups::Extra);
 				}
 			}
 			if (State.TournamentMode) {
@@ -169,13 +178,6 @@ namespace HostTab {
 				if (IsInLobby() && State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
 					State.Save();
 
-				/*int32_t maxPlayers = options.GetMaxPlayers();
-				maxPlayers = std::clamp(maxPlayers, 0, int(Game::MAX_PLAYERS));
-				if (IsInLobby() && ImGui::InputInt("Max Players", &maxPlayers))
-					GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, maxPlayers);*/ //support for more than 15 players
-
-					/*if (IsInLobby() && ToggleButton("Flip Skeld", &State.FlipSkeld))
-						State.Save();*/ //to be fixed later
 				ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 				if (IsInLobby() && ImGui::Button("Force Start of Game"))
 				{
@@ -183,50 +185,13 @@ namespace HostTab {
 				}
 				if (ToggleButton("Disable Meetings", &State.DisableMeetings))
 					State.Save();
-				
+
 				if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
 					State.Save();
 
-				std::vector<const char*> GAMEMODES = { "Default", "Task Speedrun" };
-				if (State.DisableHostAnticheat) GAMEMODES = { "Default", "Task Speedrun", "Battle Royale" };
-				State.GameMode = std::clamp(State.GameMode, 0, State.DisableHostAnticheat ? 2 : 1);
-				if (IsInLobby() && CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 100 * State.dpiScale)) {
-					if (State.GameMode == 1) {
-						State.TaskSpeedrun = true;
-						State.BattleRoyale = false;
-					}
-					else if (State.GameMode == 2) {
-						State.TaskSpeedrun = false;
-						State.BattleRoyale = true;
-					}
-					else {
-						State.TaskSpeedrun = false;
-						State.BattleRoyale = false;
-					}
-				}
-
-				if (ToggleButton("Show Lobby Timer", &State.ShowLobbyTimer))
+				if (ToggleButton("Disable Kills", &State.DisableKills));
+				if (State.DisableKills && !State.SafeMode) ImGui::Text("Note: Cheaters can still bypass this feature!");
 					State.Save();
-
-				if (ToggleButton("Auto Start Game", &State.AutoStartGame))
-					State.Save();
-
-				if (State.AutoStartGame) {
-					ImGui::Text("Start After");
-					ImGui::SameLine();
-					if (ImGui::InputInt("sec", &State.AutoStartTimer))
-						State.Save();
-				}
-
-				//if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
-
-				/*if (ToggleButton("Disable Specific RPC Call ID", &State.DisableCallId))
-					State.Save();
-				int callId = State.ToDisableCallId;
-				if (ImGui::InputInt("ID to Disable", &callId)) {
-					State.ToDisableCallId = (uint8_t)callId;
-					State.Save();
-				}*/
 
 				if ((State.mapType == Settings::MapType::Airship) && IsInGame() && ImGui::Button("Switch Moving Platform Side"))
 				{
@@ -300,27 +265,25 @@ namespace HostTab {
 
 			if (openSettings) {
 				// AU v2022.8.24 has been able to change maps in lobby.
-				State.mapHostChoice = State.FlipSkeld ? 3 : options.GetByte(app::ByteOptionNames__Enum::MapId);
-				/*if (State.mapHostChoice > 3)
-					State.mapHostChoice--;*/
+				State.mapHostChoice = options.GetByte(app::ByteOptionNames__Enum::MapId);
+				if (State.mapHostChoice > 3)
+					State.mapHostChoice--;
 				State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
 				if (IsInLobby() && CustomListBoxInt("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale)) {
 					//if (!IsInGame()) {
 						// disable flip
-					if (State.mapHostChoice == 3) {
-						options.SetByte(app::ByteOptionNames__Enum::MapId, 0);
-						State.FlipSkeld = true;
-						SyncAllSettings();
-					}
-					else {
-						options.SetByte(app::ByteOptionNames__Enum::MapId, State.mapHostChoice);
-						State.FlipSkeld = false;
-						SyncAllSettings();
-					}
-					/*auto id = State.mapHostChoice;
+						/*if (State.mapHostChoice == 3) {
+							options.SetByte(app::ByteOptionNames__Enum::MapId, 0);
+							State.FlipSkeld = true;
+						}
+						else {
+							options.SetByte(app::ByteOptionNames__Enum::MapId, State.mapHostChoice);
+							State.FlipSkeld = false;
+						}*/
+					auto id = State.mapHostChoice;
 					if (id >= 3) id++;
 					options.SetByte(app::ByteOptionNames__Enum::MapId, id);
-					SyncAllSettings();*/
+					SyncAllSettings();
 					//}
 				}
 				auto gamemode = options.GetGameMode();
@@ -500,8 +463,38 @@ namespace HostTab {
 					MakeFloat("Ping Interval", pingInterval, FloatOptionNames__Enum::MaxPingTime);
 					MakeBool("Show Names", showNames, BoolOptionNames__Enum::ShowCrewmateNames);
 				}
-#pragma endregion
 			}
+			if (openExtra) {
+				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+				if (ToggleButton("Point System", &State.TournamentMode))
+				State.Save();
+				if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
+
+
+				ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
+				if (ToggleButton("Battle Royale", &State.BattleRoyale))
+					State.Save();
+
+
+				ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
+				int32_t maxPlayers = options.GetMaxPlayers();
+				maxPlayers = std::clamp(maxPlayers, 0, int(Game::MAX_PLAYERS));
+				ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), ("\nWorks With Modded Regions!"));
+				if (IsHost() && ImGui::InputInt("Players Count", &maxPlayers))
+					GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, maxPlayers); //support for more than 15 players
+				State.Save();
+
+
+				ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
+				if (ToggleButton("Disable Specific RPC Call ID", &State.DisableCallId)) State.Save();
+				State.Save();
+				int callId = State.ToDisableCallId;
+				if (ImGui::InputInt("ID to Disable", &callId)) {
+					State.ToDisableCallId = (uint8_t)callId;
+					State.Save();
+				}
+			}
+
 			if (openTournaments && State.TournamentMode) {
 				if (ImGui::Button("Clear All Data")) {
 					State.tournamentPoints.clear();
@@ -511,15 +504,8 @@ namespace HostTab {
 				for (auto i : State.tournamentFriendCodes) {
 					float points = State.tournamentPoints[i], win = State.tournamentWinPoints[i],
 						callout = State.tournamentCalloutPoints[i], death = State.tournamentEarlyDeathPoints[i];
-					std::string text = std::format("{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
-						DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
-					if (IsInLobby() && State.ChatCooldown >= 3.f && text.size() <= 120 && ImGui::Button("Send")) {
-						//in ideal conditions a message longer than 120 characters should not be possible
-						State.lobbyRpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, text));
-						State.MessageSent = true;
-					}
-					if (IsInLobby() && State.ChatCooldown >= 3.f && text.size() <= 120) ImGui::SameLine();
-					ImGui::Text(text.c_str());
+					ImGui::Text(std::format("{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
+						DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str());
 				}
 			}
 			ImGui::EndChild();

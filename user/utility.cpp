@@ -336,7 +336,7 @@ std::string RemoveHtmlTags(std::string html_str) {
 
 bool IsNameValid(std::string str) {
 	if (str == "") return false;
-	/*(std::vector<std::string> properChars = {}; //check properly for length
+	std::vector<std::string> properChars = {}; //check properly for length
 	String* blank = convert_to_string("");
 	std::string last_char = "";
 	for (size_t i = 0; i < str.length(); i++) {
@@ -346,9 +346,9 @@ bool IsNameValid(std::string str) {
 		}
 		properChars.push_back(last_char + str[i]);
 		last_char = "";
-	}*/
-	if (convert_to_string(str)->fields.m_stringLength > 12) return false;
-	if (str.find("<") != std::string::npos || str.find(">") != std::string::npos || str.find("=") != std::string::npos || str.find("-") != std::string::npos) return false;
+	}
+	if (properChars.size() > 12) return false;
+	if (str.find("<") != std::string::npos || str.find(">") != std::string::npos || str.find("=") != std::string::npos) return false;
 	return true;
 }
 
@@ -895,10 +895,14 @@ std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2) {
 	std::string opener = "";
 	if (State.UnderlineName) opener += "<u>";
 	if (State.StrikethroughName) opener += "<s>";
+	if (State.BoldName) opener += "<b>";
+	if (State.NobrName) opener += "<nobr>";
 
 	std::string closer = "";
 	if (State.UnderlineName) closer += "</s>";
 	if (State.StrikethroughName) closer += "</u>";
+	if (State.BoldName) closer += "</b>";
+	if (State.BoldName) closer += "</nobr>";
 
 	if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
 		return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
@@ -1315,7 +1319,8 @@ void DoPolylineSimplification(std::vector<ImVec2>& inPoints, std::vector<std::ch
 
 float getMapXOffsetSkeld(float x)
 {
-	return (State.FlipSkeld && GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) ? x - 50.0f : x;
+	GameOptions options;
+	return (options.GetByte(app::ByteOptionNames__Enum::MapId) == 3) ? (-1) * x : x;
 }
 
 bool Object_1_IsNotNull(app::Object_1* obj)
@@ -1376,10 +1381,46 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 		closer += "</s>";
 	}
 
+	if (State.BoldName && (!State.ColoredName || State.RgbName)) {
+		opener += "<b>";
+		closer += "</b>";
+	}
+
+	if (State.NobrName && (!State.ColoredName || State.RgbName)) {
+		opener += "<nobr>";
+		closer += "</nobr>";
+	}
+
 	if (State.ResizeName) {
 		opener += std::format("<size={}%>", State.NameSize * 100);
 		closer += "</size>";
 	}
+
+	if (State.IndentName) {
+		opener += std::format("<line-indent={}>", State.NameIndent * 1);
+		closer += "</line-indent>";
+	}
+
+	if (State.CspaceName) {
+		opener += std::format("<cspace={}>", State.NameCspace * 1);
+		closer += "</cspace>";
+	}
+
+	if (State.MspaceName) {
+		opener += std::format("<mspace={}>", State.NameMspace * 1);
+		closer += "</mspace>";
+	}
+
+	if (State.VoffsetName) {
+		opener += std::format("<voffset={}>", State.NameVoffset * 1);
+		closer += "</voffset>";
+	}
+
+	if (State.RotateName) {
+		opener += std::format("<rotate={}>", State.NameRotate * 1);
+		closer += "<rotate=0>";
+	}
+
 	if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
 
 	return opener + name + closer;
@@ -1406,10 +1447,51 @@ bool CheckConfigExists(std::string configName) {
 	return std::filesystem::exists(settingsPath);
 }
 
-void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
+void UpdateTournamentPoints(NetworkedPlayerInfo* playerData, int reason) {
 	if (!IsHost() || !State.TournamentMode) return;
 	std::string friendCode = convert_from_string(playerData->fields.FriendCode);
-	State.tournamentPoints[friendCode] += points;
+	switch (reason) {
+	case 0://Settings::PointReason::ImpKill:
+		if (State.tournamentKillCaps[friendCode] < 3.f) {
+			State.tournamentPoints[friendCode] += 1.f;
+			State.tournamentKillCaps[friendCode] += 1.f;
+		}
+		break;
+	case 1://Settings::PointReason::ImpWin:
+		State.tournamentPoints[friendCode] += 1.f;
+		break;
+	case 2://Settings::PointReason::AllImpsWin:
+		State.tournamentPoints[friendCode] += 2.f;
+		break;
+	case 3://Settings::PointReason::ImpVoteOut:
+		State.tournamentPoints[friendCode] -= 1.f;
+		break;
+	case 4://Settings::PointReason::CrewVoteOut:
+		State.tournamentPoints[friendCode] += 1.f;
+		break;
+	case 5://Settings::PointReason::ImpVoteOutCorrect:
+		State.tournamentPoints[friendCode] += 1.f;
+		break;
+	case 6://Settings::PointReason::ImpVoteOutIncorrect:
+		State.tournamentPoints[friendCode] -= 1.f;
+		break;
+	case 7://Settings::PointReason::CrewWin:
+		State.tournamentPoints[friendCode] += 1.f;
+		break;
+	case 8://Settings::PointReason::CorrectCallout:
+		if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), friendCode) != State.tournamentCallers.end()) {
+			State.tournamentPoints[friendCode] += 1.5f;
+		}
+		break;
+	case 9://Settings::PointReason::IncorrectCallout:
+		if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), friendCode) != State.tournamentCallers.end()) {
+			State.tournamentPoints[friendCode] -= 1.5f;
+		}
+		break;
+	case 10://Settings::PointReason::ImpLose:
+		State.tournamentPoints[friendCode] -= 1.f;
+		break;
+	}
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
@@ -1417,8 +1499,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
 	if (State.SMAC_AddToBlacklist) {
 		std::string puid = convert_from_string(pData->fields.Puid);
-		State.BlacklistFriendCodes.push_back(puid);
-		State.Save();
+		State.SMAC_Blacklist[puid] = name;
 	}
 	std::string cheaterMessage = "Player " + name + " has been caught cheating! Reason: " + reason;
 	LOG_INFO(cheaterMessage);
