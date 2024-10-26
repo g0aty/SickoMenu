@@ -799,7 +799,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerLeft executed");
-    State.BlinkPlayersTab = true;
+    //State.BlinkPlayersTab = true;
     try {
         if (data->fields.Character) { // Don't use Object_1_IsNotNull().
             auto playerInfo = GetPlayerData(data->fields.Character);
