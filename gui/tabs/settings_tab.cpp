@@ -316,10 +316,6 @@ namespace SettingsTab {
 					State.Save();
 				}
 				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-				if (ToggleButton("Change to BAU RPC", &State.BetterAmongUsDetection) && (!State.SickoDetection && !State.AmongUsMenuDetection && !State.KillNetworkDetection)) {
-					State.Save();
-				}
-				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
 				if (ToggleButton("Change to KillNetwork RPC", &State.KillNetworkDetection) && (!State.SickoDetection && !State.AmongUsMenuDetection && !State.BetterAmongUsDetection)) {
 					State.Save();
 				}
