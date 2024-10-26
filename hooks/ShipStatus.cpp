@@ -89,7 +89,7 @@ void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemTyp
 
 void dShipStatus_RpcCloseDoorsOfType (ShipStatus* __this, SystemTypes__Enum type, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_RpcCloseDoorsOfType executed");
-	if (!State.PanicMode && (State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun))) {
+	if (!State.PanicMode && (State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun)) && State.mapType != Settings::MapType::Hq) {
 		return;
 	}
 	ShipStatus_RpcCloseDoorsOfType(__this, type, method);

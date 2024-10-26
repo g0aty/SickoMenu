@@ -135,9 +135,6 @@ namespace PlayersTab {
 
 					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
-
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "Sicko-Fork") // So as not to get confused
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateRoleBlue);
 				}
 
 				if (playerData->fields.IsDead)

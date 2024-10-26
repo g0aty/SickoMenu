@@ -234,7 +234,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}*/
 				std::string modUsage = __this == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
 					std::format(" <#fb0>[{} User]</color>",
-						__this == *Game::pLocalPlayer ? "<#RRGGBB>Sicko-Fork</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
+						__this == *Game::pLocalPlayer ? "<#0f0>Sicko</color><#f00>Menu</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				std::string listed = "";
 				if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end())
@@ -1028,7 +1028,8 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 		}
 		if (IsHost() && ((((!State.PanicMode && State.DisableMeetings) || (State.BattleRoyale || State.TaskSpeedrun)) && 
 			(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
-			((State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun)) && (callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
+			((State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun)) && 
+			((callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType && State.mapType != Settings::MapType::Hq) || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
 			//we cannot prevent murderplayer because the player will force it
 			return;
 		if (!State.PanicMode && State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder) {
