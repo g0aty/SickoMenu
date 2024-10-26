@@ -261,7 +261,6 @@ void Settings::Load() {
         JSON_TRYGET("ShowLobbyTimer", this->ShowLobbyTimer);
         JSON_TRYGET("SickoDetection", this->SickoDetection);
         JSON_TRYGET("AmongUsMenuDetection", this->AmongUsMenuDetection);
-        JSON_TRYGET("BetterAmongUsDetection", this->BetterAmongUsDetection);
         JSON_TRYGET("KillNetworkDetection", this->KillNetworkDetection);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
@@ -540,8 +539,7 @@ void Settings::Save() {
                 { "AutoStartTimer", this->AutoStartTimer },
                 { "SickoDetection", this->SickoDetection },
                 { "AmongUsMenuDetection", this->AmongUsMenuDetection },
-                { "BeeterAmongUsDetection", this->BetterAmongUsDetection },
-                { "KillNetworkDetection", this->BetterAmongUsDetection },
+                { "KillNetworkDetection", this->KillNetworkDetection },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
 
