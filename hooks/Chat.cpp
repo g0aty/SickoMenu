@@ -259,6 +259,11 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		//remove rpc queue stuff cuz of delay and anticheat kick
 		State.MessageSent = true;
 	}
+		if (!State.PanicMode && State.SafeMode && State.CrashChatSpam && (State.ChatSpamMode == 0 || State.ChatSpamMode == 2) && (IsInGame() || IsInLobby()) && __this->fields.timeSinceLastMessage >= 3.5f) {
+			PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(State.chatMessage), NULL);
+			//remove rpc queue stuff cuz of delay and anticheat kick
+			State.MessageSent = true;
+	}
 
 
 	ChatController_Update(__this, method);
