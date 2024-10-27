@@ -447,7 +447,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					}
 				}
 				if (State.ChatSpam && (IsInGame() || IsInLobby())) {
-					static float spamDelay = 0;
+					static float spamDelay = 15;
 					auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
 					for (auto p : GetAllPlayerControl()) {
 						if (p == player || State.ChatSpamEveryone) {
@@ -460,6 +460,25 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 							}
 							else if (State.ChatSpamMode == 1 || State.ChatSpamMode == 2) {
 								PlayerControl_RpcSendChatNote(player, p->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
+							}
+						}
+					}
+				}
+
+				if (State.CrashChatSpam && (IsInGame() || IsInLobby())) {
+					static float spamDelay = 0;
+					auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+					for (auto p : GetAllPlayerControl()) {
+						if (p == player || State.CrashChatSpam) {
+							if (!State.SafeMode && (State.CrashChatSpamMode == 1 || State.CrashChatSpamMode == 1)) {
+								auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), player->fields._.NetId,
+									uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+								MessageWriter_WriteString(writer, convert_to_string(State.chatMessage), NULL);
+								InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+								ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(State.chatMessage), false, NULL);
+							}
+							else if (State.CrashChatSpamMode == 1 || State.CrashChatSpamMode == 1) {
+								PlayerControl_RpcSendChatNote(player, p->fields.PlayerId, (ChatNoteTypes__Enum)2, NULL);
 							}
 						}
 					}

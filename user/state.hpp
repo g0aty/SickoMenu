@@ -101,8 +101,10 @@ public:
     int GameMode = 0;
     bool NoGameEnd = false;
     bool ChatSpam = false;
+    bool CrashChatSpam = false;
     bool ChatSpamEveryone = false;
     int ChatSpamMode = 0;
+    int CrashChatSpamMode = 1;
     bool AutoJoinLobby = false;
     std::string AutoJoinLobbyCode = "";
 

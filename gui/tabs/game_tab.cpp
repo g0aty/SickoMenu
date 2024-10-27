@@ -435,13 +435,21 @@ namespace GameTab {
             if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) {
                 State.Save();
             }
-            if (IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
-            
+            {
+                if (IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
+                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+            }
             if (IsInGame() && ToggleButton("Attempt to Crash", &State.UltimateSpamReport)) {
                 State.Save();
             }
-            if (IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Alternate Crash Server!\nMay cause game crashing!\nMay work with delay!"));
-
+            {
+                if (IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Alternate Crash Server!\nMay cause game crashing!\nMay work with delay!"));
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            }
+            if (IsInMultiplayerGame() || IsInLobby()) (ToggleButton("Crash Chat Spam", &State.CrashChatSpam));
+            {
+                if (IsInMultiplayerGame() || IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Upgraded [Spam Blank Chat as {Everyone}] Exploit")); State.Save();
+            }
             /*ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
             if (IsInLobby() || IsInGame) ToggleButton("Destroy Game Logic", &State.SpoofCrashLevel) && (!State.SpoofLevel); {
                 if (State.SpoofCrashLevel) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Zero Level = Crash Server"));
