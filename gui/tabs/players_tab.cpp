@@ -124,19 +124,19 @@ namespace PlayersTab {
 				else if (PlayerIsImpostor(localData) && PlayerIsImpostor(playerData))
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
 				else if (playerCtrl == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end()) {
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#0f0>Sicko</color><#f00>Menu</color>") //Other Client
+					if (State.modUsers.at(playerData->fields.PlayerId) == "<#0f0>Sicko</color><#f00>Menu</color>") //Other Client
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LogSuccessColor);
 
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f00>KillNetwork</color>")
+					if (State.modUsers.at(playerData->fields.PlayerId) == "<#f00>KillNetwork</color>")
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
 
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#5f5>BetterAmongUs</color>")
+					if (State.modUsers.at(playerData->fields.PlayerId) == "<#5f5>BetterAmongUs</color>")
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LightBlue);
 
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
+					if (State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
 
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "SickoMenu ") //Your Client
+					if (playerCtrl == *Game::pLocalPlayer) //Your Client
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->AcceptedGreen);
 				}
 
