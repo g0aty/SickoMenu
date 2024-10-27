@@ -124,17 +124,20 @@ namespace PlayersTab {
 				else if (PlayerIsImpostor(localData) && PlayerIsImpostor(playerData))
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
 				else if (playerCtrl == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end()) {
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#0f0>Sicko</color><#f00>Menu</color>")
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->AcceptedGreen);
-
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f00>KillNetwork</color>")
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
-
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#5f5>BetterAmongUs</color>")
+					if (State.modUsers.at(playerData->fields.PlayerId) == "<#0f0>Sicko</color><#f00>Menu</color>") //Other Client
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LogSuccessColor);
 
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
+					if (State.modUsers.at(playerData->fields.PlayerId) == "<#f00>KillNetwork</color>")
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+
+					if (State.modUsers.at(playerData->fields.PlayerId) == "<#5f5>BetterAmongUs</color>")
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LightBlue);
+
+					if (State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
+
+					if (playerCtrl == *Game::pLocalPlayer) //Your Client
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->AcceptedGreen);
 				}
 
 				if (playerData->fields.IsDead)
@@ -151,7 +154,7 @@ namespace PlayersTab {
 					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
 					ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
 					if (isUsingMod)
-						ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "Sicko-Fork" : RemoveHtmlTags(State.modUsers.at(selectedPlayer.get_PlayerData()->fields.PlayerId)).c_str());
+						ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu " : RemoveHtmlTags(State.modUsers.at(selectedPlayer.get_PlayerData()->fields.PlayerId)).c_str());
 					std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
 					std::string playerIdText = std::format("Player ID: {}", playerId);
 					ImGui::Text(const_cast<char*>(playerIdText.c_str()));
