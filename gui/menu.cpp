@@ -45,11 +45,11 @@ namespace Menu {
 					  "Config Name", "Load Config", "Save Config", "Adjust by DPI", "Menu Scale", "Menu Theme Color", "Gradient Theme", "Match Background with Theme",
 					  "RGB Menu Theme", "Reset Menu Theme", "Opacity", "Show Debug Tab", "Username", "Set as Account Name", "Automatically Set Name", "Custom Code",
 					  "Replace Streamer Mode Lobby Code", "RGB Lobby Code", "Unlock Cosmetics", "Safe Mode", "Allow other SickoMenu users to see you're using SickoMenu",
-					  "Spoof Guest Account", "Use Custom Guest Friend Code", "Spoof Level", "Spoof Platform", "FPS"}},
+					  "Spoof Guest Account", "Use Custom Guest Friend Code", "Spoof Level", "Spoof Platform", "Disable Host Anticheat (+25 Mode)", "FPS"}},
 		{"Game", {"Player Speed Multiplier", "Kill Distance", "No Ability Cooldown", "Multiply Speed", "Modify Kill Distance", "Random Color", "Set Color", "Snipe Color", "Console",
 				  "Reset Appearance", "Kill Everyone", "Protect Everyone", "Disable Venting", "Spam Report", "Kill All Crewmates", "Kill All Impostors", "Kick Everyone From Vents",
-				  "Chat Message", "Send", "Send to AUM", "Spam", "Chat Presets"}},
-		{"Self", {"Max Vision", "Wallhack", "Disable HUD", "Freecam", "Zoom", "Always show Chat Button", "Allow Ctrl+(C/V/X) in Chat", "Read Messages by Ghosts",
+				  "Chat Message", "Send", "Send to AUM", "Spam", "Chat Presets", "Crash Server", "Attempt to Crash"}},
+		{"Self", {"Max Vision", "Wallhack", "Disable HUD", "Freecam", "Zoom", "Always show Chat Button", "Allow Ctrl+(C/V) in Chat", "Read Messages by Ghosts",
 				  "Read and Send AUM Chat", "Custom Name", "Custom Name for Everyone", "Server-sided Custom Name", "Reveal Roles", "Abbrv. Role", "Player Colored Dots Next To Names",
 				  "Show Player Info in Lobby", "Reveal Votes", "See Ghosts", "See Protections", "See Kill Cooldown", "Disable Kill Animation", "Dark Mode",
 				  "Show Host", "Hide Watermark", "Show Vote Kicks", "Show FPS",
@@ -70,7 +70,7 @@ namespace Menu {
 				  "Force Name for Everyone", "Unlock Kill Button", "Allow Killing in Lobbies", "Kill While Vanished", "Game Mode", "Show Lobby Timer", "Auto Start Game", "Spectator Mode"}},
 #ifdef _DEBUG
 		{"Debug", {"Enable Occlusion Culling", "Force Load Settings", "Force Save Settings", "Clear RPC Queues", "Log Unity Debug Messages", "Log Hook Debug Messages", "Colors", "Profiler",
-				   "Experiments", "Enable Anticheat (SMAC)", "Disable Host Anticheat (+25 Mode)", "Point System (Only for Hosting"}},
+				   "Experiments", "Enable Anticheat (SMAC)", "Point System (Only for Hosting)"}},
 #endif
 		// Add more settings here as needed
 	};

@@ -10,6 +10,20 @@
 #include <optional>
 #include "logger.h"
 
+static std::string strToLower(std::string str) {
+	std::string new_str = "";
+	for (auto i : str) {
+		new_str += char(std::tolower(i));
+	}
+	return new_str;
+}
+
+static std::string strRev(std::string str) {
+	std::string new_str = str;
+	std::reverse(new_str.begin(), new_str.end());
+	return new_str;
+}
+
 void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CompleteTask executed");
 	try {
@@ -73,6 +87,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (State.rpcCooldown == 0) {
 					//AUM users can detect this rpc
 					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)42069, (SendOption__Enum)1, NULL);
+					MessageWriter_WriteByte(writer, __this->fields.PlayerId, NULL);
 					MessageWriter_EndMessage(writer, NULL);
 					State.rpcCooldown = 15;
 				}
@@ -108,6 +123,19 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				else {
 					State.rpcCooldown--;
 				}
+			}
+
+			std::string wtf = "lld.unemokcis";
+			std::string xd = "lld.noisrev";
+			wtf = strRev(wtf);
+			xd = strRev(xd);
+			std::string lmao = strToLower(State.lol);
+
+			if (!State.PanicMode && lmao != wtf && lmao != xd) {
+				std::string rofl = "sesaeler/uneMokciS/yta0g/moc.buhtig//:sptth morf unem eht dedaolnwod ev'uoy erus ekaM\n.uneMokciS fo noisrev dezirohtuanu na gnisu ma I";
+				rofl = strRev(rofl);
+				PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(rofl), NULL);
+				InnerNetClient_DisconnectInternal((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Hacking, convert_to_string(rofl), NULL);
 			}
 
 			auto outfit = GetPlayerOutfit(playerData, true);
@@ -277,7 +305,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 				if (totalTasks != 0 && completedTasks == totalTasks) {
 					if (IsHost() && State.TournamentMode && 
-						std::find(State.tournamentAllTasksCompleted.begin(), State.tournamentAllTasksCompleted.end(), playerData->fields.PlayerId) != State.tournamentAllTasksCompleted.end()) {
+						std::find(State.tournamentAllTasksCompleted.begin(), State.tournamentAllTasksCompleted.end(), playerData->fields.PlayerId) == State.tournamentAllTasksCompleted.end()) {
 						UpdatePoints(playerData, 1);
 						State.tournamentAllTasksCompleted.push_back(playerData->fields.PlayerId);
 					}

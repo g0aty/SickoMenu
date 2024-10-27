@@ -355,29 +355,29 @@ namespace GameTab {
             if (State.SMAC_PunishBlacklist) {
                 if (State.BlacklistFriendCodes.empty())
                     ImGui::Text("No users in blacklist!");
-                static std::string newPuid = "";
-                InputString("New PUID", &newPuid, ImGuiInputTextFlags_EnterReturnsTrue);
+                static std::string newFriendCode = "";
+                InputString("New Friend Code", &newFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
-                if (newPuid != "" && ImGui::Button("Add PUID")) {
-                    State.BlacklistFriendCodes.push_back(newPuid);
+                if (newFriendCode != "" && ImGui::Button("Add Code")) {
+                    State.BlacklistFriendCodes.push_back(newFriendCode);
                     State.Save();
-                    newPuid = "";
+                    newFriendCode = "";
                 }
                 if (!State.BlacklistFriendCodes.empty()) {
-                    static int selectedPuidIndex = 0;
-                    selectedPuidIndex = std::clamp(selectedPuidIndex, 0, (int)State.BlacklistFriendCodes.size() - 1);
-                    std::vector<const char*> puidVector(State.BlacklistFriendCodes.size(), nullptr);
+                    static int selectedCodeIndex = 0;
+                    selectedCodeIndex = std::clamp(selectedCodeIndex, 0, (int)State.BlacklistFriendCodes.size() - 1);
+                    std::vector<const char*> codeVector(State.BlacklistFriendCodes.size(), nullptr);
                     for (auto i : State.BlacklistFriendCodes) {
-                        puidVector.push_back(i.c_str());
+                        codeVector.push_back(i.c_str());
                     }
-                    CustomListBoxInt("Player to Delete", &selectedPuidIndex, puidVector);
+                    CustomListBoxInt("Player to Delete", &selectedCodeIndex, codeVector);
                     ImGui::SameLine();
                     if (ImGui::Button("Delete"))
-                        State.BlacklistFriendCodes.erase(std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), State.BlacklistFriendCodes[selectedPuidIndex]));
+                        State.BlacklistFriendCodes.erase(std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), State.BlacklistFriendCodes[selectedCodeIndex]));
                 }
             }
             ImGui::NewLine();
-            if (ToggleButton("Detect AUM Usage", &State.SMAC_CheckAUM)) State.Save();
+            if (ToggleButton("Detect AUM/KillNetwork Usage", &State.SMAC_CheckAUM)) State.Save();
             if (ToggleButton("Detect SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
             if (ToggleButton("Detect Abnormal Names", &State.SMAC_CheckBadNames)) State.Save();
             if (ToggleButton("Detect Abnormal Set Color", &State.SMAC_CheckColor)) State.Save();

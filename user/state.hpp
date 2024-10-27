@@ -460,7 +460,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0_rc3";
+    std::string SickoVersion = "v4.0";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
@@ -496,6 +496,8 @@ public:
 
     std::vector<std::string> WhitelistFriendCodes = {};
     std::vector<std::string> BlacklistFriendCodes = {};
+
+    std::string lol = "";
 
     void Load();
     void Save();

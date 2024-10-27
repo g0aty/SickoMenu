@@ -129,10 +129,9 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 			else
 				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode + glitchDisplay + lobbyTimeDisplay), NULL);
 		}
-		__this->fields.MinPlayers = State.PanicMode ? 4 : 1;
 	}
 	catch (...) {
-		LOG_ERROR("Exception occurred in GameStartManager_Update (ShipStatus)");
+		LOG_ERROR("Exception occurred in GameStartManager_Update (LobbyBehaviour)");
 	}
 	GameStartManager_Update(__this, method);
 }

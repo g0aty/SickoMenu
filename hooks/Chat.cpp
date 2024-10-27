@@ -58,7 +58,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 				std::string lowerMessage = strToLower(message);
 				for (auto word : State.SMAC_BadWords) {
 					std::string lowerWord = strToLower(word);
-					if (lowerMessage.starts_with(lowerWord) || lowerMessage.find(lowerWord) != std::string::npos || lowerMessage.ends_with(lowerWord)) {
+					if (lowerMessage.find(lowerWord) != std::string::npos) {
 						SMAC_OnCheatDetected(sourcePlayer, "Bad Word: " + word);
 						break;
 					}

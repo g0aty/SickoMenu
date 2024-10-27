@@ -41,29 +41,29 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 			STREAM_DEBUG("RPC Received for a KillNetwork user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
 	}
-		break;
-		case (uint8_t)101:
-		{
-			std::string playerName = convert_from_string(MessageReader_ReadString(reader, NULL));
-			//we have to get only the message, however aum sends the player's name before this
-			std::string message = convert_from_string(MessageReader_ReadString(reader, NULL));
-			uint32_t colorId = MessageReader_ReadInt32(reader, NULL);
-			if (message.size() == 0) break;
-			if (!State.PanicMode && State.ReadAndSendAumChat) {
-				NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
-				bool wasDead = false;
-				if (player != NULL && GetPlayerData(player)->fields.IsDead && local != NULL && !local->fields.IsDead) {
-					local->fields.IsDead = true; //see aum chat of ghosts
-					wasDead = true;
-				}
-				ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#f55><b>[AUM Chat]</b></color>\n" + message), false, NULL);
-				if (wasDead) {
-					local->fields.IsDead = false;
-				}
-				STREAM_DEBUG("AUM Chat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+	break;
+	case (uint8_t)101:
+	{
+		std::string playerName = convert_from_string(MessageReader_ReadString(reader, NULL));
+		//we have to get only the message, however aum sends the player's name before this
+		std::string message = convert_from_string(MessageReader_ReadString(reader, NULL));
+		uint32_t colorId = MessageReader_ReadInt32(reader, NULL);
+		if (message.size() == 0) break;
+		if (!State.PanicMode && State.ReadAndSendAumChat) {
+			NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
+			bool wasDead = false;
+			if (player != NULL && GetPlayerData(player)->fields.IsDead && local != NULL && !local->fields.IsDead) {
+				local->fields.IsDead = true; //see aum chat of ghosts
+				wasDead = true;
 			}
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#f55><b>[AUM Chat]</b></color>\n" + message), false, NULL);
+			if (wasDead) {
+				local->fields.IsDead = false;
+			}
+			STREAM_DEBUG("AUM Chat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
-		break;
+	}
+	break;
 	}
 }
 
@@ -142,7 +142,7 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	case (uint8_t)RpcCalls__Enum::ReportDeadBody: {
 		auto bodyPlayer = GetPlayerDataById(MessageReader_ReadByte(reader, NULL));
 		if (State.SMAC_CheckReport) {
-			if (IsInLobby()) {
+			if (IsInLobby() || !State.GameLoaded) {
 				SMAC_OnCheatDetected(player, "Abnormal Report Body");
 				return true;
 			}
@@ -190,6 +190,7 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		}
 		break;
 	}
+	case (uint8_t)250:
 	case (uint8_t)420: {
 		auto playerId = player->fields.PlayerId;
 		if (State.SMAC_CheckSicko && MessageReader_get_BytesRemaining(reader, NULL) == 0 && State.modUsers.find(playerId) == State.modUsers.end()) {

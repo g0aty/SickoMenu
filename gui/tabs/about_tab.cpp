@@ -38,8 +38,8 @@ namespace AboutTab {
         if (openWelcome) {
             std::string welcomeText = std::format("Welcome {}to SickoMenu {}!", State.HasOpenedMenuBefore ? "back " : "", State.SickoVersion);
             ImGui::Text(welcomeText.c_str());
-            ImGui::Text("SickoMenu is a highly sophisticated cheat menu for Among Us based on AmongUsMenu.");
-            ImGui::Text("It promises more features and regular updates.");
+            ImGui::Text("SickoMenu is a powerful utility for Among Us.");
+            ImGui::Text("It aims to improve the game experience for all players!");
             ImGui::Text("Use the \"Check for Updates\" button to download the latest release!");
             if (ImGui::Button("GitHub")) {
                 OpenLink("https://github.com/g0aty/SickoMenu");
@@ -66,10 +66,27 @@ namespace AboutTab {
         }
 
         if (openCredits) {
-            ImGui::Text("SickoMenu is a fork of AmongUsMenu, go check it out!");
+            ImGui::Text("SickoMenu is a fork of AmongUsMenu (archived), go check it out!");
             if (ImGui::Button("AmongUsMenu")) {
                 OpenLink("https://github.com/BitCrackers/AmongUsMenu");
             }
+            ImGui::Text("Contributors:");
+            if (ImGui::Button("GDjkhp")) {
+                OpenLink("https://github.com/GDjkhp");
+            }
+
+            if (ImGui::Button("Reycko")) {
+                OpenLink("https://github.com/Reycko");
+            }
+
+            if (ImGui::Button("astra1dev")) {
+                OpenLink("https://github.com/astra1dev");
+            }
+
+            if (ImGui::Button("Luckyheat")) {
+                OpenLink("https://github.com/Luckyheat");
+            }
+
             ImGui::Text("Some people who contributed to AUM:");
             if (ImGui::Button("KulaGGin")) {
                 OpenLink("https://github.com/KulaGGin");
@@ -88,6 +105,11 @@ namespace AboutTab {
             }
             ImGui::SameLine();
             ImGui::Text("(Helped in updating to the Fungle release)");
+
+            ImGui::Text("Thanks to v0idp for originally creating AmongUsMenu!");
+            if (ImGui::Button("v0idp")) {
+                OpenLink("https://github.com/v0idp");
+            }                        
 
             ImGui::Text("Everyone else who contributed to AUM and I couldn't list here.");
             ImGui::Text("Thank you for making SickoMenu possible!");

@@ -1,4 +1,4 @@
-# 👺 SickoMenu v3.7.2
+# 👺 SickoMenu v4.0
 A powerful utility for Among Us that aims to improve the game experience!
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
@@ -97,6 +97,6 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 
 ## ✨ Inspiration
 * [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by the-real-techiee
-* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by Team-Yu
-* [BetterAmongUs-Public](https://github.com/D1GQ/BetterAmongUs-Public) by D1GQ
+* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by Team-YuTeam
+* [BetterAmongUs-Public](https://github.com/EnhancedNetwork/BetterAmongUs-Public) by EnhancedNetwork (D1GQ)
 * [MalumMenu](https://github.com/scp222thj/MalumMenu) by scp222thj

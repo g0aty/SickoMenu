@@ -30,7 +30,7 @@ std::string GetCRC32(std::filesystem::path filePath) {
 		auto readSize = fin.gcount();
 		crc32.add(&buffer[0], (size_t) readSize);
 	}
-	//LOG_DEBUG("CRC32 of \"" + filePath.u8string() + "\" is " + crc32.getHash());
+	//LOG_DEBUG("CRC32 of \"" + filePath.string() + "\" is " + crc32.getHash());
 	return crc32.getHash();
 }
 
@@ -82,6 +82,7 @@ void Run(LPVOID lpParam) {
 		return;
 	}
 	hModule = (HMODULE)lpParam;
+	State.lol = getModulePath(hModule).filename().string();
 	init_il2cpp();
 	ScopedThreadAttacher managedThreadAttached;
 	{
