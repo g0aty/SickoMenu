@@ -43,11 +43,9 @@ namespace GameTab {
         if (TabGroup("Anticheat", openAnticheat)) {
             CloseOtherGroups(Groups::Anticheat);
         }
-        if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
-            ImGui::SameLine();
-            if (TabGroup("Destruct", openDestruct)) {
-                CloseOtherGroups(Groups::Destruct);
-            }
+        ImGui::SameLine();
+        if (TabGroup("Destruct", openDestruct)) {
+            CloseOtherGroups(Groups::Destruct);
         }
 
         if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
@@ -80,9 +78,9 @@ namespace GameTab {
                 State.Save();
             }
 
-            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
+            ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
             ImGui::Separator();
-            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
+            ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
 
             if (IsHost() || !State.SafeMode) {
                 CustomListBoxInt(" ", &State.SelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
@@ -154,19 +152,17 @@ namespace GameTab {
             if (IsInLobby() && (IsHost() || !State.SafeMode) && ImGui::Button("Allow Everyone to NoClip")) {
                 for (auto p : GetAllPlayerControl()) {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
-                }
+				}
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            if (IsInLobby() && ImGui::Button("Allow Friends to NoClip")) {
-                for (auto p : GetAllPlayerControl()) {
-                    if (!State.Friends.contains(convert_from_string(p->fields.Puid))) continue; // only friends
-                    if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
-                }
-            }
+            /*if (ImGui::Button("Spawn Dummy")) {
+                if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy());
+                if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy());
+            }*/
             if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
-                if (ImGui::Button("Protect Everyone")) {
+                if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
                     for (auto player : GetAllPlayerControl()) {
                         uint8_t colorId = GetPlayerOutfit(GetPlayerData(player))->fields.ColorId;
                         if (IsInGame())
@@ -282,7 +278,7 @@ namespace GameTab {
             if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) {
                 State.Save();
             }
-            if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f) {
+            if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && State.chatMessage.size() <= 120) {
                 ImGui::SameLine();
                 if (ImGui::Button("Send"))
                 {
@@ -315,10 +311,37 @@ namespace GameTab {
             {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (!State.SafeMode && ToggleButton("Spam by Everyone", &State.ChatSpamEveryone))
+            if (State.ChatSpamMode) ImGui::SameLine();
+            if (State.ChatSpamMode && ToggleButton("Spam by Everyone", &State.ChatSpamEveryone))
             {
                 State.Save();
+            }
+            if (CustomListBoxInt("Chat Spam Mode", &State.ChatSpamMode, 
+                { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
+
+            if (std::find(State.ChatPresets.begin(), State.ChatPresets.end(), State.chatMessage) == State.ChatPresets.end() && ImGui::Button("Add Message as Preset")) {
+                State.ChatPresets.push_back(State.chatMessage);
+                State.Save();
+            }
+            if (!(IsHost() || !State.SafeMode) && State.chatMessage.size() > 120) {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Message will be detected by anticheat.");
+            }
+            if (!State.ChatPresets.empty()) {
+                static int selectedPresetIndex = 0;
+                selectedPresetIndex = std::clamp(selectedPresetIndex, 0, (int)State.ChatPresets.size() - 1);
+                std::vector<const char*> presetVector(State.ChatPresets.size(), nullptr);
+                for (size_t i = 0; i < State.ChatPresets.size(); i++) {
+                    presetVector[i] = State.ChatPresets[i].c_str();
+                }
+                CustomListBoxInt("Message to Send/Remove", &selectedPresetIndex, presetVector);
+                auto msg = State.ChatPresets[selectedPresetIndex];
+                if (ImGui::Button("Set as Chat Message"))
+                {
+                    State.chatMessage = msg;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Remove"))
+                    State.ChatPresets.erase(State.ChatPresets.begin() + selectedPresetIndex);
             }
         }
 
@@ -330,32 +353,27 @@ namespace GameTab {
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
             if (ToggleButton("Punish Blacklisted Players", &State.SMAC_PunishBlacklist)) State.Save();
             if (State.SMAC_PunishBlacklist) {
-                if (State.SMAC_Blacklist.empty())
+                if (State.BlacklistFriendCodes.empty())
                     ImGui::Text("No users in blacklist!");
                 static std::string newPuid = "";
-                static std::string newName = "";
-                InputString("New Name", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                 InputString("New PUID", &newPuid, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
                 if (newPuid != "" && ImGui::Button("Add PUID")) {
-                    State.SMAC_Blacklist[newPuid] = newName != "" ? newName : "No Name";
+                    State.BlacklistFriendCodes.push_back(newPuid);
                     State.Save();
-                    newName = "";
                     newPuid = "";
                 }
-                if (!State.SMAC_Blacklist.empty()) {
+                if (!State.BlacklistFriendCodes.empty()) {
                     static int selectedPuidIndex = 0;
-                    selectedPuidIndex = std::clamp(selectedPuidIndex, 0, (int)State.SMAC_Blacklist.size() - 1);
-                    std::vector<const char*> puidUserVector(State.SMAC_Blacklist.size(), nullptr);
-                    std::vector<const char*> puidVector(State.SMAC_Blacklist.size(), nullptr);
-                    for (auto i : State.SMAC_Blacklist) {
-                        puidUserVector.push_back(std::format("{} ({})", i.second, i.first).c_str());
-                        puidVector.push_back(i.first.c_str());
+                    selectedPuidIndex = std::clamp(selectedPuidIndex, 0, (int)State.BlacklistFriendCodes.size() - 1);
+                    std::vector<const char*> puidVector(State.BlacklistFriendCodes.size(), nullptr);
+                    for (auto i : State.BlacklistFriendCodes) {
+                        puidVector.push_back(i.c_str());
                     }
-                    CustomListBoxInt("Player to Delete", &selectedPuidIndex, puidUserVector);
+                    CustomListBoxInt("Player to Delete", &selectedPuidIndex, puidVector);
                     ImGui::SameLine();
                     if (ImGui::Button("Delete"))
-                        State.SMAC_Blacklist.erase((std::string)puidVector[selectedPuidIndex]);
+                        State.BlacklistFriendCodes.erase(std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), State.BlacklistFriendCodes[selectedPuidIndex]));
                 }
             }
             ImGui::NewLine();
@@ -375,38 +393,67 @@ namespace GameTab {
             if (ToggleButton("Detect Abnormal Murders", &State.SMAC_CheckMurder)) State.Save();
             if (ToggleButton("Detect Abnormal Shapeshift", &State.SMAC_CheckShapeshift)) State.Save();
             if (ToggleButton("Detect Abnormal Vanish", &State.SMAC_CheckVanish)) State.Save();
-            if (ToggleButton("Detect Abnormal Player Levels", &State.SMAC_CheckLevel)) State.Save();
-            if (State.SMAC_CheckLevel && ImGui::InputInt("Minimum Level to Detect", &State.SMAC_HighLevel)) {
+            if (ToggleButton("Detect Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
+            if (State.SMAC_CheckLevel && ImGui::InputInt("Detect Level >=", &State.SMAC_HighLevel)) {
+                State.Save();
+            }
+            if (State.SMAC_CheckLevel && ImGui::InputInt("Detect Level <=", &State.SMAC_LowLevel)) {
                 State.Save();
             }
             if (ToggleButton("Detect Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
             if (ToggleButton("Detect Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
+            if (ToggleButton("Detect Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
+            if (State.SMAC_CheckBadWords) {
+                if (State.SMAC_BadWords.empty())
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No bad words added!");
+                static std::string newWord = "";
+                InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
+                ImGui::SameLine();
+                if (ImGui::Button("Add Word")) {
+                    State.SMAC_BadWords.push_back(newWord);
+                    State.Save();
+                    newWord = "";
+                }
+                if (!State.SMAC_BadWords.empty()) {
+                    static int selectedWordIndex = 0;
+                    selectedWordIndex = std::clamp(selectedWordIndex, 0, (int)State.SMAC_BadWords.size() - 1);
+                    std::vector<const char*> wordVector(State.SMAC_BadWords.size(), nullptr);
+                    for (size_t i = 0; i < State.SMAC_BadWords.size(); i++) {
+                        wordVector[i] = State.SMAC_BadWords[i].c_str();
+                    }
+                    CustomListBoxInt("Word to Delete", &selectedWordIndex, wordVector);
+                    ImGui::SameLine();
+                    if (ImGui::Button("Delete"))
+                        State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
+                }
+            }
         }
 
         if (openDestruct) {
+            if (!IsInLobby() && !IsInGame()) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Only available in game/lobby!"));
 
-            ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
-            if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) State.Save(); {
-                if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
+            if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) {
                 State.Save();
             }
-
-            ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
-            if (IsInGame() && ToggleButton("Attempt to Ban [Everyone]", &State.UltimateSpamReport)) State.Save(); {
-                if (State.UltimateSpamReport) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Alt `Crash Server`!\nMay be cause crash of game!\nMay be works with delay!"));
+            {
+                if (IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
+                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+            }
+            if (IsInGame() && ToggleButton("Attempt to Crash", &State.UltimateSpamReport)) {
                 State.Save();
             }
-
+            {
+                if (IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Alternate Crash Server!\nMay cause game crashing!\nMay work with delay!"));
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            }
+            if (IsInMultiplayerGame() || IsInLobby()) (ToggleButton("Crash Chat Spam", &State.CrashChatSpam));
+            {
+                if (IsInMultiplayerGame() || IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Upgraded [Spam Blank Chat as {Everyone}] Exploit")); State.Save();
+            }
             /*ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
-            if (IsInLobby() || IsInGame) ToggleButton("Destroy Game Logic", &State.CrashServerEvrhre); State.Save(); {
-                if (State.SetCrashServerEvrhre) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Empty"));
+            if (IsInLobby() || IsInGame) ToggleButton("Destroy Game Logic", &State.SpoofCrashLevel) && (!State.SpoofLevel); {
+                if (State.SpoofCrashLevel) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Zero Level = Crash Server"));
                 State.Save();
-            }*/
-            /* {
-                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale); 
-                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ("\nSoon will be added more features!"));
-                State.Save();
-
             }*/
         }
 
@@ -479,9 +526,9 @@ namespace GameTab {
                     ImGui::Text("Guardian Angel Protect Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F));
                     ImGui::Text("Guardian Angel Protection Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, 1.0F));
 
-                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
                     ImGui::Separator();
-                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
 
                     ImGui::Text("Max Shapeshifters: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Shapeshifter));
                     ImGui::Text("Shapeshifter Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Shapeshifter));
