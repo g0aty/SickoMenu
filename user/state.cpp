@@ -365,6 +365,8 @@ void Settings::Save() {
                 { "GuestFriendCode", this->GuestFriendCode },
                 { "FakeFriendCode", this->FakeFriendCode },
                 { "FakePuid", this->FakePuid },
+                { "StealedFC", this->StealedFC },
+                { "StealedPUID", this->StealedPUID },
                 { "SpoofPlatform", this->SpoofPlatform },
                 { "RPCSpoof", this->RPCSpoof },
                 { "FakePlatform", this->FakePlatform },
