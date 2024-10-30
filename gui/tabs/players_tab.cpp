@@ -1185,23 +1185,29 @@ namespace PlayersTab {
 			}
 			if (openPUID && selectedPlayer.has_value()) {
 				ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
-				if (convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid) != "" && ImGui::Button("Steal Data")) {
-					State.FakePuid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
-					State.FakeFriendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+				if (ImGui::Button("Steal Data")) {
+					State.StealedPUID = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
+					State.StealedFC = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
 					State.Save();
 				}
 				ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
-				if (InputString("PUID", &State.FakePuid)) {
+				if (InputString("PUID", &State.StealedPUID)) {
 					State.Save();
 				}
 				ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
-				if (InputString("Friend Code", &State.FakeFriendCode)) {
+				if (InputString("Friend Code", &State.StealedFC)) {
 					State.Save();
 				}
-				if (convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid) != "" && ImGui::Button("Copy PUID"))
-					ClipboardHelper_PutClipboardString(selectedPlayer.get_PlayerData()->fields.Puid, NULL);
-				if (convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode) != "" && ImGui::Button("Copy Friend Code"))
-					ClipboardHelper_PutClipboardString(selectedPlayer.get_PlayerData()->fields.FriendCode, NULL);
+				ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+				{
+					if (convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid) != "" && ImGui::Button("Copy PUID"))
+						ClipboardHelper_PutClipboardString(selectedPlayer.get_PlayerData()->fields.Puid, NULL);
+				}
+				ImGui::SameLine();
+				{
+					if (convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode) != "" && ImGui::Button("Copy Friend Code"))
+						ClipboardHelper_PutClipboardString(selectedPlayer.get_PlayerData()->fields.FriendCode, NULL);
+				}
 			}
 			ImGui::EndChild();
 		}
