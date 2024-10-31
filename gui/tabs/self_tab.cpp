@@ -298,14 +298,14 @@ namespace SelfTab {
                 State.Save();
             }
 
-            if (ToggleButton("Change Body Type", &State.ChangeBodyType)) {
+            /*if (ToggleButton("Change Body Type", &State.ChangeBodyType)) {
                 State.Save();
             }
             if (State.ChangeBodyType) {
                 ImGui::SameLine();
                 if (CustomListBoxInt("Type", &State.BodyType, BODYTYPES, 75.f * State.dpiScale))
                     State.Save();
-            }
+            }*/
 
             if (State.InMeeting && ImGui::Button("Move in Meeting"))
             {
