@@ -14,19 +14,16 @@ namespace PlayersTab {
 		Player,
 		Trolling,
 		PUID,
-		Detection,
 	};
 
 	static bool openPlayer = true; //default to visual tab group
 	static bool openTrolling = false;
 	static bool openPUID = false;
-	static bool openDetection = false;
 
 	void CloseOtherGroups(Groups group) {
 		openPlayer = group == Groups::Player;
 		openTrolling = group == Groups::Trolling;
 		openPUID = group == Groups::PUID;
-		openDetection = group == Groups::Detection;
 	}
 
 	static bool murderLoop = false;
@@ -244,10 +241,6 @@ namespace PlayersTab {
 				ImGui::SameLine();
 				if (TabGroup("PUID", openPUID)) {
 					CloseOtherGroups(Groups::PUID);
-				}
-				ImGui::SameLine();
-				if (TabGroup("Detection", openDetection)) {
-					CloseOtherGroups(Groups::Detection);
 				}
 			}
 			if (State.DisableMeetings && IsHost())
@@ -1159,6 +1152,20 @@ namespace PlayersTab {
 						}
 					}
 
+					//we have to send these rpc messages as ourselves since anticheat only allows you to send rpcs with your own net id
+					if (ImGui::Button(!State.SafeMode ? "Force AUM Detection" : "Fake AUM Detection")) {
+						if (IsInGame()) State.rpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
+						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
+					}
+					ImGui::SameLine();
+					static std::string aumMessage = "";
+					if (ImGui::Button(!State.SafeMode ? "Force AUM Chat" : "Fake AUM Chat")) {
+						if (IsInGame()) State.rpcQueue.push(new RpcForceAumChat(selectedPlayer, aumMessage, !State.SafeMode));
+						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceAumChat(selectedPlayer, aumMessage, !State.SafeMode));
+					}
+
+					InputString("AUM Message", &aumMessage);
+
 					if (!State.SafeMode && (IsInGame() || IsInLobby()) && !selectedPlayer.is_Disconnected() && !selectedPlayer.is_LocalPlayer())
 					{
 						if (State.playerToChatAs.equals(State.selectedPlayer) && State.activeChatSpoof) {
@@ -1202,50 +1209,7 @@ namespace PlayersTab {
 						ClipboardHelper_PutClipboardString(selectedPlayer.get_PlayerData()->fields.FriendCode, NULL);
 				}
 			}
-
-			if (openDetection && selectedPlayer.has_value()) {
-				{
-					static std::string aumMessage = "";
-					if (ImGui::Button(!State.SafeMode || IsHost() ? "Force AUM Chat" : "Fake AUM Chat")) {
-						if (IsInGame()) State.rpcQueue.push(new RpcForceAumChat(selectedPlayer, aumMessage, !State.SafeMode));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceAumChat(selectedPlayer, aumMessage, !State.SafeMode));
-					}
-					{
-						ImGui::SameLine();
-						static std::string knMessage = "";
-						if (ImGui::Button(!State.SafeMode || IsHost() ? "Force KN Chat" : "Fake KN Chat")) {
-							if (IsInGame()) State.rpcQueue.push(new RpcForceKNChat(selectedPlayer, knMessage, !State.SafeMode));
-							if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceKNChat(selectedPlayer, knMessage, !State.SafeMode));
-						}
-
-						InputString("AUM Message", &aumMessage);
-
-						InputString("KN Message", &knMessage);
-					}
-				}
-
-				ImGui::NewLine();
-				{
-					//we have to send these rpc messages as ourselves since anticheat only allows you to send rpcs with your own net id
-					if (ImGui::Button(!State.SafeMode || IsHost() ? "Force AmongUsMenu Detection" : "Fake AmongUsMenu Detection")) {
-						if (IsInGame()) State.rpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
-					}
-
-					ImGui::NewLine();
-					if (ImGui::Button(!State.SafeMode || IsHost() ? "Force KillNetwork Detection" : "Fake KillNetwork Detection")) {
-						if (IsInGame()) State.rpcQueue.push(new RpcForceDetectKN(selectedPlayer, !State.SafeMode));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceDetectKN(selectedPlayer, !State.SafeMode));
-					}
-
-					ImGui::NewLine();
-					if (ImGui::Button(!State.SafeMode || IsHost() ? "Force BetterAmongUs Detection" : "Fake BetterAmongUs Detection")) {
-						if (IsInGame()) State.rpcQueue.push(new RpcForceDetectBAU(selectedPlayer, !State.SafeMode));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceDetectBAU(selectedPlayer, !State.SafeMode));
-					}
-				}
-			}
-	ImGui::EndChild();
+			ImGui::EndChild();
 		}
 
 		if (openPlayer || State.selectedPlayers.size() == 0 || IsInLobby()) { //clear murder/suicide loops
