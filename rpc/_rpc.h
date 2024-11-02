@@ -438,6 +438,31 @@ public:
 	virtual void Process() override;
 };
 
+class RpcForceDetectKN : public RPCInterface {
+	PlayerSelection target;
+	bool completeForce;
+public:
+	RpcForceDetectKN(const PlayerSelection& target, bool completeForce = false);
+	virtual void Process() override;
+};
+
+class RpcForceKNChat : public RPCInterface {
+	PlayerSelection target;
+	std::string msg;
+	bool completeForce;
+public:
+	RpcForceKNChat(const PlayerSelection& target, std::string_view msg, bool completeForce = false);
+	virtual void Process() override;
+};
+
+class RpcForceDetectBAU : public RPCInterface {
+	PlayerSelection target;
+	bool completeForce;
+public:
+	RpcForceDetectBAU(const PlayerSelection& target, bool completeForce = false);
+	virtual void Process() override;
+};
+
 class RpcSyncSettings : public RPCInterface {
 public:
 	RpcSyncSettings();
