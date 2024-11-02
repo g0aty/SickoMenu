@@ -88,6 +88,12 @@ namespace SelfTab {
                 State.Save();
             }
             if (State.ReadAndSendAumChat) ImGui::Text("Send AUM chat messages in regular chat by typing \"/aum [message]\"!");
+            if (State.ReadAndSendAumChat) ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+
+            //Don't have command for sending [canon]
+            if (ToggleButton("Read and Send KillNetwork Chat", &State.ReadAndSendKNChat)) {
+                State.Save();
+            }
             /*static int framesPassed = 0;
             if (ImGui::Button("Refresh Chat Button")) {
                 State.RefreshChatButton = true;
@@ -96,6 +102,9 @@ namespace SelfTab {
 
             if (framesPassed == 0) State.RefreshChatButton = false;
             else framesPassed--;*/
+            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
             if (IsHost() || !State.SafeMode) {
                 if (ToggleButton("Custom Name", &State.CustomName)) {
