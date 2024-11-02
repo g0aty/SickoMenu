@@ -378,6 +378,57 @@ void RpcForceAumChat::Process()
 	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(chatVisual), false, NULL);
 }
 
+RpcForceKNChat::RpcForceKNChat(const PlayerSelection& target, std::string_view msg, bool completeForce)
+{
+	this->target = target;
+	this->msg = msg;
+	this->completeForce = completeForce;
+}
+
+void RpcForceKNChat::Process()
+{
+	PlayerControl* player = target.validate().get_PlayerControl();
+	String* playerName = NetworkedPlayerInfo_get_PlayerName(target.validate().get_PlayerData(), NULL);
+	MessageWriter* rpcMessage = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), (completeForce ? player : *Game::pLocalPlayer)->fields._.NetId, 887, SendOption__Enum::Reliable, NULL);
+	auto outfit = GetPlayerOutfit(GetPlayerData(player));
+	MessageWriter_WriteString(rpcMessage, playerName, NULL);
+	MessageWriter_WriteString(rpcMessage, convert_to_string(msg), NULL);
+	MessageWriter_WriteInt32(rpcMessage, outfit->fields.ColorId, NULL);
+	MessageWriter_EndMessage(rpcMessage, NULL);
+	std::string chatVisual = "<cspace=+0.03><#222><font=\"Barlow-Bold SDF\" material=\"Barlow-Italic SDF Outline\"><b><size=-0.2>[</size></b></font></material><font=\"CONSOLA SDF\"><size=+0.2><#222>K<mspace=-1><#F00>K</mspace> <#222>i<mspace=-1.1><#F00>i</mspace> <#222>l<mspace=-1.1><#F00>l</mspace> <#222>l<mspace=-1.1><#F00>l</mspace> <#222>N<mspace=-1.1><#F00>N</mspace> <#222>e<mspace=-1.1><#F00>e</mspace> <#222>t<mspace=-1.2><#F00><cspace=+0.15>t</mspace> <#222>w</cspace><mspace=-1.1><#F00>w</mspace> <#222>o<mspace=-1.1><#F00>o</mspace> <#222>r<mspace=-1.0><#F00>r</mspace> <#222>k<mspace=-1.0><#F00>k</mspace>  <#222>C<mspace=-1.1><#F00>C</mspace> <#222>h<mspace=-1.1><#F00>h</mspace> <#222>a<mspace=-1.1><#F00>a</mspace> <#222>t<mspace=-1.15><#F00>t</mspace> </font></material><#222><font=\"Barlow-Bold SDF\" material=\"Barlow-Italic SDF Outline\"><b><size=-0.2>]</b></size></font></material></color></color></color></color></color></color></color></color></color></color></color></color></color></color></color>\n" + msg;
+	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(chatVisual), false, NULL);
+}
+
+RpcForceDetectBAU::RpcForceDetectBAU(const PlayerSelection& target, bool completeForce)
+{
+	this->target = target;
+	this->completeForce = completeForce;
+}
+
+void RpcForceDetectBAU::Process()
+{
+	if (!target.has_value()) return;
+	PlayerControl* player = target.validate().get_PlayerControl();
+	MessageWriter* rpcMessage = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), (completeForce ? player : *Game::pLocalPlayer)->fields._.NetId, (uint8_t)150, SendOption__Enum::Reliable, NULL);
+	MessageWriter_WriteByte(rpcMessage, player->fields.PlayerId, NULL);
+	MessageWriter_EndMessage(rpcMessage, NULL);
+}
+
+RpcForceDetectKN::RpcForceDetectKN(const PlayerSelection& target, bool completeForce)
+{
+	this->target = target;
+	this->completeForce = completeForce;
+}
+
+void RpcForceDetectKN::Process()
+{
+	if (!target.has_value()) return;
+	PlayerControl* player = target.validate().get_PlayerControl();
+	MessageWriter* rpcMessage = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), (completeForce ? player : *Game::pLocalPlayer)->fields._.NetId, (uint8_t)250, SendOption__Enum::Reliable, NULL);
+	MessageWriter_WriteByte(rpcMessage, player->fields.PlayerId, NULL);
+	MessageWriter_EndMessage(rpcMessage, NULL);
+}
+
 RpcSyncSettings::RpcSyncSettings() {
 	//thanks Rabek009! https://github.com/Rabek009/MoreGamemodes/ <3
 }
