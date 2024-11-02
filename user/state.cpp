@@ -173,6 +173,7 @@ void Settings::Load() {
         JSON_TRYGET("ChatAlwaysActive", this->ChatAlwaysActive);
         JSON_TRYGET("ReadGhostMessages", this->ReadGhostMessages);
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
+        JSON_TRYGET("ReadAndSendKNChat", this->ReadAndSendKNChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
         JSON_TRYGET("CustomRgbName", this->CustomRgbName);
@@ -457,6 +458,7 @@ void Settings::Save() {
                 { "ChatAlwaysActive", this->ChatAlwaysActive },
                 { "ReadGhostMessages", this->ReadGhostMessages },
                 { "ReadAndSendAumChat", this->ReadAndSendAumChat },
+                { "ReadAndSendKNChat", this->ReadAndSendKNChat },
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
                 { "ResizeName", this->ResizeName },
