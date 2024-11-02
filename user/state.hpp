@@ -247,6 +247,7 @@ public:
     bool ChatActiveOriginalState = false;
     bool ReadGhostMessages = false;
     bool ReadAndSendAumChat = false;
+    bool ReadAndSendKNChat = false;
     bool ShiftRightClickTP = false;
     bool TeleportEveryone = false;
     bool RotateEveryone = false;
