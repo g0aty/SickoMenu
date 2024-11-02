@@ -64,6 +64,32 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		}
 	}
 	break;
+	case (uint8_t)887: // KillNetwork Source
+	{
+		std::string playerName = convert_from_string(MessageReader_ReadString(reader, NULL));
+		std::string message = convert_from_string(MessageReader_ReadString(reader, NULL));
+		uint32_t colorId = MessageReader_ReadInt32(reader, NULL);
+
+		if (message.empty()) break;
+
+		if (!State.PanicMode && State.ReadAndSendKNChat) {
+			NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
+
+			if (player != NULL && local != NULL) {
+				bool wasDead = GetPlayerData(player)->fields.IsDead && !local->fields.IsDead;
+				if (wasDead) {
+					local->fields.IsDead = true;
+				}
+
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<cspace=+0.03><#222><font=\"Barlow-Bold SDF\" material=\"Barlow-Italic SDF Outline\"><b><size=-0.2>[</size></b></font></material><font=\"CONSOLA SDF\"><size=+0.2><#222>K<mspace=-1><#F00>K</mspace> <#222>i<mspace=-1.1><#F00>i</mspace> <#222>l<mspace=-1.1><#F00>l</mspace> <#222>l<mspace=-1.1><#F00>l</mspace> <#222>N<mspace=-1.1><#F00>N</mspace> <#222>e<mspace=-1.1><#F00>e</mspace> <#222>t<mspace=-1.2><#F00><cspace=+0.15>t</mspace> <#222>w</cspace><mspace=-1.1><#F00>w</mspace> <#222>o<mspace=-1.1><#F00>o</mspace> <#222>r<mspace=-1.0><#F00>r</mspace> <#222>k<mspace=-1.0><#F00>k</mspace>  <#222>C<mspace=-1.1><#F00>C</mspace> <#222>h<mspace=-1.1><#F00>h</mspace> <#222>a<mspace=-1.1><#F00>a</mspace> <#222>t<mspace=-1.15><#F00>t</mspace> </font></material><#222><font=\"Barlow-Bold SDF\" material=\"Barlow-Italic SDF Outline\"><b><size=-0.2>]</b></size></font></material></color></color></color></color></color></color></color></color></color></color></color></color></color></color></color>\n" + message), false, NULL);
+
+			if (wasDead) {
+				local->fields.IsDead = false;
+			}
+			}
+		}
+	}
+	break;
 	}
 }
 
@@ -153,9 +179,9 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		}
 		break;
 	}
-	/*case (uint8_t)RpcCalls__Enum::CheckMurder:
-	case (uint8_t)RpcCalls__Enum::MurderPlayer:
-	check PlayerControl.cpp*/
+												/*case (uint8_t)RpcCalls__Enum::CheckMurder:
+												case (uint8_t)RpcCalls__Enum::MurderPlayer:
+												check PlayerControl.cpp*/
 	case (uint8_t)RpcCalls__Enum::Shapeshift:
 	case (uint8_t)RpcCalls__Enum::CheckShapeshift:
 	case (uint8_t)RpcCalls__Enum::RejectShapeshift: {
