@@ -278,6 +278,7 @@ namespace GameTab {
             if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) {
                 State.Save();
             }
+            ImGui::Dummy(ImVec2(6, 6)* State.dpiScale);
             if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && State.chatMessage.size() <= 120) {
                 ImGui::SameLine();
                 if (ImGui::Button("Send"))
@@ -306,7 +307,20 @@ namespace GameTab {
                     State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(player), State.chatMessage, true));
                 }
             }
+            if ((IsInGame() || IsInLobby()) && State.ReadAndSendKNChat) ImGui::SameLine();
+            if (State.ReadAndSendKNChat && (IsInGame() || IsInLobby()) && ImGui::Button("Send to KN"))
+            {
+                auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
+                    State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+                if (IsInGame()) {
+                    State.rpcQueue.push(new RpcForceKNChat(PlayerSelection(player), State.chatMessage, true));
+                }
+                else if (IsInLobby()) {
+                    State.lobbyRpcQueue.push(new RpcForceKNChat(PlayerSelection(player), State.chatMessage, true));
+                }
+            }
 
+            ImGui::NewLine();
             if (ToggleButton("Spam", &State.ChatSpam))
             {
                 State.Save();
