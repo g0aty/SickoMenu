@@ -148,29 +148,6 @@ namespace PlayersTab {
 			if (shouldEndListBox)
 				ImGui::ListBoxFooter();
 
-			if (murderDelay <= 0) {
-				if (murderCount > 0 && selectedPlayer.has_value()) {
-					for (auto& p : selectedPlayers) {
-						auto validPlayer = p.validate();
-						if (IsInGame()) {
-							State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
-						}
-						else if (IsInLobby()) {
-							State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
-						}
-					}
-					murderDelay = 5;
-					murderCount--;
-				}
-				else {
-					murderLoop = false;
-					murderCount = 0;
-				}
-			}
-			else {
-				murderDelay--;
-			}
-
 			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1 && !selectedPlayers[0].validate().is_Disconnected()) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
 			{
 				if ((IsInMultiplayerGame() || IsInLobby()) || (selectedPlayer.has_value() && selectedPlayer.is_LocalPlayer())) {
@@ -814,6 +791,29 @@ namespace PlayersTab {
 							murderLoop = false;
 							murderCount = 0;
 						}
+					}
+
+					if (murderDelay <= 0) {
+						if (murderCount > 0 && selectedPlayer.has_value()) {
+							for (auto& p : selectedPlayers) {
+								auto validPlayer = p.validate();
+								if (IsInGame()) {
+									State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
+								}
+								else if (IsInLobby()) {
+									State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
+								}
+							}
+							murderDelay = 5;
+							murderCount--;
+						}
+						else {
+							murderLoop = false;
+							murderCount = 0;
+						}
+					}
+					else {
+						murderDelay--;
 					}
 
 					if (IsInGame() && (State.RealRole == RoleTypes__Enum::Impostor || State.RealRole == RoleTypes__Enum::Shapeshifter || State.RealRole == RoleTypes__Enum::Phantom)) {
