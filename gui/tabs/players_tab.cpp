@@ -148,7 +148,7 @@ namespace PlayersTab {
 			if (shouldEndListBox)
 				ImGui::ListBoxFooter();
 
-			if (selectedPlayer.has_value() && selectedPlayers.size() == 1) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
+			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
 			{
 				if ((IsInMultiplayerGame() || IsInLobby()) || (selectedPlayer.has_value() && selectedPlayer.is_LocalPlayer())) {
 					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
@@ -805,7 +805,7 @@ namespace PlayersTab {
 								}
 							}
 							murderDelay = 5;
-							murderCount--;
+							--murderCount;
 						}
 						else {
 							murderLoop = false;
@@ -813,7 +813,7 @@ namespace PlayersTab {
 						}
 					}
 					else {
-						murderDelay--;
+						--murderDelay;
 					}
 
 					if (IsInGame() && (State.RealRole == RoleTypes__Enum::Impostor || State.RealRole == RoleTypes__Enum::Shapeshifter || State.RealRole == RoleTypes__Enum::Phantom)) {
