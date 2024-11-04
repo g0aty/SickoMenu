@@ -14,7 +14,7 @@ namespace PlayersTab {
 		Player,
 		Trolling,
 		PUID,
-	//	Detection,
+		//	Detection,
 	};
 
 	static bool openPlayer = true; //default to visual tab group
@@ -26,7 +26,7 @@ namespace PlayersTab {
 		openPlayer = group == Groups::Player;
 		openTrolling = group == Groups::Trolling;
 		openPUID = group == Groups::PUID;
-	//	openDetection = group == Groups::Detection;
+		//	openDetection = group == Groups::Detection;
 	}
 
 	static bool murderLoop = false;
@@ -148,7 +148,7 @@ namespace PlayersTab {
 			if (shouldEndListBox)
 				ImGui::ListBoxFooter();
 
-			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1 && !selectedPlayers[0].validate().is_Disconnected()) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
+			if (selectedPlayer.has_value() && selectedPlayers.size() == 1) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
 			{
 				if ((IsInMultiplayerGame() || IsInLobby()) || (selectedPlayer.has_value() && selectedPlayer.is_LocalPlayer())) {
 					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
@@ -426,7 +426,7 @@ namespace PlayersTab {
 							}
 						}
 					}*/
-					
+
 					if (IsHost() && ImGui::Button("Ban")) {
 						State.selectedPlayer = {};
 						State.selectedPlayers.clear();
@@ -435,7 +435,7 @@ namespace PlayersTab {
 							app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
 						}
 					}
-					
+
 					if (selectedPlayers.size() == 1 && !selectedPlayers[0].validate().is_LocalPlayer()) {
 						Game::PlayerId playerId = selectedPlayers[0].validate().get_PlayerControl()->fields.PlayerId;
 						std::string friendCode = convert_from_string(selectedPlayers[0].validate().get_PlayerData()->fields.FriendCode);
@@ -1213,7 +1213,7 @@ namespace PlayersTab {
 				if (InputString("Friend Code", &State.StealedFC)) {
 					State.Save();
 				}
-				ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+				ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
 				{
 					if (convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid) != "" && ImGui::Button("Copy PUID"))
 						ClipboardHelper_PutClipboardString(selectedPlayer.get_PlayerData()->fields.Puid, NULL);
@@ -1268,7 +1268,7 @@ namespace PlayersTab {
 					}
 				}
 			}*/
-	ImGui::EndChild();
+			ImGui::EndChild();
 		}
 
 		if (openPlayer || State.selectedPlayers.size() == 0 || IsInLobby()) { //clear murder/suicide loops
