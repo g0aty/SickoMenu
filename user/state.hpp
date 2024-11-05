@@ -57,6 +57,8 @@ public:
     std::string GuestFriendCode = "";
     std::string FakeFriendCode = "";
     std::string FakePuid = "";
+    std::string StealedFC = "";
+    std::string StealedPUID = "";
     bool SpoofPlatform = false;
     bool RPCSpoof = false;
     int FakePlatform = 0;
