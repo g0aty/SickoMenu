@@ -391,8 +391,8 @@ namespace SabotageTab {
                 else {
                     automaticToggle = false;
                     auto switchSystem = (SwitchSystem*)il2cpp::Dictionary((*Game::pShipStatus)->fields.Systems)[SystemTypes__Enum::Electrical];
-                    switchSystem->fields.ActualSwitches = switchSystem->fields.ExpectedSwitches;
-                    State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, switchSystem->fields.ActualSwitches));
+                    State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, switchSystem->fields.ExpectedSwitches));
+                    State.rpcQueue = std::queue<RPCInterface*>();
                 }
             }
 
@@ -405,6 +405,9 @@ namespace SabotageTab {
                     if (unfixReactorActive) {
                         std::thread(UnfixReactorLoop).detach();
                     }
+                    else {
+                        State.rpcQueue = std::queue<RPCInterface*>();
+                    }
                 }
             }
 
@@ -414,6 +417,9 @@ namespace SabotageTab {
                     unfixPolusReactorActive.store(unfixPolusReactorActiveLocal);
                     if (unfixPolusReactorActive) {
                         std::thread(UnfixPolusReactorLoop).detach();
+                    }
+                    else {
+                        State.rpcQueue = std::queue<RPCInterface*>();
                     }
                 }
             }
@@ -426,6 +432,9 @@ namespace SabotageTab {
                     if (unfixOxygenActive) {
                         std::thread(UnfixOxygenLoop).detach();
                     }
+                    else {
+                        State.rpcQueue = std::queue<RPCInterface*>();
+                    }
                 }
             }
 
@@ -436,6 +445,9 @@ namespace SabotageTab {
                     if (unfixCrashCourseActive) {
                         std::thread(UnfixCrashCourseLoop).detach();
                     }
+                    else {
+                        State.rpcQueue = std::queue<RPCInterface*>();
+                    }
                 }
             }
             if (State.mapType == Settings::MapType::Fungle) {
@@ -444,6 +456,9 @@ namespace SabotageTab {
                     unfixFungleCommsActive.store(unfixFungleCommsActiveLocal);
                     if (unfixFungleCommsActive) {
                         std::thread(UnfixFungleCommsLoop).detach();
+                    }
+                    else {
+                        State.rpcQueue = std::queue<RPCInterface*>();
                     }
                 }
             }
@@ -455,6 +470,9 @@ namespace SabotageTab {
                     unfixCommsActive.store(unfixCommsActiveLocal);
                     if (unfixCommsActive) {
                         std::thread(UnfixCommsLoop).detach();
+                    }
+                    else {
+                        State.rpcQueue = std::queue<RPCInterface*>();
                     }
                 }
             }

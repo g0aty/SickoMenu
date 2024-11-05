@@ -120,6 +120,7 @@ void Settings::Load() {
         JSON_TRYGET("UserName", this->userName);
         JSON_TRYGET("ShowGhosts", this->ShowGhosts);
         JSON_TRYGET("ShowPhantoms", this->ShowPhantoms);
+        JSON_TRYGET("ShowPlayersInVents", this->ShowPlayersInVents);
         JSON_TRYGET("FakeRole", this->FakeRole);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
         JSON_TRYGET("ShowRadar", this->ShowRadar);
@@ -175,7 +176,6 @@ void Settings::Load() {
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
-        JSON_TRYGET("CustomRgbName", this->CustomRgbName);
         JSON_TRYGET("ResizeName", this->ResizeName);
         JSON_TRYGET("IndentName", this->IndentName);
         JSON_TRYGET("CspaceName", this->CspaceName);
@@ -403,6 +403,7 @@ void Settings::Save() {
                 { "UserName", this->userName },
                 { "ShowGhosts", this->ShowGhosts },
                 { "ShowPhantoms", this->ShowPhantoms },
+                { "ShowPlayersInVents", this->ShowPlayersInVents },
                 { "FakeRole", this->FakeRole },
                 { "AutoFakeRole", this->AutoFakeRole },
                 { "ShowRadar", this->ShowRadar },

@@ -85,6 +85,7 @@ public:
     bool UnlockKillButton = false;
     bool ShowGhosts = false;
     bool ShowPhantoms = false;
+    bool ShowPlayersInVents = false;
     int FakeRole = 0;
     bool AutoFakeRole = false;
     bool DisableVents = false;
@@ -462,7 +463,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.0";
+    std::string SickoVersion = "v4.1_pr1";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;

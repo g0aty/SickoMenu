@@ -83,6 +83,22 @@ void RpcMurderLoop::Process()
 	}
 }
 
+RpcExiled::RpcExiled(PlayerControl* target, bool onlyOnTarget)
+{
+	this->target = target;
+	this->onlyOnTarget = onlyOnTarget;
+}
+
+void RpcExiled::Process()
+{
+	for (auto p : GetAllPlayerControl()) {
+		if (!PlayerSelection(target).has_value() || (onlyOnTarget && target != p)) break;
+		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), target->fields._.NetId,
+			uint8_t(RpcCalls__Enum::Exiled), SendOption__Enum::None, p->fields._.OwnerId, NULL);
+		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+	}
+}
+
 //damn im too lazy to add new files
 
 RpcShapeshift::RpcShapeshift(PlayerControl* Player, const PlayerSelection& target, bool animate)

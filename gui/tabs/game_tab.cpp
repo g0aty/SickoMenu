@@ -149,7 +149,7 @@ namespace GameTab {
                 }
             }
             if (IsInLobby()) ImGui::SameLine();
-            if (IsInLobby() && (IsHost() || !State.SafeMode) && ImGui::Button("Allow Everyone to NoClip")) {
+            if (IsInLobby() && !State.SafeMode && ImGui::Button("Allow Everyone to NoClip")) {
                 for (auto p : GetAllPlayerControl()) {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
 				}
@@ -311,13 +311,15 @@ namespace GameTab {
             {
                 State.Save();
             }
-            if (State.ChatSpamMode) ImGui::SameLine();
-            if (State.ChatSpamMode && ToggleButton("Spam by Everyone", &State.ChatSpamEveryone))
+            if ((IsHost() || !State.SafeMode) && State.ChatSpamMode) ImGui::SameLine();
+            if ((IsHost() || !State.SafeMode) && State.ChatSpamMode && ToggleButton("Spam by Everyone", &State.ChatSpamEveryone))
             {
                 State.Save();
             }
-            if (CustomListBoxInt("Chat Spam Mode", &State.ChatSpamMode, 
-                { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
+            if (IsHost() || !State.SafeMode) {
+                if (CustomListBoxInt("Chat Spam Mode", &State.ChatSpamMode,
+                    { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
+            }
 
             if (std::find(State.ChatPresets.begin(), State.ChatPresets.end(), State.chatMessage) == State.ChatPresets.end() && ImGui::Button("Add Message as Preset")) {
                 State.ChatPresets.push_back(State.chatMessage);
@@ -435,26 +437,13 @@ namespace GameTab {
             if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) {
                 State.Save();
             }
-            {
-                if (IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Server crashes after starting a game-match!\nMay be hard ping in lobby"));
-                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
-            }
+            if (IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Server crashes after starting a game-match!"));
+            ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
             if (IsInGame() && ToggleButton("Attempt to Crash", &State.UltimateSpamReport)) {
                 State.Save();
             }
-            {
-                if (IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Alternate Crash Server!\nMay cause game crashing!\nMay work with delay!"));
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            }
-            if (IsInMultiplayerGame() || IsInLobby()) (ToggleButton("Crash Chat Spam", &State.CrashChatSpam));
-            {
-                if (IsInMultiplayerGame() || IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Upgraded [Spam Blank Chat as {Everyone}] Exploit")); State.Save();
-            }
-            /*ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
-            if (IsInLobby() || IsInGame) ToggleButton("Destroy Game Logic", &State.SpoofCrashLevel) && (!State.SpoofLevel); {
-                if (State.SpoofCrashLevel) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Zero Level = Crash Server"));
-                State.Save();
-            }*/
+            if (IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Alternate Crash Server!\nMay cause game crashing!\nMay work with delay!"));
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
         }
 
         if (openOptions) {

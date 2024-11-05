@@ -458,7 +458,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 								InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 								ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(State.chatMessage), false, NULL);
 							}
-							else if (State.ChatSpamMode == 1 || State.ChatSpamMode == 2) {
+							else if (State.ChatSpamMode == 1 || (State.ChatSpamMode == 2 && (IsHost() || !State.SafeMode))) {
 								PlayerControl_RpcSendChatNote(player, p->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
 							}
 						}
@@ -675,9 +675,27 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			}
 
 			bool shouldSeePhantom = __this == *Game::pLocalPlayer || PlayerIsImpostor(localData) || localData->fields.IsDead;
+			auto roleType = playerData->fields.RoleType;
 
-			if (__this->fields.invisibilityAlpha <= 0.5f) {
-				__this->fields.invisibilityAlpha = State.ShowPhantoms || shouldSeePhantom ? 0.5f : 0.f;
+			if (roleType == RoleTypes__Enum::Phantom && !shouldSeePhantom) {
+				auto phantomRole = (PhantomRole*)(playerData->fields.Role);
+				bool isFullyVanished = phantomRole->fields.isInvisible;
+				if (isFullyVanished && __this->fields.invisibilityAlpha < 0.5f && State.ShowPhantoms) {
+					PlayerControl_SetInvisibility(__this, false, NULL);
+					bool wasDead = false;
+					auto local = GetPlayerData(*Game::pLocalPlayer);
+					if (__this != NULL && local != NULL && !local->fields.IsDead) {
+						local->fields.IsDead = true;
+						wasDead = true;
+					}
+					PlayerControl_SetInvisibility(__this, true, NULL);
+					if (wasDead) {
+						local->fields.IsDead = false;
+					}
+				}
+				if (isFullyVanished && __this->fields.invisibilityAlpha == 0.5f && !State.ShowPhantoms) {
+					PlayerControl_SetInvisibility(__this, true, NULL);
+				}
 			}
 
 			if (!State.FreeCam && __this == *Game::pLocalPlayer && State.prevCamPos.x != NULL) {
@@ -1495,7 +1513,7 @@ void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, Me
 	PlayerControl_CmdCheckAppear(__this, shouldAnimate, method);
 }
 
-void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method) {
+void dPlayerControl_SetInvisibility(PlayerControl* __this, bool isActive, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_SetRoleInvisibility executed");
 	if (!State.PanicMode && State.ShowPhantoms) {
 		bool wasDead = false;
@@ -1508,7 +1526,7 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
 			State.liveReplayEvents.emplace_back(std::make_unique<PhantomEvent>(GetEventPlayerControl(__this).value(),
 				isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));
 		}
-		PlayerControl_SetRoleInvisibility(__this, isActive, shouldAnimate, playFullAnimation, method);
+		PlayerControl_SetInvisibility(__this, isActive, method);
 		if (wasDead) {
 			local->fields.IsDead = false;
 		}
@@ -1518,7 +1536,7 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
 		State.liveReplayEvents.emplace_back(std::make_unique<PhantomEvent>(GetEventPlayerControl(__this).value(), 
 			isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));
 	}
-	PlayerControl_SetRoleInvisibility(__this, isActive, shouldAnimate, playFullAnimation, method);
+	PlayerControl_SetInvisibility(__this, isActive, method);
 }
 
 void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method) {

@@ -206,6 +206,14 @@ public:
 	virtual void Process() override;
 };
 
+class RpcExiled : public RPCInterface {
+	PlayerControl* target;
+	bool onlyOnTarget;
+public:
+	RpcExiled(PlayerControl* target, bool onlyOnTarget = true);
+	virtual void Process() override;
+};
+
 class RpcShapeshift : public RPCInterface {
 	PlayerControl* Player;
 	PlayerSelection target;

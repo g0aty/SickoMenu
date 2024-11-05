@@ -213,7 +213,7 @@ void DetourInitilization() {
 	HOOKFUNC(ChatBubble_SetText);
 	HOOKFUNC(PlayerControl_CmdCheckVanish);
 	HOOKFUNC(PlayerControl_CmdCheckAppear);
-	HOOKFUNC(PlayerControl_SetRoleInvisibility);
+	HOOKFUNC(PlayerControl_SetInvisibility);
 	HOOKFUNC(ShipStatus_UpdateSystem);
 	HOOKFUNC(PlayerControl_CmdCheckProtect);
 	HOOKFUNC(MeetingHud_RpcVotingComplete);
@@ -224,6 +224,7 @@ void DetourInitilization() {
 	HOOKFUNC(ModManager_LateUpdate);
 	HOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
 	HOOKFUNC(PlayerControl_SetLevel);
+	HOOKFUNC(Vent_TryMoveToVent);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -357,7 +358,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(ChatBubble_SetText);
 	UNHOOKFUNC(PlayerControl_CmdCheckVanish);
 	UNHOOKFUNC(PlayerControl_CmdCheckAppear);
-	UNHOOKFUNC(PlayerControl_SetRoleInvisibility);
+	UNHOOKFUNC(PlayerControl_SetInvisibility);
 	UNHOOKFUNC(ShipStatus_UpdateSystem);
 	UNHOOKFUNC(PlayerControl_CmdCheckProtect);
 	UNHOOKFUNC(MeetingHud_RpcVotingComplete);
@@ -368,6 +369,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(ModManager_LateUpdate);
 	UNHOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
 	UNHOOKFUNC(PlayerControl_SetLevel);
+	UNHOOKFUNC(Vent_TryMoveToVent);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

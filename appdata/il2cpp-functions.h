@@ -113,6 +113,7 @@ DO_APP_FUNC(void, PlayerControl_CmdCheckName, (PlayerControl* __this, String* na
 DO_APP_FUNC(void, PlayerControl_RpcSetLevel, (PlayerControl* __this, uint32_t level, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSetLevel(System.UInt32)");
 DO_APP_FUNC(void, PlayerControl_SetLevel, (PlayerControl* __this, uint32_t level, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetLevel(System.UInt32)");
 DO_APP_FUNC(void, PlayerControl_RpcSetName, (PlayerControl* __this, String* name, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSetName(System.String)");
+DO_APP_FUNC(bool, PlayerControl_get_Visible, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean PlayerControl::get_Visible()");
 DO_APP_FUNC(void, PlayerControl_set_Visible, (PlayerControl* __this, bool value, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::set_Visible(System.Boolean)");
 DO_APP_FUNC(void, PlayerControl_HandleRpc, (PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::HandleRpc(System.Byte, Hazel.MessageReader)");
 DO_APP_FUNC(void, PlayerControl_RpcSetPet, (PlayerControl* __this, String* petId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSetPet(System.String)");
@@ -371,3 +372,6 @@ DO_APP_FUNC(void, EndGameNavigation_ShowDefaultNavigation, (EndGameNavigation* _
 DO_APP_FUNC(void*, EndGameNavigation_CoJoinGame, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator EndGameNavigation::CoJoinGame()");
 DO_APP_FUNC(PlayerBodyTypes__Enum, HideAndSeekManager_GetBodyType, (HideAndSeekManager* __this, PlayerControl* player, MethodInfo* method), "Assembly-CSharp, PlayerBodyTypes HideAndSeekManager::GetBodyType(PlayerControl)");
 DO_APP_FUNC(PlayerBodyTypes__Enum, NormalGameManager_GetBodyType, (NormalGameManager* __this, PlayerControl* player, MethodInfo* method), "Assembly-CSharp, PlayerBodyTypes NormalGameManager::GetBodyType(PlayerControl)");
+DO_APP_FUNC(void, PlayerControl_SetInvisibility, (PlayerControl* __this, bool isActive, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetInvisibility(System.Boolean)");
+DO_APP_FUNC(void, CosmeticsLayer_SetPhantomRoleAlpha, (CosmeticsLayer* __this, float alphaValue, MethodInfo* method), "Assembly-CSharp, System.Void CosmeticsLayer::SetPhantomRoleAlpha(System.Single)");
+DO_APP_FUNC(bool, Vent_TryMoveToVent, (Vent* __this, Vent* otherVent, String** error, MethodInfo* method), "Assembly-CSharp, System.Boolean Vent::TryMoveToVent(Vent, System.String&)");

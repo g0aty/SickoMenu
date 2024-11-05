@@ -262,6 +262,10 @@ namespace SelfTab {
             if (ToggleButton("See Phantoms", &State.ShowPhantoms)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("See Players In Vents", &State.ShowPlayersInVents)) {
+                State.Save();
+            }
 
             if (ToggleButton("See Protections", &State.ShowProtections))
             {

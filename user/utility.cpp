@@ -895,14 +895,10 @@ std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2) {
 	std::string opener = "";
 	if (State.UnderlineName) opener += "<u>";
 	if (State.StrikethroughName) opener += "<s>";
-	if (State.BoldName) opener += "<b>";
-	if (State.NobrName) opener += "<nobr>";
 
 	std::string closer = "";
 	if (State.UnderlineName) closer += "</s>";
 	if (State.StrikethroughName) closer += "</u>";
-	if (State.BoldName) closer += "</b>";
-	if (State.BoldName) closer += "</nobr>";
 
 	if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
 		return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
@@ -1380,46 +1376,10 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 		closer += "</s>";
 	}
 
-	if (State.BoldName && (!State.ColoredName || State.RgbName)) {
-		opener += "<b>";
-		closer += "</b>";
-	}
-
-	if (State.NobrName && (!State.ColoredName || State.RgbName)) {
-		opener += "<nobr>";
-		closer += "</nobr>";
-	}
-
 	if (State.ResizeName) {
 		opener += std::format("<size={}%>", State.NameSize * 100);
 		closer += "</size>";
 	}
-
-	if (State.IndentName) {
-		opener += std::format("<line-indent={}>", State.NameIndent * 1);
-		closer += "</line-indent>";
-	}
-
-	if (State.CspaceName) {
-		opener += std::format("<cspace={}>", State.NameCspace * 1);
-		closer += "</cspace>";
-	}
-
-	if (State.MspaceName) {
-		opener += std::format("<mspace={}>", State.NameMspace * 1);
-		closer += "</mspace>";
-	}
-
-	if (State.VoffsetName) {
-		opener += std::format("<voffset={}>", State.NameVoffset * 1);
-		closer += "</voffset>";
-	}
-
-	if (State.RotateName) {
-		opener += std::format("<rotate={}>", State.NameRotate * 1);
-		closer += "<rotate=0>";
-	}
-
 	if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
 
 	return opener + name + closer;
@@ -1453,6 +1413,7 @@ void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
+	if (pCtrl == *Game::pLocalPlayer) return; //avoid detecting yourself
 	auto pData = GetPlayerData(pCtrl);
 	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
 	if (State.SMAC_AddToBlacklist) {
@@ -1460,7 +1421,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 		State.BlacklistFriendCodes.push_back(puid);
 		State.Save();
 	}
-	std::string cheaterMessage = "Player " + name + " has been caught cheating! Reason: " + reason;
+	std::string cheaterMessage = "Player " + name + " has done an unauthorized action: " + reason;
 	LOG_INFO(cheaterMessage);
 	if (IsHost()) {
 		switch (State.SMAC_HostPunishment) {

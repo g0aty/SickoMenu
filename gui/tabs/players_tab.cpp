@@ -145,7 +145,7 @@ namespace PlayersTab {
 			if (shouldEndListBox)
 				ImGui::ListBoxFooter();
 
-			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1 && !selectedPlayers[0].validate().is_Disconnected()) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
+			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
 			{
 				if ((IsInMultiplayerGame() || IsInLobby()) || (selectedPlayer.has_value() && selectedPlayer.is_LocalPlayer())) {
 					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
@@ -275,12 +275,12 @@ namespace PlayersTab {
 				if (IsInGame() && !State.DisableMeetings && selectedPlayers.size() == 1) {
 					ImGui::NewLine();
 					if (!State.InMeeting) {
-						if (ImGui::Button("Report Body") && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) {
+						if (!GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Report Body")) {
 							State.rpcQueue.push(new RpcReportBody(State.selectedPlayer));
 						}
 					}
 					else {
-						if (ImGui::Button("Report Body") && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) {
+						if (ImGui::Button("Report Body")) {
 							State.rpcQueue.push(new RpcForceMeeting(*Game::pLocalPlayer, State.selectedPlayer));
 						}
 					}
@@ -302,11 +302,7 @@ namespace PlayersTab {
 				}
 
 				if (IsInGame() && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
-					&& !selectedPlayer.get_PlayerData()->fields.IsDead
-					&& !selectedPlayer.get_PlayerControl()->fields.inVent
-					&& !selectedPlayer.get_PlayerControl()->fields.inMovingPlat
 					&& !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ((*Game::pLocalPlayer)->fields.killTimer <= 0.0f)
-					&& selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0
 					&& !State.InMeeting)
 				{
 					if (ImGui::Button("Kill"))
@@ -315,7 +311,7 @@ namespace PlayersTab {
 					}
 				}
 				else if (IsHost() || !State.SafeMode) {
-					if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && ImGui::Button("Kill"))
+					if (IsInGame() && ImGui::Button("Kill"))
 					{
 						for (PlayerSelection p : selectedPlayers) {
 							auto validPlayer = p.validate();
@@ -330,12 +326,8 @@ namespace PlayersTab {
 						}
 					}
 				}
-				if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
-					&& !selectedPlayer.get_PlayerData()->fields.IsDead
-					&& !selectedPlayer.get_PlayerControl()->fields.inVent
-					&& !selectedPlayer.get_PlayerControl()->fields.inMovingPlat
+				if (IsInGame() && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
 					&& !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ((*Game::pLocalPlayer)->fields.killTimer <= 0.0f)
-					&& selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0
 					&& !State.InMeeting)
 				{
 					ImGui::SameLine();
@@ -347,7 +339,7 @@ namespace PlayersTab {
 						framesPassed = 40;
 					}
 				}
-				else if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode)) {
+				else if (IsInGame() && (IsHost() || !State.SafeMode)) {
 					ImGui::SameLine();
 					if (ImGui::Button("Telekill"))
 					{
@@ -429,9 +421,9 @@ namespace PlayersTab {
 						}
 					}
 					
-					if (selectedPlayers.size() == 1 && !selectedPlayers[0].validate().is_LocalPlayer()) {
-						Game::PlayerId playerId = selectedPlayers[0].validate().get_PlayerControl()->fields.PlayerId;
-						std::string friendCode = convert_from_string(selectedPlayers[0].validate().get_PlayerData()->fields.FriendCode);
+					if (selectedPlayers.size() == 1) {
+						Game::PlayerId playerId = selectedPlayer.get_PlayerControl()->fields.PlayerId;
+						std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
 						if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) == State.WhitelistFriendCodes.end()) {
 							if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end()) {
 								if (ImGui::Button("Remove from Blacklist")) {
@@ -574,23 +566,25 @@ namespace PlayersTab {
 			}
 
 			if (openTrolling && selectedPlayer.has_value()) {
-				if (ImGui::Button("Send Blank Chat As")) {
-					for (auto p : selectedPlayers) {
-						if (IsInGame()) State.rpcQueue.push(new RpcSendChatNote(p.validate().get_PlayerControl(), 1));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChatNote(p.validate().get_PlayerControl(), 1));
+				if (IsHost() || !State.SafeMode) {
+					if (ImGui::Button("Send Blank Chat As")) {
+						for (auto p : selectedPlayers) {
+							if (IsInGame()) State.rpcQueue.push(new RpcSendChatNote(p.validate().get_PlayerControl(), 1));
+							if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChatNote(p.validate().get_PlayerControl(), 1));
+						}
 					}
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("Spam Blank Chat As")) {
-					for (auto p : selectedPlayers) {
-						if (IsInGame()) State.rpcQueue.push(new RpcSpamChatNote(p.validate().get_PlayerControl()));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpamChatNote(p.validate().get_PlayerControl()));
+					ImGui::SameLine();
+					if (ImGui::Button("Spam Blank Chat As")) {
+						for (auto p : selectedPlayers) {
+							if (IsInGame()) State.rpcQueue.push(new RpcSpamChatNote(p.validate().get_PlayerControl()));
+							if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpamChatNote(p.validate().get_PlayerControl()));
+						}
 					}
 				}
 
-				if (IsInGame() && !GetPlayerData(selectedPlayer.get_PlayerControl())->fields.IsDead && selectedPlayers.size() == 1) {
+				if (IsInGame() && selectedPlayers.size() == 1) {
 					if (!State.InMeeting) {
-						if (ImGui::Button("Force Meeting By")) {
+						if (ImGui::Button("Force Meeting By") && !GetPlayerData(selectedPlayer.get_PlayerControl())->fields.IsDead) {
 							if (IsHost() || !State.SafeMode) State.rpcQueue.push(new RpcForceReportBody(selectedPlayer.get_PlayerControl(), {}));
 							else {
 								State.rpcQueue.push(new RpcReportBody(selectedPlayer));
@@ -605,10 +599,10 @@ namespace PlayersTab {
 					}
 				}
 
-				if (selectedPlayer.has_value() && IsInGame() && !selectedPlayer.get_PlayerData()->fields.IsDead && selectedPlayers.size() == 1) {
+				if (selectedPlayer.has_value() && IsInGame() && selectedPlayers.size() == 1) {
 					ImGui::SameLine();
 					if (!State.InMeeting) {
-						if (ImGui::Button("Self-Report")) {
+						if (!selectedPlayer.get_PlayerData()->fields.IsDead && ImGui::Button("Self-Report")) {
 							if (IsHost() || !State.SafeMode) State.rpcQueue.push(new RpcForceReportBody(selectedPlayer.get_PlayerControl(), selectedPlayer));
 							else {
 								State.rpcQueue.push(new RpcReportBody(selectedPlayer));
@@ -744,7 +738,7 @@ namespace PlayersTab {
 					}
 				}
 
-				if ((IsHost() || !State.SafeMode) && IsInLobby() && ImGui::Button(selectedPlayers.size() == 1 ? "Allow Player to NoClip" : "Allow Players to NoClip")) {
+				if (!State.SafeMode && IsInLobby() && ImGui::Button(selectedPlayers.size() == 1 ? "Allow Player to NoClip" : "Allow Players to NoClip")) {
 					for (auto p : selectedPlayers) {
 						if (p.has_value() && p.validate().is_LocalPlayer()) State.NoClip = true;
 						else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 1, true));
@@ -772,10 +766,17 @@ namespace PlayersTab {
 							}
 						}
 					}
+					ImGui::SameLine();
+					if (ImGui::Button("Exile")) {
+						for (auto p : selectedPlayers) {
+							if (IsInGame()) State.rpcQueue.push(new RpcExiled(p.validate().get_PlayerControl(), true));
+							else State.lobbyRpcQueue.push(new RpcExiled(p.validate().get_PlayerControl(), true));
+						}
+					}
 				}
 
 				if (IsHost() || !State.SafeMode) {
-					if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
+					if (IsInGame()) {
 						if (!murderLoop && ImGui::Button("Murder Loop")) {
 							murderLoop = true;
 							murderCount = 200; //controls how many times the player is to be murdered
@@ -880,7 +881,7 @@ namespace PlayersTab {
 					else suicideDelay--;
 				}
 
-				if (!State.SafeMode && selectedPlayers.size() == 1 && (IsInGame() || (IsInLobby() && State.KillInLobbies))) {
+				if (!State.SafeMode && selectedPlayers.size() == 1 && IsInGame()) {
 					if (ImGui::Button("Kill Crewmates By")) {
 						for (auto player : GetAllPlayerControl()) {
 							if (!PlayerIsImpostor(GetPlayerData(player))) {
@@ -1004,7 +1005,7 @@ namespace PlayersTab {
 					}
 				}
 
-				if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && !selectedPlayer.get_PlayerData()->fields.IsDead && selectedPlayers.size() == 1) {
+				if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1 && !selectedPlayer.get_PlayerData()->fields.IsDead) {
 					if (ImGui::Button("Turn into Ghost"))
 					{
 						if (PlayerIsImpostor(selectedPlayer.get_PlayerData())) {
