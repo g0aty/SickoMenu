@@ -25,143 +25,198 @@ namespace SabotageTab {
     bool brokeSystemSwitchesToggled = false;
     std::thread toggleThread;
 
-    void MushroomMixupSabotageLoop() {
+    static void MushroomMixupSabotageLoop() {
+        static std::random_device rd;
+        static std::mt19937 mt(rd());
+        static std::uniform_int_distribution<int> dist(10000, 99999);
+
         while (infiniteMushroomMixupActive) {
             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 1));
+
             std::this_thread::sleep_for(std::chrono::milliseconds(mushroomMixupInterval));
         }
     }
 
-    int generateRandomCode() {
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<int> dist(10000, 99999);
+    static int generateRandomCode() {
+        static std::random_device rd;
+        static std::mt19937 mt(rd());
+        static std::uniform_int_distribution<int> dist(10000, 99999);
         return dist(mt);
     }
 
-    void UnfixFungleCommsLoop() {
+    static void UnfixFungleCommsLoop() {
+        static std::mt19937 gen(std::random_device{}());
+        static std::uniform_int_distribution<> dis(5, 20);
         while (unfixFungleCommsActive) {
             if (State.mapType == Settings::MapType::Fungle) {
                 int newCode = generateRandomCode();
                 if (std::rand() % 10 == 0) {
                     newCode = 0;
                 }
+
                 State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, newCode));
             }
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> dis(5, 20);
             int delay = dis(gen);
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         }
         RepairSabotage(*Game::pLocalPlayer);
     }
 
-    void UnfixCommsLoop() {
-        while (unfixCommsActive) {
-            if (State.mapType == Settings::MapType::Ship ||
+    class RpcLoopHelper {
+    public:
+        static int generateRandomCode() {
+            static std::random_device rd;
+            static std::mt19937 mt(rd());
+            static std::uniform_int_distribution<int> dist(10000, 99999);
+            return dist(mt);
+        }
+
+        static int getRandomDelay(int min = 10, int max = 20) {
+            static std::random_device rd;
+            static std::mt19937 gen(rd());
+            static std::uniform_int_distribution<> dis(min, max);
+            return dis(gen);
+        }
+
+        static bool shouldResetCode() {
+            return std::rand() % 10 == 0;
+        }
+
+        static void pushCommsUpdate(int code) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, code));
+        }
+
+        static void pushReactorUpdate(int code) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, code));
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128));
+        }
+
+        static void pushOxygenUpdate(int code) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, code));
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 128));
+        }
+
+        static void pushPolusReactorUpdate(int code) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, code));
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 128));
+        }
+
+        static void performRepair() {
+            RepairSabotage(*Game::pLocalPlayer);
+        }
+
+        static bool isValidMapTypeForComms() {
+            return State.mapType == Settings::MapType::Ship ||
                 State.mapType == Settings::MapType::Pb ||
                 State.mapType == Settings::MapType::Hq ||
-                State.mapType == Settings::MapType::Airship) {
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
+                State.mapType == Settings::MapType::Airship;
+        }
+
+        static bool isValidMapTypeForReactor() {
+            return State.mapType == Settings::MapType::Ship ||
+                State.mapType == Settings::MapType::Hq ||
+                State.mapType == Settings::MapType::Airship ||
+                State.mapType == Settings::MapType::Fungle;
+        }
+
+        static bool isValidMapTypeForPolusReactor() {
+            return State.mapType == Settings::MapType::Pb;
+        }
+
+        static bool isValidMapTypeForOxygen() {
+            return State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq;
+        }
+    };
+
+    static void UnfixCommsLoop() {
+        while (unfixCommsActive) {
+            if (RpcLoopHelper::isValidMapTypeForComms()) {
+                RpcLoopHelper::pushCommsUpdate(128);
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
-        RepairSabotage(*Game::pLocalPlayer);
+        RpcLoopHelper::performRepair();
     }
 
-    void UnfixReactorLoop() {
+    static void UnfixReactorLoop() {
         auto lastRepairTime = std::chrono::steady_clock::now();
         const auto repairInterval = std::chrono::milliseconds(250);
 
         while (unfixReactorActive) {
-            if (State.mapType == Settings::MapType::Ship ||
-                State.mapType == Settings::MapType::Hq ||
-                State.mapType == Settings::MapType::Airship ||
-                State.mapType == Settings::MapType::Fungle) {
-                int newCode = generateRandomCode();
-                if (std::rand() % 10 == 0) {
+            if (RpcLoopHelper::isValidMapTypeForReactor()) {
+                int newCode = RpcLoopHelper::generateRandomCode();
+                if (RpcLoopHelper::shouldResetCode()) {
                     newCode = 0;
                 }
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, newCode));
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128));
+                RpcLoopHelper::pushReactorUpdate(newCode);
             }
 
             auto now = std::chrono::steady_clock::now();
             if (now - lastRepairTime >= repairInterval) {
-                RepairSabotage(*Game::pLocalPlayer);
+                RpcLoopHelper::performRepair();
                 lastRepairTime = now;
             }
 
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> dis(10, 20);
-            int delay = dis(gen);
+            int delay = RpcLoopHelper::getRandomDelay();
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         }
 
-        RepairSabotage(*Game::pLocalPlayer);
+        RpcLoopHelper::performRepair();
     }
 
-    void UnfixPolusReactorLoop() {
+    static void UnfixPolusReactorLoop() {
         auto lastRepairTime = std::chrono::steady_clock::now();
         const auto repairInterval = std::chrono::milliseconds(250);
+
         while (unfixPolusReactorActive) {
-            if (State.mapType == Settings::MapType::Pb) {
-                int newCode = generateRandomCode();
-                if (std::rand() % 10 == 0) {
+            if (RpcLoopHelper::isValidMapTypeForPolusReactor()) {
+                int newCode = RpcLoopHelper::generateRandomCode();
+                if (RpcLoopHelper::shouldResetCode()) {
                     newCode = 0;
                 }
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, newCode));
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 128));
+                RpcLoopHelper::pushPolusReactorUpdate(newCode);
             }
 
             auto now = std::chrono::steady_clock::now();
             if (now - lastRepairTime >= repairInterval) {
-                RepairSabotage(*Game::pLocalPlayer);
+                RpcLoopHelper::performRepair();
                 lastRepairTime = now;
             }
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> dis(10, 20);
-            int delay = dis(gen);
+
+            int delay = RpcLoopHelper::getRandomDelay();
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         }
-        RepairSabotage(*Game::pLocalPlayer);
+
+        RpcLoopHelper::performRepair();
     }
 
-    void UnfixOxygenLoop() {
+    static void UnfixOxygenLoop() {
         auto lastRepairTime = std::chrono::steady_clock::now();
         const auto repairInterval = std::chrono::milliseconds(250);
 
         while (unfixOxygenActive) {
-            if (State.mapType == Settings::MapType::Ship ||
-                State.mapType == Settings::MapType::Hq) {
-                int newCode = generateRandomCode();
-                if (std::rand() % 10 == 0) {
+            if (RpcLoopHelper::isValidMapTypeForOxygen()) {
+                int newCode = RpcLoopHelper::generateRandomCode();
+                if (RpcLoopHelper::shouldResetCode()) {
                     newCode = 0;
                 }
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, newCode));
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 128));
+                RpcLoopHelper::pushOxygenUpdate(newCode);
             }
 
             auto now = std::chrono::steady_clock::now();
             if (now - lastRepairTime >= repairInterval) {
-                RepairSabotage(*Game::pLocalPlayer);
+                RpcLoopHelper::performRepair();
                 lastRepairTime = now;
             }
 
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> dis(10, 20);
-            int delay = dis(gen);
+            int delay = RpcLoopHelper::getRandomDelay();
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         }
 
-        RepairSabotage(*Game::pLocalPlayer);
+        RpcLoopHelper::performRepair();
     }
 
-    void UnfixCrashCourseLoop() {
+    static void UnfixCrashCourseLoop() {
         auto lastRepairTime = std::chrono::steady_clock::now();
         const auto repairInterval = std::chrono::milliseconds(250);
 
@@ -185,7 +240,7 @@ namespace SabotageTab {
         RepairSabotage(*Game::pLocalPlayer);
     }
 
-    void ToggleSwitches(SwitchSystem* switchSystem) {
+    static void ToggleSwitches(SwitchSystem* switchSystem) {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(0, 1);
@@ -373,7 +428,7 @@ namespace SabotageTab {
                     }
                 }
             }
-            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            ImGui::SameLine();
             if (ToggleButton("Disable Lights [Auto Movement Switches]", &brokeSystemSwitchesToggled)) {
                 if (brokeSystemSwitchesToggled) {
                     if (State.mapType != Settings::MapType::Fungle) {
@@ -395,7 +450,20 @@ namespace SabotageTab {
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, switchSystem->fields.ActualSwitches));
                 }
             }
-
+            if (State.mapType == Settings::MapType::Ship ||
+                State.mapType == Settings::MapType::Hq ||
+                State.mapType == Settings::MapType::Pb ||
+                State.mapType == Settings::MapType::Airship ||
+                State.mapType == Settings::MapType::Fungle) {
+                bool unfixCommsActiveLocal = unfixCommsActive.load();
+                if (ToggleButton("Disable Fix Comms", &unfixCommsActiveLocal)) {
+                    unfixCommsActive.store(unfixCommsActiveLocal);
+                    if (unfixCommsActive) {
+                        std::thread(UnfixCommsLoop).detach();
+                    }
+                }
+            }
+            ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
             if (State.mapType == Settings::MapType::Ship ||
                 State.mapType == Settings::MapType::Hq ||
                 State.mapType == Settings::MapType::Fungle) {
@@ -444,17 +512,6 @@ namespace SabotageTab {
                     unfixFungleCommsActive.store(unfixFungleCommsActiveLocal);
                     if (unfixFungleCommsActive) {
                         std::thread(UnfixFungleCommsLoop).detach();
-                    }
-                }
-            }
-            if (State.mapType == Settings::MapType::Ship ||
-                State.mapType == Settings::MapType::Hq ||
-                State.mapType == Settings::MapType::Pb) {
-                bool unfixCommsActiveLocal = unfixCommsActive.load();
-                if (ToggleButton("Disable Fix Comms", &unfixCommsActiveLocal)) {
-                    unfixCommsActive.store(unfixCommsActiveLocal);
-                    if (unfixCommsActive) {
-                        std::thread(UnfixCommsLoop).detach();
                     }
                 }
             }
