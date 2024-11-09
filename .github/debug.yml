@@ -1,0 +1,59 @@
+# Someone suggest me a better name
+name: Build Project for Testing
+
+on: [push, pull_request]
+  
+jobs:
+  Build_Release:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      
+      - name: Build Release
+        shell: bash
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Release'
+        
+      - name: Build Release_Version
+        shell: bash
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Release_Version'
+        
+      - name: Package Release Builds
+        shell: cmd
+        run: |
+          move /y Release\SickoMenu.dll SickoMenu.dll
+          move /y Release_Version\version.dll version.dll
+          tar -caf Release.zip SickoMenu.dll version.dll LICENSE
+        
+      - name: Upload Release Artifact
+        uses: actions/upload-artifact@v4.2.0
+        with:
+          name: Release
+          path: Release.zip
+          
+  Build_Debug:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      
+      - name: Build Debug
+        shell: bash
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Debug'
+        
+      - name: Build Debug_Version
+        shell: bash
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Debug_Version'
+        
+      - name: Package Debug Builds
+        shell: cmd
+        run: |
+          move /y Debug\SickoMenu.dll SickoMenu.dll
+          move /y Debug_Version\version.dll version.dll
+          tar -caf Debug.zip SickoMenu.dll version.dll LICENSE
+        
+      - name: Upload Debug Artifact
+        uses: actions/upload-artifact@v4.2.0
+        with:
+          name: Debug
+          path: Debug.zip
