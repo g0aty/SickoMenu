@@ -66,7 +66,7 @@ jobs:
   AutoRelease:
     runs-on: windows-2022
     needs: [Build_Release, Build_Debug]
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
     steps:
 #      - name: Parse tag semver
 #        uses: booxmedialtd/ws-action-parse-semver@3576f3a20a39f8752fe0d8195f5ed384090285dc
