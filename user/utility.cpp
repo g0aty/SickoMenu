@@ -46,31 +46,36 @@ RoleRates::RoleRates(const class GameOptions& gameOptions, int playerAmount) {
 }
 
 int RoleRates::GetRoleCount(RoleTypes__Enum role) {
-	switch (role)
-	{
-		case RoleTypes__Enum::Shapeshifter:
-			return this->ShapeshifterCount;
-		case RoleTypes__Enum::Phantom:
-			return this->PhantomCount;
-		case RoleTypes__Enum::Impostor:
-			return this->ImpostorCount;
-		case RoleTypes__Enum::Scientist:
-			return this->ScientistCount;
-		case RoleTypes__Enum::Engineer:
-			return this->EngineerCount;
-		case RoleTypes__Enum::Tracker:
-			return this->TrackerCount;
-		case RoleTypes__Enum::Noisemaker:
-			return this->NoisemakerCount;
-		case RoleTypes__Enum::GuardianAngel:
-			return this->GuardianAngelCount;
-		case RoleTypes__Enum::Crewmate:
-			return this->MaxCrewmates;
-		default:
+	auto impCount = GetMaxImpostorAmount(GetAllPlayerControl().size());
+	auto specialImpCount = this->ShapeshifterCount + this->PhantomCount;
+	if (specialImpCount != 0 && specialImpCount > impCount) { //prevent zero-division, more role assignment than needed
+		this->ShapeshifterCount = (int)(this->ShapeshifterCount / specialImpCount) * impCount;
+		this->PhantomCount = impCount - this->ShapeshifterCount;
+	}
+	switch (role) {
+	case RoleTypes__Enum::Shapeshifter:
+		return this->ShapeshifterCount;
+	case RoleTypes__Enum::Phantom:
+		return this->PhantomCount;
+	case RoleTypes__Enum::Impostor:
+		return impCount - specialImpCount;
+	case RoleTypes__Enum::Scientist:
+		return this->ScientistCount;
+	case RoleTypes__Enum::Engineer:
+		return this->EngineerCount;
+	case RoleTypes__Enum::Tracker:
+		return this->TrackerCount;
+	case RoleTypes__Enum::Noisemaker:
+		return this->NoisemakerCount;
+	case RoleTypes__Enum::GuardianAngel:
+		return this->GuardianAngelCount;
+	case RoleTypes__Enum::Crewmate:
+		return this->MaxCrewmates;
+	default:
 /*#ifdef _DEBUG
-			assert(false);
+		assert(false);
 #endif*/
-			return 0;
+		return 0;
 	}
 }
 
@@ -80,13 +85,11 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
 		if (this->ShapeshifterCount < 1)
 			return;
 		this->ShapeshifterCount--;
-		this->ImpostorCount--;
 	}
 	else if (role == RoleTypes__Enum::Phantom)
 	{
 		if (this->PhantomCount < 1)
 			return;
-		this->ImpostorCount--;
 		this->PhantomCount--;
 	}
 	else if (role == RoleTypes__Enum::Impostor)
@@ -94,8 +97,6 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
 		if (this->ImpostorCount < 1)
 			return;
 		this->ImpostorCount--;
-		this->ShapeshifterCount--;
-		this->PhantomCount--;
 	}
 	else if (role == RoleTypes__Enum::Scientist)
 	{
@@ -121,12 +122,12 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
 			return;
 		this->NoisemakerCount--;
 	}
-	else if (role == RoleTypes__Enum::GuardianAngel)
+	/*else if (role == RoleTypes__Enum::GuardianAngel)
 	{
 		if (this->GuardianAngelCount < 1)
 			return;
 		this->GuardianAngelCount--;
-	}
+	}*/ //why does this even exist
 }
 
 int GetMaxImpostorAmount(int playerAmount)
@@ -1416,11 +1417,16 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	if (pCtrl == *Game::pLocalPlayer) return; //avoid detecting yourself
 	auto pData = GetPlayerData(pCtrl);
 	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
-	if (State.SMAC_AddToBlacklist) {
-		std::string puid = convert_from_string(pData->fields.Puid);
-		State.BlacklistFriendCodes.push_back(puid);
-		State.Save();
+	
+	std::string fc = convert_from_string(pData->fields.FriendCode);
+	auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
+	if (fc != "" && State.SMAC_IgnoreWhitelist && it != State.WhitelistFriendCodes.end()) return;
+	if (fc != "" && State.SMAC_AddToBlacklist) {
+		if (it != State.WhitelistFriendCodes.end()) State.WhitelistFriendCodes.erase(it);
+		State.BlacklistFriendCodes.push_back(fc);
 	}
+	State.Save();
+	
 	std::string cheaterMessage = "Player " + name + " has done an unauthorized action: " + reason;
 	LOG_INFO(cheaterMessage);
 	if (IsHost()) {

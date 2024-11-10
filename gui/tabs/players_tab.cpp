@@ -40,12 +40,20 @@ namespace PlayersTab {
 		if ((IsInGame() || IsInLobby()) && !State.BlinkPlayersTab) {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::BeginChild("players#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
+			if (!State.selectedPlayer.has_value() || State.selectedPlayer.validate().is_Disconnected()) {
+				State.selectedPlayer = {};
+			}
 			auto selectedPlayer = State.selectedPlayer.validate();
 			bool shouldEndListBox = ImGui::ListBoxHeader("###players#list", ImVec2(200, 230) * State.dpiScale);
 			auto localData = GetPlayerData(*Game::pLocalPlayer);
 			std::vector<PlayerSelection> selectedPlayers = {};
 			for (auto id : State.selectedPlayers) {
-				selectedPlayers.push_back(PlayerSelection(GetPlayerControlById(id)));
+				auto playerCtrl = GetPlayerControlById(id);
+				const auto& validPlayer = PlayerSelection(playerCtrl).validate();
+				if (!validPlayer.has_value() || validPlayer.is_Disconnected()) {
+					continue;
+				}
+				selectedPlayers.push_back(PlayerSelection(playerCtrl));
 			}
 			for (auto playerCtrl : GetAllPlayerControl()) {
 				const auto& player = PlayerSelection(playerCtrl);
@@ -1209,6 +1217,16 @@ namespace PlayersTab {
 					if (convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode) != "" && ImGui::Button("Copy Friend Code"))
 						ClipboardHelper_PutClipboardString(selectedPlayer.get_PlayerData()->fields.FriendCode, NULL);
 				}
+
+				static int reportReason = 2;
+				if (ImGui::Button("Report Player")) {
+					if (IsInGame()) State.rpcQueue.push(new ReportPlayer(selectedPlayer.get_PlayerControl(), (ReportReasons__Enum)reportReason));
+					if (IsInLobby()) State.lobbyRpcQueue.push(new ReportPlayer(selectedPlayer.get_PlayerControl(), (ReportReasons__Enum)reportReason));
+				}
+
+				const std::vector<const char*> REPORTREASONS = { "Inappropriate Name", "Inappropriate Chat", "Cheating/Hacking", "Harassment/Misconduct" };
+
+				CustomListBoxInt("Report Reason", &reportReason, REPORTREASONS);
 			}
 			ImGui::EndChild();
 		}

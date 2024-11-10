@@ -25,6 +25,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 			STREAM_DEBUG("RPC Received for an AmongUsMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
 	}
+	break;
 	case (uint8_t)150:
 	{
 		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
@@ -33,6 +34,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 			STREAM_DEBUG("RPC Received for a BetterAmongUs user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
 	}
+	break;
 	case (uint8_t)250:
 	{
 		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
@@ -67,8 +69,8 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 	}
 }
 
-bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
-	if (!State.Enable_SMAC || player == *Game::pLocalPlayer) return false;
+void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
+	if (!State.Enable_SMAC || player == *Game::pLocalPlayer || callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting) return;
 	auto pData = GetPlayerData(player);
 	switch (callId) {
 	case (uint8_t)RpcCalls__Enum::CheckName:
@@ -78,13 +80,13 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		if (State.SMAC_CheckBadNames && IsInGame()) {
 			auto name = MessageReader_ReadString(reader, NULL);
 			std::string nameStr = convert_from_string(name);
-			if (nameStr == "") return false; //prevent false flags
-			if (MessageReader_get_BytesRemaining(reader, NULL) > 0 || MessageReader_ReadBoolean(reader, NULL)) return false;
-			if (nameStr != RemoveHtmlTags(nameStr)) return true;
-			if (!IsNameValid(nameStr)) return true;
+			if (nameStr == "") return; //prevent false flags
+			if (MessageReader_get_BytesRemaining(reader, NULL) > 0 || MessageReader_ReadBoolean(reader, NULL)) return;
+			if (nameStr != RemoveHtmlTags(nameStr)) return;
+			if (!IsNameValid(nameStr)) return;
 			SMAC_OnCheatDetected(player, "Abnormal Name");
 		}
-		return false;
+		return;
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::CheckColor:
@@ -92,7 +94,7 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 			break;
 		if (State.SMAC_CheckColor && IsInGame()) {
 			SMAC_OnCheatDetected(player, "Abnormal Change Color");
-			return true;
+			return;
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SetHat:
@@ -108,51 +110,51 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		if (!State.SafeMode) break;
 		if (State.SMAC_CheckCosmetics && IsInGame()) {
 			SMAC_OnCheatDetected(player, "Abnormal Change Cosmetics");
-			return true;
+			return;
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SendChatNote:
 		if (State.SMAC_CheckChatNote && (IsInLobby() || !State.InMeeting)) {
 			SMAC_OnCheatDetected(player, "Abnormal Chat Note");
-			return true;
+			return;
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SetScanner:
 		if (State.SMAC_CheckScanner && (IsInLobby() || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle)) {
 			SMAC_OnCheatDetected(player, "Abnormal MedBay Scan");
-			return true;
+			return;
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SetTasks:
 		if (State.SMAC_CheckTasks && (IsInLobby() || State.InMeeting)) {
 			SMAC_OnCheatDetected(player, "Abnormal Set Tasks");
-			return true;
+			return;
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SendChat: {
 		break;
 	}
-	case (uint8_t)RpcCalls__Enum::StartMeeting: {
+	/*case (uint8_t)RpcCalls__Enum::StartMeeting: {
 		if (State.SMAC_CheckMeeting && (IsInLobby() || GameOptions().GetGameMode() == GameModes__Enum::HideNSeek)) {
 			SMAC_OnCheatDetected(player, "Abnormal Meeting");
-			return true;
+			return;
 		}
 		break;
-	}
-	case (uint8_t)RpcCalls__Enum::ReportDeadBody: {
+	}*/
+	/*case (uint8_t)RpcCalls__Enum::ReportDeadBody: {
 		auto bodyPlayer = GetPlayerDataById(MessageReader_ReadByte(reader, NULL));
 		if (State.SMAC_CheckReport) {
 			if (IsInLobby() || !State.GameLoaded) {
 				SMAC_OnCheatDetected(player, "Abnormal Report Body");
-				return true;
+				return;
 			}
 			if (IsInGame() && ((bodyPlayer != NULL && !bodyPlayer->fields.IsDead) || GameOptions().GetGameMode() == GameModes__Enum::HideNSeek)) {
 				SMAC_OnCheatDetected(player, "Abnormal Report Body");
-				return true;
+				return;
 			}
 		}
 		break;
-	}
+	}*/ //causes host's body to be reported
 	/*case (uint8_t)RpcCalls__Enum::CheckMurder:
 	case (uint8_t)RpcCalls__Enum::MurderPlayer:
 	check PlayerControl.cpp*/
@@ -161,7 +163,7 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	case (uint8_t)RpcCalls__Enum::RejectShapeshift: {
 		if (State.SMAC_CheckShapeshift && (IsInLobby() || GetPlayerData(player)->fields.RoleType != RoleTypes__Enum::Shapeshifter)) {
 			SMAC_OnCheatDetected(player, "Abnormal Shapeshift");
-			return true;
+			return;
 		}
 		break;
 	}
@@ -171,7 +173,7 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	case (uint8_t)RpcCalls__Enum::CheckAppear: {
 		if (State.SMAC_CheckVanish && (IsInLobby() || GetPlayerData(player)->fields.RoleType != RoleTypes__Enum::Phantom)) {
 			SMAC_OnCheatDetected(player, "Abnormal Vanish/Appear");
-			return true;
+			return;
 		}
 		break;
 	}
@@ -179,14 +181,14 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		/*uint32_t level = MessageReader_ReadUInt32(reader, NULL);
 		if (State.SMAC_CheckLevel && (IsInGame() || level >= (uint32_t)State.SMAC_HighLevel)) {
 			SMAC_OnCheatDetected(player, "Abnormal Level");
-			return true;
+			return;
 		}*/
 		break;
 	}
 	case (uint8_t)RpcCalls__Enum::EnterVent: {
 		if (State.SMAC_CheckVent && (IsInLobby() || pData->fields.IsDead || !(PlayerIsImpostor(pData) || pData->fields.RoleType == RoleTypes__Enum::Engineer))) {
 			SMAC_OnCheatDetected(player, "Abnormal Venting");
-			return true;
+			return;
 		}
 		break;
 	}
@@ -195,7 +197,7 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		auto playerId = player->fields.PlayerId;
 		if (State.SMAC_CheckSicko && MessageReader_get_BytesRemaining(reader, NULL) == 0 && State.modUsers.find(playerId) == State.modUsers.end()) {
 			SMAC_OnCheatDetected(player, "SickoMenu User");
-			return true;
+			return;
 		}
 		break;
 	}
@@ -203,12 +205,11 @@ bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		auto playerId = player->fields.PlayerId;
 		if (State.SMAC_CheckAUM && State.modUsers.find(playerId) == State.modUsers.end()) {
 			SMAC_OnCheatDetected(player, "AmongUsMenu User");
-			return true;
+			return;
 		}
 		break;
 	}
 	}
-	return false;
 }
 
 bool SMAC_HandleUpdateSystem(PlayerControl* player, SystemTypes__Enum sysType, uint8_t reader) {

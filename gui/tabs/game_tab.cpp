@@ -353,58 +353,104 @@ namespace GameTab {
             else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
-            if (ToggleButton("Punish Blacklisted Players", &State.SMAC_PunishBlacklist)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Punish Blacklist", &State.SMAC_PunishBlacklist)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Ignore Whitelist", &State.SMAC_IgnoreWhitelist)) State.Save();
             if (State.SMAC_PunishBlacklist) {
+                ImGui::Text("Blacklist");
                 if (State.BlacklistFriendCodes.empty())
-                    ImGui::Text("No users in blacklist!");
-                static std::string newFriendCode = "";
-                InputString("New Friend Code", &newFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
-                ImGui::SameLine();
-                if (newFriendCode != "" && ImGui::Button("Add Code")) {
-                    State.BlacklistFriendCodes.push_back(newFriendCode);
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in blacklist!");
+                static std::string newBFriendCode = "";
+                InputString("New Friend Code", &newBFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
+                if (newBFriendCode != "") ImGui::SameLine();
+                if (newBFriendCode != "" && ImGui::Button("Add")) {
+                    State.BlacklistFriendCodes.push_back(newBFriendCode);
                     State.Save();
-                    newFriendCode = "";
+                    newBFriendCode = "";
                 }
+
                 if (!State.BlacklistFriendCodes.empty()) {
-                    static int selectedCodeIndex = 0;
-                    selectedCodeIndex = std::clamp(selectedCodeIndex, 0, (int)State.BlacklistFriendCodes.size() - 1);
-                    std::vector<const char*> codeVector(State.BlacklistFriendCodes.size(), nullptr);
-                    for (auto i : State.BlacklistFriendCodes) {
-                        codeVector.push_back(i.c_str());
+                    static int selectedBCodeIndex = 0;
+                    selectedBCodeIndex = std::clamp(selectedBCodeIndex, 0, (int)State.BlacklistFriendCodes.size() - 1);
+                    std::vector<const char*> bCodeVector(State.BlacklistFriendCodes.size(), nullptr);
+                    for (size_t i = 0; i < State.BlacklistFriendCodes.size(); i++) {
+                        bCodeVector[i] = State.BlacklistFriendCodes[i].c_str();
                     }
-                    CustomListBoxInt("Player to Delete", &selectedCodeIndex, codeVector);
+                    CustomListBoxInt("Player to Delete", &selectedBCodeIndex, bCodeVector);
                     ImGui::SameLine();
                     if (ImGui::Button("Delete"))
-                        State.BlacklistFriendCodes.erase(std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), State.BlacklistFriendCodes[selectedCodeIndex]));
+                        State.BlacklistFriendCodes.erase(State.BlacklistFriendCodes.begin() + selectedBCodeIndex);
                 }
             }
-            ImGui::NewLine();
-            if (ToggleButton("Detect AUM/KillNetwork Usage", &State.SMAC_CheckAUM)) State.Save();
-            if (ToggleButton("Detect SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
-            if (ToggleButton("Detect Abnormal Names", &State.SMAC_CheckBadNames)) State.Save();
-            if (ToggleButton("Detect Abnormal Set Color", &State.SMAC_CheckColor)) State.Save();
-            if (ToggleButton("Detect Abnormal Set Cosmetics", &State.SMAC_CheckCosmetics)) State.Save();
-            if (ToggleButton("Detect Abnormal Chat Note", &State.SMAC_CheckChatNote)) State.Save();
-            if (ToggleButton("Detect Abnormal Scanner", &State.SMAC_CheckScanner)) State.Save();
-            if (ToggleButton("Detect Abnormal Animation", &State.SMAC_CheckAnimation)) State.Save();
-            if (ToggleButton("Detect Setting Tasks", &State.SMAC_CheckTasks)) State.Save();
-            if (ToggleButton("Detect Setting Roles", &State.SMAC_CheckRole)) State.Save();
-            if (ToggleButton("Detect Abnormal Chat", &State.SMAC_CheckChat)) State.Save();
-            if (ToggleButton("Detect Abnormal Meetings", &State.SMAC_CheckMeeting)) State.Save();
-            if (ToggleButton("Detect Abnormal Body Reports", &State.SMAC_CheckReport)) State.Save();
-            if (ToggleButton("Detect Abnormal Murders", &State.SMAC_CheckMurder)) State.Save();
-            if (ToggleButton("Detect Abnormal Shapeshift", &State.SMAC_CheckShapeshift)) State.Save();
-            if (ToggleButton("Detect Abnormal Vanish", &State.SMAC_CheckVanish)) State.Save();
-            if (ToggleButton("Detect Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
-            if (State.SMAC_CheckLevel && ImGui::InputInt("Detect Level >=", &State.SMAC_HighLevel)) {
+            if (State.SMAC_IgnoreWhitelist) {
+                ImGui::Text("Whitelist");
+                if (State.WhitelistFriendCodes.empty())
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in whitelist!");
+                static std::string newWFriendCode = "";
+                InputString("New Friend Code\n", &newWFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
+                if (newWFriendCode != "") ImGui::SameLine();
+                if (newWFriendCode != "" && ImGui::Button("Add\n")) {
+                    State.WhitelistFriendCodes.push_back(newWFriendCode);
+                    State.Save();
+                    newWFriendCode = "";
+                }
+
+                if (!State.WhitelistFriendCodes.empty()) {
+                    static int selectedWCodeIndex = 0;
+                    selectedWCodeIndex = std::clamp(selectedWCodeIndex, 0, (int)State.WhitelistFriendCodes.size() - 1);
+                    std::vector<const char*> wCodeVector(State.WhitelistFriendCodes.size(), nullptr);
+                    for (size_t i = 0; i < State.WhitelistFriendCodes.size(); i++) {
+                        wCodeVector[i] = State.WhitelistFriendCodes[i].c_str();
+                    }
+                    CustomListBoxInt("Player to Delete\n", &selectedWCodeIndex, wCodeVector);
+                    ImGui::SameLine();
+                    if (ImGui::Button("Delete\n"))
+                        State.WhitelistFriendCodes.erase(State.WhitelistFriendCodes.begin() + selectedWCodeIndex);
+                }
+            }
+            ImGui::Text("Detect Actions:");
+            if (ToggleButton("AUM/KillNetwork Usage", &State.SMAC_CheckAUM)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Names", &State.SMAC_CheckBadNames)) State.Save();
+            
+            if (ToggleButton("Abnormal Set Color", &State.SMAC_CheckColor)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Set Cosmetics", &State.SMAC_CheckCosmetics)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Chat Note", &State.SMAC_CheckChatNote)) State.Save();
+
+            if (ToggleButton("Abnormal Scanner", &State.SMAC_CheckScanner)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Animation", &State.SMAC_CheckAnimation)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Setting Tasks", &State.SMAC_CheckTasks)) State.Save();
+
+            if (ToggleButton("Abnormal Murders", &State.SMAC_CheckMurder)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Shapeshift", &State.SMAC_CheckShapeshift)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Vanish", &State.SMAC_CheckVanish)) State.Save();
+
+            if (ToggleButton("Abnormal Meetings/Body Reports", &State.SMAC_CheckReport)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
+            if (State.SMAC_CheckLevel && ImGui::InputInt("Level >=", &State.SMAC_HighLevel)) {
                 State.Save();
             }
-            if (State.SMAC_CheckLevel && ImGui::InputInt("Detect Level <=", &State.SMAC_LowLevel)) {
+            if (State.SMAC_CheckLevel && ImGui::InputInt("Level <=", &State.SMAC_LowLevel)) {
                 State.Save();
             }
-            if (ToggleButton("Detect Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
-            if (ToggleButton("Detect Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
-            if (ToggleButton("Detect Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
+
+            if (ToggleButton("Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Chat", &State.SMAC_CheckChat)) State.Save();
+
+            if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
             if (State.SMAC_CheckBadWords) {
                 if (State.SMAC_BadWords.empty())
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No bad words added!");
@@ -423,9 +469,9 @@ namespace GameTab {
                     for (size_t i = 0; i < State.SMAC_BadWords.size(); i++) {
                         wordVector[i] = State.SMAC_BadWords[i].c_str();
                     }
-                    CustomListBoxInt("Word to Delete", &selectedWordIndex, wordVector);
+                    CustomListBoxInt("Word to Remove", &selectedWordIndex, wordVector);
                     ImGui::SameLine();
-                    if (ImGui::Button("Delete"))
+                    if (ImGui::Button("Remove"))
                         State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
                 }
             }

@@ -185,7 +185,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					roleColor.a, playerName);
 			}
 
-			if (IsHost() && State.TournamentMode &&
+			/*if (IsHost() && State.TournamentMode &&
 				std::find(State.tournamentFriendCodes.begin(), State.tournamentFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.tournamentFriendCodes.end()) {
 				auto fc = convert_from_string(playerData->fields.FriendCode);
 				float points = State.tournamentPoints[fc], win = State.tournamentWinPoints[fc],
@@ -193,7 +193,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				std::string pointsHeader = std::format("Your Points: <#0f0>{} Normal</color>, <#9ef>{} +W, {} +C, {} +D</color>", DisplayScore(points),
 					DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
 				playerName = std::format("<size=50%>{}</size>\n{}\n<size=50%><#0000>0</color></size>", pointsHeader, playerName);
-			}
+			}*/ //removed on request
 
 			if (State.ShowPlayerInfo && IsInLobby() && !State.PanicMode)
 			{
@@ -260,9 +260,15 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						break;
 					}
 				}*/
-				std::string modUsage = __this == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
+				std::string localPlayerMod = "";
+				if (State.ModDetection) {
+					if (State.SickoDetection) localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
+					if (State.AmongUsMenuDetection) localPlayerMod = "<#f55>AmongUsMenu</color>";
+					if (State.KillNetworkDetection) localPlayerMod = "<#f00>KillNetwork</color>";
+				}
+				std::string modUsage = (__this == *Game::pLocalPlayer && State.ModDetection) || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
 					std::format(" <#fb0>[{} User]</color>",
-						__this == *Game::pLocalPlayer ? "<#0f0>Sicko</color><#f00>Menu</color>" : State.modUsers.at(playerData->fields.PlayerId)) : "";
+						__this == *Game::pLocalPlayer ? localPlayerMod : State.modUsers.at(playerData->fields.PlayerId)) : "";
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				std::string listed = "";
 				if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end())
@@ -470,14 +476,14 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
 					for (auto p : GetAllPlayerControl()) {
 						if (p == player || State.CrashChatSpam) {
-							if (!State.SafeMode && (State.CrashChatSpamMode == 1 || State.CrashChatSpamMode == 1)) {
+							if (!State.SafeMode && State.CrashChatSpamMode == 1) {
 								auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), player->fields._.NetId,
 									uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
 								MessageWriter_WriteString(writer, convert_to_string(State.chatMessage), NULL);
 								InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 								ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(State.chatMessage), false, NULL);
 							}
-							else if (State.CrashChatSpamMode == 1 || State.CrashChatSpamMode == 1) {
+							else if (State.CrashChatSpamMode == 1) {
 								PlayerControl_RpcSendChatNote(player, p->fields.PlayerId, (ChatNoteTypes__Enum)2, NULL);
 							}
 						}
@@ -1062,6 +1068,14 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 			return;
 		}
 		else {
+			if (State.Enable_SMAC && State.SMAC_CheckReport) {
+				if (IsInLobby()) {
+					SMAC_OnCheatDetected(__this, "Abnormal Meeting");
+				}
+				if (IsInGame() && ((target != NULL && !target->fields.IsDead) || GameOptions().GetGameMode() == GameModes__Enum::HideNSeek)) {
+					SMAC_OnCheatDetected(__this, "Abnormal Meeting");
+				}
+			}
 			synchronized(Replay::replayEventMutex) {
 				State.liveReplayEvents.emplace_back(std::make_unique<ReportDeadBodyEvent>(GetEventPlayerControl(__this).value(), GetEventPlayer(target), PlayerControl_GetTruePosition(__this, NULL), GetTargetPosition(target)));
 			}

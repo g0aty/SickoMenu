@@ -61,7 +61,7 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 
 bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodInfo* method) {
 	if (!State.PanicMode && *Game::pLocalPlayer != NULL) {
-		bool wasVisible = PlayerControl_get_Visible(*Game::pLocalPlayer, NULL) && !(*Game::pLocalPlayer)->fields.walkingToVent && State.ShowPlayersInVents;
+		bool wasVisible = PlayerControl_get_Visible(*Game::pLocalPlayer, NULL) && !(*Game::pLocalPlayer)->fields.walkingToVent && State.ShowPlayersInVents && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead;
 		if (wasVisible) {
 			PlayerControl_set_Visible(*Game::pLocalPlayer, false, NULL);
 		}

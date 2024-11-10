@@ -397,6 +397,7 @@ public:
     bool PanicMode = false;
     bool TempPanicMode = false; //prevent instant crash on joining lobby
     bool BlinkPlayersTab = false; //prevent instant crash on player leaving
+    bool ModDetection = true;
     bool SickoDetection = true;
     bool AmongUsMenuDetection = false;
     bool KillNetworkDetection = false;
@@ -465,12 +466,13 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.1_pr1";
+    std::string SickoVersion = "v4.1";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
     int SMAC_HostPunishment = 0;
     bool SMAC_AddToBlacklist = false;
+    bool SMAC_IgnoreWhitelist = false;
     bool SMAC_PunishBlacklist = false;
     bool SMAC_CheckAUM = true;
     bool SMAC_CheckSicko = true;

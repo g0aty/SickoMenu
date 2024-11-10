@@ -237,14 +237,15 @@ namespace SettingsTab {
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
-			if (Achievements::IsSupported() && ImGui::Button("Unlock all achievements"))
-			{
-				Achievements::UnlockAll();
-			}
-
-			ImGui::SameLine();
 			if (ToggleButton("Unlock Cosmetics", &State.UnlockCosmetics)) {
 				State.Save();
+			}
+
+			if (Achievements::IsSupported())
+			{
+				ImGui::SameLine();
+				if (ImGui::Button("Unlock All Achievements"))
+					Achievements::UnlockAll();
 			}
 
 			if (ToggleButton("Safe Mode", &State.SafeMode)) {
@@ -254,7 +255,30 @@ namespace SettingsTab {
 			if (ToggleButton("Spoof Modded Host", &State.SpoofModdedHost)) {
 				State.Save(); //haven't figured this out yet
 			}*/
-			if (ToggleButton("Allow other SickoMenu users to see you're using SickoMenu", &State.SickoDetection)) {
+			static int modToShow = 0;
+
+			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) {
+				State.Save();
+			}
+			ImGui::SameLine();
+			if (CustomListBoxInt(" ", &modToShow, MODS)) {
+				switch (modToShow) {
+				case 0:
+					State.SickoDetection = State.ModDetection;
+					State.AmongUsMenuDetection = false;
+					State.KillNetworkDetection = false;
+					break;
+				case 1:
+					State.SickoDetection = false;
+					State.AmongUsMenuDetection = State.ModDetection;
+					State.KillNetworkDetection = false;
+					break;
+				case 2:
+					State.SickoDetection = false;
+					State.AmongUsMenuDetection = false;
+					State.KillNetworkDetection = State.ModDetection;
+					break;
+				}
 				State.Save();
 			}
 
@@ -283,6 +307,9 @@ namespace SettingsTab {
 			if (ImGui::InputInt("Level", &State.FakeLevel, 0, 1)) {
 				State.Save();
 			}
+			if (State.SafeMode && (State.FakeLevel <= 0 || State.FakeLevel > 100001))
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Level will be detected by anticheat, your level will be between 0 and 100001.");
+
 			if (ToggleButton("Spoof Platform", &State.SpoofPlatform)) {
 				State.Save();
 			}

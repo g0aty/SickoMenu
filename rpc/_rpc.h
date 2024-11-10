@@ -2,7 +2,7 @@
 #include "utility.h"
 
 void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader);
-bool SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader);
+void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader);
 
 class RPCInterface {
 public:
@@ -274,6 +274,14 @@ class RpcVoteKick : public RPCInterface {
 	bool exploit;
 public:
 	RpcVoteKick(PlayerControl* target, bool exploit = false);
+	virtual void Process() override;
+};
+
+class ReportPlayer : public RPCInterface {
+	PlayerControl* target;
+	ReportReasons__Enum reason;
+public:
+	ReportPlayer(PlayerControl* target, ReportReasons__Enum reason);
 	virtual void Process() override;
 };
 

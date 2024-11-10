@@ -10683,6 +10683,28 @@ namespace app
     };
 #pragma endregion
 
+#pragma region ReportReasons__Enum
+#if defined(_CPLUSPLUS_)
+    enum class ReportReasons__Enum : int32_t {
+        None = -1,
+        InappropriateName = 0x00000000,
+        InappropriateChat = 0x00000001,
+        Cheating_Hacking = 0x00000002,
+        Harassment_Misconduct = 0x00000003,
+    };
+
+#else
+    enum ReportReasons__Enum {
+        ReportReasons__Enum_None = -1,
+        ReportReasons__Enum_InappropriateName = 0x00000000,
+        ReportReasons__Enum_InappropriateChat = 0x00000001,
+        ReportReasons__Enum_Cheating_Hacking = 0x00000002,
+        ReportReasons__Enum_Harassment_Misconduct = 0x00000003,
+    };
+
+#endif
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ActivityManager;

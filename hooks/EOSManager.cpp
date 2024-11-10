@@ -123,7 +123,8 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	if (State.SpoofLevel) {
 		auto player = DataManager_get_Player(NULL);
 		auto stats = PlayerData_get_Stats(player, NULL);
-		stats->fields.level = State.FakeLevel - 1;
+		int fakeLevel = State.SafeMode ? std::clamp(State.FakeLevel, 1, 100001) : State.FakeLevel;
+		stats->fields.level = fakeLevel - 1;
 		AbstractSaveData_Save((AbstractSaveData*)player, NULL);
 	}
 }

@@ -5,9 +5,9 @@
 
 void dPlainDoor_SetDoorway(PlainDoor* __this, bool open, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlainDoor_SetDoorway executed");
-	if (__this->fields.Open && (std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), __this->fields._.Room) != State.pinnedDoors.end())) {
+	/*if (__this->fields.Open && (std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), __this->fields._.Room) != State.pinnedDoors.end())) {
 		ShipStatus_RpcCloseDoorsOfType(*Game::pShipStatus, __this->fields._.Room, NULL);
-	}
+	}*/
 	app::PlainDoor_SetDoorway(__this, open, method);
 }
 

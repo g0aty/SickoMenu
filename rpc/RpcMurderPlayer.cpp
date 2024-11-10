@@ -216,6 +216,20 @@ void RpcVoteKick::Process()
 	}
 }
 
+ReportPlayer::ReportPlayer(PlayerControl* target, ReportReasons__Enum reason)
+{
+	this->target = target;
+	this->reason = reason;
+}
+
+void ReportPlayer::Process()
+{
+	if (!PlayerSelection(target).has_value())
+		return;
+
+	InnerNetClient_ReportPlayer((InnerNetClient*)(*Game::pAmongUsClient), target->fields._.OwnerId, reason, NULL);
+}
+
 RpcClearVote::RpcClearVote(PlayerControl* Player)
 {
 	this->Player = Player;

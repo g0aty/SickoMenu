@@ -94,7 +94,7 @@ namespace Menu {
 	}
 
 	void Init() {
-		ImGui::SetNextWindowSize(ImVec2(600, 400) * State.dpiScale, ImGuiCond_None);
+		ImGui::SetNextWindowSize(ImVec2(600, 450) * State.dpiScale, ImGuiCond_None);
 		ImGui::SetNextWindowBgAlpha(State.MenuThemeColor.w);
 	}
 
@@ -127,7 +127,7 @@ namespace Menu {
 			if (!init)
 				Menu::Init();
 			std::string modText = "SickoMenu " + State.SickoVersion;
-			ImGui::Begin("SickoMenu", &State.ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+			ImGui::Begin("SickoMenu", &State.ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse);
 			static ImVec4 titleCol = State.MenuThemeColor;
 			if (State.RgbMenuTheme)
 				titleCol = State.RgbColor;

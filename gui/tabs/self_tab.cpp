@@ -344,10 +344,7 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
-                State.Save();
-            }
+            
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
             }
@@ -538,10 +535,6 @@ namespace SelfTab {
 
             if (!State.SafeMode) {
                 if (ToggleButton("Unlock Kill Button", &State.UnlockKillButton)) {
-                    State.Save();
-                }
-                ImGui::SameLine();
-                if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
                     State.Save();
                 }
                 ImGui::SameLine();

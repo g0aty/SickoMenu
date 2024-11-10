@@ -375,3 +375,4 @@ DO_APP_FUNC(PlayerBodyTypes__Enum, NormalGameManager_GetBodyType, (NormalGameMan
 DO_APP_FUNC(void, PlayerControl_SetInvisibility, (PlayerControl* __this, bool isActive, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetInvisibility(System.Boolean)");
 DO_APP_FUNC(void, CosmeticsLayer_SetPhantomRoleAlpha, (CosmeticsLayer* __this, float alphaValue, MethodInfo* method), "Assembly-CSharp, System.Void CosmeticsLayer::SetPhantomRoleAlpha(System.Single)");
 DO_APP_FUNC(bool, Vent_TryMoveToVent, (Vent* __this, Vent* otherVent, String** error, MethodInfo* method), "Assembly-CSharp, System.Boolean Vent::TryMoveToVent(Vent, System.String&)");
+DO_APP_FUNC(void, InnerNetClient_ReportPlayer, (InnerNetClient* __this, int32_t clientId, ReportReasons__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::ReportPlayer(System.Int32, InnerNet.ReportReasons)");

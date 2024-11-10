@@ -183,10 +183,11 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             if (State.SpoofLevel && (IsInGame() || IsInLobby()) && !State.activeImpersonation) {
-                if (IsInGame() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != State.FakeLevel)
-                    State.rpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (State.FakeLevel - 1)));
-                else if (IsInLobby() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != State.FakeLevel)
-                    State.lobbyRpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (State.FakeLevel - 1)));
+                int fakeLevel = State.SafeMode ? std::clamp(State.FakeLevel, 1, 100001) : State.FakeLevel;
+                if (IsInGame() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != fakeLevel)
+                    State.rpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (fakeLevel - 1)));
+                else if (IsInLobby() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != fakeLevel)
+                    State.lobbyRpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (fakeLevel - 1)));
             }
 
             if (IsInLobby()) {
