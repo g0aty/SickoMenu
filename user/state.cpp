@@ -260,6 +260,7 @@ void Settings::Load() {
         JSON_TRYGET("RgbLobbyCode", this->RgbLobbyCode);
 
         JSON_TRYGET("ShowLobbyTimer", this->ShowLobbyTimer);
+        JSON_TRYGET("ModDetection", this->ModDetection);
         JSON_TRYGET("SickoDetection", this->SickoDetection);
         JSON_TRYGET("AmongUsMenuDetection", this->AmongUsMenuDetection);
         JSON_TRYGET("KillNetworkDetection", this->KillNetworkDetection);
@@ -547,6 +548,7 @@ void Settings::Save() {
                 { "ShowLobbyTimer", this->ShowLobbyTimer },
                 { "AutoStartGame", this->AutoStartGame },
                 { "AutoStartTimer", this->AutoStartTimer },
+                { "ModDetection", this->ModDetection },
                 { "SickoDetection", this->SickoDetection },
                 { "AmongUsMenuDetection", this->AmongUsMenuDetection },
                 { "KillNetworkDetection", this->KillNetworkDetection },

@@ -261,7 +261,7 @@ namespace SettingsTab {
 				State.Save();
 			}
 			ImGui::SameLine();
-			if (CustomListBoxInt(" ", &modToShow, MODS)) {
+			if (CustomListBoxInt(" ", &modToShow, MODS, 100.f * State.dpiScale)) {
 				switch (modToShow) {
 				case 0:
 					State.SickoDetection = State.ModDetection;
@@ -330,23 +330,6 @@ namespace SettingsTab {
 			}
 			if (CustomListBoxInt("RPC", &State.RPC, RPC))
 				State.Save();*/
-
-			ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
-			if (ImGui::CollapsingHeader("RPC Spoofing"))
-			{
-				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-				if (ToggleButton("Change to SickoMenu RPC", &State.SickoDetection) && (!State.AmongUsMenuDetection && !State.KillNetworkDetection)) {
-					State.Save();
-				}
-				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-				if (ToggleButton("Change to AUM RPC", &State.AmongUsMenuDetection) && (!State.SickoDetection && !State.KillNetworkDetection)) {
-					State.Save();
-				}
-				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-				if (ToggleButton("Change to KillNetwork RPC", &State.KillNetworkDetection) && (!State.SickoDetection && !State.AmongUsMenuDetection)) {
-					State.Save();
-				}
-			}
 		}
 
 		if (openKeybinds) {

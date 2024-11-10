@@ -260,7 +260,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						break;
 					}
 				}*/
-				std::string localPlayerMod = "";
+				std::string localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
 				if (State.ModDetection) {
 					if (State.SickoDetection) localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
 					if (State.AmongUsMenuDetection) localPlayerMod = "<#f55>AmongUsMenu</color>";
