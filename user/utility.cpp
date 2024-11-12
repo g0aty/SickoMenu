@@ -46,19 +46,13 @@ RoleRates::RoleRates(const class GameOptions& gameOptions, int playerAmount) {
 }
 
 int RoleRates::GetRoleCount(RoleTypes__Enum role) {
-	auto impCount = GetMaxImpostorAmount(GetAllPlayerControl().size());
-	auto specialImpCount = this->ShapeshifterCount + this->PhantomCount;
-	if (specialImpCount != 0 && specialImpCount > impCount) { //prevent zero-division, more role assignment than needed
-		this->ShapeshifterCount = (int)(this->ShapeshifterCount / specialImpCount) * impCount;
-		this->PhantomCount = impCount - this->ShapeshifterCount;
-	}
 	switch (role) {
 	case RoleTypes__Enum::Shapeshifter:
 		return this->ShapeshifterCount;
 	case RoleTypes__Enum::Phantom:
 		return this->PhantomCount;
 	case RoleTypes__Enum::Impostor:
-		return impCount - specialImpCount;
+		return this->ImpostorCount;
 	case RoleTypes__Enum::Scientist:
 		return this->ScientistCount;
 	case RoleTypes__Enum::Engineer:
@@ -85,18 +79,22 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
 		if (this->ShapeshifterCount < 1)
 			return;
 		this->ShapeshifterCount--;
+		this->ImpostorCount--;
 	}
 	else if (role == RoleTypes__Enum::Phantom)
 	{
 		if (this->PhantomCount < 1)
 			return;
 		this->PhantomCount--;
+		this->ImpostorCount--;
 	}
 	else if (role == RoleTypes__Enum::Impostor)
 	{
 		if (this->ImpostorCount < 1)
 			return;
 		this->ImpostorCount--;
+		this->ShapeshifterCount--;
+		this->PhantomCount--;
 	}
 	else if (role == RoleTypes__Enum::Scientist)
 	{
@@ -896,10 +894,14 @@ std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2) {
 	std::string opener = "";
 	if (State.UnderlineName) opener += "<u>";
 	if (State.StrikethroughName) opener += "<s>";
+	if (State.BoldName) opener += "<b>";
+	if (State.NobrName) opener += "<nobr>";
 
 	std::string closer = "";
 	if (State.UnderlineName) closer += "</s>";
 	if (State.StrikethroughName) closer += "</u>";
+	if (State.BoldName) closer += "</b>";
+	if (State.NobrName) closer += "</nobr>";
 
 	if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
 		return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
@@ -1376,11 +1378,39 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 		opener += "<s>";
 		closer += "</s>";
 	}
-
+	if (State.BoldName && (!State.ColoredName || State.RgbName)) {
+		opener += "<b>";
+		closer += "</b>";
+	}
+	if (State.NobrName && (!State.ColoredName || State.RgbName)) {
+		opener += "<nobr>";
+		closer += "</nobr>";
+	}
 	if (State.ResizeName) {
 		opener += std::format("<size={}%>", State.NameSize * 100);
 		closer += "</size>";
 	}
+	if (State.IndentName) {
+		opener += std::format("<line-indent={}>", State.NameIndent * 1);
+		closer += "</line-indent>";
+	}
+	if (State.CspaceName) {
+		opener += std::format("<cspace={}>", State.NameCspace * 1);
+		closer += "</cspace>";
+	}
+	if (State.MspaceName) {
+		opener += std::format("<mspace={}>", State.NameMspace * 1);
+		closer += "</mspace>";
+	}
+	if (State.VoffsetName) {
+		opener += std::format("<voffset={}>", State.NameVoffset * 1);
+		closer += "</voffset>";
+	}
+	if (State.RotateName) {
+		opener += std::format("<rotate={}>", State.NameRotate * 1);
+		closer += "<rotate=0>";
+	}
+	
 	if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
 
 	return opener + name + closer;
