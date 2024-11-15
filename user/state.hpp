@@ -152,6 +152,28 @@ public:
     bool ForceColorForEveryone = false;
     bool CustomName = false;
     bool RgbName = false;
+    bool Font = false;
+    bool BarlowItalic = false;
+    bool BarlowMedium = false;
+    bool BarlowBold = false;
+    bool BarlowSemiBold = false;
+    bool BarlowSemiBoldM = false;
+    bool BarlowExtraBold = false;
+    bool BarlowBoldItalic = false;
+    bool BarlowBoldItalicM = false;
+    bool BarlowBlack = false;
+    bool BarlowLight = false;
+    bool BarlowRegular = false;
+    bool BarlowRegularM = false;
+    bool BarlowRegularO = false;
+    bool Brook = false;
+    bool LiberationSans = false;
+    bool NotoSans = false;
+    bool VCR = false;
+    bool CONSOLA = false;
+    bool Digital7 = false;
+    bool OCRAEXT = false;
+    bool DINProBold700 = false;
     bool CustomRgbName = false;
     bool ResizeName = false;
     bool IndentName = false;
@@ -401,6 +423,7 @@ public:
     bool SickoDetection = true;
     bool AmongUsMenuDetection = false;
     bool KillNetworkDetection = false;
+    bool BetterAmongUsDetection = false;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
     bool TournamentMode = false;
@@ -466,7 +489,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.1.1_rc1";
+    std::string SickoVersion = "v4.2+ [Fork]";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
