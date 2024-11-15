@@ -176,6 +176,28 @@ void Settings::Load() {
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
+        JSON_TRYGET("Font", this->Font);
+        JSON_TRYGET("BarlowItalic", this->BarlowItalic);
+        JSON_TRYGET("BarlowMedium", this->BarlowMedium);
+        JSON_TRYGET("BarlowBold", this->BarlowBold);
+        JSON_TRYGET("BarlowSemiBold", this->BarlowSemiBold);
+        JSON_TRYGET("BarlowSemiBoldM", this->BarlowSemiBoldM);
+        JSON_TRYGET("BarlowExtraBold", this->BarlowExtraBold);
+        JSON_TRYGET("BarlowBoldItalic", this->BarlowBoldItalic);
+        JSON_TRYGET("BarlowBoldItalicM", this->BarlowBoldItalicM);
+        JSON_TRYGET("BarlowBlack", this->BarlowBlack);
+        JSON_TRYGET("BarlowLight", this->BarlowLight);
+        JSON_TRYGET("BarlowRegular", this->BarlowRegular);
+        JSON_TRYGET("BarlowRegularM", this->BarlowRegularM);
+        JSON_TRYGET("BarlowRegularO", this->BarlowRegularO);
+        JSON_TRYGET("Brook", this->Brook);
+        JSON_TRYGET("LiberationSans", this->LiberationSans);
+        JSON_TRYGET("NotoSans", this->NotoSans);
+        JSON_TRYGET("VCR", this->VCR);
+        JSON_TRYGET("CONSOLA", this->CONSOLA);
+        JSON_TRYGET("Digital7", this->Digital7);
+        JSON_TRYGET("OCRAEXT", this->OCRAEXT);
+        JSON_TRYGET("DINProBold700", this->DINProBold700);
         JSON_TRYGET("ResizeName", this->ResizeName);
         JSON_TRYGET("IndentName", this->IndentName);
         JSON_TRYGET("CspaceName", this->CspaceName);
@@ -264,6 +286,7 @@ void Settings::Load() {
         JSON_TRYGET("SickoDetection", this->SickoDetection);
         JSON_TRYGET("AmongUsMenuDetection", this->AmongUsMenuDetection);
         JSON_TRYGET("KillNetworkDetection", this->KillNetworkDetection);
+        JSON_TRYGET("BetterAmongUsDetection", this->BetterAmongUsDetection);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
         JSON_TRYGET("SpectatorMode", this->SpectatorMode);
@@ -462,6 +485,28 @@ void Settings::Save() {
                 { "ReadAndSendAumChat", this->ReadAndSendAumChat },
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
+                { "Font", this->Font },
+                { "BarlowItalic", this->BarlowItalic },
+                { "BarlowMedium", this->BarlowMedium },
+                { "BarlowBold", this->BarlowBold },
+                { "BarlowSemiBold", this->BarlowSemiBold },
+                { "BarlowSemiBoldM", this->BarlowSemiBoldM },
+                { "BarlowExtraBold", this->BarlowExtraBold },
+                { "BarlowBoldItalic", this->BarlowBoldItalic },
+                { "BarlowBoldItalicM", this->BarlowBoldItalicM },
+                { "BarlowBlack", this->BarlowBlack },
+                { "BarlowLight", this->BarlowLight },
+                { "BarlowRegular", this->BarlowRegular },
+                { "BarlowRegularM", this->BarlowRegularM },
+                { "BarlowRegularO", this->BarlowRegularO },
+                { "Brook", this->Brook },
+                { "LiberationSans", this->LiberationSans },
+                { "NotoSans", this->NotoSans },
+                { "VCR", this->VCR },
+                { "CONSOLA", this->CONSOLA },
+                { "Digital7", this->Digital7 },
+                { "OCRAEXT", this->OCRAEXT },
+                { "DINProBold700", this->DINProBold700 },
                 { "ResizeName", this->ResizeName },
                 { "IndentName", this->IndentName },
                 { "CspaceName", this->CspaceName },
@@ -552,6 +597,7 @@ void Settings::Save() {
                 { "SickoDetection", this->SickoDetection },
                 { "AmongUsMenuDetection", this->AmongUsMenuDetection },
                 { "KillNetworkDetection", this->KillNetworkDetection },
+                { "BetterAmongUsDetection", this->BetterAmongUsDetection },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
                 { "SpectatorMode", this->SpectatorMode },
