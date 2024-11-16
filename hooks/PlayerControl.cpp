@@ -249,7 +249,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 
 				std::string modUsage = (__this == *Game::pLocalPlayer && State.ModDetection) || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
-					std::format(" <#fb0>[{}]</color>",
+					std::format(" <#fb0>[{} User]</color>",
 						__this == *Game::pLocalPlayer ? localPlayerMod : State.modUsers.at(playerData->fields.PlayerId)) : "";
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				std::string listed = "";
