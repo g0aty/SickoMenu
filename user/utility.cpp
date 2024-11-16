@@ -1385,110 +1385,140 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 		closer += "</nobr>";
 	}
 
-	if (State.Font && (State.BarlowItalic)) {
-		opener += "<font=\"Barlow-Italic SDF\">";
+	if (State.Font) {
+		switch (State.FontType) {
+		case 0:{
+			opener += "<font=\"Barlow-Italic SDF\">";
+			break;
+		}
+		case 1: {
+			opener += "<font=\"Barlow-Medium SDF\">";
+			break;
+		}
+		case 2: {
+			opener += "<font=\"Barlow-Bold SDF\">";
+			break;
+		}
+		case 3: {
+			opener += "<font=\"Barlow-SemiBold SDF\">";
+			break;
+		}
+		case 4: {
+			opener += "<font=\"Barlow-SemiBold SDF\">";
+			break;
+		}
+		case 5: {
+			opener += "<font=\"Barlow-SemiBold Masked\">";
+			break;
+		}
+		case 6: {
+			opener += "<font=\"Barlow-ExtraBold SDF\">";
+			break;
+		}
+		case 7: {
+			opener += "<font=\"Barlow-BoldItalic SDF\">";
+			break;
+		}
+		case 8: {
+			opener += "<font=\"Barlow-BoldItalic Masked\">";
+			break;
+		}
+		case 9: {
+			opener += "<font=\"Barlow-Black SDF\">";
+			break;
+		}
+		case 10: {
+			opener += "<font=\"Barlow-Light SDF\">";
+			break;
+		}
+		case 11: {
+			opener += "<font=\"Barlow-Regular SDF\">";
+			break;
+		}
+		case 12: {
+			opener += "<font=\"Barlow-Regular Masked\">";
+			break;
+		}
+		case 13: {
+			opener += "<font=\"Barlow-Regular Outline\">";
+			break;
+		}
+		case 14: {
+			opener += "<font=\"Brook SDF\">";
+			break;
+		}
+		case 15: {
+			opener += "<font=\"LiberationSans SDF\">";
+			break;
+		}
+		case 16: {
+			opener += "<font=\"NotoSansJP-Regular SDF\">";
+			break;
+		}
+		case 17: {
+			opener += "<font=\"VCR SDF\">";
+			break;
+		}
+		case 18: {
+			opener += "<font=\"CONSOLA SDF\">";
+			break;
+		}
+		case 19: {
+			opener += "<font=\"digital-7 SDF\">";
+			break;
+		}
+		case 20: {
+			opener += "<font=\"OCRAEXT SDF\">";
+			break;
+		}
+		case 21: {
+			opener += "<font=\"DIN_Pro_Bold_700 SDF\">";
+			break;
+		}
+		}
 		closer += "</font>";
 	}
+	if (State.Font && (State.BarlowItalic)) 
 
-	if (State.Font && (State.BarlowMedium)) {
-		opener += "<font=\"Barlow-Medium SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowMedium)) 
 
-	if (State.Font && (State.BarlowBold)) {
-		opener += "<font=\"Barlow-Bold SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowBold)) 
 
-	if (State.Font && (State.BarlowSemiBold)) {
-		opener += "<font=\"Barlow-SemiBold SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowSemiBold)) 
 
-	if (State.Font && (State.BarlowSemiBoldM)) {
-		opener += "<font=\"Barlow-SemiBold Masked\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowSemiBoldM)) 
 
-	if (State.Font && (State.BarlowExtraBold)) {
-		opener += "<font=\"Barlow-ExtraBold SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowExtraBold)) 
 
-	if (State.Font && (State.BarlowBoldItalic)) {
-		opener += "<font=\"Barlow-BoldItalic SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowBoldItalic)) 
 
-	if (State.Font && (State.BarlowBoldItalicM)) {
-		opener += "<font=\"Barlow-BoldItalic Masked\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowBoldItalicM)) 
 
-	if (State.Font && (State.BarlowBlack)) {
-		opener += "<font=\"Barlow-Black SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowBlack)) 
 
-	if (State.Font && (State.BarlowLight)) {
-		opener += "<font=\"Barlow-Light SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowLight)) 
 
-	if (State.Font && (State.BarlowRegular)) {
-		opener += "<font=\"Barlow-Regular SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowRegular)) 
 
-	if (State.Font && (State.BarlowRegularM)) {
-		opener += "<font=\"Barlow-Regular Masked\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowRegularM)) 
 
-	if (State.Font && (State.BarlowRegularO)) {
-		opener += "<font=\"Barlow-Regular Outline\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.BarlowRegularO)) 
 
-	if (State.Font && (State.Brook)) {
-		opener += "<font=\"Brook SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.Brook)) 
 
-	if (State.Font && (State.LiberationSans)) {
-		opener += "<font=\"LiberationSans SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.LiberationSans)) 
 
-	if (State.Font && (State.NotoSans)) {
-		opener += "<font=\"NotoSansJP-Regular SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.NotoSans)) 
 
-	if (State.Font && (State.VCR)) {
-		opener += "<font=\"VCR SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.VCR)) 
 
-	if (State.Font && (State.CONSOLA)) {
-		opener += "<font=\"CONSOLA SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.CONSOLA)) 
 
-	if (State.Font && (State.Digital7)) {
-		opener += "<font=\"digital-7 SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.Digital7)) 
 
-	if (State.Font && (State.OCRAEXT)) {
-		opener += "<font=\"OCRAEXT SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.OCRAEXT)) 
 
-	if (State.Font && (State.DINProBold700)) {
-		opener += "<font=\"DIN_Pro_Bold_700 SDF\">";
-		closer += "</font>";
-	}
+	if (State.Font && (State.DINProBold700)) 
 
 
 	if (State.ResizeName) {
