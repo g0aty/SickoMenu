@@ -102,7 +102,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableLights = false;
                 State.CloseAllDoors = false;
                 State.SpamReport = false;
-                State.UltimateSpamReport = false;
                 State.DisableVents = false;
 
                 if (!IsInLobby()) {
@@ -417,31 +416,17 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             static int reportDelays = 0;
-            if (reportDelays <= 0 && State.UltimateSpamReport && IsInGame()) {
+            if (reportDelays <= 0 && State.CrashSpamReport && IsInGame()) {
                 for (auto p : GetAllPlayerControl()) {
                     if (State.InMeeting)
                         State.rpcQueue.push(new RpcForceMeeting(p, PlayerSelection(p)));
                     else
                         State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
                 }
-                reportDelays = 1; //Should be approximately 1 second
+                reportDelays = 0;
             }
             else {
                 reportDelays--;
-            }
-
-            static int reportDelayss = 0;
-            if (reportDelayss <= 0 && State.CrashSpamReport && IsInGame()) {
-                for (auto p : GetAllPlayerControl()) {
-                    if (State.InMeeting)
-                        State.rpcQueue.push(new RpcForceMeeting(p, PlayerSelection(p)));
-                    else
-                        State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
-                }
-                reportDelayss = 1; //Should be approximately 1 second
-            }
-            else {
-                reportDelayss--;
             }
 
             static int nameChangeCycleDelay = 0; //If we spam too many name changes, we're banned
@@ -722,6 +707,15 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 else
                     playerCycleDelay = 0;
             }
+
+            State.RgbNameColor += 0.022f;
+            constexpr auto tau = 2.f * 3.14159265358979323846f;
+            while (State.RgbNameColor > tau) State.RgbNameColor -= tau;
+            const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
+            auto color_r = calculate(State.RgbNameColor + 0.f);
+            auto color_g = calculate(State.RgbNameColor + 4.f);
+            auto color_b = calculate(State.RgbNameColor + 2.f);
+            State.rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
             onStart = false;
 
             //static int attachDelay = 0; //If we spam too many name changes, we're banned
@@ -870,6 +864,7 @@ void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, Meth
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerJoined executed");
     AmongUsClient_OnPlayerJoined(__this, data, method);
 }
+
 
 bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
 {
