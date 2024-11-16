@@ -708,16 +708,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     playerCycleDelay = 0;
             }
 
-            State.RgbNameColor += 0.022f;
-            constexpr auto tau = 2.f * 3.14159265358979323846f;
-            while (State.RgbNameColor > tau) State.RgbNameColor -= tau;
-            const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
-            auto color_r = calculate(State.RgbNameColor + 0.f);
-            auto color_g = calculate(State.RgbNameColor + 4.f);
-            auto color_b = calculate(State.RgbNameColor + 2.f);
-            State.rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
-            onStart = false;
-
             //static int attachDelay = 0; //If we spam too many name changes, we're banned
             auto playerToAttach = State.playerToAttach.validate();
 
