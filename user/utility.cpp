@@ -351,7 +351,6 @@ bool IsNameValid(std::string str) {
 	return true;
 }
 
-
 NetworkedPlayerInfo* GetPlayerData(PlayerControl* player) {
 	if (player) return app::PlayerControl_get_Data(player, NULL);
 	return NULL;
@@ -1387,7 +1386,7 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 
 	if (State.Font) {
 		switch (State.FontType) {
-		case 0:{
+		case 0: {
 			opener += "<font=\"Barlow-Italic SDF\">";
 			break;
 		}

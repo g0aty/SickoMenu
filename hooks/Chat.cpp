@@ -149,26 +149,7 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 					playerName = convert_to_string("<size=50%>" + GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames) + "</size> " + convert_from_string(playerName));
 				}
 				if (State.CustomName && !State.ServerSideCustomName && playerData == GetPlayerData(*Game::pLocalPlayer)) {
-					if (State.ColoredName && !State.RgbName) {
-						playerName = convert_to_string(GetGradientUsername(convert_from_string(playerName)));
-					}
-					//we don't want to hide our own chat messages
-					/*if (State.ResizeName)
-						playerName = convert_to_string(std::format("<size={}>", State.NameSize) + convert_from_string(playerName) + "</size>");*/
-					if (State.ItalicName)
-						playerName = convert_to_string("<i>" + convert_from_string(playerName) + "</i>");
-					if (State.UnderlineName && (!State.ColoredName || State.RgbName))
-						playerName = convert_to_string("<u>" + convert_from_string(playerName) + "</u>");
-					if (State.StrikethroughName && (!State.ColoredName || State.RgbName))
-						playerName = convert_to_string("<s>" + convert_from_string(playerName) + "</s>");
-					if (State.BoldName && (!State.ColoredName || State.RgbName))
-						playerName = convert_to_string("<b>" + convert_from_string(playerName) + "</b>");
-					if (State.NobrName && (!State.ColoredName || State.RgbName))
-						playerName = convert_to_string("<nobr>" + convert_from_string(playerName) + "</nobr>");
-					//rgb color doesn't change
-					/*if (State.RgbName) {
-						playerName = convert_to_string(State.rgbCode + convert_from_string(playerName) + "</color>");
-					}*/
+					playerName = convert_to_string(GetCustomName(convert_from_string(playerName)));
 				}
 
 				if (State.PlayerColoredDots) {
