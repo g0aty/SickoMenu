@@ -66,9 +66,9 @@ int RoleRates::GetRoleCount(RoleTypes__Enum role) {
 	case RoleTypes__Enum::Crewmate:
 		return this->MaxCrewmates;
 	default:
-/*#ifdef _DEBUG
-		assert(false);
-#endif*/
+		/*#ifdef _DEBUG
+				assert(false);
+		#endif*/
 		return 0;
 	}
 }
@@ -253,7 +253,7 @@ std::optional<NetworkedPlayerInfo*> PlayerSelection::get_PlayerData() const
 		return data;
 	}
 	return std::nullopt;
-	}
+}
 #pragma endregion
 
 ImVec4 AmongUsColorToImVec4(const Color& color) {
@@ -399,7 +399,7 @@ std::string GenerateRandomString(bool completelyRandom) {
 		std::vector<std::string> fiveLetters = { "ackee", "actor", "acute", "adept", "afoot", "agile", "aglow", "alarm", "album", "alert", "alike", "alive", "alkyl", "alkyl", "alloy", "alone", "alpha", "alpha", "amber", "amber", "ample", "angle", "apple", "apron", "arena", "argon", "arrow", "aside", "astir", "atlas", "attic", "audio", "aunty", "avail", "awake", "award", "aware", "awash", "axial", "azure", "badge", "baggy", "balmy", "barge", "basal", "basic", "basin", "basis", "baths", "baton", "baulk", "beach", "beads", "beady", "beefy", "beery", "beige", "bench", "berry", "bhaji", "bidet", "bijou", "bitty", "blank", "blase", "blaze", "bling", "bliss", "bliss", "block", "bloke", "blond", "blues", "blurb", "board", "bonny", "bonus", "booth", "boric", "bound", "bower", "brake", "brass", "brass", "brave", "break", "bream", "bride", "brief", "briny", "brisk", "broad", "broom", "brown", "brown", "bugle", "built", "bulky", "bumpy", "bunch", "cabin", "cable", "cairn", "calyx", "canny", "canoe", "canto", "caret", "cargo", "chain", "chalk", "charm", "chart", "chary", "chess", "chest", "chewy", "chief", "chief", "chill", "chine", "chive", "choir", "chump", "cinch", "civic", "civil", "claim", "clank", "class", "clear", "clerk", "cliff", "cloak", "clock", "close", "cloth", "cloud", "clove", "clump", "coach", "coast", "cocoa", "combe", "comfy", "comic", "comic", "comma", "conic", "coomb", "copse", "coral", "coral", "corps", "court", "coven", "cover", "crane", "crate", "crisp", "crisp", "croak", "crony", "crowd", "crown", "crumb", "crust", "cubic", "curly", "curve", "daily", "dairy", "dairy", "daisy", "dance", "dazed", "delta", "demob", "denim", "diary", "digit", "diner", "dinky", "disco", "ditch", "diver", "divot", "dizzy", "dodge", "domed", "doubt", "dozen", "draft", "drain", "drama", "drawl", "drawn", "dream", "dress", "dried", "drier", "drill", "drink", "drive", "droll", "drone", "duple", "dusky", "dusty", "eager", "eagle", "early", "eater", "elder", "elect", "elfin", "elite", "email", "envoy", "epoch", "equal", "error", "ether", "ethic", "event", "every", "exact", "extra", "facet", "faint", "famed", "fancy", "farad", "fated", "feast", "fence", "ferny", "ferry", "fever", "fibre", "fiery", "filmy", "final", "finch", "fishy", "fizzy", "flash", "flash", "flask", "fleet", "fleet", "flick", "flies", "flock", "flood", "floor", "flour", "fluid", "fluid", "flush", "flute", "focal", "focus", "foggy", "force", "forge", "forty", "fount", "frame", "frank", "fresh", "front", "frost", "frown", "funny", "furry", "furze", "futon", "fuzzy", "gable", "gamma", "gamut", "gauzy", "gecko", "ghost", "giant", "giant", "giddy", "given", "glace", "glass", "glaze", "gleam", "globe", "glory", "glove", "gluey", "going", "goods", "goody", "gooey", "goose", "gorse", "gouge", "gourd", "grace", "grain", "grand", "grand", "grape", "graph", "grasp", "great", "green", "groat", "group", "grown", "guard", "guest", "guide", "guise", "gummy", "gusty", "hanky", "happy", "hardy", "hasty", "heads", "heaps", "heavy", "hedge", "hefty", "helix", "herby", "hertz", "hewer", "hilly", "hinge", "hobby", "holey", "homey", "honey", "hoppy", "hotel", "humid", "husky", "husky", "hutch", "hyena", "icing", "ideal", "image", "imago", "index", "inner", "ionic", "irons", "ivory", "jacks", "jaggy", "jammy", "jazzy", "jeans", "jelly", "jewel", "jokey", "jolly", "juice", "jumbo", "jumbo", "jumpy", "kazoo", "khaki", "kiosk", "knife", "knurl", "koala", "label", "laird", "large", "larky", "larva", "laser", "lasso", "latex", "lathe", "latte", "layer", "leafy", "leaky", "least", "ledge", "leech", "leggy", "lemon", "lento", "level", "level", "lever", "lilac", "limit", "linen", "liner", "litre", "loads", "loamy", "local", "lofty", "logic", "lolly", "loose", "lorry", "loser", "lotto", "lower", "lucid", "lucky", "lunar", "lunch", "lupin", "lyric", "lyric", "magic", "magic", "major", "malty", "mango", "marly", "marsh", "maser", "match", "matey", "maths", "mauve", "mayor", "mealy", "meaty", "medal", "media", "mercy", "merry", "metal", "metal", "meter", "metre", "micro", "miner", "minty", "misty", "mixed", "mixer", "modal", "model", "model", "molar", "month", "moral", "moral", "motel", "motet", "mothy", "motor", "motor", "motte", "mould", "mouse", "mousy", "mouth", "movie", "muddy", "mulch", "mural", "music", "musty", "muted", "natty", "naval", "navvy", "newel", "newsy", "nifty", "night", "ninja", "noble", "noise", "nomad", "north", "north", "notch", "noted", "novel", "novel", "oaken", "ocean", "olden", "olive", "onion", "onset", "orbit", "order", "other", "outer", "outer", "overt", "owing", "oxide", "ozone", "pacer", "pager", "paint", "pally", "palmy", "panda", "paper", "party", "pasty", "patch", "pause", "peace", "peach", "peaky", "pearl", "pearl", "peaty", "peeve", "pence", "penny", "perch", "perky", "petal", "phone", "photo", "piano", "pilot", "pitch", "pithy", "piton", "place", "plain", "plain", "plane", "plank", "plant", "plumy", "plush", "point", "polar", "polka", "porch", "posse", "pouch", "pound", "pouty", "power", "prank", "prawn", "price", "pride", "prime", "prime", "prior", "prism", "privy", "prize", "prize", "prone", "proof", "proof", "prose", "proud", "pulpy", "pupal", "pupil", "puppy", "puree", "purse", "quark", "quart", "query", "quest", "quick", "quiet", "quill", "quilt", "quirk", "quits", "radar", "radio", "radio", "rainy", "rally", "ranch", "range", "rapid", "raven", "razor", "ready", "recap", "redox", "reedy", "regal", "reign", "relay", "remit", "reply", "resit", "retro", "rhyme", "rider", "ridge", "rifle", "right", "rigid", "rimed", "risky", "river", "roast", "robin", "robot", "rocky", "rooms", "roomy", "roost", "round", "route", "royal", "royal", "ruler", "runic", "rural", "rusty", "sable", "salad", "salon", "sassy", "sated", "satin", "saute", "scale", "scaly", "scant", "scarf", "scent", "scoop", "scope", "scrub", "scuff", "sedge", "senna", "sense", "sepia", "seven", "shade", "shaky", "shale", "shame", "shank", "shape", "shark", "sharp", "sheer", "sheet", "shelf", "shell", "shiny", "shirt", "shoal", "shock", "shore", "short", "shrug", "shtum", "sieve", "sight", "silky", "silty", "sixer", "skate", "skill", "skirl", "slang", "slaty", "sleek", "sleet", "slice", "slide", "slime", "small", "smart", "smelt", "smoke", "smoky", "snack", "snail", "snake", "snare", "sniff", "snore", "snowy", "solar", "solid", "solid", "sonic", "soppy", "sorry", "sound", "sound", "soupy", "south", "south", "space", "spare", "spark", "spate", "spawn", "spear", "spent", "spicy", "spiel", "spike", "spire", "spite", "splay", "spoon", "sport", "spout", "spree", "squad", "stack", "staff", "stage", "staid", "stain", "stair", "stamp", "stand", "stare", "start", "state", "state", "steak", "steam", "steel", "steep", "stern", "stick", "still", "stock", "stock", "stoic", "stone", "stony", "stool", "store", "stork", "storm", "story", "stout", "strap", "straw", "stray", "stuck", "study", "style", "suave", "sugar", "sunny", "sunup", "super", "surge", "swarm", "sweet", "sweet", "swell", "swell", "swift", "swipe", "swish", "sword", "sworn", "syrup", "table", "tacit", "tamer", "tangy", "taper", "tarry", "taste", "tawny", "tenon", "tense", "tense", "tenth", "terms", "terse", "theme", "these", "thief", "third", "thorn", "those", "three", "tiara", "tidal", "tiger", "tight", "tilde", "tiled", "tined", "tinny", "tipsy", "tired", "title", "toast", "today", "token", "tonal", "tonic", "topic", "torch", "torte", "total", "total", "towel", "tower", "trail", "train", "treat", "trial", "tribe", "trice", "trike", "trill", "trout", "truce", "truck", "trunk", "trunk", "truss", "truth", "twain", "tweak", "twine", "twirl", "uncut", "undue", "union", "upper", "urban", "usual", "utter", "vague", "valid", "value", "vegan", "verse", "video", "visit", "vista", "vital", "vocal", "voice", "vowel", "wacky", "wagon", "waist", "washy", "watch", "water", "waxen", "weave", "weber", "weeny", "weird", "whale", "wheat", "whiff", "whole", "whorl", "widow", "width", "wince", "winch", "windy", "wiper", "wispy", "witty", "woody", "wordy", "world", "worth", "wound", "wreck", "wrist", "yacht", "yogic", "young", "youth", "yummy", "zebra", "zippy", "zonal" };
 		std::vector<std::string> sixLetters = { "ablaze", "access", "acting", "action", "active", "actual", "acuity", "adagio", "adroit", "adverb", "advice", "aerial", "aflame", "afloat", "agency", "airway", "alight", "allied", "allure", "amazed", "amoeba", "amount", "anchor", "annual", "annual", "answer", "apeman", "apical", "arable", "arbour", "arcane", "ardent", "ardour", "armful", "armlet", "armour", "arrant", "artful", "artist", "asleep", "aspect", "asthma", "astral", "astute", "atomic", "august", "auntie", "autumn", "avatar", "badger", "ballet", "banner", "barber", "bardic", "barley", "barrel", "basics", "basket", "bathos", "batten", "battle", "beaded", "beaked", "beaker", "bedbug", "bedsit", "beetle", "belief", "benign", "better", "billow", "binary", "bionic", "biotic", "blazon", "blithe", "blotch", "blouse", "blower", "bluish", "blurry", "bonded", "bonnet", "bonsai", "border", "botany", "bottle", "bounds", "bovine", "breach", "breath", "breeze", "breezy", "brewer", "bridge", "bright", "bronze", "brooch", "bubbly", "bubbly", "bucket", "buckle", "budget", "bumper", "bumper", "bundle", "burger", "burrow", "button", "buzzer", "bygone", "byroad", "cachet", "cactus", "camera", "campus", "canape", "candid", "candle", "canine", "canned", "canopy", "canvas", "carbon", "career", "career", "carpet", "carrot", "carton", "castle", "casual", "catchy", "catnap", "cattle", "causal", "caveat", "caviar", "celery", "cellar", "cement", "centre", "centre", "cereal", "cerise", "chalky", "chance", "chancy", "change", "chatty", "cheery", "cheese", "chilly", "chirpy", "choice", "choice", "choral", "chorus", "chummy", "chunky", "cinder", "cinema", "circle", "circus", "classy", "claves", "clayey", "clever", "clinic", "cloche", "cobweb", "cocoon", "coeval", "coffee", "coffer", "cogent", "collar", "collie", "colour", "column", "comedy", "common", "conger", "conoid", "convex", "cookie", "cooler", "coping", "copper", "copper", "cordon", "corned", "corner", "cosmic", "county", "coupon", "course", "covert", "cowboy", "coyote", "cradle", "craggy", "crayon", "creaky", "credit", "crispy", "crumby", "crunch", "cuboid", "cupola", "curacy", "cursor", "curtsy", "custom", "cyclic", "dainty", "damper", "dapper", "daring", "dative", "dazzle", "debate", "debtor", "decent", "defect", "degree", "deluxe", "demure", "denary", "desert", "desire", "detail", "device", "dexter", "diatom", "dilute", "dimple", "dinghy", "direct", "divide", "divine", "docile", "doctor", "dogged", "doodle", "dotage", "doting", "dotted", "double", "doughy", "dragon", "drapes", "drawer", "dreamy", "dressy", "dulcet", "duplex", "earthy", "earwig", "echoey", "effect", "effort", "eighty", "either", "elated", "eldest", "elfish", "elixir", "embryo", "ending", "energy", "engine", "enough", "enough", "entire", "equine", "eraser", "ermine", "errant", "ersatz", "excise", "excuse", "exempt", "exotic", "expert", "expert", "expiry", "extant", "fabled", "facile", "factor", "fallow", "family", "famous", "farmer", "fecund", "feisty", "feline", "fellow", "fencer", "ferric", "fervid", "fierce", "figure", "filial", "fillip", "finish", "finite", "fiscal", "fitful", "fitted", "flambe", "flaxen", "fleece", "fleecy", "flight", "flinty", "floral", "florid", "flossy", "floury", "flower", "fluent", "fluffy", "fodder", "foible", "folder", "folksy", "forage", "forest", "formal", "former", "fridge", "frieze", "fright", "frilly", "frizzy", "frosty", "frothy", "frozen", "frugal", "funnel", "future", "future", "gabled", "gaffer", "gaiter", "galaxy", "gallon", "galore", "gaming", "gaoler", "garage", "garden", "garlic", "gentle", "gerbil", "gifted", "giggly", "ginger", "girder", "glassy", "glider", "glitzy", "global", "glossy", "glossy", "gloved", "golden", "gopher", "gowned", "grainy", "grassy", "grater", "gratis", "gravel", "grease", "greasy", "greeny", "grilse", "gritty", "groove", "grotto", "ground", "grubby", "grungy", "guitar", "gutter", "hairdo", "haloed", "hamlet", "hammer", "hanger", "hawser", "header", "health", "helper", "hempen", "herbal", "hermit", "heroic", "hiccup", "hinder", "hinged", "homely", "homing", "honest", "hoofed", "hooked", "horsey", "hostel", "hourly", "hubbub", "huddle", "humane", "humble", "humour", "hungry", "hunted", "hunter", "hurray", "hybrid", "hyphen", "iambic", "icicle", "iconic", "iguana", "immune", "inborn", "indoor", "inland", "inmost", "innate", "inrush", "insect", "inside", "inside", "instep", "intact", "intent", "intern", "invite", "inward", "iodine", "ironic", "island", "italic", "jacket", "jagged", "jailer", "jargon", "jaunty", "jingle", "jingly", "jockey", "jocose", "jocund", "jogger", "joggle", "jovial", "joyful", "joyous", "jumble", "jumper", "jungly", "junior", "kennel", "ketone", "kettle", "kilted", "kindly", "kingly", "kirsch", "kitbag", "kitten", "knight", "ladder", "landed", "laptop", "larder", "larval", "latest", "latter", "laurel", "lavish", "lawful", "lawyer", "layman", "leaded", "leaden", "league", "ledger", "legacy", "legend", "legion", "lemony", "lender", "length", "lepton", "lessee", "lesser", "lesson", "lethal", "letter", "liable", "lidded", "likely", "limber", "limpid", "lineal", "linear", "liquid", "lissom", "listed", "litter", "little", "lively", "livery", "living", "living", "lizard", "loaded", "loafer", "locker", "locust", "logger", "lordly", "lounge", "lovely", "loving", "lugger", "lupine", "lustre", "luxury", "madcap", "magnet", "maiden", "maiden", "malted", "mammal", "manful", "manned", "manner", "mantis", "manual", "marble", "margin", "marine", "marked", "market", "maroon", "marshy", "mascot", "massif", "matrix", "matted", "matter", "mature", "meadow", "medial", "median", "medium", "memory", "merest", "meteor", "method", "metric", "mickle", "mickle", "midday", "middle", "middle", "mighty", "milieu", "minded", "minute", "minute", "mirror", "missus", "moated", "mobile", "modern", "modest", "modish", "module", "mohair", "molten", "moment", "mosaic", "motion", "motive", "motive", "motley", "moving", "muckle", "mucous", "muddle", "mulish", "mulled", "mullet", "museum", "mutiny", "mutton", "mutual", "muzzle", "myopia", "myriad", "myriad", "mystic", "mythic", "nachos", "narrow", "nation", "native", "natter", "nature", "nearby", "nether", "nettle", "neuter", "newish", "nimble", "nobody", "normal", "notice", "nought", "number", "object", "oblate", "oblong", "oblong", "occult", "octane", "ocular", "oddity", "offcut", "office", "oldish", "oniony", "online", "onrush", "onside", "onward", "opaque", "opener", "orange", "orange", "origin", "ornate", "orphan", "osprey", "outfit", "owlish", "oxtail", "oxygen", "packed", "packet", "palace", "paltry", "papery", "parade", "parcel", "parody", "parrot", "patchy", "patent", "pathos", "pavane", "peachy", "peaked", "peanut", "pebble", "pebbly", "pedlar", "people", "pepper", "petite", "petrol", "phrase", "picker", "picket", "pickle", "picnic", "pigeon", "pillar", "pillow", "pimple", "pimply", "pincer", "pinion", "piping", "pitted", "placid", "planar", "planet", "plaque", "plenty", "pliant", "plucky", "plumed", "plummy", "plunge", "plural", "plural", "plushy", "pocked", "pocket", "pocket", "poetic", "poetry", "poised", "polite", "pollen", "porous", "postal", "poster", "potato", "potted", "pounce", "powder", "precis", "prefix", "pretty", "pricey", "primal", "profit", "prompt", "proper", "proven", "public", "puddle", "pulley", "pulsar", "punchy", "puppet", "purism", "purist", "purple", "purply", "puzzle", "quaint", "quango", "quasar", "quirky", "rabbit", "racing", "racket", "radial", "radius", "raffia", "raffle", "ragged", "raging", "raglan", "raglan", "ragtag", "raisin", "rammer", "ramrod", "random", "rapper", "raring", "rarity", "rasher", "rating", "ration", "rattle", "ravine", "raving", "reason", "rebate", "recent", "recess", "recipe", "record", "record", "redial", "reform", "regent", "region", "relief", "relish", "remark", "remiss", "remote", "rennet", "rennin", "repair", "report", "rested", "result", "retort", "revamp", "reward", "rhythm", "ribbon", "ridden", "riddle", "ridged", "ripple", "rising", "robust", "rocket", "rodent", "rotary", "rotund", "roving", "rubble", "ruched", "rudder", "rueful", "rugged", "rugger", "rumour", "rumpus", "runway", "russet", "rustic", "rustle", "rutted", "saddle", "saithe", "saline", "salmon", "sample", "sandal", "sateen", "satiny", "saucer", "saving", "sawfly", "scalar", "scalar", "scales", "scarab", "scarce", "scenic", "scheme", "school", "schtum", "scorer", "scrawl", "screen", "script", "scurfy", "season", "seated", "second", "secret", "secret", "secure", "sedate", "seemly", "select", "senior", "sensor", "septet", "serene", "serial", "series", "settee", "setter", "severe", "shaper", "sharer", "sheeny", "shield", "shiner", "shorts", "shovel", "shower", "shrewd", "shrill", "shrimp", "signal", "signal", "signet", "silage", "silent", "silken", "silver", "silver", "simian", "simile", "simper", "simple", "sinewy", "single", "sinter", "sister", "sketch", "slangy", "sledge", "sleepy", "sleety", "sleeve", "sleigh", "slight", "slinky", "slippy", "sluice", "slushy", "smooth", "smudge", "smudgy", "snaggy", "snazzy", "snoopy", "snoozy", "social", "socket", "sodium", "softie", "solemn", "solids", "sonnet", "source", "sparky", "speech", "speedy", "sphere", "sphinx", "spider", "spinet", "spiral", "spiral", "spooky", "sporty", "spotty", "sprain", "sprawl", "spring", "spruce", "sprung", "square", "square", "squash", "squish", "stable", "stagey", "stamen", "staple", "staple", "starch", "starry", "static", "statue", "steady", "steely", "stereo", "stereo", "stocks", "stocky", "stolid", "stormy", "streak", "stride", "string", "stripe", "stripy", "stroll", "strong", "stubby", "studio", "sturdy", "subtle", "suburb", "subway", "sudden", "suffix", "sugary", "sulpha", "summer", "sundry", "sunken", "sunlit", "sunset", "superb", "supine", "supper", "supply", "supply", "surfer", "surtax", "survey", "swampy", "swanky", "sweaty", "switch", "swivel", "sylvan", "symbol", "syntax", "syrupy", "tablet", "taking", "talent", "talker", "tangle", "tanker", "tannic", "target", "tartan", "taster", "tavern", "teacup", "teapot", "teasel", "temper", "tennis", "tester", "tether", "thesis", "thirty", "thrill", "throes", "throne", "ticker", "ticket", "tiddly", "tiered", "tights", "timber", "timely", "tinker", "tinned", "tinted", "tipped", "tipple", "tiptop", "tissue", "titchy", "titled", "tomato", "tracer", "trader", "treaty", "treble", "tremor", "trendy", "tricky", "triple", "troops", "trophy", "trough", "truant", "trusty", "tucker", "tufted", "tundra", "tunnel", "turbid", "turkey", "turtle", "tussle", "twirly", "twisty", "umlaut", "unable", "unborn", "undone", "uneven", "unique", "unlike", "unmade", "unpaid", "unread", "unreal", "unsaid", "unseen", "unsold", "untold", "unused", "unwary", "unworn", "upbeat", "uphill", "upland", "uproar", "uptake", "upward", "upwind", "urbane", "urchin", "urgent", "usable", "useful", "utmost", "valley", "vapour", "varied", "veggie", "veiled", "veined", "velour", "velvet", "verbal", "verity", "vernal", "versed", "vertex", "vessel", "viable", "vinous", "violet", "violin", "visage", "viscid", "visual", "volume", "voyage", "waders", "waggle", "waiter", "waiver", "waking", "wallet", "wallop", "walrus", "wanted", "warble", "warder", "wealth", "wearer", "webbed", "webcam", "wedded", "weevil", "wheezy", "whippy", "wicker", "wifely", "wilful", "window", "winged", "winger", "winner", "winter", "wintry", "witted", "wizard", "wobbly", "wonder", "wonted", "wooded", "woolly", "woolly", "worthy", "wreath", "wrench", "yarrow", "yearly", "yellow", "yonder", "zapper", "zenith", "zigzag", "zigzag", "zircon", "zither" };
 		std::vector<std::string> sevenLetters = { "abiding", "ability", "abiotic", "absence", "account", "acidity", "acrobat", "acrylic", "actress", "actuary", "adamant", "addenda", "address", "advance", "aerated", "aerobic", "affable", "ageless", "airport", "alcopop", "alleged", "amazing", "ambient", "amenity", "amiable", "amusing", "anaemia", "ancient", "angelic", "angling", "angular", "animate", "animism", "aniseed", "annular", "annulus", "anodyne", "antacid", "anthill", "antique", "antique", "antonym", "aplenty", "apology", "apparel", "applied", "apropos", "aquatic", "aqueous", "arbiter", "archaic", "article", "ascetic", "aseptic", "assured", "athlete", "attache", "audible", "aureole", "autocue", "average", "avidity", "awesome", "bagpipe", "balcony", "balloon", "bandsaw", "banquet", "bargain", "baronet", "barrage", "bassist", "battery", "beeline", "belated", "beloved", "bemused", "bequest", "bespoke", "betters", "bicycle", "billion", "binding", "biology", "biscuit", "bismuth", "bivalve", "blanket", "blanket", "blatant", "blessed", "blister", "blogger", "blossom", "blowfly", "blurred", "bonfire", "bookish", "boracic", "boulder", "boxroom", "boycott", "boyhood", "bracket", "bravery", "breaded", "breadth", "breathy", "brimful", "brisket", "bristly", "brittle", "bromide", "brother", "buckram", "bucolic", "budding", "builder", "bulrush", "bulwark", "buoyant", "burning", "bursary", "butcher", "buzzard", "cabaret", "cadence", "cadenza", "caisson", "calends", "calorie", "candied", "cannery", "capable", "capital", "capital", "captain", "caption", "capture", "caravan", "caraway", "carbide", "careful", "carmine", "carnage", "cartoon", "carving", "cashier", "cavalry", "ceiling", "centaur", "central", "centric", "century", "ceramic", "certain", "cession", "chamber", "channel", "chapter", "charity", "charmer", "chatter", "checked", "checker", "chemist", "chevron", "chicane", "chicken", "chimney", "chirrup", "chortle", "chuffed", "civvies", "clarion", "classic", "classic", "clastic", "cleaver", "clement", "climate", "clinker", "cluster", "clutter", "coastal", "coating", "coaxial", "cobbled", "coequal", "cognate", "coldish", "collage", "college", "comical", "commune", "compact", "compact", "company", "compass", "complex", "concave", "concert", "concise", "conduit", "conical", "content", "contest", "control", "convert", "cooking", "coolant", "copious", "copycat", "cordial", "coronet", "correct", "council", "counter", "counter", "country", "courage", "courtly", "crackle", "crawler", "crested", "crimson", "crinkly", "croquet", "crucial", "crumbly", "crunchy", "cryptic", "crystal", "crystal", "culvert", "cunning", "cunning", "cupcake", "curator", "curious", "currant", "current", "curried", "cursive", "cursive", "cursory", "curtain", "cushion", "customs", "cutaway", "cutback", "cutlass", "cutlery", "cutting", "cutting", "cyclist", "dabbler", "dancing", "dappled", "darling", "dashing", "dawning", "deadpan", "decagon", "decided", "decimal", "decimal", "decoder", "defiant", "deltaic", "denizen", "dentist", "dervish", "desktop", "desktop", "dessert", "devoted", "devotee", "diagram", "diamond", "diamond", "dietary", "diffuse", "digital", "dignity", "dioxide", "diploid", "diploma", "display", "distant", "disused", "diurnal", "diverse", "divided", "dolphin", "donnish", "dormant", "doughty", "drachma", "drastic", "draught", "drawing", "dresser", "dribble", "driving", "drought", "drummer", "duality", "ductile", "dungeon", "duopoly", "durable", "dustbin", "dutiful", "dynamic", "dynasty", "earmark", "earnest", "earplug", "earring", "earshot", "earthen", "earthly", "eastern", "easting", "eclipse", "economy", "edaphic", "egghead", "elastic", "elastic", "elderly", "elegant", "elegiac", "ellipse", "elusive", "emerald", "emerald", "eminent", "emirate", "emotive", "empties", "endemic", "endless", "engaged", "enquiry", "ensuing", "epicure", "epigeal", "episode", "epitome", "equable", "equator", "equerry", "erosive", "erudite", "eternal", "ethical", "evasive", "evening", "evident", "exalted", "example", "excited", "exhaust", "exigent", "expanse", "express", "extreme", "factual", "fairing", "fancier", "fantasy", "faraway", "fashion", "feather", "feature", "federal", "feeling", "felspar", "ferrety", "ferrous", "ferrule", "fervent", "festive", "fibrous", "fiction", "fighter", "figment", "filings", "finicky", "fishnet", "fissile", "fission", "fitting", "fixated", "fixture", "flannel", "flavour", "flecked", "fledged", "flighty", "flouncy", "flowery", "fluency", "fluster", "fluvial", "foliage", "foliate", "footing", "footman", "forfeit", "fortune", "forward", "forward", "fragile", "freckly", "freebie", "freeman", "freesia", "freezer", "fretted", "friable", "frilled", "fringed", "frosted", "frowsty", "fulsome", "furcate", "furlong", "furrier", "further", "furtive", "fusible", "fusilli", "gainful", "gallant", "gallery", "gamelan", "garbled", "garnish", "gavotte", "gazette", "gearbox", "general", "genteel", "genuine", "germane", "getaway", "gherkin", "gibbous", "gingery", "giraffe", "girlish", "glaring", "gleeful", "glimmer", "glowing", "gnomish", "goggles", "gorilla", "gradual", "grammar", "grandam", "grandee", "graphic", "grating", "gravity", "greatly", "greyish", "greylag", "gristly", "grocery", "grommet", "grooved", "gryphon", "guarded", "guising", "gushing", "gymnast", "habitat", "hafnium", "halcyon", "halfway", "hallway", "halogen", "halting", "halyard", "handbag", "harbour", "harvest", "heading", "healthy", "hearing", "heating", "helical", "helpful", "helping", "herbage", "heroics", "hexagon", "history", "hitcher", "holdall", "holiday", "holmium", "hominid", "homonym", "honeyed", "hopeful", "horizon", "hotline", "hotness", "hulking", "hunched", "hundred", "hurdler", "hurried", "hydrous", "hygiene", "idyllic", "igneous", "immense", "imprint", "inbuilt", "inexact", "infuser", "ingrown", "initial", "initial", "inkling", "inshore", "instant", "instant", "intense", "interim", "interim", "invader", "inverse", "isohyet", "isthmus", "italics", "jackpot", "jasmine", "jocular", "journal", "journey", "jubilee", "justice", "kenning", "kestrel", "keynote", "kindred", "kindred", "kinetic", "kingdom", "kinsman", "kitchen", "knowing", "knuckle", "knurled", "laconic", "lacquer", "lactose", "lagging", "lambent", "lantern", "largish", "lasting", "lateral", "lattice", "lawsuit", "layette", "leading", "leaflet", "learned", "learner", "leather", "lectern", "legible", "leisure", "lengthy", "lenient", "leonine", "leopard", "lettuce", "lexical", "liberty", "library", "lilting", "lineage", "linkage", "linkman", "lioness", "literal", "lithium", "logging", "logical", "longish", "lottery", "louvred", "lovable", "lowland", "luggage", "lyrical", "machine", "maestro", "magenta", "magenta", "magical", "magnate", "majesty", "maltose", "mammoth", "mammoth", "manners", "mansard", "marbled", "marital", "marquee", "mascara", "massive", "matinee", "matting", "mattock", "maximal", "maximum", "mayoral", "meaning", "meaning", "medical", "meeting", "melodic", "mermaid", "message", "midland", "midweek", "million", "million", "mimetic", "mindful", "mineral", "mineral", "minimal", "minimum", "minster", "missile", "missing", "mission", "mistake", "mixture", "modular", "mollusc", "moneyed", "monitor", "monthly", "moonlit", "moorhen", "morello", "morning", "mottled", "mounted", "mourner", "movable", "muddler", "muffler", "mullion", "musical", "mustard", "mustard", "nankeen", "narwhal", "natural", "nebular", "needful", "neither", "netball", "netting", "network", "newness", "nightly", "nitrous", "nomadic", "nominal", "notable", "noughth", "nuclear", "nursery", "nursing", "nurture", "obesity", "oblique", "obscure", "obvious", "oceanic", "octagon", "octopus", "offbeat", "officer", "offline", "offside", "oilcake", "ominous", "onerous", "ongoing", "onshore", "opening", "opinion", "optimal", "optimum", "opulent", "orbital", "orchard", "ordered", "orderly", "ordinal", "ordinal", "organic", "osmosis", "osmotic", "outdoor", "outline", "outside", "outside", "outsize", "outward", "overall", "overarm", "overlay", "package", "padlock", "pageant", "painter", "paisley", "palaver", "palette", "palmate", "palmtop", "panicle", "paragon", "parking", "parlous", "partial", "passage", "passing", "passive", "pastime", "pasture", "patient", "patient", "pattern", "payable", "peacock", "peckish", "pelagic", "pelisse", "penalty", "pendent", "pending", "penguin", "pension", "peppery", "perfect", "perfume", "persona", "phantom", "philtre", "phonics", "picture", "piebald", "pillbox", "pinched", "pinkish", "piquant", "pitcher", "pitfall", "pivotal", "plaster", "plastic", "plastic", "platoon", "playful", "pleased", "pleated", "plenary", "pliable", "plumber", "plunger", "podcast", "poetess", "pointed", "polemic", "politic", "popcorn", "popular", "portion", "postage", "postbox", "postern", "postman", "potable", "pottage", "pottery", "powdery", "powered", "praline", "prattle", "precise", "prefect", "premier", "present", "present", "prickle", "primary", "process", "product", "profuse", "program", "project", "pronged", "pronoun", "propane", "protean", "protein", "proverb", "proviso", "prudent", "psychic", "puckish", "pumpkin", "purpose", "puzzler", "pyjamas", "pyramid", "pyrites", "quality", "quantum", "quarter", "quavery", "queenly", "quinine", "quorate", "rabbity", "rackety", "radiant", "radical", "raffish", "rafting", "railing", "railman", "railway", "rainbow", "rambler", "ramekin", "rampant", "rarebit", "ratable", "raucous", "rawhide", "readies", "recital", "recount", "recruit", "redhead", "redwing", "referee", "refined", "regards", "regatta", "regency", "regnant", "regular", "related", "relaxed", "reliant", "remorse", "removed", "replete", "reproof", "reptile", "reputed", "respect", "restful", "restive", "rethink", "retired", "retread", "revelry", "revenge", "reverse", "rhombus", "rickety", "rimless", "ringing", "riotous", "riviera", "roaring", "robotic", "rolling", "roseate", "rounded", "rounder", "routine", "routine", "ruffled", "ruinous", "runaway", "rundown", "running", "saddler", "sailing", "salient", "salvage", "sampler", "sapient", "sardine", "saurian", "sausage", "savings", "savoury", "scarlet", "scenery", "scented", "science", "scrappy", "scratch", "scrawny", "screech", "scribal", "sealant", "searing", "seasick", "seaside", "seaward", "seaweed", "section", "secular", "seedbed", "seeming", "segment", "seismic", "sensory", "sensual", "serious", "serried", "servant", "several", "shadowy", "shapely", "shelter", "sheriff", "shivery", "shocker", "showery", "showing", "shrubby", "shudder", "shutter", "sickbay", "sidecar", "sighted", "sightly", "signing", "silvery", "similar", "sincere", "sinless", "sinuous", "sixfold", "sketchy", "skilful", "skilled", "skimmed", "skyline", "skyward", "slatted", "sleeved", "slipper", "slotted", "slowish", "slurred", "sniffle", "sniffly", "snuffly", "snuggly", "society", "soldier", "soluble", "someone", "soprano", "sorghum", "soulful", "spangle", "spangly", "spaniel", "spanner", "sparing", "sparkly", "sparrow", "spartan", "spatial", "speaker", "special", "speckle", "spidery", "spindly", "splashy", "splotch", "spotted", "springy", "spurred", "squally", "squashy", "squidgy", "squiffy", "squishy", "stadium", "standby", "standby", "stapler", "starchy", "starlit", "stately", "station", "stature", "staunch", "stealth", "stellar", "sticker", "stilted", "stoical", "strange", "stratum", "streaky", "stretch", "striker", "strings", "stringy", "striped", "stubbly", "student", "studied", "stylish", "styptic", "subject", "subject", "sublime", "success", "suiting", "sultana", "summary", "summary", "summery", "sunburn", "sundial", "sundown", "sunfish", "sunless", "sunrise", "sunroof", "support", "supreme", "surface", "surface", "surfeit", "surgery", "surmise", "surname", "surplus", "surreal", "swarthy", "swearer", "sweater", "swollen", "synapse", "synonym", "tabular", "tactful", "tactile", "tadpole", "tallish", "tangram", "tantrum", "taxable", "teacher", "telling", "tenable", "tenfold", "tensile", "ternary", "terrace", "terrain", "terrine", "testate", "textile", "textual", "texture", "theatre", "thistle", "thought", "thrifty", "through", "thrower", "thunder", "tideway", "timpani", "titanic", "titular", "toaster", "toccata", "tombola", "tonight", "toothed", "topical", "topmost", "topsoil", "torment", "tornado", "touched", "tourism", "tourist", "tracing", "tracker", "tractor", "trailer", "trainer", "trapeze", "treacly", "tremolo", "triable", "triadic", "tribune", "trickle", "trochee", "trolley", "trophic", "tropism", "trouble", "trouper", "trumpet", "tsunami", "tubular", "tumbler", "tunable", "tuneful", "twelfth", "twiddly", "twilled", "twitchy", "twofold", "typical", "umpteen", "unaided", "unarmed", "unasked", "unaware", "unbound", "unbowed", "uncanny", "undying", "unequal", "unheard", "unicorn", "unifier", "uniform", "uniform", "unitary", "unladen", "unlined", "unmoved", "unnamed", "unpaved", "unready", "untried", "unusual", "unwaged", "upfront", "upright", "upriver", "upstage", "upstate", "upswept", "useable", "utility", "utility", "valiant", "vanilla", "variant", "variety", "various", "vaulted", "vehicle", "velvety", "venison", "verbena", "verbose", "verdant", "verdict", "verdure", "vernier", "version", "vesicle", "vibrant", "victory", "vinegar", "vintage", "vintner", "virtual", "visible", "visitor", "vitamin", "vlogger", "volcano", "voltaic", "voluble", "voucher", "vulpine", "waggish", "wagtail", "wakeful", "walkout", "wallaby", "wanting", "warmish", "warrant", "washing", "waverer", "waxwing", "waxwork", "wayward", "wealthy", "wearing", "weather", "weather", "webbing", "website", "weighty", "welcome", "welcome", "western", "wetsuit", "wheaten", "wheelie", "whisker", "widower", "wildcat", "willing", "willowy", "winning", "winsome", "wishful", "wistful", "witness", "woollen", "working", "working", "worldly", "worsted", "wriggly", "wrinkle", "writing", "wrought", "zealous", "zestful" };
-		
+
 		std::map<int, std::vector<std::string>> mapper;
 		mapper[3] = threeLetters; mapper[4] = fourLetters; mapper[5] = fiveLetters; mapper[6] = sixLetters; mapper[7] = sevenLetters;
 		int rand1 = randi(3, 7);
@@ -596,8 +596,8 @@ const char* TranslateTaskTypes(TaskTypes__Enum taskType) {
 		"Buy Beverage", "Process Data", "Run Diagnostics", "Water Plants", "Monitor Oxygen", "Store Artifacts", "Fill Canisters", "Activate Weather Nodes", "Insert Keys",
 		"Reset Seismic Stabilizers", "Scan Boarding Pass", "Open Waterways", "Replace Water Jug", "Repair Drill", "Align Telescope", "Record Temperature", "Reboot Wifi",
 		"Polish Ruby", "Reset Breakers", "Decontaminate", "Make Burger", "Unlock Safe", "Sort Records", "Put Away Pistols", "Fix Shower", "Clean Toilet", "Dress Mannequin",
-		"Pick Up Towels", "Rewind Tapes", "Start Fans", "Develop Photos", "Get Biggol Sword", "Put Away Rifles", "Stop Charles", "Clean Vent", "None", "Build Sandcastle", 
-		"Cook Fish", "Collect Shells", "Lift Weights", "Roast Marshmallow", "Throw Frisbee", "Collect Samples", "Prep Vegetables", "Hoist Supplies", "Mine Ores", "Polish Gem", "Replace Parts", "Help Critter", 
+		"Pick Up Towels", "Rewind Tapes", "Start Fans", "Develop Photos", "Get Biggol Sword", "Put Away Rifles", "Stop Charles", "Clean Vent", "None", "Build Sandcastle",
+		"Cook Fish", "Collect Shells", "Lift Weights", "Roast Marshmallow", "Throw Frisbee", "Collect Samples", "Prep Vegetables", "Hoist Supplies", "Mine Ores", "Polish Gem", "Replace Parts", "Help Critter",
 		"Crank Generator", "Fix Antenna", "Find Signal", "Activate Mushroom Mixup", "Extract Fuel", "Monitor Mushroom", "Play Video Game" };
 	return TASK_TRANSLATIONS.at(static_cast<size_t>(taskType));
 }
@@ -642,7 +642,7 @@ SystemTypes__Enum GetSystemTypes(const Vector2& vector) {
 	if (*Game::pShipStatus) {
 		auto shipStatus = *Game::pShipStatus;
 		for (auto room : il2cpp::Array(shipStatus->fields._AllRooms_k__BackingField))
-			if (room->fields.roomArea != nullptr && app::Collider2D_OverlapPoint(room->fields.roomArea, vector, NULL)) 
+			if (room->fields.roomArea != nullptr && app::Collider2D_OverlapPoint(room->fields.roomArea, vector, NULL))
 				return room->fields.RoomId;
 	}
 	return State.mapType == Settings::MapType::Fungle ? SystemTypes__Enum::Beach : SystemTypes__Enum::Outside;
@@ -803,20 +803,20 @@ void ImpersonateName(__maybenull NetworkedPlayerInfo* data)
 	for (auto p : GetAllPlayerData()) allNames.push_back(convert_from_string(NetworkedPlayerInfo_get_PlayerName(p, nullptr)));
 	std::sort(allNames.begin(), allNames.end(), compareStrings);
 	for (std::string n : allNames) {
-		if (n == playerName + (std::string("­") * size_t(fillers))) fillers++;
+		if (n == playerName + (std::string("") * size_t(fillers))) fillers++;
 	}
 
 	if (IsHost() || !State.SafeMode) {
 		if (IsInGame())
-			State.rpcQueue.push(new RpcSetName(playerName + (std::string("­") * size_t(fillers))));
+			State.rpcQueue.push(new RpcSetName(playerName + (std::string("") * size_t(fillers))));
 		else if (IsInLobby())
-			State.lobbyRpcQueue.push(new RpcSetName(playerName + (std::string("­") * size_t(fillers))));
+			State.lobbyRpcQueue.push(new RpcSetName(playerName + (std::string("") * size_t(fillers))));
 	}
 	else if (IsNameValid(playerName) && playerName.length() <= size_t(12 - fillers)) {
 		if (IsInGame())
-			State.rpcQueue.push(new RpcSetName(playerName + "­"));
+			State.rpcQueue.push(new RpcSetName(playerName + ""));
 		else if (IsInLobby())
-			State.lobbyRpcQueue.push(new RpcSetName(playerName + "­"));
+			State.lobbyRpcQueue.push(new RpcSetName(playerName + ""));
 	}
 	else {
 		if (IsInGame())
@@ -829,7 +829,7 @@ void ImpersonateName(__maybenull NetworkedPlayerInfo* data)
 void ImpersonateOutfit(NetworkedPlayerInfo_PlayerOutfit* outfit)
 {
 	if (!(IsInGame() || IsInLobby() || outfit)) return;
-	
+
 	if (IsInGame()) {
 		State.rpcQueue.push(new RpcSetColor((IsHost() || !State.SafeMode) ? outfit->fields.ColorId : GetRandomColorId(), (IsHost() || !State.SafeMode)));
 		State.rpcQueue.push(new RpcSetHat(outfit->fields.HatId));
@@ -967,7 +967,7 @@ void SaveOriginalAppearance()
 	State.originalPet = outfit->fields.PetId;
 	State.originalColor = outfit->fields.ColorId;
 	State.activeImpersonation = false;
-	State.originalVisor = outfit->fields.VisorId; 
+	State.originalVisor = outfit->fields.VisorId;
 	State.originalNamePlate = outfit->fields.NamePlateId;
 }
 
@@ -1195,30 +1195,30 @@ std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = fals
 
 	switch (roleBehaviour->fields.Role)
 	{
-		case RoleTypes__Enum::Engineer:
-			return (abbreviated ? "Eng" : "Engineer");
-		case RoleTypes__Enum::GuardianAngel:
-			return (abbreviated ? "GA" : "Guardian Angel");
-		case RoleTypes__Enum::Impostor:
-			return (abbreviated ? "Imp" : "Impostor");
-		case RoleTypes__Enum::Scientist:
-			return (abbreviated ? "Sci" : "Scientist");
-		case RoleTypes__Enum::Shapeshifter:
-			return (abbreviated ? "SS" : "Shapeshifter");
-		case RoleTypes__Enum::Crewmate:
-			return (abbreviated ? "Crew" : "Crewmate");
-		case RoleTypes__Enum::CrewmateGhost:
-			return (abbreviated ? "CG" : "Crewmate Ghost");
-		case RoleTypes__Enum::ImpostorGhost:
-			return (abbreviated ? "IG" : "Impostor Ghost");
-		case RoleTypes__Enum::Noisemaker:
-			return (abbreviated ? "NM" : "Noisemaker");
-		case RoleTypes__Enum::Tracker:
-			return (abbreviated ? "Tra" : "Tracker");
-		case RoleTypes__Enum::Phantom:
-			return (abbreviated ? "Ph" : "Phantom");
-		default:
-			return (abbreviated ? "Unk" : "Unknown");
+	case RoleTypes__Enum::Engineer:
+		return (abbreviated ? "Eng" : "Engineer");
+	case RoleTypes__Enum::GuardianAngel:
+		return (abbreviated ? "GA" : "Guardian Angel");
+	case RoleTypes__Enum::Impostor:
+		return (abbreviated ? "Imp" : "Impostor");
+	case RoleTypes__Enum::Scientist:
+		return (abbreviated ? "Sci" : "Scientist");
+	case RoleTypes__Enum::Shapeshifter:
+		return (abbreviated ? "SS" : "Shapeshifter");
+	case RoleTypes__Enum::Crewmate:
+		return (abbreviated ? "Crew" : "Crewmate");
+	case RoleTypes__Enum::CrewmateGhost:
+		return (abbreviated ? "CG" : "Crewmate Ghost");
+	case RoleTypes__Enum::ImpostorGhost:
+		return (abbreviated ? "IG" : "Impostor Ghost");
+	case RoleTypes__Enum::Noisemaker:
+		return (abbreviated ? "NM" : "Noisemaker");
+	case RoleTypes__Enum::Tracker:
+		return (abbreviated ? "Tra" : "Tracker");
+	case RoleTypes__Enum::Phantom:
+		return (abbreviated ? "Ph" : "Phantom");
+	default:
+		return (abbreviated ? "Unk" : "Unknown");
 	}
 }
 
@@ -1375,19 +1375,19 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 		closer += "</s>";
 	}
 
-	if (State.BoldName && (!State.ColoredName || State.RgbName)) {
+	if (State.BoldName) {
 		opener += "<b>";
 		closer += "</b>";
 	}
 
-	if (State.NobrName && (!State.ColoredName || State.RgbName)) {
+	if (State.NobrName) {
 		opener += "<nobr>";
 		closer += "</nobr>";
 	}
 
 	if (State.Font) {
 		switch (State.FontType) {
-		case 0:{
+		case 0: {
 			opener += "<font=\"Barlow-Italic SDF\">";
 			break;
 		}
@@ -1540,7 +1540,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	if (pCtrl == *Game::pLocalPlayer) return; //avoid detecting yourself
 	auto pData = GetPlayerData(pCtrl);
 	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
-	
+
 	std::string fc = convert_from_string(pData->fields.FriendCode);
 	auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
 	if (fc != "" && State.SMAC_IgnoreWhitelist && it != State.WhitelistFriendCodes.end()) return;
@@ -1549,7 +1549,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 		State.BlacklistFriendCodes.push_back(fc);
 	}
 	State.Save();
-	
+
 	std::string cheaterMessage = "Player " + name + " has done an unauthorized action: " + reason;
 	LOG_INFO(cheaterMessage);
 	if (IsHost()) {
@@ -1559,19 +1559,19 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 		case 1:
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
 			break;
-		/*case 2:
-			if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
-			else {
-				if (cheaterMessage.size() > 120) {
-					cheaterMessage = "<#f00>Failed to send message to all players because message is too long.</color>\n" + cheaterMessage;
-					ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
-				}
+			/*case 2:
+				if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
 				else {
-					while (State.ChatCooldown < 3.f) continue;
-					PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+					if (cheaterMessage.size() > 120) {
+						cheaterMessage = "<#f00>Failed to send message to all players because message is too long.</color>\n" + cheaterMessage;
+						ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+					}
+					else {
+						while (State.ChatCooldown < 3.f) continue;
+						PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+					}
 				}
-			}
-			break;*/
+				break;*/
 		case 2:
 		{
 			String* newName = convert_to_string(name + " has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
@@ -1595,29 +1595,29 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 		case 1:
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
 			break;
-		/*case 2:
-			if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
-			else {
-				if (cheaterMessage.size() > 120) {
-					cheaterMessage = "<#f00>Failed to send message to all players because message is too long.</color>\n" + cheaterMessage;
-					ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+			/*case 2:
+				if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+				else {
+					if (cheaterMessage.size() > 120) {
+						cheaterMessage = "<#f00>Failed to send message to all players because message is too long.</color>\n" + cheaterMessage;
+						ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+					}
+					else {
+						while (State.ChatCooldown < 3.f) continue;
+						PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+					}
+				}
+				break;
+			case 3:
+				if (State.SafeMode) {
+					//if (IsInGame()) State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, pCtrl, 200, true));
+					//else State.SMAC_AttemptBanLobby.push_back(pCtrl->fields.PlayerId);
 				}
 				else {
-					while (State.ChatCooldown < 3.f) continue;
-					PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
+					if (IsInGame()) State.rpcQueue.push(new RpcVoteKick(pCtrl, true));
+					else State.lobbyRpcQueue.push(new RpcVoteKick(pCtrl, true));
 				}
-			}
-			break;
-		case 3:
-			if (State.SafeMode) {
-				//if (IsInGame()) State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, pCtrl, 200, true));
-				//else State.SMAC_AttemptBanLobby.push_back(pCtrl->fields.PlayerId);
-			}
-			else {
-				if (IsInGame()) State.rpcQueue.push(new RpcVoteKick(pCtrl, true));
-				else State.lobbyRpcQueue.push(new RpcVoteKick(pCtrl, true));
-			}
-			break;*/
+				break;*/
 		}
 	}
 }
@@ -1761,7 +1761,7 @@ int32_t GameOptions::GetTotalTaskCount() const {
 
 RoleOptions GameOptions::GetRoleOptions() const {
 	auto& func = GET_VIRTUAL_INVOKE(_options, get_RoleOptions);
-	return RoleOptions(((app::IRoleOptionsCollection*(*)(void*, const void*))(func.methodPtr))(_options, func.method));
+	return RoleOptions(((app::IRoleOptionsCollection * (*)(void*, const void*))(func.methodPtr))(_options, func.method));
 }
 
 float GameOptions::GetPlayerSpeedMod() const {
