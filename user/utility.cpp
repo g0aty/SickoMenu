@@ -79,18 +79,22 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
 		if (this->ShapeshifterCount < 1)
 			return;
 		this->ShapeshifterCount--;
+		this->ImpostorCount--;
 	}
 	else if (role == RoleTypes__Enum::Phantom)
 	{
 		if (this->PhantomCount < 1)
 			return;
 		this->PhantomCount--;
+		this->ImpostorCount--;
 	}
 	else if (role == RoleTypes__Enum::Impostor)
 	{
 		if (this->ImpostorCount < 1)
 			return;
 		this->ImpostorCount--;
+		this->ShapeshifterCount--;
+		this->PhantomCount--;
 	}
 	else if (role == RoleTypes__Enum::Scientist)
 	{
