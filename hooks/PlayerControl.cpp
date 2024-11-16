@@ -156,7 +156,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 								if (IsInGame()) State.rpcQueue.push(new RpcForceName(p, customName));
 								if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(p, customName));
 							}
-							nameDelay = int(0.5 * GetFps()); //0.5 seconds
+							nameDelay = int(0.5 * GetFps()); 
 						}
 					}
 					else nameDelay--;
@@ -241,33 +241,67 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						break;
 					}
 				}
-				/*std::string rpcId = "Unknown";
-				if (client != NULL) {
-					auto rpc = client->fields.RPCData->fields.RPC;
-					if (client->fields.Character == *Game::pLocalPlayer && State.RPCSpoof) rpc = RPC__Enum(State.RPC);
-					switch (rpc) {
-					case RPC__Enum::SickoMenu:
-						platformId = "Epic Games";
-						break;
-					case Platforms__Enum::KillNetwork:
-						platformId = "Steam";
-						break;
-					case Platforms__Enum::AmongUsMenu:
-						platformId = "AmongUsMenu";
-						break;
-					case Platforms__Enum::BetterAmongUs:
-						platformId = "BetterAmongUs";
-						break;
-					}
-				}*/
-				std::string localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
+				std::string puid = convert_from_string(playerData->fields.Puid);
+				std::string localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> User";
 				if (State.ModDetection) {
-					if (State.SickoDetection) localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
-					if (State.AmongUsMenuDetection) localPlayerMod = "<#f55>AmongUsMenu</color>";
-					if (State.KillNetworkDetection) localPlayerMod = "<#f00>KillNetwork</color>";
+					if (State.SickoDetection) {
+						localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> User";
+
+						if (!puid.empty()) {
+							if (puid == "000000000000000000000000000000000") { // Main Sicko Developer
+								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#903>Developer</color>";
+							}
+							else if (puid == "0002d4d8fcb7455d89ea9731237ec9ff") { // Sicko Contributor [1]
+								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#3c9>Contributor</color>";
+							}
+							else if (puid == "000000000000000000000000000000002") { // Sicko Contributor [2]
+								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#3c9>Contributor</color>";
+							}
+							else if (puid == "000000000000000000000000000000003") { // Sicko Contributor [3]
+								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#3c9>Contributor</color>";
+							}
+							else if (puid == "000000000000000000000000000000004") { // Sicko Contributor [4]
+								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#3c9>Contributor</color>";
+							}
+						}
+					}
+
+					/*if (State.BetterAmongUsDetection) {
+						localPlayerMod = "<#5f5>BetterAmongUs </color>User";
+
+						if (!puid.empty()) {
+							if (puid == "000000008000000000000000000000005") { // Developer [BAU]
+								localPlayerMod = "<#5f5>BetterAmongUs Developer</color>";
+							}
+						}
+					}*/
+
+					if (State.AmongUsMenuDetection) {
+						localPlayerMod = "<#f55>AmongUsMenu </color>User";
+
+						if (!puid.empty()) {
+							if (puid == "000000000000000000000000000000006") { // AUM Contributor
+								localPlayerMod = "<#f55>AmongUsMenu</color> Contributor";
+							}
+						}
+					}
+
+					if (State.KillNetworkDetection) {
+						localPlayerMod = "<#f00>KillNetwork </color>User";
+
+						if (!puid.empty()) {
+							if (puid == "000000000000000000000000000000007") {
+								localPlayerMod = "<#f00>KillNetwork Leader</color>";
+							}
+							if (puid == "000000000000000000000000000000008") {
+								localPlayerMod = "<#f00>KillNetwork Contributor</color>";
+							}
+						}
+					}
 				}
+
 				std::string modUsage = (__this == *Game::pLocalPlayer && State.ModDetection) || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
-					std::format(" <#fb0>[{} User]</color>",
+					std::format(" <#fb0>[{}]</color>",
 						__this == *Game::pLocalPlayer ? localPlayerMod : State.modUsers.at(playerData->fields.PlayerId)) : "";
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				std::string listed = "";
@@ -292,6 +326,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>" + friendCode + "</color><#0000>0</color>";
 				}
 			}
+
 			if (IsInGame() && (State.RevealRoles || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
 			{
 				std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
