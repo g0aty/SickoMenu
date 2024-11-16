@@ -60,9 +60,7 @@ public:
     std::string StealedFC = "";
     std::string StealedPUID = "";
     bool SpoofPlatform = false;
-    bool RPCSpoof = false;
     int FakePlatform = 0;
-    int RPC = 0;
     bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
 
@@ -76,8 +74,8 @@ public:
     float PrevPlayerSpeed = 1.f;
     float PlayerSpeed = 1.f;
     bool MultiplySpeed = false;
-	float PrevKillCooldown = 30.f;
-	float KillCooldown = 30.f;
+    float PrevKillCooldown = 30.f;
+    float KillCooldown = 30.f;
     float PrevGACooldown = 60.f;
     float GACooldown = 60.f;
     float CycleTimer = 0.5f;
@@ -93,7 +91,6 @@ public:
     bool DisableVents = false;
     bool SpamReport = false;
     bool CrashSpamReport = false;
-    bool UltimateSpamReport = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
     bool DisableKills = false;
@@ -134,8 +131,8 @@ public:
     int PrevTaskBarUpdates = 0;
     int TaskBarUpdates = 0;
     bool ModifyTaskBarUpdates = false;
-	bool PrevVisualTasks = true;
-	bool VisualTasks = true;
+    bool PrevVisualTasks = true;
+    bool VisualTasks = true;
     bool PrevShowNames = false;
     bool ShowNames = false;
     bool Cycler = false;
@@ -154,6 +151,8 @@ public:
     bool RgbName = false;
     bool Font = false;
     int FontType = 0;
+    //bool Material = false;
+    //int MaterialType = 0;
     bool CustomRgbName = false;
     bool ResizeName = false;
     bool IndentName = false;
@@ -372,7 +371,7 @@ public:
     uint8_t ToDisableCallId = 0;
     uint8_t VoteKicks = 0;
 
-	bool OcclusionCulling = false;
+    bool OcclusionCulling = false;
     bool ShowUnityLogs = true;
     bool ShowHookLogs = false;
 
