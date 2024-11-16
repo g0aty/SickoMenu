@@ -158,7 +158,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 								if (IsInGame()) State.rpcQueue.push(new RpcForceName(p, customName));
 								if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(p, customName));
 							}
-							nameDelay = int(0.5 * GetFps()); //0.5 seconds
+							nameDelay = int(0.5 * GetFps()); 
 						}
 					}
 					else nameDelay--;
@@ -243,31 +243,13 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						break;
 					}
 				}
-				/*std::string rpcId = "Unknown";
-				if (client != NULL) {
-					auto rpc = client->fields.RPCData->fields.RPC;
-					if (client->fields.Character == *Game::pLocalPlayer && State.RPCSpoof) rpc = RPC__Enum(State.RPC);
-					switch (rpc) {
-					case RPC__Enum::SickoMenu:
-						platformId = "Epic Games";
-						break;
-					case Platforms__Enum::KillNetwork:
-						platformId = "Steam";
-						break;
-					case Platforms__Enum::AmongUsMenu:
-						platformId = "AmongUsMenu";
-						break;
-					case Platforms__Enum::BetterAmongUs:
-						platformId = "BetterAmongUs";
-						break;
-					}
-				}*/
 				std::string localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
 				if (State.ModDetection) {
 					if (State.SickoDetection) localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
 					if (State.AmongUsMenuDetection) localPlayerMod = "<#f55>AmongUsMenu</color>";
 					if (State.KillNetworkDetection) localPlayerMod = "<#f00>KillNetwork</color>";
 				}
+
 				std::string modUsage = (__this == *Game::pLocalPlayer && State.ModDetection) || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
 					std::format(" <#fb0>[{} User]</color>",
 						__this == *Game::pLocalPlayer ? localPlayerMod : State.modUsers.at(playerData->fields.PlayerId)) : "";
@@ -294,6 +276,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>" + friendCode + "</color><#0000>0</color>";
 				}
 			}
+
 			if (IsInGame() && (State.RevealRoles || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
 			{
 				std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);

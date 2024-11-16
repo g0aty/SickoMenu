@@ -480,15 +480,10 @@ namespace GameTab {
         if (openDestruct) {
             if (!IsInLobby() && !IsInGame()) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Only available in game/lobby!"));
 
-            if (IsInLobby() && ToggleButton("Crash Server", &State.CrashSpamReport)) {
-                State.Save();
+            if ((IsInLobby() || IsInGame()) && ToggleButton(IsInLobby() ? "Crash Server" : "Attempt to Crash", &State.CrashSpamReport)) {
+                if (IsInGame()) State.Save();
             }
-            if (IsInLobby()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Server crashes after starting a game-match!"));
-            ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
-            if (IsInGame() && ToggleButton("Attempt to Crash", &State.UltimateSpamReport)) {
-                State.Save();
-            }
-            if (IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Alternate Crash Server!\nMay cause game crashing!\nMay work with delay!"));
+            if (IsInLobby() || IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("The server should fail after enabling this feature"));
             ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
         }
 
