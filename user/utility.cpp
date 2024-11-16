@@ -45,59 +45,32 @@ RoleRates::RoleRates(const class GameOptions& gameOptions, int playerAmount) {
 #undef GET_ROLE_RATE
 }
 
-void RoleRates::SubtractRole(RoleTypes__Enum role) {
-	if (role == RoleTypes__Enum::Shapeshifter)
-	{
-		if (this->ShapeshifterCount < 1)
-			return;
-		this->ShapeshifterCount--;
-		this->ImpostorCount--;
+int RoleRates::GetRoleCount(RoleTypes__Enum role) {
+	switch (role) {
+	case RoleTypes__Enum::Shapeshifter:
+		return this->ShapeshifterCount;
+	case RoleTypes__Enum::Phantom:
+		return this->PhantomCount;
+	case RoleTypes__Enum::Impostor:
+		return this->ImpostorCount;
+	case RoleTypes__Enum::Scientist:
+		return this->ScientistCount;
+	case RoleTypes__Enum::Engineer:
+		return this->EngineerCount;
+	case RoleTypes__Enum::Tracker:
+		return this->TrackerCount;
+	case RoleTypes__Enum::Noisemaker:
+		return this->NoisemakerCount;
+	case RoleTypes__Enum::GuardianAngel:
+		return this->GuardianAngelCount;
+	case RoleTypes__Enum::Crewmate:
+		return this->MaxCrewmates;
+	default:
+/*#ifdef _DEBUG
+		assert(false);
+#endif*/
+		return 0;
 	}
-	else if (role == RoleTypes__Enum::Phantom)
-	{
-		if (this->PhantomCount < 1)
-			return;
-		this->PhantomCount--;
-		this->ImpostorCount--;
-	}
-	else if (role == RoleTypes__Enum::Impostor)
-	{
-		if (this->ImpostorCount < 1)
-			return;
-		this->ImpostorCount--;
-		this->ShapeshifterCount--;
-		this->PhantomCount--;
-	}
-	else if (role == RoleTypes__Enum::Scientist)
-	{
-		if (this->ScientistCount < 1)
-			return;
-		this->ScientistCount--;
-	}
-	else if (role == RoleTypes__Enum::Engineer)
-	{
-		if (this->EngineerCount < 1)
-			return;
-		this->EngineerCount--;
-	}
-	else if (role == RoleTypes__Enum::Tracker)
-	{
-		if (this->TrackerCount < 1)
-			return;
-		this->TrackerCount--;
-	}
-	else if (role == RoleTypes__Enum::Noisemaker)
-	{
-		if (this->NoisemakerCount < 1)
-			return;
-		this->NoisemakerCount--;
-	}
-	/*else if (role == RoleTypes__Enum::GuardianAngel)
-	{
-		if (this->GuardianAngelCount < 1)
-			return;
-		this->GuardianAngelCount--;
-	}*/ //why does this even exist
 }
 
 void RoleRates::SubtractRole(RoleTypes__Enum role) {
