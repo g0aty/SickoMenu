@@ -241,63 +241,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						break;
 					}
 				}
-				std::string puid = convert_from_string(playerData->fields.Puid);
-				std::string localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> User";
+				std::string localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
 				if (State.ModDetection) {
-					if (State.SickoDetection) {
-						localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> User";
-
-						if (!puid.empty()) {
-							if (puid == "000000000000000000000000000000000") { // Main Sicko Developer
-								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#903>Developer</color>";
-							}
-							else if (puid == "0002d4d8fcb7455d89ea9731237ec9ff") { // Sicko Contributor [1]
-								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#3c9>Contributor</color>";
-							}
-							else if (puid == "000000000000000000000000000000002") { // Sicko Contributor [2]
-								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#3c9>Contributor</color>";
-							}
-							else if (puid == "000000000000000000000000000000003") { // Sicko Contributor [3]
-								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#3c9>Contributor</color>";
-							}
-							else if (puid == "000000000000000000000000000000004") { // Sicko Contributor [4]
-								localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color> <#3c9>Contributor</color>";
-							}
-						}
-					}
-
-					/*if (State.BetterAmongUsDetection) {
-						localPlayerMod = "<#5f5>BetterAmongUs </color>User";
-
-						if (!puid.empty()) {
-							if (puid == "000000008000000000000000000000005") { // Developer [BAU]
-								localPlayerMod = "<#5f5>BetterAmongUs Developer</color>";
-							}
-						}
-					}*/
-
-					if (State.AmongUsMenuDetection) {
-						localPlayerMod = "<#f55>AmongUsMenu </color>User";
-
-						if (!puid.empty()) {
-							if (puid == "000000000000000000000000000000006") { // AUM Contributor
-								localPlayerMod = "<#f55>AmongUsMenu</color> Contributor";
-							}
-						}
-					}
-
-					if (State.KillNetworkDetection) {
-						localPlayerMod = "<#f00>KillNetwork </color>User";
-
-						if (!puid.empty()) {
-							if (puid == "000000000000000000000000000000007") {
-								localPlayerMod = "<#f00>KillNetwork Leader</color>";
-							}
-							if (puid == "000000000000000000000000000000008") {
-								localPlayerMod = "<#f00>KillNetwork Contributor</color>";
-							}
-						}
-					}
+					if (State.SickoDetection) localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
+					if (State.AmongUsMenuDetection) localPlayerMod = "<#f55>AmongUsMenu</color>";
+					if (State.KillNetworkDetection) localPlayerMod = "<#f00>KillNetwork</color>";
 				}
 
 				std::string modUsage = (__this == *Game::pLocalPlayer && State.ModDetection) || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
