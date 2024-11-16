@@ -41,7 +41,7 @@ namespace SelfTab {
         }
 
         if (openVisuals) {
-            ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             if (ToggleButton("Max Vision", &State.MaxVision)) {
                 State.Save();
             }
@@ -79,7 +79,7 @@ namespace SelfTab {
             if (ToggleButton("Allow Ctrl+(C/V) in Chat", &State.ChatPaste)) { //add copying later
                 State.Save();
             }
-            
+
             if (ToggleButton("Read Messages by Ghosts", &State.ReadGhostMessages)) {
                 State.Save();
             }
@@ -172,6 +172,16 @@ namespace SelfTab {
                 ImGui::Dummy(ImVec2(-5, -5) * State.dpiScale);
                 if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: The white nickname will not be visible in the chat"));
 
+                ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
+
+                /*if (ToggleButton("Material", &State.Material)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (CustomListBoxInt(" Some materials are not supported", &State.MaterialType, MATERIALS, 160.f * State.dpiScale)) {
+                    State.Save();
+                }*/
+
                 ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
                 if (ToggleButton("Size", &State.ResizeName)) {
                     State.Save();
@@ -231,7 +241,7 @@ namespace SelfTab {
                 if (ImGui::InputFloat("Name Rotate", &State.NameRotate)) {
                     State.Save();
                 }
-                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
             }
 
             if (ToggleButton("Reveal Roles", &State.RevealRoles)) {
@@ -247,7 +257,7 @@ namespace SelfTab {
             {
                 State.Save();
             }
-            
+
             if (ToggleButton("Show Player Info in Lobby", &State.ShowPlayerInfo))
             {
                 State.Save();
@@ -344,7 +354,7 @@ namespace SelfTab {
             if (ToggleButton("Always Move", &State.AlwaysMove)) {
                 State.Save();
             }
-            
+
             if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) {
                 State.Save();
             }
@@ -356,7 +366,7 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
-            
+
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
             }
@@ -699,7 +709,7 @@ namespace SelfTab {
                         queue->push(new RpcForceNamePlate(player, convert_to_string(availableNamePlates[randi(0, availableNamePlates.size() - 1)])));
                     }
                 }
-                
+
                 ImGui::Text("Confuse when:");
                 if (ToggleButton("Joining Lobby", &State.confuseOnJoin)) {
                     State.Save();
