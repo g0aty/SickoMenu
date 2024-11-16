@@ -1471,43 +1471,62 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 			opener += "<font=\"DIN_Pro_Bold_700 SDF\">";
 			break;
 		}
+			   closer += "</font>";
 		}
-		closer += "</font>";
 	}
 
-	if (State.ResizeName) {
-		opener += std::format("<size={}%>", State.NameSize * 100);
-		closer += "</size>";
-	}
+		/*if (State.Material) {
+			switch (State.MaterialType) {
+			case 0: {
+				opener += "<material=\"Barlow-Italic SDF Outline\">";
+				break;
+			}
+			case 1: {
+				opener += "<material=\"Barlow-BoldItalic SDF Outline\">";
+				break;
+			}
+			case 2: {
+				opener += "<material=\"Barlow-SemiBold SDF Outline\">";
+				break;
+			}
+				  closer += "</material>";
+			}
+		}*/
 
-	if (State.IndentName) {
-		opener += std::format("<line-indent={}>", State.NameIndent * 1);
-		closer += "</line-indent>";
-	}
+			if (State.ResizeName) {
+				opener += std::format("<size={}%>", State.NameSize * 100);
+				closer += "</size>";
+			}
 
-	if (State.CspaceName) {
-		opener += std::format("<cspace={}>", State.NameCspace * 1);
-		closer += "</cspace>";
-	}
+			if (State.IndentName) {
+				opener += std::format("<line-indent={}>", State.NameIndent * 1);
+				closer += "</line-indent>";
+			}
 
-	if (State.MspaceName) {
-		opener += std::format("<mspace={}>", State.NameMspace * 1);
-		closer += "</mspace>";
-	}
+			if (State.CspaceName) {
+				opener += std::format("<cspace={}>", State.NameCspace * 1);
+				closer += "</cspace>";
+			}
 
-	if (State.VoffsetName) {
-		opener += std::format("<voffset={}>", State.NameVoffset * 1);
-		closer += "</voffset>";
-	}
+			if (State.MspaceName) {
+				opener += std::format("<mspace={}>", State.NameMspace * 1);
+				closer += "</mspace>";
+			}
 
-	if (State.RotateName) {
-		opener += std::format("<rotate={}>", State.NameRotate * 1);
-		closer += "<rotate=0>";
-	}
-	if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
+			if (State.VoffsetName) {
+				opener += std::format("<voffset={}>", State.NameVoffset * 1);
+				closer += "</voffset>";
+			}
 
-	return opener + name + closer;
-}
+			if (State.RotateName) {
+				opener += std::format("<rotate={}>", State.NameRotate * 1);
+				closer += "<rotate=0>";
+			}
+			if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
+
+			return opener + name + closer;
+		}
+
 
 std::vector<std::string> GetAllConfigs() {
 	std::vector<std::string> files;
