@@ -423,7 +423,6 @@ public:
     bool SickoDetection = true;
     bool AmongUsMenuDetection = false;
     bool KillNetworkDetection = false;
-    bool BetterAmongUsDetection = false;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
     bool TournamentMode = false;
@@ -489,7 +488,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.2+ [Fork]";
+    std::string SickoVersion = "v4.1.1_rc2";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
