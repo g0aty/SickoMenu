@@ -119,7 +119,6 @@ namespace DebugTab {
 		if (ImGui::CollapsingHeader("Experiments##debug")) {
 			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "These features are in development and can break at any time.");
 			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Use these at your own risk.");
-			if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
 			if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
 		}
 
