@@ -71,40 +71,42 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			assert(Object_1_IsNotNull((Object_1*)__this->fields.cosmetics));
 			auto nameTextTMP = __this->fields.cosmetics->fields.nameText;
 
-			if (State.SickoDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 420 call to detect usage
-				if (State.rpcCooldown == 0) {
-					//SickoMenu users can detect this rpc
-					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)420, (SendOption__Enum)1, NULL);
-					MessageWriter_EndMessage(writer, NULL);
-					State.rpcCooldown = 15;
+			if (State.ModDetection) {
+				if (State.SickoDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 420 call to detect usage
+					if (State.rpcCooldown == 0) {
+						//SickoMenu users can detect this rpc
+						MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)420, (SendOption__Enum)1, NULL);
+						MessageWriter_EndMessage(writer, NULL);
+						State.rpcCooldown = 15;
+					}
+					else {
+						State.rpcCooldown--;
+					}
 				}
-				else {
-					State.rpcCooldown--;
-				}
-			}
 
-			if (State.AmongUsMenuDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 42069 call to detect usage
-				if (State.rpcCooldown == 0) {
-					//AUM users can detect this rpc
-					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)42069, (SendOption__Enum)1, NULL);
-					MessageWriter_WriteByte(writer, __this->fields.PlayerId, NULL);
-					MessageWriter_EndMessage(writer, NULL);
-					State.rpcCooldown = 15;
+				if (State.AmongUsMenuDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 42069 call to detect usage
+					if (State.rpcCooldown == 0) {
+						//AUM users can detect this rpc
+						MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)42069, (SendOption__Enum)1, NULL);
+						MessageWriter_WriteByte(writer, __this->fields.PlayerId, NULL); //AUM specifically sends the player ID with the RPC
+						MessageWriter_EndMessage(writer, NULL);
+						State.rpcCooldown = 15;
+					}
+					else {
+						State.rpcCooldown--;
+					}
 				}
-				else {
-					State.rpcCooldown--;
-				}
-			}
 
-			if (State.KillNetworkDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 250 call to detect usage
-				if (State.rpcCooldown == 0) {
-					//KillNetMenu users can detect this rpc
-					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)250, (SendOption__Enum)1, NULL);
-					MessageWriter_EndMessage(writer, NULL);
-					State.rpcCooldown = 15;
-				}
-				else {
-					State.rpcCooldown--;
+				if (State.KillNetworkDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 250 call to detect usage
+					if (State.rpcCooldown == 0) {
+						//KillNetwork users can detect this rpc
+						MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)250, (SendOption__Enum)1, NULL);
+						MessageWriter_EndMessage(writer, NULL);
+						State.rpcCooldown = 15;
+					}
+					else {
+						State.rpcCooldown--;
+					}
 				}
 			}
 
