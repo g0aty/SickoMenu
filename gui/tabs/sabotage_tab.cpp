@@ -530,20 +530,6 @@ namespace SabotageTab {
                     }
                 }
             }
-            if (State.mapType == Settings::MapType::Ship ||
-                State.mapType == Settings::MapType::Hq ||
-                State.mapType == Settings::MapType::Pb) {
-                bool unfixCommsActiveLocal = unfixCommsActive.load();
-                if (ToggleButton("Disable Fix Comms", &unfixCommsActiveLocal)) {
-                    unfixCommsActive.store(unfixCommsActiveLocal);
-                    if (unfixCommsActive) {
-                        std::thread(UnfixCommsLoop).detach();
-                    }
-                    else {
-                        State.rpcQueue = std::queue<RPCInterface*>();
-                    }
-                }
-            }
             ImGui::EndChild();
         }
     }
