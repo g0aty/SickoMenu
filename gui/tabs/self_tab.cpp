@@ -161,8 +161,6 @@ namespace SelfTab {
                 }
 
                 ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
-                static int fonts = 0;
-                ImGui::Dummy(ImVec2(2, 2)* State.dpiScale);
 
                 if (ToggleButton("Font", &State.Font)) {
                     State.Save();
