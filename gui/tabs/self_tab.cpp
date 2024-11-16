@@ -160,6 +160,18 @@ namespace SelfTab {
                     State.Save();
                 }
 
+                ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
+
+                if (ToggleButton("Font", &State.Font)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (CustomListBoxInt(" ", &State.FontType, FONTS, 160.f * State.dpiScale)) {
+                    State.Save();
+                }
+                ImGui::Dummy(ImVec2(-5, -5) * State.dpiScale);
+                if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: The white nickname will not be visible in the chat"));
+
                 ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
                 if (ToggleButton("Size", &State.ResizeName)) {
                     State.Save();

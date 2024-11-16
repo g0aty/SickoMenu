@@ -152,6 +152,8 @@ public:
     bool ForceColorForEveryone = false;
     bool CustomName = false;
     bool RgbName = false;
+    bool Font = false;
+    int FontType = 0;
     bool CustomRgbName = false;
     bool ResizeName = false;
     bool IndentName = false;
@@ -466,7 +468,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.1.1_rc1";
+    std::string SickoVersion = "v4.1.1_rc2";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;

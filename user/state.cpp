@@ -176,6 +176,8 @@ void Settings::Load() {
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
+        JSON_TRYGET("Font", this->Font);
+        JSON_TRYGET("FontType", this->FontType);
         JSON_TRYGET("ResizeName", this->ResizeName);
         JSON_TRYGET("IndentName", this->IndentName);
         JSON_TRYGET("CspaceName", this->CspaceName);
@@ -462,6 +464,8 @@ void Settings::Save() {
                 { "ReadAndSendAumChat", this->ReadAndSendAumChat },
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
+                { "Font", this->Font },
+                { "FontType", this->FontType },
                 { "ResizeName", this->ResizeName },
                 { "IndentName", this->IndentName },
                 { "CspaceName", this->CspaceName },
