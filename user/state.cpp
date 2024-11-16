@@ -85,7 +85,6 @@ void Settings::Load() {
         JSON_TRYGET("GuestFriendCode", this->GuestFriendCode);
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
-        JSON_TRYGET("RPCSpoof", this->RPCSpoof);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
@@ -178,6 +177,8 @@ void Settings::Load() {
         JSON_TRYGET("RgbName", this->RgbName);
         JSON_TRYGET("Font", this->Font);
         JSON_TRYGET("FontType", this->FontType);
+        //JSON_TRYGET("Material", this->Material);
+        //JSON_TRYGET("MaterialType", this->MaterialType);
         JSON_TRYGET("ResizeName", this->ResizeName);
         JSON_TRYGET("IndentName", this->IndentName);
         JSON_TRYGET("CspaceName", this->CspaceName);
@@ -300,10 +301,11 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckBadWords", this->SMAC_CheckBadWords);
         JSON_TRYGET("SMAC_BadWords", this->SMAC_BadWords);
         JSON_TRYGET("ChatPresets", this->ChatPresets);
-        
+
         JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
-    } catch (...) {
+    }
+    catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
 
@@ -329,7 +331,7 @@ void Settings::Save() {
         catch (...) {
             //Log.Info("Unable to save sicko-selected-config.json");
         }
-        auto settingsPath = path.parent_path() / 
+        auto settingsPath = path.parent_path() /
             std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? this->selectedConfig : "default");
 
         try {
@@ -372,9 +374,7 @@ void Settings::Save() {
                 { "StealedFC", this->StealedFC },
                 { "StealedPUID", this->StealedPUID },
                 { "SpoofPlatform", this->SpoofPlatform },
-                { "RPCSpoof", this->RPCSpoof },
                 { "FakePlatform", this->FakePlatform },
-                { "RPC", this->RPC },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
                 //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
 
@@ -466,6 +466,8 @@ void Settings::Save() {
                 { "RgbName", this->RgbName },
                 { "Font", this->Font },
                 { "FontType", this->FontType },
+                //{ "Material", this->Material },
+                //{ "MaterialType", this->MaterialType },
                 { "ResizeName", this->ResizeName },
                 { "IndentName", this->IndentName },
                 { "CspaceName", this->CspaceName },
