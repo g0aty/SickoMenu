@@ -286,7 +286,6 @@ void Settings::Load() {
         JSON_TRYGET("SickoDetection", this->SickoDetection);
         JSON_TRYGET("AmongUsMenuDetection", this->AmongUsMenuDetection);
         JSON_TRYGET("KillNetworkDetection", this->KillNetworkDetection);
-        JSON_TRYGET("BetterAmongUsDetection", this->BetterAmongUsDetection);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
         JSON_TRYGET("SpectatorMode", this->SpectatorMode);
@@ -597,7 +596,6 @@ void Settings::Save() {
                 { "SickoDetection", this->SickoDetection },
                 { "AmongUsMenuDetection", this->AmongUsMenuDetection },
                 { "KillNetworkDetection", this->KillNetworkDetection },
-                { "BetterAmongUsDetection", this->BetterAmongUsDetection },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
                 { "SpectatorMode", this->SpectatorMode },
