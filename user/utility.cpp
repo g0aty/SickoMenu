@@ -894,14 +894,10 @@ std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2) {
 	std::string opener = "";
 	if (State.UnderlineName) opener += "<u>";
 	if (State.StrikethroughName) opener += "<s>";
-	if (State.BoldName) opener += "<b>";
-	if (State.NobrName) opener += "<nobr>";
 
 	std::string closer = "";
 	if (State.UnderlineName) closer += "</s>";
 	if (State.StrikethroughName) closer += "</u>";
-	if (State.BoldName) closer += "</b>";
-	if (State.NobrName) closer += "</nobr>";
 
 	if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
 		return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
@@ -1378,39 +1374,136 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 		opener += "<s>";
 		closer += "</s>";
 	}
+
 	if (State.BoldName && (!State.ColoredName || State.RgbName)) {
 		opener += "<b>";
 		closer += "</b>";
 	}
+
 	if (State.NobrName && (!State.ColoredName || State.RgbName)) {
 		opener += "<nobr>";
 		closer += "</nobr>";
 	}
+
+	if (State.Font) {
+		switch (State.FontType) {
+		case 0:{
+			opener += "<font=\"Barlow-Italic SDF\">";
+			break;
+		}
+		case 1: {
+			opener += "<font=\"Barlow-Medium SDF\">";
+			break;
+		}
+		case 2: {
+			opener += "<font=\"Barlow-Bold SDF\">";
+			break;
+		}
+		case 3: {
+			opener += "<font=\"Barlow-SemiBold SDF\">";
+			break;
+		}
+		case 4: {
+			opener += "<font=\"Barlow-SemiBold Masked\">";
+			break;
+		}
+		case 5: {
+			opener += "<font=\"Barlow-ExtraBold SDF\">";
+			break;
+		}
+		case 6: {
+			opener += "<font=\"Barlow-BoldItalic SDF\">";
+			break;
+		}
+		case 7: {
+			opener += "<font=\"Barlow-BoldItalic Masked\">";
+			break;
+		}
+		case 8: {
+			opener += "<font=\"Barlow-Black SDF\">";
+			break;
+		}
+		case 9: {
+			opener += "<font=\"Barlow-Light SDF\">";
+			break;
+		}
+		case 10: {
+			opener += "<font=\"Barlow-Regular SDF\">";
+			break;
+		}
+		case 11: {
+			opener += "<font=\"Barlow-Regular Masked\">";
+			break;
+		}
+		case 12: {
+			opener += "<font=\"Barlow-Regular Outline\">";
+			break;
+		}
+		case 13: {
+			opener += "<font=\"Brook SDF\">";
+			break;
+		}
+		case 14: {
+			opener += "<font=\"LiberationSans SDF\">";
+			break;
+		}
+		case 15: {
+			opener += "<font=\"NotoSansJP-Regular SDF\">";
+			break;
+		}
+		case 16: {
+			opener += "<font=\"VCR SDF\">";
+			break;
+		}
+		case 17: {
+			opener += "<font=\"CONSOLA SDF\">";
+			break;
+		}
+		case 18: {
+			opener += "<font=\"digital-7 SDF\">";
+			break;
+		}
+		case 19: {
+			opener += "<font=\"OCRAEXT SDF\">";
+			break;
+		}
+		case 20: {
+			opener += "<font=\"DIN_Pro_Bold_700 SDF\">";
+			break;
+		}
+		}
+		closer += "</font>";
+	}
+
 	if (State.ResizeName) {
 		opener += std::format("<size={}%>", State.NameSize * 100);
 		closer += "</size>";
 	}
+
 	if (State.IndentName) {
 		opener += std::format("<line-indent={}>", State.NameIndent * 1);
 		closer += "</line-indent>";
 	}
+
 	if (State.CspaceName) {
 		opener += std::format("<cspace={}>", State.NameCspace * 1);
 		closer += "</cspace>";
 	}
+
 	if (State.MspaceName) {
 		opener += std::format("<mspace={}>", State.NameMspace * 1);
 		closer += "</mspace>";
 	}
+
 	if (State.VoffsetName) {
 		opener += std::format("<voffset={}>", State.NameVoffset * 1);
 		closer += "</voffset>";
 	}
+
 	if (State.RotateName) {
 		opener += std::format("<rotate={}>", State.NameRotate * 1);
 		closer += "<rotate=0>";
 	}
-	
 	if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
 
 	return opener + name + closer;
