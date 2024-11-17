@@ -169,47 +169,23 @@ namespace HostTab {
 				if (IsInLobby() && State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
 					State.Save();
 
-				/*const int32_t currentMaxPlayers = options.GetMaxPlayers();
-				const int32_t minPlayers = 4;
-				const int32_t maxAllowedPlayers = int(Game::MAX_PLAYERS);
+				const int32_t currentMaxPlayers = options.GetMaxPlayers();
+				const int32_t minPlayers = 4, maxAllowedPlayers = static_cast<int32_t>(Game::MAX_PLAYERS);
+				int32_t newMaxPlayers = std::clamp(currentMaxPlayers, minPlayers, maxAllowedPlayers);
 
-				int32_t maxPlayers = std::clamp(currentMaxPlayers, minPlayers, maxAllowedPlayers);
-
-				if (IsInLobby()) {
-					bool isValidInput = true;
-					bool valueChanged = false;
-					int32_t previousMaxPlayers = currentMaxPlayers;
-
-					if (ImGui::InputInt("Max Players", &maxPlayers)) {
-						valueChanged = (maxPlayers != previousMaxPlayers);
-
-						if (maxPlayers < minPlayers || maxPlayers > maxAllowedPlayers) {
-							isValidInput = false;
-							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d.", minPlayers, maxAllowedPlayers);
+				if (!State.SafeMode && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers) && newMaxPlayers != currentMaxPlayers) {
+					if (newMaxPlayers >= minPlayers && newMaxPlayers <= maxAllowedPlayers) {
+						if (newMaxPlayers == 4 || newMaxPlayers == 511) {
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
 						}
+						GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, newMaxPlayers);
 					}
-
-					if (valueChanged && isValidInput) {
-						if (maxPlayers < 2) {
-							ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Warning: Playing with less than 2 players is not recommended.");
-						}
-
-						GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, maxPlayers);
+					else {
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
+						newMaxPlayers = currentMaxPlayers;
 					}
-					else if (valueChanged) {
-						maxPlayers = previousMaxPlayers;
-						ImGui::Text("Number of players must be between %d and %d.", minPlayers, maxAllowedPlayers);
-					}
-
-					if (maxPlayers != currentMaxPlayers) {
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Max Players has been changed.");
-					}
-
 					State.Save();
-
-					if (maxPlayers < minPlayers || maxPlayers > maxAllowedPlayers) {
-					}
-				}*/
+				}
 
 
 					/*if (IsInLobby() && ToggleButton("Flip Skeld", &State.FlipSkeld))
@@ -294,6 +270,8 @@ namespace HostTab {
 						}
 					}
 				}
+
+				if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
 
 				CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
 
