@@ -271,8 +271,6 @@ namespace HostTab {
 					}
 				}
 
-				if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
-
 				CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
 
 				if (ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
