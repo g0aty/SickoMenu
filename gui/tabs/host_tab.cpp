@@ -169,10 +169,48 @@ namespace HostTab {
 				if (IsInLobby() && State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
 					State.Save();
 
-				/*int32_t maxPlayers = options.GetMaxPlayers();
-				maxPlayers = std::clamp(maxPlayers, 0, int(Game::MAX_PLAYERS));
-				if (IsInLobby() && ImGui::InputInt("Max Players", &maxPlayers))
-					GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, maxPlayers);*/ //support for more than 15 players
+				/*const int32_t currentMaxPlayers = options.GetMaxPlayers();
+				const int32_t minPlayers = 4;
+				const int32_t maxAllowedPlayers = int(Game::MAX_PLAYERS);
+
+				int32_t maxPlayers = std::clamp(currentMaxPlayers, minPlayers, maxAllowedPlayers);
+
+				if (IsInLobby()) {
+					bool isValidInput = true;
+					bool valueChanged = false;
+					int32_t previousMaxPlayers = currentMaxPlayers;
+
+					if (ImGui::InputInt("Max Players", &maxPlayers)) {
+						valueChanged = (maxPlayers != previousMaxPlayers);
+
+						if (maxPlayers < minPlayers || maxPlayers > maxAllowedPlayers) {
+							isValidInput = false;
+							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d.", minPlayers, maxAllowedPlayers);
+						}
+					}
+
+					if (valueChanged && isValidInput) {
+						if (maxPlayers < 2) {
+							ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Warning: Playing with less than 2 players is not recommended.");
+						}
+
+						GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, maxPlayers);
+					}
+					else if (valueChanged) {
+						maxPlayers = previousMaxPlayers;
+						ImGui::Text("Number of players must be between %d and %d.", minPlayers, maxAllowedPlayers);
+					}
+
+					if (maxPlayers != currentMaxPlayers) {
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Max Players has been changed.");
+					}
+
+					State.Save();
+
+					if (maxPlayers < minPlayers || maxPlayers > maxAllowedPlayers) {
+					}
+				}*/
+
 
 					/*if (IsInLobby() && ToggleButton("Flip Skeld", &State.FlipSkeld))
 						State.Save();*/ //to be fixed later
