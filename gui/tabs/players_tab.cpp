@@ -371,19 +371,21 @@ namespace PlayersTab {
 					}
 				}
 
-				if (!State.SafeMode || (IsHost() && IsInGame() && ImGui::Button("Shield Destruction"))) {
-					if (IsInGame()) {
-						auto& rpcQueue = IsInGame() ? State.rpcQueue : State.lobbyRpcQueue;
+				if (!selectedPlayer.is_LocalPlayer() || selectedPlayers.size() != 1) {
+					if (!State.SafeMode || (IsHost() && IsInGame() && ImGui::Button("Shield Destruction"))) {
+						if (IsInGame()) {
+							auto& rpcQueue = IsInGame() ? State.rpcQueue : State.lobbyRpcQueue;
 
-						for (PlayerSelection p : selectedPlayers) {
-							auto validPlayer = p.validate();
-							auto* outfit = GetPlayerOutfit(validPlayer.get_PlayerData());
-							auto colorId = outfit->fields.ColorId;
+							for (PlayerSelection p : selectedPlayers) {
+								auto validPlayer = p.validate();
+								auto* outfit = GetPlayerOutfit(validPlayer.get_PlayerData());
+								auto colorId = outfit->fields.ColorId;
 
-							rpcQueue.push(new RpcProtectPlayer(*Game::pLocalPlayer, validPlayer, colorId));
+								rpcQueue.push(new RpcProtectPlayer(*Game::pLocalPlayer, validPlayer, colorId));
 
-							bool canBeKilled = validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt;
-							rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), canBeKilled));
+								bool canBeKilled = validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt;
+								rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), canBeKilled));
+							}
 						}
 					}
 				}
