@@ -135,6 +135,25 @@ String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {
 	return EOSManager_get_ProductUserId(__this, method);
 }
 
+
+//Encrypted PUID Spoofing code [Undetectable]
+
+/*static void f1(const char* c1) {
+	if (a2.b2) {
+		int c2 = (c1[0] != 0) ? 1 : 0;
+		LOG_DEBUG("Vtpnq1");
+	}
+}
+
+static String* f2() {
+	if (a2.c3 && !a2.d4.empty()) {
+		int c3 = a2.d4.size();
+		String* c4 = f3(a2.d4);
+		return c4;
+	}
+	return nullptr;
+}*/
+
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlatformSpecificData_Serialize executed");
 	if (State.SpoofPlatform) __this->fields.Platform = Platforms__Enum(State.FakePlatform + 1);
