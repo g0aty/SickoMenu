@@ -372,7 +372,7 @@ namespace PlayersTab {
 				}
 
 				if (!State.SafeMode || (IsHost() && IsInGame() && ImGui::Button("Shield Destruction"))) {
-					if (IsInGame() || IsInLobby()) {
+					if (IsInGame()) {
 						auto& rpcQueue = IsInGame() ? State.rpcQueue : State.lobbyRpcQueue;
 
 						for (PlayerSelection p : selectedPlayers) {
