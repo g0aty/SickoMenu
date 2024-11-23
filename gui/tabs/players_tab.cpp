@@ -258,24 +258,6 @@ namespace PlayersTab {
 			if (State.DisableMeetings && IsHost())
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Meetings have been disabled.");
 			GameOptions options;
-			
-			if (!State.selectedPlayers.empty()) {
-				if (ImGui::Button("Select Everyone")) {
-					auto allPlayers = GetAllPlayerControl();
-
-					if (State.selectedPlayers.size() == allPlayers.size()) {
-						State.selectedPlayers.clear();
-					}
-					else {
-						State.selectedPlayers.clear();
-						for (auto p : allPlayers) {
-							State.selectedPlayers.push_back(p->fields.PlayerId);
-						}
-					}
-				}
-			}
-
-			
 			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings || !IsHost())) { //Player selection doesn't matter
 				if (!State.InMeeting) {
 					if (ImGui::Button("Call Meeting")) {
