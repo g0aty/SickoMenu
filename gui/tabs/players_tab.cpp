@@ -260,7 +260,7 @@ namespace PlayersTab {
 			GameOptions options;
 			
 			if (!State.selectedPlayers.empty()) {
-				if (ImGui::Button("Select All Players")) {
+				if (ImGui::Button("Select Everyone")) {
 					auto allPlayers = GetAllPlayerControl();
 
 					if (State.selectedPlayers.size() == allPlayers.size()) {
