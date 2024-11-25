@@ -71,32 +71,36 @@ namespace PlayersTab {
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0) * State.dpiScale);
 				bool isSelected = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId()) != State.selectedPlayers.end();
 				if (ImGui::Selectable(std::string("##" + ToString(playerData->fields.PlayerId)).c_str(), isSelected)) { //fix selection problems with multiple ppl having same name
-					bool isShifted = ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT);
 					bool isCtrl = ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3);
+					bool isShifted = ImGui::IsKeyDown(0x10);
+
 					if (isCtrl) {
-						if (isShifted && ImGui::IsKeyDown(0x41)) {
-							State.selectedPlayers = {};
-						}
-						else if (ImGui::IsKeyDown(0x41)) {
-							State.selectedPlayers = {};
-							for (auto p : GetAllPlayerControl()) {
-								State.selectedPlayers.push_back(p->fields.PlayerId);
+						if (isShifted) {
+							if (State.selectedPlayers.size() == GetAllPlayerControl().size()) {
+								State.selectedPlayers.clear();
 							}
-						}
-						auto it = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId());
-						if (it != State.selectedPlayers.end()) {
-							State.selectedPlayers.erase(it);
-							if (State.selectedPlayers.size() == 0) {
-								State.selectedPlayer = {};
-								selectedPlayers = {};
-								selectedPlayer = State.selectedPlayer.validate();
+							else {
+								State.selectedPlayers.clear();
+								for (auto p : GetAllPlayerControl()) {
+									State.selectedPlayers.push_back(p->fields.PlayerId);
+								}
 							}
 						}
 						else {
-							if (std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId()) == State.selectedPlayers.end())
+							auto it = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId());
+							if (it != State.selectedPlayers.end()) {
+								State.selectedPlayers.erase(it);
+								if (State.selectedPlayers.empty()) {
+									State.selectedPlayer = {};
+									selectedPlayers.clear();
+									selectedPlayer = State.selectedPlayer.validate();
+								}
+							}
+							else {
 								State.selectedPlayers.push_back(player.get_PlayerId());
-							State.selectedPlayer = validPlayer;
-							selectedPlayer = validPlayer;
+								State.selectedPlayer = validPlayer;
+								selectedPlayer = validPlayer;
+							}
 						}
 					}
 					else {
