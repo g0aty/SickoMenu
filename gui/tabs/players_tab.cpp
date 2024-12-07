@@ -4,6 +4,7 @@
 #include "state.hpp"
 #include "utility.h"
 #include "gui-helpers.hpp"
+#include <future>
 
 namespace PlayersTab {
 
@@ -375,11 +376,16 @@ namespace PlayersTab {
 					if (IsHost() && ImGui::Button("Kick")) {
 						State.selectedPlayer = {};
 						State.selectedPlayers.clear();
-						for (auto p : selectedPlayers) {
-							if (p.has_value() && p.validate().get_PlayerControl() != *Game::pLocalPlayer)
-								app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, false, NULL);
-						}
+						auto future = std::async(std::launch::async, [&]() {
+							for (auto p : selectedPlayers) {
+								if (p.has_value() && p.validate().get_PlayerControl() != *Game::pLocalPlayer)
+									app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, false, NULL);
+								std::this_thread::sleep_for(std::chrono::milliseconds(1));
+							}
+						});
+						future.get();
 					}
+
 					if (ImGui::Button("Votekick")) {
 						if (IsHost()) {
 							State.selectedPlayer = {};
@@ -427,10 +433,14 @@ namespace PlayersTab {
 					if (IsHost() && ImGui::Button("Ban")) {
 						State.selectedPlayer = {};
 						State.selectedPlayers.clear();
-						for (auto p : selectedPlayers) {
-							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-							app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
-						}
+						auto future = std::async(std::launch::async, [&]() {
+							for (auto p : selectedPlayers) {
+								if (p.has_value() && p.validate().is_LocalPlayer()) continue;
+								app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
+								std::this_thread::sleep_for(std::chrono::milliseconds(1));
+							}
+						});
+						future.get();
 					}
 					
 					if (selectedPlayers.size() == 1) {
