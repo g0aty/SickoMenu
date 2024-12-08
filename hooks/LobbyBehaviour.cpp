@@ -1,8 +1,12 @@
 #include "pch-il2cpp.h"
 #include "_hooks.h"
 #include "state.hpp"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <format>
 
-std::unordered_set<std::string> glitchEndings = { "IJPG", "YTHG", "WYWG", "KHQG", "FUGG", "UFLG", "KJQG", "ZQCG", "GEWG", "NPPG", "SZAF", "PATG", "PJDG", "TPYG", "JTFG", "VDXG", "DHSG", "TQQG", "ALGG", "UMPG", "GFXG", "RGGG", "HQXG", "LDQG", "ZLHG", "WMPG", "TAGG", "FBGG", "EJYG", "AOTG", "LCAF", "DORG", "ZCQG" };
+//std::unordered_set<std::string> glitchEndings = { "IJPG", "YTHG", "WYWG", "KHQG", "FUGG", "UFLG", "KJQG", "ZQCG", "GEWG", "NPPG", "SZAF", "PATG", "PJDG", "TPYG", "JTFG", "VDXG", "DHSG", "TQQG", "ALGG", "UMPG", "GFXG", "RGGG", "HQXG", "LDQG", "ZLHG", "WMPG", "TAGG", "FBGG", "EJYG", "AOTG", "LCAF", "DORG", "ZCQG" };
 
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 {
@@ -76,23 +80,76 @@ void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gam
 	}
 	std::string lobbyCode = IsStreamerMode() ? "" : convert_from_string(InnerNet_GameCode_IntToGameName(gameListing.GameId, NULL));
 
-	std::string glitchDisplay = "";
+/*	std::string glitchDisplay = "";
 	if (!State.PanicMode && State.ShowLobbyInfo) {
 		std::string codeEnding = lobbyCode.substr(lobbyCode.length() - 4);
 		if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " *";
 	}
 
 	lobbyCode += glitchDisplay;
-
+*/
 	int LobbyTime = (std::max)(0, int(gameListing.Age));
 	std::string lobbyTimeDisplay = "";
 	if (State.ShowLobbyTimer) {
 		lobbyTimeDisplay = std::format(" ~ <#0f0>Age: {}:{}{}</color>", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
 	}
 	std::string hostName = convert_from_string(gameListing.HostName);
-	gameListing.HostName = convert_to_string(std::format("<size=50%>{} <#fb0>{}</color>\n<#b0f>{}</color>{}</size>", hostName, lobbyCode, platformId, lobbyTimeDisplay));
+	gameListing.HostName = convert_to_string(std::format("<size=50%>{} <#fb0>{}</color>\n<#b0f>{}</color>{}</size>", hostName, lobbyCode, platformId, lobbyTimeDisplay/*, ServerMode*/));
 	MatchMakerGameButton_SetGame(__this, gameListing, method);
 }
+
+/*// Перечисление состояния сервера
+enum class ServerState {
+	InGame,
+	InLobby
+};
+
+// Структура для представления состояния
+struct State {
+	bool ShowLobbyInfo;  // Флаг для отображения информации о лобби
+};
+
+// Структура для представления сервера
+struct Server {
+	std::string name;       // Имя сервера
+	ServerState state;      // Состояние сервера
+};
+
+// Функция для вывода информации о сервере с форматированием
+void ShowServerInfo(const Server& server) {
+	std::string ServerMode = (server.state == ServerState::InGame) ? "Game-match" : "Lobby";
+	std::cout << std::format("- {} [{}]\n", server.name, ServerMode);
+	//std::string ServerMode = convert_from_string(gameListing.ServerMode);
+	gameListing.ServerMode = convert_to_string(std::format("<size=50%>{}", ServerMode));
+}
+
+int main() {
+	// Создаем список серверов
+	std::vector<Server> servers = {
+		{"Server 1", ServerState::InGame},
+		{"Server 2", ServerState::InLobby},
+		{"Server 3", ServerState::InGame},
+		{"Server 4", ServerState::InLobby},
+		{"Server 5", ServerState::InGame}
+		//+++ другие
+	};
+
+	// Создаем объект состояния с инициализацией
+	State.ShowLobbyInfo = true;  // Устанавливаем флаг для отображения информации о лобби
+
+	// Проверяем, нужно ли показывать информацию о лобби
+	if (State.ShowLobbyInfo) {
+		std::cout << "Информация о серверах:\n";
+		for (const auto& server : servers) {
+			ShowServerInfo(server);  // Отображаем информацию о каждом сервере
+		}
+	}
+	else {
+		std::cout << "Information about the lobby is not displayed.\n";
+	}
+
+	return 0;
+}*/
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dGameStartManager_Update executed");
@@ -110,24 +167,24 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 			else
 				lobbyTimeDisplay = std::format(" ({}{}:{}{})", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
 		}
-		std::string glitchDisplay = "";
+		/*std::string glitchDisplay = "";
 		if (!State.PanicMode && State.ShowLobbyInfo) {
 			std::string codeEnding = LobbyCode.substr(LobbyCode.length() - 4);
 			if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " * ";
-		}
+		}*/
 
 		if (State.HideCode && IsStreamerMode() && !State.PanicMode && LobbyCode != "") {
 			std::string customCode = State.HideCode && IsStreamerMode() ? State.customCode : "******";
 			if (State.RgbLobbyCode)
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + glitchDisplay + customCode + lobbyTimeDisplay), NULL);
+				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
 			else
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(glitchDisplay + customCode + lobbyTimeDisplay), NULL);
+				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(/*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
 		}
 		else {
 			if (State.RgbLobbyCode && !State.PanicMode)
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + glitchDisplay + LobbyCode + lobbyTimeDisplay), NULL);
+				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ LobbyCode + lobbyTimeDisplay), NULL);
 			else
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode + glitchDisplay + lobbyTimeDisplay), NULL);
+				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode + /*glitchDisplay +*/ lobbyTimeDisplay), NULL);
 		}
 	}
 	catch (...) {

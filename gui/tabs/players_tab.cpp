@@ -4,6 +4,7 @@
 #include "state.hpp"
 #include "utility.h"
 #include "gui-helpers.hpp"
+#include <future>
 
 namespace PlayersTab {
 
@@ -71,32 +72,36 @@ namespace PlayersTab {
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0) * State.dpiScale);
 				bool isSelected = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId()) != State.selectedPlayers.end();
 				if (ImGui::Selectable(std::string("##" + ToString(playerData->fields.PlayerId)).c_str(), isSelected)) { //fix selection problems with multiple ppl having same name
-					bool isShifted = ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT);
 					bool isCtrl = ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3);
+					bool isShifted = ImGui::IsKeyDown(0x10);
+
 					if (isCtrl) {
-						if (isShifted && ImGui::IsKeyDown(0x41)) {
-							State.selectedPlayers = {};
-						}
-						else if (ImGui::IsKeyDown(0x41)) {
-							State.selectedPlayers = {};
-							for (auto p : GetAllPlayerControl()) {
-								State.selectedPlayers.push_back(p->fields.PlayerId);
+						if (isShifted) {
+							if (State.selectedPlayers.size() == GetAllPlayerControl().size()) {
+								State.selectedPlayers.clear();
 							}
-						}
-						auto it = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId());
-						if (it != State.selectedPlayers.end()) {
-							State.selectedPlayers.erase(it);
-							if (State.selectedPlayers.size() == 0) {
-								State.selectedPlayer = {};
-								selectedPlayers = {};
-								selectedPlayer = State.selectedPlayer.validate();
+							else {
+								State.selectedPlayers.clear();
+								for (auto p : GetAllPlayerControl()) {
+									State.selectedPlayers.push_back(p->fields.PlayerId);
+								}
 							}
 						}
 						else {
-							if (std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId()) == State.selectedPlayers.end())
+							auto it = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId());
+							if (it != State.selectedPlayers.end()) {
+								State.selectedPlayers.erase(it);
+								if (State.selectedPlayers.empty()) {
+									State.selectedPlayer = {};
+									selectedPlayers.clear();
+									selectedPlayer = State.selectedPlayer.validate();
+								}
+							}
+							else {
 								State.selectedPlayers.push_back(player.get_PlayerId());
-							State.selectedPlayer = validPlayer;
-							selectedPlayer = validPlayer;
+								State.selectedPlayer = validPlayer;
+								selectedPlayer = validPlayer;
+							}
 						}
 					}
 					else {
@@ -371,11 +376,16 @@ namespace PlayersTab {
 					if (IsHost() && ImGui::Button("Kick")) {
 						State.selectedPlayer = {};
 						State.selectedPlayers.clear();
-						for (auto p : selectedPlayers) {
-							if (p.has_value() && p.validate().get_PlayerControl() != *Game::pLocalPlayer)
-								app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, false, NULL);
-						}
+						auto future = std::async(std::launch::async, [&]() {
+							for (auto p : selectedPlayers) {
+								if (p.has_value() && p.validate().get_PlayerControl() != *Game::pLocalPlayer)
+									app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, false, NULL);
+								std::this_thread::sleep_for(std::chrono::milliseconds(1));
+							}
+						});
+						future.get();
 					}
+
 					if (ImGui::Button("Votekick")) {
 						if (IsHost()) {
 							State.selectedPlayer = {};
@@ -423,10 +433,14 @@ namespace PlayersTab {
 					if (IsHost() && ImGui::Button("Ban")) {
 						State.selectedPlayer = {};
 						State.selectedPlayers.clear();
-						for (auto p : selectedPlayers) {
-							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-							app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
-						}
+						auto future = std::async(std::launch::async, [&]() {
+							for (auto p : selectedPlayers) {
+								if (p.has_value() && p.validate().is_LocalPlayer()) continue;
+								app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
+								std::this_thread::sleep_for(std::chrono::milliseconds(1));
+							}
+						});
+						future.get();
 					}
 					
 					if (selectedPlayers.size() == 1) {

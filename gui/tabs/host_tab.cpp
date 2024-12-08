@@ -169,10 +169,24 @@ namespace HostTab {
 				if (IsInLobby() && State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
 					State.Save();
 
-				/*int32_t maxPlayers = options.GetMaxPlayers();
-				maxPlayers = std::clamp(maxPlayers, 0, int(Game::MAX_PLAYERS));
-				if (IsInLobby() && ImGui::InputInt("Max Players", &maxPlayers))
-					GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, maxPlayers);*/ //support for more than 15 players
+				const int32_t currentMaxPlayers = options.GetMaxPlayers();
+				const int32_t minPlayers = 4, maxAllowedPlayers = static_cast<int32_t>(Game::MAX_PLAYERS);
+				int32_t newMaxPlayers = std::clamp(currentMaxPlayers, minPlayers, maxAllowedPlayers);
+
+				if (!State.SafeMode && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers) && newMaxPlayers != currentMaxPlayers) {
+					if (newMaxPlayers >= minPlayers && newMaxPlayers <= maxAllowedPlayers) {
+						if (newMaxPlayers == 4 || newMaxPlayers == 511) {
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
+						}
+						GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, newMaxPlayers);
+					}
+					else {
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
+						newMaxPlayers = currentMaxPlayers;
+					}
+					State.Save();
+				}
+
 
 					/*if (IsInLobby() && ToggleButton("Flip Skeld", &State.FlipSkeld))
 						State.Save();*/ //to be fixed later
