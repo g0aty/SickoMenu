@@ -131,8 +131,10 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_get_ProductUserId executed");
-	//if (State.SpoofPuid && State.FakePuid != "") return convert_to_string(State.FakePuid);
-	return EOSManager_get_ProductUserId(__this, method);
+	auto puid = EOSManager_get_ProductUserId(__this, method);
+	if (State.UseGuestPuid && State.GuestPuid != "")
+		return convert_to_string(State.FakePuid);
+	return puid;
 }
 
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method) {

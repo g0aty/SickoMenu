@@ -140,3 +140,5 @@ void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* 
 PlayerBodyTypes__Enum dHideAndSeekManager_GetBodyType(HideAndSeekManager* __this, PlayerControl* player, MethodInfo* method);
 PlayerBodyTypes__Enum dNormalGameManager_GetBodyType(NormalGameManager* __this, PlayerControl* player, MethodInfo* method);
 bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodInfo* method);
+float dPlayerControl_get_CalculatedAlpha(PlayerControl* __this, MethodInfo* method);
+bool dPlayerControl_get_Visible(PlayerControl* __this, MethodInfo* method);

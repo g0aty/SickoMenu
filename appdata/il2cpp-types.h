@@ -10731,4 +10731,5 @@ namespace app
     typedef Il2CppObject EndGameNavigation;
     typedef Il2CppObject HideAndSeekManager;
     typedef Il2CppObject NormalGameManager;
+    typedef Il2CppObject QuickChatPhraseBuilderResult;
 }

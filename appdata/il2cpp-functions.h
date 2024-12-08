@@ -306,7 +306,7 @@ DO_APP_FUNC(void, VoteBanSystem_CmdAddVote, (VoteBanSystem* __this, int32_t clie
 DO_APP_FUNC(void, VoteBanSystem_AddVote, (VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method), "Assembly-CSharp, System.Void VoteBanSystem::AddVote(System.Int32, System.Int32)");
 DO_APP_FUNC(void, GameStartManager_Update, (GameStartManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void GameStartManager::Update()");
 DO_APP_FUNC(void, PingTracker_Update, (PingTracker* __this, MethodInfo* method), "Assembly-CSharp, System.Void PingTracker::Update()");
-DO_APP_FUNC(String*, InnerNet_GameCode_IntToGameName, (int32_t gameId, MethodInfo* method), "Assembly-CSharp, System.String InnerNet.GameCode::IntToGameName(System.Int32)");
+DO_APP_FUNC(String*, InnerNet_GameCode_IntToGameName, (int32_t gameId, MethodInfo* method), "Assembly-CSharp, System.String InnerNet.GameCode::IntToGameNameV2(System.Int32)");
 DO_APP_FUNC(bool, TextBoxTMP_IsCharAllowed, (TextBoxTMP* __this, uint16_t i, MethodInfo* method), "Assembly-CSharp, System.Boolean TextBoxTMP::IsCharAllowed(System.Char)");
 DO_APP_FUNC(void, TextBoxTMP_SetText, (TextBoxTMP* __this, String* input, String* inputCompo, MethodInfo* method), "Assembly-CSharp, System.Void TextBoxTMP::SetText(System.String, System.String)");
 DO_APP_FUNC(void, GameManager_RpcEndGame, (GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method), "Assembly-CSharp, System.Void GameManager::RpcEndGame(GameOverReason, System.Boolean)");
@@ -343,7 +343,7 @@ DO_APP_FUNC(void, NetworkedPlayerInfo_Deserialize, (NetworkedPlayerInfo* __this,
 DO_APP_FUNC(bool, GameManager_DidImpostorsWin, (GameManager* __this, GameOverReason__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Boolean GameManager::DidImpostorsWin(GameOverReason)");
 DO_APP_FUNC(void, AmongUsClient_OnPlayerJoined, (AmongUsClient* __this, ClientData* data, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnPlayerJoined(InnerNet.ClientData)");
 DO_APP_FUNC(void*, AmongUsClient_CoJoinOnlineGameFromCode, (AmongUsClient* __this, int32_t gameId, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoJoinOnlineGameFromCode(System.Int32)");
-DO_APP_FUNC(int32_t, GameCode_GameNameToInt, (String* gameId, MethodInfo* method), "Assembly-CSharp, System.Int32 InnerNet.GameCode::GameNameToInt(System.String)");
+DO_APP_FUNC(int32_t, GameCode_GameNameToInt, (String* gameId, MethodInfo* method), "Assembly-CSharp, System.Int32 InnerNet.GameCode::GameNameToIntV2(System.String)");
 DO_APP_FUNC(PlayerStatsData*, PlayerData_get_Stats, (PlayerData* __this, MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Player.PlayerStatsData AmongUs.Data.Player.PlayerData::get_Stats()");
 DO_APP_FUNC(void, AbstractSaveData_Save, (AbstractSaveData* __this, MethodInfo* method), "Assembly-CSharp, System.Void AmongUs.Data.AbstractSaveData::Save()");
 DO_APP_FUNC(void, ShipStatus_HandleRpc, (ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void ShipStatus::HandleRpc(System.Byte, Hazel.MessageReader)");
@@ -376,3 +376,5 @@ DO_APP_FUNC(void, PlayerControl_SetInvisibility, (PlayerControl* __this, bool is
 DO_APP_FUNC(void, CosmeticsLayer_SetPhantomRoleAlpha, (CosmeticsLayer* __this, float alphaValue, MethodInfo* method), "Assembly-CSharp, System.Void CosmeticsLayer::SetPhantomRoleAlpha(System.Single)");
 DO_APP_FUNC(bool, Vent_TryMoveToVent, (Vent* __this, Vent* otherVent, String** error, MethodInfo* method), "Assembly-CSharp, System.Boolean Vent::TryMoveToVent(Vent, System.String&)");
 DO_APP_FUNC(void, InnerNetClient_ReportPlayer, (InnerNetClient* __this, int32_t clientId, ReportReasons__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::ReportPlayer(System.Int32, InnerNet.ReportReasons)");
+DO_APP_FUNC(void, QuickChatNetData_Serialize, (QuickChatPhraseBuilderResult* data, MessageWriter* writer, MethodInfo* method), "Assembly-CSharp, System.Void AmongUs.QuickChat.QuickChatNetData::Serialize(AmongUs.QuickChat.QuickChatPhraseBuilderResult, Hazel.MessageWriter)");
+DO_APP_FUNC(float, PlayerControl_get_CalculatedAlpha, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Single PlayerControl::get_CalculatedAlpha()");

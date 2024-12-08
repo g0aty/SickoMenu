@@ -54,8 +54,10 @@ public:
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
     bool UseGuestFriendCode = false;
+    bool UseGuestPuid = false;
     std::string GuestFriendCode = "";
     std::string FakeFriendCode = "";
+    std::string GuestPuid = "";
     std::string FakePuid = "";
     std::string StealedFC = "";
     std::string StealedPUID = "";
@@ -293,6 +295,7 @@ public:
 
     //std::vector<Game::PlayerId> aumUsers;
     //std::vector<Game::PlayerId> sickoUsers;
+    std::vector<Game::PlayerId> vanishedPlayers;
     std::map<Game::PlayerId, std::string> modUsers;
     int32_t rpcCooldown = 15;
     int32_t playerKilledId = 0;

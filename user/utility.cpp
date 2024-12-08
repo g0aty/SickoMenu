@@ -1555,7 +1555,7 @@ void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
-	if (pCtrl == *Game::pLocalPlayer) return; //avoid detecting yourself
+	if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; //avoid detecting yourself and practice mode dummies
 	auto pData = GetPlayerData(pCtrl);
 	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
 

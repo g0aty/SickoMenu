@@ -225,6 +225,8 @@ void DetourInitilization() {
 	HOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
 	HOOKFUNC(PlayerControl_SetLevel);
 	HOOKFUNC(Vent_TryMoveToVent);
+	HOOKFUNC(PlayerControl_get_CalculatedAlpha);
+	HOOKFUNC(PlayerControl_get_Visible);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -370,6 +372,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
 	UNHOOKFUNC(PlayerControl_SetLevel);
 	UNHOOKFUNC(Vent_TryMoveToVent);
+	UNHOOKFUNC(PlayerControl_get_CalculatedAlpha);
+	UNHOOKFUNC(PlayerControl_get_Visible);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

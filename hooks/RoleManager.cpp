@@ -106,7 +106,7 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		int ssCount = roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter), phCount = roleRates.GetRoleCount(RoleTypes__Enum::Phantom), splImpCount = ssCount + phCount;
 
 		if (splImpCount > 0 && splImpCount >= maxImpostorAmount && (role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Phantom)) {
-			roleCount = (int)(roleCount / splImpCount) * maxImpostorAmount; //go for the portion of the impostors selected
+			roleCount = (int)std::round((roleCount / splImpCount) * maxImpostorAmount); //go for the portion of the impostors selected
 			//In previous version, Sicko would assign more imps than MaxImposterAmount based on (shapeshifter + phantom) amount.
 		}
 

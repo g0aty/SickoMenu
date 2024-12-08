@@ -68,6 +68,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 		if ((IsInGame() || IsInLobby())) {
 			auto playerData = GetPlayerData(__this);
 			auto localData = GetPlayerData(*Game::pLocalPlayer);
+
+			if (!playerData || !localData)
+				return;
+
 			assert(Object_1_IsNotNull((Object_1*)__this->fields.cosmetics));
 			auto nameTextTMP = __this->fields.cosmetics->fields.nameText;
 
@@ -109,9 +113,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					}
 				}
 			}
-
-			if (!playerData || !localData)
-				return;
 
 			if (IsInGame() && State.DisableVents && __this->fields.inVent) {
 				if (State.rpcCooldown == 0) {
@@ -169,7 +170,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			if (State.PlayerColoredDots && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
+			bool hideName = GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && !(GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames));
+
+			bool shouldSeeName = ((!State.PanicMode && (State.RevealRoles || State.ShowKillCD || State.PlayerColoredDots)) || PlayerControl_get_Visible(__this, NULL)) && !hideName;
+
+			if (State.PlayerColoredDots && shouldSeeName && !State.PanicMode)
 			{
 				auto realOutfit = GetPlayerOutfit(playerData);
 				Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
@@ -277,7 +282,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			if (IsInGame() && (State.RevealRoles || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent) && !State.PanicMode)
+			if (IsInGame() && (State.RevealRoles || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && shouldSeeName && !State.PanicMode)
 			{
 				std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
 				int completedTasks = 0;
@@ -337,7 +342,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				&& !playerData->fields.IsDead
 				&& playerData->fields.Role
 				&& playerData->fields.Role->fields.CanUseKillButton
-				&& !((State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) && __this->fields.inVent)
+				&& shouldSeeName
 				&& !State.PanicMode) {
 				if (State.RevealRoles) {
 					float killTimer = __this->fields.killTimer;
@@ -356,12 +361,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			if (IsInGame() && (State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && !(GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames))) && __this->fields.inVent && !State.PanicMode) {
+			if (IsInGame() && !shouldSeeName) {
 				playerName = "<#0000>" + playerName + "</color>";
-			}
-
-			else {
-				playerName = playerName; //failsafe
 			}
 
 			if ((IsHost() || !State.SafeMode) && State.TeleportEveryone && (IsInGame() && !State.InMeeting)
@@ -918,7 +919,7 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 		auto victim = GetEventPlayerControl(target);
 		auto killerData = GetPlayerData(__this);
 		auto victimData = GetPlayerData(target);
-		if (target == *Game::pLocalPlayer && (victimData->fields.IsDead || State.IsRevived)) return; //prevent ban exploit
+		if (target == *Game::pLocalPlayer && (victimData->fields.IsDead || State.IsRevived) && (IsInMultiplayerGame() || IsInLobby())) return; //prevent ban exploit
 		if (victimData->fields.IsDead && State.LevelFarm) return; //prevent lag caused by multiple bodies
 		if (killer && victim) {
 			if (!PlayerIsImpostor(killerData) || (PlayerIsImpostor(killerData) && (killerData->fields.IsDead || (victimData->fields.IsDead || PlayerIsImpostor(victimData))))) {
@@ -1121,7 +1122,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dRenderer_set_enabled executed");
 	try {//If we're already rendering it, lets skip checking if we should
 		if (!State.PanicMode) {
-			if ((IsInGame() || IsInLobby()) && !value && State.ShowGhosts)
+			/*if ((IsInGame() || IsInLobby()) && !value && State.ShowGhosts)
 			{
 				Transform* rendererTrans = app::Component_get_transform(reinterpret_cast<app::Component_1*>(__this), NULL);
 				if (rendererTrans != NULL)
@@ -1148,7 +1149,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 						}
 					}
 				}
-			}
+			}*/
 		}
 	}
 	catch (...) {
@@ -1167,7 +1168,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 					auto playerInfo = GetPlayerData(player);
 					if (!playerInfo || !player->fields.cosmetics) break; //This happens sometimes during loading
 					if (((playerInfo->fields.IsDead && State.ShowGhosts) || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible && State.ShowPhantoms)) ||
-						(!playerInfo->fields.IsDead && State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false))
+						(!playerInfo->fields.IsDead && State.RevealRoles))
 					{
 						auto nameObject = Component_get_gameObject((Component_1*)player->fields.cosmetics->fields.nameText, NULL);
 						if (nameObject == __this) {
@@ -1176,7 +1177,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 						}
 					}
 					else if ((playerInfo->fields.IsDead  || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible)) 
-						&& !State.RevealRoles && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) == false) {
+						&& !State.RevealRoles) {
 						auto nameObject = Component_get_gameObject((Component_1*)player->fields.cosmetics->fields.nameText, NULL);
 						if (nameObject == __this) {
 							value = false;
@@ -1514,7 +1515,7 @@ void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, Me
 
 void dPlayerControl_SetInvisibility(PlayerControl* __this, bool isActive, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_SetRoleInvisibility executed");
-	if (!State.PanicMode && State.ShowPhantoms) {
+	/*if (!State.PanicMode && State.ShowPhantoms) {
 		bool wasDead = false;
 		auto local = GetPlayerData(*Game::pLocalPlayer);
 		if (__this != NULL && local != NULL && !local->fields.IsDead) {
@@ -1530,11 +1531,18 @@ void dPlayerControl_SetInvisibility(PlayerControl* __this, bool isActive, Method
 			local->fields.IsDead = false;
 		}
 		return;
-	}
+	}*/
 	synchronized(Replay::replayEventMutex) {
 		State.liveReplayEvents.emplace_back(std::make_unique<PhantomEvent>(GetEventPlayerControl(__this).value(), 
 			isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));
 	}
+	if (isActive) State.vanishedPlayers.push_back(__this->fields.PlayerId);
+	else {
+		auto it = std::find(State.vanishedPlayers.begin(), State.vanishedPlayers.end(), __this->fields.PlayerId);
+		if (it != State.vanishedPlayers.end())
+			State.vanishedPlayers.erase(it);
+	}
+
 	PlayerControl_SetInvisibility(__this, isActive, method);
 }
 
@@ -1593,4 +1601,12 @@ PlayerBodyTypes__Enum dNormalGameManager_GetBodyType(NormalGameManager* __this, 
 		}
 	}
 	return NormalGameManager_GetBodyType(__this, player, method);
+}
+
+float dPlayerControl_get_CalculatedAlpha(PlayerControl* __this, MethodInfo* method) {
+	return PlayerControl_get_CalculatedAlpha(__this, method);
+}
+
+bool dPlayerControl_get_Visible(PlayerControl* __this, MethodInfo* method) {
+	return PlayerControl_get_Visible(__this, method);
 }

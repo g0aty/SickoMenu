@@ -288,34 +288,52 @@ namespace SettingsTab {
 			if (ToggleButton("Spoof Guest Account", &State.SpoofGuestAccount)) {
 				State.Save();
 			}
-			ImGui::SameLine();
-			if (ToggleButton("Use Custom Guest Friend Code", &State.UseGuestFriendCode)) {
-				State.Save();
+			if (State.SpoofGuestAccount) {
+				ImGui::SameLine();
+				if (ToggleButton("Use Custom Guest Friend Code", &State.UseGuestFriendCode)) {
+					State.Save();
+				}
+				if (State.UseGuestFriendCode) {
+					if (InputString("Guest Friend Code", &State.GuestFriendCode)) {
+						State.Save();
+					}
+					ImGui::Text("Guest friend code should be <= 10 characters long and cannot have a hashtag.");
+				}
+
+				if (ToggleButton("Use Custom Guest PUID", &State.UseGuestPuid)) {
+					State.Save();
+				}
+				if (State.UseGuestPuid) {
+					ImGui::SameLine();
+					if (InputString("Guest PUID", &State.GuestPuid)) {
+						State.Save();
+					}
+				}
 			}
-			
-			if (InputString("Guest Friend Code", &State.GuestFriendCode)) {
-				State.Save();
-			}
-			ImGui::Text("Guest friend code should be <= 10 characters long and cannot have a hashtag.");
 			/*if (ImGui::Button("Force Login as Guest")) {
 				State.ForceLoginAsGuest = true;
 			}*/
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
 			}
-			ImGui::SameLine();
-			if (ImGui::InputInt("Level", &State.FakeLevel, 0, 1)) {
-				State.Save();
+			if (State.SpoofLevel) {
+				ImGui::SameLine();
+				if (ImGui::InputInt("Level", &State.FakeLevel, 0, 1)) {
+					State.Save();
+				}
+
+				if (State.SafeMode && (State.FakeLevel <= 0 || State.FakeLevel > 100001))
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Level will be detected by anticheat, your level will be between 0 and 100001.");
 			}
-			if (State.SafeMode && (State.FakeLevel <= 0 || State.FakeLevel > 100001))
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Level will be detected by anticheat, your level will be between 0 and 100001.");
 
 			if (ToggleButton("Spoof Platform", &State.SpoofPlatform)) {
 				State.Save();
 			}
-			ImGui::SameLine();
-			if (CustomListBoxInt("Platform", &State.FakePlatform, PLATFORMS))
-				State.Save();
+			if (State.SpoofPlatform) {
+				ImGui::SameLine();
+				if (CustomListBoxInt("Platform", &State.FakePlatform, PLATFORMS))
+					State.Save();
+			}
 
 			//if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
 			if (ToggleButton("Disable Host Anticheat (+25 Mode)", &State.DisableHostAnticheat)) {
