@@ -300,7 +300,7 @@ namespace SettingsTab {
 					ImGui::Text("Guest friend code should be <= 10 characters long and cannot have a hashtag.");
 				}
 
-				if (ToggleButton("Use Custom Guest PUID", &State.UseGuestPuid)) {
+				/*if (ToggleButton("Use Custom Guest PUID", &State.UseGuestPuid)) {
 					State.Save();
 				}
 				if (State.UseGuestPuid) {
@@ -308,7 +308,7 @@ namespace SettingsTab {
 					if (InputString("Guest PUID", &State.GuestPuid)) {
 						State.Save();
 					}
-				}
+				}*/
 			}
 			/*if (ImGui::Button("Force Login as Guest")) {
 				State.ForceLoginAsGuest = true;

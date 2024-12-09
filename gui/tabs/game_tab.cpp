@@ -122,7 +122,7 @@ namespace GameTab {
                 State.Save();
             }
 
-            if (ToggleButton("Auto-Join", &State.AutoJoinLobby))
+            /*if (ToggleButton("Auto-Join", &State.AutoJoinLobby))
                 State.Save();
             ImGui::SameLine();
             if (InputString("Lobby Code", &State.AutoJoinLobbyCode))
@@ -132,7 +132,7 @@ namespace GameTab {
                 AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
                     GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
                     NULL);
-            }
+            }*/
 
             if (IsInGame() || IsInLobby()) ImGui::SameLine();
             if ((IsInGame() || IsInLobby()) && ImGui::Button("Reset Appearance"))

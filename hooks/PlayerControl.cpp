@@ -581,7 +581,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			if (IsColorBlindMode()) {
 				auto colorBlindText = __this->fields.cosmetics->fields.colorBlindText;
 				String* text = TMP_Text_get_text((TMP_Text*)colorBlindText, NULL);
-				if ((State.ShowPlayerInfo && IsInLobby()) || (State.ShowKillCD && IsInGame() && PlayerIsImpostor(GetPlayerData(__this))))
+				if ((State.ShowPlayerInfo && IsInLobby()) || (State.ShowKillCD && IsInGame() && playerData->fields.Role->fields.CanUseKillButton))
 					text = convert_from_string(text).find("\n\n") == std::string::npos ? convert_to_string("\n\n" + convert_from_string(text)) : text;
 				else
 					text = convert_from_string(text).find("\n\n") != std::string::npos ? convert_to_string(convert_from_string(text).substr(2)) : text;
@@ -1161,7 +1161,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dGameObject_SetActive executed");
-	try {
+	/*try {
 		if (!State.PanicMode) {
 			if ((IsInGame() || IsInLobby()) && !value) { //If we're already rendering it, lets skip checking if we should
 				for (auto player : GetAllPlayerControl()) {
@@ -1190,7 +1190,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in GameObject_SetActive (PlayerControl)");
-	}
+	}*/
 	GameObject_SetActive(__this, value, method);
 }
 
