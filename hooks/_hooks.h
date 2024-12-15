@@ -126,7 +126,7 @@ void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerI
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method);
 void dPlayerControl_CmdCheckVanish(PlayerControl* __this, float maxDuration, MethodInfo* method);
 void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, MethodInfo* method);
-void dPlayerControl_SetInvisibility(PlayerControl* __this, bool isActive, MethodInfo* method);
+void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method);
 void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method);
 void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method);
 void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method);

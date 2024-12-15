@@ -802,20 +802,20 @@ void ImpersonateName(__maybenull NetworkedPlayerInfo* data)
 	for (auto p : GetAllPlayerData()) allNames.push_back(convert_from_string(NetworkedPlayerInfo_get_PlayerName(p, nullptr)));
 	std::sort(allNames.begin(), allNames.end(), compareStrings);
 	for (std::string n : allNames) {
-		if (n == playerName + (std::string("­") * size_t(fillers))) fillers++;
+		if (n == playerName + (std::string(" ") * size_t(fillers))) fillers++;
 	}
 
 	if (IsHost() || !State.SafeMode) {
 		if (IsInGame())
-			State.rpcQueue.push(new RpcSetName(playerName + (std::string("­") * size_t(fillers))));
+			State.rpcQueue.push(new RpcSetName(playerName + (std::string(" ") * size_t(fillers))));
 		else if (IsInLobby())
-			State.lobbyRpcQueue.push(new RpcSetName(playerName + (std::string("­") * size_t(fillers))));
+			State.lobbyRpcQueue.push(new RpcSetName(playerName + (std::string(" ") * size_t(fillers))));
 	}
 	else if (IsNameValid(playerName) && playerName.length() <= size_t(12 - fillers)) {
 		if (IsInGame())
-			State.rpcQueue.push(new RpcSetName(playerName + "­"));
+			State.rpcQueue.push(new RpcSetName(playerName + " "));
 		else if (IsInLobby())
-			State.lobbyRpcQueue.push(new RpcSetName(playerName + "­"));
+			State.lobbyRpcQueue.push(new RpcSetName(playerName + " "));
 	}
 	else {
 		if (IsInGame())

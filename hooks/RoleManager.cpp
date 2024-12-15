@@ -6,6 +6,8 @@
 #include "utility.h"
 #include "game.h"
 
+static int preChosenImpCount = 0;
+
 void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dRoleManager_SelectRoles executed");
 	std::vector<uint8_t> assignedPlayers;
@@ -33,6 +35,7 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 
 void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPlayers)
 {
+	preChosenImpCount = 0;
 	if (State.BattleRoyale || State.TaskSpeedrun) return;
 	for (size_t i = 0; i < State.assignedRolesPlayer.size(); i++)
 	{
@@ -45,6 +48,8 @@ void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPl
 		roleRates.SubtractRole(trueRole);
 
 		PlayerControl_RpcSetRole(player, trueRole, false, NULL);
+		if (trueRole == RoleTypes__Enum::Impostor || trueRole == RoleTypes__Enum::Shapeshifter || trueRole == RoleTypes__Enum::Phantom)
+			preChosenImpCount++;
 		if (State.TournamentMode) {
 			auto friendCode = convert_from_string(GetPlayerData(player)->fields.FriendCode);
 			if (std::find(State.tournamentFriendCodes.begin(), State.tournamentFriendCodes.end(), friendCode) == State.tournamentFriendCodes.end()) {
@@ -93,7 +98,7 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		GameOptions options;
 		auto roleCount = roleRates.GetRoleCount(role);
 		auto playerAmount = allPlayers.size();
-		auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
+		auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount) - preChosenImpCount;
 
 		//if (role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Impostor) {
 		//	if (State.shapeshifters_amount + State.impostors_amount >= maxImpostorAmount)

@@ -213,7 +213,7 @@ void DetourInitilization() {
 	HOOKFUNC(ChatBubble_SetText);
 	HOOKFUNC(PlayerControl_CmdCheckVanish);
 	HOOKFUNC(PlayerControl_CmdCheckAppear);
-	HOOKFUNC(PlayerControl_SetInvisibility);
+	HOOKFUNC(PlayerControl_SetRoleInvisibility);
 	HOOKFUNC(ShipStatus_UpdateSystem);
 	HOOKFUNC(PlayerControl_CmdCheckProtect);
 	HOOKFUNC(MeetingHud_RpcVotingComplete);
@@ -360,7 +360,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(ChatBubble_SetText);
 	UNHOOKFUNC(PlayerControl_CmdCheckVanish);
 	UNHOOKFUNC(PlayerControl_CmdCheckAppear);
-	UNHOOKFUNC(PlayerControl_SetInvisibility);
+	UNHOOKFUNC(PlayerControl_SetRoleInvisibility);
 	UNHOOKFUNC(ShipStatus_UpdateSystem);
 	UNHOOKFUNC(PlayerControl_CmdCheckProtect);
 	UNHOOKFUNC(MeetingHud_RpcVotingComplete);
