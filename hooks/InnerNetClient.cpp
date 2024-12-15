@@ -28,6 +28,7 @@ static void onGameEnd() {
         State.crewmates_amount = 0; //We need to reset these. Or if the host doesn't turn on host tab ,these value won't update.
         State.IsRevived = false;
         State.protectMonitor.clear();
+        State.vanishedPlayers.clear();
         State.VoteKicks = 0;
         State.OutfitCooldown = 50;
         State.CanChangeOutfit = false;
