@@ -1,8 +1,7 @@
-# 👺 SickoMenu v4.1
+# 👺 SickoMenu v4.1.1
 A powerful utility for Among Us that aims to improve the game experience!
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
-### Vanity invite: https://discord.gg/sickos
 ### Permanent invite: https://dsc.gg/sickos
 
 ## ⚠️ Disclaimer
@@ -13,7 +12,6 @@ This mod is not affiliated with Among Us or Innersloth LLC, and the content cont
 ## ⚙️ Features
 A huge collection of various utilities and cheats such as
 - Generate a brand new guest account every time the game is launched
-- Allow other players to no-clip while hosting
 - Fake Roles
 - NoClip
 - Move in Vents
