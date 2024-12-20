@@ -22,33 +22,41 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 			bool shouldSeeGhost = localData->fields.IsDead || State.ShowGhosts;
 			auto playerData = GetPlayerData(player);
 			auto roleType = playerData->fields.RoleType;
-			bool isFullyVanished = std::find(State.vanishedPlayers.begin(), State.vanishedPlayers.end(), GetPlayerData(player)->fields.PlayerId) != State.vanishedPlayers.end();
+			bool isFullyVanished = std::find(State.vanishedPlayers.begin(), State.vanishedPlayers.end(), playerData->fields.PlayerId) != State.vanishedPlayers.end();
 			bool isDead = playerData->fields.IsDead;
 			auto nameText = Component_get_gameObject((Component_1*)player->fields.cosmetics->fields.nameText, NULL);
+			bool isSeekerBody = player->fields.cosmetics->fields.bodyType == PlayerBodyTypes__Enum::Seeker || player->fields.cosmetics->fields.bodyType == PlayerBodyTypes__Enum::LongSeeker;
 			if (player->fields.inVent) {
 				if (!PlayerControl_get_Visible(player, NULL) && State.ShowPlayersInVents && (!isFullyVanished || shouldSeePhantom) && !State.PanicMode) {
 					PlayerControl_set_Visible(player, true, NULL);
-					GameObject_SetActive(nameText, true, NULL);
 					player->fields.invisibilityAlpha = 0.5f;
 					CosmeticsLayer_SetPhantomRoleAlpha(player->fields.cosmetics, player->fields.invisibilityAlpha, NULL);
+					if (isSeekerBody) {
+						SpriteRenderer_set_color(player->fields.cosmetics->fields.skin->fields.layer, Palette__TypeInfo->static_fields->ClearWhite, NULL);
+					}
 				}
 				else if (player->fields.invisibilityAlpha == 0.5f && (!(State.ShowPlayersInVents && (!isFullyVanished || shouldSeePhantom)) || State.PanicMode)) {
 					PlayerControl_set_Visible(player, false, NULL);
-					GameObject_SetActive(nameText, false, NULL);
 					player->fields.invisibilityAlpha = 0.f;
 					CosmeticsLayer_SetPhantomRoleAlpha(player->fields.cosmetics, player->fields.invisibilityAlpha, NULL);
+					if (isSeekerBody) {
+						SpriteRenderer_set_color(player->fields.cosmetics->fields.skin->fields.layer, Palette__TypeInfo->static_fields->ClearWhite, NULL);
+					}
 				}
 			}
 			else if (!isDead) {
 				player->fields.invisibilityAlpha = isFullyVanished ? (shouldSeePhantom ? 0.5f : 0.f) : 1.f;
 				CosmeticsLayer_SetPhantomRoleAlpha(player->fields.cosmetics, player->fields.invisibilityAlpha, NULL);
 				PlayerControl_set_Visible(player, player->fields.invisibilityAlpha > 0.f, NULL);
-				GameObject_SetActive(nameText, player->fields.invisibilityAlpha > 0.f, NULL);
+				if (isSeekerBody) {
+					SpriteRenderer_set_color(player->fields.cosmetics->fields.skin->fields.layer, Palette__TypeInfo->static_fields->ClearWhite, NULL);
+				}
 			}
 			else if (playerData->fields.IsDead) {
 				PlayerControl_set_Visible(player, shouldSeeGhost && !State.PanicMode, NULL);
-				GameObject_SetActive(nameText, shouldSeeGhost && !State.PanicMode, NULL);
+				player->fields.invisibilityAlpha = shouldSeeGhost && !State.PanicMode ? 1.f : 0.f;
 			}
+			GameObject_SetActive(nameText, player->fields.invisibilityAlpha > 0.f, NULL);
 		}
 		app::PlayerPhysics_FixedUpdate(__this, method);
 	}

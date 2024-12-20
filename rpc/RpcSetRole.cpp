@@ -13,9 +13,9 @@ void RpcSetRole::Process()
 {
 	if (Player == nullptr) return;
 
-	bool isDeadRole = Role == RoleTypes__Enum::CrewmateGhost || Role == RoleTypes__Enum::GuardianAngel || Role == RoleTypes__Enum::ImpostorGhost;
+	//bool isDeadRole = Role == RoleTypes__Enum::CrewmateGhost || Role == RoleTypes__Enum::GuardianAngel || Role == RoleTypes__Enum::ImpostorGhost;
 
-	PlayerControl_RpcSetRole(Player, Role, Player->fields.roleAssigned && !isDeadRole, NULL);
+	PlayerControl_RpcSetRole(Player, Role, true, NULL);
 }
 
 SetRole::SetRole(RoleTypes__Enum role)

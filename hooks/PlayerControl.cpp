@@ -172,7 +172,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
 			bool hideName = GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && !(GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames));
 
-			bool shouldSeeName = ((!State.PanicMode && (State.RevealRoles || State.ShowKillCD || State.PlayerColoredDots)) || PlayerControl_get_Visible(__this, NULL)) && !hideName;
+			bool shouldSeeName = ((!State.PanicMode && (State.RevealRoles || State.ShowKillCD || State.PlayerColoredDots)) || !hideName) && PlayerControl_get_Visible(__this, NULL);
 
 			if (State.PlayerColoredDots && shouldSeeName && !State.PanicMode)
 			{
@@ -605,9 +605,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						isPlaying = true;
 						break;
 					}
-				if (isPlaying == State.ShowProtections)
+				if (isPlaying == (State.ShowProtections && !State.PanicMode))
 					break;
-				if (!State.ShowProtections)
+				if (!State.ShowProtections || State.PanicMode)
 					app::PlayerControl_RemoveProtection(__this, nullptr);
 				std::pair<int32_t/*ColorId*/, float/*Time*/> pair;
 				synchronized(State.protectMutex) {
@@ -619,7 +619,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (_Duration > 0.f)
 					app::PlayerControl_TurnOnProtection(__this, State.ShowProtections, pair.first, __this->fields.protectedByGuardianId, nullptr);
 				options.SetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, ProtectionDurationSeconds);
-			} while (State.PanicMode);
+			} while (0);
 
 			/*if ((State.Wallhack || State.IsRevived) && __this == *Game::pLocalPlayer && !State.FreeCam
 				&& !State.playerToFollow.has_value() && !State.PanicMode) {
