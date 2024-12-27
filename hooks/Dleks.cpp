@@ -2,21 +2,7 @@
 #include "_hooks.h"
 #include "state.hpp"
 
-/*bool dConstants_1_ShouldFlipSkeld(MethodInfo* method) {
-	bool orig_return = Constants_1_ShouldFlipSkeld(method);
-	if (State.FlipSkeld) {
-		return true;
-	}
-	else if (orig_return)
-	{
-		State.FlipSkeld = true;
-	} //fix later
-	return orig_return;
-}*/
-
-//Full Code from KillNetwork source code:
-
-constexpr int32_t AnticheatPenalty = 25; // Prevent rare crashing
+constexpr int32_t AnticheatPenalty = 25;
 
 void LogIfEnabled(const std::string& message) {
     if (State.ShowHookLogs) {
@@ -27,7 +13,7 @@ void LogIfEnabled(const std::string& message) {
 int32_t GetAdjustedBroadcastVersion(MethodInfo* method) {
     LogIfEnabled("Hook dConstants_1_GetBroadcastVersion executed");
     int32_t baseVersion = Constants_1_GetBroadcastVersion(method);
-    return baseVersion + (State.DisableHostAnticheat ? AnticheatPenalty : 0); // Prevents bugs with protocol mixing
+    return baseVersion + (State.DisableHostAnticheat ? AnticheatPenalty : 0);
 }
 
 bool IsVersionModded(MethodInfo* method) {
@@ -43,15 +29,20 @@ AsyncOperationHandle_1_UnityEngine_GameObject_ InstantiateAssetAsync(
 {
     LOG_DEBUG(std::format("AssetReference_InstantiateAsync executed with scene {}", State.CurrentScene).c_str());
 
-    bool isHost = IsHost();
-    bool isInGame = IsInGame();
+    if (!assetRef) {
+        LOG_ERROR("AssetReference is null!");
+        return {};
+    }
+
     auto amongUsClient = *Game::pAmongUsClient;
+    if (!amongUsClient) {
+        LOG_ERROR("AmongUsClient is null!");
+        return {};
+    }
 
-    // Check for special asset instantiation case
-    if (isHost && !isInGame && amongUsClient && parent == nullptr && !instantiateInWorldSpace) {
+    if (IsHost() && !IsInGame() && parent == nullptr && !instantiateInWorldSpace) {
         il2cpp::List shipPrefabs = amongUsClient->fields.ShipPrefabs;
-
-        if (assetRef == shipPrefabs[0] && State.FlipSkeld) {
+        if (shipPrefabs.size() > 3 && assetRef == shipPrefabs[0] && State.FlipSkeld) {
             auto asyncHandle = AssetReference_InstantiateAsync_1(shipPrefabs[3], parent, instantiateInWorldSpace, method);
             amongUsClient->fields.ShipLoadingAsyncHandle = asyncHandle;
             return asyncHandle;
@@ -62,13 +53,13 @@ AsyncOperationHandle_1_UnityEngine_GameObject_ InstantiateAssetAsync(
         return AssetReference_InstantiateAsync_1(assetRef, parent, instantiateInWorldSpace, method);
     }
     catch (const std::exception& e) {
-        LOG_ERROR(std::format("Exception caught: {}", e.what()).c_str());
+        LOG_ERROR(std::format("Exception caught in AssetReference_InstantiateAsync: {}", e.what()).c_str());
     }
     catch (...) {
-        LOG_ERROR("Unknown exception caught");
+        LOG_ERROR("Unknown exception caught in AssetReference_InstantiateAsync");
     }
 
-    return {}; // Return default constructed handle on failure
+    return {};
 }
 
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
@@ -85,5 +76,10 @@ AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_
     bool instantiateInWorldSpace,
     MethodInfo* method)
 {
+    if (!__this) {
+        LOG_ERROR("AssetReference is null in dAssetReference_InstantiateAsync_1!");
+        return {};
+    }
+
     return InstantiateAssetAsync(__this, parent, instantiateInWorldSpace, method);
 }
