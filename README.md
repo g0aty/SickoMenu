@@ -56,6 +56,17 @@ First you will need protontricks, you can install it with your packager of choic
 10. Click **Add** and then **Apply**
 11. SickoMenu should now work properly in the game
 
+### Installation - macOS
+
+>[!NOTE] This method uses CrossOver ONLY! If you have ANY other ways to use this with other software, refer to the contributing section!
+
+For this, you will need:
+
+- Among Us (Steam Version)
+- CrossOver
+
+Install a bottle of CrossOver, install Steam in it and install Among Us. <br> Then, open the C drive inside of CrossOver (there should be a button). Quit CrossOver. A Finder window will open. <br> Go to `Program Files (x86)/Steam/steamapps/common/Among Us/` and STAY in the folder. <br> Put the `version.dll` inside of the Among Us folder **WHERE THE EXECUTABLE IS LOCATED** (NOT THE AMONG US DATA FOLDER) and then reopen CrossOver. Go to the "Configure Wine" panel and go to "Libraries" then, pop the menu right below "New Replacement for:" and search carefully the "version" option. <br> Click it and select "Add". Click Apply then OK. Start up Among Us and do Command+⌦ to pop up the SickoMenu. And go on with your hacking in game, have fun.
+
 ## ⌨️ Default Hotkeys
 - Show Menu - DELETE
 - Show Radar - INSERT
@@ -99,21 +110,3 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by Team-YuTeam
 * [BetterAmongUs-Public](https://github.com/EnhancedNetwork/BetterAmongUs-Public) by EnhancedNetwork (D1GQ)
 * [MalumMenu](https://github.com/scp222thj/MalumMenu) by scp222thj
-
-## Installation - macOS
-
->[!NOTE] This method uses CrossOver ONLY! If you have ANY other ways to use this with other software, refer to the contributing section!
-
-For this, you will need:
-
-- Among Us (Steam Version)
-- CrossOver (read bottom of the page for Download)
-
-Install a bottle of CrossOver, install Steam in it and install Among Us. <br> Then, open the C drive inside of CrossOver (there should be a button). Quit CrossOver. A Finder window will open. <br> Go to `Program Files (x86)/Steam/steamapps/common/Among Us/` and STAY in the folder. <br> Put the `version.dll` inside of the Among Us folder **WHERE THE EXECUTABLE IS LOCATED** (NOT THE AMONG US DATA FOLDER) and then reopen CrossOver. Go to the "Configure Wine" panel and go to "Libraries" then, pop the menu right below "New Replacement for:" and search carefully the "version" option. <br> Click it and select "Add". Click Apply then OK. Start up Among Us and do Command+⌦ to pop up the SickoMenu. And go on with your hacking in game, have fun.
-
-## CrossOver crack because who wants to pay 75$ to play Among Us
-
-Download CrossOver from either those 2 links
-
-Macked: [https://macked.app/crossover-crack.html](https://macked.app/crossover-crack.html)
-AppsTorrent: [https://appstorrent.ru/185-crossover.html](https://appstorrent.ru/185-crossover.html)
