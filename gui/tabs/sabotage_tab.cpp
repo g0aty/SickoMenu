@@ -24,6 +24,8 @@ namespace SabotageTab {
     std::atomic<bool> automaticToggle(false);
     bool brokeSystemSwitchesToggled = false;
     std::thread toggleThread;
+    bool isAutoRepairEnabled = false;
+    std::chrono::steady_clock::time_point lastRepairTime = std::chrono::steady_clock::now();
 
     void TryRepairSabotage() {
         if (isAutoRepairEnabled) {
