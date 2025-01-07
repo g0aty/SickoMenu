@@ -25,6 +25,12 @@ namespace SabotageTab {
     bool brokeSystemSwitchesToggled = false;
     std::thread toggleThread;
 
+    void TryRepairSabotage() {
+        if (isAutoRepairEnabled) {
+            RepairSabotage(*Game::pLocalPlayer);
+        }
+    }
+
     static void MushroomMixupSabotageLoop() {
         static std::random_device rd;
         static std::mt19937 mt(rd());
@@ -281,6 +287,17 @@ namespace SabotageTab {
             if (ImGui::Button("Repair Sabotage")) {
                 RepairSabotage(*Game::pLocalPlayer);
             }
+
+            if (ToggleButton("Auto Repair Sabotage", &State.AutoRepairSabotage)) {
+                isAutoRepairEnabled = State.AutoRepairSabotage;
+            }
+
+            auto currentTime = std::chrono::steady_clock::now();
+            if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastRepairTime).count() >= 0.15) {
+                TryRepairSabotage();
+                lastRepairTime = currentTime;
+            }
+
             ImGui::NewLine();
             if (State.DisableSabotages)
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Sabotages have been disabled. Nothing can be sabotaged.");
