@@ -95,6 +95,7 @@ public:
     bool CrashSpamReport = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
+    bool AutoRepairSabotage = false;
     bool DisableKills = false;
     bool BattleRoyale = false;
     bool TaskSpeedrun = false;
