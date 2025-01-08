@@ -38,34 +38,35 @@ A huge collection of various utilities and cheats such as
 
 ## ⬇️ Download & Install
 ### For Windows
-You can find the latest release here: [Download](https://github.com/g0aty/SickoMenu/releases/latest).
-Either inject "SickoMenu.dll" with a reliable injector or put "version.dll" in your Among Us directory (the folder containing "Among Us.exe").
+You can find the latest release [here](https://github.com/g0aty/SickoMenu/releases/latest).
+Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in your Among Us directory (the folder containing `Among Us.exe`).
 
 ### For Proton (Version Proxy Only)
-First you will need protontricks, you can install it with your packager of choice.
+First you will need [protontricks](https://github.com/Matoking/protontricks), you can install it with your packager of choice.
 
-1. Make sure you are running Among Us under Proton  
-   You can check by going to **Properties -> Compatibility**
-3. Put version.dll into Among Us folder
-4. Run `protontricks --gui`
-5. Choose **Among Us**
-6. Click on **Select the default wineprefix** and then **OK**
-7. Click on **Run winecfg** and then **OK**
-8. In the configuration window, click on **Libraries**
-9. Type `version` into the **New override for library** input
-10. Click **Add** and then **Apply**
-11. SickoMenu should now work properly in the game
+1. Make sure you are running Among Us under Proton. 
+   On Steam you can check this by going to **Properties -> Compatibility**
+2. Put version.dll into your Among Us directory (the folder containing `Among Us.exe`).
+3. Run `protontricks --gui`
+4. Choose **Among Us**
+5. Click on **Select the default wineprefix** and then **OK**
+6. Click on **Run winecfg** and then **OK**
+7. In the configuration window, click on **Libraries**
+8. Enter `version` into the **New override for library** input field
+9. Click **Add** and then **Apply**
+10. SickoMenu should now work properly in the game
 
-### Installation - macOS
+### For macOS (Version Proxy Only)
 
->[!NOTE] This method uses CrossOver ONLY! If you have ANY other ways to use this with other software, refer to the contributing section!
+> [!NOTE]
+> This method uses CrossOver. If you have ANY other ways to use this with other software, refer to the contributing section!
 
-For this, you will need:
-
-- Among Us (Steam Version)
-- CrossOver
-
-Install a bottle of CrossOver, install Steam in it and install Among Us. <br> Then, open the C drive inside of CrossOver (there should be a button). Quit CrossOver. A Finder window will open. <br> Go to `Program Files (x86)/Steam/steamapps/common/Among Us/` and STAY in the folder. <br> Put the `version.dll` inside of the Among Us folder **WHERE THE EXECUTABLE IS LOCATED** (NOT THE AMONG US DATA FOLDER) and then reopen CrossOver. Go to the "Configure Wine" panel and go to "Libraries" then, pop the menu right below "New Replacement for:" and search carefully the "version" option. <br> Click it and select "Add". Click Apply then OK. Start up Among Us and do Command+⌦ to pop up the SickoMenu. And go on with your hacking in game, have fun.
+1. Install a bottle of CrossOver, install Steam in it and install Among Us.
+2. Open the C drive inside of CrossOver (there should be a button). Quit CrossOver. A Finder window will open.
+3. Go to `Program Files (x86)/Steam/steamapps/common/Among Us/` and put the `version.dll` into it. Then reopen CrossOver.
+5. Go to the **Configure Wine** panel, go to **Libraries**, open the menu below **New Replacement for:** and search for `version`.
+6. Select it and click **Add**, then **Apply** and **OK**.
+7. Start Among Us and press **Command+⌦** to show SickoMenu.
 
 ## ⌨️ Default Hotkeys
 - Show Menu - DELETE
