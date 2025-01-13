@@ -510,6 +510,8 @@ public:
 
     std::string lol = "";
 
+    bool LagEveryone = false;
+
     void Load();
     void Save();
     void Delete();
