@@ -775,7 +775,25 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer) {
+                State.AutoStartGame = false;
                 InnerNetClient_SendStartGame(__this, NULL);
+            }
+            static int lagdelay = 0;
+            if ((IsInLobby() || IsInGame()) && State.LagEveryone && lagdelay <= 0) {
+                for (auto pc : GetAllPlayerControl()) {
+                    if (!(pc == *Game::pLocalPlayer)) {
+                        for (int i = 0; i < 169; ++i) {
+                            auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
+                                uint8_t(RpcCalls__Enum::ProtectPlayer), SendOption__Enum::None, pc->fields._.OwnerId, NULL);
+                            InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                        }
+                    }
+                }
+                lagdelay = 16;
+            }
+
+            else {
+                lagdelay--;
             }
         }
     }

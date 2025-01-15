@@ -65,7 +65,7 @@
     <ClCompile Include="hooks\Dleks.cpp" />
     <ClCompile Include="hooks\EOSManager.cpp" />
     <ClCompile Include="hooks\ExileController.cpp" />
-	<ClCompile Include="hooks\FungleShipStatus.cpp" />
+    <ClCompile Include="hooks\FungleShipStatus.cpp" />
     <ClCompile Include="hooks\GameOptionsManager.cpp" />
     <ClCompile Include="hooks\HudManager.cpp" />
     <ClCompile Include="hooks\InnerNetClient.cpp" />
@@ -397,13 +397,13 @@
     <Image Include="resources\airship.png" />
     <Image Include="resources\cross.png" />
     <Image Include="resources\dead_body.png" />
-	<Image Include="resources\fungle.png" />
+    <Image Include="resources\fungle.png" />
     <Image Include="resources\kill.png" />
     <Image Include="resources\mira_hq.png" />
     <Image Include="resources\pause.png" />
     <Image Include="resources\play.png" />
     <Image Include="resources\player.png" />
-	<Image Include="resources\player_visor.png" />
+    <Image Include="resources\player_visor.png" />
     <Image Include="resources\polus.png" />
     <Image Include="resources\report.png" />
     <Image Include="resources\skeld.png" />
@@ -489,6 +489,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Version|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>version</TargetName>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PreLinkEventUseInBuild>false</PreLinkEventUseInBuild>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
