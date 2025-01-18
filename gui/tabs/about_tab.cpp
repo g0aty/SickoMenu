@@ -16,7 +16,7 @@ namespace AboutTab {
 
     const ImVec4 Sicko = ImVec4(0.13f, 0.8f, 0.31f, 1.0f);
     const ImVec4 Menu = ImVec4(0.8f, 0.13f, 0.2f, 1.0f);
-    const ImVec4 Orange = ImVec4(1.0f, 0.647f, 0.0f, 1.0f); // Оранжевый цвет
+    const ImVec4 Orange = ImVec4(1.0f, 0.647f, 0.0f, 1.0f);
     const ImVec4 AUM_Color = ImVec4(180.0f / 255.0f, 50.0f / 255.0f, 93.0f / 255.0f, 1.0f);
     const ImVec4 lightSeaGreen = ImVec4(26.0f / 255.0f, 188.0f / 255.0f, 156.0f / 255.0f, 1.0f);
 
