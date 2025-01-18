@@ -160,7 +160,7 @@ namespace PlayersTab {
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
 				else if (playerCtrl == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end()) {
 					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f00>KillNetwork</color>")
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+						nameColor = KillNetwork_Color; // Exclusive KN Color [NEW]
 
 					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#5f5>BetterAmongUs</color>")
 						nameColor = BetterAmongUs_Color; // Exclusive BAU Color [NEW]
@@ -169,7 +169,7 @@ namespace PlayersTab {
 						nameColor = AUM_Color; // Exclusive AUM Color [NEW]
 
 					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#0f0>Sicko</color><#f00>Menu</color>")
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->AcceptedGreen);
+						nameColor = Sicko_Color; // Exclusive SM Color [NEW]
 				}
 
 				if (playerData->fields.IsDead)
