@@ -21,7 +21,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 	{
 		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
 		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#f55>AmongUsMenu</color>" });
+			State.modUsers.insert({ playerId, "<#B4325DFF>AmongUsMenu</color>" });
 			STREAM_DEBUG("RPC Received for an AmongUsMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
 	}
@@ -58,7 +58,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 				local->fields.IsDead = true; //see aum chat of ghosts
 				wasDead = true;
 			}
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#f55><b>[AUM Chat]</b></color>\n" + message), false, NULL);
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#B4325DFF><b>[AUM Chat]</b></color>\n" + message), false, NULL);
 			if (wasDead) {
 				local->fields.IsDead = false;
 			}
