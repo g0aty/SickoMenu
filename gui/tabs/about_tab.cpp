@@ -6,8 +6,8 @@
 #include "game.h"
 #include "achievements.hpp"
 #include "DirectX.h"
-#include "imgui/imgui_impl_win32.h"
-#include "theme.hpp"
+#include "imgui/imgui_impl_win32.h" // ImGui_ImplWin32_GetDpiScaleForHwnd
+#include "theme.hpp" // ApplyTheme
 #include <cstdlib>
 
 namespace AboutTab {
@@ -112,17 +112,29 @@ namespace AboutTab {
             ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
             ImGui::PushStyleColor(ImGuiCol_Text, lightSeaGreen);
 
-            if (ImGui::Button("GDjkhp")) OpenLink("https://github.com/GDjkhp");
+            if (ImGui::Button("GDjkhp")) {
+                OpenLink("https://github.com/GDjkhp");
+            }
 
-            if (ImGui::Button("Reycko")) OpenLink("https://github.com/Reycko");
+            if (ImGui::Button("Reycko")) {
+                OpenLink("https://github.com/Reycko");
+            }
 
-            if (ImGui::Button("astra1dev")) OpenLink("https://github.com/astra1dev");
+            if (ImGui::Button("astra1dev")) {
+                OpenLink("https://github.com/astra1dev");
+            }
 
-            if (ImGui::Button("Luckyheat")) OpenLink("https://github.com/Luckyheat");
+            if (ImGui::Button("Luckyheat")) {
+                OpenLink("https://github.com/Luckyheat");
+            }
 
-            if (ImGui::Button("acer51-doctom")) OpenLink("https://github.com/acer51-doctom");
+            if (ImGui::Button("acer51-doctom")) {
+                OpenLink("https://github.com/acer51-doctom");
+            }
 
-            if (ImGui::Button("UN83991956")) OpenLink("https://github.com/UN83991956");
+            if (ImGui::Button("UN83991956")) {
+                OpenLink("https://github.com/UN83991956");
+            }
             
             ImGui::PopStyleColor();
 
