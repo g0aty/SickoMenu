@@ -16,7 +16,7 @@ namespace AboutTab {
 
     const ImVec4 Sicko = ImVec4(0.13f, 0.8f, 0.31f, 1.0f);
     const ImVec4 Menu = ImVec4(0.8f, 0.13f, 0.2f, 1.0f);
-    const ImVec4 Orange = ImVec4(1.0f, 0.647f, 0.0f, 1.0f);
+    const ImVec4 Orange = ImVec4(1.0f, 0.647f, 0.0f, 1.0f); // Оранжевый цвет
     const ImVec4 AUM_Color = ImVec4(180.0f / 255.0f, 50.0f / 255.0f, 93.0f / 255.0f, 1.0f);
     const ImVec4 lightSeaGreen = ImVec4(26.0f / 255.0f, 188.0f / 255.0f, 156.0f / 255.0f, 1.0f);
 
@@ -111,10 +111,19 @@ namespace AboutTab {
             ImGui::Text("Contributors:");
             ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
             ImGui::PushStyleColor(ImGuiCol_Text, lightSeaGreen);
+
             if (ImGui::Button("GDjkhp")) OpenLink("https://github.com/GDjkhp");
+
             if (ImGui::Button("Reycko")) OpenLink("https://github.com/Reycko");
+
             if (ImGui::Button("astra1dev")) OpenLink("https://github.com/astra1dev");
+
             if (ImGui::Button("Luckyheat")) OpenLink("https://github.com/Luckyheat");
+
+            if (ImGui::Button("acer51-doctom")) OpenLink("https://github.com/acer51-doctom");
+
+            if (ImGui::Button("UN83991956")) OpenLink("https://github.com/UN83991956");
+            
             ImGui::PopStyleColor();
 
             ImGui::Dummy(ImVec2(6, 6) * State.dpiScale);
