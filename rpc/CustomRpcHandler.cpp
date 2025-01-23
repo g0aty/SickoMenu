@@ -21,7 +21,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 	{
 		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
 		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#f55>AmongUsMenu</color>" });
+			State.modUsers.insert({ playerId, "<#B4325DFF>AmongUsMenu</color>" });
 			STREAM_DEBUG("RPC Received for an AmongUsMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
 	}
@@ -58,7 +58,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 				local->fields.IsDead = true; //see aum chat of ghosts
 				wasDead = true;
 			}
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#f55><b>[AUM Chat]</b></color>\n" + message), false, NULL);
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#B4325DFF><b>[AUM Chat]</b></color>\n" + message), false, NULL);
 			if (wasDead) {
 				local->fields.IsDead = false;
 			}
@@ -73,7 +73,6 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	if (!State.Enable_SMAC || player == *Game::pLocalPlayer || callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting) return;
 	auto pData = GetPlayerData(player);
 	switch (callId) {
-	case (uint8_t)RpcCalls__Enum::CheckName:
 	case (uint8_t)RpcCalls__Enum::SetName: {
 		if ((IsHost() || !State.SafeMode) && (State.ForceNameForEveryone || State.CustomNameForEveryone || (State.Cycler && State.CycleName && State.CycleForEveryone)))
 			break;
@@ -89,14 +88,6 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		return;
 		break;
 	}
-	case (uint8_t)RpcCalls__Enum::CheckColor:
-		if ((IsHost() || !State.SafeMode) && (State.ForceColorForEveryone || (State.Cycler && State.RandomColor && State.CycleForEveryone)))
-			break;
-		if (State.SMAC_CheckColor && IsInGame()) {
-			SMAC_OnCheatDetected(player, "Abnormal Change Color");
-			return;
-		}
-		break;
 	case (uint8_t)RpcCalls__Enum::SetHat:
 	case (uint8_t)RpcCalls__Enum::SetHatStr:
 	case (uint8_t)RpcCalls__Enum::SetVisor:
