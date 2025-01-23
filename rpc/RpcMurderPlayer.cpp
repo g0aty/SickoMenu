@@ -3,6 +3,7 @@
 #include "game.h"
 #include "utility.h"
 #include "state.hpp"
+#include <iostream>
 
 RpcMurderPlayer::RpcMurderPlayer(PlayerControl* Player, PlayerControl* target, bool success)
 {
@@ -260,14 +261,14 @@ void EndMeeting::Process()
 	MeetingHud_Close(MeetingHud__TypeInfo->static_fields->Instance, NULL);
 }
 
-DestroyMap::DestroyMap() {
-
+DestroyMap::DestroyMap() 
+{
+	
 }
 
 void DestroyMap::Process()
 {
-	return;
-	//ShipStatus_OnDestroy(ShipStatus__TypeInfo->static_fields->Instance, NULL);
+
 }
 
 RpcRevive::RpcRevive(PlayerControl* Player)
@@ -404,7 +405,7 @@ void RpcForceAumChat::Process()
 	MessageWriter_WriteString(rpcMessage, convert_to_string(msg), NULL);
 	MessageWriter_WriteInt32(rpcMessage, outfit->fields.ColorId, NULL);
 	MessageWriter_EndMessage(rpcMessage, NULL);
-	std::string chatVisual = "<#f55><b>[AUM Chat]</b></color>\n" + msg;
+	std::string chatVisual = "<#B4325DFF><b>[AUM Chat]</b></color>\n" + msg;
 	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(chatVisual), false, NULL);
 }
 
