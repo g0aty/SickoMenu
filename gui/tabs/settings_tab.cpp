@@ -237,7 +237,7 @@ namespace SettingsTab {
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
-			static float timer = 0.0f;
+      static float timer = 0.0f;
       static bool showMessage = false;
 
       if (ToggleButton("Unlock Cosmetics", &State.UnlockCosmetics)) {
