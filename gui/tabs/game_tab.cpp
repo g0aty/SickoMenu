@@ -5,6 +5,113 @@
 #include "utility.h"
 #include "state.hpp"
 #include "logger.h"
+#include <hunspell/hunspell.hxx>
+#include <sstream>
+#include <string>
+#include <vector>
+#include "imgui.h" // Ensure you have ImGui included
+
+// RAII wrapper for Hunspell to ensure proper resource management
+class SpellChecker {
+public:
+    SpellChecker(const std::string& affPath, const std::string& dicPath) {
+        if (!Hunspell::isAvailable()) {
+            throw std::runtime_error("Hunspell is not available.");
+        }
+        spell = new Hunspell(affPath.c_str(), dicPath.c_str());
+        if (!spell->load()) {
+            delete spell;
+            throw std::runtime_error("Failed to load Hunspell dictionary.");
+        }
+    }
+
+    ~SpellChecker() {
+        delete spell;
+    }
+
+    bool isCorrect(const std::string& word) const {
+        return spell->spell(word.c_str());
+    }
+
+private:
+    Hunspell* spell;
+};
+
+void HighlightMisspelledWords(SpellChecker& checker, const std::string& text) {
+    std::istringstream iss(text);
+    std::string word;
+
+    while (iss >> word) {
+        // Check if the word is misspelled
+        bool isCorrect = checker.isCorrect(word);
+
+        if (!isCorrect) {
+            // Highlight misspelled words in red
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", word.c_str());
+        } else {
+            // Render correctly spelled words normally
+            ImGui::Text("%s ", word.c_str()); // Add space to separate words
+        }
+    }
+}
+
+void RenderMenu() {
+    try {
+        SpellChecker spellChecker("en_US.aff", "en_US.dic");
+
+        std::string chatMessage = "Ths is a smaple text with sme misspelled wrds.";
+
+        if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
+        if (State.SMAC_CheckBadWords) {
+            HighlightMisspelledWords(spellChecker, chatMessage);
+
+            static std::string newWord = "";
+            InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
+            ImGui::SameLine();
+            if (ImGui::Button("Add Word")) {
+                State.SMAC_BadWords.push_back(newWord);
+                State.Save();
+                newWord = "";
+            }
+
+            // Existing code for managing bad words...
+        }
+    } catch (const std::exception& e) {
+        // Handle exceptions, possibly log them or display an error message
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Error: %s", e.what());
+    }
+}
+
+// Example functions for ToggleButton and InputString to simulate ImGui behavior
+bool ToggleButton(const char* label, bool* p_value) {
+    return ImGui::Checkbox(label, p_value);
+}
+
+void InputString(const char* label, std::string* str, int flags = 0) {
+    ImGui::InputText(label, &(*str)[0], str->capacity() + 1, flags);
+}
+
+// Example State structure
+struct State {
+    bool SMAC_CheckBadWords;
+    void Save() {}
+    static std::vector<std::string> SMAC_BadWords;
+};
+
+std::vector<std::string> State::SMAC_BadWords;
+
+int main() {
+    // Initialize ImGui and other necessary components here
+
+    while (true) { // Main loop
+        RenderMenu();
+        
+        // Render ImGui frame, handle events, etc.
+    }
+
+    return 0;
+}
+
 
 namespace GameTab {
     enum Groups {
