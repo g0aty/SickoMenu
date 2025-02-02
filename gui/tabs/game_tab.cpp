@@ -9,9 +9,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "imgui.h" // Ensure you have ImGui included
+#include "imgui.h" 
 
-// RAII wrapper for Hunspell to ensure proper resource management
 class SpellChecker {
 public:
     SpellChecker(const std::string& affPath, const std::string& dicPath) {
@@ -42,15 +41,15 @@ void HighlightMisspelledWords(SpellChecker& checker, const std::string& text) {
     std::string word;
 
     while (iss >> word) {
-        // Check if the word is misspelled
+       
         bool isCorrect = checker.isCorrect(word);
 
         if (!isCorrect) {
-            // Highlight misspelled words in red
+            
             ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", word.c_str());
         } else {
-            // Render correctly spelled words normally
-            ImGui::Text("%s ", word.c_str()); // Add space to separate words
+           
+            ImGui::Text("%s ", word.c_str()); 
         }
     }
 }
@@ -74,7 +73,7 @@ void RenderMenu() {
                 newWord = "";
             }
 
-            // Existing code for managing bad words...
+            
         }
     } catch (const std::exception& e) {
         // Handle exceptions, possibly log them or display an error message
@@ -82,7 +81,7 @@ void RenderMenu() {
     }
 }
 
-// Example functions for ToggleButton and InputString to simulate ImGui behavior
+
 bool ToggleButton(const char* label, bool* p_value) {
     return ImGui::Checkbox(label, p_value);
 }
@@ -91,7 +90,7 @@ void InputString(const char* label, std::string* str, int flags = 0) {
     ImGui::InputText(label, &(*str)[0], str->capacity() + 1, flags);
 }
 
-// Example State structure
+
 struct State {
     bool SMAC_CheckBadWords;
     void Save() {}
@@ -101,12 +100,12 @@ struct State {
 std::vector<std::string> State::SMAC_BadWords;
 
 int main() {
-    // Initialize ImGui and other necessary components here
+   
 
-    while (true) { // Main loop
+    while (true) { 
         RenderMenu();
         
-        // Render ImGui frame, handle events, etc.
+       
     }
 
     return 0;
@@ -122,7 +121,7 @@ namespace GameTab {
         Options
     };
 
-    static bool openGeneral = true; //default to visual tab group
+    static bool openGeneral = true; 
     static bool openChat = false;
     static bool openAnticheat = false;
     static bool openDestruct = false;
@@ -169,10 +168,7 @@ namespace GameTab {
             if (SteppedSliderFloat("Kill Distance", &State.KillDistance, 0.f, 20.f, 0.1f, "%.1f m", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
                 State.PrevKillDistance = State.KillDistance;
             }
-            /*if (GameOptions().GetGameMode() == GameModes__Enum::Normal) {
-                if (CustomListBoxInt("Task Bar Updates", &State.TaskBarUpdates, TASKBARUPDATES, 225 * State.dpiScale))
-                    State.PrevTaskBarUpdates = State.TaskBarUpdates;
-            }*/
+            
             if (ToggleButton("No Ability Cooldown", &State.NoAbilityCD)) {
                 State.Save();
             }
@@ -229,17 +225,7 @@ namespace GameTab {
                 State.Save();
             }
 
-            /*if (ToggleButton("Auto-Join", &State.AutoJoinLobby))
-                State.Save();
-            ImGui::SameLine();
-            if (InputString("Lobby Code", &State.AutoJoinLobbyCode))
-                State.Save();
-
-            if (ImGui::Button("Join Lobby")) {
-                AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
-                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
-                    NULL);
-            }*/
+        
 
             if (IsInGame() || IsInLobby()) ImGui::SameLine();
             if ((IsInGame() || IsInLobby()) && ImGui::Button("Reset Appearance"))
@@ -264,10 +250,7 @@ namespace GameTab {
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            /*if (ImGui::Button("Spawn Dummy")) {
-                if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy());
-                if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy());
-            }*/
+
             if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
                 if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
