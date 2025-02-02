@@ -41,7 +41,7 @@ void HighlightMisspelledWords(SpellChecker& checker, const std::string& text) {
     std::string word;
 
     while (iss >> word) {
-       
+        
         bool isCorrect = checker.isCorrect(word);
 
         if (!isCorrect) {
@@ -73,10 +73,10 @@ void RenderMenu() {
                 newWord = "";
             }
 
-            
+           
         }
     } catch (const std::exception& e) {
-        // Handle exceptions, possibly log them or display an error message
+        
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Error: %s", e.what());
     }
 }
@@ -100,7 +100,7 @@ struct State {
 std::vector<std::string> State::SMAC_BadWords;
 
 int main() {
-   
+    
 
     while (true) { 
         RenderMenu();
@@ -168,7 +168,10 @@ namespace GameTab {
             if (SteppedSliderFloat("Kill Distance", &State.KillDistance, 0.f, 20.f, 0.1f, "%.1f m", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
                 State.PrevKillDistance = State.KillDistance;
             }
-            
+            /*if (GameOptions().GetGameMode() == GameModes__Enum::Normal) {
+                if (CustomListBoxInt("Task Bar Updates", &State.TaskBarUpdates, TASKBARUPDATES, 225 * State.dpiScale))
+                    State.PrevTaskBarUpdates = State.TaskBarUpdates;
+            }*/
             if (ToggleButton("No Ability Cooldown", &State.NoAbilityCD)) {
                 State.Save();
             }
@@ -225,7 +228,17 @@ namespace GameTab {
                 State.Save();
             }
 
-        
+            /*if (ToggleButton("Auto-Join", &State.AutoJoinLobby))
+                State.Save();
+            ImGui::SameLine();
+            if (InputString("Lobby Code", &State.AutoJoinLobbyCode))
+                State.Save();
+
+            if (ImGui::Button("Join Lobby")) {
+                AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
+                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
+                    NULL);
+            }*/
 
             if (IsInGame() || IsInLobby()) ImGui::SameLine();
             if ((IsInGame() || IsInLobby()) && ImGui::Button("Reset Appearance"))
@@ -250,7 +263,10 @@ namespace GameTab {
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-
+            /*if (ImGui::Button("Spawn Dummy")) {
+                if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy());
+                if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy());
+            }*/
             if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
                 if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
