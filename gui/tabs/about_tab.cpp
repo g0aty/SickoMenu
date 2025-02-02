@@ -36,9 +36,21 @@ namespace AboutTab {
         }
 
         if (openWelcome) {
-            std::string welcomeText = std::format("Welcome {}to SickoMenu {}!", State.HasOpenedMenuBefore ? "back " : "", State.SickoVersion);
-            ImGui::Text(welcomeText.c_str());
-            ImGui::Text("SickoMenu is a powerful utility for Among Us.");
+            ImGui::Text("Welcome %sto", State.HasOpenedMenuBefore ? "back " : "");
+            ImGui::SameLine(0.0f); // Remove space after "Welcome"
+
+            // "SickoMenu" with no space, "Sicko" in green, "Menu" in red
+            ImGui::TextColored(ImVec4(0.13f, 0.8f, 0.31f, 1.0f), "Sicko");
+            ImGui::SameLine(0.0f); // No space
+            ImGui::TextColored(ImVec4(0.8f, 0.13f, 0.2f, 1.0f), "Menu");
+            ImGui::SameLine(0.0f); // No space
+            ImGui::Text("!");
+
+            // Use the same styling for all references to "SickoMenu"
+            ImGui::TextColored(ImVec4(0.13f, 0.8f, 0.31f, 1.0f), "Sicko");
+            ImGui::SameLine(0.0f); // No space
+            ImGui::TextColored(ImVec4(0.8f, 0.13f, 0.2f, 1.0f), "Menu");
+            ImGui::Text(" is a powerful utility for Among Us.");
             ImGui::Text("It aims to improve the game experience for all players!");
             ImGui::Text("Use the \"Check for Updates\" button to download the latest release!");
             if (ImGui::Button("GitHub")) {
@@ -50,7 +62,7 @@ namespace AboutTab {
             }
             ImGui::Text("Join the Discord server for support, bug reports, and sneak peeks!");
             if (ImGui::Button("Join our Discord!")) {
-                OpenLink("https://dsc.gg/sickos"); //sickomenu discord invite
+                OpenLink("https://dsc.gg/sickos");
             }
             ImGui::Text("SickoMenu is a free and open-source software.");
 
@@ -66,7 +78,17 @@ namespace AboutTab {
         }
 
         if (openCredits) {
-            ImGui::Text("SickoMenu is a fork of AmongUsMenu (archived), go check it out!");
+            // "SickoMenu" with no space, "Sicko" in green, "Menu" in red
+            ImGui::TextColored(ImVec4(0.13f, 0.8f, 0.31f, 1.0f), "Sicko");
+            ImGui::SameLine(0.0f); // No space
+            ImGui::TextColored(ImVec4(0.8f, 0.13f, 0.2f, 1.0f), "Menu");
+            ImGui::Text(" is a fork of ");
+
+            // "AmongUsMenu" with no space, "AmongUs" in red, "Menu" in white
+            ImGui::TextColored(ImVec4(0.8f, 0.13f, 0.2f, 1.0f), "AmongUs");
+            ImGui::SameLine(0.0f); // No space
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Menu");
+            ImGui::Text(" (archived), go check it out!");
             if (ImGui::Button("AmongUsMenu")) {
                 OpenLink("https://github.com/BitCrackers/AmongUsMenu");
             }
@@ -109,7 +131,7 @@ namespace AboutTab {
             ImGui::Text("Thanks to v0idp for originally creating AmongUsMenu!");
             if (ImGui::Button("v0idp")) {
                 OpenLink("https://github.com/v0idp");
-            }                        
+            }
 
             ImGui::Text("Everyone else who contributed to AUM and I couldn't list here.");
             ImGui::Text("Thank you for making SickoMenu possible!");
