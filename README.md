@@ -21,7 +21,6 @@ A huge collection of various utilities and cheats such as
 - View Ghosts and Chat
 - View Others roles
 - Gradient name **(Only as host or Non-Safe Mode)**
-- 
 - Better AUM Chat (Type in regular chat: "/aum [insert message here]")
 - And much more! Check out the full list of features [here](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)!
 
