@@ -6,7 +6,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Permanent invite: https://dsc.gg/sickos
 
 ## ⚠️ Disclaimer
-This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) And Sickomenu team is not responsible for what you do in game
+This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) and Sickomenu team is not responsible for what you do in game.
 
 This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.
 
@@ -18,8 +18,8 @@ A huge collection of various utilities and cheats such as
 - Move in Vents
 - Zoom Out
 - Confuser
-- See Ghosts and Chat
-- See Others roles!
+- View Ghosts and Chat
+- View Others roles
 - Gradient name **(Only as host or Non-Safe Mode)**
 - 
 - Better AUM Chat (Type in regular chat: "/aum [insert message here]")
@@ -34,10 +34,10 @@ A huge collection of various utilities and cheats such as
 - ✅ Steam (Supported)
 - ✅ Epic Games (Supported)
 - ✅ itch.io (Supported)
-- ❓ Cracked (Only works on Steam,Epic,itch Cracked Among us. I don't condone it)
+- ❓ Cracked (Only works with cracked versions of Steam, Epic Games, or itch.io releases. I don't condone it)
 - ❌ Microsoft Store (Not Supported)
 - ❌ iOS/iPadOS/Android (Not Supported)
-- ❌ Switch/Xbox/Playstation (Not Supported) sorry!
+- ❌ Switch/Xbox/Playstation (Not Supported) 
 
 ## ⬇️ Download & Install
 ### For Windows
@@ -87,13 +87,13 @@ You can compile two different versions of the menu. Normal or Version Proxy. Ste
 Inject it with any reliable injector you have.
 
 - Debug (With Debug Information and can be attached to process)
-- Release (Optimized with all  Debug information stripped)
+- Release (Optimized with all Debug information stripped)
 
 ### Version Proxy (version.dll)
 Will automatically be loaded by the Game itself if the dll is in the game directory.
 
 - Debug_Version (With Debug Information and can be attached to process)
-- Release_Version (Optimized with all information stripped)
+- Release_Version (Optimized with all Debug information stripped)
 
 ## 🙏 Special Thanks
 * The BitCrackers team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
