@@ -1,24 +1,27 @@
 # 👺 SickoMenu v4.1.2
-A powerful utility for Among Us that aims to improve the game experience!
+A powerful utility for Among Us that aims to improve the game experience! 
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Vanity Invite: https://discord.gg/sickos
 ### Permanent invite: https://dsc.gg/sickos
 
 ## ⚠️ Disclaimer
-This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) am not responsible.
+This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) And Sickomenu team is not responsible for what you do in game
 
 This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.
 
 ## ⚙️ Features
 A huge collection of various utilities and cheats such as
 - Generate a brand new guest account every time the game is launched
-- Fake Roles
+- Fake Roles **(Only as host or Non-Safe Mode)**
 - NoClip
 - Move in Vents
 - Zoom Out
 - Confuser
 - See Ghosts and Chat
+- See Others roles!
+- Gradient name **(Only as host or Non-Safe Mode)**
+- 
 - Better AUM Chat (Type in regular chat: "/aum [insert message here]")
 - And much more! Check out the full list of features [here](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)!
 
@@ -31,10 +34,10 @@ A huge collection of various utilities and cheats such as
 - ✅ Steam (Supported)
 - ✅ Epic Games (Supported)
 - ✅ itch.io (Supported)
-- ❓ Cracked (works occasionally, I don't condone it)
+- ❓ Cracked (Only works on Steam,Epic,itch Cracked Among us. I don't condone it)
 - ❌ Microsoft Store (Not Supported)
 - ❌ iOS/iPadOS/Android (Not Supported)
-- ❌ Switch/Xbox/Playstation (Not Supported)
+- ❌ Switch/Xbox/Playstation (Not Supported) sorry!
 
 ## ⬇️ Download & Install
 ### For Windows
@@ -81,10 +84,10 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
 
 ### Normal (SickoMenu.dll)
-Inject it with any injector you have.
+Inject it with any reliable injector you have.
 
 - Debug (With Debug Information and can be attached to process)
-- Release (Optimized with all information stripped)
+- Release (Optimized with all  Debug information stripped)
 
 ### Version Proxy (version.dll)
 Will automatically be loaded by the Game itself if the dll is in the game directory.
