@@ -6,7 +6,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Permanent invite: https://dsc.gg/sickos
 
 ## ⚠️ Disclaimer
-This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) and Sickomenu team is not responsible for what you do in game.
+This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) and Sickomenu team are not responsible for what you do in game.
 
 This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.
 
