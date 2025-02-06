@@ -52,7 +52,7 @@ void HighlightMisspelledWords(const std::string& text) {
           
             ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", word.c_str());
         } else {
-            // Простой вывод правильных слов
+            
             ImGui::Text("%s ", word.c_str());
         }
     }
