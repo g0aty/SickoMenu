@@ -6,6 +6,84 @@
 #include "logger.h"
 #include "DirectX.h"
 #include <DirectX.h>
+#include <sstream>
+#include <string>
+#include <unordered_set>
+#include "imgui.h"
+
+
+extern bool enableSpellCheck;
+
+
+std::unordered_set<std::string> dictionary = {
+    "the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", "on", "with", "as", "you", "do", "at", 
+    "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", 
+    "there", "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", 
+    "like", "time", "no", "just", "him", "know", "take", "person", "into", "year", "your", "good", "some", "could", "them", 
+    "see", "other", "than", "then", "now", "look", "only", "come", "its", "over", "think", "also", "back", "after", "use", 
+    "two", "how", "our", "work", "first", "well", "way", "even", "new", "want", "because", "any", "these", "give", "day", 
+    "most", "us", "is", "are", "was", "were", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", 
+    "a", "an", "the", "more", "over", "just", "be", "no", "see", "world", "run", "place", "good", "find", "way", "work", "school",
+    "game", "night", "right", "left", "white", "color", "someone", "man", "woman", "child", "children", "people", "language", "hand",
+    "eye", "face", "head", "mouth", "life", "death", "question", "answer", "time", "space", "light", "dark", "story", "line", "know",
+    "known", "table", "shirt", "pants", "shoes", "computer", "movie", "television", "board", "screen", "car", "bicycle", "train", "city",
+    "town", "village", "country", "nation", "world", "music", "song", "guitar", "piano", "harmonica", "drums", "band", "sing", "dance", 
+    "eat", "drink", "sleep", "run", "jump", "smile", "laugh", "cry", "think", "remember", "forget", "understand", "love", "hate", "like", 
+    "need", "want", "wish", "desire", "hope", "try", "hard", "work", "play", "study", "learn", "teach", "student", "teacher", "school", 
+    "university", "class", "book", "pen", "paper", "word", "sentence", "paragraph", "book", "novel", "poem", "author", "writer", "reader"
+};
+
+
+bool isCorrect(const std::string& word) {
+    return dictionary.find(word) != dictionary.end();
+}
+
+void HighlightMisspelledWords(const std::string& text) {
+    std::istringstream iss(text);
+    std::string word;
+
+    while (iss >> word) {
+      
+        word.erase(remove_if(word.begin(), word.end(), [](unsigned char c) { return !isalpha(c); }), word.end());
+        
+        bool correct = isCorrect(word);
+
+        if (!correct) {
+          
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", word.c_str());
+        } else {
+            // Простой вывод правильных слов
+            ImGui::Text("%s ", word.c_str());
+        }
+    }
+}
+
+
+bool ToggleButton(const char* str_id, bool* v) {
+    ImVec4* colors = GetStyle().Colors;
+    ImVec2 p = GetCursorScreenPos();
+    ImDrawList* draw_list = GetWindowDrawList();
+
+    float height = GetFrameHeight();
+    float width = height * 1.55f;
+    float radius = height * 0.50f;
+    InvisibleButton(str_id, ImVec2(width, height));
+    bool result = false;
+    if (IsItemClicked()) {
+        *v = !*v;
+        result = true;
+    }
+
+    if (IsItemHovered())
+        draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f);
+    else
+        draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBgActive] : colors[ImGuiCol_FrameBg]), height * 0.50f);
+    draw_list->AddCircleFilled(ImVec2(p.x + radius + (*v ? 1 : 0) * (width - radius * 2.0f), p.y + radius), radius - 1.5f, GetColorU32(colors[ImGuiCol_CheckMark]));
+    SameLine();
+    Text(str_id);
+    return result;
+}
+
 
 using namespace ImGui;
 
