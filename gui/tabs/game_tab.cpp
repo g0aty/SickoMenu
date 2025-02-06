@@ -5,6 +5,30 @@
 #include "utility.h"
 #include "state.hpp"
 #include "logger.h"
+#include "gui-helpers.cpp" 
+#include "imgui.h"
+
+
+extern bool enableSpellCheck;
+
+
+void RenderGameTab() {
+   
+    if (ToggleButton("Spell Check", &enableSpellCheck)) {
+
+    }
+
+
+    std::string chatMessage = "Ths is a smaple text with sme misspelled wrds.";
+
+   
+    if (enableSpellCheck) {
+        HighlightMisspelledWords(chatMessage);
+    } else {
+   
+        ImGui::Text("%s", chatMessage.c_str());
+    }
+}
 
 namespace GameTab {
     enum Groups {
@@ -15,7 +39,7 @@ namespace GameTab {
         Options
     };
 
-    static bool openGeneral = true; //default to visual tab group
+    static bool openGeneral = true;
     static bool openChat = false;
     static bool openAnticheat = false;
     static bool openDestruct = false;
@@ -122,17 +146,7 @@ namespace GameTab {
                 State.Save();
             }
 
-            /*if (ToggleButton("Auto-Join", &State.AutoJoinLobby))
-                State.Save();
-            ImGui::SameLine();
-            if (InputString("Lobby Code", &State.AutoJoinLobbyCode))
-                State.Save();
-
-            if (ImGui::Button("Join Lobby")) {
-                AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
-                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
-                    NULL);
-            }*/
+    
 
             if (IsInGame() || IsInLobby()) ImGui::SameLine();
             if ((IsInGame() || IsInLobby()) && ImGui::Button("Reset Appearance"))
@@ -157,10 +171,7 @@ namespace GameTab {
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            /*if (ImGui::Button("Spawn Dummy")) {
-                if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy());
-                if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy());
-            }*/
+           
             if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
                 if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
