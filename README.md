@@ -1,26 +1,41 @@
-# 👺 SickoMenu v4.1.2
-A powerful utility for Among Us that aims to improve the game experience!
+# 👺 SickoMenu v4.1.2 (by g0aty)
+A powerful utility for Among Us designed to enhance your game experince with custom features!
+**⚠️ Intended for educational and experimental use only.**
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Vanity Invite: https://discord.gg/sickos
 ### Permanent invite: https://dsc.gg/sickos
+---
+
+## 🛑 Ethical Use Protocol
+**By using SickoMenu, you agree to:**
+1. **Use exclusively in private lobbies** with consenting players.
+2. **Never exploit features in public matches** or to harass others.
+3. **Respect Innersloth's Terms of Service** and the integrity of the game.
+4. **Immediately disable the mod** (`PAUSE BREAK` hotkey) if joining public lobbies accidentally.
+
+> 🚫 Misuse may result in account bans. **We do not condone cheating.**  
+> Report unethical usage in our [Discord](https://discord.gg/sickos).
+
+---
 
 ## ⚠️ Disclaimer
-This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) am not responsible.
+This project is **strictly for educational purposes** to study game mechanics and anti-cheat systems. It is **not endorsed by Innersloth LLC**, and we strongly discourage use in public matches. By downloading, you accept full responsibility for any consequences.I (g0aty) am not responsible for any repercussions.
 
-This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.
-
+**Legal Notice:**  
+Portions of materials used are property of Innersloth LLC. © Innersloth LLC. This mod complies with Innersloth's [Modding Policy](https://www.innersloth.com/policies/) for non-malicious private use.
 ## ⚙️ Features
-A huge collection of various utilities and cheats such as
-- Generate a brand new guest account every time the game is launched
-- Fake Roles
-- NoClip
-- Move in Vents
-- Zoom Out
-- Confuser
-- See Ghosts and Chat
-- Better AUM Chat (Type in regular chat: "/aum [insert message here]")
-- And much more! Check out the full list of features [here](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)!
+A huge amount of features!!
+  - NoClip (`CTRL`)  
+  - Ghost Visibility  
+  - Confuser (May disrupt gameplay)  
+- **Cosmetic/UI Enhancements**:  
+  - Guest Account Generator  
+  - Zoom Out  
+  - Better AUM Chat (`/aum [message]`)  
+- **Full Feature List**: [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
+
+> 🔸 Features marked with **!** may impact game balance. Always obtain lobby consent
 
 ## 📸 Screenshot
 <p align="center">
@@ -76,6 +91,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 - Repair Sabotage - PAGE DOWN (PgDn)
 - NoClip - CTRL
 - Panic / Disable SickoMenu - PAUSE BREAK (Break)
+> 🔸 Features marked with **!** may impact game balance. Always obtain lobby consent
 
 ## ⚒️ Compile (Configurations)
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
