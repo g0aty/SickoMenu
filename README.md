@@ -6,6 +6,11 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Vanity Invite: https://discord.gg/sickos
 ### Permanent invite: https://dsc.gg/sickos
 ---
+## ⚠️ Disclaimer
+This project is **strictly for educational purposes** to study game mechanics and anti-cheat systems. It is **not endorsed by Innersloth LLC**, and we strongly discourage use in public matches. By downloading, you accept full responsibility for any consequences.I (g0aty) am not responsible for any repercussions.
+
+**Legal Notice:**  
+Portions of materials used are property of Innersloth LLC. © Innersloth LLC. This mod complies with Innersloth's [Modding Policy](https://www.innersloth.com/policies/) for non-malicious private use.
 
 ## 🛑 Ethical Use Protocol
 **By using SickoMenu, you agree to:**
@@ -19,18 +24,12 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 
 ---
 
-## ⚠️ Disclaimer
-This project is **strictly for educational purposes** to study game mechanics and anti-cheat systems. It is **not endorsed by Innersloth LLC**, and we strongly discourage use in public matches. By downloading, you accept full responsibility for any consequences.I (g0aty) am not responsible for any repercussions.
-
-**Legal Notice:**  
-Portions of materials used are property of Innersloth LLC. © Innersloth LLC. This mod complies with Innersloth's [Modding Policy](https://www.innersloth.com/policies/) for non-malicious private use.
 ## ⚙️ Features
 A huge amount of features!!
   - NoClip (`CTRL`)  
   - Ghost Visibility  
   - Confuser (May disrupt gameplay)  
 - **Cosmetic/UI Enhancements**:  
-  - Guest Account Generator  
   - Zoom Out  
   - Better AUM Chat (`/aum [message]`)  
 - **Full Feature List**: [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
@@ -91,7 +90,6 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 - Repair Sabotage - PAGE DOWN (PgDn)
 - NoClip - CTRL
 - Panic / Disable SickoMenu - PAUSE BREAK (Break)
-> 🔸 Features marked with **!** may impact game balance. Always obtain lobby consent
 
 ## ⚒️ Compile (Configurations)
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
