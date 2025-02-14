@@ -20,7 +20,7 @@ Portions of materials used are property of Innersloth LLC. © Innersloth LLC. Th
 3. **Respect Innersloth's Terms of Service** and the integrity of the game.
 4. **Immediately disable the mod** (`PAUSE BREAK` hotkey) if joining public lobbies accidentally.
 
-> 🚫 Misuse may result in account bans. **We do not condone cheating.**  
+> 🚫 Misuse may lead to an Among Us account ban. **We do not condone cheating.**  
 > Report unethical usage in our [Discord](https://discord.gg/sickos).
 
 ---
@@ -122,7 +122,7 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 5. Create a new Pull Request
 
 ## ✨ Inspiration
-* [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by the-real-techiee
-* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by Team-YuTeam
-* [BetterAmongUs-Public](https://github.com/EnhancedNetwork/BetterAmongUs-Public) by EnhancedNetwork (D1GQ)
-* [MalumMenu](https://github.com/scp222thj/MalumMenu) by scp222thj
+* [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee)
+* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
+* [BetterAmongUs-Public](https://github.com/EnhancedNetwork/BetterAmongUs-Public) by [EnhancedNetwork](https://github.com/EnhancedNetwork) [(D1GQ)](https://github.com/D1GQ)
+* [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
