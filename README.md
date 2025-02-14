@@ -9,8 +9,6 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 This project is intended for Educational Use only. I do not condone this software being used to gain an advantage against other people. This project is aimed to make Innersloth's anticheat better. Use at your own risk. If you get banned from playing entirely or from a lobby, I (g0aty) am not responsible.
 
 This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.
-## ⁉ Need Help?
-Join Sicko Menu's Discord server and go to the Support channel to get help, [Sicko Menu Discord Invite Link](https://discord.gg/sickos)
 ## ⚙️ Features
 A huge collection of various utilities and cheats such as
 - Generate a brand new guest account every time the game is launched
@@ -22,7 +20,13 @@ A huge collection of various utilities and cheats such as
 - See Ghosts and Chat
 - Better AUM Chat (Type in regular chat: "/aum [insert message here]")
 - And much more! Check out the full list of features [here](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)!
-
+## NOTE: Innersloth keeps patching hacks the below listed features are patched now
+Force Meeting / Force Report / Spam Report (without Host)
+Attach to / Teleporting extremely quickly (rate-limit)
+Level Farm (rate-limit)
+Spam Sabotage (rate-limit)
+Spoof Guest Account (limited to Quick Chat lobbies)
+There will be more soon because Innersloth Patches Features you can find all Patched features at the SickoMenu Discord Server
 ## 📸 Screenshot
 <p align="center">
    <img src="screenshot.png">
