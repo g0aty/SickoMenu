@@ -1,5 +1,6 @@
-# 👺 SickoMenu v4.1.2 (by g0aty)
+# 👺 SickoMenu v4.1.2
 A powerful utility for Among Us designed to enhance your game experince with custom features!
+
 **⚠️ Intended for educational and experimental use only.**
 
 Join our very own Discord server for support, bug reports, and sneak peeks!
