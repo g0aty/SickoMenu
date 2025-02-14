@@ -16,7 +16,7 @@ namespace AboutTab {
         Credits
     };
 
-    static bool openWelcome = true; //default to welcome tab group
+    static bool openWelcome = true; // Default to welcome tab group
     static bool openCredits = false;
 
     void CloseOtherGroups(Groups group) {
@@ -27,6 +27,7 @@ namespace AboutTab {
     void Render() {
         ImGui::SameLine(100 * State.dpiScale);
         ImGui::BeginChild("###About", ImVec2(500 * State.dpiScale, 300), true, ImGuiWindowFlags_NoBackground);
+        
         if (TabGroup("Welcome", openWelcome)) {
             CloseOtherGroups(Groups::Welcome);
         }
@@ -41,6 +42,7 @@ namespace AboutTab {
             ImGui::Text("SickoMenu is a powerful utility for Among Us.");
             ImGui::Text("It aims to improve the game experience for all players!");
             ImGui::Text("Use the \"Check for Updates\" button to download the latest release!");
+            
             if (ImGui::Button("GitHub")) {
                 OpenLink("https://github.com/g0aty/SickoMenu");
             }
@@ -48,10 +50,17 @@ namespace AboutTab {
             if (ImGui::Button("Check for Updates")) {
                 OpenLink("https://github.com/g0aty/SickoMenu/releases/latest");
             }
+
+            // Add note about manually updating SickoMenu
+            ImGui::Text("Note: After downloading the latest release, you must manually update SickoMenu.");
+            ImGui::Text("Follow the same installation steps as before, but replace the old DLL with the new one.");
+            ImGui::Text("Make sure to close the game before updating!");
+
             ImGui::Text("Join the Discord server for support, bug reports, and sneak peeks!");
             if (ImGui::Button("Join our Discord!")) {
-                OpenLink("https://dsc.gg/sickos"); //sickomenu discord invite
+                OpenLink("https://dsc.gg/sickos"); // SickoMenu Discord invite
             }
+
             ImGui::Text("SickoMenu is a free and open-source software.");
 
             if (State.SickoVersion.find("pr") != std::string::npos) {
@@ -62,7 +71,6 @@ namespace AboutTab {
                 ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "Make sure you have downloaded the latest version of SickoMenu from GitHub or our");
                 ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "official Discord!");
             }
-            //hopefully stop people from reselling a foss menu for actual money
         }
 
         if (openCredits) {
@@ -70,6 +78,7 @@ namespace AboutTab {
             if (ImGui::Button("AmongUsMenu")) {
                 OpenLink("https://github.com/BitCrackers/AmongUsMenu");
             }
+
             ImGui::Text("Contributors:");
             if (ImGui::Button("GDjkhp")) {
                 OpenLink("https://github.com/GDjkhp");
@@ -86,6 +95,8 @@ namespace AboutTab {
             if (ImGui::Button("Luckyheat")) {
                 OpenLink("https://github.com/Luckyheat");
             }
+            ImGui::SameLine();
+            ImGui::Text("Developed the Destruct tab features for SickoMenu.");
 
             ImGui::Text("Some people who contributed to AUM:");
             if (ImGui::Button("KulaGGin")) {
@@ -111,8 +122,16 @@ namespace AboutTab {
                 OpenLink("https://github.com/v0idp");
             }                        
 
-            ImGui::Text("Everyone else who contributed to AUM and I couldn't list here.");
-            ImGui::Text("Thank you for making SickoMenu possible!");
+            ImGui::Text("Thank you to everyone else who contributed to AUM,");
+            ImGui::Text("and whose contributions couldn't all be listed here.");
+            ImGui::Text("Your support has made SickoMenu possible!");
+
+            ImGui::Text("Thank you to all contributors, SickoMenu Discord staff, and developers");
+            ImGui::Text("whose efforts have made SickoMenu possible!");
+
+            // Add thanks for donators and server boosters
+            ImGui::Text("A special thanks to our donators and those who boosted the SickoMenu Discord server.");
+            ImGui::Text("Your contributions are greatly appreciated!");
         }
         ImGui::EndChild();
     }
