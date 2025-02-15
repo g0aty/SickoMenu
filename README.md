@@ -81,9 +81,9 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 1. Install a bottle of CrossOver, install Steam in it and install Among Us.
 2. Open the C drive inside of CrossOver (there should be a button). Quit CrossOver. A Finder window will open.
 3. Go to `Program Files (x86)/Steam/steamapps/common/Among Us/` and put the `version.dll` into it. Then reopen CrossOver.
-5. Go to the **Configure Wine** panel, go to **Libraries**, open the menu below **New Replacement for:** and search for `version`.
-6. Select it and click **Add**, then **Apply** and **OK**.
-7. Start Among Us and press **Command+⌦** to show SickoMenu.
+4. Go to the **Configure Wine** panel, go to **Libraries**, open the menu below **New Replacement for:** and search for `version`.
+5. Select it and click **Add**, then **Apply** and **OK**.
+6. Start Among Us and press **Command+⌦** to show SickoMenu.
 
 **Method 2:-**
 
