@@ -259,19 +259,28 @@ namespace PlayersTab {
 			if (State.DisableMeetings && IsHost())
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Meetings have been disabled.");
 			GameOptions options;
-			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings || !IsHost())) { //Player selection doesn't matter
-				if (!State.InMeeting) {
-					if (ImGui::Button("Call Meeting")) {
-						RepairSabotage(*Game::pLocalPlayer);
-						State.rpcQueue.push(new RpcReportBody({}));
-					}
-				}
-				else {
-					if (ImGui::Button("Call Meeting")) {
-						RepairSabotage(*Game::pLocalPlayer);
-						State.rpcQueue.push(new RpcForceMeeting(*Game::pLocalPlayer, {}));
-					}
-				}
+			if (State.InMeeting && !IsHost() && State.SafeMode) {
+    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A meeting is already in progress. You cannot start another meeting.");
+    ImGui::BeginDisabled();
+}
+
+if (!State.InMeeting) {
+    if (ImGui::Button("Call Meeting")) {
+        RepairSabotage(*Game::pLocalPlayer);
+        State.rpcQueue.push(new RpcReportBody({}));
+    }
+} 
+else {
+    if (ImGui::Button("Call Meeting")) {
+        RepairSabotage(*Game::pLocalPlayer);
+        State.rpcQueue.push(new RpcForceMeeting(*Game::pLocalPlayer, {}));
+    }
+}
+
+if (State.InMeeting && !IsHost() && State.SafeMode) {
+    ImGui::EndDisabled();
+}
+
 			}
 			if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("Skip Vote by All")) {
 				Game::PlayerId VoteOffPlayerId = Game::SkippedVote;
