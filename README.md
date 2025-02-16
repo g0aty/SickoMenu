@@ -1,5 +1,5 @@
 <p align="center">
-   <img src="NMxou (1).png">
+   <img src="Remove background project (2).png">
   </p>
   
 <h1 align="center">SickoMenu v4.1.2</h1>
