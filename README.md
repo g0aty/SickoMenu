@@ -129,4 +129,4 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
 * [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
 * [BetterAmongUs-Public](https://github.com/EnhancedNetwork/BetterAmongUs-Public) by [EnhancedNetwork](https://github.com/EnhancedNetwork/) ([D1GQ](https://github.com/D1GQ))
-* [MalumMenu](https://github.com/scp222thj/MalumMenu) by scp222thj
+* [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
