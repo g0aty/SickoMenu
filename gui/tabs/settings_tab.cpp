@@ -351,7 +351,8 @@ namespace SettingsTab {
 			}
 
 			//if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
-			if (ToggleButton("Disable Host Anticheat (+25 Mode)", &State.DisableHostAnticheat)) {
+			if (!State.SafeMode)
+			 if (ToggleButton("Disable Host Anticheat (+25 Mode)", &State.DisableHostAnticheat)) {
 				if (!State.DisableHostAnticheat && State.BattleRoyale) {
 					State.BattleRoyale = false;
 					State.GameMode = 0;
