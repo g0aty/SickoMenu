@@ -237,24 +237,25 @@ namespace SettingsTab {
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
-      static float timer = 0.0f;
-      static bool showMessage = false;
+			static float timer = 0.0f;
+			static bool showMessage1 = false;
 
-      if (ToggleButton("Unlock Cosmetics", &State.UnlockCosmetics)) {
-        State.Save();
-        showMessage1 = true;
-        timer = ImGui::GetTime(); // Record the current time
-    }
-      if (showMessage1) {
-        float currentTime = ImGui::GetTime();
-        if (currentTime - timer < 4.0f) { // Show for 4 seconds
-          ImGui::TextColored(
-              ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
-              "Unlocked All Cosmetics!/Disabled Unlocked All Cosmetics");
-        } else {
-          showMessage1 = false; // Stop showing the message after 4 seconds
-        }
-    }
+			if (ToggleButton("Unlock Cosmetics", &State.UnlockCosmetics)) {
+				State.Save();
+				showMessage1 = true;
+				timer = static_cast<float>(ImGui::GetTime());
+			}
+			if (showMessage1) {
+				float currentTime = static_cast<float>(ImGui::GetTime());
+				if (currentTime - timer < 4.0f) { 
+					ImGui::TextColored(
+						ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
+						"Unlocked All Cosmetics!/Disabled Unlocked All Cosmetics");
+				}
+				else {
+					showMessage1 = false;
+				}
+			}
 
 			if (Achievements::IsSupported())
 			{
