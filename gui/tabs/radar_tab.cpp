@@ -34,7 +34,7 @@ namespace RadarTab {
 		if (ToggleButton("Hide Radar During Meetings", &State.HideRadar_During_Meetings)) {
 			State.Save();
 		}
-		if (ToggleButton("Draw Player Icons", &State.RadarDrawIcons)) {
+		if (ToggleButton("Display players' faces", &State.RadarDrawIcons)) {
 			State.Save();
 		}
 		/*if (State.RadarDrawIcons && State.RevealRoles) {

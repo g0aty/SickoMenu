@@ -22,7 +22,7 @@ namespace ReplayTab {
 			State.Save();
 		}
 
-		if (ToggleButton("Clear after meeting", &State.Replay_ClearAfterMeeting))
+		if (ToggleButton("Clear log after meeting", &State.Replay_ClearAfterMeeting))
 		{
 			State.Save();
 		}

@@ -1,4 +1,8 @@
-# 👺 SickoMenu v4.1.2
+<p align="center">
+   <img src="Remove background project (2).png">
+  </p>
+  
+<h1 align="center">SickoMenu v4.1.2</h1>
 A powerful utility for Among Us designed to enhance your game experince with custom features!
 
 **⚠️ Intended for educational and experimental use only.**
@@ -20,7 +24,7 @@ Portions of materials used are property of Innersloth LLC. © Innersloth LLC. Th
 3. **Respect Innersloth's Terms of Service** and the integrity of the game.
 4. **Immediately disable the mod** (`PAUSE BREAK` hotkey) if joining public lobbies accidentally.
 
-> 🚫 Misuse may result in account bans. **We do not condone cheating.**  
+> 🚫 Misuse may lead to an Among Us account ban. **We do not condone cheating.**
 > Report unethical usage in our [Discord](https://discord.gg/sickos).
 
 ---
@@ -133,7 +137,7 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 - Release_Version (Optimized with all information stripped)
 
 ## 🙏 Special Thanks
-* The BitCrackers team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
+* The [BitCrackers](https://github.com/bitcrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
 * [KulaGGin](https://github.com/KulaGGin) (Helped with some ImGui code for replay system)
 * [tomsa000](https://github.com/tomsa000) (Helped with fixing memory leaks and smart pointers)
 * [cddjr](https://github.com/cddjr) (Helped in updating to the Fungle map, saved a lot of my time)
@@ -147,7 +151,7 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 5. Create a new Pull Request
 
 ## ✨ Inspiration
-* [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by the-real-techiee
-* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by Team-YuTeam
-* [BetterAmongUs-Public](https://github.com/EnhancedNetwork/BetterAmongUs-Public) by EnhancedNetwork (D1GQ)
-* [MalumMenu](https://github.com/scp222thj/MalumMenu) by scp222thj
+* [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
+* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
+* [BetterAmongUs-Public](https://github.com/EnhancedNetwork/BetterAmongUs-Public) by [EnhancedNetwork](https://github.com/EnhancedNetwork/) ([D1GQ](https://github.com/D1GQ))
+* [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)

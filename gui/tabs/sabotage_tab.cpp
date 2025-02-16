@@ -278,7 +278,7 @@ namespace SabotageTab {
                 ImGui::Separator();
                 ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
             }
-            if (ImGui::Button("Repair Sabotage")) {
+            if (ImGui::Button("Repair all Sabotages")) {
                 RepairSabotage(*Game::pLocalPlayer);
             }
             ImGui::NewLine();
@@ -395,7 +395,7 @@ namespace SabotageTab {
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 1));
                 }
             }
-            if (ImGui::Button("Sabotage Comms")) {
+            if (ImGui::Button("Sabotage Communications")) {
                 State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
             }
 
