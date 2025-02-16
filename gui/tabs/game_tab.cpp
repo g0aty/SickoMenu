@@ -5,6 +5,112 @@
 #include "utility.h"
 #include "state.hpp"
 #include "logger.h"
+#include <hunspell/hunspell.hxx>
+#include <sstream>
+#include <string>
+#include <vector>
+#include "imgui.h" 
+
+class SpellChecker {
+public:
+    SpellChecker(const std::string& affPath, const std::string& dicPath) {
+        if (!Hunspell::isAvailable()) {
+            throw std::runtime_error("Hunspell is not available.");
+        }
+        spell = new Hunspell(affPath.c_str(), dicPath.c_str());
+        if (!spell->load()) {
+            delete spell;
+            throw std::runtime_error("Failed to load Hunspell dictionary.");
+        }
+    }
+
+    ~SpellChecker() {
+        delete spell;
+    }
+
+    bool isCorrect(const std::string& word) const {
+        return spell->spell(word.c_str());
+    }
+
+private:
+    Hunspell* spell;
+};
+
+void HighlightMisspelledWords(SpellChecker& checker, const std::string& text) {
+    std::istringstream iss(text);
+    std::string word;
+
+    while (iss >> word) {
+        
+        bool isCorrect = checker.isCorrect(word);
+
+        if (!isCorrect) {
+            
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", word.c_str());
+        } else {
+           
+            ImGui::Text("%s ", word.c_str()); 
+        }
+    }
+}
+
+void RenderMenu() {
+    try {
+        SpellChecker spellChecker("en_US.aff", "en_US.dic");
+
+        std::string chatMessage = "Ths is a smaple text with sme misspelled wrds.";
+
+        if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
+        if (State.SMAC_CheckBadWords) {
+            HighlightMisspelledWords(spellChecker, chatMessage);
+
+            static std::string newWord = "";
+            InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
+            ImGui::SameLine();
+            if (ImGui::Button("Add Word")) {
+                State.SMAC_BadWords.push_back(newWord);
+                State.Save();
+                newWord = "";
+            }
+
+           
+        }
+    } catch (const std::exception& e) {
+        
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Error: %s", e.what());
+    }
+}
+
+
+bool ToggleButton(const char* label, bool* p_value) {
+    return ImGui::Checkbox(label, p_value);
+}
+
+void InputString(const char* label, std::string* str, int flags = 0) {
+    ImGui::InputText(label, &(*str)[0], str->capacity() + 1, flags);
+}
+
+
+struct State {
+    bool SMAC_CheckBadWords;
+    void Save() {}
+    static std::vector<std::string> SMAC_BadWords;
+};
+
+std::vector<std::string> State::SMAC_BadWords;
+
+int main() {
+    
+
+    while (true) { 
+        RenderMenu();
+        
+       
+    }
+
+    return 0;
+}
+
 
 namespace GameTab {
     enum Groups {
@@ -15,7 +121,7 @@ namespace GameTab {
         Options
     };
 
-    static bool openGeneral = true; //default to visual tab group
+    static bool openGeneral = true; 
     static bool openChat = false;
     static bool openAnticheat = false;
     static bool openDestruct = false;
