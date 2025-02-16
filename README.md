@@ -2,7 +2,7 @@
    <img src="NMxou (1).png">
   </p>
   
-# 👺 SickoMenu v4.1.2
+#           SickoMenu v4.1.2
 A powerful utility for Among Us designed to enhance your game experince with custom features!
 
 **⚠️ Intended for educational and experimental use only.**
