@@ -112,7 +112,7 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
 * [BetterAmongUs-Public](https://github.com/EnhancedNetwork/BetterAmongUs-Public) by [EnhancedNetwork](https://github.com/EnhancedNetwork) [(D1GQ)](https://github.com/D1GQ)
 * [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
-* The BitCrackers team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
+* The [BitCrackers](https://github.com/bitcrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
 * [KulaGGin](https://github.com/KulaGGin) (Helped with some ImGui code for replay system)
 * [tomsa000](https://github.com/tomsa000) (Helped with fixing memory leaks and smart pointers)
 * [cddjr](https://github.com/cddjr) (Helped in updating to the Fungle map, saved a lot of my time)
