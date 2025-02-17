@@ -24,7 +24,7 @@ Portions of materials used are property of Innersloth LLC. © Innersloth LLC. Th
 3. **Respect Innersloth's Terms of Service** and the integrity of the game.
 4. **Immediately disable the mod** (`PAUSE BREAK` hotkey) if joining public lobbies accidentally.
 
-> 🚫 Misuse may lead to an Among Us account ban. **We do not condone cheating.**
+> 🚫 Misuse may result in account bans. **We do not condone cheating.**  
 > Report unethical usage in our [Discord](https://discord.gg/sickos).
 
 ---
@@ -79,14 +79,39 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 
 > [!NOTE]
 > This method uses CrossOver. If you have ANY other ways to use this with other software, refer to the contributing section!
+> 
+**Method 1:-**
 
 1. Install a bottle of CrossOver, install Steam in it and install Among Us.
 2. Open the C drive inside of CrossOver (there should be a button). Quit CrossOver. A Finder window will open.
 3. Go to `Program Files (x86)/Steam/steamapps/common/Among Us/` and put the `version.dll` into it. Then reopen CrossOver.
-5. Go to the **Configure Wine** panel, go to **Libraries**, open the menu below **New Replacement for:** and search for `version`.
-6. Select it and click **Add**, then **Apply** and **OK**.
-7. Start Among Us and press **Command+⌦** to show SickoMenu.
+4. Go to the **Configure Wine** panel, go to **Libraries**, open the menu below **New Replacement for:** and search for `version`.
+5. Select it and click **Add**, then **Apply** and **OK**.
+6. Start Among Us and press **Command+⌦** to show SickoMenu.
 
+**Method 2:-**
+
+1. Download from [PlayOnMac](https://www.playonmac.com) and install it.
+2. Open PlayOnMac and click **Install**.
+   - Search for "Among Us" (even if not listed) and select **Install a non-listed program**.
+   - Name the virtual drive (e.g., "Among Us Modded") and ensure it’s set to **32-bit architecture**.
+3. Download the Steam installer from [store.steampowered.com](https://store.steampowered.com/about/).
+   - In PlayOnMac’s installation wizard, select **Install components directly** > **Steam**.
+   - Follow prompts to install Steam in the virtual drive.
+4. Launch Steam from PlayOnMac, log in, and install Among Us.
+5. Add SickoMenu’s `version.dll`
+   - Right-click your virtual drive in PlayOnMac > **Open virtual drive’s directory**.
+   - Navigate to:  
+     `drive_c/Program Files (x86)/Steam/steamapps/common/Among Us`  
+   - Place the `version.dll` file here.
+6.  In PlayOnMac, select your virtual drive > **Configure** > **Wine** > **Libraries**.
+   - Add `version` to the overrides and set it to **Native (Windows)**.
+7.Run Among Us through Steam in PlayOnMac. Use the hotkey **Command + Delete** to toggle the mod menu.
+### **Note:-**
+- macOS Catalina+ Users: macOS versions ≥10.15 lack 32-bit support, which may cause issues. Use **Wine-Staging** (via Homebrew) for better compatibility:
+  ```bash
+  brew install --cask wine-stable
+  ```
 ## ⌨️ Default Hotkeys
 - Show Menu - DELETE
 - Show Radar - INSERT
