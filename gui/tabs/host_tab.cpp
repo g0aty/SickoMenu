@@ -249,6 +249,17 @@ namespace HostTab {
 				{
 					State.rpcQueue.push(new RpcUsePlatform());
 				}
+				static bool spamMovePlatform = false; // Toggle state
+
+				if ((State.mapType == Settings::MapType::Airship) && IsInGame()) {
+					if (ToggleButton("Spam Moving Platform", &spamMovePlatform)) {
+						State.Save();
+					}
+
+					if (spamMovePlatform) {
+						State.rpcQueue.push(new RpcUsePlatform());
+					}
+				}
 
 				if (State.InMeeting && ImGui::Button("End Meeting")) {
 					State.rpcQueue.push(new RpcEndMeeting());
