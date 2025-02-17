@@ -24,7 +24,7 @@ Portions of materials used are property of Innersloth LLC. © Innersloth LLC. Th
 3. **Respect Innersloth's Terms of Service** and the integrity of the game.
 4. **Immediately disable the mod** (`PAUSE BREAK` hotkey) if joining public lobbies accidentally.
 
-> 🚫 Misuse may result in account bans. **We do not condone cheating.**  
+> 🚫 Misuse may result in Among us account bans. **We do not condone cheating.**  
 > Report unethical usage in our [Discord](https://discord.gg/sickos).
 
 ---
