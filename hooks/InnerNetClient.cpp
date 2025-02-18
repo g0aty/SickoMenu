@@ -101,6 +101,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 State.InMeeting = false;
                 State.DisableLights = false;
+		State.AutoRepairSabotage = false;
                 State.CloseAllDoors = false;
                 State.SpamReport = false;
                 State.DisableVents = false;
@@ -808,6 +809,29 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     }
     Application_set_targetFrameRate(State.GameFPS > 1 ? State.GameFPS : 60, NULL);
     InnerNetClient_Update(__this, method);
+	
+    static int SpamPlatformDelay = 10;
+    if (SpamPlatformDelay <= 0) {
+        if (State.SpamMovingPlatform) {
+            State.rpcQueue.push(new RpcUsePlatform());
+            SpamPlatformDelay = 10;
+        }
+    }
+    else {
+        SpamPlatformDelay--;
+    }
+
+
+    static int AutoRepairSabotageDelay = 100;
+    if (AutoRepairSabotageDelay <= 0) {
+        if (State.AutoRepairSabotage) {
+            RepairSabotage(*Game::pLocalPlayer);
+            AutoRepairSabotageDelay = 100;
+        }
+    }
+    else {
+        AutoRepairSabotageDelay--;
+    }
 }
 
 void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, MethodInfo* method) {

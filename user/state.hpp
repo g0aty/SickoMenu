@@ -191,6 +191,7 @@ public:
     bool HotkeyNoClip = false;
 
     bool DisableLights = false;
+    bool AutoRepairSabotage = false;
 
     bool MoveInVentAndShapeshift = false;
     bool AlwaysMove = false;
@@ -380,6 +381,7 @@ public:
 
     float LobbyTimer = 600.f;
     bool ShowLobbyTimer = false;
+    bool SpamMovingPlatform = false;
     bool JoinedAsHost = false;
     float ChatCooldown = 0.f;
     bool MessageSent = false;

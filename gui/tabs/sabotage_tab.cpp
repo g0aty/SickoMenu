@@ -281,6 +281,11 @@ namespace SabotageTab {
             if (ImGui::Button("Repair Sabotage")) {
                 RepairSabotage(*Game::pLocalPlayer);
             }
+
+            if (ToggleButton("Auto Repair Sabotages", &State.AutoRepairSabotage)) {
+                State.Save();
+            }
+
             ImGui::NewLine();
             if (State.DisableSabotages)
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Sabotages have been disabled. Nothing can be sabotaged.");
