@@ -250,6 +250,12 @@ namespace HostTab {
 					State.rpcQueue.push(new RpcUsePlatform());
 				}
 
+				if ((State.mapType == Settings::MapType::Airship) && IsInGame()) {
+					if (ToggleButton("Spam Moving Platform", &State.SpamMovingPlatform)) {
+						State.Save();
+					}
+				}
+
 				if (State.InMeeting && ImGui::Button("End Meeting")) {
 					State.rpcQueue.push(new RpcEndMeeting());
 					State.InMeeting = false;
