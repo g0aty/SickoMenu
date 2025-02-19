@@ -101,7 +101,14 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 State.InMeeting = false;
                 State.DisableLights = false;
-		State.AutoRepairSabotage = false;
+		State.DisableLightsAlt = false;
+                State.UnfixableCommsPrev = false;
+                State.UnfixableComms = false;
+                State.UnfixableReactor = false;
+                State.UnfixableO2 = false;
+                State.UnfixableLaboratory = false;
+                State.UnfixableCrashCourse = false;
+                State.MushroomMixup = false;
                 State.CloseAllDoors = false;
                 State.SpamReport = false;
                 State.DisableVents = false;
@@ -820,7 +827,26 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     else {
         SpamPlatformDelay--;
     }
+    static int SpamPlatformDelay = 10;
+    if (SpamPlatformDelay <= 0) {
+        if (State.SpamMovingPlatform) {
+            State.rpcQueue.push(new RpcUsePlatform());
+            SpamPlatformDelay = 10;
+        }
+    }
+    else {
+        SpamPlatformDelay--;
+    }
 
+    static int SabotageLoopCommsPrev = 50;
+    static int SabotageLoopComms = 50;
+    static int SabotageLoopReactor = 50;
+    static int SabotageLoopO2 = 50;
+    static int SabotageLoopLaboratory = 50;
+    static int SabotageLoopCrashCourse = 50;
+    static int SabotageLoopMushroomMixup = 0;
+    static int MushroomMixupInterval = 100;
+    static int FixSabotage = 0;
 
     static int AutoRepairSabotageDelay = 100;
     if (AutoRepairSabotageDelay <= 0) {
@@ -831,6 +857,113 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     }
     else {
         AutoRepairSabotageDelay--;
+    }
+
+    if (SabotageLoopCommsPrev <= 0) {
+        if (State.UnfixableCommsPrev) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
+            SabotageLoopCommsPrev = 50;
+        }
+    }
+    else {
+        SabotageLoopCommsPrev--;
+    }
+
+    if (SabotageLoopComms <= 0) {
+        if (State.UnfixableComms) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
+            RepairSabotage(*Game::pLocalPlayer);
+            SabotageLoopComms = 50;
+        }
+    }
+    else {
+        SabotageLoopComms--;
+    }
+
+    if (SabotageLoopReactor > 0) {
+        SabotageLoopReactor--;
+    }
+    else {
+        if (FixSabotage > 0) {
+            FixSabotage--;
+            if (FixSabotage == 0) {
+                RepairSabotage(*Game::pLocalPlayer);
+                SabotageLoopReactor = 50;
+            }
+        }
+        else if (State.UnfixableReactor) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128));
+            FixSabotage = 50;
+        }
+    }
+
+    if (SabotageLoopO2 > 0) {
+        SabotageLoopO2--;
+    }
+    else {
+        if (FixSabotage > 0) {
+            FixSabotage--;
+            if (FixSabotage == 0) {
+                RepairSabotage(*Game::pLocalPlayer);
+                SabotageLoopO2 = 50;
+            }
+        }
+        else if (State.UnfixableO2) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 128));
+            FixSabotage = 50;
+        }
+    }
+
+    if (SabotageLoopLaboratory > 0) {
+        SabotageLoopLaboratory--;
+    }
+    else {
+        if (FixSabotage > 0) {
+            FixSabotage--;
+            if (FixSabotage == 0) {
+                RepairSabotage(*Game::pLocalPlayer);
+                SabotageLoopLaboratory = 50;
+            }
+        }
+        else if (State.UnfixableLaboratory) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 128));
+            FixSabotage = 50;
+        }
+    }
+
+    if (SabotageLoopCrashCourse > 0) {
+        SabotageLoopCrashCourse--;
+    }
+    else {
+        if (FixSabotage > 0) {
+            FixSabotage--;
+            if (FixSabotage == 0) {
+                RepairSabotage(*Game::pLocalPlayer);
+                SabotageLoopCrashCourse = 50;
+            }
+        }
+        else if (State.UnfixableCrashCourse) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 128));
+            FixSabotage = 50;
+        }
+    }
+
+    if (SabotageLoopMushroomMixup > 0) {
+        SabotageLoopMushroomMixup--;
+    }
+    else {
+        SabotageLoopMushroomMixup = State.MushroomMixupInterval;
+
+        if (State.MushroomMixup) {
+            State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 1));
+        }
+
+        if (State.MushroomMixupInterval < 100) {
+            State.MushroomMixupInterval = 100;
+        }
+        else if (State.MushroomMixupInterval > 1000) {
+            State.MushroomMixupInterval = 1000;
+        }
     }
 }
 
