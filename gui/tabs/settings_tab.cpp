@@ -245,17 +245,20 @@ namespace SettingsTab {
 				showMessage1 = true;
 				timer = static_cast<float>(ImGui::GetTime());
 			}
+
 			if (showMessage1) {
 				float currentTime = static_cast<float>(ImGui::GetTime());
-				if (currentTime - timer < 4.0f) { 
-					ImGui::TextColored(
-						ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
-						"Unlocked All Cosmetics!/Disabled Unlocked All Cosmetics");
+				if (currentTime - timer < 4.0f) {
+					if (State.UnlockCosmetics)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Unlocked All Cosmetics!");
+					else
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Disabled Unlock Cosmetics!");
 				}
 				else {
 					showMessage1 = false;
 				}
 			}
+
 
 			if (Achievements::IsSupported())
 			{
