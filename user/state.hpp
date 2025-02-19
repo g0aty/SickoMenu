@@ -191,6 +191,15 @@ public:
     bool HotkeyNoClip = false;
 
     bool DisableLights = false;
+    bool DisableLightsAlt = false;
+    bool UnfixableCommsPrev = false;
+    bool UnfixableComms = false;
+    bool UnfixableReactor = false;
+    bool UnfixableO2 = false;
+    bool UnfixableLaboratory = false;
+    bool UnfixableCrashCourse = false;
+    bool MushroomMixup = false;
+    int MushroomMixupInterval = false;
     bool AutoRepairSabotage = false;
 
     bool MoveInVentAndShapeshift = false;
