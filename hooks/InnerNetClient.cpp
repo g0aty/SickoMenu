@@ -720,8 +720,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.lobbyRpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(playerToAttach.get_PlayerControl())));
             }
 
-            // Shift + Right-click Teleport
-            // Shift + Right-click Teleport
+            // Shift/Ctrl + Right-click Teleport
             static float rightClickHoldTime = 0.0f;
             static bool isRightClickHeld = false;
 
