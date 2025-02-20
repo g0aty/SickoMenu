@@ -6,6 +6,28 @@
 #include "gui-helpers.hpp"
 #include <future>
 
+const ImVec4 UsingMod_Color_Yes = ImVec4(0.0f, 1.0f, 0.0f, 1.0f); // If Player Uses Modified Client [Green Shades]
+const ImVec4 UsingMod_Color_No = ImVec4(1.0f, 0.0f, 0.0f, 1.0f); // If Player Not Uses Modified Client [Red Shades]
+
+
+const ImVec4 Sicko_Color(0.13f, 0.8f, 0.31f, 1.0f); // Exclusive Color Display [{Sicko}Menu]
+const ImVec4 Menu_Color(0.8f, 0.13f, 0.2f, 1.0f); // Exclusive Color Display [Sicko{Menu}]
+
+const ImVec4 AUM_Color(180.0f / 255.0f, 50.0f / 255.0f, 93.0f / 255.0f, 1.0f); // Exclusive Color Display [AUM]
+const ImVec4 KillNetwork_Color(1.0f, 0.0f, 0.0f, 1.0f); // Exclusive Color Display [KillNetwork]
+const ImVec4 BetterAmongUs_Color(0.5f, 1.0f, 0.5f, 0.8f); // Exclusive Color Display [BetterAmongUs]
+
+
+const ImVec4 PlayerID_Color = ImVec4(0.949f, 0.0f, 0.0f, 1.0f); // Player ID Color [Red Shades]
+const ImVec4 FriendCode_Color = ImVec4(50.0f / 255.0f, 151.0f / 255.0f, 251.0f / 255.0f, 1.0f); // Friend Code Color [Blue Shades]
+const ImVec4 PUID_Color = ImVec4(1.0f, 0.65f, 0.0f, 1.0f); // PUID Color [Orange Shades]
+const ImVec4 Level_Color = ImVec4(0.0039f, 0.796f, 0.0039f, 1.0f); // Level Color [Green Shades]
+const ImVec4 Platform_Color = ImVec4(179.0f / 255.0f, 0.0f / 255.0f, 244.0f / 255.0f, 1.0f); // Platform Color [Purple Shades]
+
+
+const ImVec4 Playstation_Color = ImVec4(0.0f / 255.0f, 87.0f / 255.0f, 183.0f / 255.0f, 1.0f); // Playstation Color [Blue Shades]
+const ImVec4 Xbox_Color = ImVec4(16.0f / 255.0f, 124.0f / 255.0f, 16.0f / 255.0f, 1.0f); // Xbox Color [Green Shades]
+
 namespace PlayersTab {
 
 	int framesPassed = -1;
@@ -138,16 +160,16 @@ namespace PlayersTab {
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
 				else if (playerCtrl == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end()) {
 					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f00>KillNetwork</color>")
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+						nameColor = KillNetwork_Color; // Exclusive KN Color [NEW]
 
 					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#5f5>BetterAmongUs</color>")
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LogSuccessColor);
+						nameColor = BetterAmongUs_Color; // Exclusive BAU Color [NEW]
 
-					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
+					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#B4325DFF>AmongUsMenu</color>")
+						nameColor = AUM_Color; // Exclusive AUM Color [NEW]
 
 					if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#0f0>Sicko</color><#f00>Menu</color>")
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->AcceptedGreen);
+						nameColor = Sicko_Color; // Exclusive SM Color [NEW]
 				}
 
 				if (playerData->fields.IsDead)
@@ -162,25 +184,64 @@ namespace PlayersTab {
 			{
 				if ((IsInMultiplayerGame() || IsInLobby()) || (selectedPlayer.has_value() && selectedPlayer.is_LocalPlayer())) {
 					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
-					ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
-					if (isUsingMod)
-						ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPlayer.get_PlayerData()->fields.PlayerId)).c_str());
+					if (isUsingMod) {
+						ImGui::Text("Is using Modified Client: ");
+						ImGui::SameLine(0.0f, 0.0f);
+						ImGui::TextColored(UsingMod_Color_Yes, "Yes");
+
+						ImGui::Text("Client Name: "); // Local Client Name
+						if (selectedPlayer.is_LocalPlayer()) {
+							ImGui::SameLine(0.0f, 0.0f);
+							ImGui::TextColored(Sicko_Color, "Sicko");
+							ImGui::SameLine(0.0f, 0.0f);
+							ImGui::TextColored(Menu_Color, "Menu");
+						}
+						else {
+							const std::string& playerMod = State.modUsers.at(selectedPlayer.get_PlayerData()->fields.PlayerId);
+							ImGui::SameLine(0.0f, 0.0f);
+
+							if (playerMod == "<#0f0>Sicko</color><#f00>Menu</color>") {
+								ImGui::SameLine(0.0f, 0.0f);
+								ImGui::TextColored(Sicko_Color, "Sicko");
+								ImGui::SameLine(0.0f, 0.0f);
+								ImGui::TextColored(Menu_Color, "Menu");
+							}
+							else if (playerMod == "<#B4325DFF>AmongUsMenu</color>") {
+								ImGui::TextColored(AUM_Color, RemoveHtmlTags(playerMod).c_str());
+							}
+							else if (playerMod == "<#f00>KillNetwork</color>") {
+								ImGui::TextColored(KillNetwork_Color, RemoveHtmlTags(playerMod).c_str());
+							}
+							else if (playerMod == "<#5f5>BetterAmongUs</color>") {
+								ImGui::TextColored(BetterAmongUs_Color, RemoveHtmlTags(playerMod).c_str());
+							}
+						}
+					}
+					else {
+						ImGui::Text("Is using Modified Client: ");
+						ImGui::SameLine(0.0f, 0.0f);
+						ImGui::TextColored(UsingMod_Color_No, "No");
+					}
+					ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
 					std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
 					std::string playerIdText = std::format("Player ID: {}", playerId);
-					ImGui::Text(const_cast<char*>(playerIdText.c_str()));
+					ImGui::TextColored(PlayerID_Color, "%s", playerIdText.c_str());
+
 					std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
-					std::string friendCodeText = std::format("Friend Code: {}", (!IsStreamerMode()) ? friendCode : ((friendCode != "") ? friendCode.substr(0, 1) + "..." : ""));
-					if (friendCode != "") {
-						ImGui::Text(const_cast<char*>(friendCodeText.c_str()));
+					if (!friendCode.empty()) {
+						std::string friendCodeText = std::format("Friend Code: {}", (!IsStreamerMode()) ? friendCode : friendCode.substr(0, 1) + "...");
+						ImGui::TextColored(FriendCode_Color, "%s", friendCodeText.c_str());
 					}
+
 					std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
-					std::string puidText = std::format("PUID:\n{}", (!IsStreamerMode()) ? puid : ((puid != "") ? puid.substr(0, 1) + "..." : ""));
-					if (puid != "") {
-						ImGui::Text(const_cast<char*>(puidText.c_str()));
+					if (!puid.empty()) {
+						std::string puidText = std::format("PUID: {}", (!IsStreamerMode()) ? puid : puid.substr(0, 1) + "...");
+						ImGui::TextColored(PUID_Color, "%s", puidText.c_str());
 					}
 					uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
 					std::string levelText = std::format("Level: {}", playerLevel);
-					ImGui::Text(const_cast<char*>(levelText.c_str()));
+					ImGui::TextColored(Level_Color, "%s", levelText.c_str());
+
 					std::string platform = "Unknown";
 					auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl(), NULL);
 					if (GetPlayerControlById(selectedPlayer.get_PlayerData()->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
@@ -220,23 +281,30 @@ namespace PlayersTab {
 							break;
 						}
 					}
+
 					std::string platformText = std::format("Platform: {}", platform);
-					ImGui::Text(platformText.c_str());
+					ImGui::TextColored(Platform_Color, "%s", platformText.c_str());
 					uint64_t psnId = client->fields.PlatformData->fields.PsnPlatformId;
-					std::string psnText = std::format("PSN Platform ID: {}", psnId);
-					if (psnId != 0) ImGui::Text(const_cast<char*>(psnText.c_str()));
+					if (psnId != 0) {
+						std::string psnText = std::format("PSN Platform ID: {}", psnId);
+						ImGui::TextColored(Playstation_Color, "%s", psnText.c_str());
+					}
 					uint64_t xboxId = client->fields.PlatformData->fields.XboxPlatformId;
-					std::string xboxText = std::format("Xbox Platform ID: {}", xboxId);
-					if (xboxId != 0) ImGui::Text(const_cast<char*>(xboxText.c_str()));
+					if (xboxId != 0) {
+						std::string xboxText = std::format("Xbox Platform ID: {}", xboxId);
+						ImGui::TextColored(Xbox_Color, "%s", xboxText.c_str());
+					}
 				}
 				else {
-					ImGui::Text("Is using Modified Client: No");
+					ImGui::Text("Is using Modified Client: ");
+					ImGui::SameLine(0.0f, 0.0f);
+					ImGui::TextColored(UsingMod_Color_No, "No");
 					std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
 					std::string playerIdText = std::format("Player ID: {}", playerId);
-					ImGui::Text(const_cast<char*>(playerIdText.c_str()));
+					ImGui::TextColored(PlayerID_Color, "%s", playerIdText.c_str());
 					uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
 					std::string levelText = std::format("Level: {}", playerLevel);
-					ImGui::Text(const_cast<char*>(levelText.c_str()));
+					ImGui::TextColored(Level_Color, "%s", levelText.c_str());
 				}
 			}
 
@@ -429,7 +497,6 @@ namespace PlayersTab {
 							}
 						}
 					}*/
-					
 					if (IsHost() && ImGui::Button("Ban")) {
 						State.selectedPlayer = {};
 						State.selectedPlayers.clear();
@@ -1171,6 +1238,38 @@ namespace PlayersTab {
 							if (ImGui::Button("Whisper To")) {
 								State.playerToWhisper = State.selectedPlayer;
 								State.activeWhisper = true;
+							}
+						}
+					}
+
+					static int ventId = 0;
+					if ((IsHost() || !State.SafeMode) && IsInGame()) {
+						std::vector<const char*> allVents;
+						switch (State.mapType) {
+						case Settings::MapType::Ship:
+							allVents = SHIPVENTS;
+							break;
+						case Settings::MapType::Hq:
+							allVents = HQVENTS;
+							break;
+						case Settings::MapType::Pb:
+							allVents = PBVENTS;
+							break;
+						case Settings::MapType::Airship:
+							allVents = AIRSHIPVENTS;
+							break;
+						case Settings::MapType::Fungle:
+							allVents = FUNGLEVENTS;
+							break;
+						}
+						ventId = std::clamp(ventId, 0, (int)allVents.size() - 1);
+
+						CustomListBoxInt("Vent", &ventId, allVents);
+
+						if (ImGui::Button("Teleport to Vent")) {
+							for (auto p : selectedPlayers) {
+								State.rpcQueue.push(new RpcBootFromVent(p.validate().get_PlayerControl(),
+									(State.mapType == Settings::MapType::Hq) ? ventId + 1 : ventId)); //MiraHQ vents start from 1 instead of 0
 							}
 						}
 					}

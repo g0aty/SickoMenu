@@ -189,6 +189,17 @@ namespace Menu {
 				firstRender = false;
 				CloseAllOtherTabs(Tabs::About); //welcome the user on startup
 			}
+
+			ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 90 * State.dpiScale, ImGui::GetWindowHeight() - 20 * State.dpiScale));
+
+			ImVec4 Panic_Mode = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+			ImGui::PushStyleColor(ImGuiCol_Text, Panic_Mode);
+			if (ImGui::Button("x"))
+				State.PanicMode = true;
+
+			ImGui::PopStyleColor();
+
 			//ImGui::EndTabBar();
 			ImGui::EndChild();
 
