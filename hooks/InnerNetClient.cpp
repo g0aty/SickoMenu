@@ -827,26 +827,17 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     else {
         SpamPlatformDelay--;
     }
-    static int SpamPlatformDelay = 10;
-    if (SpamPlatformDelay <= 0) {
-        if (State.SpamMovingPlatform) {
-            State.rpcQueue.push(new RpcUsePlatform());
-            SpamPlatformDelay = 10;
-        }
-    }
-    else {
-        SpamPlatformDelay--;
-    }
 
-    static int SabotageLoopCommsPrev = 50;
-    static int SabotageLoopComms = 50;
-    static int SabotageLoopReactor = 50;
-    static int SabotageLoopO2 = 50;
-    static int SabotageLoopLaboratory = 50;
-    static int SabotageLoopCrashCourse = 50;
+    static int SabotageLoopCommsPrev = 25;
+    static int SabotageLoopComms = 25;
+    static int SabotageLoopReactor = 25;
+    static int SabotageLoopO2 = 25;
+    static int SabotageLoopLaboratory = 25;
+    static int SabotageLoopCrashCourse = 25;
     static int SabotageLoopMushroomMixup = 0;
     static int MushroomMixupInterval = 100;
     static int FixSabotage = 0;
+    int SabotageCooldown = 25; // Better than old
 
     static int AutoRepairSabotageDelay = 100;
     if (AutoRepairSabotageDelay <= 0) {
@@ -859,10 +850,11 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         AutoRepairSabotageDelay--;
     }
 
+
     if (SabotageLoopCommsPrev <= 0) {
         if (State.UnfixableCommsPrev) {
             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
-            SabotageLoopCommsPrev = 50;
+            SabotageLoopCommsPrev = SabotageCooldown;
         }
     }
     else {
@@ -873,7 +865,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         if (State.UnfixableComms) {
             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
             RepairSabotage(*Game::pLocalPlayer);
-            SabotageLoopComms = 50;
+            SabotageLoopComms = SabotageCooldown;
         }
     }
     else {
@@ -888,12 +880,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             FixSabotage--;
             if (FixSabotage == 0) {
                 RepairSabotage(*Game::pLocalPlayer);
-                SabotageLoopReactor = 50;
+                SabotageLoopReactor = SabotageCooldown;
             }
         }
         else if (State.UnfixableReactor) {
             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128));
-            FixSabotage = 50;
+            FixSabotage = SabotageCooldown;
         }
     }
 
@@ -905,12 +897,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             FixSabotage--;
             if (FixSabotage == 0) {
                 RepairSabotage(*Game::pLocalPlayer);
-                SabotageLoopO2 = 50;
+                SabotageLoopO2 = SabotageCooldown;
             }
         }
         else if (State.UnfixableO2) {
             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 128));
-            FixSabotage = 50;
+            FixSabotage = SabotageCooldown;
         }
     }
 
@@ -922,12 +914,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             FixSabotage--;
             if (FixSabotage == 0) {
                 RepairSabotage(*Game::pLocalPlayer);
-                SabotageLoopLaboratory = 50;
+                SabotageLoopLaboratory = SabotageCooldown;
             }
         }
         else if (State.UnfixableLaboratory) {
             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 128));
-            FixSabotage = 50;
+            FixSabotage = SabotageCooldown;
         }
     }
 
@@ -939,14 +931,15 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             FixSabotage--;
             if (FixSabotage == 0) {
                 RepairSabotage(*Game::pLocalPlayer);
-                SabotageLoopCrashCourse = 50;
+                SabotageLoopCrashCourse = SabotageCooldown;
             }
         }
         else if (State.UnfixableCrashCourse) {
             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 128));
-            FixSabotage = 50;
+            FixSabotage = SabotageCooldown;
         }
     }
+
 
     if (SabotageLoopMushroomMixup > 0) {
         SabotageLoopMushroomMixup--;
