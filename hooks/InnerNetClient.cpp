@@ -721,21 +721,73 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             // Shift + Right-click Teleport
-            if ((IsInGame() && !State.InMeeting) && State.ShiftRightClickTP && ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !(State.TeleportEveryone && (ImGui::IsKeyPressed(VK_CONTROL) || ImGui::IsKeyDown(VK_CONTROL)))) {
-                ImVec2 mouse = ImGui::GetMousePos();
-                Vector2 target = {
-                    (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
-                    ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
-                };
-                State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+            // Shift + Right-click Teleport
+            static float rightClickHoldTime = 0.0f;
+            static bool isRightClickHeld = false;
+
+            if ((IsInGame() && !State.InMeeting) && State.ShiftRightClickTP) {
+                if (ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+                    ImVec2 mouse = ImGui::GetMousePos();
+                    Vector2 target = {
+                        (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
+                        ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
+                    };
+                    State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                }
+                else if (ImGui::IsKeyDown(VK_CONTROL)) {
+                    if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+                        isRightClickHeld = true;
+                        rightClickHoldTime = 0.0f;
+                    }
+
+                    if (isRightClickHeld && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+                        rightClickHoldTime += ImGui::GetIO().DeltaTime;
+                        int teleportCount = static_cast<int>(rightClickHoldTime * 10);
+                        ImVec2 mouse = ImGui::GetMousePos();
+                        Vector2 target = {
+                            (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
+                            ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
+                        };
+
+                        State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                    }
+
+                    if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+                        isRightClickHeld = false;
+                    }
+                }
             }
-            else if (IsInLobby() && State.ShiftRightClickTP && ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !(State.TeleportEveryone && (ImGui::IsKeyPressed(VK_CONTROL) || ImGui::IsKeyDown(VK_CONTROL)))) {
-                ImVec2 mouse = ImGui::GetMousePos();
-                Vector2 target = {
-                    (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
-                    ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
-                };
-                State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+            else if (IsInLobby() && State.ShiftRightClickTP) {
+                if (ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+                    ImVec2 mouse = ImGui::GetMousePos();
+                    Vector2 target = {
+                        (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
+                        ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
+                    };
+                    State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                }
+                else if (ImGui::IsKeyDown(VK_CONTROL)) {
+                    if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+                        isRightClickHeld = true;
+                        rightClickHoldTime = 0.0f;
+                    }
+
+                    if (isRightClickHeld && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+                        rightClickHoldTime += ImGui::GetIO().DeltaTime;
+                        int teleportCount = static_cast<int>(rightClickHoldTime * 10);
+                        ImVec2 mouse = ImGui::GetMousePos();
+                        Vector2 target = {
+                            (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
+                            ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
+                        };
+
+                        State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                    }
+
+                    if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+                        isRightClickHeld = false;
+                    }
+                }
             }
 
             if ((IsInGame() || IsInLobby()) && State.GodMode) {
