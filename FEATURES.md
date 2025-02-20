@@ -117,7 +117,6 @@ View the game options!
 - **Always Move** Allows you to move in meetings and game menus such as tasks (Default: OFF)
 - **Shapeshift without Animation** Allows you to shapeshift without the animation (Default: OFF)
 - **Copy Lobby Code on Disconnect** Automatically copies the lobby code to your clipboard when you get disconnected unintentionally (Default: OFF)
-- **Auto Rejoin** Automatically rejoins the lobby when you get disconnected unintentionally (Default: OFF)
 - **NoClip** Allows you to walk through walls (Default: OFF)
 - **Kill Other Impostors** *(Only with Safe Mode disabled)* Allows you to kill fellow impostors (Default: OFF)
 - **Unlock Kill Button** *(Only with Safe Mode disabled)* Allows you to use kill button at any time (Default: OFF)
@@ -255,7 +254,6 @@ A dedicated player menu for viewing and manipulating players
 ## 🫅 Host
 - **Choose Roles** Select everyone's roles!
 - **Map** Change the map
-- **Flip Skeld** Be able to select a mirrored version of "The Skeld" (Default: OFF)
 - **Custom Impostor Amount** Force your desired number of impostors to spawn (Default: OFF)
 - **Force Start of Game** Forces the game to start
 - **Disable Meetings** Disables meetings and body reports (Default: OFF)
