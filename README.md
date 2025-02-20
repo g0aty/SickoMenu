@@ -154,7 +154,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
   brew install --cask wine-stable
   ```
   **For Method 3:-**
-- The bash in the first step will install Homebrew, if don't have it on your os.
+- The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
 
 ---
 ## ⌨️ Default Hotkeys
