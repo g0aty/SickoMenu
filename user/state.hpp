@@ -95,6 +95,7 @@ public:
     bool CrashSpamReport = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
+    bool DisableAllVotekicks = false;
     bool DisableKills = false;
     bool BattleRoyale = false;
     bool TaskSpeedrun = false;
@@ -191,6 +192,12 @@ public:
     bool HotkeyNoClip = false;
 
     bool DisableLights = false;
+    bool DisableLightSwitches = false;
+    bool DisableComms = false;
+    bool DisableReactor = false;
+    bool DisableOxygen = false;
+    bool InfiniteMushroomMixup = false;
+    bool SpamDoors = false;
     bool AutoRepairSabotage = false;
 
     bool MoveInVentAndShapeshift = false;
@@ -221,6 +228,7 @@ public:
     std::vector<uint8_t> selectedPlayers = {};
     std::queue<RPCInterface*> rpcQueue;
     std::queue<RPCInterface*> lobbyRpcQueue;
+    std::queue<RPCInterface*> taskRpcQueue;
 
     bool ShowRadar = false;
     bool ShowRadar_DeadBodies = false;
@@ -297,6 +305,8 @@ public:
     //std::vector<Game::PlayerId> aumUsers;
     //std::vector<Game::PlayerId> sickoUsers;
     std::vector<Game::PlayerId> vanishedPlayers;
+    std::vector<Game::PlayerId> overloadedPlayers;
+    std::vector<Game::PlayerId> laggedPlayers;
     std::map<Game::PlayerId, std::string> modUsers;
     int32_t rpcCooldown = 15;
     int32_t playerKilledId = 0;
@@ -320,6 +330,9 @@ public:
     float CameraHeight = 3.0;
     Camera* FollowerCam = nullptr;
     bool EnableZoom = false;
+
+    VersionShower* versionShower = nullptr;
+    std::string versionShowerDefaultText = "";
 
     bool DisableHud = false;
     bool GodMode = false;
@@ -401,6 +414,7 @@ public:
     std::map<std::string, std::map<std::string, std::string>> playerOutfits = {};
 
     bool PanicMode = false;
+    bool PanicWarning = true;
     bool TempPanicMode = false; //prevent instant crash on joining lobby
     bool BlinkPlayersTab = false; //prevent instant crash on player leaving
     bool ModDetection = true;
@@ -472,7 +486,7 @@ public:
         Replay::Reset();
     }
 
-    std::string SickoVersion = "v4.1.2";
+    std::string SickoVersion = "v[Major].[Minor].[Patch]";
 
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
@@ -512,7 +526,11 @@ public:
 
     std::string lol = "";
 
+    bool Destruct_IgnoreWhitelist = false;
+    bool OverloadEveryone = false;
     bool LagEveryone = false;
+
+    bool AprilFoolsMode = false;
 
     void Load();
     void Save();

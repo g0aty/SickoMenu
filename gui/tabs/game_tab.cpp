@@ -5,7 +5,7 @@
 #include "utility.h"
 #include "state.hpp"
 #include "logger.h"
-#include <hunspell/hunspell.hxx>
+/*#include <hunspell/hunspell.hxx>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -111,7 +111,7 @@ int main() {
     return 0;
 }
 
-
+*/
 namespace GameTab {
     enum Groups {
         General,
@@ -263,7 +263,7 @@ namespace GameTab {
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            /*if (ImGui::Button("Spawn Dummy")) {
+            /*if (IsHost() && (IsInGame() || IsInLobby()) && ImGui::Button("Spawn Dummy")) {
                 if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy());
                 if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy());
             }*/
@@ -284,7 +284,7 @@ namespace GameTab {
                 State.Save();
             }
             if (IsInGame()) ImGui::SameLine();
-            if (IsInGame() && ToggleButton("Spam Report", &State.SpamReport)) {
+            if (IsInGame() && (IsHost() || !State.SafeMode) && ToggleButton("Spam Report", &State.SpamReport)) {
                 State.Save();
             }
 
@@ -586,15 +586,22 @@ namespace GameTab {
 
         if (openDestruct) {
             if (!IsInLobby() && !IsInGame()) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Only available in game/lobby!"));
-            if ((IsInLobby() || IsInGame()) && ToggleButton("Lag Everyone", &State.LagEveryone)) {
+            if (ToggleButton("Ignore Whitelisted Players", &State.Destruct_IgnoreWhitelist)) {
                 State.Save();
             }
-            if ((IsInLobby() || IsInGame()) && ToggleButton(IsInLobby() ? "Crash Server" : "Attempt to Crash", &State.CrashSpamReport)) {
-                if (IsInGame()) State.Save();
+            if (ToggleButton("Overload Everyone [Slow]", &State.OverloadEveryone)) {
+                State.Save();
             }
-           
-            if (IsInLobby() || IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("The server should fail after enabling this feature"));
-            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if (ToggleButton("Lag Everyone [Fast]", &State.LagEveryone)) {
+                State.Save();
+            }
+            if (ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {
+                State.Save();
+            }
+            if (IsHost() && ImGui::Button("Remove Map")) {
+                State.taskRpcQueue.push(new DestroyMap());
+            }
+            if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
         }
 
         if (openOptions) {

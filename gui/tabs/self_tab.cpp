@@ -412,7 +412,7 @@ namespace SelfTab {
                 State.Save();
             }*/
 
-            if (ToggleButton("(Shift + Right Click) to Teleport", &State.ShiftRightClickTP)) {
+            if (ToggleButton("(Shift/Ctrl + Right Click) to Teleport", &State.ShiftRightClickTP)) {
                 State.Save();
             }
             if (!State.SafeMode) ImGui::SameLine();

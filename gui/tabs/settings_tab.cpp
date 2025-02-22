@@ -52,7 +52,8 @@ namespace SettingsTab {
 			if (ToggleButton("Always Show Menu on Startup", &State.ShowMenuOnStartup)) {
 				State.Save();
 			}
-			if (ToggleButton("Panic (Disable SickoMenu)", &State.PanicMode)) {
+			ImGui::SameLine();
+			if (ToggleButton("Panic Warning", &State.PanicWarning)) {
 				State.Save();
 			}
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
@@ -238,24 +239,27 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
 			static float timer = 0.0f;
-			static bool showMessage1 = false;
+			static bool showMessage = false;
 
 			if (ToggleButton("Unlock Cosmetics", &State.UnlockCosmetics)) {
 				State.Save();
-				showMessage1 = true;
+				showMessage = true;
 				timer = static_cast<float>(ImGui::GetTime());
 			}
-			if (showMessage1) {
+
+			if (showMessage) {
 				float currentTime = static_cast<float>(ImGui::GetTime());
-				if (currentTime - timer < 4.0f) { 
-					ImGui::TextColored(
-						ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
-						"Unlocked All Cosmetics!/Disabled Unlocked All Cosmetics");
+				if (currentTime - timer < 4.0f) {
+					if (State.UnlockCosmetics)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Unlocked All Cosmetics!");
+					else
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Disabled Unlock Cosmetics!");
 				}
 				else {
-					showMessage1 = false;
+					showMessage = false;
 				}
 			}
+
 
 			if (Achievements::IsSupported())
 			{
@@ -267,10 +271,6 @@ namespace SettingsTab {
 			if (ToggleButton("Safe Mode", &State.SafeMode)) {
 				State.Save();
 			}
-			/*ImGui::SameLine();
-			if (ToggleButton("Spoof Modded Host", &State.SpoofModdedHost)) {
-				State.Save(); //haven't figured this out yet
-			}*/
 			static int modToShow = 0;
 
 			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) {
@@ -278,23 +278,9 @@ namespace SettingsTab {
 			}
 			ImGui::SameLine();
 			if (CustomListBoxInt(" ", &modToShow, MODS, 100.f * State.dpiScale)) {
-				switch (modToShow) {
-				case 0:
-					State.SickoDetection = State.ModDetection;
-					State.AmongUsMenuDetection = false;
-					State.KillNetworkDetection = false;
-					break;
-				case 1:
-					State.SickoDetection = false;
-					State.AmongUsMenuDetection = State.ModDetection;
-					State.KillNetworkDetection = false;
-					break;
-				case 2:
-					State.SickoDetection = false;
-					State.AmongUsMenuDetection = false;
-					State.KillNetworkDetection = State.ModDetection;
-					break;
-				}
+				State.SickoDetection = modToShow == 0;
+				State.AmongUsMenuDetection = modToShow == 1;
+				State.KillNetworkDetection = modToShow == 2;
 				State.Save();
 			}
 
