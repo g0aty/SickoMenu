@@ -270,22 +270,6 @@ namespace SettingsTab {
 
 			if (ToggleButton("Safe Mode", &State.SafeMode)) {
 				State.Save();
-				showMessage = true;
-				timer = static_cast<float>(ImGui::GetTime());
-			}
-
-			if (showMessage) {
-				float currentTime = static_cast<float>(ImGui::GetTime());
-				if (currentTime - timer < 4.0f) {
-					if (State.SafeMode)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "SafeMode is On!");
-					else
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "SafeMode is Off");
-				}
-				else {
-					showMessage = false;
-				}
-			}
 			}
 			static int modToShow = 0;
 
