@@ -6,6 +6,17 @@
 #include "logger.h"
 #include "DirectX.h"
 #include <DirectX.h>
+#include "imgui.h"
+#include "game_tab.cpp"
+
+extern bool autoCorrectionEnabled;
+
+void RenderGUI() {
+    if (ImGui::Button(autoCorrectionEnabled ? "Auto-correction: ON" : "Auto-correction: OFF")) {
+        toggleAutoCorrection();
+    }
+}
+
 
 using namespace ImGui;
 
