@@ -246,25 +246,26 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
 			static float timer = 0.0f;
-			static bool showMessage = false;
+			static bool CosmeticsNotification = false;
+			static bool SafeModeNotification = false;
 
 			if (ToggleButton("Unlock Cosmetics", &State.UnlockCosmetics)) {
 				State.Save();
-				showMessage = true;
+				CosmeticsNotification = true;
 				timer = static_cast<float>(ImGui::GetTime());
 			}
 
-			if (showMessage) {
+			if (CosmeticsNotification) {
 				float currentTime = static_cast<float>(ImGui::GetTime());
-				if (currentTime - timer < 4.0f) {
+				if (currentTime - timer < 5.0f) {
 					ImGui::SameLine();
 					if (State.UnlockCosmetics)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Unlocked All Cosmetics!");
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Cosmetics Are Unlocked!");
 					else
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Disabled Unlock Cosmetics!");
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Cosmetics Are Locked!");
 				}
 				else {
-					showMessage = false;
+					CosmeticsNotification = false;
 				}
 			}
 
@@ -277,22 +278,22 @@ namespace SettingsTab {
 
 			if (ToggleButton("Safe Mode", &State.SafeMode)) {
 				State.Save();
+				SafeModeNotification = true;
+				timer = static_cast<float>(ImGui::GetTime());
 			}
 
-			static float timer1 = 0.0f;
-			static bool showMessage1 = false;
-
-			if (showMessage1) {
+			if (SafeModeNotification) {
 				float currentTime = static_cast<float>(ImGui::GetTime());
-				if (currentTime - timer1 < 4.0f) {
+
+				if (currentTime - timer < 5.0f) {
 					ImGui::SameLine();
-					if (State.UnlockCosmetics)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Unlocked All Cosmetics!");
+					if (State.SafeMode)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "SafeMode is Enabled!");
 					else
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Disabled Unlock Cosmetics!");
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "SafeMode is Disabled! (The likelihood of getting banned increases)");
 				}
 				else {
-					showMessage1 = false;
+					SafeModeNotification = false;
 				}
 			}
 
