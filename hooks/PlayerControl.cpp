@@ -1003,6 +1003,10 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 
 void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_HandleRpc executed");
+	if (callId == 45 && MessageReader_ReadString(reader, NULL) != NULL) {
+		SMAC_OnCheatDetected(__this, "Overloading");
+		return;
+	}
 	try {
 		HandleRpc(__this, callId, reader);
 		SMAC_HandleRpc(__this, callId, reader);
@@ -1162,6 +1166,7 @@ void dPlayerControl_Shapeshift(PlayerControl* __this, PlayerControl* target, boo
 }
 
 void dPlayerControl_ProtectPlayer(PlayerControl* __this, PlayerControl* target, int32_t colorId, MethodInfo* method) {
+	if (target == NULL) return;
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_ProtectPlayer executed");
 	try {
 		if (SYNCHRONIZED(Replay::replayEventMutex); target != nullptr) {

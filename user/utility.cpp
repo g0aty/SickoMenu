@@ -1577,6 +1577,7 @@ void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
+	if (reason == "Overloading" && !(IsHost() && State.SMAC_HostPunishment >= 2)) return; // Don't spam logs for overloading, that causes overload as well
 	if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; // Avoid detecting yourself and practice mode dummies
 	if (reason == "Bad Sabotage" && !IsHost()) return; // Without host, we cannot detect who sent UpdateSystem rpc properly
 

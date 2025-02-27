@@ -257,6 +257,7 @@ namespace SettingsTab {
 			if (showMessage) {
 				float currentTime = static_cast<float>(ImGui::GetTime());
 				if (currentTime - timer < 4.0f) {
+					ImGui::SameLine();
 					if (State.UnlockCosmetics)
 						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Unlocked All Cosmetics!");
 					else
@@ -266,7 +267,6 @@ namespace SettingsTab {
 					showMessage = false;
 				}
 			}
-
 
 			if (Achievements::IsSupported())
 			{
@@ -278,6 +278,24 @@ namespace SettingsTab {
 			if (ToggleButton("Safe Mode", &State.SafeMode)) {
 				State.Save();
 			}
+
+			static float timer1 = 0.0f;
+			static bool showMessage1 = false;
+
+			if (showMessage1) {
+				float currentTime = static_cast<float>(ImGui::GetTime());
+				if (currentTime - timer1 < 4.0f) {
+					ImGui::SameLine();
+					if (State.UnlockCosmetics)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Unlocked All Cosmetics!");
+					else
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Disabled Unlock Cosmetics!");
+				}
+				else {
+					showMessage1 = false;
+				}
+			}
+
 			static int modToShow = 0;
 
 			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) {

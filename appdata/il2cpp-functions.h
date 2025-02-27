@@ -175,7 +175,6 @@ DO_APP_FUNC(MessageWriter*, InnerNetClient_StartRpcImmediately, (InnerNetClient*
 DO_APP_FUNC(void, InnerNetClient_FinishRpcImmediately, (InnerNetClient* __this, MessageWriter* msg, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::FinishRpcImmediately(Hazel.MessageWriter)");
 
 DO_APP_FUNC(void, MessageExtensions_WriteNetObject, (MessageWriter* self, InnerNetObject* obj, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.MessageExtensions::WriteNetObject(Hazel.MessageWriter, InnerNet.InnerNetObject)");
-DO_APP_FUNC(PlayerControl*, MessageExtensions_ReadNetObject_1, (MessageReader* self, MethodInfo* method), "Assembly-CSharp, PlayerControl InnerNet.MessageExtensions::ReadNetObject(Hazel.MessageReader)");
 
 //DO_APP_FUNC(bool, Constants_1_ShouldFlipSkeld, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldFlipSkeld()");
 //this causes issues with dleks

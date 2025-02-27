@@ -763,6 +763,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 if ((IsInLobby() || IsInGame()) && (State.OverloadEveryone || State.overloadedPlayers.size() != 0 ||
                     State.LagEveryone || State.laggedPlayers.size() != 0) && overloadDelay <= 0 && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
                     bool lag = State.LagEveryone || State.laggedPlayers.size() != 0;
+                    uint8_t count = 0;
                     for (auto p : GetAllPlayerControl()) {
                         if (State.Destruct_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(),
                             convert_from_string(GetPlayerData(p)->fields.FriendCode)) != State.WhitelistFriendCodes.end()) continue;
@@ -772,13 +773,15 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                             p->fields.PlayerId) == State.laggedPlayers.end()) continue;
                         if (p != *Game::pLocalPlayer) {
                             for (int i = 0; i < (lag ? 169 : 25); ++i) {
-                                auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, 0xb4 -
-                                    0x87, SendOption__Enum::None, p->fields._.OwnerId, NULL);
+                                auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, 
+                                    (uint8_t)RpcCalls__Enum::ProtectPlayer, SendOption__Enum::None, p->fields._.OwnerId, NULL);
+                                MessageWriter_WriteString(writer, convert_to_string("This string is written so that other mods can detect overloading easily."), NULL);
                                 InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
                             }
+                            count++;
                         }
                     }
-                    overloadDelay = int((lag ? 0.2 : 0.1) * GetFps());
+                    overloadDelay = int((lag ? 0.3 : 0.1) * GetFps());
                 }
                 else overloadDelay--;
 
