@@ -269,7 +269,7 @@ ImVec4 AmongUsColorToImVec4(const Color32& color) {
 #define LocalInLobby (((*Game::pAmongUsClient)->fields._.NetworkMode == NetworkModes__Enum::LocalGame) && ((*Game::pAmongUsClient)->fields._.GameState == InnerNetClient_GameStates__Enum::Joined))
 #define OnlineInGame (((*Game::pAmongUsClient)->fields._.NetworkMode == NetworkModes__Enum::OnlineGame) && ((*Game::pAmongUsClient)->fields._.GameState == InnerNetClient_GameStates__Enum::Started))
 #define OnlineInLobby (((*Game::pAmongUsClient)->fields._.NetworkMode == NetworkModes__Enum::OnlineGame) && ((*Game::pAmongUsClient)->fields._.GameState == InnerNetClient_GameStates__Enum::Joined))
-#define TutorialScene (State.CurrentScene.compare("Tutorial") == 0)
+#define TutorialScene (!State.CurrentScene.compare("Tutorial"))
 
 bool IsInLobby() {
 	if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
@@ -289,13 +289,13 @@ bool IsModdedHost() {
 bool IsInGame() {
 	if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
 	if (!app::GameManager_get_Instance(nullptr)) return false;
-	return (LocalInGame || OnlineInGame || TutorialScene) && Object_1_IsNotNull((Object_1*)*Game::pShipStatus) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
+	return (LocalInGame || OnlineInGame || TutorialScene) && (Object_1_IsNotNull((Object_1*)*Game::pShipStatus) || State.GameLoaded) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
 }
 
 bool IsInMultiplayerGame() {
 	if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
 	if (!app::GameManager_get_Instance(nullptr)) return false;
-	return (LocalInGame || OnlineInGame) && Object_1_IsNotNull((Object_1*)*Game::pShipStatus) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
+	return (LocalInGame || OnlineInGame) && (Object_1_IsNotNull((Object_1*)*Game::pShipStatus) || State.GameLoaded) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
 }
 
 bool IsColorBlindMode() {
@@ -311,6 +311,15 @@ bool IsStreamerMode() {
 	if (auto settings = DataManager_get_Settings(nullptr)) {
 		if (auto gameplay = SettingsData_get_Gameplay(settings, nullptr)) {
 			return GameplaySettingsData_get_StreamerMode(gameplay, nullptr);
+		}
+	}
+	return false;
+}
+
+bool IsChatCensored() {
+	if (auto settings = DataManager_get_Settings(nullptr)) {
+		if (auto multiplayer = SettingsData_get_Multiplayer(settings, nullptr)) {
+			return MultiplayerSettingsData_get_CensorChat(multiplayer, nullptr);
 		}
 	}
 	return false;
@@ -585,6 +594,19 @@ void CompleteTask(NormalPlayerTask* playerTask) {
 	if (playerTask->fields._._Owner_k__BackingField == (*Game::pLocalPlayer)) {
 		while (playerTask->fields.taskStep < playerTask->fields.MaxStep)
 			app::NormalPlayerTask_NextStep(playerTask, NULL);
+	}
+}
+
+void CompleteAllTasks(PlayerControl* player) {
+	if (!IsInGame()) return;
+	if (player == NULL) {
+		player = *Game::pLocalPlayer;
+		if (*Game::pLocalPlayer == NULL) return;
+	}
+	if (State.SafeMode && player != *Game::pLocalPlayer) return;
+	auto playerTasks = GetNormalPlayerTasks(player);
+	for (auto playerTask : playerTasks) {
+		State.taskRpcQueue.push(new RpcForceCompleteTask(player, playerTask->fields._._Id_k__BackingField));
 	}
 }
 
@@ -876,7 +898,7 @@ Game::ColorId GetRandomColorId()
 		if (availableColors.size() > 0)
 			colorId = availableColors.at(randi(0, (int)availableColors.size() - 1));
 		else
-			colorId = players.size(); //gives u fortegreen when all colors are taken
+			colorId = randi(0, (int)PlayerColors.size() - 1);
 	}
 	else
 	{
@@ -1470,61 +1492,61 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 			opener += "<font=\"DIN_Pro_Bold_700 SDF\">";
 			break;
 		}
-			   closer += "</font>";
 		}
+		closer += "</font>";
 	}
 
-		/*if (State.Material) {
-			switch (State.MaterialType) {
-			case 0: {
-				opener += "<material=\"Barlow-Italic SDF Outline\">";
-				break;
-			}
-			case 1: {
-				opener += "<material=\"Barlow-BoldItalic SDF Outline\">";
-				break;
-			}
-			case 2: {
-				opener += "<material=\"Barlow-SemiBold SDF Outline\">";
-				break;
-			}
-				  closer += "</material>";
-			}
-		}*/
-
-			if (State.ResizeName) {
-				opener += std::format("<size={}%>", State.NameSize * 100);
-				closer += "</size>";
-			}
-
-			if (State.IndentName) {
-				opener += std::format("<line-indent={}>", State.NameIndent * 1);
-				closer += "</line-indent>";
-			}
-
-			if (State.CspaceName) {
-				opener += std::format("<cspace={}>", State.NameCspace * 1);
-				closer += "</cspace>";
-			}
-
-			if (State.MspaceName) {
-				opener += std::format("<mspace={}>", State.NameMspace * 1);
-				closer += "</mspace>";
-			}
-
-			if (State.VoffsetName) {
-				opener += std::format("<voffset={}>", State.NameVoffset * 1);
-				closer += "</voffset>";
-			}
-
-			if (State.RotateName) {
-				opener += std::format("<rotate={}>", State.NameRotate * 1);
-				closer += "<rotate=0>";
-			}
-			if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
-
-			return opener + name + closer;
+	/*if (State.Material) {
+		switch (State.MaterialType) {
+		case 0: {
+			opener += "<material=\"Barlow-Italic SDF Outline\">";
+			break;
 		}
+		case 1: {
+			opener += "<material=\"Barlow-BoldItalic SDF Outline\">";
+			break;
+		}
+		case 2: {
+			opener += "<material=\"Barlow-SemiBold SDF Outline\">";
+			break;
+		}
+				closer += "</material>";
+		}
+	}*/
+
+	if (State.ResizeName) {
+		opener += std::format("<size={}%>", State.NameSize * 100);
+		closer += "</size>";
+	}
+
+	if (State.IndentName) {
+		opener += std::format("<line-indent={}>", State.NameIndent * 1);
+		closer += "</line-indent>";
+	}
+
+	if (State.CspaceName) {
+		opener += std::format("<cspace={}>", State.NameCspace * 1);
+		closer += "</cspace>";
+	}
+
+	if (State.MspaceName) {
+		opener += std::format("<mspace={}>", State.NameMspace * 1);
+		closer += "</mspace>";
+	}
+
+	if (State.VoffsetName) {
+		opener += std::format("<voffset={}>", State.NameVoffset * 1);
+		closer += "</voffset>";
+	}
+
+	if (State.RotateName) {
+		opener += std::format("<rotate={}>", State.NameRotate * 1);
+		closer += "<rotate=0>";
+	}
+	if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
+
+	return opener + name + closer;
+}
 
 
 std::vector<std::string> GetAllConfigs() {
@@ -1555,7 +1577,9 @@ void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
-	if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; //avoid detecting yourself and practice mode dummies
+	if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; // Avoid detecting yourself and practice mode dummies
+	if (reason == "Bad Sabotage" && !IsHost()) return; // Without host, we cannot detect who sent UpdateSystem rpc properly
+
 	auto pData = GetPlayerData(pCtrl);
 	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
 

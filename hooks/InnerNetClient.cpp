@@ -10,6 +10,24 @@
 #include <sstream>
 #include "esp.hpp"
 
+using namespace std::string_view_literals;
+
+static bool autoStartedGame = false;
+
+static bool OpenDoor(OpenableDoor* door) {
+    if ("PlainDoor"sv == door->klass->name) {
+        app::PlainDoor_SetDoorway(reinterpret_cast<PlainDoor*>(door), true, {});
+    }
+    else if ("MushroomWallDoor"sv == door->klass->name) {
+        app::MushroomWallDoor_SetDoorway(reinterpret_cast<MushroomWallDoor*>(door), true, {});
+    }
+    else {
+        return false;
+    }
+    State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Doors, door->fields.Id | 64));
+    return true;
+}
+
 static void onGameEnd() {
     try {
         LOG_DEBUG("Reset All");
@@ -29,6 +47,8 @@ static void onGameEnd() {
         State.IsRevived = false;
         State.protectMonitor.clear();
         State.vanishedPlayers.clear();
+        State.overloadedPlayers.clear();
+        State.laggedPlayers.clear();
         State.VoteKicks = 0;
         State.OutfitCooldown = 50;
         State.CanChangeOutfit = false;
@@ -36,6 +56,7 @@ static void onGameEnd() {
         State.RealRole = RoleTypes__Enum::Crewmate;
         State.mapType = Settings::MapType::Ship;
         State.SpeedrunTimer = 0.f;
+        autoStartedGame = false;
 
         if (State.PanicMode && State.TempPanicMode) {
             State.PanicMode = false;
@@ -66,6 +87,26 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dInnerNetClient_Update executed");
     try {
+        if (State.versionShower != nullptr && (State.CurrentScene == "MainMenu" || State.CurrentScene == "FindAGame" ||
+            State.CurrentScene == "MMOnline" || State.CurrentScene == "MatchMaking")) {
+            // Constantly update VersionShower so that watermark gets displayed
+            if (!State.PanicMode) {
+                int watermarkSize = 100;
+                if (!State.HideWatermark) {
+                    if (State.CurrentScene == "FindAGame") watermarkSize = 60;
+                    else if (State.CurrentScene == "MainMenu") watermarkSize = 75;
+                }
+                std::string watermarkOffset = State.CurrentScene == "MMOnline" ? "<#0000>00000</color>" : "";
+                std::string watermarkText = State.AprilFoolsMode ? std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[F{}son Mode]</color> by <#39f>g0aty</color>",
+                    State.SickoVersion, IsChatCensored() ? "***" : "uck") :
+                    std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
+                const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}</color></size></font>",
+                    watermarkSize, State.DarkMode ? "<#666>" : "<#fff>", State.versionShowerDefaultText,
+                    State.HideWatermark ? "" : watermarkText, watermarkOffset);
+                TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(versionText), nullptr);
+            }
+            else TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(State.versionShowerDefaultText), nullptr);
+        }
         if (!State.PanicMode) {
             static bool onStart = true;
             if (!IsInLobby()) {
@@ -84,7 +125,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             if ((IsInGame() || IsInLobby()) && State.CanChangeOutfit) { //removed hotkeynoclip cuz even if noclip setting is saved and turned on it doesn't work
                 if (!(GetPlayerData(*Game::pLocalPlayer)->fields.IsDead)) {
-                    if (State.NoClip || State.IsRevived)
+                    if (!State.PanicMode && (State.NoClip || State.IsRevived))
                         app::GameObject_set_layer(app::Component_get_gameObject((Component_1*)(*Game::pLocalPlayer), NULL), app::LayerMask_NameToLayer(convert_to_string("Ghost"), NULL), NULL);
                     else
                         app::GameObject_set_layer(app::Component_get_gameObject((Component_1*)(*Game::pLocalPlayer), NULL), app::LayerMask_NameToLayer(convert_to_string("Players"), NULL), NULL);
@@ -98,10 +139,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             if (!IsInGame()) {
-
                 State.InMeeting = false;
                 State.DisableLights = false;
-		State.AutoRepairSabotage = false;
+                State.AutoRepairSabotage = false;
                 State.CloseAllDoors = false;
                 State.SpamReport = false;
                 State.DisableVents = false;
@@ -157,6 +197,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             if (IsInGame() || IsInLobby()) {
+                State.versionShower = nullptr;
                 if (State.AlwaysMove && !State.ChatFocused)
                     (*Game::pLocalPlayer)->fields.moveable = true;
                 if (State.FakeAlive && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) {
@@ -186,9 +227,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (State.SpoofLevel && (IsInGame() || IsInLobby()) && !State.activeImpersonation) {
                 int fakeLevel = State.SafeMode ? std::clamp(State.FakeLevel, 1, 100001) : State.FakeLevel;
                 if (IsInGame() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != fakeLevel)
-                    State.rpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (fakeLevel - 1)));
+                    State.rpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, fakeLevel));
                 else if (IsInLobby() && (GetPlayerData(*Game::pLocalPlayer)->fields.PlayerLevel + 1) != fakeLevel)
-                    State.lobbyRpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, (fakeLevel - 1)));
+                    State.lobbyRpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, fakeLevel));
             }
 
             if (IsInLobby()) {
@@ -218,12 +259,21 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 }
             }
 
-            if (!IsInGame() && !State.rpcQueue.empty()) {
-                State.rpcQueue = {};
+            static int rpcDelay = 0;
+            if ((IsInGame() || IsInLobby()) && !State.taskRpcQueue.empty()) {
+                if (rpcDelay <= 0) {
+                    auto rpc = State.taskRpcQueue.front();
+                    State.taskRpcQueue.pop();
+                    rpc->Process();
+                    delete rpc;
+                    rpcDelay = State.SafeMode ? int(0.1 * GetFps()) : 0;
+                }
+                else rpcDelay--;
             }
-            if (!IsInLobby() && !State.lobbyRpcQueue.empty()) {
-                State.lobbyRpcQueue = {};
-            }
+
+            if (!IsInGame() && !State.rpcQueue.empty()) State.rpcQueue = {};
+            if (!IsInLobby() && !State.lobbyRpcQueue.empty()) State.lobbyRpcQueue = {};
+            if (!IsInGame() && !IsInLobby() && !State.taskRpcQueue.empty()) State.taskRpcQueue = {};
 
             if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::Normal) {
                 auto localData = GetPlayerData(*Game::pLocalPlayer);
@@ -286,8 +336,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         }
                     }
                     if (role == RoleTypes__Enum::Shapeshifter) {
-                        app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
-                        shapeshifterRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
+                        /*app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
+                        shapeshifterRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written*/
                     }
                     if (role == RoleTypes__Enum::Phantom) {
                         app::PhantomRole* phantomRole = (app::PhantomRole*)playerRole;
@@ -333,10 +383,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         scientistRole->fields.currentCharge = charge;
                 }
                 if (role == RoleTypes__Enum::Shapeshifter) {
-                    app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
+                    /*app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
                     float shiftTime = options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F);
                     if (shapeshifterRole->fields.durationSecondsRemaining > shiftTime)
-                        shapeshifterRole->fields.durationSecondsRemaining = shiftTime;
+                        shapeshifterRole->fields.durationSecondsRemaining = shiftTime;*/
                 }
 
                 int emergencies = options.GetInt(app::Int32OptionNames__Enum::NumEmergencyMeetings, 1);
@@ -404,7 +454,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             static int reportDelay = 0;
-            if (reportDelay <= 0 && State.SpamReport && IsInGame()) {
+            if (reportDelay <= 0 && State.SpamReport && (IsHost() || !State.SafeMode) && IsInGame()) {
                 for (auto p : GetAllPlayerControl()) {
                     if (State.InMeeting)
                         State.rpcQueue.push(new RpcForceMeeting(p, PlayerSelection(p)));
@@ -420,10 +470,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             static int reportDelays = 0;
             if (reportDelays <= 0 && State.CrashSpamReport && IsInGame()) {
                 for (auto p : GetAllPlayerControl()) {
-                    if (State.InMeeting)
-                        State.rpcQueue.push(new RpcForceMeeting(p, PlayerSelection(p)));
-                    else
-                        State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
+                    State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
+                    return;
                 }
                 reportDelays = 0;
             }
@@ -458,23 +506,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             static int nameCtr = 1;
 
-            static float cycleNameDelay = 0; //If we spam too many name changes, we're banned
-            static float colorChangeCycleDelay = 0; //If we spam too many color changes, we're banned?
-
-            static float hatChangeCycler = 0; //controls the hat string
-            static float hatChangeCycleDelay = 0; //controls the actual hat cycler
-
-            static float skinChangeCycler = 0; //controls the skin string
-            static float skinChangeCycleDelay = 0; //controls the actual skin cycler
-
-            static float visorChangeCycler = 0; //controls the visor string
-            static float visorChangeCycleDelay = 0; //controls the actual visor cycler
-
-            static float petChangeCycler = 0; //controls the pet string
-            static float petChangeCycleDelay = 0; //controls the actual pet cycler
-
-            static float namePlateChangeCycler = 0; //controls the nameplate string
-            static float namePlateChangeCycleDelay = 0; //controls the actual nameplate cycler
+            static int cycleNameDelay = 0; //If we spam too many name changes, we're banned
+            static int colorChangeCycleDelay = 0; //If we spam too many color changes, we're banned?
+            static int changeCycleDelay = 0; //controls the actual cosmetic cycler
 
             if (State.Cycler)
                 State.CycleBetweenPlayers = false;
@@ -482,204 +516,144 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.Cycler = false;
 
             if (State.Cycler && (!State.InMeeting || State.CycleInMeeting) && State.CanChangeOutfit) {
-                static float cycleNameDelay = 0;
                 if (State.CycleName && cycleNameDelay <= 0) {
                     std::vector<std::string> validNames;
                     for (std::string i : State.cyclerUserNames) {
-                        if (IsNameValid(i)) continue;
+                        if (!IsNameValid(i)) continue; // Screw you, g0aty from the past
                         validNames.push_back(i);
                     }
-                    if (State.cyclerNameGeneration < 2 || (State.cyclerNameGeneration == 2 && ((IsHost() || !State.SafeMode) ? State.cyclerUserNames.empty() : validNames.empty()))) {
-                        if (IsInGame())
-                            State.rpcQueue.push(new RpcSetName(State.cyclerNameGeneration == 1 ? GenerateRandomString(true) : GenerateRandomString()));
-                        else if (IsInLobby())
-                            State.lobbyRpcQueue.push(new RpcSetName(State.cyclerNameGeneration == 1 ? GenerateRandomString(true) : GenerateRandomString()));
-                        cycleNameDelay = State.CycleDuration;
-                    }
-                    else if (State.cyclerNameGeneration == 2) {
-                        static int nameCtr = 0;
-                        if (cycleNameDelay <= 0) {
-                            if ((size_t)nameCtr >= ((IsHost() || !State.SafeMode) ? State.cyclerUserNames.size() : validNames.size()))
-                                nameCtr = 0;
-                            if (IsHost() || !State.SafeMode) {
-                                if (IsInGame())
-                                    State.rpcQueue.push(new RpcSetName(State.cyclerUserNames[nameCtr]));
-                                else if (IsInLobby())
-                                    State.lobbyRpcQueue.push(new RpcSetName(State.cyclerUserNames[nameCtr]));
+                    for (auto p : GetAllPlayerControl()) {
+                        if (p != *Game::pLocalPlayer && !((IsHost() || !State.SafeMode) && State.CycleForEveryone)) continue;
+                        if (State.cyclerNameGeneration < 2 || (State.cyclerNameGeneration == 2 && ((IsHost() || !State.SafeMode) ? State.cyclerUserNames.empty() : validNames.empty()))) {
+                            if (IsHost())
+                                PlayerControl_RpcSetName(p, State.cyclerNameGeneration == 1 ?
+                                    convert_to_string(GenerateRandomString(true)) : convert_to_string(GenerateRandomString()), NULL);
+                            else
+                                PlayerControl_CmdCheckName(p, State.cyclerNameGeneration == 1 ?
+                                    convert_to_string(GenerateRandomString(true)) : convert_to_string(GenerateRandomString()), NULL);
+                        }
+                        else if (State.cyclerNameGeneration == 2) {
+                            static int nameCtr = 0;
+                            if (cycleNameDelay <= 0) {
+                                if ((size_t)nameCtr >= ((IsHost() || !State.SafeMode) ? State.cyclerUserNames.size() : validNames.size()))
+                                    nameCtr = 0;
+                                if (IsHost()) PlayerControl_RpcSetName(p, convert_to_string(State.cyclerUserNames[nameCtr]), NULL);
+                                else  PlayerControl_CmdCheckName(p, convert_to_string(State.cyclerUserNames[nameCtr]), NULL);
                                 nameCtr++;
-                                cycleNameDelay = State.CycleDuration;
-                            }
-                            else {
-                                if (IsInGame())
-                                    State.rpcQueue.push(new RpcSetName(validNames[nameCtr]));
-                                else if (IsInLobby())
-                                    State.lobbyRpcQueue.push(new RpcSetName(validNames[nameCtr]));
-                                nameCtr++;
-                                cycleNameDelay = State.CycleDuration;
                             }
                         }
+                        else {
+                            if (IsHost()) PlayerControl_RpcSetName(p, convert_to_string(GenerateRandomString()), NULL);
+                            else PlayerControl_CmdCheckName(p, convert_to_string(GenerateRandomString()), NULL);
+                        }
                     }
-                    else {
-                        if (IsInGame())
-                            State.rpcQueue.push(new RpcSetName(GenerateRandomString()));
-                        else if (IsInLobby())
-                            State.lobbyRpcQueue.push(new RpcSetName(GenerateRandomString()));
-                        cycleNameDelay = State.CycleDuration;
-                    }
+                    cycleNameDelay = int(State.CycleTimer * GetFps()); // Far better
                 }
-                else {
-                    cycleNameDelay--;
-                }
+                else cycleNameDelay--;
 
                 if (colorChangeCycleDelay <= 0 && State.RandomColor && !State.activeImpersonation && !State.CycleForEveryone) {
-                    if (IsInGame()) {
-                        State.RandomColorId = GetRandomColorId();
-                        State.rpcQueue.push(new RpcSetColor(State.RandomColorId));
+                    if ((IsHost() || !State.SafeMode) && State.CycleForEveryone) {
+                        for (auto p : GetAllPlayerControl()) {
+                            PlayerControl_CmdCheckColor(p, GetRandomColorId(), NULL);
+                        }
                     }
-                    else if (IsInLobby()) {
-                        State.RandomColorId = GetRandomColorId();
-                        State.lobbyRpcQueue.push(new RpcSetColor(State.RandomColorId));
-                    }
-                    colorChangeCycleDelay = State.CycleDuration; //idk how long this is
+                    else PlayerControl_CmdCheckColor(*Game::pLocalPlayer, GetRandomColorId(), NULL);
+                    colorChangeCycleDelay = int(State.CycleTimer * GetFps()); //idk how long this is
                 }
-                else if (colorChangeCycleDelay > 0) {
-                    colorChangeCycleDelay--;
-                }
+                else colorChangeCycleDelay--;
 
-                if (hatChangeCycler <= 0 && State.RandomHat && !State.activeImpersonation) {
-                    std::vector availableHats = { "hat_NoHat", "hat_AbominalHat", "hat_anchor", "hat_antenna", "hat_Antenna_Black", "hat_arrowhead", "hat_Astronaut-Blue", "hat_Astronaut-Cyan", "hat_Astronaut-Orange", "hat_astronaut", "hat_axe", "hat_babybean", "hat_Baguette", "hat_BananaGreen", "hat_BananaPurple", "hat_bandanaWBY", "hat_Bandana_Blue", "hat_Bandana_Green", "hat_Bandana_Pink", "hat_Bandana_Red", "hat_Bandana_White", "hat_Bandana_Yellow", "hat_baseball_Black", "hat_baseball_Green", "hat_baseball_Lightblue", "hat_baseball_LightGreen", "hat_baseball_Lilac", "hat_baseball_Orange", "hat_baseball_Pink", "hat_baseball_Purple", "hat_baseball_Red", "hat_baseball_White", "hat_baseball_Yellow", "hat_Basketball", "hat_bat_crewcolor", "hat_bat_green", "hat_bat_ice", "hat_beachball", "hat_Beanie_Black", "hat_Beanie_Blue", "hat_Beanie_Green", "hat_Beanie_Lightblue", "hat_Beanie_LightGreen", "hat_Beanie_LightPurple", "hat_Beanie_Pink", "hat_Beanie_Purple", "hat_Beanie_White", "hat_Beanie_Yellow", "hat_bearyCold", "hat_bone", "hat_Bowlingball", "hat_brainslug", "hat_BreadLoaf", "hat_bucket", "hat_bucketHat", "hat_bushhat", "hat_Butter", "hat_caiatl", "hat_caitlin", "hat_candycorn", "hat_captain", "hat_cashHat", "hat_cat_grey", "hat_cat_orange", "hat_cat_pink", "hat_cat_snow", "hat_chalice", "hat_cheeseBleu", "hat_cheeseMoldy", "hat_cheeseSwiss", "hat_ChefWhiteBlue", "hat_cherryOrange", "hat_cherryPink", "hat_Chocolate", "hat_chocolateCandy", "hat_chocolateMatcha", "hat_chocolateVanillaStrawb", "hat_clagger", "hat_clown_purple", "hat_comper", "hat_croissant", "hat_crownBean", "hat_crownDouble", "hat_crownTall", "hat_CuppaJoe", "hat_Deitied", "hat_devilhorns_black", "hat_devilhorns_crewcolor", "hat_devilhorns_green", "hat_devilhorns_murky", "hat_devilhorns_white", "hat_devilhorns_yellow", "hat_Doc_black", "hat_Doc_Orange", "hat_Doc_Purple", "hat_Doc_Red", "hat_Doc_White", "hat_Dodgeball", "hat_Dorag_Black", "hat_Dorag_Desert", "hat_Dorag_Jungle", "hat_Dorag_Purple", "hat_Dorag_Sky", "hat_Dorag_Snow", "hat_Dorag_Yellow", "hat_doubletophat", "hat_DrillMetal", "hat_DrillStone", "hat_DrillWood", "hat_EarmuffGreen", "hat_EarmuffsPink", "hat_EarmuffsYellow", "hat_EarnmuffBlue", "hat_eggGreen", "hat_eggYellow", "hat_enforcer", "hat_erisMorn", "hat_fairywings", "hat_fishCap", "hat_fishhed", "hat_fishingHat", "hat_flowerpot", "hat_frankenbolts", "hat_frankenbride", "hat_fungleFlower", "hat_geoff", "hat_glowstick", "hat_glowstickCyan", "hat_glowstickOrange", "hat_glowstickPink", "hat_glowstickPurple", "hat_glowstickYellow", "hat_goggles", "hat_Goggles_Black", "hat_Goggles_Chrome", "hat_GovtDesert", "hat_GovtHeadset", "hat_halospartan", "hat_hardhat", "hat_Hardhat_black", "hat_Hardhat_Blue", "hat_Hardhat_Green", "hat_Hardhat_Orange", "hat_Hardhat_Pink", "hat_Hardhat_Purple", "hat_Hardhat_Red", "hat_Hardhat_White", "hat_HardtopHat", "hat_headslug_Purple", "hat_headslug_Red", "hat_headslug_White", "hat_headslug_Yellow", "hat_Heart", "hat_heim", "hat_Herohood_Black", "hat_Herohood_Blue", "hat_Herohood_Pink", "hat_Herohood_Purple", "hat_Herohood_Red", "hat_Herohood_Yellow", "hat_hl_fubuki", "hat_hl_gura", "hat_hl_korone", "hat_hl_marine", "hat_hl_mio", "hat_hl_moona", "hat_hl_okayu", "hat_hl_pekora", "hat_hl_risu", "hat_hl_watson", "hat_hunter", "hat_IceCreamMatcha", "hat_IceCreamMint", "hat_IceCreamNeo", "hat_IceCreamStrawberry", "hat_IceCreamUbe", "hat_IceCreamVanilla", "hat_Igloo", "hat_Janitor", "hat_jayce", "hat_jinx", "hat_killerplant", "hat_lilShroom", "hat_maraSov", "hat_mareLwyd", "hat_military", "hat_MilitaryWinter", "hat_MinerBlack", "hat_MinerYellow", "hat_mira_bush", "hat_mira_case", "hat_mira_cloud", "hat_mira_flower", "hat_mira_flower_red", "hat_mira_gem", "hat_mira_headset_blue", "hat_mira_headset_pink", "hat_mira_headset_yellow", "hat_mira_leaf", "hat_mira_milk", "hat_mira_sign_blue", "hat_mohawk_bubblegum", "hat_mohawk_bumblebee", "hat_mohawk_purple_green", "hat_mohawk_rainbow", "hat_mummy", "hat_mushbuns", "hat_mushroomBeret", "hat_mysteryBones", "hat_NewYear2023", "hat_OrangeHat", "hat_osiris", "hat_pack01_Astronaut0001", "hat_pack02_Tengallon0001", "hat_pack02_Tengallon0002", "hat_pack03_Stickynote0004", "hat_pack04_Geoffmask0001", "hat_pack06holiday_candycane0001", "hat_PancakeStack", "hat_paperhat", "hat_Paperhat_Black", "hat_Paperhat_Blue", "hat_Paperhat_Cyan", "hat_Paperhat_Lightblue", "hat_Paperhat_Pink", "hat_Paperhat_Yellow", "hat_papermask", "hat_partyhat", "hat_pickaxe", "hat_Pineapple", "hat_PizzaSliceHat", "hat_pk01_BaseballCap", "hat_pk02_Crown", "hat_pk02_Eyebrows", "hat_pk02_HaloHat", "hat_pk02_HeroCap", "hat_pk02_PipCap", "hat_pk02_PlungerHat", "hat_pk02_ScubaHat", "hat_pk02_StickminHat", "hat_pk02_StrawHat", "hat_pk02_TenGallonHat", "hat_pk02_ThirdEyeHat", "hat_pk02_ToiletPaperHat", "hat_pk02_Toppat", "hat_pk03_Fedora", "hat_pk03_Goggles", "hat_pk03_Headphones", "hat_pk03_Security1", "hat_pk03_StrapHat", "hat_pk03_Traffic", "hat_pk04_Antenna", "hat_pk04_Archae", "hat_pk04_Balloon", "hat_pk04_Banana", "hat_pk04_Bandana", "hat_pk04_Beanie", "hat_pk04_Bear", "hat_pk04_BirdNest", "hat_pk04_CCC", "hat_pk04_Chef", "hat_pk04_DoRag", "hat_pk04_Fez", "hat_pk04_GeneralHat", "hat_pk04_HunterCap", "hat_pk04_JungleHat", "hat_pk04_MinerCap", "hat_pk04_MiniCrewmate", "hat_pk04_Pompadour", "hat_pk04_RamHorns", "hat_pk04_Slippery", "hat_pk04_Snowman", "hat_pk04_Vagabond", "hat_pk04_WinterHat", "hat_pk05_Burthat", "hat_pk05_Cheese", "hat_pk05_cheesetoppat", "hat_pk05_Cherry", "hat_pk05_davehat", "hat_pk05_Egg", "hat_pk05_Ellie", "hat_pk05_EllieToppat", "hat_pk05_Ellryhat", "hat_pk05_Fedora", "hat_pk05_Flamingo", "hat_pk05_FlowerPin", "hat_pk05_GeoffreyToppat", "hat_pk05_Helmet", "hat_pk05_HenryToppat", "hat_pk05_Macbethhat", "hat_pk05_Plant", "hat_pk05_RHM", "hat_pk05_Svenhat", "hat_pk05_Wizardhat", "hat_pk06_Candycanes", "hat_pk06_ElfHat", "hat_pk06_Lights", "hat_pk06_Present", "hat_pk06_Reindeer", "hat_pk06_Santa", "hat_pk06_Snowman", "hat_pk06_tree", "hat_pkHW01_BatWings", "hat_pkHW01_CatEyes", "hat_pkHW01_Horns", "hat_pkHW01_Machete", "hat_pkHW01_Mohawk", "hat_pkHW01_Pirate", "hat_pkHW01_PlagueHat", "hat_pkHW01_Pumpkin", "hat_pkHW01_ScaryBag", "hat_pkHW01_Witch", "hat_pkHW01_Wolf", "hat_Plunger_Blue", "hat_Plunger_Yellow", "hat_police", "hat_Ponytail", "hat_Pot", "hat_Present", "hat_Prototype", "hat_pusheenGreyHat", "hat_PusheenicornHat", "hat_pusheenMintHat", "hat_pusheenPinkHat", "hat_pusheenPurpleHat", "hat_pusheenSitHat", "hat_pusheenSleepHat", "hat_pyramid", "hat_rabbitEars", "hat_Ramhorn_Black", "hat_Ramhorn_Red", "hat_Ramhorn_White", "hat_ratchet", "hat_Records", "hat_RockIce", "hat_RockLava", "hat_Rubberglove", "hat_Rupert", "hat_russian", "hat_saint14", "hat_sausage", "hat_savathun", "hat_schnapp", "hat_screamghostface", "hat_Scrudge", "hat_sharkfin", "hat_shaxx", "hat_shovel", "hat_SlothHat", "hat_SnowbeanieGreen", "hat_SnowbeanieOrange", "hat_SnowBeaniePurple", "hat_SnowbeanieRed", "hat_Snowman", "hat_Soccer", "hat_Sorry", "hat_starBalloon", "hat_starhorse", "hat_Starless", "hat_StarTopper", "hat_stethescope", "hat_StrawberryLeavesHat", "hat_TenGallon_Black", "hat_TenGallon_White", "hat_ThomasC", "hat_tinFoil", "hat_titan", "hat_ToastButterHat", "hat_tombstone", "hat_tophat", "hat_ToppatHair", "hat_towelwizard", "hat_Traffic_Blue", "hat_traffic_purple", "hat_Traffic_Red", "hat_Traffic_Yellow", "hat_Unicorn", "hat_vi", "hat_viking", "hat_Visor", "hat_Voleyball", "hat_w21_candycane_blue", "hat_w21_candycane_bubble", "hat_w21_candycane_chocolate", "hat_w21_candycane_mint", "hat_w21_elf_pink", "hat_w21_elf_swe", "hat_w21_gingerbread", "hat_w21_holly", "hat_w21_krampus", "hat_w21_lights_white", "hat_w21_lights_yellow", "hat_w21_log", "hat_w21_mistletoe", "hat_w21_mittens", "hat_w21_nutcracker", "hat_w21_pinecone", "hat_w21_present_evil", "hat_w21_present_greenyellow", "hat_w21_present_redwhite", "hat_w21_present_whiteblue", "hat_w21_santa_evil", "hat_w21_santa_green", "hat_w21_santa_mint", "hat_w21_santa_pink", "hat_w21_santa_white", "hat_w21_santa_yellow", "hat_w21_snowflake", "hat_w21_snowman", "hat_w21_snowman_evil", "hat_w21_snowman_greenred", "hat_w21_snowman_redgreen", "hat_w21_snowman_swe", "hat_w21_winterpuff", "hat_wallcap", "hat_warlock", "hat_whitetophat", "hat_wigJudge", "hat_wigTall", "hat_WilfordIV", "hat_Winston", "hat_WinterGreen", "hat_WinterHelmet", "hat_WinterRed", "hat_WinterYellow", "hat_witch_green", "hat_witch_murky", "hat_witch_pink", "hat_witch_white", "hat_wolf_grey", "hat_wolf_murky", "hat_Zipper" };
-                    assert(availableHats.size() > 0);
-                    State.cyclerHat = convert_to_string(availableHats[randi(0, availableHats.size() - 1)]);
+                if (changeCycleDelay <= 0 && !State.activeImpersonation && (State.RandomHat || State.RandomSkin || State.RandomVisor || State.RandomPet || State.RandomNamePlate)) {
+                    if (State.RandomHat) {
+                        std::vector availableHats = { "hat_NoHat", "hat_AbominalHat", "hat_anchor", "hat_antenna", "hat_Antenna_Black", "hat_arrowhead", "hat_Astronaut-Blue", "hat_Astronaut-Cyan", "hat_Astronaut-Orange", "hat_astronaut", "hat_axe", "hat_babybean", "hat_Baguette", "hat_BananaGreen", "hat_BananaPurple", "hat_bandanaWBY", "hat_Bandana_Blue", "hat_Bandana_Green", "hat_Bandana_Pink", "hat_Bandana_Red", "hat_Bandana_White", "hat_Bandana_Yellow", "hat_baseball_Black", "hat_baseball_Green", "hat_baseball_Lightblue", "hat_baseball_LightGreen", "hat_baseball_Lilac", "hat_baseball_Orange", "hat_baseball_Pink", "hat_baseball_Purple", "hat_baseball_Red", "hat_baseball_White", "hat_baseball_Yellow", "hat_Basketball", "hat_bat_crewcolor", "hat_bat_green", "hat_bat_ice", "hat_beachball", "hat_Beanie_Black", "hat_Beanie_Blue", "hat_Beanie_Green", "hat_Beanie_Lightblue", "hat_Beanie_LightGreen", "hat_Beanie_LightPurple", "hat_Beanie_Pink", "hat_Beanie_Purple", "hat_Beanie_White", "hat_Beanie_Yellow", "hat_bearyCold", "hat_bone", "hat_Bowlingball", "hat_brainslug", "hat_BreadLoaf", "hat_bucket", "hat_bucketHat", "hat_bushhat", "hat_Butter", "hat_caiatl", "hat_caitlin", "hat_candycorn", "hat_captain", "hat_cashHat", "hat_cat_grey", "hat_cat_orange", "hat_cat_pink", "hat_cat_snow", "hat_chalice", "hat_cheeseBleu", "hat_cheeseMoldy", "hat_cheeseSwiss", "hat_ChefWhiteBlue", "hat_cherryOrange", "hat_cherryPink", "hat_Chocolate", "hat_chocolateCandy", "hat_chocolateMatcha", "hat_chocolateVanillaStrawb", "hat_clagger", "hat_clown_purple", "hat_comper", "hat_croissant", "hat_crownBean", "hat_crownDouble", "hat_crownTall", "hat_CuppaJoe", "hat_Deitied", "hat_devilhorns_black", "hat_devilhorns_crewcolor", "hat_devilhorns_green", "hat_devilhorns_murky", "hat_devilhorns_white", "hat_devilhorns_yellow", "hat_Doc_black", "hat_Doc_Orange", "hat_Doc_Purple", "hat_Doc_Red", "hat_Doc_White", "hat_Dodgeball", "hat_Dorag_Black", "hat_Dorag_Desert", "hat_Dorag_Jungle", "hat_Dorag_Purple", "hat_Dorag_Sky", "hat_Dorag_Snow", "hat_Dorag_Yellow", "hat_doubletophat", "hat_DrillMetal", "hat_DrillStone", "hat_DrillWood", "hat_EarmuffGreen", "hat_EarmuffsPink", "hat_EarmuffsYellow", "hat_EarnmuffBlue", "hat_eggGreen", "hat_eggYellow", "hat_enforcer", "hat_erisMorn", "hat_fairywings", "hat_fishCap", "hat_fishhed", "hat_fishingHat", "hat_flowerpot", "hat_frankenbolts", "hat_frankenbride", "hat_fungleFlower", "hat_geoff", "hat_glowstick", "hat_glowstickCyan", "hat_glowstickOrange", "hat_glowstickPink", "hat_glowstickPurple", "hat_glowstickYellow", "hat_goggles", "hat_Goggles_Black", "hat_Goggles_Chrome", "hat_GovtDesert", "hat_GovtHeadset", "hat_halospartan", "hat_hardhat", "hat_Hardhat_black", "hat_Hardhat_Blue", "hat_Hardhat_Green", "hat_Hardhat_Orange", "hat_Hardhat_Pink", "hat_Hardhat_Purple", "hat_Hardhat_Red", "hat_Hardhat_White", "hat_HardtopHat", "hat_headslug_Purple", "hat_headslug_Red", "hat_headslug_White", "hat_headslug_Yellow", "hat_Heart", "hat_heim", "hat_Herohood_Black", "hat_Herohood_Blue", "hat_Herohood_Pink", "hat_Herohood_Purple", "hat_Herohood_Red", "hat_Herohood_Yellow", "hat_hl_fubuki", "hat_hl_gura", "hat_hl_korone", "hat_hl_marine", "hat_hl_mio", "hat_hl_moona", "hat_hl_okayu", "hat_hl_pekora", "hat_hl_risu", "hat_hl_watson", "hat_hunter", "hat_IceCreamMatcha", "hat_IceCreamMint", "hat_IceCreamNeo", "hat_IceCreamStrawberry", "hat_IceCreamUbe", "hat_IceCreamVanilla", "hat_Igloo", "hat_Janitor", "hat_jayce", "hat_jinx", "hat_killerplant", "hat_lilShroom", "hat_maraSov", "hat_mareLwyd", "hat_military", "hat_MilitaryWinter", "hat_MinerBlack", "hat_MinerYellow", "hat_mira_bush", "hat_mira_case", "hat_mira_cloud", "hat_mira_flower", "hat_mira_flower_red", "hat_mira_gem", "hat_mira_headset_blue", "hat_mira_headset_pink", "hat_mira_headset_yellow", "hat_mira_leaf", "hat_mira_milk", "hat_mira_sign_blue", "hat_mohawk_bubblegum", "hat_mohawk_bumblebee", "hat_mohawk_purple_green", "hat_mohawk_rainbow", "hat_mummy", "hat_mushbuns", "hat_mushroomBeret", "hat_mysteryBones", "hat_NewYear2023", "hat_OrangeHat", "hat_osiris", "hat_pack01_Astronaut0001", "hat_pack02_Tengallon0001", "hat_pack02_Tengallon0002", "hat_pack03_Stickynote0004", "hat_pack04_Geoffmask0001", "hat_pack06holiday_candycane0001", "hat_PancakeStack", "hat_paperhat", "hat_Paperhat_Black", "hat_Paperhat_Blue", "hat_Paperhat_Cyan", "hat_Paperhat_Lightblue", "hat_Paperhat_Pink", "hat_Paperhat_Yellow", "hat_papermask", "hat_partyhat", "hat_pickaxe", "hat_Pineapple", "hat_PizzaSliceHat", "hat_pk01_BaseballCap", "hat_pk02_Crown", "hat_pk02_Eyebrows", "hat_pk02_HaloHat", "hat_pk02_HeroCap", "hat_pk02_PipCap", "hat_pk02_PlungerHat", "hat_pk02_ScubaHat", "hat_pk02_StickminHat", "hat_pk02_StrawHat", "hat_pk02_TenGallonHat", "hat_pk02_ThirdEyeHat", "hat_pk02_ToiletPaperHat", "hat_pk02_Toppat", "hat_pk03_Fedora", "hat_pk03_Goggles", "hat_pk03_Headphones", "hat_pk03_Security1", "hat_pk03_StrapHat", "hat_pk03_Traffic", "hat_pk04_Antenna", "hat_pk04_Archae", "hat_pk04_Balloon", "hat_pk04_Banana", "hat_pk04_Bandana", "hat_pk04_Beanie", "hat_pk04_Bear", "hat_pk04_BirdNest", "hat_pk04_CCC", "hat_pk04_Chef", "hat_pk04_DoRag", "hat_pk04_Fez", "hat_pk04_GeneralHat", "hat_pk04_HunterCap", "hat_pk04_JungleHat", "hat_pk04_MinerCap", "hat_pk04_MiniCrewmate", "hat_pk04_Pompadour", "hat_pk04_RamHorns", "hat_pk04_Slippery", "hat_pk04_Snowman", "hat_pk04_Vagabond", "hat_pk04_WinterHat", "hat_pk05_Burthat", "hat_pk05_Cheese", "hat_pk05_cheesetoppat", "hat_pk05_Cherry", "hat_pk05_davehat", "hat_pk05_Egg", "hat_pk05_Ellie", "hat_pk05_EllieToppat", "hat_pk05_Ellryhat", "hat_pk05_Fedora", "hat_pk05_Flamingo", "hat_pk05_FlowerPin", "hat_pk05_GeoffreyToppat", "hat_pk05_Helmet", "hat_pk05_HenryToppat", "hat_pk05_Macbethhat", "hat_pk05_Plant", "hat_pk05_RHM", "hat_pk05_Svenhat", "hat_pk05_Wizardhat", "hat_pk06_Candycanes", "hat_pk06_ElfHat", "hat_pk06_Lights", "hat_pk06_Present", "hat_pk06_Reindeer", "hat_pk06_Santa", "hat_pk06_Snowman", "hat_pk06_tree", "hat_pkHW01_BatWings", "hat_pkHW01_CatEyes", "hat_pkHW01_Horns", "hat_pkHW01_Machete", "hat_pkHW01_Mohawk", "hat_pkHW01_Pirate", "hat_pkHW01_PlagueHat", "hat_pkHW01_Pumpkin", "hat_pkHW01_ScaryBag", "hat_pkHW01_Witch", "hat_pkHW01_Wolf", "hat_Plunger_Blue", "hat_Plunger_Yellow", "hat_police", "hat_Ponytail", "hat_Pot", "hat_Present", "hat_Prototype", "hat_pusheenGreyHat", "hat_PusheenicornHat", "hat_pusheenMintHat", "hat_pusheenPinkHat", "hat_pusheenPurpleHat", "hat_pusheenSitHat", "hat_pusheenSleepHat", "hat_pyramid", "hat_rabbitEars", "hat_Ramhorn_Black", "hat_Ramhorn_Red", "hat_Ramhorn_White", "hat_ratchet", "hat_Records", "hat_RockIce", "hat_RockLava", "hat_Rubberglove", "hat_Rupert", "hat_russian", "hat_saint14", "hat_sausage", "hat_savathun", "hat_schnapp", "hat_screamghostface", "hat_Scrudge", "hat_sharkfin", "hat_shaxx", "hat_shovel", "hat_SlothHat", "hat_SnowbeanieGreen", "hat_SnowbeanieOrange", "hat_SnowBeaniePurple", "hat_SnowbeanieRed", "hat_Snowman", "hat_Soccer", "hat_Sorry", "hat_starBalloon", "hat_starhorse", "hat_Starless", "hat_StarTopper", "hat_stethescope", "hat_StrawberryLeavesHat", "hat_TenGallon_Black", "hat_TenGallon_White", "hat_ThomasC", "hat_tinFoil", "hat_titan", "hat_ToastButterHat", "hat_tombstone", "hat_tophat", "hat_ToppatHair", "hat_towelwizard", "hat_Traffic_Blue", "hat_traffic_purple", "hat_Traffic_Red", "hat_Traffic_Yellow", "hat_Unicorn", "hat_vi", "hat_viking", "hat_Visor", "hat_Voleyball", "hat_w21_candycane_blue", "hat_w21_candycane_bubble", "hat_w21_candycane_chocolate", "hat_w21_candycane_mint", "hat_w21_elf_pink", "hat_w21_elf_swe", "hat_w21_gingerbread", "hat_w21_holly", "hat_w21_krampus", "hat_w21_lights_white", "hat_w21_lights_yellow", "hat_w21_log", "hat_w21_mistletoe", "hat_w21_mittens", "hat_w21_nutcracker", "hat_w21_pinecone", "hat_w21_present_evil", "hat_w21_present_greenyellow", "hat_w21_present_redwhite", "hat_w21_present_whiteblue", "hat_w21_santa_evil", "hat_w21_santa_green", "hat_w21_santa_mint", "hat_w21_santa_pink", "hat_w21_santa_white", "hat_w21_santa_yellow", "hat_w21_snowflake", "hat_w21_snowman", "hat_w21_snowman_evil", "hat_w21_snowman_greenred", "hat_w21_snowman_redgreen", "hat_w21_snowman_swe", "hat_w21_winterpuff", "hat_wallcap", "hat_warlock", "hat_whitetophat", "hat_wigJudge", "hat_wigTall", "hat_WilfordIV", "hat_Winston", "hat_WinterGreen", "hat_WinterHelmet", "hat_WinterRed", "hat_WinterYellow", "hat_witch_green", "hat_witch_murky", "hat_witch_pink", "hat_witch_white", "hat_wolf_grey", "hat_wolf_murky", "hat_Zipper" };
+                        if (!State.SafeMode && State.CycleForEveryone) {
+                            for (auto p : GetAllPlayerControl()) {
+                                PlayerControl_RpcSetHat(p, convert_to_string(availableHats[randi(0, availableHats.size() - 1)]), NULL);
+                            }
+                        }
+                        else PlayerControl_RpcSetHat(*Game::pLocalPlayer, convert_to_string(availableHats[randi(0, availableHats.size() - 1)]), NULL);
+                    }
+                    if (State.RandomSkin) {
+                        std::vector availableSkins = { "skin_None", "skin_Abominalskin", "skin_ApronGreen", "skin_Archae", "skin_Astro", "skin_Astronaut-Blueskin", "skin_Astronaut-Cyanskin", "skin_Astronaut-Orangeskin", "skin_Bananaskin", "skin_benoit", "skin_Bling", "skin_BlueApronskin", "skin_BlueSuspskin", "skin_Box1skin", "skin_BubbleWrapskin", "skin_Burlapskin", "skin_BushSign1skin", "skin_Bushskin", "skin_BusinessFem-Aquaskin", "skin_BusinessFem-Tanskin", "skin_BusinessFemskin", "skin_caitlin", "skin_Capt", "skin_CCC", "skin_ChefBlackskin", "skin_ChefBlue", "skin_ChefRed", "skin_clown", "skin_D2Cskin", "skin_D2Hunter", "skin_D2Osiris", "skin_D2Saint14", "skin_D2Shaxx", "skin_D2Titan", "skin_D2Warlock", "skin_enforcer", "skin_fairy", "skin_FishingSkinskin", "skin_fishmonger", "skin_FishSkinskin", "skin_General", "skin_greedygrampaskin", "skin_halospartan", "skin_Hazmat-Blackskin", "skin_Hazmat-Blueskin", "skin_Hazmat-Greenskin", "skin_Hazmat-Pinkskin", "skin_Hazmat-Redskin", "skin_Hazmat-Whiteskin", "skin_Hazmat", "skin_heim", "skin_hl_fubuki", "skin_hl_gura", "skin_hl_korone", "skin_hl_marine", "skin_hl_mio", "skin_hl_moona", "skin_hl_okayu", "skin_hl_pekora", "skin_hl_risu", "skin_hl_watson", "skin_Horse1skin", "skin_Hotdogskin", "skin_InnerTubeSkinskin", "skin_JacketGreenskin", "skin_JacketPurpleskin", "skin_JacketYellowskin", "skin_Janitorskin", "skin_jayce", "skin_jinx", "skin_LifeVestSkinskin", "skin_Mech", "skin_MechanicRed", "skin_Military", "skin_MilitaryDesert", "skin_MilitarySnowskin", "skin_Miner", "skin_MinerBlackskin", "skin_mummy", "skin_OrangeSuspskin", "skin_PinkApronskin", "skin_PinkSuspskin", "skin_Police", "skin_presentskin", "skin_prisoner", "skin_PrisonerBlue", "skin_PrisonerTanskin", "skin_pumpkin", "skin_PusheenGreyskin", "skin_Pusheenicornskin", "skin_PusheenMintskin", "skin_PusheenPinkskin", "skin_PusheenPurpleskin", "skin_ratchet", "skin_rhm", "skin_RockIceskin", "skin_RockLavaskin", "skin_Sack1skin", "skin_scarfskin", "skin_Science", "skin_Scientist-Blueskin", "skin_Scientist-Darkskin", "skin_screamghostface", "skin_Security", "skin_Skin_SuitRedskin", "skin_Slothskin", "skin_SportsBlueskin", "skin_SportsRedskin", "skin_SuitB", "skin_SuitW", "skin_SweaterBlueskin", "skin_SweaterPinkskin", "skin_Sweaterskin", "skin_SweaterYellowskin", "skin_Tarmac", "skin_ToppatSuitFem", "skin_ToppatVest", "skin_uglysweaterskin", "skin_vampire", "skin_vi", "skin_w21_deer", "skin_w21_elf", "skin_w21_msclaus", "skin_w21_nutcracker", "skin_w21_santa", "skin_w21_snowmate", "skin_w21_tree", "skin_Wall", "skin_Winter", "skin_witch", "skin_YellowApronskin", "skin_YellowSuspskin" };
+                        if (!State.SafeMode && State.CycleForEveryone) {
+                            for (auto p : GetAllPlayerControl()) {
+                                PlayerControl_RpcSetSkin(p, convert_to_string(availableSkins[randi(0, availableSkins.size() - 1)]), NULL);
+                            }
+                        }
+                        else PlayerControl_RpcSetSkin(*Game::pLocalPlayer, convert_to_string(availableSkins[randi(0, availableSkins.size() - 1)]), NULL);
+                    }
+                    if (State.RandomVisor) {
+                        std::vector availableVisors = { "visor_EmptyVisor", "visor_anime", "visor_BaconVisor", "visor_BananaVisor", "visor_beautyMark", "visor_BillyG", "visor_Blush", "visor_Bomba", "visor_BubbleBumVisor", "visor_Candycane", "visor_Carrot", "visor_chimkin", "visor_clownnose", "visor_Crack", "visor_CucumberVisor", "visor_D2CGoggles", "visor_Dirty", "visor_Dotdot", "visor_doubleeyepatch", "visor_eliksni", "visor_erisBandage", "visor_eyeball", "visor_EyepatchL", "visor_EyepatchR", "visor_fishhook", "visor_Galeforce", "visor_heim", "visor_hl_ah", "visor_hl_bored", "visor_hl_hmph", "visor_hl_marine", "visor_hl_nothoughts", "visor_hl_nudge", "visor_hl_smug", "visor_hl_sweepy", "visor_hl_teehee", "visor_hl_wrong", "visor_IceBeard", "visor_IceCreamChocolateVisor", "visor_IceCreamMintVisor", "visor_IceCreamStrawberryVisor", "visor_IceCreamUbeVisor", "visor_is_beard", "visor_JanitorStache", "visor_jinx", "visor_Krieghaus", "visor_Lava", "visor_LolliBlue", "visor_LolliBrown", "visor_LolliOrange", "visor_lollipopCrew", "visor_lollipopLemon", "visor_lollipopLime", "visor_LolliRed", "visor_marshmallow", "visor_masque_blue", "visor_masque_green", "visor_masque_red", "visor_masque_white", "visor_mira_card_blue", "visor_mira_card_red", "visor_mira_glasses", "visor_mira_mask_black", "visor_mira_mask_blue", "visor_mira_mask_green", "visor_mira_mask_purple", "visor_mira_mask_red", "visor_mira_mask_white", "visor_Mouth", "visor_mummy", "visor_PiercingL", "visor_PiercingR", "visor_PizzaVisor", "visor_pk01_AngeryVisor", "visor_pk01_DumStickerVisor", "visor_pk01_FredVisor", "visor_pk01_HazmatVisor", "visor_pk01_MonoclesVisor", "visor_pk01_PaperMaskVisor", "visor_pk01_PlagueVisor", "visor_pk01_RHMVisor", "visor_pk01_Security1Visor", "visor_Plsno", "visor_polus_ice", "visor_pusheenGorgeousVisor", "visor_pusheenKissyVisor", "visor_pusheenKoolKatVisor", "visor_pusheenOmNomNomVisor", "visor_pusheenSmileVisor", "visor_pusheenYaaaaaayVisor", "visor_Reginald", "visor_Rudolph", "visor_savathun", "visor_Scar", "visor_SciGoggles", "visor_shopglasses", "visor_shuttershadesBlue", "visor_shuttershadesLime", "visor_shuttershadesPink", "visor_shuttershadesPurple", "visor_shuttershadesWhite", "visor_shuttershadesYellow", "visor_SkiGoggleBlack", "visor_SKiGogglesOrange", "visor_SkiGogglesWhite", "visor_SmallGlasses", "visor_SmallGlassesBlue", "visor_SmallGlassesRed", "visor_starfish", "visor_Stealthgoggles", "visor_Stickynote_Cyan", "visor_Stickynote_Green", "visor_Stickynote_Orange", "visor_Stickynote_Pink", "visor_Stickynote_Purple", "visor_Straw", "visor_sunscreenv", "visor_teary", "visor_ToastVisor", "visor_tvColorTest", "visor_vr_Vr-Black", "visor_vr_Vr-White", "visor_w21_carrot", "visor_w21_nutstache", "visor_w21_nye", "visor_w21_santabeard", "visor_wash", "visor_WinstonStache" };
+                        if (!State.SafeMode && State.CycleForEveryone) {
+                            for (auto p : GetAllPlayerControl()) {
+                                PlayerControl_RpcSetVisor(p, convert_to_string(availableVisors[randi(0, availableVisors.size() - 1)]), NULL);
+                            }
+                        }
+                        else PlayerControl_RpcSetVisor(*Game::pLocalPlayer, convert_to_string(availableVisors[randi(0, availableVisors.size() - 1)]), NULL);
+                    }
+                    if (State.RandomPet) {
+                        std::vector availablePets = { "pet_EmptyPet", "pet_Alien", "pet_Bedcrab", "pet_BredPet", "pet_Bush", "pet_Charles", "pet_Charles_Red", "pet_ChewiePet", "pet_clank", "pet_coaltonpet", "pet_Creb", "pet_Crewmate", "pet_Cube", "pet_D2GhostPet", "pet_D2PoukaPet", "pet_D2WormPet", "pet_Doggy", "pet_Ellie", "pet_frankendog", "pet_GuiltySpark", "pet_HamPet", "pet_Hamster", "pet_HolidayHamPet", "pet_Lava", "pet_nuggetPet", "pet_Pip", "pet_poro", "pet_Pusheen", "pet_Robot", "pet_Snow", "pet_Squig", "pet_Stickmin", "pet_Stormy", "pet_test", "pet_UFO", "pet_YuleGoatPet" };
+                        if (!State.SafeMode && State.CycleForEveryone) {
+                            for (auto p : GetAllPlayerControl()) {
+                                PlayerControl_RpcSetPet(p, convert_to_string(availablePets[randi(0, availablePets.size() - 1)]), NULL);
+                            }
+                        }
+                        else PlayerControl_RpcSetPet(*Game::pLocalPlayer, convert_to_string(availablePets[randi(0, availablePets.size() - 1)]), NULL);
+                    }
+                    if (State.RandomNamePlate) {
+                        std::vector availableNamePlates = { "nameplate_NoPlate", "nameplate_airship_Toppat", "nameplate_airship_CCC", "nameplate_airship_Diamond", "nameplate_airship_Emerald", "nameplate_airship_Gems", "nameplate_airship_government", "nameplate_Airship_Hull", "nameplate_airship_Ruby", "nameplate_airship_Sky", "nameplate_Polus-Skyline", "nameplate_Polus-Snowmates", "nameplate_Polus_Colors", "nameplate_Polus_DVD", "nameplate_Polus_Ground", "nameplate_Polus_Lava", "nameplate_Polus_Planet", "nameplate_Polus_Snow", "nameplate_Polus_SpecimenBlue", "nameplate_Polus_SpecimenGreen", "nameplate_Polus_SpecimenPurple", "nameplate_is_yard", "nameplate_is_dig", "nameplate_is_game", "nameplate_is_ghost", "nameplate_is_green", "nameplate_is_sand", "nameplate_is_trees", "nameplate_Mira_Cafeteria", "nameplate_Mira_Glass", "nameplate_Mira_Tiles", "nameplate_Mira_Vines", "nameplate_Mira_Wood", "nameplate_hw_candy", "nameplate_hw_woods", "nameplate_hw_pumpkin" };
+                        if (!State.SafeMode && State.CycleForEveryone) {
+                            for (auto p : GetAllPlayerControl()) {
+                                PlayerControl_RpcSetNamePlate(p, convert_to_string(availableNamePlates[randi(0, availableNamePlates.size() - 1)]), NULL);
+                            }
+                        }
+                        else PlayerControl_RpcSetNamePlate(*Game::pLocalPlayer, convert_to_string(availableNamePlates[randi(0, availableNamePlates.size() - 1)]), NULL);
+                    }
+                    changeCycleDelay = int(State.CycleTimer * GetFps());
                 }
-                else if (hatChangeCycler > 0) {
-                    hatChangeCycler--;
-                }
+                else changeCycleDelay--;
+            }
 
-                if (hatChangeCycleDelay <= 0 && State.RandomHat && !State.activeImpersonation) {
-                    if (IsInGame()) {
-                        State.rpcQueue.push(new RpcSetHat(State.cyclerHat));
-                        hatChangeCycleDelay = State.CycleDuration; //idk how long this is
+            if ((IsHost() || !State.SafeMode) && State.ForceColorForEveryone)
+            {
+                static int forceColorDelay = 0;
+                for (auto player : GetAllPlayerControl()) {
+                    if (forceColorDelay <= 0) {
+                        auto outfit = GetPlayerOutfit(GetPlayerData(player));
+                        auto colorId = outfit->fields.ColorId;
+                        if (IsInGame() && colorId != State.HostSelectedColorId)
+                            State.rpcQueue.push(new RpcForceColor(player, State.HostSelectedColorId));
+                        else if (IsInLobby() && colorId != State.HostSelectedColorId)
+                            State.lobbyRpcQueue.push(new RpcForceColor(player, State.HostSelectedColorId));
+                        forceColorDelay = int(0.5 * GetFps());
                     }
-                    else if (IsInLobby()) {
-                        State.lobbyRpcQueue.push(new RpcSetHat(State.cyclerHat));
-                        hatChangeCycleDelay = State.CycleDuration; //idk how long this is
+                    else {
+                        forceColorDelay--;
                     }
-                }
-                else if (hatChangeCycleDelay > 0) {
-                    hatChangeCycleDelay--;
-                }
-
-                if (skinChangeCycler <= 0 && State.RandomSkin && !State.activeImpersonation) {
-                    std::vector availableSkins = { "skin_None", "skin_Abominalskin", "skin_ApronGreen", "skin_Archae", "skin_Astro", "skin_Astronaut-Blueskin", "skin_Astronaut-Cyanskin", "skin_Astronaut-Orangeskin", "skin_Bananaskin", "skin_benoit", "skin_Bling", "skin_BlueApronskin", "skin_BlueSuspskin", "skin_Box1skin", "skin_BubbleWrapskin", "skin_Burlapskin", "skin_BushSign1skin", "skin_Bushskin", "skin_BusinessFem-Aquaskin", "skin_BusinessFem-Tanskin", "skin_BusinessFemskin", "skin_caitlin", "skin_Capt", "skin_CCC", "skin_ChefBlackskin", "skin_ChefBlue", "skin_ChefRed", "skin_clown", "skin_D2Cskin", "skin_D2Hunter", "skin_D2Osiris", "skin_D2Saint14", "skin_D2Shaxx", "skin_D2Titan", "skin_D2Warlock", "skin_enforcer", "skin_fairy", "skin_FishingSkinskin", "skin_fishmonger", "skin_FishSkinskin", "skin_General", "skin_greedygrampaskin", "skin_halospartan", "skin_Hazmat-Blackskin", "skin_Hazmat-Blueskin", "skin_Hazmat-Greenskin", "skin_Hazmat-Pinkskin", "skin_Hazmat-Redskin", "skin_Hazmat-Whiteskin", "skin_Hazmat", "skin_heim", "skin_hl_fubuki", "skin_hl_gura", "skin_hl_korone", "skin_hl_marine", "skin_hl_mio", "skin_hl_moona", "skin_hl_okayu", "skin_hl_pekora", "skin_hl_risu", "skin_hl_watson", "skin_Horse1skin", "skin_Hotdogskin", "skin_InnerTubeSkinskin", "skin_JacketGreenskin", "skin_JacketPurpleskin", "skin_JacketYellowskin", "skin_Janitorskin", "skin_jayce", "skin_jinx", "skin_LifeVestSkinskin", "skin_Mech", "skin_MechanicRed", "skin_Military", "skin_MilitaryDesert", "skin_MilitarySnowskin", "skin_Miner", "skin_MinerBlackskin", "skin_mummy", "skin_OrangeSuspskin", "skin_PinkApronskin", "skin_PinkSuspskin", "skin_Police", "skin_presentskin", "skin_prisoner", "skin_PrisonerBlue", "skin_PrisonerTanskin", "skin_pumpkin", "skin_PusheenGreyskin", "skin_Pusheenicornskin", "skin_PusheenMintskin", "skin_PusheenPinkskin", "skin_PusheenPurpleskin", "skin_ratchet", "skin_rhm", "skin_RockIceskin", "skin_RockLavaskin", "skin_Sack1skin", "skin_scarfskin", "skin_Science", "skin_Scientist-Blueskin", "skin_Scientist-Darkskin", "skin_screamghostface", "skin_Security", "skin_Skin_SuitRedskin", "skin_Slothskin", "skin_SportsBlueskin", "skin_SportsRedskin", "skin_SuitB", "skin_SuitW", "skin_SweaterBlueskin", "skin_SweaterPinkskin", "skin_Sweaterskin", "skin_SweaterYellowskin", "skin_Tarmac", "skin_ToppatSuitFem", "skin_ToppatVest", "skin_uglysweaterskin", "skin_vampire", "skin_vi", "skin_w21_deer", "skin_w21_elf", "skin_w21_msclaus", "skin_w21_nutcracker", "skin_w21_santa", "skin_w21_snowmate", "skin_w21_tree", "skin_Wall", "skin_Winter", "skin_witch", "skin_YellowApronskin", "skin_YellowSuspskin" };
-                    assert(availableSkins.size() > 0);
-                    State.cyclerSkin = convert_to_string(availableSkins[randi(0, availableSkins.size() - 1)]);
-                }
-                else if (skinChangeCycler > 0) {
-                    skinChangeCycler--;
-                }
-
-                if (skinChangeCycleDelay <= 0 && State.RandomSkin && !State.activeImpersonation) {
-                    if (IsInGame()) {
-                        State.rpcQueue.push(new RpcSetSkin(State.cyclerSkin));
-                        skinChangeCycleDelay = State.CycleDuration; //idk how long this is
-                    }
-                    else if (IsInLobby()) {
-                        State.lobbyRpcQueue.push(new RpcSetSkin(State.cyclerSkin));
-                        skinChangeCycleDelay = State.CycleDuration; //idk how long this is
-                    }
-                }
-                else if (skinChangeCycleDelay > 0) {
-                    skinChangeCycleDelay--;
-                }
-
-                if (visorChangeCycler <= 0 && State.RandomVisor && !State.activeImpersonation) {
-                    std::vector availableVisors = { "visor_EmptyVisor", "visor_anime", "visor_BaconVisor", "visor_BananaVisor", "visor_beautyMark", "visor_BillyG", "visor_Blush", "visor_Bomba", "visor_BubbleBumVisor", "visor_Candycane", "visor_Carrot", "visor_chimkin", "visor_clownnose", "visor_Crack", "visor_CucumberVisor", "visor_D2CGoggles", "visor_Dirty", "visor_Dotdot", "visor_doubleeyepatch", "visor_eliksni", "visor_erisBandage", "visor_eyeball", "visor_EyepatchL", "visor_EyepatchR", "visor_fishhook", "visor_Galeforce", "visor_heim", "visor_hl_ah", "visor_hl_bored", "visor_hl_hmph", "visor_hl_marine", "visor_hl_nothoughts", "visor_hl_nudge", "visor_hl_smug", "visor_hl_sweepy", "visor_hl_teehee", "visor_hl_wrong", "visor_IceBeard", "visor_IceCreamChocolateVisor", "visor_IceCreamMintVisor", "visor_IceCreamStrawberryVisor", "visor_IceCreamUbeVisor", "visor_is_beard", "visor_JanitorStache", "visor_jinx", "visor_Krieghaus", "visor_Lava", "visor_LolliBlue", "visor_LolliBrown", "visor_LolliOrange", "visor_lollipopCrew", "visor_lollipopLemon", "visor_lollipopLime", "visor_LolliRed", "visor_marshmallow", "visor_masque_blue", "visor_masque_green", "visor_masque_red", "visor_masque_white", "visor_mira_card_blue", "visor_mira_card_red", "visor_mira_glasses", "visor_mira_mask_black", "visor_mira_mask_blue", "visor_mira_mask_green", "visor_mira_mask_purple", "visor_mira_mask_red", "visor_mira_mask_white", "visor_Mouth", "visor_mummy", "visor_PiercingL", "visor_PiercingR", "visor_PizzaVisor", "visor_pk01_AngeryVisor", "visor_pk01_DumStickerVisor", "visor_pk01_FredVisor", "visor_pk01_HazmatVisor", "visor_pk01_MonoclesVisor", "visor_pk01_PaperMaskVisor", "visor_pk01_PlagueVisor", "visor_pk01_RHMVisor", "visor_pk01_Security1Visor", "visor_Plsno", "visor_polus_ice", "visor_pusheenGorgeousVisor", "visor_pusheenKissyVisor", "visor_pusheenKoolKatVisor", "visor_pusheenOmNomNomVisor", "visor_pusheenSmileVisor", "visor_pusheenYaaaaaayVisor", "visor_Reginald", "visor_Rudolph", "visor_savathun", "visor_Scar", "visor_SciGoggles", "visor_shopglasses", "visor_shuttershadesBlue", "visor_shuttershadesLime", "visor_shuttershadesPink", "visor_shuttershadesPurple", "visor_shuttershadesWhite", "visor_shuttershadesYellow", "visor_SkiGoggleBlack", "visor_SKiGogglesOrange", "visor_SkiGogglesWhite", "visor_SmallGlasses", "visor_SmallGlassesBlue", "visor_SmallGlassesRed", "visor_starfish", "visor_Stealthgoggles", "visor_Stickynote_Cyan", "visor_Stickynote_Green", "visor_Stickynote_Orange", "visor_Stickynote_Pink", "visor_Stickynote_Purple", "visor_Straw", "visor_sunscreenv", "visor_teary", "visor_ToastVisor", "visor_tvColorTest", "visor_vr_Vr-Black", "visor_vr_Vr-White", "visor_w21_carrot", "visor_w21_nutstache", "visor_w21_nye", "visor_w21_santabeard", "visor_wash", "visor_WinstonStache" };
-                    assert(availableVisors.size() > 0);
-                    State.cyclerVisor = convert_to_string(availableVisors[randi(0, availableVisors.size() - 1)]);
-                }
-                else if (visorChangeCycler > 0) {
-                    visorChangeCycler--;
-                }
-
-                if (visorChangeCycleDelay <= 0 && State.RandomVisor && !State.activeImpersonation) {
-                    if (IsInGame()) {
-                        State.rpcQueue.push(new RpcSetVisor(State.cyclerVisor));
-                        visorChangeCycleDelay = State.CycleDuration; //idk how long this is
-                    }
-                    else if (IsInLobby()) {
-                        State.lobbyRpcQueue.push(new RpcSetVisor(State.cyclerVisor));
-                        visorChangeCycleDelay = State.CycleDuration; //idk how long this is
-                    }
-                }
-                else if (visorChangeCycleDelay > 0) {
-                    visorChangeCycleDelay--;
-                }
-
-                if (petChangeCycler <= 0 && State.RandomPet && !State.activeImpersonation) {
-                    std::vector availablePets = { "pet_EmptyPet", "pet_Alien", "pet_Bedcrab", "pet_BredPet", "pet_Bush", "pet_Charles", "pet_Charles_Red", "pet_ChewiePet", "pet_clank", "pet_coaltonpet", "pet_Creb", "pet_Crewmate", "pet_Cube", "pet_D2GhostPet", "pet_D2PoukaPet", "pet_D2WormPet", "pet_Doggy", "pet_Ellie", "pet_frankendog", "pet_GuiltySpark", "pet_HamPet", "pet_Hamster", "pet_HolidayHamPet", "pet_Lava", "pet_nuggetPet", "pet_Pip", "pet_poro", "pet_Pusheen", "pet_Robot", "pet_Snow", "pet_Squig", "pet_Stickmin", "pet_Stormy", "pet_test", "pet_UFO", "pet_YuleGoatPet" };
-                    assert(availablePets.size() > 0);
-                    State.cyclerPet = convert_to_string(availablePets[randi(0, availablePets.size() - 1)]);
-                }
-                else if (petChangeCycler > 0) {
-                    petChangeCycler--;
-                }
-
-                if (petChangeCycleDelay <= 0 && State.RandomPet && !State.activeImpersonation) {
-                    if (IsInGame()) {
-                        State.rpcQueue.push(new RpcSetPet(State.cyclerPet));
-                        petChangeCycleDelay = State.CycleDuration; //idk how long this is
-                    }
-                    else if (IsInLobby()) {
-                        State.lobbyRpcQueue.push(new RpcSetPet(State.cyclerPet));
-                        petChangeCycleDelay = State.CycleDuration; //idk how long this is
-                    }
-                }
-                else if (petChangeCycleDelay > 0) {
-                    petChangeCycleDelay--;
-                }
-
-                if (namePlateChangeCycler <= 0 && State.RandomNamePlate && !State.activeImpersonation) {
-                    std::vector availableNamePlates = { "nameplate_NoPlate", "nameplate_airship_Toppat", "nameplate_airship_CCC", "nameplate_airship_Diamond", "nameplate_airship_Emerald", "nameplate_airship_Gems", "nameplate_airship_government", "nameplate_Airship_Hull", "nameplate_airship_Ruby", "nameplate_airship_Sky", "nameplate_Polus-Skyline", "nameplate_Polus-Snowmates", "nameplate_Polus_Colors", "nameplate_Polus_DVD", "nameplate_Polus_Ground", "nameplate_Polus_Lava", "nameplate_Polus_Planet", "nameplate_Polus_Snow", "nameplate_Polus_SpecimenBlue", "nameplate_Polus_SpecimenGreen", "nameplate_Polus_SpecimenPurple", "nameplate_is_yard", "nameplate_is_dig", "nameplate_is_game", "nameplate_is_ghost", "nameplate_is_green", "nameplate_is_sand", "nameplate_is_trees", "nameplate_Mira_Cafeteria", "nameplate_Mira_Glass", "nameplate_Mira_Tiles", "nameplate_Mira_Vines", "nameplate_Mira_Wood", "nameplate_hw_candy", "nameplate_hw_woods", "nameplate_hw_pumpkin" };
-                    //nameplates haven't been updated
-                    assert(availableNamePlates.size() > 0);
-                    State.cyclerNamePlate = convert_to_string(availableNamePlates[randi(0, availableNamePlates.size() - 1)]);
-                }
-                else if (namePlateChangeCycler > 0) {
-                    namePlateChangeCycler--;
-                }
-
-                if (namePlateChangeCycleDelay <= 0 && State.RandomNamePlate && !State.activeImpersonation) {
-                    if (IsInGame()) {
-                        State.rpcQueue.push(new RpcSetNamePlate(State.cyclerNamePlate));
-                        namePlateChangeCycleDelay = State.CycleDuration; //idk how long this is
-                    }
-                    else if (IsInLobby()) {
-                        State.lobbyRpcQueue.push(new RpcSetNamePlate(State.cyclerNamePlate));
-                        namePlateChangeCycleDelay = State.CycleDuration; //idk how long this is
-                    }
-                }
-                else if (namePlateChangeCycleDelay > 0) {
-                    namePlateChangeCycleDelay--;
                 }
             }
-            else {
-                cycleNameDelay = 0; //If we spam too many name changes, we're banned
-                colorChangeCycleDelay = 0; //If we spam too many color changes, we're banned?
 
-                hatChangeCycler = 0; //controls the hat string
-                hatChangeCycleDelay = 0; //controls the actual hat cycler
-
-                skinChangeCycler = 0; //controls the skin string
-                skinChangeCycleDelay = 0; //controls the actual skin cycler
-
-                visorChangeCycler = 0; //controls the visor string
-                visorChangeCycleDelay = 0; //controls the actual visor cycler
-
-                petChangeCycler = 0; //controls the pet string
-                petChangeCycleDelay = 0; //controls the actual pet cycler
-
-                namePlateChangeCycler = 0; //controls the nameplate string
-                namePlateChangeCycleDelay = 0; //controls the actual nameplate cycler
+            if ((IsHost() || !State.SafeMode) && State.ForceNameForEveryone) {
+                static int forceNameDelay = 0;
+                if (forceNameDelay <= 0) {
+                    for (auto player : GetAllPlayerControl()) {
+                        if (!(State.CustomName && State.ServerSideCustomName && (player == *Game::pLocalPlayer || State.CustomNameForEveryone))) {
+                            auto outfit = GetPlayerOutfit(GetPlayerData(player));
+                            std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(player), nullptr));
+                            std::string newName = std::format("{}<size=0><{}></size>", State.hostUserName, player->fields.PlayerId);
+                            if (playerName == newName) continue;
+                            if (IsHost()) {
+                                PlayerControl_RpcSetName(player, convert_to_string(newName), NULL);
+                                continue;
+                            }
+                            if (!State.SafeMode)
+                                PlayerControl_CmdCheckName(player, convert_to_string(newName), NULL);
+                        }
+                    }
+                    forceNameDelay = int(0.5 * GetFps());
+                }
+                else {
+                    forceNameDelay--;
+                }
             }
 
             static float playerCycleDelay = 0;
@@ -710,35 +684,48 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     playerCycleDelay = 0;
             }
 
-            //static int attachDelay = 0; //If we spam too many name changes, we're banned
+            static int attachDelay = 0;
             auto playerToAttach = State.playerToAttach.validate();
 
             if (State.ActiveAttach && State.playerToAttach.has_value()) {
-                if (IsInGame())
-                    State.rpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(playerToAttach.get_PlayerControl())));
-                else if (IsInLobby())
-                    State.lobbyRpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(playerToAttach.get_PlayerControl())));
+                if (attachDelay <= 0) {
+                    auto pos = GetTrueAdjustedPosition(playerToAttach.get_PlayerControl());
+                    if (State.AprilFoolsMode) pos.x -= (randi(0, 1) ? 0.5f : 0.2f);
+                    CustomNetworkTransform_RpcSnapTo((*Game::pLocalPlayer)->fields.NetTransform, pos, NULL);
+                    attachDelay = int(0.1 * GetFps());
+                }
+                else attachDelay--;
             }
 
-            // Shift + Right-click Teleport
-            if ((IsInGame() && !State.InMeeting) && State.ShiftRightClickTP && ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !(State.TeleportEveryone && (ImGui::IsKeyPressed(VK_CONTROL) || ImGui::IsKeyDown(VK_CONTROL)))) {
-                ImVec2 mouse = ImGui::GetMousePos();
-                Vector2 target = {
-                    (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
-                    ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
-                };
-                State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
-            }
-            else if (IsInLobby() && State.ShiftRightClickTP && ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !(State.TeleportEveryone && (ImGui::IsKeyPressed(VK_CONTROL) || ImGui::IsKeyDown(VK_CONTROL)))) {
-                ImVec2 mouse = ImGui::GetMousePos();
-                Vector2 target = {
-                    (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
-                    ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
-                };
-                State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+            // Shift/Ctrl + Right-click Teleport
+            static int ctrlRightClickDelay = 0;
+
+            if ((IsInGame() || IsInLobby()) && !State.InMeeting && State.ShiftRightClickTP) {
+                if (ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+                    ImVec2 mouse = ImGui::GetMousePos();
+                    Vector2 target = {
+                        (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
+                        ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
+                    };
+                    if (IsInGame()) State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                    if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                }
+                else if (ImGui::IsKeyDown(VK_CONTROL) && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+                    if (ctrlRightClickDelay <= 0) {
+                        ImVec2 mouse = ImGui::GetMousePos();
+                        Vector2 target = {
+                            (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
+                            ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
+                        };
+                        if (IsInGame()) State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                        if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                        ctrlRightClickDelay = int(0.1 * GetFps());
+                    }
+                    else ctrlRightClickDelay--;
+                }
             }
 
-            if ((IsInGame() || IsInLobby()) && State.GodMode) {
+            if ((IsInGame() || IsInLobby()) && State.GodMode && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
                 if (State.protectMonitor.find((*Game::pLocalPlayer)->fields.PlayerId) == State.protectMonitor.end())
                     PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
             }
@@ -761,11 +748,87 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.IsRevived = false;
 
                 std::queue<RPCInterface*>* queue = IsInGame() ? &State.rpcQueue : &State.lobbyRpcQueue;
-                if (State.SafeMode && (IsInMultiplayerGame() || IsInLobby())) {
+                if (!IsHost() && (IsInMultiplayerGame() || IsInLobby())) {
                     if (roleType == RoleTypes__Enum::GuardianAngel && State.RealRole != RoleTypes__Enum::GuardianAngel) {
                         queue->push(new SetRole(RoleTypes__Enum::CrewmateGhost)); //prevent being unable to protect
                     }
                 }
+
+                if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer && !autoStartedGame) {
+                    autoStartedGame = true;
+                    InnerNetClient_SendStartGame(__this, NULL);
+                }
+                
+                static int overloadDelay = 0;
+                if ((IsInLobby() || IsInGame()) && (State.OverloadEveryone || State.overloadedPlayers.size() != 0 ||
+                    State.LagEveryone || State.laggedPlayers.size() != 0) && overloadDelay <= 0 && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
+                    bool lag = State.LagEveryone || State.laggedPlayers.size() != 0;
+                    for (auto p : GetAllPlayerControl()) {
+                        if (State.Destruct_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(),
+                            convert_from_string(GetPlayerData(p)->fields.FriendCode)) != State.WhitelistFriendCodes.end()) continue;
+                        if (!lag && !State.OverloadEveryone && std::find(State.overloadedPlayers.begin(), State.overloadedPlayers.end(),
+                            p->fields.PlayerId) == State.overloadedPlayers.end()) continue;
+                        if (lag && !State.LagEveryone && std::find(State.laggedPlayers.begin(), State.laggedPlayers.end(),
+                            p->fields.PlayerId) == State.laggedPlayers.end()) continue;
+                        if (p != *Game::pLocalPlayer) {
+                            for (int i = 0; i < (lag ? 169 : 25); ++i) {
+                                auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, 0xb4 -
+                                    0x87, SendOption__Enum::None, p->fields._.OwnerId, NULL);
+                                InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                            }
+                        }
+                    }
+                    overloadDelay = int((lag ? 0.2 : 0.1) * GetFps());
+                }
+                else overloadDelay--;
+
+                static int sabotageDelay = 0;
+                static bool fixSabotage = false;
+                if (sabotageDelay <= 0) {
+                    if (IsInGame()) {
+                        if (State.mapType != Settings::MapType::Fungle && State.DisableLightSwitches) {
+                            for (int i = 0; i < 5; ++i) {
+                                if (randi(0, 1)) ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Electrical, i, NULL);
+                            }
+                        }
+                        if (fixSabotage) {
+                            RepairSabotage(*Game::pLocalPlayer);
+                            if (State.SpamDoors) {
+                                for (auto door : il2cpp::Array((*Game::pShipStatus)->fields.AllDoors)) {
+                                    ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Doors, (uint8_t)(door->fields.Id | 64), NULL);
+                                    ShipStatus_UpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Doors, *Game::pLocalPlayer, (uint8_t)(door->fields.Id | 64), NULL);
+                                }
+                            }
+                        }
+                        else {
+                            if (State.DisableComms) {
+                                ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Comms, 128, NULL);
+                            }
+                            if (State.DisableReactor) {
+                                if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle)
+                                    ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Reactor, 128, NULL);
+                                else if (State.mapType == Settings::MapType::Pb)
+                                    ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Laboratory, 128, NULL);
+                                else if (State.mapType == Settings::MapType::Airship)
+                                    ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::HeliSabotage, 128, NULL);
+                            }
+                            if ((State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq) && State.DisableOxygen) {
+                                ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::LifeSupp, 128, NULL);
+                            }
+                            if (State.mapType == Settings::MapType::Fungle && State.InfiniteMushroomMixup) {
+                                ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::MushroomMixupSabotage, 1, NULL);
+                            }
+                            if ((State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle)
+                                && State.SpamDoors) {
+                                for (auto door : il2cpp::Array((*Game::pShipStatus)->fields.AllDoors)) {
+                                    ShipStatus_RpcCloseDoorsOfType(*Game::pShipStatus, door->fields.Room, NULL);
+                                }
+                            }
+                        }
+                    }
+                    sabotageDelay = int(0.2 * GetFps());
+                }
+                else sabotageDelay--;
             }
 
             if (!IsHost() && (IsInGame() || IsInLobby())) {
@@ -773,28 +836,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableKills = false;
                 State.DisableMeetings = false;
                 State.DisableSabotages = false;
-            }
-
-            if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer) {
-                State.AutoStartGame = false;
-                InnerNetClient_SendStartGame(__this, NULL);
-            }
-            static int lagdelay = 0;
-            if ((IsInLobby() || IsInGame()) && State.LagEveryone && lagdelay <= 0) {
-                for (auto pc : GetAllPlayerControl()) {
-                    if (!(pc == *Game::pLocalPlayer)) {
-                        for (int i = 0; i < 169; ++i) {
-                            auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
-                                uint8_t(RpcCalls__Enum::ProtectPlayer), SendOption__Enum::None, pc->fields._.OwnerId, NULL);
-                            InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-                        }
-                    }
-                }
-                lagdelay = 16;
-            }
-
-            else {
-                lagdelay--;
             }
         }
     }
@@ -809,7 +850,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     }
     Application_set_targetFrameRate(State.GameFPS > 1 ? State.GameFPS : 60, NULL);
     InnerNetClient_Update(__this, method);
-	
+
     static int SpamPlatformDelay = 10;
     if (SpamPlatformDelay <= 0) {
         if (State.SpamMovingPlatform) {
@@ -871,10 +912,18 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
             else
                 Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
-            if (State.modUsers.find(data->fields.Character->fields.PlayerId) != State.modUsers.end())
-                State.modUsers.erase(data->fields.Character->fields.PlayerId);
+            uint8_t playerId = data->fields.Character->fields.PlayerId;
 
-            auto playerId = data->fields.Character->fields.PlayerId;
+            if (State.modUsers.find(playerId) != State.modUsers.end())
+                State.modUsers.erase(playerId);
+
+            auto it1 = std::find(State.overloadedPlayers.begin(), State.overloadedPlayers.end(), playerId);
+            if (it1 != State.overloadedPlayers.end())
+                State.overloadedPlayers.erase(it1);
+
+            auto it2 = std::find(State.laggedPlayers.begin(), State.laggedPlayers.end(), playerId);
+            if (it2 != State.laggedPlayers.end())
+                State.laggedPlayers.erase(it2);
 
             if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                 synchronized(Replay::replayEventMutex) {
@@ -963,7 +1012,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnGameEnd executed");
     try {
-		if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
+        if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
             RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
         //fixes game crashing on ending with shapeshifter
         onGameEnd();
@@ -1040,8 +1089,14 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
                         State.tournamentWinPoints[friendCode] += 1;
                     }
                     else if (PlayerIsImpostor(p)) {
-                        UpdatePoints(p, 1); //ImpWin
-                        State.tournamentWinPoints[friendCode] += 1;
+                        if (State.tournamentAliveImpostors.size() == 1) {
+                            UpdatePoints(p, 2); //ImpWin
+                            State.tournamentWinPoints[friendCode] += 2;
+                        }
+                        else {
+                            UpdatePoints(p, 1); //ImpWin
+                            State.tournamentWinPoints[friendCode] += 1;
+                        }
                     }
                 }
                 else {
@@ -1141,6 +1196,7 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
                 InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), clientId, false, NULL);
                 return;
             }
+            if (State.DisableAllVotekicks) return;
         }
         std::string sourceplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
         std::string affectedplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(affectedPlayer), nullptr));
@@ -1168,26 +1224,26 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
                     State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.",
                     State.SafeMode ? "Please report this bug in Safe Mode on GitHub/Discord!" : "Disabling safe mode isn't recommended on official servers!")), NULL);
         }
-        break;
+                                             break;
         case DisconnectReasons__Enum::Kicked: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("You were kicked from the lobby.\n\n{}",
                     State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby if it hasn't started.")), NULL);
         }
-        break;
+                                            break;
         case DisconnectReasons__Enum::Banned: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("You were banned from the lobby.\n\n{}",
                     State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby by changing your IP address.")), NULL);
         }
-        break;
+                                            break;
         default: {
             std::string prevText = convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields._textArea, NULL));
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("{}{}", prevText,
                     State.AutoCopyLobbyCode ? "\nLobby Code has been copied to the clipboard." : "")), NULL);
         }
-        break;
+               break;
         }
         if (State.AutoCopyLobbyCode) ClipboardHelper_PutClipboardString(convert_to_string(State.LastLobbyJoined), NULL);
     }

@@ -23,10 +23,7 @@ namespace TasksTab {
 
 			if (tasks.size() != tasksCompleted) {
 				if (ImGui::Button("Complete All Tasks")) {
-					for (auto task : tasks) {
-						if (task->fields.taskStep != task->fields.MaxStep)
-							State.rpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
-					}
+					CompleteAllTasks();
 				}
 			}
 			if (!State.SafeMode) {
@@ -34,10 +31,7 @@ namespace TasksTab {
 			}
 			if (!State.SafeMode && ImGui::Button("Complete Everyone's Tasks")) {
 				for (auto player : GetAllPlayerControl()) {
-					auto playerTasks = GetNormalPlayerTasks(player);
-					for (auto playerTask : playerTasks) {
-						State.rpcQueue.push(new RpcForceCompleteTask(player, playerTask->fields._._Id_k__BackingField));
-					}
+					CompleteAllTasks(player);
 				}
 			}
 
@@ -45,7 +39,7 @@ namespace TasksTab {
 
 			for (auto task : tasks) {
 				if (!NormalPlayerTask_get_IsComplete(task, NULL) && ImGui::Button(("Complete##Button" + std::to_string(task->fields._._Id_k__BackingField)).c_str())) {
-					State.rpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
+					State.taskRpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
 				}
 
 				if (!NormalPlayerTask_get_IsComplete(task, NULL))

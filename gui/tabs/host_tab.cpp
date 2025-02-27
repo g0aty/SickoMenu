@@ -176,7 +176,7 @@ namespace HostTab {
 				if (!State.SafeMode && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers) && newMaxPlayers != currentMaxPlayers) {
 					if (newMaxPlayers >= minPlayers && newMaxPlayers <= maxAllowedPlayers) {
 						if (newMaxPlayers == 4 || newMaxPlayers == 511) {
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
+							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
 						}
 						GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, newMaxPlayers);
 					}
@@ -188,8 +188,8 @@ namespace HostTab {
 				}
 
 
-					/*if (IsInLobby() && ToggleButton("Flip Skeld", &State.FlipSkeld))
-						State.Save();*/ //to be fixed later
+				/*if (IsInLobby() && ToggleButton("Flip Skeld", &State.FlipSkeld))
+					State.Save();*/ //to be fixed later
 				ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 				if (IsInLobby() && ImGui::Button("Force Start of Game"))
 				{
@@ -197,8 +197,11 @@ namespace HostTab {
 				}
 				if (ToggleButton("Disable Meetings", &State.DisableMeetings))
 					State.Save();
-				
+
 				if (ToggleButton("Disable Sabotages", &State.DisableSabotages))
+					State.Save();
+
+				if (ToggleButton("Disable All Votekicks", &State.DisableAllVotekicks))
 					State.Save();
 
 				std::vector<const char*> GAMEMODES = { "Default", "Task Speedrun" };
@@ -261,7 +264,7 @@ namespace HostTab {
 					State.InMeeting = false;
 				}
 
-				if (IsInMultiplayerGame() || IsInLobby()) { //lobby isn't possible in freeplay
+				if (State.CurrentScene.compare("Tutorial") || IsInLobby()) { //lobby isn't possible in freeplay
 					if (ToggleButton("Disable Game Ending", &State.NoGameEnd)) {
 						State.Save();
 					}

@@ -83,9 +83,9 @@ class PlayerSelection {
 			return _playerData;
 		}
 		constexpr bool is_LocalPlayer() const {
-/*#if _CONTAINER_DEBUG_LEVEL > 0
-			assert(has_value() && "is_LocalPlayer() called on empty result");
-#endif*/
+			/*#if _CONTAINER_DEBUG_LEVEL > 0
+						assert(has_value() && "is_LocalPlayer() called on empty result");
+			#endif*/
 			try {
 				return _playerControl->fields._.OwnerId == (*Game::pAmongUsClient)->fields._.ClientId;
 			}
@@ -94,9 +94,9 @@ class PlayerSelection {
 			}
 		}
 		constexpr bool is_Disconnected() const {
-/*#if _CONTAINER_DEBUG_LEVEL > 0
-			assert(has_value() && "is_Disconnected() called on empty result");
-#endif*/
+			/*#if _CONTAINER_DEBUG_LEVEL > 0
+						assert(has_value() && "is_Disconnected() called on empty result");
+			#endif*/
 			try {
 				return _playerData->fields.Disconnected;
 			}
@@ -175,6 +175,7 @@ bool IsInGame();
 bool IsInMultiplayerGame();
 bool IsColorBlindMode();
 bool IsStreamerMode();
+bool IsChatCensored();
 std::string GetHostUsername(bool colored = false);
 std::string RemoveHtmlTags(std::string html_str);
 bool IsNameValid(std::string str);
@@ -199,6 +200,7 @@ std::vector<NormalPlayerTask*> GetNormalPlayerTasks(PlayerControl* player);
 Object_1* GetSabotageTask(PlayerControl* player);
 void RepairSabotage(PlayerControl* player);
 void CompleteTask(NormalPlayerTask* playerTask);
+void CompleteAllTasks(PlayerControl* player = NULL);
 const char* TranslateTaskTypes(TaskTypes__Enum taskType);
 const char* TranslateSystemTypes(SystemTypes__Enum systemType);
 Color32 GetPlayerColor(Game::ColorId colorId);

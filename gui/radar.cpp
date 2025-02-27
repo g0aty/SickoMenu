@@ -48,7 +48,16 @@ namespace Radar {
 				(((mouse.y - winpos.y) / State.dpiScale - yOffset) * -1.F) / map.scale
 			};
 
-			State.rpcQueue.push(new RpcSnapTo(target));
+			static int tpDelay = 0;
+
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) State.rpcQueue.push(new RpcSnapTo(target));
+			else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+				if (tpDelay <= 0) {
+					State.rpcQueue.push(new RpcSnapTo(target));
+					tpDelay = int(0.1 * GetFps());
+				}
+				else tpDelay--;
+			}
 		}
 		if (State.TeleportEveryone && !(ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT)) && (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
 			ImVec2 mouse = ImGui::GetMousePos();
@@ -97,7 +106,7 @@ namespace Radar {
 		ImVec2 winpos = ImGui::GetWindowPos();
 
 		if (State.RadarBorder) {
-			const ImVec2 points[] = { {winpos.x + 3.f * State.dpiScale, winpos.y + 1.f * State.dpiScale}, {winpos.x - 5.f * State.dpiScale + ImGui::GetWindowWidth(), winpos.y + 1.f * State.dpiScale}, {winpos.x - 5.f * State.dpiScale + ImGui::GetWindowWidth(), winpos.y + ImGui::GetWindowHeight() - 4.f * State.dpiScale}, {winpos.x + 3.f * State.dpiScale, winpos.y + ImGui::GetWindowHeight() - 4.f * State.dpiScale}, {winpos.x + 3.f * State.dpiScale, winpos.y + 1.f * State.dpiScale}};
+			const ImVec2 points[] = { {winpos.x + 3.f * State.dpiScale, winpos.y + 1.f * State.dpiScale}, {winpos.x - 5.f * State.dpiScale + ImGui::GetWindowWidth(), winpos.y + 1.f * State.dpiScale}, {winpos.x - 5.f * State.dpiScale + ImGui::GetWindowWidth(), winpos.y + ImGui::GetWindowHeight() - 4.f * State.dpiScale}, {winpos.x + 3.f * State.dpiScale, winpos.y + ImGui::GetWindowHeight() - 4.f * State.dpiScale}, {winpos.x + 3.f * State.dpiScale, winpos.y + 1.f * State.dpiScale} };
 			for (size_t i = 0; i < std::size(points); i++) {
 				ImGui::GetCurrentWindow()->DrawList->AddLine(points[i], points[i + 1], State.RgbMenuTheme ? ImGui::GetColorU32(ImVec4(State.RgbColor.x, State.RgbColor.y, State.RgbColor.z, State.SelectedColor.w)) : ImGui::GetColorU32(State.SelectedColor), 2.f);
 			}
@@ -108,7 +117,7 @@ namespace Radar {
 			RadarColor = { State.RgbColor.x, State.RgbColor.y, State.RgbColor.z, State.SelectedColor.w };
 		else
 			RadarColor = State.SelectedColor;
-		
+
 		GameOptions options;
 
 		ImGui::Image((void*)map.mapImage.shaderResourceView,

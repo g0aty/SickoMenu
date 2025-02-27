@@ -52,13 +52,14 @@ namespace SettingsTab {
 			if (ToggleButton("Always Show Menu on Startup", &State.ShowMenuOnStartup)) {
 				State.Save();
 			}
-			if (ToggleButton("Panic (Disable SickoMenu)", &State.PanicMode)) {
+			ImGui::SameLine();
+			if (ToggleButton("Panic Warning", &State.PanicWarning)) {
 				State.Save();
 			}
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-			
+
 			// sorry to anyone trying to read this code it is pretty messy
 #pragma region New config menu, needs fixing
 			/*
@@ -127,7 +128,7 @@ namespace SettingsTab {
 				ImGui::SameLine();
 			}
 
-			if (ToggleButton("Adjust by DPI", &State.AdjustByDPI)) {
+			/*if (ToggleButton("Adjust by DPI", &State.AdjustByDPI)) {
 				if (!State.AdjustByDPI) {
 					State.dpiScale = 1.0f;
 				}
@@ -136,14 +137,21 @@ namespace SettingsTab {
 				}
 				State.dpiChanged = true;
 				State.Save();
-			}
+			}*/
 
-			static const std::vector<const char*> DPI_SCALING_LEVEL = { "50%", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "100%", "105%", "110%", "115%", "120%", "125%", "130%", "135%", "140%", "145%", "150%", "155%", "160%", "165%", "170%", "175%", "180%", "185%", "190%", "195%", "200%", "205%", "210%", "215%", "220%", "225%", "230%", "235%", "240%", "245%", "250%", "255%", "260%", "265%", "270%", "275%", "280%", "285%", "290%", "295%", "300%" };
-			ImGui::SameLine();
+			/*static const std::vector<const char*> DPI_SCALING_LEVEL = {"50%", "60%", "70%", "80%", "90%", "100%", "110%", "120%", "130%", "140%", "150%", "160%", "170%", "180%", "190%", "200%", "210%", "220%", "230%", "240%", "250%", "260%", "270%", "280%", "290%", "300%"};
+			
 			int scaleIndex = (int(std::clamp(State.dpiScale, 0.5f, 3.0f) * 100.0f) - 50) / 5;
 			if (CustomListBoxInt("Menu Scale", &scaleIndex, DPI_SCALING_LEVEL, 100 * State.dpiScale)) {
-				State.dpiScale = (scaleIndex * 5 + 50) / 100.0f;
+				State.dpiScale = (scaleIndex * 10 + 50) / 100.0f;
 				State.dpiChanged = true;
+			}*/
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(50 * State.dpiScale);
+			if (ImGui::InputFloat("Menu Scale", &State.dpiScale)) {
+				State.dpiScale = std::clamp(State.dpiScale, 0.5f, 3.f);
+				State.dpiChanged = true;
+				State.Save();
 			}
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
@@ -238,24 +246,27 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
 			static float timer = 0.0f;
-			static bool showMessage1 = false;
+			static bool showMessage = false;
 
 			if (ToggleButton("Unlock Cosmetics", &State.UnlockCosmetics)) {
 				State.Save();
-				showMessage1 = true;
+				showMessage = true;
 				timer = static_cast<float>(ImGui::GetTime());
 			}
-			if (showMessage1) {
+
+			if (showMessage) {
 				float currentTime = static_cast<float>(ImGui::GetTime());
-				if (currentTime - timer < 4.0f) { 
-					ImGui::TextColored(
-						ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
-						"Unlocked All Cosmetics!/Disabled Unlocked All Cosmetics");
+				if (currentTime - timer < 4.0f) {
+					if (State.UnlockCosmetics)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Unlocked All Cosmetics!");
+					else
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Disabled Unlock Cosmetics!");
 				}
 				else {
-					showMessage1 = false;
+					showMessage = false;
 				}
 			}
+
 
 			if (Achievements::IsSupported())
 			{
@@ -267,10 +278,6 @@ namespace SettingsTab {
 			if (ToggleButton("Safe Mode", &State.SafeMode)) {
 				State.Save();
 			}
-			/*ImGui::SameLine();
-			if (ToggleButton("Spoof Modded Host", &State.SpoofModdedHost)) {
-				State.Save(); //haven't figured this out yet
-			}*/
 			static int modToShow = 0;
 
 			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) {
@@ -278,23 +285,9 @@ namespace SettingsTab {
 			}
 			ImGui::SameLine();
 			if (CustomListBoxInt(" ", &modToShow, MODS, 100.f * State.dpiScale)) {
-				switch (modToShow) {
-				case 0:
-					State.SickoDetection = State.ModDetection;
-					State.AmongUsMenuDetection = false;
-					State.KillNetworkDetection = false;
-					break;
-				case 1:
-					State.SickoDetection = false;
-					State.AmongUsMenuDetection = State.ModDetection;
-					State.KillNetworkDetection = false;
-					break;
-				case 2:
-					State.SickoDetection = false;
-					State.AmongUsMenuDetection = false;
-					State.KillNetworkDetection = State.ModDetection;
-					break;
-				}
+				State.SickoDetection = modToShow == 0;
+				State.AmongUsMenuDetection = modToShow == 1;
+				State.KillNetworkDetection = modToShow == 2;
 				State.Save();
 			}
 
@@ -315,6 +308,8 @@ namespace SettingsTab {
 					}
 					ImGui::Text("Guest friend code should be <= 10 characters long and cannot have a hashtag.");
 				}
+				ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "Pro Tip: You can bypass the free chat restriction using a space after your custom friend");
+				ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "code!");
 
 				/*if (ToggleButton("Use Custom Guest PUID", &State.UseGuestPuid)) {
 					State.Save();
@@ -394,8 +389,6 @@ namespace SettingsTab {
 				State.Save();
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Replay");
-
-			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
 
 			if (HotKey(State.KeyBinds.Toggle_ChatAlwaysActive)) {
 				State.Save();

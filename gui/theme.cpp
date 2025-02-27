@@ -114,20 +114,24 @@ void ApplyTheme()
 	// scale by dpi
 	style.ScaleAllSizes(State.dpiScale);
 
-	State.RgbNameColor += 0.025f;
-	constexpr auto tau = 2.f * 3.14159265358979323846f;
-	while (State.RgbNameColor > tau) State.RgbNameColor -= tau;
-	const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
-	auto color_r = calculate(State.RgbNameColor + 0.f);
-	auto color_g = calculate(State.RgbNameColor + 4.f);
-	auto color_b = calculate(State.RgbNameColor + 2.f);
-	State.rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
+	static int rgbDelay = 0;
+	if (rgbDelay <= 0) {
+		State.RgbNameColor += 0.025f;
+		constexpr auto tau = 2.f * 3.14159265358979323846f;
+		while (State.RgbNameColor > tau) State.RgbNameColor -= tau;
+		const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
+		auto color_r = calculate(State.RgbNameColor + 0.f);
+		auto color_g = calculate(State.RgbNameColor + 4.f);
+		auto color_b = calculate(State.RgbNameColor + 2.f);
+		State.rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
 
-	if (State.RgbMenuTheme) {
 		State.RgbColor.x = color_r;
 		State.RgbColor.y = color_g;
 		State.RgbColor.z = color_b;
+
+		rgbDelay = int(0.01 * GetFps());
 	}
+	else rgbDelay--;
 
 	static uint8_t gradientStep = 1;
 	static bool gradientIncreasing = true;

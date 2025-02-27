@@ -21,12 +21,10 @@ static bool OpenDoor(OpenableDoor* door) {
 
 void dDoorBreakerGame_Start(DoorBreakerGame* __this, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dDoorBreakerGame_Start executed");
-    if (!State.PanicMode) {
-        if (State.AutoOpenDoors) {
-            if (OpenDoor(__this->fields.MyDoor)) {
-                Minigame_Close((Minigame*)__this, {});
-                return;
-            }
+    if (!State.PanicMode && State.AutoOpenDoors) {
+        if (OpenDoor(__this->fields.MyDoor)) {
+            Minigame_Close((Minigame*)__this, {});
+            return;
         }
     }
     DoorBreakerGame_Start(__this, method);
@@ -34,12 +32,10 @@ void dDoorBreakerGame_Start(DoorBreakerGame* __this, MethodInfo* method) {
 
 void dDoorCardSwipeGame_Begin(DoorCardSwipeGame* __this, PlayerTask* playerTask, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dDoorCardSwipeGame_Begin executed");
-    if(!State.PanicMode) {
-        if (State.AutoOpenDoors) {
-            if (OpenDoor(__this->fields.MyDoor)) {
-                Minigame_Close((Minigame*)__this, {});
-                return;
-            }
+    if (!State.PanicMode && State.AutoOpenDoors) {
+        if (OpenDoor(__this->fields.MyDoor)) {
+            Minigame_Close((Minigame*)__this, {});
+            return;
         }
     }
     DoorCardSwipeGame_Begin(__this, playerTask, method);

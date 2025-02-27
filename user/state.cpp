@@ -9,6 +9,8 @@
 Settings State;
 
 void Settings::Load() {
+    this->SickoVersion = "v4.2";
+
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
 
@@ -51,13 +53,13 @@ void Settings::Load() {
 
         JSON_TRYGET("HasOpenedMenuBefore", this->HasOpenedMenuBefore);
         JSON_TRYGET("ShowMenuOnStartup", this->ShowMenuOnStartup);
-        if (this->ShowMenuOnStartup)
-            JSON_TRYGET("ShowMenu", this->ShowMenu);
+        if (this->ShowMenuOnStartup) JSON_TRYGET("ShowMenu", this->ShowMenu);
         JSON_TRYGET("KeyBinds", this->KeyBinds);
 #ifdef _DEBUG
         JSON_TRYGET("ShowDebug", this->showDebugTab);
 #endif
         JSON_TRYGET("dpiScale", this->dpiScale);
+        this->dpiChanged = true;
         JSON_TRYGET("RgbTheme", this->RgbMenuTheme);
         JSON_TRYGET("GradientTheme", this->GradientMenuTheme);
         JSON_TRYGET("MatchBackgroundWithTheme", this->MatchBackgroundWithTheme);
@@ -89,7 +91,7 @@ void Settings::Load() {
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
-        //JSON_TRYGET("SpoofModdedHost", this->SpoofModdedHost); haven't figured this out
+        JSON_TRYGET("PanicWarning", this->PanicWarning);
 
         JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
         JSON_TRYGET("DarkMode", this->DarkMode);
@@ -124,6 +126,12 @@ void Settings::Load() {
         JSON_TRYGET("ShowPlayersInVents", this->ShowPlayersInVents);
         JSON_TRYGET("FakeRole", this->FakeRole);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
+
+        JSON_TRYGET("NoGameEnd", this->NoGameEnd);
+        JSON_TRYGET("DisableMeetings", this->DisableMeetings);
+        JSON_TRYGET("DisableSabotages", this->DisableSabotages);
+        JSON_TRYGET("DisableAllVotekicks", this->DisableAllVotekicks);
+
         JSON_TRYGET("ShowRadar", this->ShowRadar);
         JSON_TRYGET("ShowRadar_DeadBodies", this->ShowRadar_DeadBodies);
         JSON_TRYGET("ShowRadar_Ghosts", this->ShowRadar_Ghosts);
@@ -140,8 +148,7 @@ void Settings::Load() {
         JSON_TRYGET("RadarExtraWidth", this->RadarExtraWidth);
         JSON_TRYGET("RadarExtraHeight", this->RadarExtraHeight);
 
-        if (this->ShowMenuOnStartup)
-            JSON_TRYGET("ShowReplay", this->ShowReplay);
+        if (this->ShowMenuOnStartup) JSON_TRYGET("ShowReplay", this->ShowReplay);
         JSON_TRYGET("ReplayColor_R", this->SelectedReplayMapColor.x);
         JSON_TRYGET("ReplayColor_G", this->SelectedReplayMapColor.y);
         JSON_TRYGET("ReplayColor_B", this->SelectedReplayMapColor.z);
@@ -238,8 +245,7 @@ void Settings::Load() {
         JSON_TRYGET("CustomImpostorAmount", this->CustomImpostorAmount);
         JSON_TRYGET("ImpostorCount", this->ImpostorCount);
 
-        if (this->ShowMenuOnStartup)
-            JSON_TRYGET("ShowConsole", this->ShowConsole);
+        if (this->ShowMenuOnStartup) JSON_TRYGET("ShowConsole", this->ShowConsole);
         JSON_TRYGET("ShowUnityLogs", this->ShowUnityLogs);
         //JSON_TRYGET("ShowHookLogs", this->ShowHookLogs);
 
@@ -380,7 +386,7 @@ void Settings::Save() {
                 { "SpoofPlatform", this->SpoofPlatform },
                 { "FakePlatform", this->FakePlatform },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
-                //{ "SpoofModdedHost", this->SpoofModdedHost }, haven't figured this out
+                { "PanicWarning", this->PanicWarning },
 
                 { "NoAbilityCD", this->NoAbilityCD },
                 { "DarkMode", this->DarkMode },
@@ -416,6 +422,12 @@ void Settings::Save() {
                 { "ShowPlayersInVents", this->ShowPlayersInVents },
                 { "FakeRole", this->FakeRole },
                 { "AutoFakeRole", this->AutoFakeRole },
+
+                { "NoGameEnd", this->NoGameEnd },
+                { "DisableMeetings", this->DisableMeetings },
+                { "DisableSabotages", this->DisableSabotages },
+                { "DisableAllVotekicks", this->DisableAllVotekicks },
+
                 { "ShowRadar", this->ShowRadar },
                 { "ShowRadar_DeadBodies", this->ShowRadar_DeadBodies },
                 { "ShowRadar_Ghosts", this->ShowRadar_Ghosts },

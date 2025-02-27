@@ -121,13 +121,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Hud) && (IsInGame() || IsInLobby())) State.DisableHud = !State.DisableHud;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Reset_Appearance) && (IsInGame() || IsInLobby())) ControlAppearance(false);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Randomize_Appearance)) ControlAppearance(true);
-        if (KeyBinds::IsKeyPressed(State.KeyBinds.Complete_Tasks) && IsInGame()) {
-            auto tasks = GetNormalPlayerTasks(*Game::pLocalPlayer);
-            for (auto task : tasks) {
-                if (task->fields.taskStep != task->fields.MaxStep)
-                    State.rpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
-            }
-        }
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Complete_Tasks) && IsInGame()) CompleteAllTasks();
         if (State.EnableZoom && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f)  State.CameraHeight += 0.1f;
             if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.1f >= 1.f) State.CameraHeight -= 0.1f;
@@ -154,13 +148,13 @@ bool ImGuiInitialization(IDXGISwapChain* pSwapChain) {
         pDevice->CreateRenderTargetView(pBackBuffer, NULL, &pRenderTargetView);
         pBackBuffer->Release();
         oWndProc = (WNDPROC)SetWindowLongPtr(DirectX::window, GWLP_WNDPROC, (LONG_PTR)dWndProc);
-        if (State.AdjustByDPI) {
+        /*if (State.AdjustByDPI) {
             State.dpiScale = ImGui_ImplWin32_GetDpiScaleForHwnd(DirectX::window);
         }
         else {
             State.dpiScale = 1.0f;
         }
-        State.dpiChanged = true;
+        State.dpiChanged = true;*/
 
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();

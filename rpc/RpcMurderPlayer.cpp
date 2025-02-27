@@ -266,8 +266,11 @@ DestroyMap::DestroyMap() {
 
 void DestroyMap::Process()
 {
-	return;
-	//ShipStatus_OnDestroy(ShipStatus__TypeInfo->static_fields->Instance, NULL);
+	InnerNetObject* netObj = NULL;
+	if (IsInLobby() && LobbyBehaviour__TypeInfo->static_fields->Instance) netObj = (InnerNetObject*)(LobbyBehaviour__TypeInfo->static_fields->Instance);
+	else if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance)netObj = (InnerNetObject*)(ShipStatus__TypeInfo->static_fields->Instance);
+	if (netObj == NULL) return;
+	InnerNetObject_Despawn(netObj, NULL);
 }
 
 RpcRevive::RpcRevive(PlayerControl* Player)
@@ -280,7 +283,7 @@ void RpcRevive::Process()
 	if (!PlayerSelection(Player).has_value()) return;
 
 	PlayerControl_Revive(Player, NULL);
-	PlayerControl_RpcSetColor(Player, GetPlayerOutfit(GetPlayerData(Player))->fields.ColorId, NULL);
+	//PlayerControl_RpcSetColor(Player, GetPlayerOutfit(GetPlayerData(Player))->fields.ColorId, NULL);
 	if (PlayerIsImpostor(GetPlayerData(Player)))
 		PlayerControl_RpcSetRole(Player, RoleTypes__Enum::Impostor, true, NULL);
 	else
@@ -329,7 +332,7 @@ void RpcSetLevel::Process()
 {
 	if (!PlayerSelection(Player).has_value()) return;
 
-	PlayerControl_RpcSetLevel(Player, level, NULL);
+	PlayerControl_RpcSetLevel(Player, level - 1, NULL);
 }
 
 RpcEndGame::RpcEndGame(GameOverReason__Enum reason)
@@ -427,10 +430,31 @@ RpcSpawnDummy::RpcSpawnDummy(uint8_t colorId, std::string_view name) {
 
 void RpcSpawnDummy::Process()
 {
-	auto dummyPc = *Game::pLocalPlayer;
-	auto clientData = InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), dummyPc, NULL);
-	InnerNetClient_Spawn((InnerNetClient*)(*Game::pAmongUsClient), (InnerNetObject*)dummyPc, -2, SpawnFlags__Enum::None, NULL);
-	GameData_AddPlayer(*Game::pGameData, dummyPc, clientData, NULL);
-	if (colorId != -1) PlayerControl_RpcSetColor(dummyPc, colorId, NULL);
-	if (name != "") PlayerControl_RpcSetName(dummyPc, convert_to_string(name), NULL);
+	return; // Disable temporarily
+	PlayerControl* dummyPc = (PlayerControl*)Object_1_Instantiate((Object*)(*Game::pAmongUsClient)->fields.PlayerPrefab, NULL);
+	if (dummyPc != NULL) {
+		try {
+			GameData_AddDummy(*Game::pGameData, dummyPc, NULL);
+			InnerNetClient_Spawn((InnerNetClient*)(*Game::pAmongUsClient), (InnerNetObject*)dummyPc, -2, SpawnFlags__Enum::None, NULL);
+			if (colorId != -1) PlayerControl_RpcSetColor(dummyPc, colorId, NULL);
+			if (name != "") PlayerControl_RpcSetName(dummyPc, convert_to_string(name), NULL);
+		}
+		catch (...) {
+			LOG_DEBUG("Something wrong happened when spawning dummy");
+		}
+	}
+	else LOG_DEBUG("dummyPc was null");
+}
+
+RpcBootFromVent::RpcBootFromVent(PlayerControl* Player, int ventId)
+{
+	this->Player = Player;
+	this->ventId = ventId;
+}
+
+void RpcBootFromVent::Process()
+{
+	if (!PlayerSelection(Player).has_value()) return;
+
+	PlayerPhysics_RpcBootFromVent(Player->fields.MyPhysics, ventId, NULL);
 }

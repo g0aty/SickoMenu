@@ -80,14 +80,14 @@ void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gam
 	}
 	std::string lobbyCode = IsStreamerMode() ? "" : convert_from_string(InnerNet_GameCode_IntToGameName(gameListing.GameId, NULL));
 
-/*	std::string glitchDisplay = "";
-	if (!State.PanicMode && State.ShowLobbyInfo) {
-		std::string codeEnding = lobbyCode.substr(lobbyCode.length() - 4);
-		if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " *";
-	}
+	/*	std::string glitchDisplay = "";
+		if (!State.PanicMode && State.ShowLobbyInfo) {
+			std::string codeEnding = lobbyCode.substr(lobbyCode.length() - 4);
+			if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " *";
+		}
 
-	lobbyCode += glitchDisplay;
-*/
+		lobbyCode += glitchDisplay;
+	*/
 	int LobbyTime = (std::max)(0, int(gameListing.Age));
 	std::string lobbyTimeDisplay = "";
 	if (State.ShowLobbyTimer) {
@@ -97,59 +97,6 @@ void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gam
 	gameListing.HostName = convert_to_string(std::format("<size=50%>{} <#fb0>{}</color>\n<#b0f>{}</color>{}</size>", hostName, lobbyCode, platformId, lobbyTimeDisplay/*, ServerMode*/));
 	MatchMakerGameButton_SetGame(__this, gameListing, method);
 }
-
-/*// Перечисление состояния сервера
-enum class ServerState {
-	InGame,
-	InLobby
-};
-
-// Структура для представления состояния
-struct State {
-	bool ShowLobbyInfo;  // Флаг для отображения информации о лобби
-};
-
-// Структура для представления сервера
-struct Server {
-	std::string name;       // Имя сервера
-	ServerState state;      // Состояние сервера
-};
-
-// Функция для вывода информации о сервере с форматированием
-void ShowServerInfo(const Server& server) {
-	std::string ServerMode = (server.state == ServerState::InGame) ? "Game-match" : "Lobby";
-	std::cout << std::format("- {} [{}]\n", server.name, ServerMode);
-	//std::string ServerMode = convert_from_string(gameListing.ServerMode);
-	gameListing.ServerMode = convert_to_string(std::format("<size=50%>{}", ServerMode));
-}
-
-int main() {
-	// Создаем список серверов
-	std::vector<Server> servers = {
-		{"Server 1", ServerState::InGame},
-		{"Server 2", ServerState::InLobby},
-		{"Server 3", ServerState::InGame},
-		{"Server 4", ServerState::InLobby},
-		{"Server 5", ServerState::InGame}
-		//+++ другие
-	};
-
-	// Создаем объект состояния с инициализацией
-	State.ShowLobbyInfo = true;  // Устанавливаем флаг для отображения информации о лобби
-
-	// Проверяем, нужно ли показывать информацию о лобби
-	if (State.ShowLobbyInfo) {
-		std::cout << "Информация о серверах:\n";
-		for (const auto& server : servers) {
-			ShowServerInfo(server);  // Отображаем информацию о каждом сервере
-		}
-	}
-	else {
-		std::cout << "Information about the lobby is not displayed.\n";
-	}
-
-	return 0;
-}*/
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dGameStartManager_Update executed");

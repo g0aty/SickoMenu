@@ -1,4 +1,6 @@
 # Features of SickoMenu
+> [!NOTE]
+> Pro Tip: Use `Ctrl + F` to search for specific features!
 
 ## ⚙️ Settings
 ### General
@@ -44,7 +46,7 @@
 - **Close All Doors** (Default: None)
 - **Close Current Room Door** (Default: None)
 - **Complete All Tasks** (Default: None)
--
+
 ## 🎮 Game
 ### General
 - **Multiply Player Speed** Multiplies your speed by specified amount (Default: OFF)
@@ -55,6 +57,7 @@
 - **Send Chat** Sends a chat message to the game chat
 - **Send to AUM** Sends an AUM chat message that can be seen with AmongUsMenu or SickoMenu
 - **Spam** Spams chat with your desired message
+- **Spell Check** Highlights misspelled words
 - **Spam by Everyone** *(Only with Safe Mode disabled)* Spams the chat as all players with your desired message (Default: OFF)
 - **Console** Shows a console window that tracks all game events (Default: OFF)
 - **Allow Everyone to NoClip** *(Only as host/Safe Mode disabled)* Allows every player to walk through walls provided they're not a cheater as well
@@ -96,14 +99,16 @@ View the game options!
 - **Reveal Votes** Reveals the votes before voting results (Default: OFF)
 - **Reveal Anonymous Votes** Reveals anonymous votes (Default: OFF)
 - **See Ghosts** Allows you to see ghosts (Default: OFF)
+- **See players in vents** Allows you to see vented players (Default: OFF)
 - **See Protections** Shows the guardian angel protections on a player (Default: OFF)
 - **See Kill Cooldown** Shows the kill cooldown of an impostor below their name (Default: OFF)
-- **Dark Mode (Chat Only)** Enables dark mode while chatting (Default: OFF)
+- **Dark Mode** Enables dark mode (Default: OFF)
 - **Disable Kill Animation** Disables the kill animation (Default: OFF)
 - **Show Host** Shows the host below ping (Default: OFF)
 - **Hide Watermark** Hides the watermark, useful for streaming (Default: OFF)
 - **Show Vote Kicks** Shows your vote kicks below ping (Default: OFF)
 - **Show FPS** Shows the FPS below ping (Default: OFF)
+- **Set FPS** Allows you to set custom FPS
 - **Move in Meeting** Ends the meeting for yourself
 
 ### Utils
@@ -118,7 +123,6 @@ View the game options!
 - **Allow Killing in Lobbies** *(Only with Safe Mode disabled)* Allows you to kill in lobbies (Default: OFF)
 - **Kill While Vanished** *(Only with Safe Mode disabled)* Allows you to kill while being vanished as a phantom (Default: OFF)
 - **Infinite Kill Range** Extends your kill reach (Default: OFF)
-- **Kill During Vanish** Allows you to kill while vanished as a Phantom (Default: OFF)
 - **Bypass Guardian Angel Protections** Allows you to kill protected players (Default: OFF)
 - **Do Tasks as Impostor** Allows you to complete tasks as impostor (Default: OFF)
 - **Always Use Kill Exploit** Forces the kill exploit to always be used, thus bypassing Disable Kills (Default: OFF)
@@ -134,6 +138,7 @@ View the game options!
 - **Set Role for Everyone** *(Only as host/Safe Mode disabled)* Sets everyone's role to the specified role
 - **Set Fake Role** Sets your role client-side to the specified role
 - **Automatically Set Fake Role** Sets the fake role automatically
+- **Disable Lobby Music** Completely disable the lobby music
 
 ### Randomizers
 - **Cycler** Constantly cycles your cosmetics that you choose (Default: OFF)
@@ -182,12 +187,17 @@ A dedicated player menu for viewing and manipulating players
 - **Ban** *(Only as Host)* Bans the selected player
 - **Shift** *(Only as Shapeshifter/Safe Mode disabled)* Shapeshifts you into the selected player
 - **Protect** *(Only as Guardian Angel/Host/Safe Mode disabled)* Casts a guardian angel protection on the selected player
+- **Level Farm** Spam kills players to get XP for levels
+- **Force Vanish** Force a phantom to vanish
+- **Force Appear** Force a phantom to appear
+- **Steal Data** Get someone's PUID and friend code
 - View the player's tasks (and complete them with Safe Mode disabled)
 
 ### Trolling
 - **Allow Player to NoClip** *(Only as host/Safe Mode disabled)* Allows the selected player to walk through walls
 - **Force Meeting By** Forces an emergency meeting by the selected player
 - **Self-Report** Forces the selected player to report their own body
+- **Report on murder** Forces the selected player to auto-report players they kill
 - **Impersonate** Copies the player's cosmetics
 - **Cosmetics Stealer** Individually select the cosmetics to steal
 - **Cosmetics Resetter** Individually select the cosmetics to reset to original
@@ -223,13 +233,16 @@ A dedicated player menu for viewing and manipulating players
 - **Play Medbay Scan Animation** Plays a medbay scan animation on yourself
 - **Fake Cameras in Use** Fakes the cameras being used when there's no one using them
 
-
 ## 🚨 Sabotage
 - **Disable Sabotages** *(Only as Host)* Prevents players from sabotaging stuff
 - **Repair Sabotage** Repairs the ongoing sabotage
+- **Auto repair Sabotage** Automatically repairs all sabotages (Default: OFF)
 - **Random Sabotage** Sabotages a random system
+- **Spam Sabotage** Repeatedly calls a sabotage
 - *All specific map sabotages can be sabotaged*
 - **Disable Lights** Prevents lights from being fixed by regular means
+- **Disable Lights and auto-move switches** Automatically moves lights switches so it's harder for players to fix
+- **Infinite mushroom mixup** Activates mushroom mixup forever
 
 ## 🚪 Doors
 - *All doors can be closed, pinned, or unpinned*
@@ -255,6 +268,8 @@ A dedicated player menu for viewing and manipulating players
 - **Unlock Kill Button** Allows you to use kill button at any time (Default: OFF)
 - **Allow Killing in Lobbies** Allows you to kill in lobbies (Default: OFF)
 - **Kill While Vanished** Allows you to kill while being vanished as a phantom (Default: OFF)
+- **Spam Moving Platform** Spam uses the platform on the Airship
+- **Show Lobby Timer** See when the server will close the lobby due to inactivity (Default: OFF)
 
 ## 🧑‍💻 Debug
 - **Enable Occlusion Culling** Allows culling of objects not in your field of view (Default: OFF)

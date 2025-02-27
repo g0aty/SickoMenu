@@ -70,7 +70,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 }
 
 void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
-	if (!State.Enable_SMAC || player == *Game::pLocalPlayer || callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting) return;
+	if (!State.Enable_SMAC || player == *Game::pLocalPlayer) return;
 	auto pData = GetPlayerData(player);
 	switch (callId) {
 	case (uint8_t)RpcCalls__Enum::CheckName:

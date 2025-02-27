@@ -104,7 +104,7 @@ bool CustomListBoxIntMultiple(const char* label, std::vector<std::pair<const cha
 			return resetResponse;
 		}
 	}
-	
+
 	return response;
 }
 
@@ -200,7 +200,7 @@ bool CustomListBoxPlayerSelectionMultiple(const char* label, std::array<std::pai
 			return resetResponse;
 		}
 	}
-	
+
 	return response;
 }
 
@@ -387,7 +387,7 @@ void drawPlayerIcon(PlayerControl* player, const ImVec2& winPos, ImU32 color)
 	const ImVec2& p_min = ImVec2(radX, radY) * State.dpiScale + winPos;
 	const ImVec2& p_max = ImVec2(radXMax, radYMax) * State.dpiScale + winPos;
 
-	drawList->AddImage((void*)icon.iconImage.shaderResourceView, 
+	drawList->AddImage((void*)icon.iconImage.shaderResourceView,
 		p_min, p_max,
 		ImVec2(0.0f, 1.0f),
 		ImVec2(1.0f, 0.0f),
@@ -398,11 +398,11 @@ void drawPlayerIcon(PlayerControl* player, const ImVec2& winPos, ImU32 color)
 		ImVec2(0.0f, 1.0f),
 		ImVec2(1.0f, 0.0f),
 		(/*State.RadarVisorRoleColor && */State.RevealRoles) ?
-		GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerData(player)->fields.Role))) : 
+		GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerData(player)->fields.Role))) :
 		GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->VisorColor)));
 
 	if (GetPlayerData(player)->fields.IsDead)
-		drawList->AddImage((void*)icons.at(ICON_TYPES::CROSS).iconImage.shaderResourceView, 
+		drawList->AddImage((void*)icons.at(ICON_TYPES::CROSS).iconImage.shaderResourceView,
 			p_min, p_max,
 			ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 }
@@ -420,7 +420,7 @@ void drawDeadPlayerDot(DeadBody* deadBody, const ImVec2& winPos, ImU32 color)
 	float radX = xOffset + (bodyPos.x * map.scale);
 	float radY = yOffset - (bodyPos.y * map.scale);
 
-	drawList->AddText(GetFont(), 16 * State.dpiScale, 
+	drawList->AddText(GetFont(), 16 * State.dpiScale,
 		ImVec2(radX - 5.F, radY - 6.75F) * State.dpiScale + winPos, color, "X");
 }
 
@@ -440,7 +440,7 @@ void drawDeadPlayerIcon(DeadBody* deadBody, const ImVec2& winPos, ImU32 color)
 	float radXMax = xOffset + (bodyPos.x + (icon.iconImage.imageWidth * icon.scale * 0.5f)) * map.scale;
 	float radYMax = yOffset - (bodyPos.y + (icon.iconImage.imageHeight * icon.scale * 0.5f)) * map.scale;
 
-	drawList->AddImage((void*)icon.iconImage.shaderResourceView, 
+	drawList->AddImage((void*)icon.iconImage.shaderResourceView,
 		ImVec2(radX, radY) * State.dpiScale + winPos,
 		ImVec2(radXMax, radYMax) * State.dpiScale + winPos,
 		ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f), color);
@@ -525,7 +525,7 @@ bool ToggleButton(const char* str_id, bool* v)
 		*v = !*v;
 		result = true;
 	}
-	
+
 	if (IsItemHovered())
 		draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f);
 	else
@@ -555,4 +555,21 @@ bool TabGroup(const char* label, bool highlight)
 	ImGui::PopStyleColor(3);
 	ImGui::PopID();
 	return selected;
+}
+
+bool ColoredButton(ImVec4 col, const char* label) {
+	ImGui::PushStyleColor(ImGuiCol_Text, col);
+	bool ret = ImGui::Button(label);
+	ImGui::PopStyleColor();
+	return ret;
+}
+
+void BoldText(const char* text, ImVec4 col) {
+	ImVec2 pos = ImGui::GetCursorScreenPos();
+	std::vector<std::pair<uint8_t, uint8_t>> vec = { {1, 1}, {1, 0}, {0, 1}, {0, 0} };
+	for (std::pair<uint8_t, uint8_t> i : vec) {
+		ImGui::SetCursorScreenPos(ImVec2(pos.x + i.first, pos.y + i.second));
+		if (col.x == 0.f && col.y == 0.f && col.z == 0.f && col.w == 0.f) ImGui::Text(text);
+		else ImGui::TextColored(col, text);
+	}
 }

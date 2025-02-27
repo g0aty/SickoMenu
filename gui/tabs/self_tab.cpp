@@ -375,10 +375,10 @@ namespace SelfTab {
                 State.Save();
             }
 
-            if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
+            /*if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
                 State.Save();
             }
-            ImGui::SameLine();
+            ImGui::SameLine();*/
             if (ToggleButton("Autokill", &State.AutoKill)) {
                 State.Save();
             }
@@ -405,14 +405,14 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton(IsHost() ? "God Mode" : "Visual Protection", &State.GodMode))
+            if ((IsHost() || !State.SafeMode || !State.PatchProtect) && ToggleButton(IsHost() ? "God Mode" : "Visual Protection", &State.GodMode))
                 State.Save();
             /*ImGui::SameLine();
             if (ToggleButton("Auto-Rejoin", &State.AutoRejoin)) {
                 State.Save();
             }*/
 
-            if (ToggleButton("(Shift + Right Click) to Teleport", &State.ShiftRightClickTP)) {
+            if (ToggleButton("(Shift/Ctrl + Right Click) to Teleport", &State.ShiftRightClickTP)) {
                 State.Save();
             }
             if (!State.SafeMode) ImGui::SameLine();
@@ -623,8 +623,8 @@ namespace SelfTab {
                 }
 
                 if (IsHost() || !State.SafeMode) {
-                    ImGui::SameLine(140.0f * State.dpiScale);
-                    if (ToggleButton("Cycle for Everyone (name & color only)", &State.CycleForEveryone)) {
+                    ImGui::SameLine();
+                    if (ToggleButton(IsHost() ? "Cycle for Everyone (name & color only)" : "Cycle for Everyone", &State.CycleForEveryone)) {
                         State.Save();
                     }
                 }

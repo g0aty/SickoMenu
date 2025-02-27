@@ -72,15 +72,26 @@ namespace DoorsTab {
 					State.rpcQueue.push(new RpcCloseDoorsOfType(door, false));
 				}
 			}
-			if (State.ShowKeybinds)
-				ImGui::SameLine();
 
 			if (ImGui::Button("Close Room Door"))
 			{
 				State.rpcQueue.push(new RpcCloseDoorsOfType(GetSystemTypes(GetTrueAdjustedPosition(*Game::pLocalPlayer)), false));
 			}
-			if (State.ShowKeybinds)
-				ImGui::SameLine();
+
+			if (State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle) {
+				if (ImGui::Button("Open All Doors"))
+				{
+					for (auto door : State.mapDoors)
+					{
+						State.rpcQueue.push(new RpcOpenDoorsOfType(door));
+					}
+				}
+
+				if (ImGui::Button("Open Room Door"))
+				{
+					State.rpcQueue.push(new RpcOpenDoorsOfType(GetSystemTypes(GetTrueAdjustedPosition(*Game::pLocalPlayer))));
+				}
+			}
 
 			if (ImGui::Button("Pin All Doors"))
 			{
@@ -97,6 +108,7 @@ namespace DoorsTab {
 			{
 				State.pinnedDoors.clear();
 			}
+
 			ImGui::NewLine();
 			if (State.selectedDoor != SystemTypes__Enum::Hallway) {
 				auto plainDoor = GetPlainDoorByRoom(State.selectedDoor);
@@ -119,9 +131,9 @@ namespace DoorsTab {
 			if (State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle)
 			{
 				ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-				if (ToggleButton("Auto Open Doors", &State.AutoOpenDoors)) {
-					State.Save();
-				}
+				if (ToggleButton("Auto Open Doors on Use", &State.AutoOpenDoors)) State.Save();
+
+				if (ToggleButton("Spam Open/Close Doors", &State.SpamDoors)) State.Save();
 			}
 			ImGui::EndChild();
 		}

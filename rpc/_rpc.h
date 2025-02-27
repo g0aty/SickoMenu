@@ -18,6 +18,13 @@ public:
 	virtual void Process() override;
 };
 
+class RpcOpenDoorsOfType : public RPCInterface {
+	SystemTypes__Enum selectedSystem;
+public:
+	RpcOpenDoorsOfType(SystemTypes__Enum selectedSystem);
+	virtual void Process() override;
+};
+
 class RpcSnapTo : public RPCInterface {
 	Vector2 targetVector;
 public:
@@ -84,7 +91,7 @@ class RpcProtectPlayer : public RPCInterface {
 	PlayerSelection target;
 	uint8_t color;
 public:
-	RpcProtectPlayer(PlayerControl* Player,	PlayerSelection target, uint8_t color);
+	RpcProtectPlayer(PlayerControl* Player, PlayerSelection target, uint8_t color);
 	virtual void Process() override;
 };
 
@@ -248,18 +255,6 @@ public:
 	virtual void Process() override;
 };
 
-class RpcChatMessage : public RPCInterface {
-	std::string SenderName;
-	std::string Message;
-	uint32_t ColorId;
-	std::chrono::system_clock::time_point Timestamp;
-public:
-	RpcChatMessage(std::string sendername, std::string message, uint32_t colorId, std::chrono::system_clock::time_point timestamp);
-	virtual void Process() override;
-	virtual void PrintUser();
-	virtual void PrintMessage();
-};
-
 class RpcVotePlayer : public RPCInterface {
 	PlayerControl* Player;
 	PlayerControl* target;
@@ -314,7 +309,7 @@ class RpcSetColor : public RPCInterface {
 	uint8_t bodyColor;
 	bool forceColor; //Uses RpcSetColor, only can use as host
 public:
-	RpcSetColor(uint8_t colorId, bool force=false);
+	RpcSetColor(uint8_t colorId, bool force = false);
 	virtual void Process() override;
 };
 
@@ -465,5 +460,13 @@ class RpcSpawnDummy : public RPCInterface {
 	std::string name;
 public:
 	RpcSpawnDummy(uint8_t colorId = -1, std::string_view name = "");
+	virtual void Process() override;
+};
+
+class RpcBootFromVent : public RPCInterface {
+	PlayerControl* Player;
+	int ventId;
+public:
+	RpcBootFromVent(PlayerControl* Player, int ventId);
 	virtual void Process() override;
 };

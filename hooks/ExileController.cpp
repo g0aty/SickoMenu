@@ -4,9 +4,11 @@
 #include "logger.h"
 #include <state.hpp>
 
+NetworkedPlayerInfo* exiledInfo = NULL;
+
 void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dExileController_ReEnableGameplay executed");
-    app::ExileController_ReEnableGameplay(__this, method);
+	app::ExileController_ReEnableGameplay(__this, method);
 
 	try {// ESP: Reset Kill Cooldown
 		if (IsHost() && State.TournamentMode && !State.tournamentFirstMeetingOver) State.tournamentFirstMeetingOver = true;
@@ -20,7 +22,8 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 				}
 			}
 		}
-		if (State.GodMode) PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
+		if (State.GodMode && (IsHost() || !State.SafeMode || !State.PatchProtect))
+			PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in ExileController_ReEnableGameplay (ExileController)");
@@ -30,6 +33,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dExileController_BeginForGameplay executed");
 	ExileController_BeginForGameplay(__this, exiled, voteTie, method);
+	exiledInfo = exiled;
 	try {
 		if (IsHost() && State.TournamentMode && !voteTie && exiled != NULL) {
 			if (PlayerIsImpostor(exiled)) {

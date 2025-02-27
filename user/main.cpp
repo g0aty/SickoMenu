@@ -28,7 +28,7 @@ std::string GetCRC32(std::filesystem::path filePath) {
 	while (!fin.eof()) {
 		fin.read(&buffer[0], 4096);
 		auto readSize = fin.gcount();
-		crc32.add(&buffer[0], (size_t) readSize);
+		crc32.add(&buffer[0], (size_t)readSize);
 	}
 	//LOG_DEBUG("CRC32 of \"" + filePath.string() + "\" is " + crc32.getHash());
 	return crc32.getHash();
@@ -84,10 +84,12 @@ void Run(LPVOID lpParam) {
 	hModule = (HMODULE)lpParam;
 	State.lol = getModulePath(hModule).filename().string();
 	init_il2cpp();
+	State.Load();
 	ScopedThreadAttacher managedThreadAttached;
 	{
 		std::ostringstream ss;
 		ss << "\n\tSickoMenu - " << __DATE__ << " - " << __TIME__ << std::endl; // Log SickoMenu info
+		if (((std::string)__DATE__).starts_with("Apr 01")) State.AprilFoolsMode = true;
 		/*ss << "\tBuild: " << _CONFIGURATION_NAME << std::endl;
 		ss << "\tCommit: " << GetGitCommit() << " - " << GetGitBranch() << std::endl; // Log git info*/
 		ss << "\tVersion: " << State.SickoVersion << std::endl;
@@ -97,17 +99,16 @@ void Run(LPVOID lpParam) {
 		SetConsoleTitleA(std::format("Debug Console - SickoMenu {} (Among Us v{})", State.SickoVersion, getGameVersion()).c_str());
 #endif
 	}
-	State.Load();
 #if _DEBUG
 	hUnloadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	
-	#define DO_APP_CLASS(n, s) if(!n ## __TypeInfo) LOG_ERROR("Unable to locate " #n "__TypeInfo")
-	#include "il2cpp-classes.h"
-	#undef DO_APP_CLASS
 
-	#define DO_APP_FUNC(r, n, p, s) if(!n) LOG_ERROR("Unable to locate " #n)
-	#include "il2cpp-functions.h"
-	#undef DO_APP_FUNC
+#define DO_APP_CLASS(n, s) if(!n ## __TypeInfo) LOG_ERROR("Unable to locate " #n "__TypeInfo")
+#include "il2cpp-classes.h"
+#undef DO_APP_CLASS
+
+#define DO_APP_FUNC(r, n, p, s) if(!n) LOG_ERROR("Unable to locate " #n)
+#include "il2cpp-functions.h"
+#undef DO_APP_FUNC
 	/*
 	auto domain = il2cpp_domain_get();
 	auto assembly = il2cpp_domain_assembly_open(domain, "Assembly-CSharp");
@@ -133,7 +134,7 @@ void Run(LPVOID lpParam) {
 		STREAM_ERROR("Failed to watch unload signal! dwWaitResult = " << dwWaitResult << " Error " << GetLastError());
 		return;
 	}
-	
+
 	DetourUninitialization();
 	fclose(stdout);
 	FreeConsole();

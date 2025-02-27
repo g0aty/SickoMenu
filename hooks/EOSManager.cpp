@@ -3,6 +3,8 @@
 #include "logger.h"
 #include "state.hpp"
 
+static bool isRestrictedGuestAccount = true;
+
 void fakeSuccessfulLogin(EOSManager* eosManager)
 {
 	EOSManager_DeleteDeviceID(eosManager, NULL, NULL);
@@ -22,6 +24,7 @@ void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_StartInitialLoginFlow executed");
 	if (!State.SpoofGuestAccount) {
 		EOSManager_StartInitialLoginFlow(__this, method);
+		isRestrictedGuestAccount = false;
 		return;
 	}
 	EOSManager_StartTempAccountFlow(__this, method);
@@ -48,8 +51,14 @@ void dEOSManager_InitializePlatformInterface(EOSManager* __this, MethodInfo* met
 
 bool dEOSManager_IsFreechatAllowed(EOSManager* __this, MethodInfo* method)
 {
+	bool ret = !isRestrictedGuestAccount || IsInGame() || IsInLobby();
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_IsFreechatAllowed executed");
-	return true;//app::EOSManager_IsFreechatAllowed(__this, method);
+	return ret;
+}
+
+QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method) {
+	if (IsInGame() || IsInLobby()) return QuickChatModes__Enum::FreeChatOrQuickChat;
+	return !isRestrictedGuestAccount || IsInGame() || IsInLobby() ? MultiplayerSettingsData_get_ChatMode(__this, value, method) : QuickChatModes__Enum::QuickChatOnly;
 }
 
 bool dEOSManager_IsFriendsListAllowed(EOSManager* __this, MethodInfo* method)
@@ -164,8 +173,17 @@ void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter
 
 void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEditAccountUsername_SaveUsername executed");
-	if (State.UseGuestFriendCode && State.GuestFriendCode != "")
-		TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
+	if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
+		std::string newFriendCode = "";
+		for (auto i : State.GuestFriendCode) {
+			newFriendCode += tolower(i);
+			if (newFriendCode.ends_with(" ")) {
+				isRestrictedGuestAccount = false; // You can use free chat in a guest account by simply putting a space after your friend code... W
+				break;
+			}
+		}
+		TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);
+	}
 	else {
 		auto textStr = TMP_Text_get_text((TMP_Text*)__this->fields.UsernameText, NULL);
 		if (textStr != convert_to_string("")) {

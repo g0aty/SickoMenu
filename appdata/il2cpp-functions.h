@@ -99,6 +99,7 @@ DO_APP_FUNC(void, PlayerControl_RpcSyncSettings, (PlayerControl* __this, Byte__A
 DO_APP_FUNC(void, PlayerControl_RpcPlayAnimation, (PlayerControl* __this, uint8_t animType, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcPlayAnimation(System.Byte)");
 DO_APP_FUNC(void, PlayerControl_CmdReportDeadBody, (PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdReportDeadBody(NetworkedPlayerInfo)");
 DO_APP_FUNC(void, PlayerControl_CmdCheckMurder, (PlayerControl* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdCheckMurder(PlayerControl)");
+DO_APP_FUNC(void, PlayerControl_CheckMurder, (PlayerControl* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CheckMurder(PlayerControl)");
 DO_APP_FUNC(void, PlayerControl_MurderPlayer, (PlayerControl* __this, PlayerControl* target, MurderResultFlags__Enum resultFlags, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::MurderPlayer(PlayerControl, MurderResultFlags)");
 DO_APP_FUNC(void, PlayerControl_RpcMurderPlayer, (PlayerControl* __this, PlayerControl* target, bool didSucceed, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcMurderPlayer(PlayerControl, System.Boolean)");
 DO_APP_FUNC(void, PlayerControl_ReportDeadBody, (PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::ReportDeadBody(NetworkedPlayerInfo)");
@@ -174,7 +175,7 @@ DO_APP_FUNC(MessageWriter*, InnerNetClient_StartRpcImmediately, (InnerNetClient*
 DO_APP_FUNC(void, InnerNetClient_FinishRpcImmediately, (InnerNetClient* __this, MessageWriter* msg, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::FinishRpcImmediately(Hazel.MessageWriter)");
 
 DO_APP_FUNC(void, MessageExtensions_WriteNetObject, (MessageWriter* self, InnerNetObject* obj, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.MessageExtensions::WriteNetObject(Hazel.MessageWriter, InnerNet.InnerNetObject)");
-//DO_APP_FUNC(PlayerControl*, MessageExtensions_ReadNetObject_1, (MessageReader* self, MethodInfo* method), "Assembly-CSharp, PlayerControl InnerNet.MessageExtensions::ReadNetObject(Hazel.MessageReader)");
+DO_APP_FUNC(PlayerControl*, MessageExtensions_ReadNetObject_1, (MessageReader* self, MethodInfo* method), "Assembly-CSharp, PlayerControl InnerNet.MessageExtensions::ReadNetObject(Hazel.MessageReader)");
 
 //DO_APP_FUNC(bool, Constants_1_ShouldFlipSkeld, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldFlipSkeld()");
 //this causes issues with dleks
@@ -287,9 +288,11 @@ DO_APP_FUNC(void, PlayerCustomizationData_set_Name, (PlayerCustomizationData* __
 DO_APP_FUNC(bool, PlayerPurchasesData_GetPurchase, (PlayerPurchasesData* __this, String* itemKey, String* bundleKey, MethodInfo* method), "Assembly-CSharp, System.Boolean PlayerPurchasesData::GetPurchase(System.String, System.String)");
 DO_APP_FUNC(SettingsData*, DataManager_get_Settings, (MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Settings.SettingsData AmongUs.Data.DataManager::get_Settings()");
 DO_APP_FUNC(AccessibilitySettingsData*, SettingsData_get_Accessibility, (SettingsData* __this, MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Settings.AccessibilitySettingsData AmongUs.Data.Settings.SettingsData::get_Accessibility()");
+DO_APP_FUNC(MultiplayerSettingsData*, SettingsData_get_Multiplayer, (SettingsData* __this, MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Settings.MultiplayerSettingsData AmongUs.Data.Settings.SettingsData::get_Multiplayer()");
 DO_APP_FUNC(GameplaySettingsData*, SettingsData_get_Gameplay, (SettingsData* __this, MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Settings.GameplaySettingsData AmongUs.Data.Settings.SettingsData::get_Gameplay()");
 DO_APP_FUNC(bool, AccessibilitySettingsData_get_ColorBlindMode, (AccessibilitySettingsData* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean AmongUs.Data.Settings.AccessibilitySettingsData::get_ColorBlindMode()");
-DO_APP_FUNC(bool, GameplaySettingsData_get_StreamerMode, (GameplaySettingsData* __this, MethodInfo* method),"Assembly-CSharp, System.Boolean AmongUs.Data.Settings.GameplaySettingsData::get_StreamerMode()" );
+DO_APP_FUNC(bool, GameplaySettingsData_get_StreamerMode, (GameplaySettingsData* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean AmongUs.Data.Settings.GameplaySettingsData::get_StreamerMode()");
+DO_APP_FUNC(bool, MultiplayerSettingsData_get_CensorChat, (MultiplayerSettingsData* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean AmongUs.Data.Settings.MultiplayerSettingsData::get_CensorChat()");
 
 // 2022.12.08e
 DO_APP_FUNC(GameOptionsManager*, GameOptionsManager_get_Instance, (MethodInfo* method), "Assembly-CSharp, GameOptionsManager GameOptionsManager::get_Instance()");
@@ -301,6 +304,7 @@ DO_APP_FUNC(LogicOptions*, GameManager_get_LogicOptions, (GameManager* __this, M
 
 //adding kick/vote functions; these may have to be updated every time the game updates
 DO_APP_FUNC(void, MeetingHud_CmdCastVote, (MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::CmdCastVote(System.Byte, System.Byte)");
+DO_APP_FUNC(void, MeetingHud_CastVote, (MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::CastVote(System.Byte, System.Byte)");
 DO_APP_FUNC(void, MeetingHud_RpcClearVote, (MeetingHud* __this, int32_t clientId, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcClearVote(System.Int32)");
 DO_APP_FUNC(void, VoteBanSystem_CmdAddVote, (VoteBanSystem* __this, int32_t clientId, MethodInfo* method), "Assembly-CSharp, System.Void VoteBanSystem::CmdAddVote(System.Int32)");
 DO_APP_FUNC(void, VoteBanSystem_AddVote, (VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method), "Assembly-CSharp, System.Void VoteBanSystem::AddVote(System.Int32, System.Int32)");
@@ -314,7 +318,7 @@ DO_APP_FUNC(void, KillOverlay_ShowKillAnimation_1, (KillOverlay* __this, Network
 DO_APP_FUNC(String*, EOSManager_get_FriendCode, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.String EOSManager::get_FriendCode()");
 //DO_APP_FUNC(void, EOSManager_set_FriendCode, (EOSManager* __this, String* value, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::set_FriendCode(System.String)"); crashes epic games when run
 DO_APP_FUNC(float, LogicOptions_GetKillDistance, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, System.Single LogicOptions::GetKillDistance()");
-DO_APP_FUNC(bool, LogicOptions_GetAnonymousVotes, (LogicOptions * __this, MethodInfo * method), "Assembly-CSharp, System.Boolean LogicOptions::GetAnonymousVotes()");
+DO_APP_FUNC(bool, LogicOptions_GetAnonymousVotes, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean LogicOptions::GetAnonymousVotes()");
 //DO_APP_FUNC(TaskBarMode__Enum, LogicOptions_GetTaskBarMode, (LogicOptions* __this, MethodInfo* method), "Assembly-CSharp, TaskbarMode LogicOptions::GetTaskBarMode()");
 DO_APP_FUNC(void, KillButton_SetTarget, (KillButton* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::SetTarget(PlayerControl)");
 DO_APP_FUNC(PlayerControl*, ImpostorRole_FindClosestTarget, (ImpostorRole* __this, MethodInfo* method), "Assembly-CSharp, PlayerControl ImpostorRole::FindClosestTarget()");
@@ -350,7 +354,7 @@ DO_APP_FUNC(void, ShipStatus_HandleRpc, (ShipStatus* __this, uint8_t callId, Mes
 DO_APP_FUNC(void, TMP_Text_set_color, (TMP_Text* __this, Color value, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TMP_Text::set_color(UnityEngine.Color)");
 DO_APP_FUNC(void, ChatBubble_SetText, (ChatBubble* __this, String* chatText, MethodInfo* method), "Assembly-CSharp, System.Void ChatBubble::SetText(System.String)");
 DO_APP_FUNC(void, Mushroom_FixedUpdate, (Mushroom* __this, MethodInfo* method), "Assembly-CSharp, System.Void Mushroom::FixedUpdate()");
-DO_APP_FUNC(void, Screen_SetResolution_1, (int32_t width, int32_t height, bool fullscreen, int32_t preferredRefreshRate, MethodInfo * method), "UnityEngine.CoreModule, System.Void UnityEngine.Screen::SetResolution(System.Int32, System.Int32, System.Boolean, System.Int32)");
+DO_APP_FUNC(void, Screen_SetResolution_1, (int32_t width, int32_t height, bool fullscreen, int32_t preferredRefreshRate, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Screen::SetResolution(System.Int32, System.Int32, System.Boolean, System.Int32)");
 DO_APP_FUNC(void, GameData_ShowNotification, (GameData* __this, String* playerName, DisconnectReasons__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Void GameData::ShowNotification(System.String, DisconnectReasons)");
 DO_APP_FUNC(void, PlayerControl_CmdCheckVanish, (PlayerControl* __this, float maxDuration, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdCheckVanish(System.Single)");
 DO_APP_FUNC(void, PlayerControl_RpcVanish, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcVanish()");
@@ -362,8 +366,8 @@ DO_APP_FUNC(void, MeetingHud_RpcVotingComplete, (MeetingHud* __this, MeetingHud_
 DO_APP_FUNC(bool, AccountManager_CanPlayOnline, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean AccountManager::CanPlayOnline()");
 DO_APP_FUNC(void, SoundManager_StopSound, (SoundManager* __this, AudioClip* clip, MethodInfo* method), "Assembly-CSharp, System.Void SoundManager::StopSound(UnityEngine.AudioClip)");
 DO_APP_FUNC(void, Application_set_targetFrameRate, (int32_t value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Application::set_targetFrameRate(System.Int32)");
-//DO_APP_FUNC(PlayerControl*, Object_1_Instantiate_29, (PlayerControl* original, MethodInfo* method), "UnityEngine.CoreModule, PlayerControl UnityEngine.Object::Instantiate<PlayerControl>(PlayerControl)");
-DO_APP_FUNC(NetworkedPlayerInfo*, GameData_AddPlayer, (GameData* __this, PlayerControl* pc, ClientData* client, MethodInfo* method), "Assembly-CSharp, NetworkedPlayerInfo GameData::AddPlayer(PlayerControl, InnerNet.ClientData)");
+DO_APP_FUNC(Object*, Object_1_Instantiate, (Object* original, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Object UnityEngine.Object::Instantiate(UnityEngine.Object)");
+DO_APP_FUNC(NetworkedPlayerInfo*, GameData_AddDummy, (GameData* __this, PlayerControl* pc, MethodInfo* method), "Assembly-CSharp, NetworkedPlayerInfo GameData::AddDummy(PlayerControl)");
 DO_APP_FUNC(void, InnerNetClient_Spawn, (InnerNetClient* __this, InnerNetObject* netObjParent, int32_t ownerId, SpawnFlags__Enum flags, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::Spawn(InnerNet.InnerNetObject, System.Int32, InnerNet.SpawnFlags)");
 DO_APP_FUNC(void, MatchMakerGameButton_SetGame, (MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method), "Assembly-CSharp, System.Void MatchMakerGameButton::SetGame(InnerNet.GameListing)");
 DO_APP_FUNC(void, ModManager_LateUpdate, (ModManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void ModManager::LateUpdate()");
@@ -378,3 +382,6 @@ DO_APP_FUNC(bool, Vent_TryMoveToVent, (Vent* __this, Vent* otherVent, String** e
 DO_APP_FUNC(void, InnerNetClient_ReportPlayer, (InnerNetClient* __this, int32_t clientId, ReportReasons__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::ReportPlayer(System.Int32, InnerNet.ReportReasons)");
 DO_APP_FUNC(void, QuickChatNetData_Serialize, (QuickChatPhraseBuilderResult* data, MessageWriter* writer, MethodInfo* method), "Assembly-CSharp, System.Void AmongUs.QuickChat.QuickChatNetData::Serialize(AmongUs.QuickChat.QuickChatPhraseBuilderResult, Hazel.MessageWriter)");
 DO_APP_FUNC(float, PlayerControl_get_CalculatedAlpha, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Single PlayerControl::get_CalculatedAlpha()");
+DO_APP_FUNC(void, AbstractChatInputField_Clear, (AbstractChatInputField* __this, MethodInfo* method), "Assembly-CSharp, System.Void AbstractChatInputField::Clear()");
+DO_APP_FUNC(QuickChatModes__Enum, MultiplayerSettingsData_get_ChatMode, (MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method), "Assembly-CSharp, InnerNet.QuickChatModes AmongUs.Data.Settings.MultiplayerSettingsData::get_ChatMode()");
+DO_APP_FUNC(void, InnerNetObject_Despawn, (InnerNetObject* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetObject::Despawn()");

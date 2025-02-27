@@ -27,3 +27,5 @@ bool InputStringMultiline(const char* label, std::string* str, const ImVec2& siz
 bool InputStringWithHint(const char* label, const char* hint, std::string* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
 bool ToggleButton(const char* str_id, bool* v);
 bool TabGroup(const char* label, bool highlight = false);
+bool ColoredButton(ImVec4 col, const char* label);
+void BoldText(const char* text, ImVec4 col = ImVec4(0.f, 0.f, 0.f, 0.f));

@@ -39,7 +39,8 @@ void DetourInitilization() {
 	if (!d3d11.presentFunction) {
 		LOG_ERROR("Unable to retrieve IDXGISwapChain::Present method");
 		return;
-	} else {
+	}
+	else {
 		// Attempting to hook the Steam overlay
 		/*do {
 			if (oPresent)
@@ -127,6 +128,7 @@ void DetourInitilization() {
 	HOOKFUNC(PlainDoor_SetDoorway);
 	HOOKFUNC(PlayerControl_MurderPlayer);
 	HOOKFUNC(PlayerControl_CmdCheckMurder);
+	HOOKFUNC(PlayerControl_CheckMurder);
 	HOOKFUNC(PlayerControl_CompleteTask);
 	HOOKFUNC(PlayerControl_StartMeeting);
 	HOOKFUNC(RoleManager_SelectRoles);
@@ -227,6 +229,8 @@ void DetourInitilization() {
 	HOOKFUNC(Vent_TryMoveToVent);
 	HOOKFUNC(PlayerControl_get_CalculatedAlpha);
 	HOOKFUNC(PlayerControl_get_Visible);
+	HOOKFUNC(MeetingHud_CastVote);
+	HOOKFUNC(MultiplayerSettingsData_get_ChatMode);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -277,6 +281,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlainDoor_SetDoorway);
 	UNHOOKFUNC(PlayerControl_MurderPlayer);
 	UNHOOKFUNC(PlayerControl_CmdCheckMurder);
+	UNHOOKFUNC(PlayerControl_CheckMurder);
 	UNHOOKFUNC(PlayerControl_CompleteTask);
 	UNHOOKFUNC(PlayerControl_StartMeeting);
 	UNHOOKFUNC(RoleManager_SelectRoles);
@@ -374,6 +379,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(Vent_TryMoveToVent);
 	UNHOOKFUNC(PlayerControl_get_CalculatedAlpha);
 	UNHOOKFUNC(PlayerControl_get_Visible);
+	UNHOOKFUNC(MeetingHud_CastVote);
+	UNHOOKFUNC(MultiplayerSettingsData_get_ChatMode);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

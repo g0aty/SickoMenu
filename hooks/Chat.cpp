@@ -29,6 +29,7 @@ void doSabotageFlash() {
 
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_AddChat executed");
+	censor = IsChatCensored(); // Fix chat not being censored
 	if (!State.PanicMode) {
 		auto player = GetPlayerData(sourcePlayer);
 		auto local = GetPlayerData(*Game::pLocalPlayer);
@@ -63,59 +64,6 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 						break;
 					}
 				}
-			}
-		}
-		auto playerFc = convert_from_string(player->fields.FriendCode);
-		if (IsHost() && IsInGame() && State.TournamentMode && message.substr(0, 8) == "callout ") {
-			uint8_t alivePlayers = 0;
-			for (auto p : GetAllPlayerData()) {
-				if (!p->fields.IsDead) alivePlayers++;
-			}
-			if (alivePlayers >= 7 && std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), playerFc) == State.tournamentCallers.end()) {
-				try {
-					uint8_t calledOutId = std::stoi(message.substr(8));
-					auto calledOutPlayer = GetPlayerControlById(calledOutId);
-					if (calledOutPlayer != NULL && !GetPlayerData(calledOutPlayer)->fields.IsDead) {
-						std::string calledOutFc = convert_from_string(GetPlayerData(calledOutPlayer)->fields.FriendCode);
-						if (!PlayerIsImpostor(player) && std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), calledOutFc) == State.tournamentCalledOut.end()) {
-							if (PlayerIsImpostor(GetPlayerData(calledOutPlayer))) {
-								//check if called-out player was an impostor
-								UpdatePoints(player, 1.5); //CorrectCallout
-								State.tournamentCalloutPoints[playerFc] += 1;
-								LOG_DEBUG("Correct callout by " + ToString(GetPlayerDataById(calledOutId)));
-								State.tournamentCorrectCallers[playerFc] = calledOutId;
-							}
-							else {
-								UpdatePoints(player, -1.5); //IncorrectCallout
-								LOG_DEBUG("Incorrect callout by " + ToString(GetPlayerDataById(calledOutId)));
-							}
-							State.tournamentCallers.push_back(playerFc);
-							State.tournamentCalledOut.push_back(calledOutFc);
-							PlayerControl_RpcSendChatNote(*Game::pLocalPlayer, player->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
-						}
-						else if (PlayerIsImpostor(player) && std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), calledOutFc) == State.tournamentCalledOut.end()) {
-							State.tournamentCallers.push_back(playerFc);
-							State.tournamentCalledOut.push_back(calledOutFc);
-							PlayerControl_RpcSendChatNote(*Game::pLocalPlayer, player->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
-						}
-						else {
-							doSabotageFlash();
-							LOG_DEBUG("Invalid callout by " + ToString(GetPlayerDataById(calledOutId)));
-						}
-					}
-					else {
-						doSabotageFlash();
-						LOG_DEBUG("Called out dead/NULL player");
-					}
-				}
-				catch (...) {
-					doSabotageFlash();
-					LOG_DEBUG("Exception occured while executing callout");
-				}
-			}
-			else {
-				doSabotageFlash();
-				LOG_DEBUG("Invalid callout executed by player who already called out");
 			}
 		}
 	}
@@ -179,7 +127,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	if (!State.SafeMode)
 		__this->fields.timeSinceLastMessage = 420.69f; //we can set this to anything more than or equal to 3 and it'll work
 
-	if (State.DarkMode) {
+	if (!State.PanicMode && State.DarkMode) {
 		auto gray32 = Color32();
 		gray32.r = 34; gray32.g = 34; gray32.b = 34; gray32.a = 255;
 		auto gray = Color32_op_Implicit_1(gray32, NULL);
@@ -196,7 +144,9 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		}
 		if (__this->fields.quickChatField != NULL) {
 			auto text = __this->fields.quickChatField->fields.text;
+			auto placeholderText = __this->fields.quickChatField->fields.placeholderText;
 			TMP_Text_set_color((app::TMP_Text*)text, Palette__TypeInfo->static_fields->White, NULL);
+			TMP_Text_set_color((app::TMP_Text*)placeholderText, Palette__TypeInfo->static_fields->White, NULL);
 			SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, gray, NULL);
 		}
 	}
@@ -216,15 +166,15 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		}
 	}
 
-	auto chatText = (String*)(__this->fields.freeChatField->fields.textArea->fields.text);
+	auto chatText = __this->fields.freeChatField->fields.textArea->fields.text;
 	bool isCtrl = ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3);
 	bool isCpressed = ImGui::IsKeyPressed(0x43) || ImGui::IsKeyDown(0x63);
 	bool isXpressed = ImGui::IsKeyPressed(0x58) || ImGui::IsKeyDown(0x78);
 	if (State.ChatPaste && isCtrl && (isCpressed || isXpressed) && convert_from_string(chatText) != "") {
-		ClipboardHelper_PutClipboardString((String*)(__this->fields.freeChatField->fields.textArea->fields.text), NULL); //ctrl+c
+		ClipboardHelper_PutClipboardString(chatText, NULL); //ctrl+c
 	}
 	if (State.ChatPaste && isCtrl && isXpressed && convert_from_string(chatText) != "") {
-		auto text = (String*)(__this->fields.freeChatField->fields.textArea->fields.text);
+		auto text = chatText;
 		text = convert_to_string("");
 	}
 
@@ -248,16 +198,19 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		State.MessageSent = true;
 	}
 
-
 	ChatController_Update(__this, method);
+
+	if (!State.PanicMode && State.DarkMode && __this->fields.freeChatField != NULL) {
+		__this->fields.freeChatField->fields.textArea->fields.compoText = convert_to_string(RemoveHtmlTags(convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText)));
+	}
 }
 
 bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dTextBoxTMP_IsCharAllowed executed");
-	//0x08 is backspace, 0x0D is carriage return, 0x7F is delete character, 0x3C is <, 0x3E is >
+	//0x08 is backspace, 0x0D is carriage return, 0x7F is delete character, 0x3C is <, 0x3E is >, 0x5B is [
 	//lobby codes force uppercase, and we don't change that to fix joining a lobby with code not working
-	if (!__this->fields.ForceUppercase) return (unicode_char != 0x08 && unicode_char != 0x0D && unicode_char != 0x7F && ((State.SafeMode && unicode_char != 0x3C && unicode_char != 0x3E) || !State.SafeMode));
+	if (!__this->fields.ForceUppercase) return (unicode_char != 0x08 && unicode_char != 0x0D && unicode_char != 0x7F && ((State.SafeMode && unicode_char != 0x3C && unicode_char != 0x3E && unicode_char != 0x5B) || !State.SafeMode));
 	return TextBoxTMP_IsCharAllowed(__this, unicode_char, method);
 }
 
@@ -271,9 +224,9 @@ void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, 
 			__this->fields.characterLimit = 120;
 	}
 	else __this->fields.characterLimit = 100;
+	inputCompo = convert_to_string(RemoveHtmlTags(convert_from_string(inputCompo))); // Fix #fff/color bug in text input field
 
 	TextBoxTMP_SetText(__this, input, inputCompo, method);
-
 }
 
 void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodInfo* method)

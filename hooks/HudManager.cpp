@@ -22,7 +22,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 			__this->fields.Chat->fields.freeChatField->fields.textArea->fields.AllowPaste = State.ChatPaste && !State.PanicMode;
 		}
 
-		
+
 		static bool DisableActivation = false; //so a ghost seek button doesn't show up
 
 		if (State.InMeeting)
@@ -51,7 +51,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 						(State.PanicMode || (!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
 						&& !localData->fields.IsDead,
 						NULL);
-				
+
 				if (State.OutfitCooldown == 0) {
 					if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin)
 						ControlAppearance(true);
@@ -138,22 +138,40 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dVersionShower_Start executed");
+	State.versionShower = __this;
 	VersionShower_Start(__this, method);
-	const auto& versionText = !State.PanicMode && !State.HideWatermark ? std::format("<size=75%>{}{} ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color></color></size>",
-		State.DarkMode ? "<#666>" : "<#fff>", convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)), State.SickoVersion) :
-		convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
-	app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(versionText), nullptr);
+	State.versionShowerDefaultText = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
+	/*if (State.PanicMode) return;
+	std::string watermarkText = std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
+	const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}</color></size></font>",
+		State.HideWatermark ? 100 : 60, State.DarkMode ? "<#666>" : "<#fff>", convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)),
+		State.HideWatermark ? "" : watermarkText);
+	app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(versionText), nullptr);*/
 }
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPingTracker_Update executed");
+	__this->fields.gamePos.x = 0.f, __this->fields.lobbyPos.x = -0.09f; // Make the PingTracker actually look centered
+	bool isFreeplay = ((InnerNetClient*)(*Game::pAmongUsClient))->fields.NetworkMode == NetworkModes__Enum::FreePlay;
 	app::PingTracker_Update(__this, method);
+	if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y += 3 * (State.CameraHeight - 1);
+	if (isFreeplay) {
+		GameObject_SetActive(Component_get_gameObject((Component_1*)__this, NULL), true, NULL);
+		__this->fields.aspectPosition->fields.DistanceFromEdge = __this->fields.gamePos;
+		if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y += 3 * (State.CameraHeight - 1);
+		if (State.PanicMode) return app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(""), nullptr);
+	}
 	app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
-	//center the ping text when panic is enabled
 	try {
-		if (!IsStreamerMode() && (!State.PanicMode || State.TempPanicMode)) {
+		if (!State.PanicMode || State.TempPanicMode) {
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
-			int fps = GetFps();
+			static int fps = GetFps();
+			static int fpsDelay = 0;
+			if (fpsDelay <= 0) {
+				fps = GetFps();
+				fpsDelay = int(0.5 * GetFps()); // 0.5 sec delay
+			}
+			else fpsDelay--;
 			std::string fpsText = "";
 			if (State.ShowFps) {
 				if (fps <= 20) fpsText = std::format(" ~ FPS: <#f00>{}</color>", fps);
@@ -172,25 +190,33 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 			std::string noClip = State.NoClip ? " ~ NoClip" : "";
 			std::string freeCam = State.FreeCam ? " ~ Freecam" : "";
 			std::string spectating = "";
-			if (State.playerToFollow.has_value()) {
-				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())));
+			if (auto playerToFollow = State.playerToFollow.validate(); playerToFollow.has_value()) {
+				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerToFollow.get_PlayerData());
 				Color32 playerColor = GetPlayerColor(outfit->fields.ColorId);
 				std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>",
 					playerColor.r, playerColor.g, playerColor.b, playerColor.a);
-				spectating = " ~ Now Spectating: " + colorCode + RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(GetPlayerControlById(State.playerToFollow.get_PlayerId())), nullptr))) + "</color>";
+				auto name = RemoveHtmlTags(convert_from_string(outfit->fields.PlayerName));
+				if (name == "") spectating = " ~ Now Spectating";
+				else spectating = " ~ Now Spectating: " + colorCode + name + "</color>";
 			}
-			else spectating = "";
+			uint8_t pingSize = 100;
+			if (!State.HideWatermark || spectating != "") pingSize = 75;
+			if (!State.HideWatermark && spectating != "") pingSize = 50;
 			std::string hostText = State.ShowHost && IsInGame() ?
 				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
-			std::string watermarkText = std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color> ~ ", spectating == "" ? 100 : 50, State.SickoVersion);
-			std::string pingText = std::format("<#0000>00 00</color>{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
-				State.HideWatermark ? "" : watermarkText, ping, lobbyTimeDisplay, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
+			std::string watermarkText = State.AprilFoolsMode ? std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[F{}son Mode]</color> by <#39f>g0aty</color> ~ ",
+				IsInGame() ? pingSize : 100, State.SickoVersion, IsChatCensored() ? "***" : "uck") :
+				std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color> ~ ", IsInGame() ? pingSize : 100, State.SickoVersion);
+			std::string pingText = (isFreeplay ? "<size=150%><#0000>0</color></size>\n" : "") +
+				std::format("{}{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
+					State.HideWatermark ? "" : watermarkText, ping, lobbyTimeDisplay, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
 			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}
 		else {
-			std::string ping = "<#0000>00 00</color>" + convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
+			std::string ping = (isFreeplay ? "<size=150%><#0000>0</color></size>\n" : "") +
+				convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(ping), nullptr);
 		}
 		//"<#0000>00 00</color>" has been added to center the ping text

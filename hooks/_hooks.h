@@ -34,6 +34,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method);
 bool dPlayerControl_get_CanMove(PlayerControl* __this, MethodInfo* method);
 void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, MurderResultFlags__Enum resultFlags, MethodInfo* method);
 void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target, MethodInfo* method);
+void dPlayerControl_CheckMurder(PlayerControl* __this, PlayerControl* target, MethodInfo* method);
 void dPlayerControl_RpcSyncSettings(PlayerControl* __this, Byte__Array* optionsByteArray, MethodInfo* method);
 void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method);
 void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodInfo* method);
@@ -142,3 +143,5 @@ PlayerBodyTypes__Enum dNormalGameManager_GetBodyType(NormalGameManager* __this, 
 bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodInfo* method);
 float dPlayerControl_get_CalculatedAlpha(PlayerControl* __this, MethodInfo* method);
 bool dPlayerControl_get_Visible(PlayerControl* __this, MethodInfo* method);
+void dMeetingHud_CastVote(MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method);
+QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method);

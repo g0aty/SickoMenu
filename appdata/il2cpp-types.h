@@ -6398,6 +6398,12 @@ namespace app
         void* OnChangedEvent;
     };
 
+    struct AbstractChatInputField {
+        struct AbstractChatInputField__Class* klass;
+        MonitorData* monitor;
+        struct AbstractChatInputField__Fields fields;
+    };
+
     struct FreeChatInputField {
         void* klass;
         MonitorData* monitor;
@@ -10064,6 +10070,25 @@ namespace app
 #pragma endregion
 
 #pragma region PingTracker
+    struct AspectPosition__Fields {
+        struct MonoBehaviour__Fields _;
+        struct Camera* parentCam;
+        bool updateAlways;
+        struct Vector2 anchorPoint;
+        struct Vector3 DistanceFromEdge;
+#if defined(_CPLUSPLUS_)
+        void* Alignment;
+#else
+        int32_t Alignment;
+#endif
+    };
+
+    struct AspectPosition {
+        struct AspectPosition__Class* klass;
+        MonitorData* monitor;
+        struct AspectPosition__Fields fields;
+    };
+
     struct PingTracker__Fields {
         struct MonoBehaviour__Fields _;
         struct TextMeshPro* text;
@@ -10713,6 +10738,7 @@ namespace app
     typedef Il2CppObject LogicGameFlowHnS;
     typedef Il2CppObject PlayerData;
     typedef Il2CppObject PlayerAccountData;
+    typedef Il2CppObject MultiplayerSettingsData;
     typedef Il2CppObject PlayerCustomizationData;
     typedef Il2CppObject PlayerPurchasesData;
     typedef Il2CppObject ExileController;

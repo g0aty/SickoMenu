@@ -107,11 +107,56 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 6.  In PlayOnMac, select your virtual drive > **Configure** > **Wine** > **Libraries**.
    - Add `version` to the overrides and set it to **Native (Windows)**.
 7.Run Among Us through Steam in PlayOnMac. Use the hotkey **Command + Delete** to toggle the mod menu.
+
+**Method 3:- (recommended)**
+
+1. Open **Terminal** and install Wine via Homebrew.
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   brew install --cask wine-stable
+   ```  
+2. In Terminal, create a dedicated Wine prefix for Among Us:  
+   ```bash
+   mkdir -p ~/AmongUsWine
+   WINEPREFIX=~/AmongUsWine winecfg
+   ```  
+   - In the Wine Configuration window, set **Windows Version** to **Windows 10** and close.
+3. Download the **Steam Installer** from [store.steampowered.com](https://store.steampowered.com/about/).  
+4. Install Steam into your Wine prefix:  
+   ```bash
+   WINEPREFIX=~/AmongUsWine wine ~/Downloads/SteamSetup.exe
+   ```  
+5. Follow the installer prompts. Launch Steam from Terminal afterward:  
+   ```bash
+   WINEPREFIX=~/AmongUsWine wine ~/AmongUsWine/drive_c/Program\ Files\ \(x86\)/Steam/Steam.exe
+   ```  
+6. Log in to Steam and install **Among Us**.
+7. Locate the Among Us folder:  
+   - Open **Finder** > Go to **Go > Go to Folder** and paste:  
+     `~/AmongUsWine/drive_c/Program Files (x86)/Steam/steamapps/common/Among Us`  
+   - Drag the `version.dll` file into this fold.
+8. In Terminal, run:  
+   ```bash
+   WINEPREFIX=~/AmongUsWine winecfg
+   ```  
+   - Go to the **Libraries** tab.  
+   - Under **New override for library**, type `version`, click **Add**, then set it to **Native (Windows)**.  
+   - Click **Apply** > **OK**.
+9. Launch Steam from Terminal (as in Step 3.3).  
+- Start Among Us from your Steam library.  
+- Use **Command + Delete** to toggle SickoMenu in-game.
+
+---
 ### **Note:-**
+**For Method 2:-**
 - macOS Catalina+ Users: macOS versions ≥10.15 lack 32-bit support, which may cause issues. Use **Wine-Staging** (via Homebrew) for better compatibility:
   ```bash
   brew install --cask wine-stable
   ```
+  **For Method 3:-**
+- The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
+
+---
 ## ⌨️ Default Hotkeys
 - Show Menu - DELETE
 - Show Radar - INSERT

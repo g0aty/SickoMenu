@@ -5,11 +5,11 @@
 #include "utility.h"
 #include "state.hpp"
 #include "logger.h"
-#include <hunspell/hunspell.hxx>
+/*#include <hunspell/hunspell.hxx>
 #include <sstream>
 #include <string>
 #include <vector>
-#include "imgui.h" 
+#include "imgui.h"
 
 class SpellChecker {
 public:
@@ -41,15 +41,15 @@ void HighlightMisspelledWords(SpellChecker& checker, const std::string& text) {
     std::string word;
 
     while (iss >> word) {
-        
+
         bool isCorrect = checker.isCorrect(word);
 
         if (!isCorrect) {
-            
+
             ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", word.c_str());
         } else {
-           
-            ImGui::Text("%s ", word.c_str()); 
+
+            ImGui::Text("%s ", word.c_str());
         }
     }
 }
@@ -73,10 +73,10 @@ void RenderMenu() {
                 newWord = "";
             }
 
-           
+
         }
     } catch (const std::exception& e) {
-        
+
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Error: %s", e.what());
     }
 }
@@ -100,18 +100,18 @@ struct State {
 std::vector<std::string> State::SMAC_BadWords;
 
 int main() {
-    
 
-    while (true) { 
+
+    while (true) {
         RenderMenu();
-        
-       
+
+
     }
 
     return 0;
 }
 
-
+*/
 namespace GameTab {
     enum Groups {
         General,
@@ -121,7 +121,7 @@ namespace GameTab {
         Options
     };
 
-    static bool openGeneral = true; 
+    static bool openGeneral = true;
     static bool openChat = false;
     static bool openAnticheat = false;
     static bool openDestruct = false;
@@ -184,9 +184,9 @@ namespace GameTab {
                 State.Save();
             }
 
-            ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
+            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
             ImGui::Separator();
-            ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
+            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
             if (IsHost() || !State.SafeMode) {
                 CustomListBoxInt(" ", &State.SelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
@@ -255,19 +255,20 @@ namespace GameTab {
                         State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
                 }
             }
-            if (IsInLobby()) ImGui::SameLine();
+            if (IsInLobby() && !State.SafeMode) ImGui::SameLine();
             if (IsInLobby() && !State.SafeMode && ImGui::Button("Allow Everyone to NoClip")) {
                 for (auto p : GetAllPlayerControl()) {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
-				}
+                }
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            /*if (ImGui::Button("Spawn Dummy")) {
-                if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy());
-                if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy());
+            /*if (IsHost() && (IsInGame() || IsInLobby()) && ImGui::Button("Spawn Dummy")) {
+                auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+                if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy(outfit->fields.ColorId, convert_from_string(outfit->fields.PlayerName)));
+                if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy(outfit->fields.ColorId, convert_from_string(outfit->fields.PlayerName)));
             }*/
-            if (IsInGame() || IsInLobby()) {
+            if ((IsInGame() || IsInLobby()) && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
                 ImGui::SameLine();
                 if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
                     for (auto player : GetAllPlayerControl()) {
@@ -283,8 +284,8 @@ namespace GameTab {
             if (IsInGame() && ToggleButton("Disable Venting", &State.DisableVents)) {
                 State.Save();
             }
-            if (IsInGame()) ImGui::SameLine();
-            if (IsInGame() && ToggleButton("Spam Report", &State.SpamReport)) {
+            if (IsInGame() && (IsHost() || !State.SafeMode)) ImGui::SameLine();
+            if (IsInGame() && (IsHost() || !State.SafeMode) && ToggleButton("Spam Report", &State.SpamReport)) {
                 State.Save();
             }
 
@@ -340,6 +341,38 @@ namespace GameTab {
                         }
                     }
                 }
+
+                static int ventId = 0;
+                if (IsInGame() && (IsHost() || !State.SafeMode)) {
+                    std::vector<const char*> allVents;
+                    switch (State.mapType) {
+                    case Settings::MapType::Ship:
+                        allVents = SHIPVENTS;
+                        break;
+                    case Settings::MapType::Hq:
+                        allVents = HQVENTS;
+                        break;
+                    case Settings::MapType::Pb:
+                        allVents = PBVENTS;
+                        break;
+                    case Settings::MapType::Airship:
+                        allVents = AIRSHIPVENTS;
+                        break;
+                    case Settings::MapType::Fungle:
+                        allVents = FUNGLEVENTS;
+                        break;
+                    }
+                    ventId = std::clamp(ventId, 0, (int)allVents.size() - 1);
+
+                    ImGui::SetNextItemWidth(100 * State.dpiScale);
+                    CustomListBoxInt("Vent", &ventId, allVents);
+                    ImGui::SameLine();
+                    if (ImGui::Button("Teleport All to Vent")) {
+                        for (auto p : GetAllPlayerControl()) {
+                            State.rpcQueue.push(new RpcBootFromVent(p, (State.mapType == Settings::MapType::Hq) ? ventId + 1 : ventId)); //MiraHQ vents start from 1 instead of 0
+                        }
+                    }
+                }
             }
 
             if (IsInGame() || IsInLobby()) {
@@ -356,27 +389,44 @@ namespace GameTab {
                         else State.lobbyRpcQueue.push(new RpcForceScanner(p, false));
                     }
                 }
-                if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) ImGui::SameLine();
+                if (IsInGame() && !State.InMeeting && !State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) ImGui::SameLine();
                 if (IsInGame() && !State.InMeeting && ImGui::Button("Kick Everyone From Vents")) {
                     State.rpcQueue.push(new RpcBootAllVents());
                 }
-                if (State.InMeeting) ImGui::SameLine();
+                if ((IsHost() || !State.SafeMode) && State.InMeeting) ImGui::SameLine();
                 if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("End Meeting")) {
                     State.rpcQueue.push(new RpcEndMeeting());
                     State.InMeeting = false;
                 }
 
-                if (!State.SafeMode && ToggleButton("Force Name for Everyone", &State.ForceNameForEveryone)) {
-                    State.Save();
-                }
-                if (!State.SafeMode && InputString("Username", &State.hostUserName)) {
-                    State.Save();
-                }
+                if (!State.SafeMode && !IsHost()) {
+                    if (ImGui::Button("Set Name for Everyone")) {
+                        for (auto p : GetAllPlayerControl()) {
+                            if (IsInGame()) State.rpcQueue.push(new RpcForceName(p, std::format("{}<size=0><{}></size>", State.hostUserName, p->fields.PlayerId)));
+                            if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(p, std::format("{}<size=0><{}></size>", State.hostUserName, p->fields.PlayerId)));
+                        }
+                    }
+                    ImGui::SameLine();
+                    if (ToggleButton("Force Name for Everyone", &State.ForceNameForEveryone)) {
+                        State.Save();
+                    }
 
-                if (!State.SafeMode) CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
+                    if (InputString("Username", &State.hostUserName)) {
+                        State.Save();
+                    }
 
-                if (!State.SafeMode && ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
-                    State.Save();
+                    if (ImGui::Button("Set Color for Everyone")) {
+                        for (auto p : GetAllPlayerControl()) {
+                            if (IsInGame()) State.rpcQueue.push(new RpcForceColor(p, State.HostSelectedColorId));
+                            if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceColor(p, State.HostSelectedColorId));
+                        }
+                    }
+                    ImGui::SameLine();
+                    if (ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
+                        State.Save();
+                    }
+
+                    if (CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale)) State.Save();
                 }
             }
         }
@@ -522,7 +572,7 @@ namespace GameTab {
             if (ToggleButton("SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Abnormal Names", &State.SMAC_CheckBadNames)) State.Save();
-            
+
             if (ToggleButton("Abnormal Set Color", &State.SMAC_CheckColor)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Abnormal Set Cosmetics", &State.SMAC_CheckCosmetics)) State.Save();
@@ -586,15 +636,22 @@ namespace GameTab {
 
         if (openDestruct) {
             if (!IsInLobby() && !IsInGame()) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Only available in game/lobby!"));
-            if ((IsInLobby() || IsInGame()) && ToggleButton("Lag Everyone", &State.LagEveryone)) {
+            if (ToggleButton("Ignore Whitelisted Players", &State.Destruct_IgnoreWhitelist)) {
                 State.Save();
             }
-            if ((IsInLobby() || IsInGame()) && ToggleButton(IsInLobby() ? "Crash Server" : "Attempt to Crash", &State.CrashSpamReport)) {
-                if (IsInGame()) State.Save();
+            if (ToggleButton("Overload Everyone [Slow]", &State.OverloadEveryone)) {
+                State.Save();
             }
-           
-            if (IsInLobby() || IsInGame()) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("The server should fail after enabling this feature"));
-            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if (ToggleButton("Lag Everyone [Fast]", &State.LagEveryone)) {
+                State.Save();
+            }
+            if (ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {
+                State.Save();
+            }
+            if (IsHost() && ImGui::Button("Remove Map")) {
+                State.taskRpcQueue.push(new DestroyMap());
+            }
+            if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
         }
 
         if (openOptions) {
@@ -666,9 +723,9 @@ namespace GameTab {
                     ImGui::Text("Guardian Angel Protect Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F));
                     ImGui::Text("Guardian Angel Protection Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, 1.0F));
 
-                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
-                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
                     ImGui::Text("Max Shapeshifters: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Shapeshifter));
                     ImGui::Text("Shapeshifter Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Shapeshifter));

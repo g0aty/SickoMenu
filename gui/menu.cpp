@@ -48,7 +48,8 @@ namespace Menu {
 					  "Spoof Guest Account", "Use Custom Guest Friend Code", "Spoof Level", "Spoof Platform", "Disable Host Anticheat (+25 Mode)", "FPS"}},
 		{"Game", {"Player Speed Multiplier", "Kill Distance", "No Ability Cooldown", "Multiply Speed", "Modify Kill Distance", "Random Color", "Set Color", "Snipe Color", "Console",
 				  "Reset Appearance", "Kill Everyone", "Protect Everyone", "Disable Venting", "Spam Report", "Kill All Crewmates", "Kill All Impostors", "Kick Everyone From Vents",
-				  "Chat Message", "Send", "Send to AUM", "Spam", "Chat Presets", "Crash Server", "Attempt to Crash"}},
+				  "Chat Message", "Send", "Send to AUM", "Spam", "Chat Presets", "Attempt to Crash", "Overload Everyone", "Lag Everyone", "Enable Anticheat (SMAC)",
+				  "Whitelist", "Blacklist"}},
 		{"Self", {"Max Vision", "Wallhack", "Disable HUD", "Freecam", "Zoom", "Always show Chat Button", "Allow Ctrl+(C/V) in Chat", "Read Messages by Ghosts",
 				  "Read and Send AUM Chat", "Custom Name", "Custom Name for Everyone", "Server-sided Custom Name", "Reveal Roles", "Abbrv. Role", "Player Colored Dots Next To Names",
 				  "Show Player Info in Lobby", "Reveal Votes", "See Ghosts", "See Protections", "See Kill Cooldown", "Disable Kill Animation", "Dark Mode",
@@ -72,7 +73,7 @@ namespace Menu {
 		{"Debug", {"Enable Occlusion Culling", "Force Load Settings", "Force Save Settings", "Clear RPC Queues", "Log Unity Debug Messages", "Log Hook Debug Messages", "Colors", "Profiler",
 				   "Experiments", "Enable Anticheat (SMAC)", "Point System (Only for Hosting)"}},
 #endif
-		// Add more settings here as needed
+				   // Add more settings here as needed
 	};
 
 	void CloseAllOtherTabs(Tabs openTab) {
@@ -100,6 +101,7 @@ namespace Menu {
 
 	bool init = false;
 	bool firstRender = true;
+	bool isPanicWarning = false;
 
 	std::string ToLower(const std::string& str) {
 		std::string lowerStr = str;
@@ -112,12 +114,22 @@ namespace Menu {
 
 		std::string lowerQuery = ToLower(searchQuery);
 
+		std::vector<std::string> searchResults = {};
+
 		for (const auto& category : categories) {
 			for (const auto& setting : category.second) {
 				if (ToLower(setting).find(lowerQuery) != std::string::npos) {
-					ImGui::Text("Found in:\n%s", category.first.c_str());
+					searchResults.push_back(category.first);
 					break;
 				}
+			}
+		}
+		ImGui::TextColored(ImVec4(0.f, 0.f, 0.f, 0.f), "space");
+		if (searchResults.size() == 0) BoldText("No results.");
+		else {
+			BoldText(("Search Result" + std::string(searchResults.size() == 1 ? "" : "s")).c_str());
+			for (std::string i : searchResults) {
+				ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.f), i.c_str());
 			}
 		}
 	}
@@ -126,7 +138,7 @@ namespace Menu {
 		try {
 			if (!init)
 				Menu::Init();
-			std::string modText = "SickoMenu " + State.SickoVersion;
+			std::string modText = std::format("SickoMenu {}", State.SickoVersion, State.AprilFoolsMode ? (IsChatCensored() ? " [F***son Mode]" : " [Fuckson Mode]") : "");
 			ImGui::Begin("SickoMenu", &State.ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse);
 			static ImVec4 titleCol = State.MenuThemeColor;
 			if (State.RgbMenuTheme)
@@ -134,11 +146,18 @@ namespace Menu {
 			else
 				titleCol = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 			titleCol.w = 1.f;
-			ImGui::TextColored(titleCol, const_cast<char*>(modText.c_str()));
-			ImGui::SameLine(ImGui::GetWindowWidth() - 20 * State.dpiScale);
+			ImGui::TextColored(titleCol, modText.c_str());
+			if (State.AprilFoolsMode) {
+				ImGui::SameLine(0.f, 0.f);
+				ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), IsChatCensored() ? " [F***son Mode]" : " [Fuckson Mode]");
+			}
+			ImGui::SameLine(ImGui::GetWindowWidth() - 19 * State.dpiScale);
 			if (ImGui::Button("-")) State.ShowMenu = false; //minimize button
 			//ImGui::BeginTabBar("AmongUs#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+			// Search field
+			ImGui::SetNextItemWidth(90 * State.dpiScale); // Adjust the width of the input box
+			ImGui::InputTextWithHint("##Search", "Search...", searchQuery, IM_ARRAYSIZE(searchQuery));
 			if (ImGui::Selectable("About", openAbout)) {
 				CloseAllOtherTabs(Tabs::About);
 			}
@@ -179,11 +198,40 @@ namespace Menu {
 			if (State.showDebugTab && ImGui::Selectable("Debug", openDebug)) {
 				CloseAllOtherTabs(Tabs::Debug);
 			}
-#endif
-			// Search field
-			ImGui::SetNextItemWidth(50 * State.dpiScale); // Adjust the width of the input box
-			ImGui::InputTextWithHint("##Search", "Search", searchQuery, IM_ARRAYSIZE(searchQuery));
 			RenderSearchResults();
+
+			ImVec4 PanicCol = ImVec4(1.f, 0.f, 0.f, 1.f);
+			ImVec4 GreenCol = ImVec4(0.f, 1.f, 0.f, 1.f);
+			if (!isPanicWarning) {
+				ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 90 * State.dpiScale, ImGui::GetWindowHeight() - 20 * State.dpiScale));
+				if (ColoredButton(PanicCol, "Disable Menu")) {
+					isPanicWarning = State.PanicWarning;
+					if (!State.PanicWarning) State.PanicMode = true;
+				}
+			}
+			else {
+				bool panicKeybind = State.KeyBinds.Toggle_Sicko != 0x00;
+				ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 90 * State.dpiScale,
+					ImGui::GetWindowHeight() - 65 * State.dpiScale));
+				if (!panicKeybind) {
+					ImGui::TextColored(PanicCol, "No Panic");
+					ImGui::TextColored(PanicCol, "Keybind!");
+				}
+				else {
+					ImGui::TextColored(PanicCol, ("Press " + (std::string)KeyBinds::ToString(State.KeyBinds.Toggle_Sicko)).c_str());
+					ImGui::TextColored(PanicCol, ("to re-enable!"));
+				}
+				ImGui::TextColored(PanicCol, "Continue?");
+				if (ColoredButton(PanicCol, "Yes")) {
+					isPanicWarning = false;
+					State.PanicMode = true;
+				}
+				ImGui::SameLine();
+				if (ColoredButton(GreenCol, "No")) {
+					isPanicWarning = false;
+				}
+			}
+#endif
 
 			if (firstRender) {
 				firstRender = false;

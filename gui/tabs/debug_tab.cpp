@@ -14,7 +14,7 @@ namespace DebugTab {
 
 	void Render() {
 		ImGui::SameLine(100 * State.dpiScale);
-		ImGui::BeginChild("###Debug", ImVec2(500,0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
+		ImGui::BeginChild("###Debug", ImVec2(500, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 #ifndef _VERSION
 		if (ImGui::Button("Unload DLL"))
@@ -120,6 +120,7 @@ namespace DebugTab {
 			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "These features are in development and can break at any time.");
 			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Use these at your own risk.");
 			if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
+			if (ToggleButton("April Fools' Mode", &State.AprilFoolsMode)) State.Save();
 		}
 
 		ImGui::EndChild();

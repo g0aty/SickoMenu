@@ -16,8 +16,7 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 	auto roleRates = RoleRates(options, (int)allPlayers.size());
 
 	AssignPreChosenRoles(roleRates, assignedPlayers);
-
-	AssignPreChosenRoles(roleRates, assignedPlayers);
+	EvenOutImpostorRoleCounts(roleRates);
 	AssignRoles(roleRates, roleRates.ShapeshifterChance, RoleTypes__Enum::Shapeshifter, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.PhantomChance, RoleTypes__Enum::Phantom, allPlayers, assignedPlayers); //don't be sleep-deprived and mix-up phantom with tracker
 	AssignRoles(roleRates, 100, RoleTypes__Enum::Impostor, allPlayers, assignedPlayers);
@@ -108,12 +107,12 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		if (options.GetGameMode() == GameModes__Enum::HideNSeek && role == RoleTypes__Enum::Engineer)
 			roleCount = allPlayers.size() - 1;
 
-		int ssCount = roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter), phCount = roleRates.GetRoleCount(RoleTypes__Enum::Phantom), splImpCount = ssCount + phCount;
+		//int ssCount = roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter), phCount = roleRates.GetRoleCount(RoleTypes__Enum::Phantom), splImpCount = ssCount + phCount;
 
-		if (splImpCount > 0 && splImpCount >= maxImpostorAmount && (role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Phantom)) {
+		/*if (splImpCount > 0 && splImpCount >= maxImpostorAmount && (role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Phantom)) {
 			roleCount = (int)std::round((roleCount / splImpCount) * maxImpostorAmount); //go for the portion of the impostors selected
 			//In previous version, Sicko would assign more imps than MaxImposterAmount based on (shapeshifter + phantom) amount.
-		}
+		}*/
 
 		if (roleCount < 1)
 			return;
@@ -176,4 +175,24 @@ bool CanPlayerBeAssignedToRole(app::PlayerControl* player, std::vector<uint8_t>&
 	if (player == nullptr || std::find(assignedPlayers.begin(), assignedPlayers.end(), player->fields.PlayerId) != assignedPlayers.end())
 		return false;
 	return true;
+}
+
+void EvenOutImpostorRoleCounts(RoleRates& roleRates) {
+	for (int i = 0; i < 60; ++i) { // My sanity is lost after this code
+		int MoreThanImpostorCountOfImpostorRoles = preChosenImpCount + roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter) + roleRates.GetRoleCount(RoleTypes__Enum::Phantom);
+		if (roleRates.ImpostorCount < MoreThanImpostorCountOfImpostorRoles) {
+			uint8_t numImpRoles = 2; // Add support for more roles as they are added
+			switch (randi(1, numImpRoles)) {
+			case 1:
+				if (roleRates.ShapeshifterCount > 0)
+					roleRates.ShapeshifterCount--;
+				break;
+			case 2:
+				if (roleRates.PhantomCount > 0)
+					roleRates.PhantomCount--;
+				break;
+			}
+		}
+		else break;
+	}
 }
