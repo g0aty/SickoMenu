@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v4.2";
+    this->SickoVersion = "v4.2.1";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -64,6 +64,7 @@ void Settings::Load() {
         JSON_TRYGET("GradientTheme", this->GradientMenuTheme);
         JSON_TRYGET("MatchBackgroundWithTheme", this->MatchBackgroundWithTheme);
         JSON_TRYGET("SetName", this->SetName);
+        JSON_TRYGET("LightMode", this->LightMode);
         JSON_TRYGET("MenuThemeColor_R", this->MenuThemeColor.x);
         JSON_TRYGET("MenuThemeColor_G", this->MenuThemeColor.y);
         JSON_TRYGET("MenuThemeColor_B", this->MenuThemeColor.z);
@@ -356,6 +357,7 @@ void Settings::Save() {
                 { "GradientTheme", this->GradientMenuTheme },
                 { "MatchBackgroundWithTheme", this->MatchBackgroundWithTheme },
                 { "SetName", this->SetName },
+                { "LightMode", this->LightMode },
                 { "MenuThemeColor_R", this->MenuThemeColor.x },
                 { "MenuThemeColor_G", this->MenuThemeColor.y },
                 { "MenuThemeColor_B", this->MenuThemeColor.z },

@@ -342,6 +342,7 @@ public:
 
     bool FakeCameraUsage = false;
 
+    bool LightMode = false;
     ImVec4 MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
     ImVec4 MenuGradientColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
     ImVec4 MenuGradientColor1 = ImVec4(1.f, 0.f, 0.424f, 1.f);
@@ -531,6 +532,7 @@ public:
     bool Destruct_IgnoreWhitelist = false;
     bool OverloadEveryone = false;
     bool LagEveryone = false;
+    bool BrainrotEveryone = false;
 
     bool AprilFoolsMode = false;
 

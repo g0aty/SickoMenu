@@ -234,7 +234,7 @@ void ResetOriginalAppearance();
 void ControlAppearance(bool randomize);
 bool PlayerIsImpostor(NetworkedPlayerInfo* player);
 NetworkedPlayerInfo_PlayerOutfit* GetPlayerOutfit(NetworkedPlayerInfo* player, bool includeShapeshifted = false);
-Color GetRoleColor(RoleBehaviour* roleBehaviour);
+Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui = false);
 std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated = false);
 RoleTypes__Enum GetRoleTypesEnum(RoleType role);
 float GetDistanceBetweenPoints_Unity(const Vector2& p1, const Vector2& p2);

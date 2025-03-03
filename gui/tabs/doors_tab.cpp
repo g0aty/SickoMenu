@@ -127,6 +127,11 @@ namespace DoorsTab {
 						State.pinnedDoors.erase(std::remove(State.pinnedDoors.begin(), State.pinnedDoors.end(), State.selectedDoor), State.pinnedDoors.end());
 					}
 				}
+
+				if ((State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle) && ImGui::Button("Open Door"))
+				{
+					State.rpcQueue.push(new RpcOpenDoorsOfType(State.selectedDoor));
+				}
 			}
 			if (State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle)
 			{

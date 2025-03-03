@@ -45,9 +45,11 @@ namespace TasksTab {
 				if (!NormalPlayerTask_get_IsComplete(task, NULL))
 					ImGui::SameLine();
 
+				auto taskIncompleteCol = State.LightMode ? AmongUsColorToImVec4(app::Palette__TypeInfo->static_fields->Black) : AmongUsColorToImVec4(app::Palette__TypeInfo->static_fields->White);
+
 				ImGui::TextColored(NormalPlayerTask_get_IsComplete(task, NULL)
 					? ImVec4(0.0F, 1.0F, 0.0F, 1.0F)
-					: AmongUsColorToImVec4(app::Palette__TypeInfo->static_fields->White)
+					: taskIncompleteCol
 					, TranslateTaskTypes(task->fields._.TaskType));
 			}
 

@@ -302,7 +302,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (totalTasks != 0 && completedTasks == totalTasks) {
 					if (IsHost() && State.TournamentMode &&
 						std::find(State.tournamentAllTasksCompleted.begin(), State.tournamentAllTasksCompleted.end(), playerData->fields.PlayerId) == State.tournamentAllTasksCompleted.end()) {
-						UpdatePoints(playerData, 1);
+						UpdatePoints(playerData, 2);
+						LOG_DEBUG(std::format("Added 2 points to {} for completing tasks", ToString(playerData)).c_str());
 						State.tournamentAllTasksCompleted.push_back(playerData->fields.PlayerId);
 					}
 					if (IsHost() && State.TaskSpeedrun && !State.SpeedrunOver) {
@@ -564,11 +565,14 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
+			bool shouldSeeGhost = (State.ShowGhosts && !State.PanicMode) || localData->fields.IsDead;
 			if (playerData->fields.IsDead) {
-				PlayerControl_set_Visible(__this, State.ShowGhosts || localData->fields.IsDead, NULL);
+				PlayerControl_set_Visible(__this, shouldSeeGhost, NULL);
+				__this->fields.invisibilityAlpha = shouldSeeGhost ? 1.f : 0.f;
+				GameObject_SetActive(Component_get_gameObject((Component_1*)__this->fields.cosmetics->fields.nameText, NULL), shouldSeeGhost, NULL);
 			}
 
-			/*bool shouldSeePhantom = __this == *Game::pLocalPlayer || PlayerIsImpostor(localData) || localData->fields.IsDead;
+			bool shouldSeePhantom = __this == *Game::pLocalPlayer || PlayerIsImpostor(localData) || localData->fields.IsDead;
 			auto roleType = playerData->fields.RoleType;
 
 			if (roleType == RoleTypes__Enum::Phantom && !shouldSeePhantom) {
@@ -590,7 +594,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (isFullyVanished && __this->fields.invisibilityAlpha == 0.5f && !State.ShowPhantoms) {
 					PlayerControl_SetInvisibility(__this, true, NULL);
 				}
-			}*/
+			}
 
 			if (!State.FreeCam && __this == *Game::pLocalPlayer && State.prevCamPos.x != NULL) {
 				auto mainCamera = Camera_get_main(NULL);
@@ -844,19 +848,20 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 			if (std::find(State.tournamentAliveImpostors.begin(), State.tournamentAliveImpostors.end(), killerFc) != State.tournamentAliveImpostors.end()) {
 				if (State.tournamentKillCaps[killerFc] < 3.f) {
 					UpdatePoints(killerData, 1.f);
+					LOG_DEBUG(std::format("Added 1 point to {} for killing", ToString(killerData)).c_str());
 					State.tournamentKillCaps[killerFc] += 1.f;
 				}
 			}
 			if (!State.tournamentFirstMeetingOver) {
 				State.tournamentEarlyDeathPoints[convert_from_string(target->fields.FriendCode)] += 1.f;
 			}
-			auto targetFc = convert_from_string(targetData->fields.FriendCode);
+			/*auto targetFc = convert_from_string(targetData->fields.FriendCode);
 			for (auto i : State.tournamentCorrectCallers) {
 				if (i.first == targetFc && !GetPlayerDataById(i.second)->fields.IsDead) {
 					UpdatePoints(targetData, 1.f); //callout is correct, and the player that called them out dies before the impostor is voted
 					break;
 				}
-			}
+			}*/ // Removed on request
 		}
 
 		// ESP: Reset Kill Cooldown
@@ -890,6 +895,7 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 	}
 	PlayerControl_MurderPlayer(__this, target, resultFlags, method);
 
+	if (*Game::pShipStatus == NULL) return;
 	if (!State.PanicMode && State.ReportOnMurder && (!(__this == *Game::pLocalPlayer || PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))) || !State.PreventSelfReport)) {
 		PlayerControl_CmdReportDeadBody(*Game::pLocalPlayer, GetPlayerData(target), nullptr);
 	}
@@ -977,6 +983,7 @@ void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate
 void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_StartMeeting executed");
+	if (*Game::pShipStatus == NULL) return;
 	try {
 		if (!State.PanicMode && IsHost() && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) {
 			return;
@@ -1023,6 +1030,9 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 				}
 			}
 		}
+		if (*Game::pShipStatus == NULL && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting ||
+				callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))
+			return;
 		if (IsHost() && ((((!State.PanicMode && State.DisableMeetings) || (State.BattleRoyale || State.TaskSpeedrun)) &&
 			(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
 			((State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun)) &&
@@ -1077,7 +1087,6 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 							{
 								value = true;
 							}
-							playerInfo->fields._object->fields.MyPhysics->fields.Animations;
 						}
 					}
 				}
@@ -1093,7 +1102,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dGameObject_SetActive executed");
-	/*try {
+	try {
 		if (!State.PanicMode) {
 			if ((IsInGame() || IsInLobby()) && !value) { //If we're already rendering it, lets skip checking if we should
 				for (auto player : GetAllPlayerControl()) {
@@ -1122,13 +1131,15 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in GameObject_SetActive (PlayerControl)");
-	}*/
+	}
 	GameObject_SetActive(__this, value, method);
 }
 
 void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdReportDeadBody executed");
 	try {
+		if (*Game::pShipStatus == NULL) return;
+		if (ShipStatus__TypeInfo->static_fields->Instance == NULL) return;
 		if (!State.PanicMode && IsHost() && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) {
 			return;
 		}
@@ -1142,6 +1153,7 @@ void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, NetworkedPlayerInfo
 void dPlayerControl_RpcStartMeeting(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_RpcStartMeeting executed");
 	try {
+		if (*Game::pShipStatus == NULL) return;
 		if (!State.PanicMode && IsHost() && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) {
 			return;
 		}
@@ -1173,7 +1185,8 @@ void dPlayerControl_ProtectPlayer(PlayerControl* __this, PlayerControl* target, 
 			State.liveReplayEvents.emplace_back(std::make_unique<ProtectPlayerEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));
 		}
 		else {
-			LOG_ERROR("target is null"); // TownOfHost
+			SMAC_OnCheatDetected(__this, "Overloading");
+			return;
 		}
 	}
 	catch (...) {
@@ -1508,8 +1521,9 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
 void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdCheckProtect executed");
 	if (!State.PanicMode) {
-		if ((State.RealRole != RoleTypes__Enum::GuardianAngel || State.NoAbilityCD) && (IsHost() || !State.SafeMode || !State.PatchProtect))
+		if ((State.RealRole != RoleTypes__Enum::GuardianAngel || State.NoAbilityCD) && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
 			PlayerControl_RpcProtectPlayer(__this, target, GetPlayerOutfit(GetPlayerData(__this))->fields.ColorId, NULL);
+		}
 		else
 			PlayerControl_CmdCheckProtect(__this, target, method);
 	}
@@ -1522,7 +1536,7 @@ void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* 
 	uint32_t playerLevel = level + 1;
 
 	if (State.SMAC_CheckLevel && (IsInGame() ||
-		(State.SMAC_HighLevel != 0 && playerLevel >= (uint32_t)State.SMAC_HighLevel || (State.SMAC_LowLevel != 0 && playerLevel <= (uint32_t)State.SMAC_LowLevel)))) {
+		((State.SMAC_HighLevel != 0 && playerLevel >= (uint32_t)State.SMAC_HighLevel) || (State.SMAC_LowLevel != 0 && playerLevel <= (uint32_t)State.SMAC_LowLevel)))) {
 		SMAC_OnCheatDetected(__this, "Abnormal Level");
 	}
 

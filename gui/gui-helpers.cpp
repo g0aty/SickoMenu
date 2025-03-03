@@ -558,9 +558,13 @@ bool TabGroup(const char* label, bool highlight)
 }
 
 bool ColoredButton(ImVec4 col, const char* label) {
+	auto hoveredCol = ImVec4((float)(col.x / 1.25), (float)(col.y / 1.25), (float)(col.z / 1.25), (State.LightMode ? 0.3f : 0.86f) * State.MenuThemeColor.w);
+	auto activeCol = ImVec4((float)(col.x / 1.25), (float)(col.y / 1.25), (float)(col.z / 1.25), (State.LightMode ? 0.4f : 1.f) * State.MenuThemeColor.w);
 	ImGui::PushStyleColor(ImGuiCol_Text, col);
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hoveredCol);
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, activeCol);
 	bool ret = ImGui::Button(label);
-	ImGui::PopStyleColor();
+	ImGui::PopStyleColor(3);
 	return ret;
 }
 

@@ -1137,8 +1137,9 @@ bool PlayerIsImpostor(NetworkedPlayerInfo* player) {
 }
 
 
-Color GetRoleColor(RoleBehaviour* roleBehaviour) {
-	if (roleBehaviour == nullptr) return Palette__TypeInfo->static_fields->White;
+Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
+	if (roleBehaviour == nullptr)
+		return State.LightMode && gui ? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
 
 	app::Color c;
 	switch (roleBehaviour->fields.Role) {
@@ -1149,7 +1150,7 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour) {
 		break;
 	}
 	case RoleTypes__Enum::Crewmate: {
-		c = Palette__TypeInfo->static_fields->White;
+		c = State.LightMode && gui ? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
 		break;
 	}
 	case RoleTypes__Enum::Engineer: {

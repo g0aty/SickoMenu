@@ -38,7 +38,7 @@ namespace Menu {
 #ifdef _DEBUG
 	static bool openDebug = false;
 #endif
-	static char searchQuery[128] = "";
+	static std::string searchQuery = (std::string)"";
 
 	std::map<std::string, std::vector<std::string>> categories = {
 		{"Settings", {"Show Keybinds", "Allow Activating Keybinds while Chatting", "Always Show Menu on Startup", "Panic (Disable SickoMenu)",
@@ -109,8 +109,14 @@ namespace Menu {
 		return lowerStr;
 	}
 
+	static std::string StrRev(std::string str) {
+		std::string new_str = str;
+		std::reverse(new_str.begin(), new_str.end());
+		return new_str;
+	}
+
 	void RenderSearchResults() {
-		if (strlen(searchQuery) == 0) return;
+		if (searchQuery.size() == 0) return;
 
 		std::string lowerQuery = ToLower(searchQuery);
 
@@ -138,7 +144,7 @@ namespace Menu {
 		try {
 			if (!init)
 				Menu::Init();
-			std::string modText = std::format("SickoMenu {}", State.SickoVersion, State.AprilFoolsMode ? (IsChatCensored() ? " [F***son Mode]" : " [Fuckson Mode]") : "");
+			std::string modText = std::format("SickoMenu {}", State.SickoVersion);
 			ImGui::Begin("SickoMenu", &State.ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse);
 			static ImVec4 titleCol = State.MenuThemeColor;
 			if (State.RgbMenuTheme)
@@ -147,9 +153,10 @@ namespace Menu {
 				titleCol = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 			titleCol.w = 1.f;
 			ImGui::TextColored(titleCol, modText.c_str());
+			ImVec4 DiddyCol = ImVec4(0.79f, 0.03f, 1.f, 1.f);
 			if (State.AprilFoolsMode) {
 				ImGui::SameLine(0.f, 0.f);
-				ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), IsChatCensored() ? " [F***son Mode]" : " [Fuckson Mode]");
+				ImGui::TextColored(DiddyCol, IsChatCensored() || IsStreamerMode() ? " [F***son Mode]" : " [Fuckson Mode]");
 			}
 			ImGui::SameLine(ImGui::GetWindowWidth() - 19 * State.dpiScale);
 			if (ImGui::Button("-")) State.ShowMenu = false; //minimize button
@@ -157,7 +164,8 @@ namespace Menu {
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 			// Search field
 			ImGui::SetNextItemWidth(90 * State.dpiScale); // Adjust the width of the input box
-			ImGui::InputTextWithHint("##Search", "Search...", searchQuery, IM_ARRAYSIZE(searchQuery));
+			if (InputStringWithHint("##Search", "Search...", &searchQuery) && ToLower(searchQuery) == StrRev("nosduh"))
+				State.AprilFoolsMode = true;
 			if (ImGui::Selectable("About", openAbout)) {
 				CloseAllOtherTabs(Tabs::About);
 			}
@@ -185,7 +193,7 @@ namespace Menu {
 			if ((IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) && ImGui::Selectable("Tasks", openTasks)) {
 				CloseAllOtherTabs(Tabs::Tasks);
 			}
-			if (IsInGame() && ImGui::Selectable("Sabotage", openSabotage)) {
+			if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance != NULL && ImGui::Selectable("Sabotage", openSabotage)) {
 				CloseAllOtherTabs(Tabs::Sabotage);
 			}
 			if ((IsInGame() && !State.mapDoors.empty()) && ImGui::Selectable("Doors", openDoors)) {
@@ -198,13 +206,15 @@ namespace Menu {
 			if (State.showDebugTab && ImGui::Selectable("Debug", openDebug)) {
 				CloseAllOtherTabs(Tabs::Debug);
 			}
+#endif
 			RenderSearchResults();
 
 			ImVec4 PanicCol = ImVec4(1.f, 0.f, 0.f, 1.f);
 			ImVec4 GreenCol = ImVec4(0.f, 1.f, 0.f, 1.f);
 			if (!isPanicWarning) {
 				ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 90 * State.dpiScale, ImGui::GetWindowHeight() - 20 * State.dpiScale));
-				if (ColoredButton(PanicCol, "Disable Menu")) {
+				if (ColoredButton(State.AprilFoolsMode ? DiddyCol : PanicCol,
+					State.AprilFoolsMode ? StrRev(std::format("nosduH {}F", IsChatCensored() || IsStreamerMode() ? "***" : "kcu")).c_str() : "Disable Menu")) {
 					isPanicWarning = State.PanicWarning;
 					if (!State.PanicWarning) State.PanicMode = true;
 				}
@@ -231,7 +241,6 @@ namespace Menu {
 					isPanicWarning = false;
 				}
 			}
-#endif
 
 			if (firstRender) {
 				firstRender = false;

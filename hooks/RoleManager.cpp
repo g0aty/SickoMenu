@@ -30,6 +30,11 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 		AssignRoles(roleRates, roleRates.EngineerChance, RoleTypes__Enum::Engineer, allPlayers, assignedPlayers);
 		AssignRoles(roleRates, 100, RoleTypes__Enum::Crewmate, allPlayers, assignedPlayers);
 	}
+	/*auto allData = GetAllPlayerData();
+	il2cpp::List<List_1_NetworkedPlayerInfo_> allImpostors = allData;
+	for (size_t i = 0; i < allData.size(); i++) {
+		if (PlayerIsImpostor(allData[i])) allData.erase(i);
+	}*/
 }
 
 void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPlayers)

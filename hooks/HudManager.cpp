@@ -141,6 +141,16 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 	State.versionShower = __this;
 	VersionShower_Start(__this, method);
 	State.versionShowerDefaultText = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
+
+	auto now = std::chrono::system_clock::now();
+	std::time_t t = std::chrono::system_clock::to_time_t(now);
+	std::tm tm = {};
+	localtime_s(&tm, &t);  // Safe version of localtime
+	std::ostringstream oss;
+	oss << std::put_time(&tm, "%m-%d");
+	if (oss.str() == "04-01") State.AprilFoolsMode = true;
+	else LOG_DEBUG(oss.str());
+
 	/*if (State.PanicMode) return;
 	std::string watermarkText = std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
 	const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}</color></size></font>",
@@ -206,7 +216,7 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
 			std::string watermarkText = State.AprilFoolsMode ? std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[F{}son Mode]</color> by <#39f>g0aty</color> ~ ",
-				IsInGame() ? pingSize : 100, State.SickoVersion, IsChatCensored() ? "***" : "uck") :
+				IsInGame() ? pingSize : 100, State.SickoVersion, IsChatCensored() || IsStreamerMode() ? "***" : "uck") :
 				std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color> ~ ", IsInGame() ? pingSize : 100, State.SickoVersion);
 			std::string pingText = (isFreeplay ? "<size=150%><#0000>0</color></size>\n" : "") +
 				std::format("{}{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",

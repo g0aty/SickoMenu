@@ -3,6 +3,7 @@
 #include "utility.h"
 #include "game.h"
 #include "state.hpp"
+#include <regex>
 
 static std::string strToLower(std::string str) {
 	std::string new_str = "";
@@ -198,6 +199,17 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		State.MessageSent = true;
 	}
 
+	if (State.AprilFoolsMode && State.BrainrotEveryone && (IsInGame() || IsInLobby()) && (__this->fields.timeSinceLastMessage >= 3.5f || !State.SafeMode)) {
+		std::vector<std::string> brainrotList = { "Crazy? I was crazy once. They locked me in a room. A rubber room with Fucksons, and Fucksons give me rats.",
+			"I like my cheese drippy bruh", "Imagine if Ninja got a low taper fade", "I woke up in Ohio, feeling kinda fly", "What trollface are you?",
+			"Skibidi dop dop dop yes yes", "From the gyatt to the sus to the rizz to the mew", "Yeah I'm edging in Ohio, fanum taxing as I goon",
+			"You gotta give him that Hawk TUAH and spit on that thang", "Sticking out your gyatt for the rizzler", "I'm Baby Gronk from Ohio",
+			"19 dollar fortnite card, who wants it?", "Erm, what the sigma?", "I'll take a double triple Grimace Shake on a gyatt",
+			"I know I'm a SIGMA but that doesnt mean I can't have a GYATT too" };
+		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(brainrotList[randi(0, brainrotList.size() - 1)]), NULL);
+		State.MessageSent = true;
+	}
+
 	ChatController_Update(__this, method);
 
 	if (!State.PanicMode && State.DarkMode && __this->fields.freeChatField != NULL) {
@@ -229,51 +241,35 @@ void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, 
 	TextBoxTMP_SetText(__this, input, inputCompo, method);
 }
 
+std::string UncensorLink(const std::string& text) {
+	// Regular expression pattern to match URLs and email addresses
+	std::string pattern = R"((http[s]?://)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(/[\w-./?%&=]*)?|([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+))";
+	std::regex regex(pattern);
+
+	// Result string to store the censored output
+	std::string result = text;
+	auto begin = std::sregex_iterator(text.begin(), text.end(), regex);
+	auto end = std::sregex_iterator();
+
+	// Iterate through each match and replace periods with commas
+	for (std::sregex_iterator i = begin; i != end; ++i) {
+		std::string censored = i->str();
+		// Replace periods with commas in the match
+		for (auto& ch : censored) {
+			if (ch == '.') {
+				ch = ',';
+			}
+		}
+		result.replace(i->position(), i->length(), censored);
+	}
+
+	return result;
+}
+
 void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_RpcSendChat executed");
-	if (!State.PanicMode) {
-		auto playerToChatAs = (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-		if (State.ReadAndSendAumChat && convert_from_string(chatText).substr(0, 5) == "/aum ") {
-			if (IsInGame()) State.rpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), convert_from_string(chatText).substr(5), true));
-			if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), convert_from_string(chatText).substr(5), true));
-			return; //we don't want the chat to know we're using "aum"
-		}
-		if (State.activeWhisper && State.playerToWhisper.has_value()) {
-			MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
-				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,
-				State.playerToWhisper.get_PlayerControl().value_or(nullptr)->fields._.OwnerId, NULL);
-			std::string whisperMsg = std::format("{} whispers to you:\n{}",
-				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
-				convert_from_string(chatText));
-			if (whisperMsg.length() <= 100 || !State.SafeMode)
-				MessageWriter_WriteString(writer, convert_to_string(whisperMsg), NULL);
-			else MessageWriter_WriteString(writer, chatText, NULL);
-			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-
-			std::string whisperMsgSelf = std::format("You whisper to {}:\n{}",
-				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(State.playerToWhisper.get_PlayerData().value_or(nullptr), NULL))),
-				convert_from_string(chatText));
-			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, playerToChatAs, convert_to_string(whisperMsgSelf), false, NULL);
-		}
-		else if (__this == *Game::pLocalPlayer && !State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) {
-			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(State.playerToChatAs.get_PlayerId())->fields._.NetId,
-				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
-			MessageWriter_WriteString(writer, chatText, NULL);
-			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, GetPlayerControlById(State.playerToChatAs.get_PlayerId()), chatText, false, NULL);
-		}
-		else {
-			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
-				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
-			MessageWriter_WriteString(writer, chatText, NULL);
-			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, __this, chatText, false, NULL);
-		}
-	}
-	else {
-		PlayerControl_RpcSendChat(__this, chatText, NULL);
-	}
+	PlayerControl_RpcSendChat(__this, chatText, NULL); // This hook should be useless since dChatController_SendFreeChat sends rpc directly
 }
 
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method) {
@@ -286,4 +282,52 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 		TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
 	}
 	ChatBubble_SetText(__this, chatText, NULL);
+}
+
+void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
+	auto chatText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.text);
+	if (convert_to_string(UncensorLink(chatText))->fields.m_stringLength <= 120) chatText = UncensorLink(chatText);
+	if (chatText == "") return;
+	if (!State.PanicMode) {
+		auto playerToChatAs = (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+		if (State.ReadAndSendAumChat && chatText.substr(0, 5) == "/aum ") {
+			if (IsInGame()) State.rpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), chatText.substr(5), true));
+			if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), chatText.substr(5), true));
+			return; //we don't want the chat to know we're using "aum"
+		}
+		if (State.activeWhisper && State.playerToWhisper.has_value()) {
+			MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
+				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,
+				State.playerToWhisper.get_PlayerControl().value_or(nullptr)->fields._.OwnerId, NULL);
+			std::string whisperMsg = std::format("{} whispers to you:\n{}",
+				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
+				chatText);
+			if (whisperMsg.length() <= 100 || !State.SafeMode)
+				MessageWriter_WriteString(writer, convert_to_string(whisperMsg), NULL);
+			else MessageWriter_WriteString(writer, convert_to_string(chatText), NULL);
+			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+
+			std::string whisperMsgSelf = std::format("You whisper to {}:\n{}",
+				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(State.playerToWhisper.get_PlayerData().value_or(nullptr), NULL))),
+				chatText);
+			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, playerToChatAs, convert_to_string(whisperMsgSelf), false, NULL);
+		}
+		else if (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) {
+			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(State.playerToChatAs.get_PlayerId())->fields._.NetId,
+				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+			MessageWriter_WriteString(writer, convert_to_string(chatText), NULL);
+			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, GetPlayerControlById(State.playerToChatAs.get_PlayerId()), convert_to_string(chatText), false, NULL);
+		}
+		else {
+			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
+				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+			MessageWriter_WriteString(writer, convert_to_string(chatText), NULL);
+			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, *Game::pLocalPlayer, convert_to_string(chatText), false, NULL);
+		}
+	}
+	else {
+		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(chatText), NULL);
+	}
 }

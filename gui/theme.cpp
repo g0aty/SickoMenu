@@ -42,7 +42,7 @@ ImVec4 BG(float bg, float v = 1) {
 	}
 }
 
-#define IMGUI_TEXT(v) ImVec4(1.f, 1.f, 1.f, v * State.MenuThemeColor.w)
+#define IMGUI_TEXT(v) State.LightMode ? ImVec4(0.2f, 0.2f, 0.2f, v * State.MenuThemeColor.w) : ImVec4(1.f, 1.f, 1.f, v * State.MenuThemeColor.w)
 
 void ApplyTheme()
 {
@@ -90,6 +90,27 @@ void ApplyTheme()
 	style.Colors[ImGuiCol_TextSelectedBg] = MED(0.43f);
 	style.Colors[ImGuiCol_ModalWindowDarkening] = BG(0.230f, 0.73f);
 
+	if (State.LightMode) {
+		style.Colors[ImGuiCol_WindowBg] = BG(0.95f);
+		style.Colors[ImGuiCol_ChildBg] = BG(0.95f);
+		style.Colors[ImGuiCol_PopupBg] = BG(0.9f, 0.9f);
+		style.Colors[ImGuiCol_FrameBg] = BG(0.9f, 1.0f);
+		style.Colors[ImGuiCol_TitleBg] = BG(0.95f);
+		style.Colors[ImGuiCol_TitleBgActive] = BG(0.95f);
+		style.Colors[ImGuiCol_TitleBgCollapsed] = BG(0.95f);
+		style.Colors[ImGuiCol_MenuBarBg] = BG(0.9f, 0.5f);
+		style.Colors[ImGuiCol_ScrollbarBg] = BG(0.9f, 1.0f);
+		style.Colors[ImGuiCol_ScrollbarGrab] = BG(0.6f);
+		style.Colors[ImGuiCol_ScrollbarGrabHovered] = MED(0.8f);
+		style.Colors[ImGuiCol_Button] = BG(0.85f, 1.0f);
+		style.Colors[ImGuiCol_ButtonHovered] = MED(0.7f);
+		style.Colors[ImGuiCol_ButtonActive] = MED(0.9f);
+		style.Colors[ImGuiCol_ResizeGrip] = BG(0.9f, 0.1f);
+		style.Colors[ImGuiCol_ResizeGripHovered] = MED(0.8f);
+		style.Colors[ImGuiCol_ResizeGripActive] = MED(0.9f);
+		style.Colors[ImGuiCol_ModalWindowDarkening] = BG(0.9f, 0.7f);
+	}
+
 	style.WindowPadding = ImVec2(6, 4);
 	style.WindowRounding = 4.0f;
 	style.FramePadding = ImVec2(5, 2);
@@ -133,20 +154,25 @@ void ApplyTheme()
 	}
 	else rgbDelay--;
 
+	static int gradientDelay = 0;
 	static uint8_t gradientStep = 1;
-	static bool gradientIncreasing = true;
-	if (gradientStep == 1) {
-		gradientStep++;
-		gradientIncreasing = true;
+	if (gradientDelay <= 0) {
+		static bool gradientIncreasing = true;
+		if (gradientStep == 1) {
+			gradientStep++;
+			gradientIncreasing = true;
+		}
+		else if (gradientStep == 100) {
+			gradientStep--;
+			gradientIncreasing = false;
+		}
+		else {
+			if (gradientIncreasing) gradientStep++;
+			else gradientStep--;
+		}
+		gradientDelay = int(0.02 * GetFps());
 	}
-	else if (gradientStep == 100) {
-		gradientStep--;
-		gradientIncreasing = false;
-	}
-	else {
-		if (gradientIncreasing) gradientStep++;
-		else gradientStep--;
-	}
+	else gradientDelay--;
 
 	if (State.GradientMenuTheme) {
 		float stepR = float((State.MenuGradientColor2.x - State.MenuGradientColor1.x) / 100);

@@ -3,7 +3,7 @@
 #include "logger.h"
 #include "state.hpp"
 
-static bool isRestrictedGuestAccount = true;
+static bool isRestrictedGuestAccount = false;
 
 void fakeSuccessfulLogin(EOSManager* eosManager)
 {
@@ -24,10 +24,10 @@ void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_StartInitialLoginFlow executed");
 	if (!State.SpoofGuestAccount) {
 		EOSManager_StartInitialLoginFlow(__this, method);
-		isRestrictedGuestAccount = false;
 		return;
 	}
 	EOSManager_StartTempAccountFlow(__this, method);
+	isRestrictedGuestAccount = true;
 	EOSManager_CloseStartupWaitScreen(__this, method);
 }
 
@@ -178,7 +178,7 @@ void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* 
 		for (auto i : State.GuestFriendCode) {
 			newFriendCode += tolower(i);
 			if (newFriendCode.ends_with(" ")) {
-				isRestrictedGuestAccount = false; // You can use free chat in a guest account by simply putting a space after your friend code... W
+				isRestrictedGuestAccount = false;
 				break;
 			}
 		}
@@ -201,6 +201,7 @@ void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* 
 			}
 			TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);
 		}
+		isRestrictedGuestAccount = true;
 	}
 	EditAccountUsername_SaveUsername(__this, method);
 }

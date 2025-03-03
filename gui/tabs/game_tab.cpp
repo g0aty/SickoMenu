@@ -466,6 +466,7 @@ namespace GameTab {
 
             if (ToggleButton("Spam", &State.ChatSpam))
             {
+                if (State.BrainrotEveryone) State.BrainrotEveryone = false;
                 State.Save();
             }
             if ((IsHost() || !State.SafeMode) && State.ChatSpamMode) ImGui::SameLine();
@@ -652,13 +653,20 @@ namespace GameTab {
                 State.taskRpcQueue.push(new DestroyMap());
             }
             if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
+            if (State.AprilFoolsMode) {
+                ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), IsChatCensored() || IsStreamerMode() ? "[F***son Mode]" : "[Fuckson Mode]");
+                if (ToggleButton("Mog Everyone [Sigma]", &State.BrainrotEveryone)) {
+                    if (State.ChatSpam) State.ChatSpam = false;
+                    State.Save();
+                }
+            }
         }
 
         if (openOptions) {
-            if (GameOptions().HasOptions()) {
+            if ((IsInGame() || IsInLobby()) && GameOptions().HasOptions()) {
                 GameOptions options;
-                std::string hostText = std::format("Host: {}", RemoveHtmlTags(GetHostUsername()));
-                ImGui::Text(const_cast<char*>(hostText.c_str()));
+                /*std::string hostText = std::format("Host: {}", RemoveHtmlTags(GetHostUsername()));
+                ImGui::Text(const_cast<char*>(hostText.c_str()));*/
 
                 if (options.GetGameMode() == GameModes__Enum::Normal)
                 {

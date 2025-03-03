@@ -89,7 +89,6 @@ void Run(LPVOID lpParam) {
 	{
 		std::ostringstream ss;
 		ss << "\n\tSickoMenu - " << __DATE__ << " - " << __TIME__ << std::endl; // Log SickoMenu info
-		if (((std::string)__DATE__).starts_with("Apr 01")) State.AprilFoolsMode = true;
 		/*ss << "\tBuild: " << _CONFIGURATION_NAME << std::endl;
 		ss << "\tCommit: " << GetGitCommit() << " - " << GetGitBranch() << std::endl; // Log git info*/
 		ss << "\tVersion: " << State.SickoVersion << std::endl;

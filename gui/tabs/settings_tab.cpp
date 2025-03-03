@@ -156,6 +156,8 @@ namespace SettingsTab {
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
+			if (ToggleButton("Light Mode", &State.LightMode)) State.Save();
+			ImGui::SameLine();
 			if (!State.GradientMenuTheme) {
 				if (ImGui::ColorEdit3("Menu Theme Color", (float*)&State.MenuThemeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
 					State.Save();

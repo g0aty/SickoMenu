@@ -30,6 +30,7 @@ void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
 	try {
 		State.InMeeting = false;
 		calloutOver = false;
+		if (IsHost() && State.TournamentMode && !State.tournamentFirstMeetingOver) State.tournamentFirstMeetingOver = true;
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in MeetingHud_Close (MeetingHud)");
@@ -88,6 +89,43 @@ static void Transform_RevealAnonymousVotes(app::Transform* transform, Game::Vote
 				app::Palette__TypeInfo->static_fields->DisabledGrey,
 				(app::Renderer*)spriteRenderer, nullptr);
 		}
+	}
+}
+
+void ManageCallout(uint8_t playerId, uint8_t suspectIdx) {
+	if (!(!State.PanicMode && IsHost() && State.TournamentMode)) return;
+	/*for (auto p : GetAllPlayerControl()) {
+		if (p != *Game::pLocalPlayer) {
+			auto playerData = GetPlayerData(p);
+			PlayerControl_CmdCheckName(p, GetPlayerOutfit(playerData)->fields.PlayerName, NULL);
+		}
+	}*/
+	uint8_t alivePlayers = 0;
+	for (auto p : GetAllPlayerData()) {
+		if (!p->fields.IsDead) alivePlayers++;
+	}
+	if (alivePlayers < 7) return;
+	if (suspectIdx == Game::DeadVote || suspectIdx == Game::SkippedVote || suspectIdx == Game::MissedVote || suspectIdx == Game::HasNotVoted) return;
+	// Shadow voting
+	auto voter = GetPlayerDataById(playerId), target = GetPlayerDataById(suspectIdx);
+	if (voter == NULL || target == NULL || target->fields.IsDead) return;
+	std::string voterFc = convert_from_string(voter->fields.FriendCode), targetFc = convert_from_string(target->fields.FriendCode);
+	if (!PlayerIsImpostor(voter) &&
+		std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), voterFc) == State.tournamentCallers.end() &&
+		std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), targetFc) == State.tournamentCalledOut.end()) {
+		if (PlayerIsImpostor(target)) {
+			UpdatePoints(voter, 1.5); //CorrectCallout
+			State.tournamentCalloutPoints[voterFc] += 1.5;
+			LOG_DEBUG("Correct callout by " + ToString(target));
+			State.tournamentCorrectCallers[voterFc] = target->fields.PlayerId;
+		}
+		else {
+			UpdatePoints(voter, -1.5); //IncorrectCallout
+			State.tournamentCalloutPoints[voterFc] -= 1.5;
+			LOG_DEBUG("Incorrect callout by " + ToString(target));
+		}
+		State.tournamentCallers.push_back(voterFc);
+		State.tournamentCalledOut.push_back(targetFc);
 	}
 }
 
@@ -224,6 +262,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 						}
 						State.voteMonitor[playerData->fields.PlayerId] = playerVoteArea->fields.VotedFor;
 						STREAM_DEBUG(ToString(playerData) << " voted for " << ToString(playerVoteArea->fields.VotedFor));
+						ManageCallout(playerData->fields.PlayerId, playerVoteArea->fields.VotedFor);
 
 						// avoid duplicate votes
 
@@ -327,47 +366,4 @@ bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
 
 void dMeetingHud_CastVote(MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method) {
 	MeetingHud_CastVote(__this, playerId, suspectIdx, method);
-	if (State.Replay_ClearAfterMeeting)
-	{
-		Replay::Reset(false);
-	}
-	if (!State.PanicMode && IsHost() && State.TournamentMode) {
-		/*for (auto p : GetAllPlayerControl()) {
-			if (p != *Game::pLocalPlayer) {
-				auto playerData = GetPlayerData(p);
-				PlayerControl_CmdCheckName(p, GetPlayerOutfit(playerData)->fields.PlayerName, NULL);
-			}
-		}*/
-		uint8_t alivePlayers = 0;
-		for (auto p : GetAllPlayerData()) {
-			if (!p->fields.IsDead) alivePlayers++;
-		}
-		if (alivePlayers < 7) return;
-		if (suspectIdx == Game::DeadVote || suspectIdx == Game::SkippedVote || suspectIdx == Game::MissedVote || suspectIdx == Game::HasNotVoted) return;
-		if (calloutOver) return;
-		for (auto i : State.voteMonitor) {
-			// Shadow voting
-			auto voter = GetPlayerDataById(playerId), target = GetPlayerDataById(suspectIdx);
-			if (voter == NULL || target == NULL || target->fields.IsDead) continue;
-			std::string voterFc = convert_from_string(voter->fields.FriendCode), targetFc = convert_from_string(target->fields.FriendCode);
-			if (!PlayerIsImpostor(voter) &&
-				std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), voterFc) == State.tournamentCallers.end() &&
-				std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), targetFc) == State.tournamentCalledOut.end()) {
-				if (PlayerIsImpostor(target)) {
-					UpdatePoints(voter, 1.5); //CorrectCallout
-					State.tournamentCalloutPoints[voterFc] += 1.5;
-					LOG_DEBUG("Correct callout by " + ToString(target));
-					State.tournamentCorrectCallers[voterFc] = target->fields.PlayerId;
-				}
-				else {
-					UpdatePoints(voter, -1.5); //IncorrectCallout
-					State.tournamentCalloutPoints[voterFc] -= 1.5;
-					LOG_DEBUG("Incorrect callout by " + ToString(target));
-				}
-				State.tournamentCallers.push_back(voterFc);
-				State.tournamentCalledOut.push_back(targetFc);
-				calloutOver = true;
-			}
-		}
-	}
 }

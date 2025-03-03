@@ -19,7 +19,7 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 		if (!State.TempPanicMode && !State.PanicMode && player != NULL) {
 			auto localData = GetPlayerData(*Game::pLocalPlayer);
 			bool shouldSeePhantom = __this->fields.myPlayer == *Game::pLocalPlayer || PlayerIsImpostor(localData) || localData->fields.IsDead || State.ShowPhantoms;
-			bool shouldSeeGhost = localData->fields.IsDead || State.ShowGhosts;
+			bool shouldSeeGhost = (State.ShowGhosts && !State.PanicMode) || localData->fields.IsDead;
 			auto playerData = GetPlayerData(player);
 			auto roleType = playerData->fields.RoleType;
 			bool isFullyVanished = std::find(State.vanishedPlayers.begin(), State.vanishedPlayers.end(), playerData->fields.PlayerId) != State.vanishedPlayers.end();
@@ -53,10 +53,11 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 				}
 			}
 			else if (playerData->fields.IsDead) {
-				PlayerControl_set_Visible(player, shouldSeeGhost && !State.PanicMode, NULL);
-				player->fields.invisibilityAlpha = shouldSeeGhost && !State.PanicMode ? 1.f : 0.f;
+				PlayerControl_set_Visible(player, shouldSeeGhost, NULL);
+				player->fields.invisibilityAlpha = shouldSeeGhost ? 1.f : 0.f;
 			}
 			GameObject_SetActive(nameText, player->fields.invisibilityAlpha > 0.f, NULL);
+			PlayerControl_set_Visible(player, player->fields.invisibilityAlpha > 0.f, NULL);
 		}
 		app::PlayerPhysics_FixedUpdate(__this, method);
 	}

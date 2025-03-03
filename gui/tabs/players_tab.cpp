@@ -137,7 +137,7 @@ namespace PlayersTab {
 				ImGui::Dummy(ImVec2(0, 0) * State.dpiScale);
 				ImGui::SameLine();
 
-				ImVec4 nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
+				ImVec4 nameColor = State.LightMode ? AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Black) : AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
 				if (IsInMultiplayerGame() || IsInLobby()) {
 					if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), playerFc) != State.BlacklistFriendCodes.end()) {
 						playerName = "[-] " + playerName;
@@ -164,11 +164,11 @@ namespace PlayersTab {
 					}
 				}
 
-				if (State.RevealRoles && IsInGame())
+				if (State.RevealRoles)
 				{
 					std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
 					playerName = playerName + " (" + roleName + ")";
-					nameColor = AmongUsColorToImVec4(GetRoleColor(playerData->fields.Role));
+					nameColor = AmongUsColorToImVec4(GetRoleColor(playerData->fields.Role, true));
 				}
 
 				if (playerData->fields.IsDead)

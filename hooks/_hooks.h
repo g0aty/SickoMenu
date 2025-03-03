@@ -78,6 +78,7 @@ void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, Method
 void dEOSManager_Update(EOSManager* __this, MethodInfo* method);
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method);
 void dChatController_Update(ChatController* __this, MethodInfo* method);
+void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method);
 bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t i, MethodInfo* method);
 void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, MethodInfo* method);
 void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method);

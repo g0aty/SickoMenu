@@ -11,6 +11,7 @@ RpcReportBody::RpcReportBody(const PlayerSelection& target)
 
 void RpcReportBody::Process()
 {
+	if (*Game::pShipStatus == NULL) return;
 	if (IsHost() && !State.PanicMode && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) return;
 	PlayerControl_CmdReportDeadBody(*Game::pLocalPlayer, reportedPlayer.get_PlayerData().value_or(nullptr), nullptr);
 }
@@ -23,6 +24,7 @@ RpcForceReportBody::RpcForceReportBody(PlayerControl* Player, const PlayerSelect
 
 void RpcForceReportBody::Process()
 {
+	if (*Game::pShipStatus == NULL) return;
 	if (Player == nullptr) return;
 	if (IsHost() && !State.PanicMode && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) return;
 	PlayerControl_CmdReportDeadBody(Player, reportedPlayer.get_PlayerData().value_or(nullptr), nullptr);
@@ -36,6 +38,7 @@ RpcForceMeeting::RpcForceMeeting(PlayerControl* Player, const PlayerSelection& t
 
 void RpcForceMeeting::Process()
 {
+	if (*Game::pShipStatus == NULL) return;
 	if (Player == nullptr) return;
 	if (IsHost() && !State.PanicMode && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) return;
 	PlayerControl_RpcStartMeeting(Player, reportedPlayer.get_PlayerData().value_or(nullptr), nullptr);
@@ -50,13 +53,14 @@ RpcSpamMeeting::RpcSpamMeeting(PlayerControl* Player, PlayerControl* target, boo
 
 void RpcSpamMeeting::Process()
 {
+	if (*Game::pShipStatus == NULL) return;
 	if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) return;
 	if (IsHost() && !State.PanicMode && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) return;
 	if (!inMeeting) PlayerControl_CmdReportDeadBody(Player, GetPlayerData(target), nullptr);
 	for (int i = 0; i < 200; ++i) {
 		if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) break;
 		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerData(target)->fields._.NetId,
-			uint8_t(RpcCalls__Enum::StartMeeting), SendOption__Enum::None, GetPlayerData(target)->fields._.OwnerId, NULL);
+			uint8_t(RpcCalls__Enum::ReportDeadBody), SendOption__Enum::None, GetPlayerData(target)->fields._.OwnerId, NULL);
 		MessageWriter_WriteByte(writer, 255, NULL);
 		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 	}

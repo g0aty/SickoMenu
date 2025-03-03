@@ -98,7 +98,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 }
                 std::string watermarkOffset = State.CurrentScene == "MMOnline" ? "<#0000>00000</color>" : "";
                 std::string watermarkText = State.AprilFoolsMode ? std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[F{}son Mode]</color> by <#39f>g0aty</color>",
-                    State.SickoVersion, IsChatCensored() ? "***" : "uck") :
+                    State.SickoVersion, IsChatCensored() || IsStreamerMode() ? "***" : "uck") :
                     std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
                 const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}</color></size></font>",
                     watermarkSize, State.DarkMode ? "<#666>" : "<#fff>", State.versionShowerDefaultText,
@@ -468,7 +468,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             static int reportDelays = 0;
-            if (reportDelays <= 0 && State.CrashSpamReport && IsInGame()) {
+            if (reportDelays <= 0 && State.CrashSpamReport && IsInGame() && !State.GameLoaded) {
                 for (auto p : GetAllPlayerControl()) {
                     State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
                     return;
@@ -726,8 +726,15 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             if ((IsInGame() || IsInLobby()) && State.GodMode && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
-                if (State.protectMonitor.find((*Game::pLocalPlayer)->fields.PlayerId) == State.protectMonitor.end())
-                    PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
+                if (State.protectMonitor.find((*Game::pLocalPlayer)->fields.PlayerId) == State.protectMonitor.end()) {
+                    for (auto p : GetAllPlayerControl()) {
+                        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, (uint8_t)RpcCalls__Enum::ProtectPlayer,
+                            SendOption__Enum::None, p->fields._.OwnerId, NULL);
+                        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)(*Game::pLocalPlayer), NULL);
+                        MessageWriter_WriteInt32(writer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
+                        InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                    }
+                }
             }
 
             if (IsInGame() || IsInLobby()) {
@@ -1073,7 +1080,7 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
             else endReason = GameOverReason__Enum::ImpostorByKill;
         }
         if (State.TaskSpeedrun) return;
-        if (IsHost() && State.TournamentMode) {
+        if (IsHost()) {
             bool impostorWin = false;
             switch (endReason) {
             case GameOverReason__Enum::HideAndSeek_ByKills:
@@ -1084,33 +1091,51 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
                 impostorWin = true;
                 break;
             }
+            std::string winnersText = "Game Winners:\n";
+            int count = 0;
             for (auto p : GetAllPlayerData()) {
-                auto friendCode = convert_from_string(p->fields.FriendCode);
-                if (impostorWin) {
-                    if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
-                        UpdatePoints(p, 2); //AllImpsWin
-                        State.tournamentWinPoints[friendCode] += 1;
+                if (p == NULL) continue;
+                if (State.TournamentMode) {
+                    auto friendCode = convert_from_string(p->fields.FriendCode);
+                    if (impostorWin) {
+                        if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
+                            UpdatePoints(p, 2); //AllImpsWin
+                            LOG_DEBUG(std::format("Added 2 points to {} for all impostors win", ToString(p)).c_str());
+                            State.tournamentWinPoints[friendCode] += 1;
+                        }
+                        else if (PlayerIsImpostor(p)) {
+                            if (State.tournamentAliveImpostors.size() == 1 && !p->fields.IsDead) {
+                                UpdatePoints(p, 2); //ImpWin
+                                LOG_DEBUG(std::format("Added 2 points to {} for solo win", ToString(p)).c_str());
+                                State.tournamentWinPoints[friendCode] += 2;
+                            }
+                            else {
+                                UpdatePoints(p, 1); //ImpWin
+                                LOG_DEBUG(std::format("Added 1 point to {} for impostor win", ToString(p)).c_str());
+                                State.tournamentWinPoints[friendCode] += 1;
+                            }
+                        }
                     }
-                    else if (PlayerIsImpostor(p)) {
-                        if (State.tournamentAliveImpostors.size() == 1) {
-                            UpdatePoints(p, 2); //ImpWin
-                            State.tournamentWinPoints[friendCode] += 2;
+                    else {
+                        if (PlayerIsImpostor(p)) {
+                            UpdatePoints(p, -1); //ImpLose
+                            LOG_DEBUG(std::format("Deducted -1 point from {} for impostor loss", ToString(p)).c_str());
                         }
                         else {
-                            UpdatePoints(p, 1); //ImpWin
+                            UpdatePoints(p, 2); //CrewWin
+                            LOG_DEBUG(std::format("Added 2 points to {} for crewmate win", ToString(p)).c_str());
                             State.tournamentWinPoints[friendCode] += 1;
                         }
                     }
                 }
-                else {
-                    if (PlayerIsImpostor(p))
-                        UpdatePoints(p, -1); //ImpLose
-                    else {
-                        UpdatePoints(p, 2); //CrewWin
-                        State.tournamentWinPoints[friendCode] += 1;
-                    }
+                auto name = convert_from_string(GetPlayerOutfit(p)->fields.PlayerName);
+                if ((impostorWin && PlayerIsImpostor(p)) || (!impostorWin && !PlayerIsImpostor(p))) {
+                    winnersText += name + "\n";
+                    count++;
                 }
             }
+            if (count == 0) LOG_DEBUG("No one was a winner in the game.");
+            else LOG_DEBUG(winnersText.substr(0, (size_t)winnersText.size() - 2));
             State.tournamentKillCaps.clear();
             State.tournamentAssignedImpostors.clear();
             State.tournamentAliveImpostors.clear();
@@ -1122,7 +1147,7 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
     catch (...) {
         LOG_ERROR("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
     }
-    return GameManager_RpcEndGame(__this, endReason, showAd, method);
+    GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
 
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* killer, NetworkedPlayerInfo* victim, MethodInfo* method) {

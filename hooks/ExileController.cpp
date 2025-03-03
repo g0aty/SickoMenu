@@ -11,7 +11,6 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 	app::ExileController_ReEnableGameplay(__this, method);
 
 	try {// ESP: Reset Kill Cooldown
-		if (IsHost() && State.TournamentMode && !State.tournamentFirstMeetingOver) State.tournamentFirstMeetingOver = true;
 		for (auto pc : GetAllPlayerControl()) {
 			if (auto player = PlayerSelection(pc).validate();
 				player.has_value() && !player.is_LocalPlayer() && !player.is_Disconnected()) {
@@ -22,8 +21,9 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 				}
 			}
 		}
-		if (State.GodMode && (IsHost() || !State.SafeMode || !State.PatchProtect))
+		if (State.GodMode && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
 			PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
+		}
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in ExileController_ReEnableGameplay (ExileController)");
@@ -39,8 +39,10 @@ void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerI
 			if (PlayerIsImpostor(exiled)) {
 				UpdatePoints(exiled, -1); //ImpVoteOut
 				for (auto i : State.voteMonitor) {
-					if (i.second == exiled->fields.PlayerId && !PlayerIsImpostor(GetPlayerDataById(i.first)))
+					if (i.second == exiled->fields.PlayerId && !PlayerIsImpostor(GetPlayerDataById(i.first))) {
 						UpdatePoints(GetPlayerDataById(i.first), 1); //ImpVoteOutCorrect
+						LOG_DEBUG(std::format("Added 1 point to {} for voting out impostor correctly", ToString(i.first)).c_str());
+					}
 				}
 				auto exiledFc = convert_from_string(exiled->fields.FriendCode);
 				auto pos = std::find(State.tournamentAliveImpostors.begin(), State.tournamentAliveImpostors.end(), exiledFc);
@@ -53,12 +55,15 @@ void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerI
 						if (State.tournamentKillCaps[friendCode] < 3.f) {
 							State.tournamentKillCaps[friendCode] += 1.f;
 							UpdatePoints(p, 1); //CrewVoteOut
+							LOG_DEBUG(std::format("Added 1 point to {} for voting out crewmate", ToString(p)).c_str());
 						}
 					}
 				}
 				for (auto i : State.voteMonitor) {
-					if (i.second == exiled->fields.PlayerId && !PlayerIsImpostor(GetPlayerDataById(i.first)))
+					if (i.second == exiled->fields.PlayerId && !PlayerIsImpostor(GetPlayerDataById(i.first))) {
 						UpdatePoints(GetPlayerDataById(i.first), -1); //ImpVoteOutIncorrect
+						LOG_DEBUG(std::format("Deducted 1 point from {} for voting out crewmate", ToString(i.first)).c_str());
+					}
 				}
 			}
 		}
