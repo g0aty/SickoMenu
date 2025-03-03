@@ -161,15 +161,14 @@ void RpcSendChat::Process()
 			uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
 		MessageWriter_WriteString(writer, convert_to_string(msg), NULL);
 		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-		ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
 	}
 	else {
 		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
 			uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, target->fields._.OwnerId, NULL);
 		MessageWriter_WriteString(writer, convert_to_string(msg), NULL);
 		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-		ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
 	}
+	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
 }
 
 RpcSendChatNote::RpcSendChatNote(PlayerControl* player, int32_t type)

@@ -179,6 +179,7 @@ bool IsChatCensored();
 std::string GetHostUsername(bool colored = false);
 std::string RemoveHtmlTags(std::string html_str);
 bool IsNameValid(std::string str);
+bool IsChatValid(std::string msg);
 int GetMaxImpostorAmount(int playerAmount);
 int GenerateRandomNumber(int min, int max);
 NetworkedPlayerInfo* GetPlayerData(PlayerControl* player);

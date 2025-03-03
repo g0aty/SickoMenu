@@ -1383,7 +1383,6 @@ void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* 
 
 void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader* reader, bool initialState, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dNetworkedPlayerInfo_Deserialize executed");
-
 	std::string friendCode = convert_from_string(__this->fields.FriendCode);
 	uint8_t id = __this->fields.PlayerId;
 	if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end()) {

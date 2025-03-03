@@ -1353,7 +1353,7 @@ namespace PlayersTab {
 		static int blinkDelay = 0;
 		static bool isBlinking = false;
 		if (State.BlinkPlayersTab && !isBlinking) {
-			blinkDelay = 30;
+			blinkDelay = int(0.5 * GetFps());
 			isBlinking = true;
 		}
 		if (isBlinking && State.BlinkPlayersTab) {

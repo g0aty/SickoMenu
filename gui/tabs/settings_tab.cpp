@@ -202,30 +202,41 @@ namespace SettingsTab {
 			}
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 #endif
-			if (InputString("Username", &State.userName)) {
-				State.Save();
+			if (!IsHost() && !State.SafeMode && !IsNameValid(State.userName)) {
+				ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.f, 0.f, State.MenuThemeColor.w));
+				if (InputString("Username", &State.userName)) State.Save();
+				ImGui::PopStyleColor();
 			}
+			else if (InputString("Username", &State.userName)) State.Save();
 
-			if (!(IsHost() || !State.SafeMode)) {
+			if (!IsNameValid(State.userName) && !IsHost() && State.SafeMode) {
+				if (State.userName == "")
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Empty username gets detected by anticheat. This name will be ignored.");
 				if (State.userName.length() >= (size_t)13)
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username is too long, gets detected by anticheat. This name will be ignored.");
 				else if (!IsNameValid(State.userName))
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username contains characters blocked by anticheat. This name will be ignored.");
+				else
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username gets detected by anticheat. This name will be ignored.");
 			}
 
-			if ((IsInGame() || IsInLobby()) && (IsNameValid(State.userName) || (IsHost() || !State.SafeMode)) && ImGui::Button("Set Name")) {
-				if (IsInGame())
-					State.rpcQueue.push(new RpcSetName(State.userName));
-				else if (IsInLobby())
-					State.lobbyRpcQueue.push(new RpcSetName(State.userName));
-				LOG_INFO("Successfully set in-game name to \"" + State.userName + "\"");
+			if (IsNameValid(State.userName) || IsHost() || !State.SafeMode) {
+				if ((IsInGame() || IsInLobby()) && ImGui::Button("Set Name")) {
+					if (IsInGame())
+						State.rpcQueue.push(new RpcSetName(State.userName));
+					else if (IsInLobby())
+						State.lobbyRpcQueue.push(new RpcSetName(State.userName));
+					LOG_INFO("Successfully set in-game name to \"" + State.userName + "\"");
+				}
+				if (IsNameValid(State.userName)) {
+					if ((IsInGame() || IsInLobby())) ImGui::SameLine();
+					if (ImGui::Button("Set as Account Name")) {
+						SetPlayerName(State.userName);
+						LOG_INFO("Successfully set account name to \"" + State.userName + "\"");
+					}
+				}
+				ImGui::SameLine();
 			}
-			if ((IsInGame() || IsInLobby())) ImGui::SameLine();
-			if (IsNameValid(State.userName) && ImGui::Button("Set as Account Name")) {
-				SetPlayerName(State.userName);
-				LOG_INFO("Successfully set account name to \"" + State.userName + "\"");
-			}
-			ImGui::SameLine();
 			if (ToggleButton("Automatically Set Name", &State.SetName)) {
 				State.Save();
 			}
@@ -290,9 +301,9 @@ namespace SettingsTab {
 				if (currentTime - timer < 5.0f) {
 					ImGui::SameLine();
 					if (State.SafeMode)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "SafeMode is Enabled!");
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Safe Mode is Enabled!");
 					else
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "SafeMode is Disabled! (The likelihood of getting banned increases)");
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Safe Mode is Disabled! (The likelihood of getting banned increases)");
 				}
 				else {
 					SafeModeNotification = false;

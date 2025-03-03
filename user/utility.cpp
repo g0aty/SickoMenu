@@ -360,6 +360,24 @@ bool IsNameValid(std::string str) {
 	return true;
 }
 
+bool IsChatValid(std::string msg) {
+	if (!State.SafeMode) return true;
+	/*(std::vector<std::string> properChars = {}; //check properly for length
+	String* blank = convert_to_string("");
+	std::string last_char = "";
+	for (size_t i = 0; i < str.length(); i++) {
+		if (convert_to_string(last_char + str[i]) == blank) {
+			last_char += str[i];
+			continue;
+		}
+		properChars.push_back(last_char + str[i]);
+		last_char = "";
+	}*/
+	if (convert_to_string(msg)->fields.m_stringLength > 120) return false;
+	if (msg.find("<") != std::string::npos || msg.find(">") != std::string::npos || msg.find("[") != std::string::npos) return false;
+	return true;
+}
+
 NetworkedPlayerInfo* GetPlayerData(PlayerControl* player) {
 	if (player) return app::PlayerControl_get_Data(player, NULL);
 	return NULL;

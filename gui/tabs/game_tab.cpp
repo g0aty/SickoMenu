@@ -432,10 +432,14 @@ namespace GameTab {
         }
 
         if (openChat) {
-            if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) {
-                State.Save();
+            bool msgAllowed = IsChatValid(State.chatMessage);
+            if (!msgAllowed) {
+                ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.f, 0.f, State.MenuThemeColor.w));
+                if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) State.Save();
+                ImGui::PopStyleColor();
             }
-            if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && State.chatMessage.size() <= 120) {
+            else if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) State.Save();
+            if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && IsChatValid(State.chatMessage)) {
                 ImGui::SameLine();
                 if (ImGui::Button("Send"))
                 {
