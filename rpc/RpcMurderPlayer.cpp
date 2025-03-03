@@ -143,23 +143,33 @@ void RpcVanish::Process()
 	else PlayerControl_CmdCheckVanish(Player, 1.f, NULL);
 }
 
-RpcSendChat::RpcSendChat(PlayerControl* Player, std::string_view msg)
+RpcSendChat::RpcSendChat(PlayerControl* Player, std::string_view msg, PlayerControl* target)
 {
 	this->Player = Player;
 	this->msg = msg;
+	this->target = target;
 }
 
 void RpcSendChat::Process()
 {
 	if (!PlayerSelection(Player).has_value()) return;
-
+	if (State.ChatCooldown < 3.f) return;
 	//PlayerControl_RpcSendChat(Player, convert_to_string(msg), NULL);
 	//this allows us to do formatting in chat message
-	auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
-		uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
-	MessageWriter_WriteString(writer, convert_to_string(msg), NULL);
-	InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
+	if (target == NULL) {
+		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
+			uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+		MessageWriter_WriteString(writer, convert_to_string(msg), NULL);
+		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+		ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
+	}
+	else {
+		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
+			uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, target->fields._.OwnerId, NULL);
+		MessageWriter_WriteString(writer, convert_to_string(msg), NULL);
+		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+		ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
+	}
 }
 
 RpcSendChatNote::RpcSendChatNote(PlayerControl* player, int32_t type)

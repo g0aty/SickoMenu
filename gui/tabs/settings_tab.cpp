@@ -374,11 +374,12 @@ namespace SettingsTab {
 				}
 				State.Save();
 			}
-			/*if (ToggleButton("Spoof RPC", &State.RPCSpoof)) {
-				State.Save();
+			if (State.DisableHostAnticheat) {
+				BoldText("Warning (+25 Mode)", ImVec4(1.f, 0.f, 0.f, 1.f));
+				BoldText("With this option enabled, you can only find public lobbies with +25 enabled.");
+				BoldText("You may not find any public lobbies in the game listing due to this.");
+				BoldText("This is intended behaviour, do NOT report it as a bug.");
 			}
-			if (CustomListBoxInt("RPC", &State.RPC, RPC))
-				State.Save();*/
 		}
 
 		if (openKeybinds) {

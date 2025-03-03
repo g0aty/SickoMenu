@@ -565,18 +565,44 @@ namespace PlayersTab {
 						}
 					}
 				}*/
-				if (!selectedPlayer.is_LocalPlayer() && (IsInMultiplayerGame() || IsInLobby()) && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
+				if (selectedPlayers.size() == 1 && !selectedPlayer.is_LocalPlayer() && (IsInMultiplayerGame() || IsInLobby()) && (IsHost() || !State.SafeMode || !State.PatchProtect || State.AprilFoolsMode)) {
 					ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Destructive");
-					auto res1 = std::find(State.overloadedPlayers.begin(), State.overloadedPlayers.end(), State.selectedPlayer.get_PlayerId());
-					auto res2 = std::find(State.laggedPlayers.begin(), State.laggedPlayers.end(), State.selectedPlayer.get_PlayerId());
-					if (res1 == State.overloadedPlayers.end()) {
-						if (ImGui::Button("Overload [Slow]")) {
-							State.overloadedPlayers.push_back(State.selectedPlayer.get_PlayerId());
+					if (!State.PatchProtect) {
+						auto res1 = std::find(State.overloadedPlayers.begin(), State.overloadedPlayers.end(), State.selectedPlayer.get_PlayerId());
+						auto res2 = std::find(State.laggedPlayers.begin(), State.laggedPlayers.end(), State.selectedPlayer.get_PlayerId());
+						if (res1 == State.overloadedPlayers.end()) {
+							if (ImGui::Button("Overload [Slow]")) {
+								State.overloadedPlayers.push_back(State.selectedPlayer.get_PlayerId());
+							}
+						}
+						if (res2 == State.laggedPlayers.end()) {
+							if (ImGui::Button("Lag [Fast]")) {
+								State.laggedPlayers.push_back(State.selectedPlayer.get_PlayerId());
+							}
 						}
 					}
-					if (res2 == State.laggedPlayers.end()) {
-						if (ImGui::Button("Lag [Fast]")) {
-							State.laggedPlayers.push_back(State.selectedPlayer.get_PlayerId());
+					if (State.AprilFoolsMode && State.ChatCooldown >= 3.5f) {
+						if (ImGui::Button("Mog Player [Sigma]")) {
+							std::vector<std::string> brainrotList = { "Crazy? I was crazy once. They locked me in a room. A rubber room with Fucksons, and Fucksons give me rats.",
+								"I like my cheese drippy bruh", "Imagine if Ninja got a low taper fade", "I woke up in Ohio, feeling kinda fly", "What trollface are you?",
+								"Skibidi dop dop dop yes yes", "From the gyatt to the sus to the rizz to the mew", "Yeah I'm edging in Ohio, fanum taxing as I goon",
+								"You gotta give him that Hawk TUAH and spit on that thang", "Sticking out your gyatt for the rizzler", "I'm Baby Gronk from Ohio",
+								"19 dollar fortnite card, who wants it?", "Erm, what the sigma?", "I'll take a double triple Grimace Shake on a gyatt",
+								"I know I'm a SIGMA but that doesnt mean I can't have a GYATT too", "Just put the fries in the bag bro", "Stay on the sigma grindset",
+								"Sigma Sigma on the wall, who is the skibidiest of them all?", "Duke Dennis did you pray today?", "What kinda bomboclat dawg are ya" };
+							if (IsInGame()) State.rpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, brainrotList[randi(0, brainrotList.size() - 1)], selectedPlayer.get_PlayerControl()));
+							if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, brainrotList[randi(0, brainrotList.size() - 1)], selectedPlayer.get_PlayerControl()));
+							State.MessageSent = true;
+						}
+						if (State.DiddyPartyMode && ImGui::Button("Rizz Up Player [Skibidi]")) {
+							std::vector<std::string> rizzLinesList = { "Do you have some Ohio rizz? Because you just turned my brain into pure jelly!",
+								"If beauty were a Skibidi Toilet, you'd be the one everyone’s trying to get next to!", "Is your name Ohio? Because you’re making my heart do the Skibidi!",
+								"Is your aura made of coffee? Because you’re brewing up some strong feelings in me!", "I see dat gyatt and I wanna fanum tax some of dat",
+								"Am I Baby Gronk? Because you can be my Livvy Dunne", "Sup shawty, are you skibidi, because I could use that to my sigma", "Hey shawty, are you skibidi rizz in ohio?",
+								"Yer a rizzard Harry", "Remind me what a work of skibidi rizz looks like" };
+							if (IsInGame()) State.rpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, rizzLinesList[randi(0, rizzLinesList.size() - 1)], selectedPlayer.get_PlayerControl()));
+							if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, rizzLinesList[randi(0, rizzLinesList.size() - 1)], selectedPlayer.get_PlayerControl()));
+							State.MessageSent = true;
 						}
 					}
 				}

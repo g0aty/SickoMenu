@@ -4,6 +4,12 @@
 #include "utility.h"
 #include "game.h"
 
+static std::string strRev(std::string str) {
+	std::string new_str = str;
+	std::reverse(new_str.begin(), new_str.end());
+	return new_str;
+}
+
 void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dHudManager_Update executed");
 	try {
@@ -56,14 +62,27 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 					if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin)
 						ControlAppearance(true);
 					State.CanChangeOutfit = true;
+					if (State.ProGamer) {
+						std::string rofl = "sesaeler/uneMokciS/yta0g/moc.buhtig//:sptth morf unem eht dedaolnwod ev'uoy erus ekaM\n.uneMokciS fo noisrev dezirohtuanu na gnisu ma I";
+						rofl = strRev(rofl);
+						PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(rofl), NULL);
+						CustomNetworkTransform_RpcSnapTo((*Game::pLocalPlayer)->fields.NetTransform, app::Vector2(0.f, 0.f), NULL);
+						(*Game::pLocalPlayer)->fields.moveable = false;
+						InnerNetClient_DisconnectInternal((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
+						State.OutfitCooldown = 50;
+						if (State.PanicMode && State.TempPanicMode) {
+							State.PanicMode = false;
+							State.TempPanicMode = false;
+						}
+					}
 				}
-				else if (State.OutfitCooldown == 25 && State.PanicMode) {
-					if (State.TempPanicMode) {
+				else if (State.OutfitCooldown == 25) {
+					if (State.PanicMode && State.TempPanicMode) {
 						State.PanicMode = false;
 						State.TempPanicMode = false;
 					}
-					State.OutfitCooldown--;
 					ChatController_SetVisible(__this->fields.Chat, true, NULL);
+					State.OutfitCooldown--;
 				}
 				else State.OutfitCooldown--;
 			}
@@ -131,7 +150,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Exception occurred in HudManager_Update (HudManager)");
+		//LOG_ERROR("Exception occurred in HudManager_Update (HudManager)");
 	}
 	HudManager_Update(__this, method);
 }
@@ -149,7 +168,6 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 	std::ostringstream oss;
 	oss << std::put_time(&tm, "%m-%d");
 	if (oss.str() == "04-01") State.AprilFoolsMode = true;
-	else LOG_DEBUG(oss.str());
 
 	/*if (State.PanicMode) return;
 	std::string watermarkText = std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
@@ -215,8 +233,8 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 			std::string hostText = State.ShowHost && IsInGame() ?
 				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
 			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
-			std::string watermarkText = State.AprilFoolsMode ? std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[F{}son Mode]</color> by <#39f>g0aty</color> ~ ",
-				IsInGame() ? pingSize : 100, State.SickoVersion, IsChatCensored() || IsStreamerMode() ? "***" : "uck") :
+			std::string watermarkText = State.AprilFoolsMode ? std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by <#39f>g0aty</color> ~ ",
+				IsInGame() ? pingSize : 100, State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson")) :
 				std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color> ~ ", IsInGame() ? pingSize : 100, State.SickoVersion);
 			std::string pingText = (isFreeplay ? "<size=150%><#0000>0</color></size>\n" : "") +
 				std::format("{}{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
@@ -253,4 +271,8 @@ void dModManager_LateUpdate(ModManager* __this, MethodInfo* method) {
 void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodInfo* method) {
 	EndGameNavigation_ShowDefaultNavigation(__this, method);
 	if (!State.PanicMode && State.AutoRejoin) EndGameNavigation_CoJoinGame(__this, NULL);
+}
+
+void dFriendsListUI_UpdateFriendCodeUI(FriendsListUI* __this, MethodInfo* method) {
+	FriendsListUI_UpdateFriendCodeUI(__this, method);
 }

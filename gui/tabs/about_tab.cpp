@@ -51,6 +51,10 @@ namespace AboutTab {
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(GoldCol, std::format(" {}", State.SickoVersion).c_str());
             ImGui::SameLine(0.0f, 0.0f);
+            ImGui::Text(" by ");
+            ImGui::SameLine(0.0f, 0.0f);
+            ImGui::TextColored(DevCol, "g0aty");
+            ImGui::SameLine(0.0f, 0.0f);
             ImGui::Text("!");
 
             ImGui::TextColored(SickoCol, "Sicko");
@@ -83,11 +87,23 @@ namespace AboutTab {
                 BoldText("compiled, please report it to our support staff by making a ticket on our Discord server!", ImVec4(0.f, 1.f, 0.f, 1.f));
             }
             else {
-                ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "If you've paid for this menu, demand a refund immediately.", ImVec4(0.f, 1.f, 0.f, 1.f));
+                ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "If you've paid for this menu, demand a refund immediately.");
                 BoldText("Make sure you have downloaded the latest version of SickoMenu from GitHub or our", ImVec4(0.f, 1.f, 0.f, 1.f));
                 BoldText("official Discord!", ImVec4(0.f, 1.f, 0.f, 1.f));
             }
             //hopefully stop people from reselling a foss menu for actual money
+
+            if (State.AprilFoolsMode) {
+                ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
+                auto DiddyCol = ImVec4(0.79f, 0.03f, 1.f, 1.f);
+                ImGui::TextColored(DiddyCol, std::format("You now have access to a brand new mode: {} Mode!", State.DiddyPartyMode ? "Diddy Party" :
+                (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson")).c_str());
+                ImGui::TextColored(DiddyCol, "Find all the new features and enjoy!");
+                if (ToggleButton("Diddy Party Mode", &State.DiddyPartyMode)) {
+                    if (State.RizzUpEveryone) State.RizzUpEveryone = false;
+                    State.Save();
+                }
+            }
         }
 
         if (openCredits) {

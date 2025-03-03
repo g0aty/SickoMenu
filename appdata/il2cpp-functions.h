@@ -158,6 +158,7 @@ DO_APP_FUNC(void, VentilationSystem_Update, (VentilationSystem_Operation__Enum o
 DO_APP_FUNC(void, HudManager_Update, (HudManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void HudManager::Update()");
 DO_APP_FUNC(void, HudManager_SetHudActive, (HudManager* __this, bool isActive, MethodInfo* method), "Assembly-CSharp, System.Void HudManager::SetHudActive(System.Boolean)");
 DO_APP_FUNC(void, ChatController_AddChat, (ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::AddChat(PlayerControl, System.String, System.Boolean)");
+DO_APP_FUNC(void, ChatController_AddChatWarning, (ChatController* __this, String* warningText, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::AddChatWarning(System.String)");
 DO_APP_FUNC(void, ChatController_SetVisible, (ChatController* __this, bool visible, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::SetVisible(System.Boolean)");
 DO_APP_FUNC(void, ChatController_Update, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::Update()");
 DO_APP_FUNC(void, ChatBubble_SetName, (ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method), "Assembly-CSharp, System.Void ChatBubble::SetName(System.String, System.Boolean, System.Boolean, UnityEngine.Color)");
@@ -385,3 +386,4 @@ DO_APP_FUNC(float, PlayerControl_get_CalculatedAlpha, (PlayerControl* __this, Me
 DO_APP_FUNC(void, AbstractChatInputField_Clear, (AbstractChatInputField* __this, MethodInfo* method), "Assembly-CSharp, System.Void AbstractChatInputField::Clear()");
 DO_APP_FUNC(QuickChatModes__Enum, MultiplayerSettingsData_get_ChatMode, (MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method), "Assembly-CSharp, InnerNet.QuickChatModes AmongUs.Data.Settings.MultiplayerSettingsData::get_ChatMode()");
 DO_APP_FUNC(void, InnerNetObject_Despawn, (InnerNetObject* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetObject::Despawn()");
+DO_APP_FUNC(void, FriendsListUI_UpdateFriendCodeUI, (FriendsListUI* __this, MethodInfo* method), "Assembly-CSharp, System.Void FriendsListUI::UpdateFriendCodeUI()");

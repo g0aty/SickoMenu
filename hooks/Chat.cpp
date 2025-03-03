@@ -128,7 +128,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	if (!State.SafeMode)
 		__this->fields.timeSinceLastMessage = 420.69f; //we can set this to anything more than or equal to 3 and it'll work
 
-	if (!State.PanicMode && State.DarkMode) {
+	if ((!State.PanicMode || State.TempPanicMode) && State.DarkMode) {
 		auto gray32 = Color32();
 		gray32.r = 34; gray32.g = 34; gray32.b = 34; gray32.a = 255;
 		auto gray = Color32_op_Implicit_1(gray32, NULL);
@@ -199,20 +199,31 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		State.MessageSent = true;
 	}
 
-	if (State.AprilFoolsMode && State.BrainrotEveryone && (IsInGame() || IsInLobby()) && (__this->fields.timeSinceLastMessage >= 3.5f || !State.SafeMode)) {
+	if (!State.PanicMode && State.AprilFoolsMode && State.BrainrotEveryone && (IsInGame() || IsInLobby()) && (__this->fields.timeSinceLastMessage >= 3.5f || !State.SafeMode)) {
 		std::vector<std::string> brainrotList = { "Crazy? I was crazy once. They locked me in a room. A rubber room with Fucksons, and Fucksons give me rats.",
 			"I like my cheese drippy bruh", "Imagine if Ninja got a low taper fade", "I woke up in Ohio, feeling kinda fly", "What trollface are you?",
 			"Skibidi dop dop dop yes yes", "From the gyatt to the sus to the rizz to the mew", "Yeah I'm edging in Ohio, fanum taxing as I goon",
 			"You gotta give him that Hawk TUAH and spit on that thang", "Sticking out your gyatt for the rizzler", "I'm Baby Gronk from Ohio",
 			"19 dollar fortnite card, who wants it?", "Erm, what the sigma?", "I'll take a double triple Grimace Shake on a gyatt",
-			"I know I'm a SIGMA but that doesnt mean I can't have a GYATT too" };
+			"I know I'm a SIGMA but that doesnt mean I can't have a GYATT too", "Just put the fries in the bag bro", "Stay on the sigma grindset",
+			"Sigma Sigma on the wall, who is the skibidiest of them all?", "Duke Dennis did you pray today?", "What kinda bomboclat dawg are ya" };
 		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(brainrotList[randi(0, brainrotList.size() - 1)]), NULL);
+		State.MessageSent = true;
+	}
+
+	if (!State.PanicMode && State.AprilFoolsMode && State.DiddyPartyMode && State.RizzUpEveryone && (IsInGame() || IsInLobby()) && (__this->fields.timeSinceLastMessage >= 3.5f || !State.SafeMode)) {
+		std::vector<std::string> rizzLinesList = { "Do you have some Ohio rizz? Because you just turned my brain into pure jelly!",
+			"If beauty were a Skibidi Toilet, you'd be the one everyone’s trying to get next to!", "Is your name Ohio? Because you’re making my heart do the Skibidi!",
+			"Is your aura made of coffee? Because you’re brewing up some strong feelings in me!", "I see dat gyatt and I wanna fanum tax some of dat",
+			"Am I Baby Gronk? Because you can be my Livvy Dunne", "Sup shawty, are you skibidi, because I could use that to my sigma", "Hey shawty, are you skibidi rizz in ohio?",
+			"Yer a rizzard Harry", "Remind me what a work of skibidi rizz looks like" };
+		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(rizzLinesList[randi(0, rizzLinesList.size() - 1)]), NULL);
 		State.MessageSent = true;
 	}
 
 	ChatController_Update(__this, method);
 
-	if (!State.PanicMode && State.DarkMode && __this->fields.freeChatField != NULL) {
+	if ((!State.PanicMode || State.TempPanicMode) && State.DarkMode && __this->fields.freeChatField != NULL) {
 		__this->fields.freeChatField->fields.textArea->fields.compoText = convert_to_string(RemoveHtmlTags(convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText)));
 	}
 }

@@ -10730,6 +10730,89 @@ namespace app
 #endif
 #pragma endregion
 
+#pragma region FriendsListUI
+    struct FriendsListUI__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* FriendCodeText;
+        struct SpriteRenderer* FriendCodeHiddenIcon;
+        struct GameObject* FriendCodeHideToggleObject;
+        struct FriendsListUI_FriendsListTabButton__Array* Tabs;
+        struct GameObject* NotifArea;
+        struct GameObject* BlockedArea;
+        struct GameObject* FriendArea;
+        struct GameObject* PlatformFriendArea;
+        struct GameObject* LobbyPlayerArea;
+        struct GameObject* RecentlyPlayedArea;
+        struct GameObject* LobbyPlayersTab;
+        struct GameObject* LobbyPlayersInactiveTab;
+        struct GameObject* PlatformFriendsButton;
+        struct FriendRequestBar* FriendRequestBar;
+        struct BlockedPlayerBar* BlockedPlayerBar;
+        struct OnlineFriendBar* OnlineFriendBar;
+        struct OnlineFriendBar* PlatformFriendBar;
+        struct LobbyPlayerBar* LobbyPlayerBar;
+        struct LobbyInviteBar* LobbyInviteBar;
+        struct Scroller* FriendsScroller;
+        struct Scroller* PlatformFriendsScroller;
+        struct Scroller* BlockedScroller;
+        struct Scroller* NotifScroller;
+        struct Scroller* LobbyScroller;
+        struct Scroller* RecentlyPlayedScroller;
+        struct SpriteRenderer* InactiveAllFriends;
+        struct SpriteRenderer* InactivePlatformFriends;
+        struct TextBoxTMP* AddFriendArea;
+        struct List_1_FriendsListGuestWarning_* guestAccountWarnings;
+        float YStart;
+        float YOffset;
+        struct SpriteRenderer* ViewRequestsButton;
+        struct TextMeshPro* ViewRequestsText;
+        struct Color NewRequestColor;
+        struct Color NoRequestsColor;
+        struct GameObject* AddFriendObjects;
+        struct UiElement* BackButton;
+        struct UiElement* DefaultButtonSelected;
+        struct List_1_UiElement_* ControllerSelectable;
+        struct GameObject* glyphL;
+        struct GameObject* glyphR;
+        int32_t selectedTab;
+        struct List_1_FriendsListBar_* lobbyBars;
+        struct List_1_FriendsListBar_* friendBars;
+        struct List_1_FriendsListBar_* platformFriendBars;
+        struct List_1_FriendsListBar_* notifBars;
+        struct String* friendCodeHiddenText;
+        bool viewingAllFriends;
+        struct String* currentSceneName;
+        float addFriendCooldown;
+    };
+
+    struct FriendsListUI {
+        struct FriendsListUI__Class* klass;
+        MonitorData* monitor;
+        struct FriendsListUI__Fields fields;
+    };
+
+    struct FriendsListUI__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData OnDisable;
+    };
+
+    struct FriendsListUI__StaticFields {
+        struct FriendsListUI* Instance;
+    };
+
+    struct FriendsListUI__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct FriendsListUI__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct FriendsListUI__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ActivityManager;

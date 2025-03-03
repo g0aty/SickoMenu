@@ -1595,10 +1595,10 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	State.Save();
 
 	std::string cheaterMessage = "Player " + name + " has done an unauthorized action: " + reason;
-	LOG_INFO(cheaterMessage);
 	if (IsHost()) {
 		switch (State.SMAC_HostPunishment) {
 		case 0:
+			LOG_INFO(cheaterMessage);
 			break;
 		case 1:
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
@@ -1619,14 +1619,16 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 		case 2:
 		{
 			String* newName = convert_to_string(name + " has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
-			PlayerControl_CmdCheckName(pCtrl, newName, NULL);
+			if (name.find(" by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: ") == std::string::npos)
+				PlayerControl_RpcSetName(pCtrl, newName, NULL);
 			InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
 			break;
 		}
 		case 3:
 		{
 			String* newName = convert_to_string(name + " has been banned by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
-			PlayerControl_CmdCheckName(pCtrl, newName, NULL);
+			if (name.find(" by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: ") == std::string::npos)
+				PlayerControl_RpcSetName(pCtrl, newName, NULL);
 			InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
 			break;
 		}
@@ -1635,6 +1637,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	else {
 		switch (State.SMAC_Punishment) {
 		case 0:
+			LOG_INFO(cheaterMessage);
 			break;
 		case 1:
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);

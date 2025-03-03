@@ -250,8 +250,9 @@ public:
 class RpcSendChat : public RPCInterface {
 	PlayerControl* Player;
 	std::string msg;
+	PlayerControl* target;
 public:
-	RpcSendChat(PlayerControl* Player, std::string_view msg);
+	RpcSendChat(PlayerControl* Player, std::string_view msg, PlayerControl* target = NULL);
 	virtual void Process() override;
 };
 

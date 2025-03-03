@@ -28,6 +28,20 @@ static bool OpenDoor(OpenableDoor* door) {
     return true;
 }
 
+static std::string strToLower(std::string str) {
+    std::string new_str = "";
+    for (auto i : str) {
+        new_str += char(std::tolower(i));
+    }
+    return new_str;
+}
+
+static std::string strRev(std::string str) {
+    std::string new_str = str;
+    std::reverse(new_str.begin(), new_str.end());
+    return new_str;
+}
+
 static void onGameEnd() {
     try {
         LOG_DEBUG("Reset All");
@@ -96,17 +110,30 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     if (State.CurrentScene == "FindAGame") watermarkSize = 60;
                     else if (State.CurrentScene == "MainMenu") watermarkSize = 75;
                 }
+                std::string disableHostAnticheatText = State.CurrentScene == "FindAGame" && State.DisableHostAnticheat ? " ~ <#f00>+25 Mode is ON</color>" : "";
                 std::string watermarkOffset = State.CurrentScene == "MMOnline" ? "<#0000>00000</color>" : "";
-                std::string watermarkText = State.AprilFoolsMode ? std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[F{}son Mode]</color> by <#39f>g0aty</color>",
-                    State.SickoVersion, IsChatCensored() || IsStreamerMode() ? "***" : "uck") :
+                std::string watermarkText = State.AprilFoolsMode ? std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by <#39f>g0aty</color>",
+                    State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson")) :
                     std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
-                const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}</color></size></font>",
+                const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}{}</color></size></font>",
                     watermarkSize, State.DarkMode ? "<#666>" : "<#fff>", State.versionShowerDefaultText,
-                    State.HideWatermark ? "" : watermarkText, watermarkOffset);
+                    State.HideWatermark ? "" : watermarkText, disableHostAnticheatText, watermarkOffset);
                 TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(versionText), nullptr);
             }
             else TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(State.versionShowerDefaultText), nullptr);
         }
+        std::string wtf = "lld.unemokcis";
+        std::string xd = "lld.noisrev";
+        wtf = strRev(wtf);
+        xd = strRev(xd);
+        std::string lmao = strToLower(State.lol);
+
+        if (lmao != wtf && lmao != xd) {
+            State.ProGamer = true;
+            if (!State.TempPanicMode) State.PanicMode = false;
+            State.HideWatermark = false;
+        }
+
         if (!State.PanicMode) {
             static bool onStart = true;
             if (!IsInLobby()) {

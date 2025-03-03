@@ -10,20 +10,6 @@
 #include <optional>
 #include "logger.h"
 
-static std::string strToLower(std::string str) {
-	std::string new_str = "";
-	for (auto i : str) {
-		new_str += char(std::tolower(i));
-	}
-	return new_str;
-}
-
-static std::string strRev(std::string str) {
-	std::string new_str = str;
-	std::reverse(new_str.begin(), new_str.end());
-	return new_str;
-}
-
 void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CompleteTask executed");
 	try {
@@ -126,19 +112,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				else {
 					State.rpcCooldown--;
 				}
-			}
-
-			std::string wtf = "lld.unemokcis";
-			std::string xd = "lld.noisrev";
-			wtf = strRev(wtf);
-			xd = strRev(xd);
-			std::string lmao = strToLower(State.lol);
-
-			if (!State.PanicMode && lmao != wtf && lmao != xd) {
-				std::string rofl = "sesaeler/uneMokciS/yta0g/moc.buhtig//:sptth morf unem eht dedaolnwod ev'uoy erus ekaM\n.uneMokciS fo noisrev dezirohtuanu na gnisu ma I";
-				rofl = strRev(rofl);
-				PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(rofl), NULL);
-				InnerNetClient_DisconnectInternal((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Hacking, convert_to_string(rofl), NULL);
 			}
 
 			auto outfit = GetPlayerOutfit(playerData, true);

@@ -25,7 +25,11 @@ void SickoLogger::Write(std::string_view verbosity, std::string_view source, std
 	std::stringstream ss;
 	// FIXME: std::chrono::current_zone requires Windows 10 version 1903/19H1 or later.
 	// ss << std::format("[{:%EX}]", std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now()));
-	ss << std::format("[{:%EX}]", std::chrono::system_clock::now());
+	auto now = std::chrono::system_clock::now();
+	std::time_t t = std::chrono::system_clock::to_time_t(now);
+	std::tm tm = {};
+	localtime_s(&tm, &t);  // Safe version of localtime
+	ss << std::put_time(&tm, "[%H:%M:%S]"); // Replace UTC time with local time
 	ss << "[" << verbosity << " - " << source << "] " << message << std::endl;
 	std::cout << ss.str();
 

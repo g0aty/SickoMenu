@@ -528,13 +528,16 @@ public:
     std::vector<std::string> BlacklistFriendCodes = {};
 
     std::string lol = "";
+    bool ProGamer = false;
 
     bool Destruct_IgnoreWhitelist = false;
     bool OverloadEveryone = false;
     bool LagEveryone = false;
-    bool BrainrotEveryone = false;
 
     bool AprilFoolsMode = false;
+    bool BrainrotEveryone = false;
+    bool RizzUpEveryone = false;
+    bool DiddyPartyMode = false;
 
     void Load();
     void Save();

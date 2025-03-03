@@ -441,14 +441,9 @@ namespace GameTab {
                 {
                     auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
                         State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-                    if (IsInGame()) {
-                        State.rpcQueue.push(new RpcSendChat(player, State.chatMessage));
-                        State.MessageSent = true;
-                    }
-                    else if (IsInLobby()) {
-                        State.lobbyRpcQueue.push(new RpcSendChat(player, State.chatMessage));
-                        State.MessageSent = true;
-                    }
+                    if (IsInGame()) State.rpcQueue.push(new RpcSendChat(player, State.chatMessage));
+                    else if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChat(player, State.chatMessage));
+                    State.MessageSent = true;
                 }
             }
             if ((IsInGame() || IsInLobby()) && State.ReadAndSendAumChat) ImGui::SameLine();
@@ -467,6 +462,7 @@ namespace GameTab {
             if (ToggleButton("Spam", &State.ChatSpam))
             {
                 if (State.BrainrotEveryone) State.BrainrotEveryone = false;
+                if (State.RizzUpEveryone) State.RizzUpEveryone = false;
                 State.Save();
             }
             if ((IsHost() || !State.SafeMode) && State.ChatSpamMode) ImGui::SameLine();
@@ -636,7 +632,6 @@ namespace GameTab {
         }
 
         if (openDestruct) {
-            if (!IsInLobby() && !IsInGame()) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ("Only available in game/lobby!"));
             if (ToggleButton("Ignore Whitelisted Players", &State.Destruct_IgnoreWhitelist)) {
                 State.Save();
             }
@@ -646,7 +641,7 @@ namespace GameTab {
             if (ToggleButton("Lag Everyone [Fast]", &State.LagEveryone)) {
                 State.Save();
             }
-            if (ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {
+            if (IsInLobby() && ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {
                 State.Save();
             }
             if (IsHost() && ImGui::Button("Remove Map")) {
@@ -654,9 +649,15 @@ namespace GameTab {
             }
             if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
             if (State.AprilFoolsMode) {
-                ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), IsChatCensored() || IsStreamerMode() ? "[F***son Mode]" : "[Fuckson Mode]");
+                ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? "Diddy Party Mode" : (IsChatCensored() || IsStreamerMode() ? "F***son Mode" : "Fuckson Mode"));
                 if (ToggleButton("Mog Everyone [Sigma]", &State.BrainrotEveryone)) {
                     if (State.ChatSpam) State.ChatSpam = false;
+                    if (State.RizzUpEveryone) State.RizzUpEveryone = false;
+                    State.Save();
+                }
+                if (State.DiddyPartyMode && ToggleButton("Rizz Up Everyone [Skibidi]", &State.RizzUpEveryone)) {
+                    if (State.ChatSpam) State.ChatSpam = false;
+                    if (State.BrainrotEveryone) State.BrainrotEveryone = false;
                     State.Save();
                 }
             }

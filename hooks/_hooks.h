@@ -101,6 +101,7 @@ void dGameOptionsManager_set_CurrentGameOptions(GameOptionsManager* __this, IGam
 void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* method);
 //void dActivityManager_UpdateActivity(void* __this, Activity_1 activity, void* callback, MethodInfo* method);
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method);
+void dFriendsListUI_UpdateFriendCodeUI(FriendsListUI* __this, MethodInfo* method);
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* killer, NetworkedPlayerInfo* victim, MethodInfo* method);
 void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method);
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method);

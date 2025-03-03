@@ -189,6 +189,7 @@ void DetourInitilization() {
 	HOOKFUNC(ExileController_ReEnableGameplay);
 	//HOOKFUNC(ActivityManager_UpdateActivity);
 	HOOKFUNC(PingTracker_Update);
+	HOOKFUNC(FriendsListUI_UpdateFriendCodeUI);
 	HOOKFUNC(KillOverlay_ShowKillAnimation_1);
 	HOOKFUNC(KillButton_SetTarget);
 	HOOKFUNC(ImpostorRole_FindClosestTarget);
@@ -340,6 +341,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(ExileController_ReEnableGameplay);
 	//UNHOOKFUNC(ActivityManager_UpdateActivity);
 	UNHOOKFUNC(PingTracker_Update);
+	UNHOOKFUNC(FriendsListUI_UpdateFriendCodeUI);
 	UNHOOKFUNC(KillOverlay_ShowKillAnimation_1);
 	UNHOOKFUNC(KillButton_SetTarget);
 	UNHOOKFUNC(ImpostorRole_FindClosestTarget);

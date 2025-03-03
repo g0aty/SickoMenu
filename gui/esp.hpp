@@ -83,6 +83,7 @@ class Esp
 {
 public:
 	static void Render();
+	static void Credit();
 
 	static drawing_t& GetDrawing() { return *s_Instance; }
 private:
