@@ -3,7 +3,7 @@
   </p>
 
 <h1 align="center">👺 SickoMenu v4.2</h1>
-A powerful utility for Among Us designed to enhance your game experince with custom features!
+A powerful utility for Among Us designed to enrich your game experience with custom features!
 
 **⚠️ Intended for educational and experimental use only.**
 
