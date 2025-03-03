@@ -335,7 +335,8 @@ namespace SelfTab {
 
             if (State.InMeeting && ImGui::Button("Move in Meeting"))
             {
-                State.rpcQueue.push(new EndMeeting());
+                if (IsHost()) State.rpcQueue.push(new RpcEndMeeting());
+                else State.rpcQueue.push(new EndMeeting());
                 State.InMeeting = false;
             }
         }
