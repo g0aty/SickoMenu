@@ -1,5 +1,5 @@
 <p align="center">
-   <img src="SickoMenu_Banner.png" width="200">
+   <img src="SickoBanner.png">
   </p>
 
 <h1 align="center">👺 SickoMenu v4.2.1</h1>
