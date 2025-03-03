@@ -64,11 +64,11 @@ namespace Menu {
 		{"ESP", {"Enable", "Show Ghosts", "Hide During Meetings", "Show Boxes", "Show Tracers", "Show Distances", "Role-based"}},
 		{"Players", {"Players"}},
 		{"Tasks", {"Complete All Tasks", "Play Medbay Scan Animation"}},
-		{"Sabotage", {"Disable Sabotage", "Repair Sabotage", "Sabotage All", "Random Sabotage", "Sabotage Lights", "Sabotage Reactor", "Sabotage Oxygen", "Sabotage Comms", "Disable Lights",
+		{"Sabotage", {"Disable Sabotage", "Auto Repair Sabotages", "Repair Sabotage", "Sabotage All", "Random Sabotage", "Sabotage Lights", "Sabotage Reactor", "Sabotage Oxygen", "Sabotage Comms", "Disable Lights",
 					  "Activate Mushroom Mixup"}},
 		{"Doors", {"Close All Doors", "Close Room Door", "Pin All Doors", "Unpin All Doors", "Auto Open Doors"}},
 		{"Host", {"Custom Impostor Amount", "Impostor Count", "Force Start of Game", "Disable Meetings", "Disable Sabotages", "Disable Game Ending", "End Game", "Force Color for Everyone",
-				  "Force Name for Everyone", "Unlock Kill Button", "Allow Killing in Lobbies", "Kill While Vanished", "Game Mode", "Show Lobby Timer", "Auto Start Game", "Spectator Mode"}},
+				  "Force Name for Everyone", "Spam Moving Platform", "Unlock Kill Button", "Allow Killing in Lobbies", "Kill While Vanished", "Game Mode", "Show Lobby Timer", "Auto Start Game", "Spectator Mode"}},
 #ifdef _DEBUG
 		{"Debug", {"Enable Occlusion Culling", "Force Load Settings", "Force Save Settings", "Clear RPC Queues", "Log Unity Debug Messages", "Log Hook Debug Messages", "Colors", "Profiler",
 				   "Experiments", "Enable Anticheat (SMAC)", "Point System (Only for Hosting)"}},
