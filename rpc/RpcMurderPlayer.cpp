@@ -365,22 +365,21 @@ void RpcEndGame::Process()
 	int count = 0;
 	for (auto p : GetAllPlayerData()) {
 		if (State.TournamentMode) {
-			if (p == NULL) continue;
 			auto friendCode = convert_from_string(p->fields.FriendCode);
 			if (impostorWin) {
 				if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
-					UpdatePoints(p, 2); //AllImpsWin
+					State.tournamentPoints[friendCode] += 2; //AllImpsWin
 					LOG_DEBUG(std::format("Added 2 points to {} for all impostors win", ToString(p)).c_str());
 					State.tournamentWinPoints[friendCode] += 1;
 				}
 				else if (PlayerIsImpostor(p)) {
 					if (State.tournamentAliveImpostors.size() == 1 && !p->fields.IsDead) {
-						UpdatePoints(p, 2); //ImpWin
+						State.tournamentPoints[friendCode] += 2; //ImpWin
 						LOG_DEBUG(std::format("Added 2 points to {} for solo win", ToString(p)).c_str());
 						State.tournamentWinPoints[friendCode] += 2;
 					}
 					else {
-						UpdatePoints(p, 1); //ImpWin
+						State.tournamentPoints[friendCode] += 1; //ImpWin
 						LOG_DEBUG(std::format("Added 1 point to {} for impostor win", ToString(p)).c_str());
 						State.tournamentWinPoints[friendCode] += 1;
 					}
@@ -388,11 +387,11 @@ void RpcEndGame::Process()
 			}
 			else {
 				if (PlayerIsImpostor(p)) {
-					UpdatePoints(p, -1); //ImpLose
+					State.tournamentPoints[friendCode] -= 1; //ImpLose
 					LOG_DEBUG(std::format("Deducted -1 point from {} for impostor loss", ToString(p)).c_str());
 				}
 				else {
-					UpdatePoints(p, 2); //CrewWin
+					State.tournamentPoints[friendCode] += 2; //CrewWin
 					LOG_DEBUG(std::format("Added 2 points to {} for crewmate win", ToString(p)).c_str());
 					State.tournamentWinPoints[friendCode] += 1;
 				}

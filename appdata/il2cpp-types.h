@@ -6761,6 +6761,8 @@ namespace app
         bool DontDestroy;
     };
 
+    typedef Il2CppObject NotificationPopper;
+
     struct HudManager__Fields {
         struct DestroyableSingleton_1_HudManager___Fields _;
         struct FollowerCamera* PlayerCam;
@@ -6798,7 +6800,7 @@ namespace app
         void* shhhEmblem;
         void* IntroPrefab;
         void* GameMenu;
-        void* Notifier;
+        struct NotificationPopper* Notifier;
         void* roomTracker;
         void* TaskCompleteSound;
         void* TaskUpdateSound;
@@ -10835,7 +10837,6 @@ namespace app
     typedef Il2CppObject KillOverlay;
     typedef Il2CppObject AbstractSaveData;
     typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
-    typedef Il2CppObject NotificationPopper;
     typedef Il2CppObject MatchMakerGameButton;
     typedef Il2CppObject EndGameNavigation;
     typedef Il2CppObject HideAndSeekManager;

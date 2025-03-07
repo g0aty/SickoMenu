@@ -52,11 +52,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 	try {
 		dPlayerControl_fixedUpdateTimer = round(1.f / Time_get_fixedDeltaTime(nullptr));
 		if ((IsInGame() || IsInLobby())) {
+			if (!__this || !(*Game::pLocalPlayer)) return;
 			auto playerData = GetPlayerData(__this);
 			auto localData = GetPlayerData(*Game::pLocalPlayer);
-
-			if (!playerData || !localData)
-				return;
+			if (!playerData || !localData) return;
 
 			assert(Object_1_IsNotNull((Object_1*)__this->fields.cosmetics));
 			auto nameTextTMP = __this->fields.cosmetics->fields.nameText;
@@ -275,8 +274,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (totalTasks != 0 && completedTasks == totalTasks) {
 					if (IsHost() && State.TournamentMode &&
 						std::find(State.tournamentAllTasksCompleted.begin(), State.tournamentAllTasksCompleted.end(), playerData->fields.PlayerId) == State.tournamentAllTasksCompleted.end()) {
-						UpdatePoints(playerData, 2);
-						LOG_DEBUG(std::format("Added 2 points to {} for completing tasks", ToString(playerData)).c_str());
+						UpdatePoints(playerData, 1);
+						LOG_DEBUG(std::format("Added 1 point to {} for completing tasks", ToString(playerData)).c_str());
 						State.tournamentAllTasksCompleted.push_back(playerData->fields.PlayerId);
 					}
 					if (IsHost() && State.TaskSpeedrun && !State.SpeedrunOver) {
@@ -750,9 +749,9 @@ void dPlayerControl_RpcSyncSettings(PlayerControl* __this, Byte__Array* optionsB
 bool dPlayerControl_get_CanMove(PlayerControl* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_get_CanMove executed");
 	try {
-		if (!State.PanicMode) {
+		if (__this == NULL || GetPlayerData(__this) == NULL) return false;
+		if (!State.PanicMode && __this == *Game::pLocalPlayer) {
 			if (((State.AlwaysMove) || (State.MoveInVentAndShapeshift && (((*Game::pLocalPlayer)->fields.inVent) || ((*Game::pLocalPlayer)->fields.shapeshifting)))) && !State.ChatFocused && !((*Game::pLocalPlayer)->fields.petting)) {
-
 				return true;
 			}
 		}
@@ -956,6 +955,7 @@ void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate
 void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_StartMeeting executed");
+	State.BlinkPlayersTab = true;
 	if (*Game::pShipStatus == NULL) return;
 	try {
 		if (!State.PanicMode && IsHost() && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) {
@@ -983,10 +983,6 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 
 void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_HandleRpc executed");
-	if (callId == 45 && MessageReader_ReadString(reader, NULL) != NULL) {
-		SMAC_OnCheatDetected(__this, "Overloading");
-		return;
-	}
 	try {
 		HandleRpc(__this, callId, reader);
 		SMAC_HandleRpc(__this, callId, reader);
@@ -1151,7 +1147,6 @@ void dPlayerControl_Shapeshift(PlayerControl* __this, PlayerControl* target, boo
 }
 
 void dPlayerControl_ProtectPlayer(PlayerControl* __this, PlayerControl* target, int32_t colorId, MethodInfo* method) {
-	if (target == NULL) return;
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_ProtectPlayer executed");
 	try {
 		if (SYNCHRONIZED(Replay::replayEventMutex); target != nullptr) {
@@ -1554,4 +1549,14 @@ float dPlayerControl_get_CalculatedAlpha(PlayerControl* __this, MethodInfo* meth
 
 bool dPlayerControl_get_Visible(PlayerControl* __this, MethodInfo* method) {
 	return PlayerControl_get_Visible(__this, method);
+}
+
+bool dPlayerControl_IsFlashlightEnabled(PlayerControl* __this, MethodInfo* method) {
+	if (!State.PanicMode && State.MaxVision) return false;
+	return PlayerControl_IsFlashlightEnabled(__this, method);
+}
+
+void dPlayerControl_OnDestroy(PlayerControl* __this, MethodInfo* method) {
+	State.BlinkPlayersTab = true;
+	PlayerControl_OnDestroy(__this, method);
 }

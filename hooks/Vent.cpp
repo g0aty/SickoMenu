@@ -69,3 +69,15 @@ bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodIn
 	}
 	else return Vent_TryMoveToVent(__this, otherVent, error, method);
 }
+
+/*void dVentilationSystem_Update(VentilationSystem_Operation__Enum op, int32_t ventId, MethodInfo* method) {
+	VentilationSystem_Update(op, ventId, method);
+	if (State.FlipSkeld && IsHost() && op == VentilationSystem_Operation__Enum::Exit && *Game::pLocalPlayer != NULL)
+		(*Game::pLocalPlayer)->fields.inVent = false; // Fix venting on Dleks
+}*/
+
+void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* method) {
+	PlayerPhysics_RpcExitVent(__this, id, method);
+	if (State.FlipSkeld && IsHost() && *Game::pLocalPlayer != NULL && __this->fields.myPlayer != NULL && __this->fields.myPlayer == *Game::pLocalPlayer)
+		(*Game::pLocalPlayer)->fields.inVent = false; // Fix venting on Dleks
+}

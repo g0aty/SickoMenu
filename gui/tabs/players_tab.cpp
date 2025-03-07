@@ -63,6 +63,7 @@ namespace PlayersTab {
 				if (!validPlayer.has_value())
 					continue;
 				auto playerData = GetPlayerData(playerCtrl);
+				if (playerData == NULL) continue;
 				if (playerData->fields.Disconnected)
 					continue;
 				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
@@ -181,7 +182,7 @@ namespace PlayersTab {
 
 			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
 			{
-				if ((IsInMultiplayerGame() || IsInLobby()) && (selectedPlayer.has_value() || selectedPlayer.is_LocalPlayer())) {
+				if (!selectedPlayer.get_PlayerControl()->fields.notRealPlayer && selectedPlayer.get_PlayerData() != NULL) {
 					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
 					ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
 					if (isUsingMod)
@@ -204,7 +205,7 @@ namespace PlayersTab {
 					ImGui::Text(const_cast<char*>(levelText.c_str()));
 					std::string platform = "Unknown";
 					auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl(), NULL);
-					if (GetPlayerControlById(selectedPlayer.get_PlayerData()->fields.PlayerId)->fields._.OwnerId == client->fields.Id) {
+					if (client != NULL && client->fields.PlatformData != NULL && selectedPlayer.get_PlayerControl()->fields._.OwnerId == client->fields.Id) {
 						switch (client->fields.PlatformData->fields.Platform) {
 						case Platforms__Enum::StandaloneEpicPC:
 							platform = "Epic Games (PC)";
@@ -241,14 +242,16 @@ namespace PlayersTab {
 							break;
 						}
 					}
-					std::string platformText = std::format("Platform: {}", platform);
-					ImGui::Text(platformText.c_str());
-					uint64_t psnId = client->fields.PlatformData->fields.PsnPlatformId;
-					std::string psnText = std::format("PSN Platform ID: {}", psnId);
-					if (psnId != 0) ImGui::Text(const_cast<char*>(psnText.c_str()));
-					uint64_t xboxId = client->fields.PlatformData->fields.XboxPlatformId;
-					std::string xboxText = std::format("Xbox Platform ID: {}", xboxId);
-					if (xboxId != 0) ImGui::Text(const_cast<char*>(xboxText.c_str()));
+					if (client != NULL && client->fields.PlatformData != NULL) {
+						std::string platformText = std::format("Platform: {}", platform);
+						ImGui::Text(platformText.c_str());
+						uint64_t psnId = client->fields.PlatformData->fields.PsnPlatformId;
+						std::string psnText = std::format("PSN Platform ID: {}", psnId);
+						if (psnId != 0) ImGui::Text(const_cast<char*>(psnText.c_str()));
+						uint64_t xboxId = client->fields.PlatformData->fields.XboxPlatformId;
+						std::string xboxText = std::format("Xbox Platform ID: {}", xboxId);
+						if (xboxId != 0) ImGui::Text(const_cast<char*>(xboxText.c_str()));
+					}
 				}
 				else {
 					ImGui::Text("Is using Modified Client: No");
@@ -414,12 +417,20 @@ namespace PlayersTab {
 						}
 						for (auto p : selectedPlayers) {
 							if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-							if (IsInGame()) {
-								State.rpcQueue.push(new RpcVoteKick(p.validate().get_PlayerControl()));
-							}
-							else if (IsInLobby()) {
-								State.lobbyRpcQueue.push(new RpcVoteKick(p.validate().get_PlayerControl()));
-							}
+							auto future = std::async(std::launch::async, [&]() {
+								for (auto p : selectedPlayers) {
+									if (p.has_value() && p.validate().get_PlayerControl() != *Game::pLocalPlayer) {
+										if (IsInGame()) {
+											State.rpcQueue.push(new RpcVoteKick(p.validate().get_PlayerControl()));
+										}
+										else if (IsInLobby()) {
+											State.lobbyRpcQueue.push(new RpcVoteKick(p.validate().get_PlayerControl()));
+										}
+									}
+									std::this_thread::sleep_for(std::chrono::milliseconds(1));
+								}
+								});
+							future.get();
 						}
 					}
 					if (!State.SafeMode) {
@@ -1259,7 +1270,7 @@ namespace PlayersTab {
 					}
 				}
 			}
-			if (openInfo && (IsInMultiplayerGame() || IsInLobby()) && selectedPlayer.has_value()) {
+			if (openInfo && selectedPlayer.has_value() && selectedPlayers.size() == 1 && !selectedPlayer.get_PlayerControl()->fields.notRealPlayer) {
 				ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 				if (ImGui::Button("Steal Data")) {
 					State.StealedPUID = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
@@ -1353,7 +1364,7 @@ namespace PlayersTab {
 		static int blinkDelay = 0;
 		static bool isBlinking = false;
 		if (State.BlinkPlayersTab && !isBlinking) {
-			blinkDelay = int(0.5 * GetFps());
+			blinkDelay = 5;
 			isBlinking = true;
 		}
 		if (isBlinking && State.BlinkPlayersTab) {

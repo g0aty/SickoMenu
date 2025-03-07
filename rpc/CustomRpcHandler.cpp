@@ -14,6 +14,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		if (State.modUsers.find(playerId) == State.modUsers.end() && MessageReader_get_BytesRemaining(reader, NULL) == 0) {
 			State.modUsers.insert({ playerId, "<#0f0>Sicko</color><#f00>Menu</color>" });
 			STREAM_DEBUG("RPC Received for another SickoMenu user from " << ToString((Game::PlayerId)playerId));
+			if (State.SMAC_CheckSicko) SMAC_OnCheatDetected(player, "SickoMenu User");
 		}
 	}
 	break;
@@ -23,6 +24,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		if (State.modUsers.find(playerId) == State.modUsers.end()) {
 			State.modUsers.insert({ playerId, "<#f55>AmongUsMenu</color>" });
 			STREAM_DEBUG("RPC Received for an AmongUsMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			if (State.SMAC_CheckAUM) SMAC_OnCheatDetected(player, "AmongUsMenu User");
 		}
 	}
 	break;
@@ -41,6 +43,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		if (State.modUsers.find(playerId) == State.modUsers.end()) {
 			State.modUsers.insert({ playerId, "<#f00>KillNetwork</color>" });
 			STREAM_DEBUG("RPC Received for a KillNetwork user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			if (State.SMAC_CheckAUM) SMAC_OnCheatDetected(player, "KillNetwork User");
 		}
 	}
 	break;
@@ -188,23 +191,6 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	case (uint8_t)RpcCalls__Enum::EnterVent: {
 		if (State.SMAC_CheckVent && (IsInLobby() || pData->fields.IsDead || !(PlayerIsImpostor(pData) || pData->fields.RoleType == RoleTypes__Enum::Engineer))) {
 			SMAC_OnCheatDetected(player, "Abnormal Venting");
-			return;
-		}
-		break;
-	}
-	case (uint8_t)250:
-	case (uint8_t)420: {
-		auto playerId = player->fields.PlayerId;
-		if (State.SMAC_CheckSicko && MessageReader_get_BytesRemaining(reader, NULL) == 0 && State.modUsers.find(playerId) == State.modUsers.end()) {
-			SMAC_OnCheatDetected(player, "SickoMenu User");
-			return;
-		}
-		break;
-	}
-	case (uint8_t)42069: {
-		auto playerId = player->fields.PlayerId;
-		if (State.SMAC_CheckAUM && State.modUsers.find(playerId) == State.modUsers.end()) {
-			SMAC_OnCheatDetected(player, "AmongUsMenu User");
 			return;
 		}
 		break;

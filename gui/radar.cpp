@@ -59,7 +59,7 @@ namespace Radar {
 				else tpDelay--;
 			}
 		}
-		if (State.TeleportEveryone && !(ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT)) && (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+		if (State.TeleportEveryone && !(ImGui::IsKeyDown(VK_CONTROL) || ImGui::IsKeyDown(VK_SHIFT)) && (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
 			ImVec2 mouse = ImGui::GetMousePos();
 			ImVec2 winpos = ImGui::GetWindowPos();
 			ImVec2 winsize = ImGui::GetWindowSize();

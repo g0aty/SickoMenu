@@ -204,6 +204,7 @@ DO_APP_FUNC(Byte__Array*, MessageReader_ReadBytes, (MessageReader* __this, int32
 DO_APP_FUNC(int32_t, MessageReader_get_BytesRemaining, (MessageReader* __this, MethodInfo* method), "Hazel, System.Int32 Hazel.MessageReader::get_BytesRemaining()");
 DO_APP_FUNC(void, MessageWriter_WriteBoolean, (MessageWriter* __this, bool value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Boolean)");
 DO_APP_FUNC(void, MessageWriter_WriteByte, (MessageWriter* __this, uint8_t value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Byte)");
+DO_APP_FUNC(void, MessageWriter_WriteSByte, (MessageWriter* __this, int8_t value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.SByte)");
 DO_APP_FUNC(void, MessageWriter_WriteUShort, (MessageWriter* __this, uint16_t value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.UInt16)");
 DO_APP_FUNC(void, MessageWriter_WriteInt32, (MessageWriter* __this, int32_t value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Int32)");
 DO_APP_FUNC(void, MessageWriter_WriteSingle, (MessageWriter* __this, float value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Single)");
@@ -387,3 +388,5 @@ DO_APP_FUNC(void, AbstractChatInputField_Clear, (AbstractChatInputField* __this,
 DO_APP_FUNC(QuickChatModes__Enum, MultiplayerSettingsData_get_ChatMode, (MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method), "Assembly-CSharp, InnerNet.QuickChatModes AmongUs.Data.Settings.MultiplayerSettingsData::get_ChatMode()");
 DO_APP_FUNC(void, InnerNetObject_Despawn, (InnerNetObject* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetObject::Despawn()");
 DO_APP_FUNC(void, FriendsListUI_UpdateFriendCodeUI, (FriendsListUI* __this, MethodInfo* method), "Assembly-CSharp, System.Void FriendsListUI::UpdateFriendCodeUI()");
+DO_APP_FUNC(bool, PlayerControl_IsFlashlightEnabled, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean PlayerControl::IsFlashlightEnabled()");
+DO_APP_FUNC(void, PlayerControl_OnDestroy, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::OnDestroy()");

@@ -289,12 +289,15 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatBubble_SetText executed");
 	if ((!State.PanicMode || State.TempPanicMode) && State.DarkMode) {
 		auto black = Palette__TypeInfo->static_fields->Black;
-		if (__this->fields.playerInfo->fields.IsDead) black.a *= 0.75f;
+		bool isChatWarning = __this->fields.playerInfo == NULL;
+		if (!isChatWarning && __this->fields.playerInfo->fields.IsDead) black.a *= 0.75f;
 		SpriteRenderer_set_color(__this->fields.Background, black, NULL);
-		auto textArea = __this->fields.TextArea;
-		TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
+		if (!isChatWarning) {
+			auto textArea = __this->fields.TextArea;
+			TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
+		}
 	}
-	ChatBubble_SetText(__this, chatText, NULL);
+	ChatBubble_SetText(__this, chatText, method);
 }
 
 void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {

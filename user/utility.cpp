@@ -624,7 +624,9 @@ void CompleteAllTasks(PlayerControl* player) {
 	if (State.SafeMode && player != *Game::pLocalPlayer) return;
 	auto playerTasks = GetNormalPlayerTasks(player);
 	for (auto playerTask : playerTasks) {
-		State.taskRpcQueue.push(new RpcForceCompleteTask(player, playerTask->fields._._Id_k__BackingField));
+		if (playerTask->fields.taskStep < playerTask->fields.MaxStep) {
+			State.taskRpcQueue.push(new RpcForceCompleteTask(player, playerTask->fields._._Id_k__BackingField));
+		}
 	}
 }
 
@@ -1301,9 +1303,10 @@ float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2)
 }
 
 void ShowHudNotification(std::string text) {
+	return;
 	std::string notificationText = "</size><#fb0>[<#0f0>Sicko</color><#f00>Menu</color>]</color> " + text + "<size=0>";
-	//if (IsInGame() || IsInLobby())
-		//GameData_ShowNotification(*Game::pGameData, convert_to_string(text), DisconnectReasons__Enum::Custom, NULL);
+	if (IsInGame() || IsInLobby())
+		NotificationPopper_AddDisconnectMessage((NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier), convert_to_string(text), NULL);
 }
 
 void DoPolylineSimplification(std::vector<ImVec2>& inPoints, std::vector<std::chrono::system_clock::time_point>& inTimeStamps, std::vector<ImVec2>& outPoints, std::vector<std::chrono::system_clock::time_point>& outTimeStamps, float sqDistanceThreshold, bool clearInputs)
@@ -1590,7 +1593,7 @@ bool CheckConfigExists(std::string configName) {
 }
 
 void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
-	if (!IsHost() || !State.TournamentMode) return;
+	if (!State.TournamentMode) return;
 	std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 	State.tournamentPoints[friendCode] += points;
 }
@@ -1612,14 +1615,15 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	}
 	State.Save();
 
-	std::string cheaterMessage = "Player " + name + " has done an unauthorized action: " + reason;
+	std::string cheaterMessage = "Player " + name + " has done an unauthorized action:\n" + reason;
 	if (IsHost()) {
 		switch (State.SMAC_HostPunishment) {
 		case 0:
 			LOG_INFO(cheaterMessage);
 			break;
 		case 1:
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+			//ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+			ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string("<size=70%><b>" + cheaterMessage + "</b></size>"), NULL);
 			break;
 			/*case 2:
 				if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);

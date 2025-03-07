@@ -14,7 +14,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 	switch (__this->fields.Type) {
 	case ShipStatus_MapType__Enum::Ship:
 		if (State.mapType != Settings::MapType::Airship) State.mapType = Settings::MapType::Ship;
-		if (State.FlipSkeld) {
+		if (State.FlipSkeld && IsHost() && GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) != 3) {
 			GameOptions().SetByte(app::ByteOptionNames__Enum::MapId, 3);
 			auto gameOptionsManager = GameOptionsManager_get_Instance(NULL);
 			GameManager* gameManager = GameManager_get_Instance(NULL);
@@ -44,6 +44,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_OnEnable executed");
 	try {
+		State.BlinkPlayersTab = false;
 
 		Replay::Reset();
 

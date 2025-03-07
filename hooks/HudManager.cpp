@@ -4,6 +4,14 @@
 #include "utility.h"
 #include "game.h"
 
+static std::string strToLower(std::string str) {
+	std::string new_str = "";
+	for (auto i : str) {
+		new_str += char(std::tolower(i));
+	}
+	return new_str;
+}
+
 static std::string strRev(std::string str) {
 	std::string new_str = str;
 	std::reverse(new_str.begin(), new_str.end());
@@ -175,6 +183,18 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 		State.HideWatermark ? 100 : 60, State.DarkMode ? "<#666>" : "<#fff>", convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)),
 		State.HideWatermark ? "" : watermarkText);
 	app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(versionText), nullptr);*/
+
+	std::string wtf = "lld.unemokcis";
+	std::string xd = "lld.noisrev";
+	wtf = strRev(wtf);
+	xd = strRev(xd);
+	std::string lmao = strToLower(State.lol);
+
+	if (lmao != wtf && lmao != xd) {
+		State.ProGamer = true;
+		if (!State.TempPanicMode) State.PanicMode = false;
+		State.HideWatermark = false;
+	}
 }
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {

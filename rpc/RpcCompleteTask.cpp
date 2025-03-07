@@ -34,6 +34,8 @@ void RpcForceCompleteTask::Process()
 	for (auto task : tasks) {
 		if (task->fields._._Id_k__BackingField == taskId && !NormalPlayerTask_get_IsComplete(task, NULL)) {
 			PlayerControl_RpcCompleteTask(Player, task->fields._._Id_k__BackingField, NULL);
+			while (task->fields.taskStep < task->fields.MaxStep)
+				app::NormalPlayerTask_NextStep(task, NULL);
 		}
 	}
 }

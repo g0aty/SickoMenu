@@ -10,6 +10,7 @@ void dPolusShipStatus_OnEnable(PolusShipStatus* __this, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPolusShipStatus_OnEnable executed");
 	try {
+		State.BlinkPlayersTab = false;
 
 		Replay::Reset();
 

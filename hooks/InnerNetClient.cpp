@@ -28,20 +28,6 @@ static bool OpenDoor(OpenableDoor* door) {
     return true;
 }
 
-static std::string strToLower(std::string str) {
-    std::string new_str = "";
-    for (auto i : str) {
-        new_str += char(std::tolower(i));
-    }
-    return new_str;
-}
-
-static std::string strRev(std::string str) {
-    std::string new_str = str;
-    std::reverse(new_str.begin(), new_str.end());
-    return new_str;
-}
-
 static void onGameEnd() {
     try {
         LOG_DEBUG("Reset All");
@@ -121,17 +107,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(versionText), nullptr);
             }
             else TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(State.versionShowerDefaultText), nullptr);
-        }
-        std::string wtf = "lld.unemokcis";
-        std::string xd = "lld.noisrev";
-        wtf = strRev(wtf);
-        xd = strRev(xd);
-        std::string lmao = strToLower(State.lol);
-
-        if (lmao != wtf && lmao != xd) {
-            State.ProGamer = true;
-            if (!State.TempPanicMode) State.PanicMode = false;
-            State.HideWatermark = false;
         }
 
         if (!State.PanicMode) {
@@ -754,13 +729,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             if ((IsInGame() || IsInLobby()) && State.GodMode && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
                 if (State.protectMonitor.find((*Game::pLocalPlayer)->fields.PlayerId) == State.protectMonitor.end()) {
-                    for (auto p : GetAllPlayerControl()) {
-                        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, (uint8_t)RpcCalls__Enum::ProtectPlayer,
-                            SendOption__Enum::None, p->fields._.OwnerId, NULL);
-                        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)(*Game::pLocalPlayer), NULL);
-                        MessageWriter_WriteInt32(writer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
-                        InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-                    }
+                    PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
                 }
             }
 
@@ -933,8 +902,8 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerLeft executed");
-    State.BlinkPlayersTab = true;
     try {
+        State.BlinkPlayersTab = true;
         if (data->fields.Character) { // Don't use Object_1_IsNotNull().
             auto playerInfo = GetPlayerData(data->fields.Character);
 
@@ -946,6 +915,8 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 Log.Debug(ToString(data->fields.Character) + " has been banned for hacking.");
             else if (reason == DisconnectReasons__Enum::Error)
                 Log.Debug(ToString(data->fields.Character) + " has been disconnected due to error.");
+            else if (reason == DisconnectReasons__Enum::Sanctions)
+                Log.Debug(ToString(data->fields.Character) + " has been sanction-banned.");
             else
                 Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
@@ -1123,42 +1094,9 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
             int count = 0;
             for (auto p : GetAllPlayerData()) {
                 if (p == NULL) continue;
-                if (State.TournamentMode) {
-                    auto friendCode = convert_from_string(p->fields.FriendCode);
-                    if (impostorWin) {
-                        if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
-                            UpdatePoints(p, 2); //AllImpsWin
-                            LOG_DEBUG(std::format("Added 2 points to {} for all impostors win", ToString(p)).c_str());
-                            State.tournamentWinPoints[friendCode] += 1;
-                        }
-                        else if (PlayerIsImpostor(p)) {
-                            if (State.tournamentAliveImpostors.size() == 1 && !p->fields.IsDead) {
-                                UpdatePoints(p, 2); //ImpWin
-                                LOG_DEBUG(std::format("Added 2 points to {} for solo win", ToString(p)).c_str());
-                                State.tournamentWinPoints[friendCode] += 2;
-                            }
-                            else {
-                                UpdatePoints(p, 1); //ImpWin
-                                LOG_DEBUG(std::format("Added 1 point to {} for impostor win", ToString(p)).c_str());
-                                State.tournamentWinPoints[friendCode] += 1;
-                            }
-                        }
-                    }
-                    else {
-                        if (PlayerIsImpostor(p)) {
-                            UpdatePoints(p, -1); //ImpLose
-                            LOG_DEBUG(std::format("Deducted -1 point from {} for impostor loss", ToString(p)).c_str());
-                        }
-                        else {
-                            UpdatePoints(p, 2); //CrewWin
-                            LOG_DEBUG(std::format("Added 2 points to {} for crewmate win", ToString(p)).c_str());
-                            State.tournamentWinPoints[friendCode] += 1;
-                        }
-                    }
-                }
                 auto name = convert_from_string(GetPlayerOutfit(p)->fields.PlayerName);
                 if ((impostorWin && PlayerIsImpostor(p)) || (!impostorWin && !PlayerIsImpostor(p))) {
-                    winnersText += name + "\n";
+                    winnersText += name + ", ";
                     count++;
                 }
             }
@@ -1175,7 +1113,8 @@ void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason
     catch (...) {
         LOG_ERROR("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
     }
-    GameManager_RpcEndGame(__this, endReason, showAd, method);
+    if (State.TournamentMode) State.rpcQueue.push(new RpcEndGame(endReason));
+    else GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
 
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* killer, NetworkedPlayerInfo* victim, MethodInfo* method) {
@@ -1280,26 +1219,26 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
                     State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.",
                     State.SafeMode ? "Please report this bug in Safe Mode on GitHub/Discord!" : "Disabling safe mode isn't recommended on official servers!")), NULL);
         }
-                                             break;
+        break;
         case DisconnectReasons__Enum::Kicked: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("You were kicked from the lobby.\n\n{}",
                     State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby if it hasn't started.")), NULL);
         }
-                                            break;
+        break;
         case DisconnectReasons__Enum::Banned: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("You were banned from the lobby.\n\n{}",
                     State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby by changing your IP address.")), NULL);
         }
-                                            break;
+        break;
         default: {
             std::string prevText = convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields._textArea, NULL));
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("{}{}", prevText,
                     State.AutoCopyLobbyCode ? "\nLobby Code has been copied to the clipboard." : "")), NULL);
         }
-               break;
+        break;
         }
         if (State.AutoCopyLobbyCode) ClipboardHelper_PutClipboardString(convert_to_string(State.LastLobbyJoined), NULL);
     }

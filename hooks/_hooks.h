@@ -147,3 +147,7 @@ float dPlayerControl_get_CalculatedAlpha(PlayerControl* __this, MethodInfo* meth
 bool dPlayerControl_get_Visible(PlayerControl* __this, MethodInfo* method);
 void dMeetingHud_CastVote(MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method);
 QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method);
+//void dVentilationSystem_Update(VentilationSystem_Operation__Enum op, int32_t ventId, MethodInfo* method);
+void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* method);
+bool dPlayerControl_IsFlashlightEnabled(PlayerControl* __this, MethodInfo* method);
+void dPlayerControl_OnDestroy(PlayerControl* __this, MethodInfo* method);

@@ -313,6 +313,12 @@ namespace SettingsTab {
 			static int modToShow = 0;
 
 			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) {
+				if (!State.ModDetection) State.SickoDetection = State.AmongUsMenuDetection = State.KillNetworkDetection = false;
+				else {
+					State.SickoDetection = modToShow == 0;
+					State.AmongUsMenuDetection = modToShow == 1;
+					State.KillNetworkDetection = modToShow == 2;
+				}
 				State.Save();
 			}
 			ImGui::SameLine();

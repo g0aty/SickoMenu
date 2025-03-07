@@ -12,6 +12,8 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 	if (IsHost() && State.TaskSpeedrun && State.GameLoaded)
 		State.SpeedrunTimer += Time_get_deltaTime(NULL);
 	try {
+		State.BlinkPlayersTab = false;
+
 		Replay::Reset();
 
 		State.MatchStart = std::chrono::system_clock::now();

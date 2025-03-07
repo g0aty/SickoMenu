@@ -10,6 +10,8 @@ void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 	FungleShipStatus_OnEnable(__this, method);
 
 	try {
+		State.BlinkPlayersTab = false;
+
 		Replay::Reset();
 
 		State.MatchStart = std::chrono::system_clock::now();

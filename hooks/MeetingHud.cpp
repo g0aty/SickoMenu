@@ -11,6 +11,7 @@ static bool calloutOver = false;
 void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Awake executed");
 	try {
+		State.BlinkPlayersTab = true;
 		State.voteMonitor.clear();
 		State.InMeeting = true;
 		static std::string strVoteSpreaderType = translate_type_name("VoteSpreader, Assembly-CSharp");
@@ -28,6 +29,7 @@ void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
 	State.vanishedPlayers.clear();
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Close executed");
 	try {
+		State.BlinkPlayersTab = true;
 		State.InMeeting = false;
 		calloutOver = false;
 		if (IsHost() && State.TournamentMode && !State.tournamentFirstMeetingOver) State.tournamentFirstMeetingOver = true;
@@ -105,10 +107,12 @@ void ManageCallout(uint8_t playerId, uint8_t suspectIdx) {
 		if (!p->fields.IsDead) alivePlayers++;
 	}
 	if (alivePlayers < 7) return;
-	if (suspectIdx == Game::DeadVote || suspectIdx == Game::SkippedVote || suspectIdx == Game::MissedVote || suspectIdx == Game::HasNotVoted) return;
+	if (suspectIdx == Game::DeadVote || suspectIdx == Game::SkippedVote || suspectIdx == Game::MissedVote || suspectIdx == Game::HasNotVoted)
+		return LOG_DEBUG("Callout failed: suspectIdx == Game::DeadVote || suspectIdx == Game::SkippedVote || suspectIdx == Game::MissedVote || suspectIdx == Game::HasNotVoted");
 	// Shadow voting
 	auto voter = GetPlayerDataById(playerId), target = GetPlayerDataById(suspectIdx);
-	if (voter == NULL || target == NULL || target->fields.IsDead) return;
+	if (voter == NULL || target == NULL || target->fields.IsDead)
+		return LOG_DEBUG("Callout failed: voter == NULL || target == NULL || target->fields.IsDead");
 	std::string voterFc = convert_from_string(voter->fields.FriendCode), targetFc = convert_from_string(target->fields.FriendCode);
 	if (!PlayerIsImpostor(voter) &&
 		std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), voterFc) == State.tournamentCallers.end() &&
@@ -127,6 +131,12 @@ void ManageCallout(uint8_t playerId, uint8_t suspectIdx) {
 		State.tournamentCallers.push_back(voterFc);
 		State.tournamentCalledOut.push_back(targetFc);
 	}
+	else if (PlayerIsImpostor(voter))
+		LOG_DEBUG("Callout failed: " + ToString(target) + " is impostor");
+	else if (std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), voterFc) != State.tournamentCallers.end())
+		LOG_DEBUG("Callout failed: " + ToString(target) + " has already used callout before");
+	else if (std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), targetFc) != State.tournamentCalledOut.end())
+		LOG_DEBUG("Callout failed: " + ToString(target) + " has already been called out before");
 }
 
 void dMeetingHud_PopulateResults(MeetingHud* __this, Il2CppArraySize* states, MethodInfo* method) {

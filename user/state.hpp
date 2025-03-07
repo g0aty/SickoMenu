@@ -16,7 +16,7 @@ public:
         VK_INSERT, // toggle radar
         VK_HOME, // toggle console
         VK_NEXT, // repair sabotage
-        VK_LCONTROL, // noclip
+        VK_CONTROL, // noclip
         0x00, // autokill
         0x00, // close all doors
         0x00, // toggle zoom
