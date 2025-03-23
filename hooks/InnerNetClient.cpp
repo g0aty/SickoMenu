@@ -883,6 +883,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         AutoRepairSabotageDelay--;
     }
 
+    static int AutoPunish = 1;
+
         if (State.BanEveryone || State.KickEveryone) {
         for (int playerId = 0; playerId < Game::MAX_PLAYERS; ++playerId) {
             auto playerData = GetPlayerDataById(playerId);
