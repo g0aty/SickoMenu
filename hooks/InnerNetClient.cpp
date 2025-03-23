@@ -154,6 +154,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
+
+                    State.BanEveryone = false;
+                    State.KickEveryone = false;
                 }
             }
             else {
