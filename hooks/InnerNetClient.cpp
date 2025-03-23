@@ -879,6 +879,52 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     else {
         AutoRepairSabotageDelay--;
     }
+    
+    static int AutoPunish = 1;
+
+    if (State.BanEveryone) {
+        for (int playerId = 0; playerId < Game::MAX_PLAYERS; ++playerId) {
+            auto playerData = GetPlayerDataById(playerId);
+            auto playerControl = GetPlayerControlById(playerId);
+
+            if (!playerData || !playerControl || playerControl == *Game::pLocalPlayer) continue;
+
+            if (State.Ban_IgnoreWhitelist &&
+                std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.WhitelistFriendCodes.end()) {
+                continue;
+            }
+
+            if (AutoPunish <= 0) {
+                app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, true, NULL);
+                AutoPunish = 1; // Preventing the absence of notifications
+            }
+            else {
+                AutoPunish--;
+            }
+        }
+    }
+
+    if (State.KickEveryone) {
+        for (int playerId = 0; playerId < Game::MAX_PLAYERS; ++playerId) {
+            auto playerData = GetPlayerDataById(playerId);
+            auto playerControl = GetPlayerControlById(playerId);
+
+            if (!playerData || !playerControl || playerControl == *Game::pLocalPlayer) continue;
+
+            if (State.Ban_IgnoreWhitelist &&
+                std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.WhitelistFriendCodes.end()) {
+                continue;
+            }
+
+            if (AutoPunish <= 0) {
+                app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, false, NULL);
+                AutoPunish = 1; // Preventing the absence of notifications
+            }
+            else {
+                AutoPunish--;
+            }
+        }
+    }
 }
 
 void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, MethodInfo* method) {
