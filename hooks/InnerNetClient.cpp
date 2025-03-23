@@ -883,14 +883,16 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         AutoRepairSabotageDelay--;
     }
 
-    static int AutoPunish = 1;
+    static int AutoPunish = 10;
 
-        if (State.BanEveryone || State.KickEveryone) {
-        for (int playerId = 0; playerId < Game::MAX_PLAYERS; ++playerId) {
-            auto playerData = GetPlayerDataById(playerId);
-            auto playerControl = GetPlayerControlById(playerId);
+    if (State.BanEveryone || State.KickEveryone) {
+        auto allPlayers = GetAllPlayerControl();
 
-            if (!playerData || !playerControl || playerControl == *Game::pLocalPlayer) continue;
+        for (auto playerControl : allPlayers) {
+            if (!playerControl || playerControl == *Game::pLocalPlayer) continue;
+
+            auto playerData = GetPlayerDataById(playerControl->fields.PlayerId);
+            if (!playerData) continue;
 
             if (State.Ban_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.WhitelistFriendCodes.end()) {
                 continue;
@@ -899,7 +901,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (AutoPunish <= 0) {
                 bool ShouldBan = State.BanEveryone;
                 app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, ShouldBan, NULL);
-                AutoPunish = 1; // Preventing the absence of notifications
+                AutoPunish = 10; // Preventing the absence of notifications & self-ban/kick
             }
             else {
                 AutoPunish--;
