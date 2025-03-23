@@ -531,8 +531,11 @@ public:
     bool ProGamer = false;
 
     bool Destruct_IgnoreWhitelist = false;
+    bool Ban_IgnoreWhitelist = false;
     bool OverloadEveryone = false;
     bool LagEveryone = false;
+    bool BanEveryone = false;
+    bool KickEveryone = false;
 
     bool AprilFoolsMode = false;
     bool BrainrotEveryone = false;
