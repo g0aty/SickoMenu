@@ -131,6 +131,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
+                    
+                    State.BanEveryone = false;
+                    State.KickEveryone = false;
                 }
             }
             else {
@@ -850,6 +853,32 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     }
     else {
         AutoRepairSabotageDelay--;
+    }
+
+    static int AutoPunish = 10;
+
+    if (State.BanEveryone || State.KickEveryone) {
+        auto allPlayers = GetAllPlayerControl();
+
+        for (auto playerControl : allPlayers) {
+            if (!playerControl || playerControl == *Game::pLocalPlayer) continue;
+
+            auto playerData = GetPlayerDataById(playerControl->fields.PlayerId);
+            if (!playerData) continue;
+
+            if (State.Ban_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.WhitelistFriendCodes.end()) {
+                continue;
+            }
+
+            if (AutoPunish <= 0) {
+                bool ShouldBan = State.BanEveryone;
+                app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, ShouldBan, NULL);
+                AutoPunish = 10; // Preventing the absence of notifications & self-ban/kick
+            }
+            else {
+                AutoPunish--;
+            }
+        }
     }
 }
 

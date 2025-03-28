@@ -645,7 +645,10 @@ namespace GameTab {
         }
 
         if (openDestruct) {
-            if (ToggleButton("Ignore Whitelisted Players", &State.Destruct_IgnoreWhitelist)) {
+            if (ToggleButton("Ignore Whitelisted Players [Exploits]", &State.Destruct_IgnoreWhitelist)) {
+                State.Save();
+            }
+            if (ToggleButton("Ignore Whitelisted Players [Ban/Kick]", &State.Ban_IgnoreWhitelist)) {
                 State.Save();
             }
             if (ToggleButton("Overload Everyone [Slow]", &State.OverloadEveryone)) {
@@ -659,6 +662,16 @@ namespace GameTab {
             }
             if (IsHost() && ImGui::Button("Remove Map")) {
                 State.taskRpcQueue.push(new DestroyMap());
+            }
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if ((IsHost()) && ToggleButton("Ban Everyone", &State.BanEveryone))
+            {
+                State.Save();
+            }
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if ((IsHost()) && ToggleButton("Kick Everyone", &State.KickEveryone))
+            {
+                State.Save();
             }
             if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
             if (State.AprilFoolsMode) {
