@@ -97,6 +97,7 @@ DO_APP_FUNC(NetworkedPlayerInfo*, PlayerControl_get_Data, (PlayerControl* __this
 DO_APP_FUNC(Vector2, PlayerControl_GetTruePosition, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, UnityEngine.Vector2 PlayerControl::GetTruePosition()");
 DO_APP_FUNC(void, PlayerControl_RpcSyncSettings, (PlayerControl* __this, Byte__Array* optionsByteArray, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSyncSettings(System.Byte[])");
 DO_APP_FUNC(void, PlayerControl_RpcPlayAnimation, (PlayerControl* __this, uint8_t animType, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcPlayAnimation(System.Byte)");
+DO_APP_FUNC(void, PlayerControl_PlayAnimation, (PlayerControl* __this, uint8_t animType, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::PlayAnimation(System.Byte)");
 DO_APP_FUNC(void, PlayerControl_CmdReportDeadBody, (PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdReportDeadBody(NetworkedPlayerInfo)");
 DO_APP_FUNC(void, PlayerControl_CmdCheckMurder, (PlayerControl* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdCheckMurder(PlayerControl)");
 DO_APP_FUNC(void, PlayerControl_CheckMurder, (PlayerControl* __this, PlayerControl* target, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CheckMurder(PlayerControl)");
@@ -108,6 +109,7 @@ DO_APP_FUNC(void, PlayerControl_RpcStartMeeting, (PlayerControl* __this, Network
 DO_APP_FUNC(void, PlayerControl_RpcSetRole, (PlayerControl* __this, RoleTypes__Enum roleType, bool canOverrideRole, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSetRole(AmongUs.GameOptions.RoleTypes, System.Boolean)");
 DO_APP_FUNC(void*, PlayerControl_CoSetRole, (PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator PlayerControl::CoSetRole(AmongUs.GameOptions.RoleTypes, System.Boolean)");
 DO_APP_FUNC(void, PlayerControl_RpcSetScanner, (PlayerControl* __this, bool value, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSetScanner(System.Boolean)");
+DO_APP_FUNC(void, PlayerControl_SetScanner, (PlayerControl* __this, bool on, uint8_t cnt), "Assembly-CSharp, System.Void PlayerControl::SetScanner(System.Boolean, System.Byte)");
 DO_APP_FUNC(void, PlayerControl_CmdCheckColor, (PlayerControl* __this, uint8_t bodyColor, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdCheckColor(System.Byte)");
 DO_APP_FUNC(void, PlayerControl_RpcSetColor, (PlayerControl* __this, uint8_t bodyColor, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSetColor(System.Byte)");
 DO_APP_FUNC(void, PlayerControl_CmdCheckName, (PlayerControl* __this, String* name, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdCheckName(System.String)");
