@@ -50,8 +50,7 @@ typedef struct Il2CppThread Il2CppThread;
 typedef struct Il2CppAsyncResult Il2CppAsyncResult;
 typedef struct Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
 typedef struct Il2CppCustomAttrInfo Il2CppCustomAttrInfo;
-typedef enum
-{
+typedef enum {
     IL2CPP_PROFILE_NONE = 0,
     IL2CPP_PROFILE_APPDOMAIN_EVENTS = 1 << 0,
     IL2CPP_PROFILE_ASSEMBLY_EVENTS = 1 << 1,
@@ -75,13 +74,11 @@ typedef enum
     IL2CPP_PROFILE_GC_MOVES = 1 << 19,
     IL2CPP_PROFILE_FILEIO = 1 << 20
 } Il2CppProfileFlags;
-typedef enum
-{
+typedef enum {
     IL2CPP_PROFILE_FILEIO_WRITE = 0,
     IL2CPP_PROFILE_FILEIO_READ
 } Il2CppProfileFileIOKind;
-typedef enum
-{
+typedef enum {
     IL2CPP_GC_EVENT_START,
     IL2CPP_GC_EVENT_MARK_START,
     IL2CPP_GC_EVENT_MARK_END,
@@ -93,14 +90,12 @@ typedef enum
     IL2CPP_GC_EVENT_PRE_START_WORLD,
     IL2CPP_GC_EVENT_POST_START_WORLD
 } Il2CppGCEvent;
-typedef enum
-{
+typedef enum {
     IL2CPP_GC_MODE_DISABLED = 0,
     IL2CPP_GC_MODE_ENABLED = 1,
     IL2CPP_GC_MODE_MANUAL = 2
 } Il2CppGCMode;
-typedef enum
-{
+typedef enum {
     IL2CPP_STAT_NEW_OBJECT_COUNT,
     IL2CPP_STAT_INITIALIZED_CLASS_COUNT,
     IL2CPP_STAT_METHOD_COUNT,
@@ -110,13 +105,11 @@ typedef enum
     IL2CPP_STAT_INFLATED_METHOD_COUNT,
     IL2CPP_STAT_INFLATED_TYPE_COUNT,
 } Il2CppStat;
-typedef enum
-{
+typedef enum {
     IL2CPP_UNHANDLED_POLICY_LEGACY,
     IL2CPP_UNHANDLED_POLICY_CURRENT
 } Il2CppRuntimeUnhandledExceptionPolicy;
-typedef struct Il2CppStackFrameInfo
-{
+typedef struct Il2CppStackFrameInfo {
     const MethodInfo* method;
     uintptr_t raw_ip;
     int sourceCodeLineNumber;
@@ -124,14 +117,12 @@ typedef struct Il2CppStackFrameInfo
     const char* filePath;
 } Il2CppStackFrameInfo;
 typedef void(*Il2CppMethodPointer)();
-typedef struct Il2CppMethodDebugInfo
-{
+typedef struct Il2CppMethodDebugInfo {
     Il2CppMethodPointer methodPointer;
     int32_t code_size;
     const char* file;
 } Il2CppMethodDebugInfo;
-typedef struct
-{
+typedef struct {
     void* (*malloc_func)(size_t size);
     void* (*aligned_malloc_func)(size_t size, size_t alignment);
     void (*free_func)(void* ptr);
@@ -140,8 +131,7 @@ typedef struct
     void* (*realloc_func)(void* ptr, size_t size);
     void* (*aligned_realloc_func)(void* ptr, size_t size, size_t alignment);
 } Il2CppMemoryCallbacks;
-typedef struct
-{
+typedef struct {
     const char* name;
     void(*connect)(const char* address);
     int(*wait_for_attach)(void);
@@ -172,8 +162,7 @@ typedef uint16_t Il2CppMethodSlot;
 static const uint16_t kInvalidIl2CppMethodSlot = 65535;
 static const int ipv6AddressSize = 16;
 typedef int32_t il2cpp_hresult_t;
-typedef enum
-{
+typedef enum {
     IL2CPP_TOKEN_MODULE = 0x00000000,
     IL2CPP_TOKEN_TYPE_REF = 0x01000000,
     IL2CPP_TOKEN_TYPE_DEF = 0x02000000,
@@ -246,47 +235,39 @@ static const RGCTXIndex kRGCTXIndexInvalid = -1;
 static const StringLiteralIndex kStringLiteralIndexInvalid = -1;
 static const InteropDataIndex kInteropDataIndexInvalid = -1;
 static const int kPublicKeyByteLength = 8;
-typedef struct Il2CppMethodSpec
-{
+typedef struct Il2CppMethodSpec {
     MethodIndex methodDefinitionIndex;
     GenericInstIndex classIndexIndex;
     GenericInstIndex methodIndexIndex;
 } Il2CppMethodSpec;
-typedef enum Il2CppRGCTXDataType
-{
+typedef enum Il2CppRGCTXDataType {
     IL2CPP_RGCTX_DATA_INVALID,
     IL2CPP_RGCTX_DATA_TYPE,
     IL2CPP_RGCTX_DATA_CLASS,
     IL2CPP_RGCTX_DATA_METHOD,
     IL2CPP_RGCTX_DATA_ARRAY,
 } Il2CppRGCTXDataType;
-typedef union Il2CppRGCTXDefinitionData
-{
+typedef union Il2CppRGCTXDefinitionData {
     int32_t rgctxDataDummy;
     MethodIndex __methodIndex;
     TypeIndex __typeIndex;
 } Il2CppRGCTXDefinitionData;
-typedef struct Il2CppRGCTXDefinition
-{
+typedef struct Il2CppRGCTXDefinition {
     Il2CppRGCTXDataType type;
     const Il2CppRGCTXDefinitionData* data;
 } Il2CppRGCTXDefinition;
-typedef struct
-{
+typedef struct {
     MethodIndex methodIndex;
     MethodIndex invokerIndex;
 } Il2CppGenericMethodIndices;
-typedef struct Il2CppGenericMethodFunctionsDefinitions
-{
+typedef struct Il2CppGenericMethodFunctionsDefinitions {
     GenericMethodIndex genericMethodIndex;
     Il2CppGenericMethodIndices indices;
 } Il2CppGenericMethodFunctionsDefinitions;
-static inline uint32_t GetTokenType(uint32_t token)
-{
+static inline uint32_t GetTokenType(uint32_t token) {
     return token & 0xFF000000;
 }
-static inline uint32_t GetTokenRowId(uint32_t token)
-{
+static inline uint32_t GetTokenRowId(uint32_t token) {
     return token & 0x00FFFFFF;
 }
 typedef const struct ___Il2CppMetadataImageHandle* Il2CppMetadataImageHandle;
@@ -296,8 +277,7 @@ typedef const struct ___Il2CppMetadataMethodHandle* Il2CppMetadataMethodDefiniti
 typedef const struct ___Il2CppMetadataGenericContainerHandle* Il2CppMetadataGenericContainerHandle;
 typedef const struct ___Il2CppMetadataGenericParameterHandle* Il2CppMetadataGenericParameterHandle;
 typedef uint32_t EncodedMethodIndex;
-typedef enum Il2CppMetadataUsage
-{
+typedef enum Il2CppMetadataUsage {
     kIl2CppMetadataUsageInvalid,
     kIl2CppMetadataUsageTypeInfo,
     kIl2CppMetadataUsageIl2CppType,
@@ -306,13 +286,11 @@ typedef enum Il2CppMetadataUsage
     kIl2CppMetadataUsageStringLiteral,
     kIl2CppMetadataUsageMethodRef,
 } Il2CppMetadataUsage;
-typedef struct Il2CppInterfaceOffsetPair
-{
+typedef struct Il2CppInterfaceOffsetPair {
     TypeIndex interfaceTypeIndex;
     int32_t offset;
 } Il2CppInterfaceOffsetPair;
-typedef struct Il2CppTypeDefinition
-{
+typedef struct Il2CppTypeDefinition {
     StringIndex nameIndex;
     StringIndex namespaceIndex;
     TypeIndex byvalTypeIndex;
@@ -340,43 +318,36 @@ typedef struct Il2CppTypeDefinition
     uint32_t bitfield;
     uint32_t token;
 } Il2CppTypeDefinition;
-typedef struct Il2CppFieldDefinition
-{
+typedef struct Il2CppFieldDefinition {
     StringIndex nameIndex;
     TypeIndex typeIndex;
     uint32_t token;
 } Il2CppFieldDefinition;
-typedef struct Il2CppFieldDefaultValue
-{
+typedef struct Il2CppFieldDefaultValue {
     FieldIndex fieldIndex;
     TypeIndex typeIndex;
     DefaultValueDataIndex dataIndex;
 } Il2CppFieldDefaultValue;
-typedef struct Il2CppFieldMarshaledSize
-{
+typedef struct Il2CppFieldMarshaledSize {
     FieldIndex fieldIndex;
     TypeIndex typeIndex;
     int32_t size;
 } Il2CppFieldMarshaledSize;
-typedef struct Il2CppFieldRef
-{
+typedef struct Il2CppFieldRef {
     TypeIndex typeIndex;
     FieldIndex fieldIndex;
 } Il2CppFieldRef;
-typedef struct Il2CppParameterDefinition
-{
+typedef struct Il2CppParameterDefinition {
     StringIndex nameIndex;
     uint32_t token;
     TypeIndex typeIndex;
 } Il2CppParameterDefinition;
-typedef struct Il2CppParameterDefaultValue
-{
+typedef struct Il2CppParameterDefaultValue {
     ParameterIndex parameterIndex;
     TypeIndex typeIndex;
     DefaultValueDataIndex dataIndex;
 } Il2CppParameterDefaultValue;
-typedef struct Il2CppMethodDefinition
-{
+typedef struct Il2CppMethodDefinition {
     StringIndex nameIndex;
     TypeDefinitionIndex declaringType;
     TypeIndex returnType;
@@ -388,8 +359,7 @@ typedef struct Il2CppMethodDefinition
     uint16_t slot;
     uint16_t parameterCount;
 } Il2CppMethodDefinition;
-typedef struct Il2CppEventDefinition
-{
+typedef struct Il2CppEventDefinition {
     StringIndex nameIndex;
     TypeIndex typeIndex;
     MethodIndex add;
@@ -397,21 +367,18 @@ typedef struct Il2CppEventDefinition
     MethodIndex raise;
     uint32_t token;
 } Il2CppEventDefinition;
-typedef struct Il2CppPropertyDefinition
-{
+typedef struct Il2CppPropertyDefinition {
     StringIndex nameIndex;
     MethodIndex get;
     MethodIndex set;
     uint32_t attrs;
     uint32_t token;
 } Il2CppPropertyDefinition;
-typedef struct Il2CppStringLiteral
-{
+typedef struct Il2CppStringLiteral {
     uint32_t length;
     StringLiteralIndex dataIndex;
 } Il2CppStringLiteral;
-typedef struct Il2CppAssemblyNameDefinition
-{
+typedef struct Il2CppAssemblyNameDefinition {
     StringIndex nameIndex;
     StringIndex cultureIndex;
     StringIndex publicKeyIndex;
@@ -424,8 +391,7 @@ typedef struct Il2CppAssemblyNameDefinition
     int32_t revision;
     uint8_t public_key_token[8];
 } Il2CppAssemblyNameDefinition;
-typedef struct Il2CppImageDefinition
-{
+typedef struct Il2CppImageDefinition {
     StringIndex nameIndex;
     AssemblyIndex assemblyIndex;
     TypeDefinitionIndex typeStart;
@@ -437,34 +403,29 @@ typedef struct Il2CppImageDefinition
     CustomAttributeIndex customAttributeStart;
     uint32_t customAttributeCount;
 } Il2CppImageDefinition;
-typedef struct Il2CppAssemblyDefinition
-{
+typedef struct Il2CppAssemblyDefinition {
     ImageIndex imageIndex;
     uint32_t token;
     int32_t referencedAssemblyStart;
     int32_t referencedAssemblyCount;
     Il2CppAssemblyNameDefinition aname;
 } Il2CppAssemblyDefinition;
-typedef struct Il2CppCustomAttributeTypeRange
-{
+typedef struct Il2CppCustomAttributeTypeRange {
     uint32_t token;
     int32_t start;
     int32_t count;
 } Il2CppCustomAttributeTypeRange;
-typedef struct Il2CppMetadataRange
-{
+typedef struct Il2CppMetadataRange {
     int32_t start;
     int32_t length;
 } Il2CppMetadataRange;
-typedef struct Il2CppGenericContainer
-{
+typedef struct Il2CppGenericContainer {
     int32_t ownerIndex;
     int32_t type_argc;
     int32_t is_method;
     GenericParameterIndex genericParameterStart;
 } Il2CppGenericContainer;
-typedef struct Il2CppGenericParameter
-{
+typedef struct Il2CppGenericParameter {
     GenericContainerIndex ownerIndex;
     StringIndex nameIndex;
     GenericParameterConstraintIndex constraintsStart;
@@ -472,14 +433,12 @@ typedef struct Il2CppGenericParameter
     uint16_t num;
     uint16_t flags;
 } Il2CppGenericParameter;
-typedef struct Il2CppWindowsRuntimeTypeNamePair
-{
+typedef struct Il2CppWindowsRuntimeTypeNamePair {
     StringIndex nameIndex;
     TypeIndex typeIndex;
 } Il2CppWindowsRuntimeTypeNamePair;
 #pragma pack(push, p1,4)
-typedef struct Il2CppGlobalMetadataHeader
-{
+typedef struct Il2CppGlobalMetadataHeader {
     int32_t sanity;
     int32_t version;
     int32_t stringLiteralOffset;
@@ -546,22 +505,19 @@ typedef struct Il2CppGlobalMetadataHeader
     int32_t exportedTypeDefinitionsCount;
 } Il2CppGlobalMetadataHeader;
 #pragma pack(pop, p1)
-typedef struct Il2CppMetadataField
-{
+typedef struct Il2CppMetadataField {
     uint32_t offset;
     uint32_t typeIndex;
     const char* name;
     uint8_t isStatic;
 } Il2CppMetadataField;
-typedef enum Il2CppMetadataTypeFlags
-{
+typedef enum Il2CppMetadataTypeFlags {
     kNone = 0,
     kValueType = 1 << 0,
     kArray = 1 << 1,
     kArrayRankMask = 0xFFFF0000
 } Il2CppMetadataTypeFlags;
-typedef struct Il2CppMetadataType
-{
+typedef struct Il2CppMetadataType {
     Il2CppMetadataTypeFlags flags;
     Il2CppMetadataField* fields;
     uint32_t fieldCount;
@@ -573,29 +529,24 @@ typedef struct Il2CppMetadataType
     uint64_t typeInfoAddress;
     uint32_t size;
 } Il2CppMetadataType;
-typedef struct Il2CppMetadataSnapshot
-{
+typedef struct Il2CppMetadataSnapshot {
     uint32_t typeCount;
     Il2CppMetadataType* types;
 } Il2CppMetadataSnapshot;
-typedef struct Il2CppManagedMemorySection
-{
+typedef struct Il2CppManagedMemorySection {
     uint64_t sectionStartAddress;
     uint32_t sectionSize;
     uint8_t* sectionBytes;
 } Il2CppManagedMemorySection;
-typedef struct Il2CppManagedHeap
-{
+typedef struct Il2CppManagedHeap {
     uint32_t sectionCount;
     Il2CppManagedMemorySection* sections;
 } Il2CppManagedHeap;
-typedef struct Il2CppStacks
-{
+typedef struct Il2CppStacks {
     uint32_t stackCount;
     Il2CppManagedMemorySection* stacks;
 } Il2CppStacks;
-typedef struct NativeObject
-{
+typedef struct NativeObject {
     uint32_t gcHandleIndex;
     uint32_t size;
     uint32_t instanceId;
@@ -603,13 +554,11 @@ typedef struct NativeObject
     uint32_t referencedNativeObjectIndicesCount;
     uint32_t* referencedNativeObjectIndices;
 } NativeObject;
-typedef struct Il2CppGCHandles
-{
+typedef struct Il2CppGCHandles {
     uint32_t trackedObjectCount;
     uint64_t* pointersToObjects;
 } Il2CppGCHandles;
-typedef struct Il2CppRuntimeInformation
-{
+typedef struct Il2CppRuntimeInformation {
     uint32_t pointerSize;
     uint32_t objectHeaderSize;
     uint32_t arrayHeaderSize;
@@ -617,8 +566,7 @@ typedef struct Il2CppRuntimeInformation
     uint32_t arraySizeOffsetInHeader;
     uint32_t allocationGranularity;
 } Il2CppRuntimeInformation;
-typedef struct Il2CppManagedMemorySnapshot
-{
+typedef struct Il2CppManagedMemorySnapshot {
     Il2CppManagedHeap heap;
     Il2CppStacks stacks;
     Il2CppMetadataSnapshot metadata;
@@ -626,8 +574,7 @@ typedef struct Il2CppManagedMemorySnapshot
     Il2CppRuntimeInformation runtimeInformation;
     void* additionalUserInformation;
 } Il2CppManagedMemorySnapshot;
-typedef enum Il2CppTypeEnum
-{
+typedef enum Il2CppTypeEnum {
     IL2CPP_TYPE_END = 0x00,
     IL2CPP_TYPE_VOID = 0x01,
     IL2CPP_TYPE_BOOLEAN = 0x02,
@@ -668,8 +615,7 @@ typedef enum Il2CppTypeEnum
 typedef struct Il2CppClass Il2CppClass;
 typedef struct MethodInfo MethodInfo;
 typedef struct Il2CppType Il2CppType;
-typedef struct Il2CppArrayType
-{
+typedef struct Il2CppArrayType {
     const Il2CppType* etype;
     uint8_t rank;
     uint8_t numsizes;
@@ -677,31 +623,25 @@ typedef struct Il2CppArrayType
     int* sizes;
     int* lobounds;
 } Il2CppArrayType;
-typedef struct Il2CppGenericInst
-{
+typedef struct Il2CppGenericInst {
     uint32_t type_argc;
     const Il2CppType** type_argv;
 } Il2CppGenericInst;
-typedef struct Il2CppGenericContext
-{
+typedef struct Il2CppGenericContext {
     const Il2CppGenericInst* class_inst;
     const Il2CppGenericInst* method_inst;
 } Il2CppGenericContext;
-typedef struct Il2CppGenericClass
-{
+typedef struct Il2CppGenericClass {
     const Il2CppType* type;
     Il2CppGenericContext context;
     Il2CppClass* cached_class;
 } Il2CppGenericClass;
-typedef struct Il2CppGenericMethod
-{
+typedef struct Il2CppGenericMethod {
     const MethodInfo* methodDefinition;
     Il2CppGenericContext context;
 } Il2CppGenericMethod;
-typedef struct Il2CppType
-{
-    union
-    {
+typedef struct Il2CppType {
+    union {
         void* dummy;
         TypeDefinitionIndex __klassIndex;
         Il2CppMetadataTypeHandle typeHandle;
@@ -718,14 +658,12 @@ typedef struct Il2CppType
     unsigned int pinned : 1;
     unsigned int valuetype : 1;
 } Il2CppType;
-typedef struct Il2CppMetadataFieldInfo
-{
+typedef struct Il2CppMetadataFieldInfo {
     const Il2CppType* type;
     const char* name;
     uint32_t token;
 } Il2CppMetadataFieldInfo;
-typedef struct Il2CppMetadataMethodInfo
-{
+typedef struct Il2CppMetadataMethodInfo {
     Il2CppMetadataMethodDefinitionHandle handle;
     const char* name;
     const Il2CppType* return_type;
@@ -735,22 +673,19 @@ typedef struct Il2CppMetadataMethodInfo
     uint16_t slot;
     uint16_t parameterCount;
 } Il2CppMetadataMethodInfo;
-typedef struct Il2CppMetadataParameterInfo
-{
+typedef struct Il2CppMetadataParameterInfo {
     const char* name;
     uint32_t token;
     const Il2CppType* type;
 } Il2CppMetadataParameterInfo;
-typedef struct Il2CppMetadataPropertyInfo
-{
+typedef struct Il2CppMetadataPropertyInfo {
     const char* name;
     const MethodInfo* get;
     const MethodInfo* set;
     uint32_t attrs;
     uint32_t token;
 } Il2CppMetadataPropertyInfo;
-typedef struct Il2CppMetadataEventInfo
-{
+typedef struct Il2CppMetadataEventInfo {
     const char* name;
     const Il2CppType* type;
     const MethodInfo* add;
@@ -758,20 +693,17 @@ typedef struct Il2CppMetadataEventInfo
     const MethodInfo* raise;
     uint32_t token;
 } Il2CppMetadataEventInfo;
-typedef struct Il2CppInterfaceOffsetInfo
-{
+typedef struct Il2CppInterfaceOffsetInfo {
     const Il2CppType* interfaceType;
     int32_t offset;
 } Il2CppInterfaceOffsetInfo;
-typedef struct Il2CppGenericParameterInfo
-{
+typedef struct Il2CppGenericParameterInfo {
     Il2CppMetadataGenericContainerHandle containerHandle;
     const char* name;
     uint16_t num;
     uint16_t flags;
 } Il2CppGenericParameterInfo;
-typedef enum Il2CppCallConvention
-{
+typedef enum Il2CppCallConvention {
     IL2CPP_CALL_DEFAULT,
     IL2CPP_CALL_C,
     IL2CPP_CALL_STDCALL,
@@ -779,39 +711,32 @@ typedef enum Il2CppCallConvention
     IL2CPP_CALL_FASTCALL,
     IL2CPP_CALL_VARARG
 } Il2CppCallConvention;
-typedef enum Il2CppCharSet
-{
+typedef enum Il2CppCharSet {
     CHARSET_ANSI,
     CHARSET_UNICODE,
     CHARSET_NOT_SPECIFIED
 } Il2CppCharSet;
-typedef struct Il2CppHString__
-{
+typedef struct Il2CppHString__ {
     int unused;
 } Il2CppHString__;
 typedef Il2CppHString__* Il2CppHString;
-typedef struct Il2CppHStringHeader
-{
-    union
-    {
+typedef struct Il2CppHStringHeader {
+    union {
         void* Reserved1;
         char Reserved2[24];
     } Reserved;
 } Il2CppHStringHeader;
-typedef struct Il2CppGuid
-{
+typedef struct Il2CppGuid {
     uint32_t data1;
     uint16_t data2;
     uint16_t data3;
     uint8_t data4[8];
 } Il2CppGuid;
-typedef struct Il2CppSafeArrayBound
-{
+typedef struct Il2CppSafeArrayBound {
     uint32_t element_count;
     int32_t lower_bound;
 } Il2CppSafeArrayBound;
-typedef struct Il2CppSafeArray
-{
+typedef struct Il2CppSafeArray {
     uint16_t dimension_count;
     uint16_t features;
     uint32_t element_size;
@@ -819,11 +744,9 @@ typedef struct Il2CppSafeArray
     void* data;
     Il2CppSafeArrayBound bounds[1];
 } Il2CppSafeArray;
-typedef struct Il2CppWin32Decimal
-{
+typedef struct Il2CppWin32Decimal {
     uint16_t reserved;
-    union
-    {
+    union {
         struct
         {
             uint8_t scale;
@@ -832,8 +755,7 @@ typedef struct Il2CppWin32Decimal
         uint16_t signscale;
     } u;
     uint32_t hi32;
-    union
-    {
+    union {
         struct
         {
             uint32_t lo32;
@@ -843,8 +765,7 @@ typedef struct Il2CppWin32Decimal
     } u2;
 } Il2CppWin32Decimal;
 typedef int16_t IL2CPP_VARIANT_BOOL;
-typedef enum Il2CppVarType
-{
+typedef enum Il2CppVarType {
     IL2CPP_VT_EMPTY = 0,
     IL2CPP_VT_NULL = 1,
     IL2CPP_VT_I2 = 2,
@@ -900,10 +821,8 @@ typedef enum Il2CppVarType
 } Il2CppVarType;
 typedef struct Il2CppVariant Il2CppVariant;
 typedef struct Il2CppIUnknown Il2CppIUnknown;
-typedef struct Il2CppVariant
-{
-    union
-    {
+typedef struct Il2CppVariant {
+    union {
         struct __tagVARIANT
         {
             uint16_t type;
@@ -965,13 +884,11 @@ typedef struct Il2CppVariant
         Il2CppWin32Decimal decVal;
     } n1;
 } Il2CppVariant;
-typedef struct Il2CppFileTime
-{
+typedef struct Il2CppFileTime {
     uint32_t low;
     uint32_t high;
 } Il2CppFileTime;
-typedef struct Il2CppStatStg
-{
+typedef struct Il2CppStatStg {
     Il2CppChar* name;
     uint32_t type;
     uint64_t size;
@@ -984,14 +901,12 @@ typedef struct Il2CppStatStg
     uint32_t state;
     uint32_t reserved;
 } Il2CppStatStg;
-typedef enum Il2CppWindowsRuntimeTypeKind
-{
+typedef enum Il2CppWindowsRuntimeTypeKind {
     kTypeKindPrimitive = 0,
     kTypeKindMetadata,
     kTypeKindCustom
 } Il2CppWindowsRuntimeTypeKind;
-typedef struct Il2CppWindowsRuntimeTypeName
-{
+typedef struct Il2CppWindowsRuntimeTypeName {
     Il2CppHString typeName;
     enum Il2CppWindowsRuntimeTypeKind typeKind;
 } Il2CppWindowsRuntimeTypeName;
@@ -999,8 +914,7 @@ typedef void (*PInvokeMarshalToNativeFunc)(void* managedStructure, void* marshal
 typedef void (*PInvokeMarshalFromNativeFunc)(void* marshaledStructure, void* managedStructure);
 typedef void (*PInvokeMarshalCleanupFunc)(void* marshaledStructure);
 typedef struct Il2CppIUnknown* (*CreateCCWFunc)(Il2CppObject* obj);
-typedef struct Il2CppInteropData
-{
+typedef struct Il2CppInteropData {
     Il2CppMethodPointer delegatePInvokeWrapperFunction;
     PInvokeMarshalToNativeFunc pinvokeMarshalToNativeFunction;
     PInvokeMarshalFromNativeFunc pinvokeMarshalFromNativeFunction;
@@ -1023,20 +937,17 @@ typedef struct Il2CppNameToTypeHandleHashTable Il2CppNameToTypeHandleHashTable;
 typedef struct Il2CppCodeGenModule Il2CppCodeGenModule;
 typedef struct Il2CppMetadataRegistration Il2CppMetadataRegistration;
 typedef struct Il2CppCodeRegistration Il2CppCodeRegistration;
-typedef struct VirtualInvokeData
-{
+typedef struct VirtualInvokeData {
     Il2CppMethodPointer methodPtr;
     const MethodInfo* method;
 } VirtualInvokeData;
-typedef enum Il2CppTypeNameFormat
-{
+typedef enum Il2CppTypeNameFormat {
     IL2CPP_TYPE_NAME_FORMAT_IL,
     IL2CPP_TYPE_NAME_FORMAT_REFLECTION,
     IL2CPP_TYPE_NAME_FORMAT_FULL_NAME,
     IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED
 } Il2CppTypeNameFormat;
-typedef struct Il2CppDefaults
-{
+typedef struct Il2CppDefaults {
     Il2CppImage* corlib;
     Il2CppClass* object_class;
     Il2CppClass* byte_class;
@@ -1142,22 +1053,19 @@ typedef struct MethodInfo MethodInfo;
 typedef struct FieldInfo FieldInfo;
 typedef struct Il2CppObject Il2CppObject;
 typedef struct MemberInfo MemberInfo;
-typedef struct CustomAttributesCache
-{
+typedef struct CustomAttributesCache {
     int count;
     Il2CppObject** attributes;
 } CustomAttributesCache;
 typedef void (*CustomAttributesCacheGenerator)(CustomAttributesCache*);
-typedef struct FieldInfo
-{
+typedef struct FieldInfo {
     const char* name;
     const Il2CppType* type;
     Il2CppClass* parent;
     int32_t offset;
     uint32_t token;
 } FieldInfo;
-typedef struct PropertyInfo
-{
+typedef struct PropertyInfo {
     Il2CppClass* parent;
     const char* name;
     const MethodInfo* get;
@@ -1165,8 +1073,7 @@ typedef struct PropertyInfo
     uint32_t attrs;
     uint32_t token;
 } PropertyInfo;
-typedef struct EventInfo
-{
+typedef struct EventInfo {
     const char* name;
     const Il2CppType* eventType;
     Il2CppClass* parent;
@@ -1175,59 +1082,49 @@ typedef struct EventInfo
     const MethodInfo* raise;
     uint32_t token;
 } EventInfo;
-typedef struct ParameterInfo
-{
+typedef struct ParameterInfo {
     const char* name;
     int32_t position;
     uint32_t token;
     const Il2CppType* parameter_type;
 } ParameterInfo;
 typedef void (*InvokerMethod)(Il2CppMethodPointer, const MethodInfo*, void*, void**, void*);
-typedef enum MethodVariableKind
-{
+typedef enum MethodVariableKind {
     kMethodVariableKind_This,
     kMethodVariableKind_Parameter,
     kMethodVariableKind_LocalVariable
 } MethodVariableKind;
-typedef enum SequencePointKind
-{
+typedef enum SequencePointKind {
     kSequencePointKind_Normal,
     kSequencePointKind_StepOut
 } SequencePointKind;
-typedef struct Il2CppMethodExecutionContextInfo
-{
+typedef struct Il2CppMethodExecutionContextInfo {
     TypeIndex typeIndex;
     int32_t nameIndex;
     int32_t scopeIndex;
 } Il2CppMethodExecutionContextInfo;
-typedef struct Il2CppMethodExecutionContextInfoIndex
-{
+typedef struct Il2CppMethodExecutionContextInfoIndex {
     int32_t startIndex;
     int32_t count;
 } Il2CppMethodExecutionContextInfoIndex;
-typedef struct Il2CppMethodScope
-{
+typedef struct Il2CppMethodScope {
     int32_t startOffset;
     int32_t endOffset;
 } Il2CppMethodScope;
-typedef struct Il2CppMethodHeaderInfo
-{
+typedef struct Il2CppMethodHeaderInfo {
     int32_t code_size;
     int32_t startScope;
     int32_t numScopes;
 } Il2CppMethodHeaderInfo;
-typedef struct Il2CppSequencePointSourceFile
-{
+typedef struct Il2CppSequencePointSourceFile {
     const char* file;
     uint8_t hash[16];
 } Il2CppSequencePointSourceFile;
-typedef struct Il2CppTypeSourceFilePair
-{
+typedef struct Il2CppTypeSourceFilePair {
     TypeDefinitionIndex __klassIndex;
     int32_t sourceFileIndex;
 } Il2CppTypeSourceFilePair;
-typedef struct Il2CppSequencePoint
-{
+typedef struct Il2CppSequencePoint {
     MethodIndex __methodDefinitionIndex;
     int32_t sourceFileIndex;
     int32_t lineStart, lineEnd;
@@ -1237,16 +1134,14 @@ typedef struct Il2CppSequencePoint
     int32_t isActive;
     int32_t id;
 } Il2CppSequencePoint;
-typedef struct Il2CppCatchPoint
-{
+typedef struct Il2CppCatchPoint {
     MethodIndex __methodDefinitionIndex;
     TypeIndex catchTypeIndex;
     int32_t ilOffset;
     int32_t tryId;
     int32_t parentTryId;
 } Il2CppCatchPoint;
-typedef struct Il2CppDebuggerMetadataRegistration
-{
+typedef struct Il2CppDebuggerMetadataRegistration {
     Il2CppMethodExecutionContextInfo* methodExecutionContextInfos;
     Il2CppMethodExecutionContextInfoIndex* methodExecutionContextInfoIndexes;
     Il2CppMethodScope* methodScopes;
@@ -1260,28 +1155,24 @@ typedef struct Il2CppDebuggerMetadataRegistration
     Il2CppTypeSourceFilePair* typeSourceFiles;
     const char** methodExecutionContextInfoStrings;
 } Il2CppDebuggerMetadataRegistration;
-typedef union Il2CppRGCTXData
-{
+typedef union Il2CppRGCTXData {
     void* rgctxDataDummy;
     const MethodInfo* method;
     const Il2CppType* type;
     Il2CppClass* klass;
 } Il2CppRGCTXData;
-typedef struct MethodInfo
-{
+typedef struct MethodInfo {
     Il2CppMethodPointer methodPointer;
     InvokerMethod invoker_method;
     const char* name;
     Il2CppClass* klass;
     const Il2CppType* return_type;
     const ParameterInfo* parameters;
-    union
-    {
+    union {
         const Il2CppRGCTXData* rgctx_data;
         Il2CppMetadataMethodDefinitionHandle methodMetadataHandle;
     } Il2CppVariant;
-    union
-    {
+    union {
         const Il2CppGenericMethod* genericMethod;
         Il2CppMetadataGenericContainerHandle genericContainerHandle;
     };
@@ -1295,13 +1186,11 @@ typedef struct MethodInfo
     uint8_t wrapper_type : 1;
     uint8_t is_marshaled_from_native : 1;
 } MethodInfo;
-typedef struct Il2CppRuntimeInterfaceOffsetPair
-{
+typedef struct Il2CppRuntimeInterfaceOffsetPair {
     Il2CppClass* interfaceType;
     int32_t offset;
 } Il2CppRuntimeInterfaceOffsetPair;
-typedef struct Il2CppClass
-{
+typedef struct Il2CppClass {
     const Il2CppImage* image;
     void* gc_desc;
     const char* name;
@@ -1373,8 +1262,7 @@ typedef struct Il2CppClass
     VirtualInvokeData vtable[32];
 } Il2CppClass;
 
-typedef struct Il2CppClass_0
-{
+typedef struct Il2CppClass_0 {
     const Il2CppImage* image;
     void* gc_desc;
     const char* name;
@@ -1397,8 +1285,7 @@ typedef struct Il2CppClass_0
     Il2CppClass** implementedInterfaces;
 } Il2CppClass_0;
 
-typedef struct Il2CppClass_1
-{
+typedef struct Il2CppClass_1 {
     struct Il2CppClass** typeHierarchy;
     void* unity_user_data;
     uint32_t initializationExceptionGCHandle;
@@ -1450,8 +1337,7 @@ typedef struct Il2CppClass_1
     uint8_t has_initialization_error : 1;
 } Il2CppClass_1;
 
-typedef struct __declspec(align(8)) Il2CppClass_Merged
-{
+typedef struct __declspec(align(8)) Il2CppClass_Merged {
     struct Il2CppClass_0 _0;
     Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
     void* static_fields;
@@ -1460,15 +1346,13 @@ typedef struct __declspec(align(8)) Il2CppClass_Merged
     VirtualInvokeData vtable[32];
 } Il2CppClass_Merged;
 
-typedef struct Il2CppTypeDefinitionSizes
-{
+typedef struct Il2CppTypeDefinitionSizes {
     uint32_t instance_size;
     int32_t native_size;
     uint32_t static_fields_size;
     uint32_t thread_static_fields_size;
 } Il2CppTypeDefinitionSizes;
-typedef struct Il2CppDomain
-{
+typedef struct Il2CppDomain {
     Il2CppAppDomain* domain;
     Il2CppAppDomainSetup* setup;
     Il2CppAppContext* default_context;
@@ -1477,8 +1361,7 @@ typedef struct Il2CppDomain
     volatile int threadpool_jobs;
     void* agent_info;
 } Il2CppDomain;
-typedef struct Il2CppAssemblyName
-{
+typedef struct Il2CppAssemblyName {
     const char* name;
     const char* culture;
     const uint8_t* public_key;
@@ -1491,8 +1374,7 @@ typedef struct Il2CppAssemblyName
     int32_t revision;
     uint8_t public_key_token[8];
 } Il2CppAssemblyName;
-typedef struct Il2CppImage
-{
+typedef struct Il2CppImage {
     const char* name;
     const char* nameNoExt;
     Il2CppAssembly* assembly;
@@ -1505,43 +1387,36 @@ typedef struct Il2CppImage
     uint32_t token;
     uint8_t dynamic;
 } Il2CppImage;
-typedef struct Il2CppAssembly
-{
+typedef struct Il2CppAssembly {
     Il2CppImage* image;
     uint32_t token;
     int32_t referencedAssemblyStart;
     int32_t referencedAssemblyCount;
     Il2CppAssemblyName aname;
 } Il2CppAssembly;
-typedef struct Il2CppCodeGenOptions
-{
+typedef struct Il2CppCodeGenOptions {
     uint8_t enablePrimitiveValueTypeGenericSharing;
     int maximumRuntimeGenericDepth;
 } Il2CppCodeGenOptions;
-typedef struct Il2CppRange
-{
+typedef struct Il2CppRange {
     int32_t start;
     int32_t length;
 } Il2CppRange;
-typedef struct Il2CppTokenRangePair
-{
+typedef struct Il2CppTokenRangePair {
     uint32_t token;
     Il2CppRange range;
 } Il2CppTokenRangePair;
-typedef struct Il2CppTokenIndexMethodTuple
-{
+typedef struct Il2CppTokenIndexMethodTuple {
     uint32_t token;
     int32_t index;
     void** method;
     uint32_t __genericMethodIndex;
 } Il2CppTokenIndexMethodTuple;
-typedef struct Il2CppWindowsRuntimeFactoryTableEntry
-{
+typedef struct Il2CppWindowsRuntimeFactoryTableEntry {
     const Il2CppType* type;
     Il2CppMethodPointer createFactoryFunction;
 } Il2CppWindowsRuntimeFactoryTableEntry;
-typedef struct Il2CppCodeGenModule
-{
+typedef struct Il2CppCodeGenModule {
     const char* moduleName;
     const uint32_t methodPointerCount;
     const Il2CppMethodPointer* methodPointers;
@@ -1559,8 +1434,7 @@ typedef struct Il2CppCodeGenModule
     const Il2CppMetadataRegistration* metadataRegistration;
     const Il2CppCodeRegistration* codeRegistaration;
 } Il2CppCodeGenModule;
-typedef struct Il2CppCodeRegistration
-{
+typedef struct Il2CppCodeRegistration {
     uint32_t reversePInvokeWrapperCount;
     const Il2CppMethodPointer* reversePInvokeWrappers;
     uint32_t genericMethodPointersCount;
@@ -1576,8 +1450,7 @@ typedef struct Il2CppCodeRegistration
     uint32_t codeGenModulesCount;
     const Il2CppCodeGenModule** codeGenModules;
 } Il2CppCodeRegistration;
-typedef struct Il2CppMetadataRegistration
-{
+typedef struct Il2CppMetadataRegistration {
     int32_t genericClassesCount;
     Il2CppGenericClass* const* genericClasses;
     int32_t genericInstsCount;
@@ -1595,8 +1468,7 @@ typedef struct Il2CppMetadataRegistration
     const size_t metadataUsagesCount;
     void** const* metadataUsages;
 } Il2CppMetadataRegistration;
-typedef struct Il2CppPerfCounters
-{
+typedef struct Il2CppPerfCounters {
     uint32_t jit_methods;
     uint32_t jit_bytes;
     uint32_t jit_time;
@@ -1680,69 +1552,57 @@ typedef struct Il2CppWaitHandle Il2CppWaitHandle;
 typedef struct MonitorData MonitorData;
 typedef struct Il2CppReflectionAssembly Il2CppReflectionAssembly;
 typedef Il2CppClass Il2CppVTable;
-typedef struct Il2CppObject
-{
-    union
-    {
+typedef struct Il2CppObject {
+    union {
         Il2CppClass* klass;
         Il2CppVTable* vtable;
     } Il2CppClass;
     void* monitor;
 } Il2CppObject;
 typedef int32_t il2cpp_array_lower_bound_t;
-typedef struct Il2CppArrayBounds
-{
+typedef struct Il2CppArrayBounds {
     il2cpp_array_size_t length;
     il2cpp_array_lower_bound_t lower_bound;
 } Il2CppArrayBounds;
-typedef struct Il2CppArray
-{
+typedef struct Il2CppArray {
     Il2CppObject obj;
     Il2CppArrayBounds* bounds;
     il2cpp_array_size_t max_length;
 } Il2CppArray;
-typedef struct Il2CppArraySize
-{
+typedef struct Il2CppArraySize {
     Il2CppObject obj;
     Il2CppArrayBounds* bounds;
     il2cpp_array_size_t max_length;
     __declspec(align(8)) void* vector[32];
 } Il2CppArraySize;
-typedef struct Il2CppString
-{
+typedef struct Il2CppString {
     Il2CppObject object;
     int32_t length;
     Il2CppChar chars[32];
 } Il2CppString;
-typedef struct Il2CppReflectionType
-{
+typedef struct Il2CppReflectionType {
     Il2CppObject object;
     const Il2CppType* type;
 } Il2CppReflectionType;
-typedef struct Il2CppReflectionRuntimeType
-{
+typedef struct Il2CppReflectionRuntimeType {
     Il2CppReflectionType type;
     Il2CppObject* type_info;
     Il2CppObject* genericCache;
     Il2CppObject* serializationCtor;
 } Il2CppReflectionRuntimeType;
-typedef struct Il2CppReflectionMonoType
-{
+typedef struct Il2CppReflectionMonoType {
     Il2CppReflectionRuntimeType type;
 } Il2CppReflectionMonoType;
-typedef struct Il2CppReflectionEvent
-{
+typedef struct Il2CppReflectionEvent {
     Il2CppObject object;
     Il2CppObject* cached_add_event;
 } Il2CppReflectionEvent;
-typedef struct Il2CppReflectionMonoEvent
-{
+typedef struct Il2CppReflectionMonoEvent {
     Il2CppReflectionEvent event;
     Il2CppReflectionType* reflectedType;
     const EventInfo* eventInfo;
 } Il2CppReflectionMonoEvent;
-typedef struct Il2CppReflectionMonoEventInfo
-{
+typedef struct Il2CppReflectionMonoEventInfo {
     Il2CppReflectionType* declaringType;
     Il2CppReflectionType* reflectedType;
     Il2CppString* name;
@@ -1752,8 +1612,7 @@ typedef struct Il2CppReflectionMonoEventInfo
     uint32_t eventAttributes;
     Il2CppArray* otherMethods;
 } Il2CppReflectionMonoEventInfo;
-typedef struct Il2CppReflectionField
-{
+typedef struct Il2CppReflectionField {
     Il2CppObject object;
     Il2CppClass* klass;
     FieldInfo* field;
@@ -1761,33 +1620,28 @@ typedef struct Il2CppReflectionField
     Il2CppReflectionType* type;
     uint32_t attrs;
 } Il2CppReflectionField;
-typedef struct Il2CppReflectionProperty
-{
+typedef struct Il2CppReflectionProperty {
     Il2CppObject object;
     Il2CppClass* klass;
     const PropertyInfo* property;
 } Il2CppReflectionProperty;
-typedef struct Il2CppReflectionMethod
-{
+typedef struct Il2CppReflectionMethod {
     Il2CppObject object;
     const MethodInfo* method;
     Il2CppString* name;
     Il2CppReflectionType* reftype;
 } Il2CppReflectionMethod;
-typedef struct Il2CppReflectionGenericMethod
-{
+typedef struct Il2CppReflectionGenericMethod {
     Il2CppReflectionMethod base;
 } Il2CppReflectionGenericMethod;
-typedef struct Il2CppMethodInfo
-{
+typedef struct Il2CppMethodInfo {
     Il2CppReflectionType* parent;
     Il2CppReflectionType* ret;
     uint32_t attrs;
     uint32_t implattrs;
     uint32_t callconv;
 } Il2CppMethodInfo;
-typedef struct Il2CppPropertyInfo
-{
+typedef struct Il2CppPropertyInfo {
     Il2CppReflectionType* parent;
     Il2CppReflectionType* declaringType;
     Il2CppString* name;
@@ -1795,8 +1649,7 @@ typedef struct Il2CppPropertyInfo
     Il2CppReflectionMethod* set;
     uint32_t attrs;
 } Il2CppPropertyInfo;
-typedef struct Il2CppReflectionParameter
-{
+typedef struct Il2CppReflectionParameter {
     Il2CppObject object;
     Il2CppReflectionType* ClassImpl;
     Il2CppObject* DefaultValueImpl;
@@ -1806,8 +1659,7 @@ typedef struct Il2CppReflectionParameter
     uint32_t AttrsImpl;
     Il2CppObject* MarshalAsImpl;
 } Il2CppReflectionParameter;
-typedef struct Il2CppReflectionModule
-{
+typedef struct Il2CppReflectionModule {
     Il2CppObject obj;
     const Il2CppImage* image;
     Il2CppReflectionAssembly* assembly;
@@ -1817,8 +1669,7 @@ typedef struct Il2CppReflectionModule
     uint8_t is_resource;
     uint32_t token;
 } Il2CppReflectionModule;
-typedef struct Il2CppReflectionAssemblyName
-{
+typedef struct Il2CppReflectionAssemblyName {
     Il2CppObject obj;
     Il2CppString* name;
     Il2CppString* codebase;
@@ -1834,8 +1685,7 @@ typedef struct Il2CppReflectionAssemblyName
     uint32_t processor_architecture;
     uint32_t contentType;
 } Il2CppReflectionAssemblyName;
-typedef struct Il2CppReflectionAssembly
-{
+typedef struct Il2CppReflectionAssembly {
     Il2CppObject object;
     const Il2CppAssembly* assembly;
     Il2CppObject* resolve_event_holder;
@@ -1848,8 +1698,7 @@ typedef struct Il2CppReflectionAssembly
     uint8_t from_byte_array;
     Il2CppString* name;
 } Il2CppReflectionAssembly;
-typedef struct Il2CppReflectionMarshal
-{
+typedef struct Il2CppReflectionMarshal {
     Il2CppObject object;
     int32_t count;
     int32_t type;
@@ -1861,14 +1710,12 @@ typedef struct Il2CppReflectionMarshal
     int32_t param_num;
     uint8_t has_size;
 } Il2CppReflectionMarshal;
-typedef struct Il2CppReflectionPointer
-{
+typedef struct Il2CppReflectionPointer {
     Il2CppObject object;
     void* data;
     Il2CppReflectionType* type;
 } Il2CppReflectionPointer;
-typedef struct Il2CppInternalThread
-{
+typedef struct Il2CppInternalThread {
     Il2CppObject obj;
     int lock_thread_id;
     void* handle;
@@ -1910,22 +1757,19 @@ typedef struct Il2CppInternalThread
     size_t unused2;
     void* last;
 } Il2CppInternalThread;
-typedef struct Il2CppIOSelectorJob
-{
+typedef struct Il2CppIOSelectorJob {
     Il2CppObject object;
     int32_t operation;
     Il2CppObject* callback;
     Il2CppObject* state;
 } Il2CppIOSelectorJob;
-typedef enum
-{
+typedef enum {
     Il2Cpp_CallType_Sync = 0,
     Il2Cpp_CallType_BeginInvoke = 1,
     Il2Cpp_CallType_EndInvoke = 2,
     Il2Cpp_CallType_OneWay = 3
 } Il2CppCallType;
-typedef struct Il2CppMethodMessage
-{
+typedef struct Il2CppMethodMessage {
     Il2CppObject obj;
     Il2CppReflectionMethod* method;
     Il2CppArray* args;
@@ -1937,8 +1781,7 @@ typedef struct Il2CppMethodMessage
     Il2CppAsyncResult* async_result;
     uint32_t call_type;
 } Il2CppMethodMessage;
-typedef struct Il2CppAppDomainSetup
-{
+typedef struct Il2CppAppDomainSetup {
     Il2CppObject object;
     Il2CppString* application_base;
     Il2CppString* application_name;
@@ -1963,8 +1806,7 @@ typedef struct Il2CppAppDomainSetup
     Il2CppArray* configuration_bytes;
     Il2CppArray* serialized_non_primitives;
 } Il2CppAppDomainSetup;
-typedef struct Il2CppThread
-{
+typedef struct Il2CppThread {
     Il2CppObject obj;
     Il2CppInternalThread* internal_thread;
     Il2CppObject* start_obj;
@@ -1975,8 +1817,7 @@ typedef struct Il2CppThread
     Il2CppObject* executionContext;
     uint8_t executionContextBelongsToOuterScope;
 } Il2CppThread;
-typedef struct Il2CppException
-{
+typedef struct Il2CppException {
     Il2CppObject object;
     Il2CppString* className;
     Il2CppString* message;
@@ -1994,23 +1835,19 @@ typedef struct Il2CppException
     Il2CppArray* captured_traces;
     Il2CppArray* native_trace_ips;
 } Il2CppException;
-typedef struct Il2CppSystemException
-{
+typedef struct Il2CppSystemException {
     Il2CppException base;
 } Il2CppSystemException;
-typedef struct Il2CppArgumentException
-{
+typedef struct Il2CppArgumentException {
     Il2CppException base;
     Il2CppString* argName;
 } Il2CppArgumentException;
-typedef struct Il2CppTypedRef
-{
+typedef struct Il2CppTypedRef {
     const Il2CppType* type;
     void* value;
     Il2CppClass* klass;
 } Il2CppTypedRef;
-typedef struct Il2CppDelegate
-{
+typedef struct Il2CppDelegate {
     Il2CppObject object;
     Il2CppMethodPointer method_ptr;
     InvokerMethod invoke_impl;
@@ -2024,23 +1861,19 @@ typedef struct Il2CppDelegate
     Il2CppObject* data;
     uint8_t method_is_virtual;
 } Il2CppDelegate;
-typedef struct Il2CppMulticastDelegate
-{
+typedef struct Il2CppMulticastDelegate {
     Il2CppDelegate delegate;
     Il2CppArray* delegates;
 } Il2CppMulticastDelegate;
-typedef struct Il2CppMarshalByRefObject
-{
+typedef struct Il2CppMarshalByRefObject {
     Il2CppObject obj;
     Il2CppObject* identity;
 } Il2CppMarshalByRefObject;
-typedef struct Il2CppAppDomain
-{
+typedef struct Il2CppAppDomain {
     Il2CppMarshalByRefObject mbr;
     Il2CppDomain* data;
 } Il2CppAppDomain;
-typedef struct Il2CppStackFrame
-{
+typedef struct Il2CppStackFrame {
     Il2CppObject obj;
     int32_t il_offset;
     int32_t native_offset;
@@ -2052,8 +1885,7 @@ typedef struct Il2CppStackFrame
     int32_t column;
     Il2CppString* internal_method_name;
 } Il2CppStackFrame;
-typedef struct Il2CppDateTimeFormatInfo
-{
+typedef struct Il2CppDateTimeFormatInfo {
     Il2CppObject obj;
     Il2CppObject* CultureData;
     Il2CppString* Name;
@@ -2106,8 +1938,7 @@ typedef struct Il2CppDateTimeFormatInfo
     Il2CppString* FullTimeSpanNegativePattern;
     Il2CppArray* dtfiTokenHash;
 } Il2CppDateTimeFormatInfo;
-typedef struct Il2CppNumberFormatInfo
-{
+typedef struct Il2CppNumberFormatInfo {
     Il2CppObject obj;
     Il2CppArray* numberGroupSizes;
     Il2CppArray* currencyGroupSizes;
@@ -2144,8 +1975,7 @@ typedef struct Il2CppNumberFormatInfo
     uint8_t validForParseAsNumber;
     uint8_t validForParseAsCurrency;
 } Il2CppNumberFormatInfo;
-typedef struct Il2CppCultureData
-{
+typedef struct Il2CppCultureData {
     Il2CppObject obj;
     Il2CppString* AMDesignator;
     Il2CppString* PMDesignator;
@@ -2155,8 +1985,7 @@ typedef struct Il2CppCultureData
     uint32_t FirstDayOfWeek;
     uint32_t CalendarWeekRule;
 } Il2CppCultureData;
-typedef struct Il2CppCalendarData
-{
+typedef struct Il2CppCalendarData {
     Il2CppObject obj;
     Il2CppString* NativeName;
     Il2CppArray* ShortDatePatterns;
@@ -2174,8 +2003,7 @@ typedef struct Il2CppCalendarData
     Il2CppArray* GenitiveMonthNames;
     Il2CppArray* GenitiveAbbreviatedMonthNames;
 } Il2CppCalendarData;
-typedef struct Il2CppCultureInfo
-{
+typedef struct Il2CppCultureInfo {
     Il2CppObject obj;
     uint8_t is_read_only;
     int32_t lcid;
@@ -2205,8 +2033,7 @@ typedef struct Il2CppCultureInfo
     Il2CppObject* cultureData;
     uint8_t isInherited;
 } Il2CppCultureInfo;
-typedef struct Il2CppRegionInfo
-{
+typedef struct Il2CppRegionInfo {
     Il2CppObject obj;
     int32_t geo_id;
     Il2CppString* iso2name;
@@ -2219,8 +2046,7 @@ typedef struct Il2CppRegionInfo
     Il2CppString* currency_english_name;
     Il2CppString* currency_native_name;
 } Il2CppRegionInfo;
-typedef struct Il2CppSafeHandle
-{
+typedef struct Il2CppSafeHandle {
     Il2CppObject base;
     void* handle;
     int state;
@@ -2228,8 +2054,7 @@ typedef struct Il2CppSafeHandle
     uint8_t fullyInitialized;
 } Il2CppSafeHandle;
 typedef struct Il2CppStringBuilder Il2CppStringBuilder;
-typedef struct Il2CppStringBuilder
-{
+typedef struct Il2CppStringBuilder {
     Il2CppObject object;
     Il2CppArray* chunkChars;
     Il2CppStringBuilder* chunkPrevious;
@@ -2237,29 +2062,25 @@ typedef struct Il2CppStringBuilder
     int chunkOffset;
     int maxCapacity;
 } Il2CppStringBuilder;
-typedef struct Il2CppSocketAddress
-{
+typedef struct Il2CppSocketAddress {
     Il2CppObject base;
     int m_Size;
     Il2CppArray* data;
     uint8_t m_changed;
     int m_hash;
 } Il2CppSocketAddress;
-typedef struct Il2CppSortKey
-{
+typedef struct Il2CppSortKey {
     Il2CppObject base;
     Il2CppString* str;
     Il2CppArray* key;
     int32_t options;
     int32_t lcid;
 } Il2CppSortKey;
-typedef struct Il2CppErrorWrapper
-{
+typedef struct Il2CppErrorWrapper {
     Il2CppObject base;
     int32_t errorCode;
 } Il2CppErrorWrapper;
-typedef struct Il2CppAsyncResult
-{
+typedef struct Il2CppAsyncResult {
     Il2CppObject base;
     Il2CppObject* async_state;
     Il2CppWaitHandle* handle;
@@ -2273,8 +2094,7 @@ typedef struct Il2CppAsyncResult
     Il2CppObject* execution_context;
     Il2CppObject* original_context;
 } Il2CppAsyncResult;
-typedef struct Il2CppAsyncCall
-{
+typedef struct Il2CppAsyncCall {
     Il2CppObject base;
     Il2CppMethodMessage* msg;
     MethodInfo* cb_method;
@@ -2284,12 +2104,10 @@ typedef struct Il2CppAsyncCall
     Il2CppArray* out_args;
 } Il2CppAsyncCall;
 typedef struct Il2CppExceptionWrapper Il2CppExceptionWrapper;
-typedef struct Il2CppExceptionWrapper
-{
+typedef struct Il2CppExceptionWrapper {
     Il2CppException* ex;
 } Il2CppExceptionWrapper;
-typedef struct Il2CppIOAsyncResult
-{
+typedef struct Il2CppIOAsyncResult {
     Il2CppObject base;
     Il2CppDelegate* callback;
     Il2CppObject* state;
@@ -2297,8 +2115,7 @@ typedef struct Il2CppIOAsyncResult
     uint8_t completed_synchronously;
     uint8_t completed;
 } Il2CppIOAsyncResult;
-typedef struct Il2CppSocketAsyncResult
-{
+typedef struct Il2CppSocketAsyncResult {
     Il2CppIOAsyncResult base;
     Il2CppObject* socket;
     int32_t operation;
@@ -2319,31 +2136,26 @@ typedef struct Il2CppSocketAsyncResult
     int32_t error;
     int32_t endCalled;
 } Il2CppSocketAsyncResult;
-typedef enum Il2CppResourceLocation
-{
+typedef enum Il2CppResourceLocation {
     IL2CPP_RESOURCE_LOCATION_EMBEDDED = 1,
     IL2CPP_RESOURCE_LOCATION_ANOTHER_ASSEMBLY = 2,
     IL2CPP_RESOURCE_LOCATION_IN_MANIFEST = 4
 } Il2CppResourceLocation;
-typedef struct Il2CppManifestResourceInfo
-{
+typedef struct Il2CppManifestResourceInfo {
     Il2CppObject object;
     Il2CppReflectionAssembly* assembly;
     Il2CppString* filename;
     uint32_t location;
 } Il2CppManifestResourceInfo;
-typedef struct Il2CppAppContext
-{
+typedef struct Il2CppAppContext {
     Il2CppObject obj;
     int32_t domain_id;
     int32_t context_id;
     void* static_data;
 } Il2CppAppContext;
-typedef struct Il2CppDecimal
-{
+typedef struct Il2CppDecimal {
     uint16_t reserved;
-    union
-    {
+    union {
         struct
         {
             uint8_t scale;
@@ -2352,8 +2164,7 @@ typedef struct Il2CppDecimal
         uint16_t signscale;
     } u;
     uint32_t Hi32;
-    union
-    {
+    union {
         struct
         {
             uint32_t Lo32;
@@ -2362,32 +2173,27 @@ typedef struct Il2CppDecimal
         uint64_t Lo64;
     } v;
 } Il2CppDecimal;
-typedef struct Il2CppDouble
-{
+typedef struct Il2CppDouble {
     uint32_t mantLo : 32;
     uint32_t mantHi : 20;
     uint32_t exp : 11;
     uint32_t sign : 1;
 } Il2CppDouble;
-typedef union Il2CppDouble_double
-{
+typedef union Il2CppDouble_double {
     Il2CppDouble s;
     double d;
 } Il2CppDouble_double;
-typedef enum Il2CppDecimalCompareResult
-{
+typedef enum Il2CppDecimalCompareResult {
     IL2CPP_DECIMAL_CMP_LT = -1,
     IL2CPP_DECIMAL_CMP_EQ,
     IL2CPP_DECIMAL_CMP_GT
 } Il2CppDecimalCompareResult;
-typedef struct Il2CppSingle
-{
+typedef struct Il2CppSingle {
     uint32_t mant : 23;
     uint32_t exp : 8;
     uint32_t sign : 1;
 } Il2CppSingle;
-typedef union Il2CppSingle_float
-{
+typedef union Il2CppSingle_float {
     Il2CppSingle s;
     float f;
 } Il2CppSingle_float;
@@ -2623,31 +2429,26 @@ typedef union Il2CppSingle_float
 #pragma warning(disable : 4309)
 #pragma warning(disable : 4359)
 #if !defined(_GHIDRA_) && !defined(_IDA_)
-namespace app
-{
+namespace app {
 #endif
 
 #pragma region Object
-    struct Object
-    {
+    struct Object {
         struct Object__Class* klass;
         void* monitor;
     };
 
-    struct Object__VTable
-    {
+    struct Object__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct Object__StaticFields
-    {
+    struct Object__StaticFields {
     };
 
-    struct Object__Class
-    {
+    struct Object__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Object__StaticFields* static_fields;
@@ -2659,25 +2460,21 @@ namespace app
 #pragma endregion
 
 #pragma region Type
-    struct RuntimeTypeHandle
-    {
+    struct RuntimeTypeHandle {
         void* value;
     };
 
-    struct __declspec(align(4)) Type__Fields
-    {
+    struct __declspec(align(4)) Type__Fields {
         struct RuntimeTypeHandle _impl;
     };
 
-    struct Type
-    {
+    struct Type {
         struct Type__Class* klass;
         void* monitor;
         struct Type__Fields fields;
     };
 
-    struct Type__VTable
-    {
+    struct Type__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -2807,8 +2604,7 @@ namespace app
         VirtualInvokeData get_IsSZArray;
     };
 
-    struct Type__StaticFields
-    {
+    struct Type__StaticFields {
         void* FilterAttribute;
         void* FilterName;
         void* FilterNameIgnoreCase;
@@ -2818,8 +2614,7 @@ namespace app
         void* defaultBinder;
     };
 
-    struct Type__Class
-    {
+    struct Type__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Type__StaticFields* static_fields;
@@ -2830,21 +2625,18 @@ namespace app
 #pragma endregion
 
 #pragma region String
-    struct __declspec(align(4)) String__Fields
-    {
+    struct __declspec(align(4)) String__Fields {
         int32_t m_stringLength;
         uint16_t m_firstChar;
     };
 
-    struct String
-    {
+    struct String {
         struct String__Class* klass;
         void* monitor;
         struct String__Fields fields;
     };
 
-    struct String__VTable
-    {
+    struct String__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -2874,13 +2666,11 @@ namespace app
         VirtualInvokeData Equals_1;
     };
 
-    struct String__StaticFields
-    {
+    struct String__StaticFields {
         struct String* Empty;
     };
 
-    struct String__Class
-    {
+    struct String__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct String__StaticFields* static_fields;
@@ -2891,33 +2681,28 @@ namespace app
 #pragma endregion
 
 #pragma region Object_1
-    struct __declspec(align(4)) Object_1__Fields
-    {
+    struct __declspec(align(4)) Object_1__Fields {
         void* m_CachedPtr;
     };
 
-    struct Object_1
-    {
+    struct Object_1 {
         struct Object_1__Class* klass;
         void* monitor;
         struct Object_1__Fields fields;
     };
 
-    struct Object_1__VTable
-    {
+    struct Object_1__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct Object_1__StaticFields
-    {
+    struct Object_1__StaticFields {
         int32_t OffsetOfInstanceIDInCPlusPlusObject;
     };
 
-    struct Object_1__Class
-    {
+    struct Object_1__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Object_1__StaticFields* static_fields;
@@ -2928,32 +2713,27 @@ namespace app
 #pragma endregion
 
 #pragma region Component_1
-    struct Component_1__Fields
-    {
+    struct Component_1__Fields {
         struct Object_1__Fields _;
     };
 
-    struct Component_1
-    {
+    struct Component_1 {
         struct Component_1__Class* klass;
         void* monitor;
         struct Component_1__Fields fields;
     };
 
-    struct Component_1__VTable
-    {
+    struct Component_1__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct Component_1__StaticFields
-    {
+    struct Component_1__StaticFields {
     };
 
-    struct Component_1__Class
-    {
+    struct Component_1__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Component_1__StaticFields* static_fields;
@@ -2964,32 +2744,27 @@ namespace app
 #pragma endregion
 
 #pragma region Behaviour
-    struct Behaviour__Fields
-    {
+    struct Behaviour__Fields {
         struct Component_1__Fields _;
     };
 
-    struct Behaviour
-    {
+    struct Behaviour {
         struct Behaviour__Class* klass;
         void* monitor;
         struct Behaviour__Fields fields;
     };
 
-    struct Behaviour__VTable
-    {
+    struct Behaviour__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct Behaviour__StaticFields
-    {
+    struct Behaviour__StaticFields {
     };
 
-    struct Behaviour__Class
-    {
+    struct Behaviour__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Behaviour__StaticFields* static_fields;
@@ -3000,35 +2775,30 @@ namespace app
 #pragma endregion
 
 #pragma region Camera
-    struct Camera__Fields
-    {
+    struct Camera__Fields {
         struct Behaviour__Fields _;
     };
 
-    struct Camera
-    {
+    struct Camera {
         struct Camera__Class* klass;
         void* monitor;
         struct Camera__Fields fields;
     };
 
-    struct Camera__VTable
-    {
+    struct Camera__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct Camera__StaticFields
-    {
+    struct Camera__StaticFields {
         void* onPreCull;
         void* onPreRender;
         void* onPostRender;
     };
 
-    struct Camera__Class
-    {
+    struct Camera__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Camera__StaticFields* static_fields;
@@ -3039,8 +2809,7 @@ namespace app
 #pragma endregion
 
 #pragma region Vector3
-    struct Vector3
-    {
+    struct Vector3 {
         float x;
         float y;
         float z;
@@ -3052,8 +2821,7 @@ namespace app
 #pragma endregion
 
 #pragma region Exception
-    struct __declspec(align(4)) Exception__Fields
-    {
+    struct __declspec(align(4)) Exception__Fields {
         struct String* _className;
         struct String* _message;
         void* _data;
@@ -3071,15 +2839,13 @@ namespace app
         void* native_trace_ips;
     };
 
-    struct Exception
-    {
+    struct Exception {
         struct Exception__Class* klass;
         void* monitor;
         struct Exception__Fields fields;
     };
 
-    struct Exception__VTable
-    {
+    struct Exception__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -3094,13 +2860,11 @@ namespace app
         VirtualInvokeData GetType;
     };
 
-    struct Exception__StaticFields
-    {
+    struct Exception__StaticFields {
         struct Object* s_EDILock;
     };
 
-    struct Exception__Class
-    {
+    struct Exception__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Exception__StaticFields* static_fields;
@@ -3111,32 +2875,27 @@ namespace app
 #pragma endregion
 
 #pragma region Renderer
-    struct Renderer__Fields
-    {
+    struct Renderer__Fields {
         struct Component_1__Fields _;
     };
 
-    struct Renderer
-    {
+    struct Renderer {
         struct Renderer__Class* klass;
         void* monitor;
         struct Renderer__Fields fields;
     };
 
-    struct Renderer__VTable
-    {
+    struct Renderer__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct Renderer__StaticFields
-    {
+    struct Renderer__StaticFields {
     };
 
-    struct Renderer__Class
-    {
+    struct Renderer__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Renderer__StaticFields* static_fields;
@@ -3147,8 +2906,7 @@ namespace app
 #pragma endregion
 
 #pragma region Matrix4x4
-    struct Matrix4x4
-    {
+    struct Matrix4x4 {
         float m00;
         float m10;
         float m20;
@@ -3169,8 +2927,7 @@ namespace app
 #pragma endregion
 
 #pragma region Color32
-    struct Color32
-    {
+    struct Color32 {
         union {
             int32_t rgba;
             struct {
@@ -3184,8 +2941,7 @@ namespace app
 #pragma endregion
 
 #pragma region Color
-    struct Color
-    {
+    struct Color {
         float r;
         float g;
         float b;
@@ -3194,16 +2950,14 @@ namespace app
 #pragma endregion
 
 #pragma region Vector2
-    struct Vector2
-    {
+    struct Vector2 {
         float x;
         float y;
     };
 #pragma endregion
 
 #pragma region Vector4
-    struct Vector4
-    {
+    struct Vector4 {
         float x;
         float y;
         float z;
@@ -3212,20 +2966,17 @@ namespace app
 #pragma endregion
 
 #pragma region Transform
-    struct Transform__Fields
-    {
+    struct Transform__Fields {
         struct Component_1__Fields _;
     };
 
-    struct Transform
-    {
+    struct Transform {
         struct Transform__Class* klass;
         void* monitor;
         struct Transform__Fields fields;
     };
 
-    struct Transform__VTable
-    {
+    struct Transform__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -3233,12 +2984,10 @@ namespace app
         VirtualInvokeData GetEnumerator;
     };
 
-    struct Transform__StaticFields
-    {
+    struct Transform__StaticFields {
     };
 
-    struct Transform__Class
-    {
+    struct Transform__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Transform__StaticFields* static_fields;
@@ -3249,32 +2998,27 @@ namespace app
 #pragma endregion
 
 #pragma region GameObject
-    struct GameObject__Fields
-    {
+    struct GameObject__Fields {
         struct Object_1__Fields _;
     };
 
-    struct GameObject
-    {
+    struct GameObject {
         struct GameObject__Class* klass;
         void* monitor;
         struct GameObject__Fields fields;
     };
 
-    struct GameObject__VTable
-    {
+    struct GameObject__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct GameObject__StaticFields
-    {
+    struct GameObject__StaticFields {
     };
 
-    struct GameObject__Class
-    {
+    struct GameObject__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct GameObject__StaticFields* static_fields;
@@ -3289,32 +3033,27 @@ namespace app
 #pragma endregion
 
 #pragma region SpriteRenderer
-    struct SpriteRenderer__Fields
-    {
+    struct SpriteRenderer__Fields {
         struct Renderer__Fields _;
     };
 
-    struct SpriteRenderer
-    {
+    struct SpriteRenderer {
         struct SpriteRenderer__Class* klass;
         void* monitor;
         struct SpriteRenderer__Fields fields;
     };
 
-    struct SpriteRenderer__VTable
-    {
+    struct SpriteRenderer__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct SpriteRenderer__StaticFields
-    {
+    struct SpriteRenderer__StaticFields {
     };
 
-    struct SpriteRenderer__Class
-    {
+    struct SpriteRenderer__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct SpriteRenderer__StaticFields* static_fields;
@@ -3329,39 +3068,33 @@ namespace app
 #pragma endregion
 
 #pragma region Scene
-    struct Scene
-    {
+    struct Scene {
         int32_t m_Handle;
     };
 #pragma endregion
 
 #pragma region Collider2D
-    struct Collider2D__Fields
-    {
+    struct Collider2D__Fields {
         struct Behaviour__Fields _;
     };
 
-    struct Collider2D
-    {
+    struct Collider2D {
         struct Collider2D__Class* klass;
         void* monitor;
         struct Collider2D__Fields fields;
     };
 
-    struct Collider2D__VTable
-    {
+    struct Collider2D__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct Collider2D__StaticFields
-    {
+    struct Collider2D__StaticFields {
     };
 
-    struct Collider2D__Class
-    {
+    struct Collider2D__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Collider2D__StaticFields* static_fields;
@@ -3372,8 +3105,7 @@ namespace app
 #pragma endregion
 
 #pragma region MessageReader
-    struct __declspec(align(4)) MessageReader__Fields
-    {
+    struct __declspec(align(4)) MessageReader__Fields {
         struct Byte__Array* Buffer;
         uint8_t Tag;
         int32_t Length;
@@ -3383,15 +3115,13 @@ namespace app
         int32_t readHead;
     };
 
-    struct MessageReader
-    {
+    struct MessageReader {
         struct MessageReader__Class* klass;
         void* monitor;
         struct MessageReader__Fields fields;
     };
 
-    struct MessageReader__VTable
-    {
+    struct MessageReader__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -3399,13 +3129,11 @@ namespace app
         VirtualInvokeData Recycle;
     };
 
-    struct MessageReader__StaticFields
-    {
+    struct MessageReader__StaticFields {
         void* ReaderPool;
     };
 
-    struct MessageReader__Class
-    {
+    struct MessageReader__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct MessageReader__StaticFields* static_fields;
@@ -3422,23 +3150,20 @@ namespace app
 #pragma region MessageWriter
 
 #if defined(_CPLUSPLUS_)
-    enum class SendOption__Enum : uint8_t
-    {
+    enum class SendOption__Enum : uint8_t {
         None = 0x00,
         Reliable = 0x01,
     };
 
 #else
-    enum SendOption__Enum
-    {
+    enum SendOption__Enum {
         SendOption__Enum_None = 0x00,
         SendOption__Enum_Reliable = 0x01,
     };
 
 #endif
 
-    struct __declspec(align(4)) MessageWriter__Fields
-    {
+    struct __declspec(align(4)) MessageWriter__Fields {
         struct Byte__Array* Buffer;
         int32_t Length;
         int32_t Position;
@@ -3450,15 +3175,13 @@ namespace app
         void* messageStarts;
     };
 
-    struct MessageWriter
-    {
+    struct MessageWriter {
         struct MessageWriter__Class* klass;
         void* monitor;
         struct MessageWriter__Fields fields;
     };
 
-    struct MessageWriter__VTable
-    {
+    struct MessageWriter__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -3466,14 +3189,12 @@ namespace app
         VirtualInvokeData Recycle;
     };
 
-    struct MessageWriter__StaticFields
-    {
+    struct MessageWriter__StaticFields {
         int32_t BufferSize;
         void* WriterPool;
     };
 
-    struct MessageWriter__Class
-    {
+    struct MessageWriter__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct MessageWriter__StaticFields* static_fields;
@@ -3484,32 +3205,27 @@ namespace app
 #pragma endregion
 
 #pragma region MonoBehaviour
-    struct MonoBehaviour__Fields
-    {
+    struct MonoBehaviour__Fields {
         struct Behaviour__Fields _;
     };
 
-    struct MonoBehaviour
-    {
+    struct MonoBehaviour {
         struct MonoBehaviour__Class* klass;
         MonitorData* monitor;
         struct MonoBehaviour__Fields fields;
     };
 
-    struct MonoBehaviour__VTable
-    {
+    struct MonoBehaviour__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct MonoBehaviour__StaticFields
-    {
+    struct MonoBehaviour__StaticFields {
     };
 
-    struct MonoBehaviour__Class
-    {
+    struct MonoBehaviour__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct MonoBehaviour__StaticFields* static_fields;
@@ -3520,8 +3236,7 @@ namespace app
 #pragma endregion
 
 #pragma region Extents
-    struct Extents
-    {
+    struct Extents {
         struct Vector2 min;
         struct Vector2 max;
     };
@@ -3529,8 +3244,7 @@ namespace app
 
 #pragma region TextMeshPro garbage
 
-    struct UIBehaviour__Fields
-    {
+    struct UIBehaviour__Fields {
         struct MonoBehaviour__Fields _;
     };
 
@@ -3543,6 +3257,7 @@ namespace app
         struct TextMeshPro* outputText;
         struct SpriteRenderer* Background;
         struct MeshRenderer* Pipe;
+        struct TextMeshPro* placeholderText;
         float pipeBlinkTimer;
         bool ClearOnFocus;
         bool ForceUppercase;
@@ -3559,8 +3274,11 @@ namespace app
         bool hasFocus;
         int32_t caretPos;
         float caretRepeatTimer;
+        float caretYOffset;
+        struct Color colorBackground;
         struct StringBuilder* tempTxt;
         struct SpriteRenderer* sendButtonGlyph;
+        bool SendOnFullChars;
     };
 
     struct TextBoxTMP {
@@ -3569,8 +3287,7 @@ namespace app
         struct TextBoxTMP__Fields fields;
     };
 
-    struct Graphic__Fields
-    {
+    struct Graphic__Fields {
         struct UIBehaviour__Fields _;
         void* m_Material;
         struct Color m_Color;
@@ -3593,8 +3310,7 @@ namespace app
         bool _useLegacyMeshGeneration_k__BackingField;
     };
 
-    struct MaskableGraphic__Fields
-    {
+    struct MaskableGraphic__Fields {
         struct Graphic__Fields _;
         bool m_ShouldRecalculateStencil;
         void* m_MaskMaterial;
@@ -3608,8 +3324,7 @@ namespace app
         void* m_Corners;
     };
 
-    struct MaterialReference
-    {
+    struct MaterialReference {
         int32_t index;
         void* fontAsset;
         void* spriteAsset;
@@ -3621,8 +3336,7 @@ namespace app
         int32_t referenceCount;
     };
 
-    struct TMP_TextProcessingStack_1_MaterialReference_
-    {
+    struct TMP_TextProcessingStack_1_MaterialReference_ {
         void* itemStack;
         int32_t index;
         struct MaterialReference m_DefaultItem;
@@ -3631,16 +3345,14 @@ namespace app
         int32_t m_Count;
     };
 
-    struct VertexGradient
-    {
+    struct VertexGradient {
         struct Color topLeft;
         struct Color topRight;
         struct Color bottomLeft;
         struct Color bottomRight;
     };
 
-    struct TMP_TextProcessingStack_1_System_Single_
-    {
+    struct TMP_TextProcessingStack_1_System_Single_ {
         void* itemStack;
         int32_t index;
         float m_DefaultItem;
@@ -3649,8 +3361,7 @@ namespace app
         int32_t m_Count;
     };
 
-    struct TMP_TextProcessingStack_1_FontWeight_
-    {
+    struct TMP_TextProcessingStack_1_FontWeight_ {
         void* itemStack;
         int32_t index;
         int32_t m_DefaultItem;
@@ -3659,8 +3370,7 @@ namespace app
         int32_t m_Count;
     };
 
-    struct TMP_FontStyleStack
-    {
+    struct TMP_FontStyleStack {
         uint8_t bold;
         uint8_t italic;
         uint8_t underline;
@@ -3673,8 +3383,7 @@ namespace app
         uint8_t smallcaps;
     };
 
-    struct TMP_TextProcessingStack_1_HorizontalAlignmentOptions_
-    {
+    struct TMP_TextProcessingStack_1_HorizontalAlignmentOptions_ {
         void* itemStack;
         int32_t index;
         int32_t m_DefaultItem;
@@ -3683,8 +3392,7 @@ namespace app
         int32_t m_Count;
     };
 
-    struct TMP_LineInfo
-    {
+    struct TMP_LineInfo {
         int32_t controlCharacterCount;
         int32_t characterCount;
         int32_t visibleCharacterCount;
@@ -3707,8 +3415,7 @@ namespace app
         struct Extents lineExtents;
     };
 
-    struct TMP_TextProcessingStack_1_System_Int32_
-    {
+    struct TMP_TextProcessingStack_1_System_Int32_ {
         void* itemStack;
         int32_t index;
         int32_t m_DefaultItem;
@@ -3717,8 +3424,7 @@ namespace app
         int32_t m_Count;
     };
 
-    struct TMP_TextProcessingStack_1_UnityEngine_Color32_
-    {
+    struct TMP_TextProcessingStack_1_UnityEngine_Color32_ {
         void* itemStack;
         int32_t index;
         struct Color32 m_DefaultItem;
@@ -3727,22 +3433,19 @@ namespace app
         int32_t m_Count;
     };
 
-    struct TMP_Offset
-    {
+    struct TMP_Offset {
         float m_Left;
         float m_Right;
         float m_Top;
         float m_Bottom;
     };
 
-    struct HighlightState
-    {
+    struct HighlightState {
         struct Color32 color;
         struct TMP_Offset padding;
     };
 
-    struct TMP_TextProcessingStack_1_HighlightState_
-    {
+    struct TMP_TextProcessingStack_1_HighlightState_ {
         void* itemStack;
         int32_t index;
         struct HighlightState m_DefaultItem;
@@ -3751,8 +3454,7 @@ namespace app
         int32_t m_Count;
     };
 
-    struct TMP_TextProcessingStack_1_TMP_ColorGradient_
-    {
+    struct TMP_TextProcessingStack_1_TMP_ColorGradient_ {
         void* itemStack;
         int32_t index;
         void* m_DefaultItem;
@@ -3761,8 +3463,7 @@ namespace app
         int32_t m_Count;
     };
 
-    struct WordWrapState
-    {
+    struct WordWrapState {
         int32_t previous_WordBreak;
         int32_t total_CharacterCount;
         int32_t visible_CharacterCount;
@@ -3798,7 +3499,7 @@ namespace app
         float glyphHorizontalAdvanceAdjustment;
         float cSpace;
         float mSpace;
-        void* textInfo;
+        struct TMP_TextInfo* textInfo;
         struct TMP_LineInfo lineInfo;
         struct Color32 vertexColor;
         struct Color32 underlineColor;
@@ -3821,17 +3522,16 @@ namespace app
         struct TMP_TextProcessingStack_1_MaterialReference_ materialReferenceStack;
         struct TMP_TextProcessingStack_1_HorizontalAlignmentOptions_ lineJustificationStack;
         int32_t spriteAnimationID;
-        void* currentFontAsset;
-        void* currentSpriteAsset;
-        void* currentMaterial;
+        struct TMP_FontAsset* currentFontAsset;
+        struct TMP_SpriteAsset* currentSpriteAsset;
+        struct Material* currentMaterial;
         int32_t currentMaterialIndex;
         struct Extents meshExtents;
         bool tagNoParsing;
         bool isNonBreakingSpace;
     };
 
-    struct TMP_TextProcessingStack_1_WordWrapState_
-    {
+    struct TMP_TextProcessingStack_1_WordWrapState_ {
         void* itemStack;
         int32_t index;
         struct WordWrapState m_DefaultItem;
@@ -3840,8 +3540,7 @@ namespace app
         int32_t m_Count;
     };
 
-    struct TMP_Text_SpecialCharacter
-    {
+    struct TMP_Text_SpecialCharacter {
         void* character;
         void* fontAsset;
         void* material;
@@ -3941,17 +3640,17 @@ namespace app
         struct MaskableGraphic__Fields _;
         struct String* m_text;
         bool m_IsTextBackingStringDirty;
-        void* m_TextPreprocessor;
+        struct ITextPreprocessor* m_TextPreprocessor;
         bool m_isRightToLeft;
-        void* m_fontAsset;
-        void* m_currentFontAsset;
+        struct TMP_FontAsset* m_fontAsset;
+        struct TMP_FontAsset* m_currentFontAsset;
         bool m_isSDFShader;
-        void* m_sharedMaterial;
-        void* m_currentMaterial;
+        struct Material* m_sharedMaterial;
+        struct Material* m_currentMaterial;
         int32_t m_currentMaterialIndex;
-        void* m_fontSharedMaterials;
-        void* m_fontMaterial;
-        void* m_fontMaterials;
+        struct Material__Array* m_fontSharedMaterials;
+        struct Material* m_fontMaterial;
+        struct Material__Array* m_fontMaterials;
         bool m_isMaterialDirty;
         struct Color32 m_fontColor32;
         struct Color m_fontColor;
@@ -3960,13 +3659,13 @@ namespace app
         bool m_enableVertexGradient;
         int32_t m_colorMode;
         struct VertexGradient m_fontColorGradient;
-        void* m_fontColorGradientPreset;
-        void* m_spriteAsset;
+        struct TMP_ColorGradient* m_fontColorGradientPreset;
+        struct TMP_SpriteAsset* m_spriteAsset;
         bool m_tintAllSprites;
         bool m_tintSprite;
         struct Color32 m_spriteColor;
-        void* m_StyleSheet;
-        void* m_TextStyle;
+        struct TMP_StyleSheet* m_StyleSheet;
+        struct TMP_Style* m_TextStyle;
         int32_t m_TextStyleHashCode;
         bool m_overrideHtmlColors;
         struct Color32 m_faceColor;
@@ -4055,26 +3754,26 @@ namespace app
         float m_marginWidth;
         float m_marginHeight;
         float m_width;
-        void* m_textInfo;
+        struct TMP_TextInfo* m_textInfo;
         bool m_havePropertiesChanged;
         bool m_isUsingLegacyAnimationComponent;
-        void* m_transform;
-        void* m_rectTransform;
+        struct Transform* m_transform;
+        struct RectTransform* m_rectTransform;
         struct Vector2 m_PreviousRectTransformSize;
         struct Vector2 m_PreviousPivotPosition;
         bool _autoSizeTextContainer_k__BackingField;
         bool m_autoSizeTextContainer;
-        void* m_mesh;
+        struct Mesh* m_mesh;
         bool m_isVolumetricText;
-        void* OnPreRenderText;
-        void* m_spriteAnimator;
+        struct Action_1_TMPro_TMP_TextInfo_* OnPreRenderText;
+        struct TMP_SpriteAnimator* m_spriteAnimator;
         float m_flexibleHeight;
         float m_flexibleWidth;
         float m_minWidth;
         float m_minHeight;
         float m_maxWidth;
         float m_maxHeight;
-        void* m_LayoutElement;
+        struct LayoutElement* m_LayoutElement;
         float m_preferredWidth;
         float m_renderedWidth;
         bool m_isPreferredWidthDirty;
@@ -4095,9 +3794,9 @@ namespace app
         bool m_isParsingText;
         struct Matrix4x4 m_FXMatrix;
         bool m_isFXMatrixSet;
-        void* m_TextProcessingArray;
+        struct TMP_Text_UnicodeChar__Array* m_TextProcessingArray;
         int32_t m_InternalTextProcessingArraySize;
-        void* m_internalCharacterInfo;
+        struct TMP_CharacterInfo__Array* m_internalCharacterInfo;
         int32_t m_totalCharacterCount;
         int32_t m_characterCount;
         int32_t m_firstCharacterOfLine;
@@ -4123,12 +3822,12 @@ namespace app
         struct TMP_TextProcessingStack_1_UnityEngine_Color32_ m_underlineColorStack;
         struct TMP_TextProcessingStack_1_UnityEngine_Color32_ m_strikethroughColorStack;
         struct TMP_TextProcessingStack_1_HighlightState_ m_HighlightStateStack;
-        void* m_colorGradientPreset;
+        struct TMP_ColorGradient* m_colorGradientPreset;
         struct TMP_TextProcessingStack_1_TMP_ColorGradient_ m_colorGradientStack;
         bool m_colorGradientPresetIsTinted;
         float m_tabSpacing;
         float m_spacing;
-        void* m_TextStyleStacks;
+        struct TMP_TextProcessingStack_1_System_Int32___Array* m_TextStyleStacks;
         int32_t m_TextStyleStackDepth;
         struct TMP_TextProcessingStack_1_System_Int32_ m_ItalicAngleStack;
         int32_t m_ItalicAngle;
@@ -4138,21 +3837,20 @@ namespace app
         struct TMP_TextProcessingStack_1_System_Single_ m_baselineOffsetStack;
         float m_xAdvance;
         int32_t m_textElementType;
-        void* m_cached_TextElement;
+        struct TMP_TextElement* m_cached_TextElement;
         struct TMP_Text_SpecialCharacter m_Ellipsis;
         struct TMP_Text_SpecialCharacter m_Underline;
-        void* m_defaultSpriteAsset;
-        void* m_currentSpriteAsset;
+        struct TMP_SpriteAsset* m_defaultSpriteAsset;
+        struct TMP_SpriteAsset* m_currentSpriteAsset;
         int32_t m_spriteCount;
         int32_t m_spriteIndex;
         int32_t m_spriteAnimationID;
         bool m_ignoreActiveState;
         struct TMP_Text_TextBackingContainer m_TextBackingArray;
-        void* k_Power;
+        struct Decimal__Array* k_Power;
     };
 
-    struct TMP_Text
-    {
+    struct TMP_Text {
         struct TMP_Text__Class* klass;
         MonitorData* monitor;
         struct TMP_Text__Fields fields;
@@ -4295,11 +3993,32 @@ namespace app
     };
 
     struct TMP_Text__StaticFields {
-        // ...
+        struct MaterialReference__Array* m_materialReferences;
+        struct Dictionary_2_System_Int32_System_Int32_* m_materialReferenceIndexLookup;
+        struct TMP_TextProcessingStack_1_MaterialReference_ m_materialReferenceStack;
+        struct Color32 s_colorWhite;
+        struct Func_3_Int32_String_TMPro_TMP_FontAsset_* OnFontAssetRequest;
+        struct Func_3_Int32_String_TMPro_TMP_SpriteAsset_* OnSpriteAssetRequest;
+        struct Char__Array* m_htmlTag;
+        struct RichTextTagAttribute__Array* m_xmlAttribute;
+        struct Single__Array* m_attributeParameterValues;
+        struct WordWrapState m_SavedWordWrapState;
+        struct WordWrapState m_SavedLineState;
+        struct WordWrapState m_SavedEllipsisState;
+        struct WordWrapState m_SavedLastValidState;
+        struct WordWrapState m_SavedSoftLineBreakState;
+        struct TMP_TextProcessingStack_1_WordWrapState_ m_EllipsisInsertionCandidateStack;
+        void* k_ParseTextMarker;
+        void* k_InsertNewLineMarker;
+        struct Vector2 k_LargePositiveVector2;
+        struct Vector2 k_LargeNegativeVector2;
+        float k_LargePositiveFloat;
+        float k_LargeNegativeFloat;
+        int32_t k_LargePositiveInt;
+        int32_t k_LargeNegativeInt;
     };
 
-    struct TMP_Text__Class
-    {
+    struct TMP_Text__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct TMP_Text__StaticFields* static_fields;
@@ -4310,30 +4029,28 @@ namespace app
 #pragma endregion
 
 #pragma region TextMeshPro
-    struct TextMeshPro__Fields
-    {
+    struct TextMeshPro__Fields {
         struct TMP_Text__Fields _;
         bool m_hasFontAssetChanged;
         float m_previousLossyScaleY;
         struct Renderer* m_renderer;
-        void* m_meshFilter;
+        struct MeshFilter* m_meshFilter;
         bool m_isFirstAllocation;
         int32_t m_max_characters;
         int32_t m_max_numberOfLines;
-        void* m_subTextObjects;
+        struct TMP_SubMesh__Array* m_subTextObjects;
         int32_t m_maskType;
         struct Matrix4x4 m_EnvMapMatrix;
-        void* m_RectTransformCorners;
+        struct Vector3__Array* m_RectTransformCorners;
         bool m_isRegisteredForEvents;
         int32_t _SortingLayer;
         int32_t _SortingLayerID;
         int32_t _SortingOrder;
-        void* OnPreRenderText;
+        struct Action_1_TMPro_TMP_TextInfo_* OnPreRenderText;
         bool m_currentAutoSizeMode;
     };
 
-    struct TextMeshPro
-    {
+    struct TextMeshPro {
         struct TextMeshPro__Class* klass;
         void* monitor;
         struct TextMeshPro__Fields fields;
@@ -4485,12 +4202,10 @@ namespace app
         VirtualInvokeData GenerateTextMesh;
     };
 
-    struct TextMeshPro__StaticFields
-    {
+    struct TextMeshPro__StaticFields {
     };
 
-    struct TextMeshPro__Class
-    {
+    struct TextMeshPro__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct TextMeshPro__StaticFields* static_fields;
@@ -4544,13 +4259,12 @@ namespace app
 #pragma endregion
 
 #pragma region AccountTab
-    struct AccountTab__Fields
-    {
+    struct AccountTab__Fields {
         struct MonoBehaviour__Fields _;
         struct TextMeshPro* userName;
         struct TextMeshPro* friendCode;
         struct TextMeshPro* friendCodeTitle;
-        void* playerImage; // struct PoolablePlayer, not actual img
+        struct PoolablePlayer* playerImage;
         struct GameObject* friendCodeObject;
         struct SpriteRenderer* FriendCodeHiddenIcon;
         struct GameObject* offlineMode;
@@ -4558,47 +4272,44 @@ namespace app
         struct FullAccount* loggedInMode;
         struct GameObject* waitingForGuardian;
         struct TextMeshPro* guardianEmailText;
-        void* editNameScreen;
+        struct EditName* editNameScreen;
         struct GameObject* idCard;
         struct GameObject* resendEmailButton;
         struct TextMeshPro* levelText;
-        void* xpProgressBar;
+        struct ProgressBar* xpProgressBar;
         struct TextMeshPro* veryBadErrorText;
         struct Collider2D* clickToCloseCollider;
         struct TextMeshPro* accountIDDisplayText;
         struct GameObject* showAccountIDButton;
         struct SpriteRenderer* SpaceBean;
         struct SpriteRenderer* SpaceHorse;
-        void* InfoTextBoxDisplay;
-        void* signInStatusComponent;
+        struct InfoTextBox* InfoTextBoxDisplay;
+        struct SignInStatusComponent* signInStatusComponent;
+        struct GameObject* accountCopyButton;
         bool showAccountID;
         struct String* friendCodeHiddenText;
-        void* BackButton;
-        void* PotentialDefaultSelections;
-        void* selectableObjects;
+        struct UiElement* BackButton;
+        struct List_1_UiElement_* PotentialDefaultSelections;
+        struct List_1_UiElement_* selectableObjects;
     };
 
-    struct AccountTab
-    {
+    struct AccountTab {
         struct AccountTab__Class* klass;
         void* monitor;
         struct AccountTab__Fields fields;
     };
 
-    struct AccountTab__VTable
-    {
+    struct AccountTab__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct AccountTab__StaticFields
-    {
+    struct AccountTab__StaticFields {
     };
 
-    struct AccountTab__Class
-    {
+    struct AccountTab__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct AccountTab__StaticFields* static_fields;
@@ -4612,8 +4323,8 @@ namespace app
     //sicko
     struct EOSManager__Fields {
         void* _;
-        void* OnEncryptedAppTicketResponseCallResult;
-        void* successCallback;
+        struct CallResult_1_EncryptedAppTicketResponse_t_* OnEncryptedAppTicketResponseCallResult;
+        struct OnLoginCallback* successCallback;
         struct Action* onLoginFailedCallback;
         struct String* productName;
         struct String* productVersion;
@@ -4638,7 +4349,7 @@ namespace app
         bool announcementsVisible;
         bool attemptAuthAgain;
         uint32_t numLinkedAccounts;
-        void* linkedExternalAccounts;
+        struct List_1_Epic_OnlineServices_Connect_ExternalAccountInfo_* linkedExternalAccounts;
         struct EditAccountUsername* editAccountUsername;
         struct AskToMergeGuest* askToMergeAccount;
         struct String* freeChatKey;
@@ -4662,15 +4373,13 @@ namespace app
         struct PlatformInterface* s_eosPlatformInterface;
     };
 
-    struct EOSManager
-    {
+    struct EOSManager {
         struct EOSManager__Class* klass;
         void* monitor;
         struct EOSManager__Fields fields;
     };
 
-    struct EOSManager__VTable
-    {
+    struct EOSManager__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -4679,12 +4388,10 @@ namespace app
         VirtualInvokeData OnDestroy;
     };
 
-    struct EOSManager__StaticFields
-    {
+    struct EOSManager__StaticFields {
     };
 
-    struct EOSManager__Class
-    {
+    struct EOSManager__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct EOSManager__StaticFields* static_fields;
@@ -4702,27 +4409,23 @@ namespace app
         struct GameObject* manageAccount;
     };
 
-    struct FullAccount
-    {
+    struct FullAccount {
         struct FullAccount__Class* klass;
         void* monitor;
         struct FullAccount__Fields fields;
     };
 
-    struct FullAccount__VTable
-    {
+    struct FullAccount__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct FullAccount__StaticFields
-    {
+    struct FullAccount__StaticFields {
     };
 
-    struct FullAccount__Class
-    {
+    struct FullAccount__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct FullAccount__StaticFields* static_fields;
@@ -4735,23 +4438,20 @@ namespace app
 #pragma region InnerNetObject
 
 #if defined(_CPLUSPLUS_)
-    enum class SpawnFlags__Enum : uint8_t
-    {
+    enum class SpawnFlags__Enum : uint8_t {
         None = 0x00,
         IsClientCharacter = 0x01,
     };
 
 #else
-    enum SpawnFlags__Enum
-    {
+    enum SpawnFlags__Enum {
         SpawnFlags__Enum_None = 0x00,
         SpawnFlags__Enum_IsClientCharacter = 0x01,
     };
 
 #endif
 
-    struct InnerNetObject__Fields
-    {
+    struct InnerNetObject__Fields {
         struct MonoBehaviour__Fields _;
         uint32_t SpawnId;
         uint32_t NetId;
@@ -4770,15 +4470,13 @@ namespace app
         bool DespawnOnDestroy;
     };
 
-    struct InnerNetObject
-    {
+    struct InnerNetObject {
         struct InnerNetObject__Class* klass;
         void* monitor;
         struct InnerNetObject__Fields fields;
     };
 
-    struct InnerNetObject__VTable
-    {
+    struct InnerNetObject__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -4792,12 +4490,10 @@ namespace app
         VirtualInvokeData __unknown_2;
     };
 
-    struct InnerNetObject__StaticFields
-    {
+    struct InnerNetObject__StaticFields {
     };
 
-    struct InnerNetObject__Class
-    {
+    struct InnerNetObject__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct InnerNetObject__StaticFields* static_fields;
@@ -4817,9 +4513,9 @@ namespace app
         struct MeetingHud* _Parent_k__BackingField;
         uint8_t TargetPlayerId;
         struct GameObject* Buttons;
-        void* ConfirmButton;
-        void* CancelButton;
-        void* PlayerButton;
+        struct UiElement* ConfirmButton;
+        struct UiElement* CancelButton;
+        struct UiElement* PlayerButton;
         struct SpriteRenderer* Background;
         struct SpriteRenderer* MaskArea;
         struct SpriteRenderer* Flag;
@@ -4838,7 +4534,7 @@ namespace app
         uint8_t VotedFor;
         bool voteComplete;
         bool resultsShowing;
-        void* PlayerIcon;
+        struct PoolablePlayer* PlayerIcon;
         int32_t _MaskLayer_k__BackingField;
     };
 
@@ -4848,20 +4544,17 @@ namespace app
         struct PlayerVoteArea__Fields fields;
     };
 
-    struct PlayerVoteArea__VTable
-    {
+    struct PlayerVoteArea__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct PlayerVoteArea__StaticFields
-    {
+    struct PlayerVoteArea__StaticFields {
     };
 
-    struct PlayerVoteArea__Class
-    {
+    struct PlayerVoteArea__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PlayerVoteArea__StaticFields* static_fields;
@@ -5006,8 +4699,7 @@ namespace app
 #pragma endregion
 
 #pragma region PlainShipRoom
-    struct PlainShipRoom__Fields
-    {
+    struct PlainShipRoom__Fields {
         struct MonoBehaviour__Fields _;
 #if defined(_CPLUSPLUS_)
         SystemTypes__Enum RoomId;
@@ -5018,26 +4710,23 @@ namespace app
         struct Collider2D* roomArea;
     };
 
-    struct PlainShipRoom
-    {
+    struct PlainShipRoom {
         struct PlainShipRoom__Class* klass;
         MonitorData* monitor;
         struct PlainShipRoom__Fields fields;
     };
-    struct PlainShipRoom__VTable
-    {
+
+    struct PlainShipRoom__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct PlainShipRoom__StaticFields
-    {
+    struct PlainShipRoom__StaticFields {
     };
 
-    struct PlainShipRoom__Class
-    {
+    struct PlainShipRoom__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PlainShipRoom__StaticFields* static_fields;
@@ -5054,8 +4743,7 @@ namespace app
 #pragma region ShipStatus
 
 #if defined(_CPLUSPLUS_)
-    enum class ShipStatus_MapType__Enum : int32_t
-    {
+    enum class ShipStatus_MapType__Enum : int32_t {
         Ship = 0x00000000,
         Hq = 0x00000001,
         Pb = 0x00000002,
@@ -5063,8 +4751,7 @@ namespace app
     };
 
 #else
-    enum ShipStatus_MapType__Enum
-    {
+    enum ShipStatus_MapType__Enum {
         ShipStatus_MapType__Enum_Ship = 0x00000000,
         ShipStatus_MapType__Enum_Hq = 0x00000001,
         ShipStatus_MapType__Enum_Pb = 0x00000002,
@@ -5079,47 +4766,47 @@ namespace app
         float MaxLightRadius;
         float MinLightRadius;
         float MapScale;
-        void* MapPrefab;
+        struct MapBehaviour* MapPrefab;
         void* ExileCutscenePrefab;
-        void* EmergencyOverlay;
-        void* ReportOverlay;
-        void* MeetingBackground;
-        void* BrokenEmergencyButton;
-        void* EmergencyButton;
+        struct MeetingCalledAnimation* EmergencyOverlay;
+        struct MeetingCalledAnimation* ReportOverlay;
+        struct Sprite* MeetingBackground;
+        struct Sprite* BrokenEmergencyButton;
+        struct SystemConsole* EmergencyButton;
         struct Vector2 InitialSpawnCenter;
         struct Vector2 MeetingSpawnCenter;
         struct Vector2 MeetingSpawnCenter2;
         float SpawnRadius;
-        void* CommonTasks;
-        void* LongTasks;
-        void* ShortTasks;
+        struct NormalPlayerTask__Array* CommonTasks;
+        struct NormalPlayerTask__Array* LongTasks;
+        struct NormalPlayerTask__Array* ShortTasks;
         struct PlayerTask__Array* SpecialTasks;
-        void* DummyLocations;
-        void* AllCameras;
+        struct Transform__Array* DummyLocations;
+        struct SurvCamera__Array* AllCameras;
         struct OpenableDoor__Array* AllDoors;
-        void* AllConsoles;
-        void* Ladders;
+        struct Console_1__Array* AllConsoles;
+        struct Ladder__Array* Ladders;
         struct Dictionary_2_SystemTypes_ISystemType_* Systems;
-        void* SystemNames;
-        void* ExtraTaskNames;
-        void* _AllStepWatchers_k__BackingField;
+        struct StringNames__Enum__Array* SystemNames;
+        struct StringNames__Enum__Array* ExtraTaskNames;
+        struct IStepWatcher__Array* _AllStepWatchers_k__BackingField;
         struct PlainShipRoom__Array* _AllRooms_k__BackingField;
-        void* _FastRooms_k__BackingField;
+        struct Dictionary_2_SystemTypes_PlainShipRoom_* _FastRooms_k__BackingField;
         struct Vent__Array* _AllVents_k__BackingField;
         void* SabotageSound;
-        void* WeaponFires;
-        void* WeaponsImage;
-        void* VentMoveSounds;
+        struct AnimationClip__Array* WeaponFires;
+        struct SpriteAnim* WeaponsImage;
+        struct AudioClip__Array* VentMoveSounds;
         void* VentEnterSound;
         void* VentExitSound;
-        void* HatchActive;
-        void* Hatch;
-        void* HatchParticles;
-        void* ShieldsActive;
-        void* ShieldsImages;
+        struct AnimationClip* HatchActive;
+        struct SpriteAnim* Hatch;
+        struct ParticleSystem* HatchParticles;
+        struct AnimationClip* ShieldsActive;
+        struct SpriteAnim__Array* ShieldsImages;
         struct SpriteRenderer* ShieldBorder;
-        void* ShieldBorderOn;
-        void* MedScanner;
+        struct Sprite* ShieldBorderOn;
+        struct MedScannerBehaviour* MedScanner;
         int32_t WeaponFireIdx;
         float Timer;
         float EmergencyCooldown;
@@ -5129,8 +4816,8 @@ namespace app
         int32_t Type;
 #endif
         float _HideCountdown_k__BackingField;
-        void* _CosmeticsCache_k__BackingField;
-        void* logger;
+        struct CosmeticsCache* _CosmeticsCache_k__BackingField;
+        struct Logger_2* logger;
         int32_t numScans;
     };
 
@@ -5227,27 +4914,23 @@ namespace app
 #pragma endregion
 
 #pragma region ISystemType
-    struct ISystemType
-    {
+    struct ISystemType {
         struct ISystemType__Class* klass;
         void* monitor;
     };
-    struct ISystemType__VTable
-    {
+
+    struct ISystemType__VTable {
         VirtualInvokeData get_IsDirty;
-        VirtualInvokeData Detoriorate;
-        VirtualInvokeData RepairDamage;
+        VirtualInvokeData Deteriorate;
         VirtualInvokeData UpdateSystem;
         VirtualInvokeData Serialize;
         VirtualInvokeData Deserialize;
     };
 
-    struct ISystemType__StaticFields
-    {
+    struct ISystemType__StaticFields {
     };
 
-    struct ISystemType__Class
-    {
+    struct ISystemType__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ISystemType__StaticFields* static_fields;
@@ -5431,15 +5114,13 @@ namespace app
 
 #pragma region RoleTeamTypes__Enum
 #if defined(_CPLUSPLUS_)
-    enum class RoleTeamTypes__Enum : int32_t
-    {
+    enum class RoleTeamTypes__Enum : int32_t {
         Crewmate = 0x00000000,
         Impostor = 0x00000001,
     };
 
 #else
-    enum RoleTeamTypes__Enum
-    {
+    enum RoleTeamTypes__Enum {
         RoleTeamTypes__Enum_Crewmate = 0x00000000,
         RoleTeamTypes__Enum_Impostor = 0x00000001,
     };
@@ -5449,15 +5130,13 @@ namespace app
 
 #pragma region QuickChatModes__Enum
 #if defined(_CPLUSPLUS_)
-    enum class QuickChatModes__Enum : int32_t
-    {
+    enum class QuickChatModes__Enum : int32_t {
         FreeChatOrQuickChat = 0x00000001,
         QuickChatOnly = 0x00000002,
     };
 
 #else
-    enum QuickChatModes__Enum
-    {
+    enum QuickChatModes__Enum {
         QuickChatModes__Enum_FreeChatOrQuickChat = 0x00000001,
         QuickChatModes__Enum_QuickChatOnly = 0x00000002,
     };
@@ -5495,9 +5174,9 @@ namespace app
 #else
         int32_t BlurbNameLong;
 #endif
-        void* RoleIconSolid;
-        void* RoleIconWhite;
-        void* RoleScreenshot;
+        struct Sprite* RoleIconSolid;
+        struct Sprite* RoleIconWhite;
+        struct Sprite* RoleScreenshot;
         struct Color NameColor;
         bool TasksCountTowardProgress;
         bool CanUseKillButton;
@@ -5519,11 +5198,10 @@ namespace app
         struct AudioClip* UseSound;
         struct AudioClip* IntroSound;
         struct PlayerControl* Player;
-        void* buttonManager;
+        struct AbilityButton* buttonManager;
     };
 
-    struct RoleBehaviour
-    {
+    struct RoleBehaviour {
         struct RoleBehaviour__Class* klass;
         MonitorData* monitor;
         struct RoleBehaviour__Fields fields;
@@ -5559,8 +5237,7 @@ namespace app
         struct List_1_PlayerControl_* tempPlayerList;
     };
 
-    struct RoleBehaviour__Class
-    {
+    struct RoleBehaviour__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct RoleBehaviour__StaticFields* static_fields;
@@ -5571,8 +5248,7 @@ namespace app
 #pragma endregion
 
 #pragma region Nullable_1_AmongUs_GameOptions_RoleTypes_
-    struct Nullable_1_AmongUs_GameOptions_RoleTypes_
-    {
+    struct Nullable_1_AmongUs_GameOptions_RoleTypes_ {
 #if defined(_CPLUSPLUS_)
         RoleTypes__Enum value;
 #else
@@ -5599,7 +5275,7 @@ namespace app
         uint32_t PlayerLevel;
         bool Disconnected;
         struct RoleBehaviour* Role;
-        void* Tasks;
+        struct List_1_NetworkedPlayerInfo_TaskInfo_* Tasks;
         bool IsDead;
         struct PlayerControl* _object;
     };
@@ -5619,22 +5295,20 @@ namespace app
         struct Vector3 DisabledPosition;
         struct Vector3 LeftUsePosition;
         struct Vector3 RightUsePosition;
-        void* MovingSound;
+        struct AudioClip* MovingSound;
         bool IsLeft;
         struct PlayerControl* Target;
         uint8_t useId;
         bool _IsDirty_k__BackingField;
     };
 
-    struct MovingPlatformBehaviour
-    {
+    struct MovingPlatformBehaviour {
         struct MovingPlatformBehaviour__Class* klass;
         void* monitor;
         struct MovingPlatformBehaviour__Fields fields;
     };
 
-    struct MovingPlatformBehaviour__VTable
-    {
+    struct MovingPlatformBehaviour__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -5646,12 +5320,10 @@ namespace app
         VirtualInvokeData Deserialize;
     };
 
-    struct MovingPlatformBehaviour__StaticFields
-    {
+    struct MovingPlatformBehaviour__StaticFields {
     };
 
-    struct MovingPlatformBehaviour__Class
-    {
+    struct MovingPlatformBehaviour__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct MovingPlatformBehaviour__StaticFields* static_fields;
@@ -5664,16 +5336,14 @@ namespace app
 #pragma region Minigame
 
 #if defined(_CPLUSPLUS_)
-    enum class TransitionType__Enum : int32_t
-    {
+    enum class TransitionType__Enum : int32_t {
         SlideBottom = 0x00000000,
         Alpha = 0x00000001,
         None = 0x00000002,
     };
 
 #else
-    enum TransitionType__Enum
-    {
+    enum TransitionType__Enum {
         TransitionType__Enum_SlideBottom = 0x00000000,
         TransitionType__Enum_Alpha = 0x00000001,
         TransitionType__Enum_None = 0x00000002,
@@ -5682,16 +5352,14 @@ namespace app
 #endif
 
 #if defined(_CPLUSPLUS_)
-    enum class Minigame_CloseState__Enum : int32_t
-    {
+    enum class Minigame_CloseState__Enum : int32_t {
         None = 0x00000000,
         Waiting = 0x00000001,
         Closing = 0x00000002,
     };
 
 #else
-    enum Minigame_CloseState__Enum
-    {
+    enum Minigame_CloseState__Enum {
         Minigame_CloseState__Enum_None = 0x00000000,
         Minigame_CloseState__Enum_Waiting = 0x00000001,
         Minigame_CloseState__Enum_Closing = 0x00000002,
@@ -5707,33 +5375,31 @@ namespace app
         int32_t TransType;
 #endif
         struct Vector2 TargetPosition;
-        void* MyTask;
-        void* MyNormTask;
-        void* _Console_k__BackingField;
+        struct PlayerTask* MyTask;
+        struct NormalPlayerTask* MyNormTask;
+        struct Console_1* _Console_k__BackingField;
 #if defined(_CPLUSPLUS_)
         Minigame_CloseState__Enum amClosing;
 #else
         int32_t amClosing;
 #endif
         bool amOpening;
-        void* OpenSound;
-        void* CloseSound;
-        void* inputHandler;
+        struct AudioClip* OpenSound;
+        struct AudioClip* CloseSound;
+        struct SpecialInputHandler* inputHandler;
         bool multistageMinigameChecked;
-        void* multistageMinigameParent;
-        void* logger;
+        struct MultistageMinigame* multistageMinigameParent;
+        struct Logger_2* logger;
         float timeOpened;
     };
 
-    struct Minigame
-    {
+    struct Minigame {
         struct Minigame__Class* klass;
         void* monitor;
         struct Minigame__Fields fields;
     };
 
-    struct Minigame__VTable
-    {
+    struct Minigame__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -5745,13 +5411,11 @@ namespace app
         VirtualInvokeData CoDestroySelf;
     };
 
-    struct Minigame__StaticFields
-    {
+    struct Minigame__StaticFields {
         struct Minigame* Instance;
     };
 
-    struct Minigame__Class
-    {
+    struct Minigame__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Minigame__StaticFields* static_fields;
@@ -5764,8 +5428,7 @@ namespace app
 #pragma region DoorCardSwipeGame
 
 #if defined(_CPLUSPLUS_)
-    enum class DoorCardSwipeGame_TaskStages__Enum : int32_t
-    {
+    enum class DoorCardSwipeGame_TaskStages__Enum : int32_t {
         Before = 0x00000000,
         Animating = 0x00000001,
         Inserted = 0x00000002,
@@ -5773,8 +5436,7 @@ namespace app
     };
 
 #else
-    enum DoorCardSwipeGame_TaskStages__Enum
-    {
+    enum DoorCardSwipeGame_TaskStages__Enum {
         DoorCardSwipeGame_TaskStages__Enum_Before = 0x00000000,
         DoorCardSwipeGame_TaskStages__Enum_Animating = 0x00000001,
         DoorCardSwipeGame_TaskStages__Enum_Inserted = 0x00000002,
@@ -5792,18 +5454,18 @@ namespace app
 #else
         int32_t State;
 #endif
-        void* myController;
-        void* YRange;
+        struct Controller_1* myController;
+        struct FloatRange* YRange;
         float minAcceptedTime;
         struct Collider2D* col;
         struct SpriteRenderer* confirmSymbol;
-        void* AcceptSymbol;
-        void* RejectSymbol;
+        struct Sprite* AcceptSymbol;
+        struct Sprite* RejectSymbol;
         struct TextMeshPro* StatusText;
-        void* AcceptSound;
-        void* DenySound;
-        void* CardMove;
-        void* WalletOut;
+        struct AudioClip* AcceptSound;
+        struct AudioClip* DenySound;
+        struct AudioClip__Array* CardMove;
+        struct AudioClip* WalletOut;
         float dragTime;
         bool moving;
         struct Vector2 prevStickInput;
@@ -5846,8 +5508,7 @@ namespace app
 #pragma region PlayerTask
 
 #if defined(_CPLUSPLUS_)
-    enum class TaskTypes__Enum : int32_t
-    {
+    enum class TaskTypes__Enum : int32_t {
         SubmitScan = 0x00000000,
         PrimeShields = 0x00000001,
         FuelEngines = 0x00000002,
@@ -5933,8 +5594,7 @@ namespace app
     };
 
 #else
-    enum TaskTypes__Enum
-    {
+    enum TaskTypes__Enum {
         TaskTypes__Enum_SubmitScan = 0x00000000,
         TaskTypes__Enum_PrimeShields = 0x00000001,
         TaskTypes__Enum_FuelEngines = 0x00000002,
@@ -6021,8 +5681,7 @@ namespace app
 
 #endif
 
-    struct PlayerTask__Fields
-    {
+    struct PlayerTask__Fields {
         struct MonoBehaviour__Fields _;
         int32_t _Index_k__BackingField;
         uint32_t _Id_k__BackingField;
@@ -6037,20 +5696,18 @@ namespace app
 #else
         int32_t TaskType;
 #endif
-        void* MinigamePrefab;
+        struct Minigame* MinigamePrefab;
         bool HasLocation;
         bool LocationDirty;
     };
 
-    struct PlayerTask
-    {
+    struct PlayerTask {
         struct PlayerTask__Class* klass;
         void* monitor;
         struct PlayerTask__Fields fields;
     };
 
-    struct PlayerTask__VTable
-    {
+    struct PlayerTask__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -6065,12 +5722,10 @@ namespace app
         VirtualInvokeData GetMinigamePrefab;
     };
 
-    struct PlayerTask__StaticFields
-    {
+    struct PlayerTask__StaticFields {
     };
 
-    struct PlayerTask__Class
-    {
+    struct PlayerTask__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PlayerTask__StaticFields* static_fields;
@@ -6135,33 +5790,28 @@ namespace app
 #pragma endregion
 
 #pragma region VersionShower
-    struct VersionShower__Fields
-    {
+    struct VersionShower__Fields {
         struct MonoBehaviour__Fields _;
         struct TextMeshPro* text;
     };
 
-    struct VersionShower
-    {
+    struct VersionShower {
         struct VersionShower__Class* klass;
         void* monitor;
         struct VersionShower__Fields fields;
     };
 
-    struct VersionShower__VTable
-    {
+    struct VersionShower__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct VersionShower__StaticFields
-    {
+    struct VersionShower__StaticFields {
     };
 
-    struct VersionShower__Class
-    {
+    struct VersionShower__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct VersionShower__StaticFields* static_fields;
@@ -6183,27 +5833,23 @@ namespace app
         struct Vector2 centerPosition;
     };
 
-    struct FollowerCamera
-    {
+    struct FollowerCamera {
         struct FollowerCamera__Class* klass;
         void* monitor;
         struct FollowerCamera__Fields fields;
     };
 
-    struct FollowerCamera__VTable
-    {
+    struct FollowerCamera__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct FollowerCamera__StaticFields
-    {
+    struct FollowerCamera__StaticFields {
     };
 
-    struct FollowerCamera__Class
-    {
+    struct FollowerCamera__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct FollowerCamera__StaticFields* static_fields;
@@ -6260,9 +5906,7 @@ namespace app
 #pragma endregion
 
 #pragma region ChatBubble
-
-    struct PoolableBehavior__Fields
-    {
+    struct PoolableBehavior__Fields {
         struct MonoBehaviour__Fields _;
         void* OwnerPool;
         int32_t PoolIndex;
@@ -6270,28 +5914,27 @@ namespace app
 
     struct ChatBubble__Fields {
         struct PoolableBehavior__Fields _;
-        void* Player; // struct PoolablePlayer
+        void* Player; //struct PoolablePlayer
         struct SpriteRenderer* Xmark;
         struct SpriteRenderer* votedMark;
         struct TextMeshPro* NameText;
         struct TextMeshPro* TextArea;
         struct SpriteRenderer* Background;
         struct SpriteRenderer* MaskArea;
-        void* PlatformIcon;
+        struct PlatformIdentifier* PlatformIcon;
         struct TextMeshPro* ColorBlindName;
         struct NetworkedPlayerInfo* playerInfo;
         int32_t maskLayer;
+        float playerZ;
     };
 
-    struct ChatBubble
-    {
+    struct ChatBubble {
         struct ChatBubble__Class* klass;
         void* monitor;
         struct ChatBubble__Fields fields;
     };
 
-    struct ChatBubble__VTable
-    {
+    struct ChatBubble__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -6299,16 +5942,14 @@ namespace app
         VirtualInvokeData Reset;
     };
 
-    struct ChatBubble__StaticFields
-    {
+    struct ChatBubble__StaticFields {
         struct Vector3 PlayerMessageScale;
         struct Vector3 PlayerNotificationScale;
         struct Vector3 VotedAndDeadMarkerPosition;
         struct Vector3 VotedAndDeadMarkerPositionRight;
     };
 
-    struct ChatBubble__Class
-    {
+    struct ChatBubble__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ChatBubble__StaticFields* static_fields;
@@ -6340,29 +5981,29 @@ namespace app
 
     struct ChatController__Fields {
         struct MonoBehaviour__Fields _;
-        void* chatButton;
-        void* chatButtonAspectPosition;
+        struct PassiveButton* chatButton;
+        struct AspectPosition* chatButtonAspectPosition;
         void* banButton;
         struct GameObject* openKeyboardButton;
-        void* quickChatButton;
+        struct PassiveButton* quickChatButton;
         struct GameObject* chatScreen;
-        void* chatBubblePool;
-        void* scroller;
+        struct ObjectPoolBehavior* chatBubblePool;
+        struct Scroller* scroller;
         struct SpriteRenderer* backgroundImage;
         struct SpriteRenderer* chatNotifyDot;
         struct TextMeshPro* sendRateMessageText;
-        void* aspectPosition;
+        struct AspectPosition* aspectPosition;
         struct FreeChatInputField* freeChatField;
-        void* quickChatMenu;
+        struct QuickChatMenu* quickChatMenu;
         struct QuickChatPreviewField* quickChatField;
-        void* messageSound;
-        void* warningSound;
-        void* chatAnimationIn;
-        void* chatAnimationOut;
-        void* backButton;
-        void* defaultButtonSelected;
-        void* controllerSelectable;
-        void* chatNotification;
+        struct AudioClip* messageSound;
+        struct AudioClip* warningSound;
+        struct AnimationCurve* chatAnimationIn;
+        struct AnimationCurve* chatAnimationOut;
+        struct UiElement* backButton;
+        struct UiElement* defaultButtonSelected;
+        struct List_1_UiElement_* controllerSelectable;
+        struct ChatNotification* chatNotification;
 #if defined(_CPLUSPLUS_)
         ChatControllerState__Enum state;
 #else
@@ -6370,8 +6011,8 @@ namespace app
 #endif
         struct Vector3 targetChatPosition;
         float timeSinceLastMessage;
-        void* notificationRoutine;
-        void* specialInputHandler;
+        struct Coroutine* notificationRoutine;
+        struct SpecialInputHandler* specialInputHandler;
         float targetScale;
     };
 
@@ -6410,8 +6051,7 @@ namespace app
         struct FreeChatInputField__Fields fields;
     };
 
-    struct ChatController__VTable
-    {
+    struct ChatController__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -6422,8 +6062,7 @@ namespace app
         void* Logger;
     };
 
-    struct ChatController__Class
-    {
+    struct ChatController__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ChatController__StaticFields* static_fields;
@@ -6531,20 +6170,20 @@ namespace app
     struct PlayerPhysics__Fields {
         struct InnerNetObject__Fields _;
         uint8_t lastClimbLadderSid;
-        void* ImpostorDiscoveredSound;
-        void* Animations;
-        void* inputHandler;
+        struct AudioClip* ImpostorDiscoveredSound;
+        struct PlayerAnimations* Animations;
+        struct SpecialInputHandler* inputHandler;
         float Speed;
         float GhostSpeed;
-        void* logger;
-        void* body;
+        struct Logger_2* logger;
+        struct Rigidbody2D* body;
         struct PlayerControl* myPlayer;
 #if defined(_CPLUSPLUS_)
         PlayerBodyTypes__Enum bodyType;
 #else
         int32_t bodyType;
 #endif
-        void* petCoroutine;
+        struct Coroutine* petCoroutine;
         bool _DoingCustomAnimation_k__BackingField;
     };
 
@@ -6554,8 +6193,7 @@ namespace app
         struct PlayerPhysics__Fields fields;
     };
 
-    struct PlayerPhysics__VTable
-    {
+    struct PlayerPhysics__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -6569,12 +6207,10 @@ namespace app
         VirtualInvokeData Deserialize;
     };
 
-    struct PlayerPhysics__StaticFields
-    {
+    struct PlayerPhysics__StaticFields {
     };
 
-    struct PlayerPhysics__Class
-    {
+    struct PlayerPhysics__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PlayerPhysics__StaticFields* static_fields;
@@ -6587,21 +6223,21 @@ namespace app
 #pragma region CosmeticsLayer
     struct CosmeticsLayer__Fields {
         struct MonoBehaviour__Fields _;
-        void* OnColorChange;
-        void* OnSetBodyAsGhost;
-        void* OnCosmeticSet;
+        struct Action_1_Int32_* OnColorChange;
+        struct Action* OnSetBodyAsGhost;
+        struct Action_3_String_Int32_CosmeticsLayer_CosmeticKind_* OnCosmeticSet;
         bool alwaysDrawNormalPlayer;
         bool uiPet;
         float zIndexSpacing;
         bool showColorBlindText;
-        void* bodySprites;
+        struct List_1_PlayerBodySprite_* bodySprites;
         struct TextMeshPro* colorBlindText;
-        void* hat;
+        struct HatParent* hat;
         struct TextMeshPro* nameText;
         struct GameObject* nameTextContainer;
         struct Transform* petParent;
         struct SkinLayer* skin;
-        void* visor;
+        struct VisorLayer* visor;
         struct Vector3 defaultHatVisorPosition;
 #if defined(_CPLUSPLUS_)
         PlayerBodyTypes__Enum bodyType;
@@ -6609,12 +6245,12 @@ namespace app
         int32_t bodyType;
 #endif
         struct PlayerMaterial_Properties bodyMatProperties;
-        void* currentBodySprite;
-        void* currentPet;
-        void* normalBodySprite;
+        struct PlayerBodySprite* currentBodySprite;
+        struct PetBehaviour* currentPet;
+        struct PlayerBodySprite* normalBodySprite;
         bool initialized;
-        void* petAsset;
-        void* longboi;
+        struct AddressableAsset_1_PetBehaviour_* petAsset;
+        struct LongBoiPlayerBody* longboi;
         bool visible;
         bool isNameVisible;
         bool lockVisible;
@@ -6648,7 +6284,6 @@ namespace app
 #pragma endregion
 
 #pragma region PlayerControl
-
     struct PlayerControl__Fields {
         struct InnerNetObject__Fields _;
         int32_t LastStartCounter;
@@ -6682,13 +6317,13 @@ namespace app
         bool isTrackingPlayer;
         struct PlayerControl* trackedPlayer;
         int32_t trackedPlayerColorID;
-        void* FootSteps;
-        void* KillSfx;
-        void* KillAnimations;
+        struct AudioSource* FootSteps;
+        struct AudioClip* KillSfx;
+        struct KillAnimation__Array* KillAnimations;
         float killTimer;
         int32_t RemainingEmergencies;
-        void* LightPrefab;
-        void* lightSource;
+        struct LightSource* LightPrefab;
+        struct LightSource* lightSource;
         struct Collider2D* Collider;
         struct PlayerPhysics* MyPhysics;
         struct CustomNetworkTransform* NetTransform;
@@ -6699,15 +6334,15 @@ namespace app
         struct GameObject* TargetFlashlight;
         bool isDummy;
         bool notRealPlayer;
-        void* logger;
-        void* visibilityItems;
-        void* hitBuffer;
-        void* closest;
+        struct Logger_2* logger;
+        struct List_1_IPlayerVisibleItem_* visibilityItems;
+        struct Collider2D__Array* hitBuffer;
+        struct IUsable* closest;
         bool isNew;
-        void* rigidbody2D;
-        void* cache;
-        void* itemsInRange;
-        void* newItemsInRange;
+        struct Rigidbody2D* rigidbody2D;
+        struct Dictionary_2_UnityEngine_Collider2D_IUsable_* cache;
+        struct List_1_IUsable_* itemsInRange;
+        struct List_1_IUsable_* newItemsInRange;
         uint8_t scannerCount;
         bool roleAssigned;
     };
@@ -6718,8 +6353,7 @@ namespace app
         struct PlayerControl__Fields fields;
     };
 
-    struct PlayerControl__VTable
-    {
+    struct PlayerControl__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -6738,8 +6372,7 @@ namespace app
         struct List_1_PlayerControl_* AllPlayerControls;
     };
 
-    struct PlayerControl__Class
-    {
+    struct PlayerControl__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PlayerControl__StaticFields* static_fields;
@@ -6754,9 +6387,7 @@ namespace app
 #pragma endregion
 
 #pragma region HudManager
-
-    struct DestroyableSingleton_1_HudManager___Fields
-    {
+    struct DestroyableSingleton_1_HudManager___Fields {
         struct MonoBehaviour__Fields _;
         bool DontDestroy;
     };
@@ -6768,54 +6399,54 @@ namespace app
         struct FollowerCamera* PlayerCam;
         struct Camera* UICamera;
         struct MeetingHud* MeetingPrefab;
-        void* KillButton;
-        void* AdminButton;
-        void* SabotageButton;
-        void* ImpostorVentButton;
-        void* UseButton;
-        void* PetButton;
-        void* AbilityButton;
-        void* ReportButton;
+        struct KillButton* KillButton;
+        struct AdminButton* AdminButton;
+        struct SabotageButton* SabotageButton;
+        struct VentButton* ImpostorVentButton;
+        struct UseButton* UseButton;
+        struct PetButton* PetButton;
+        struct AbilityButton* AbilityButton;
+        struct ReportButton* ReportButton;
         struct GameObject* TaskStuff;
         struct TaskPanelBehaviour* TaskPanel;
         struct CrewmatesKilledTracker* CrewmatesKilled;
         struct ChatController* Chat;
-        void* Dialogue;
+        struct DialogueBox* Dialogue;
         struct Transform* TaskCompleteOverlay;
         float taskDirtyTimer;
-        void* ShadowQuad;
+        struct MeshRenderer* ShadowQuad;
         struct SpriteRenderer* FullScreen;
-        void* _ReactorFlash_k__BackingField;
-        void* _OxyFlash_k__BackingField;
-        void* MapButton;
+        struct Coroutine* _ReactorFlash_k__BackingField;
+        struct Coroutine* _OxyFlash_k__BackingField;
+        struct PassiveButton* MapButton;
         struct GameObject* MapButtonGlyph;
         void* KillOverlay;
-        void* joystick;
-        void* joystickR;
-        void* Joysticks;
+        struct IVirtualJoystick* joystick;
+        struct VirtualJoystick* joystickR;
+        struct MonoBehaviour__Array* Joysticks;
         struct MonoBehaviour* RightVJoystick;
         struct Collider2D* LeftStickDeadZone;
         struct Collider2D* RightStickDeadZone;
-        void* discussEmblem;
-        void* shhhEmblem;
+        struct DiscussBehaviour* discussEmblem;
+        struct ShhhBehaviour* shhhEmblem;
         void* IntroPrefab;
-        void* GameMenu;
+        struct OptionsMenuBehaviour* GameMenu;
         struct NotificationPopper* Notifier;
-        void* roomTracker;
-        void* TaskCompleteSound;
-        void* TaskUpdateSound;
+        struct RoomTracker* roomTracker;
+        struct AudioClip* TaskCompleteSound;
+        struct AudioClip* TaskUpdateSound;
         struct Transform* consoleUIRoot;
-        void* consoleUIObjects;
+        struct GameObject__Array* consoleUIObjects;
         struct GameObject* menuNavigationPrompts;
         struct GameObject* GameLoadAnimation;
-        void* LobbyTimerExtensionUI;
+        struct LobbyTimerExtensionUI* LobbyTimerExtensionUI;
         float consoleUIHorizontalShift;
         struct GameObject* playerListPrompt;
-        void* AlertFlash;
-        void* DangerMeter;
+        struct AlertFlash* AlertFlash;
+        struct DangerMeter* DangerMeter;
         struct GameObject* SettingsButton;
-        void* tasksString;
-        void* lightFlashHandle;
+        struct StringBuilder* tasksString;
+        struct DualshockLightManager_LightOverlayHandle* lightFlashHandle;
         bool _IsIntroDisplayed_k__BackingField;
     };
 
@@ -6825,8 +6456,7 @@ namespace app
         struct HudManager__Fields fields;
     };
 
-    struct HudManager__VTable
-    {
+    struct HudManager__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -6835,12 +6465,10 @@ namespace app
         VirtualInvokeData OnDestroy;
     };
 
-    struct HudManager__StaticFields
-    {
+    struct HudManager__StaticFields {
     };
 
-    struct HudManager__Class
-    {
+    struct HudManager__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct HudManager__StaticFields* static_fields;
@@ -6851,8 +6479,7 @@ namespace app
 #pragma endregion
 
 #pragma region KeyboardJoystick
-    struct KeyboardJoystick__Fields
-    {
+    struct KeyboardJoystick__Fields {
         struct MonoBehaviour__Fields _;
         struct Vector2 del;
         void* myController;
@@ -6860,8 +6487,7 @@ namespace app
         int32_t touchId;
     };
 
-    struct KeyboardJoystick
-    {
+    struct KeyboardJoystick {
         struct KeyboardJoystick__Class* klass;
         void* monitor;
         struct KeyboardJoystick__Fields fields;
@@ -6877,13 +6503,11 @@ namespace app
         VirtualInvokeData ToggleVisuals;
     };
 
-    struct KeyboardJoystick__StaticFields
-    {
+    struct KeyboardJoystick__StaticFields {
         void* player;
     };
 
-    struct KeyboardJoystick__Class
-    {
+    struct KeyboardJoystick__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct KeyboardJoystick__StaticFields* static_fields;
@@ -6894,8 +6518,7 @@ namespace app
 #pragma endregion
 
 #pragma region ScreenJoystick
-    struct ScreenJoystick__Fields
-    {
+    struct ScreenJoystick__Fields {
         struct MonoBehaviour__Fields _;
         void* hitBuffer;
         struct Vector2 _Delta_k__BackingField;
@@ -6903,8 +6526,7 @@ namespace app
         int32_t touchId;
     };
 
-    struct ScreenJoystick
-    {
+    struct ScreenJoystick {
         struct ScreenJoystick__Class* klass;
         void* monitor;
         struct ScreenJoystick__Fields fields;
@@ -6920,12 +6542,10 @@ namespace app
         VirtualInvokeData ToggleVisuals;
     };
 
-    struct ScreenJoystick__StaticFields
-    {
+    struct ScreenJoystick__StaticFields {
     };
 
-    struct ScreenJoystick__Class
-    {
+    struct ScreenJoystick__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ScreenJoystick__StaticFields* static_fields;
@@ -6978,8 +6598,7 @@ namespace app
 #pragma region MeetingHud
 
 #if defined(_CPLUSPLUS_)
-    enum class MeetingHud_VoteStates__Enum : int32_t
-    {
+    enum class MeetingHud_VoteStates__Enum : int32_t {
         Animating = 0x00000000,
         Discussion = 0x00000001,
         NotVoted = 0x00000002,
@@ -6989,8 +6608,7 @@ namespace app
     };
 
 #else
-    enum MeetingHud_VoteStates__Enum
-    {
+    enum MeetingHud_VoteStates__Enum {
         MeetingHud_VoteStates__Enum_Animating = 0x00000000,
         MeetingHud_VoteStates__Enum_Discussion = 0x00000001,
         MeetingHud_VoteStates__Enum_NotVoted = 0x00000002,
@@ -7004,23 +6622,23 @@ namespace app
     struct MeetingHud__Fields {
         struct InnerNetObject__Fields _;
         struct SpriteRenderer* BlackBackground;
-        void* OuterMasks;
-        void* PlayerColoredParts;
-        void* MeetingIntro;
+        struct SpriteRenderer__Array* OuterMasks;
+        struct SpriteRenderer__Array* PlayerColoredParts;
+        struct MeetingIntroAnimation* MeetingIntro;
         struct Transform* ButtonParent;
         struct TextMeshPro* TitleText;
         struct Vector3 VoteOrigin;
         struct Vector3 VoteButtonOffsets;
-        void* SkipVoteButton;
+        struct PlayerVoteArea* SkipVoteButton;
         struct PlayerVoteArea__Array* playerStates;
-        void* PlayerButtonPrefab;
+        struct PlayerVoteArea* PlayerButtonPrefab;
         struct SpriteRenderer* PlayerVotePrefab;
-        void* CrackedGlass;
+        struct Sprite* CrackedGlass;
         struct SpriteRenderer* Glass;
-        void* ProceedButton;
-        void* VoteSound;
-        void* VoteLockinSound;
-        void* VoteEndingSound;
+        struct PassiveButton* ProceedButton;
+        struct AudioClip* VoteSound;
+        struct AudioClip* VoteLockinSound;
+        struct AudioClip* VoteEndingSound;
         struct Transform* meetingContents;
 #if defined(_CPLUSPLUS_)
         MeetingHud_VoteStates__Enum state;
@@ -7037,10 +6655,10 @@ namespace app
         bool amDead;
         float resultsStartedAt;
         int32_t lastSecond;
-        void* logger;
-        void* DefaultButtonSelected;
-        void* ProceedButtonUi;
-        void* ControllerSelectable;
+        struct Logger_2* logger;
+        struct UiElement* DefaultButtonSelected;
+        struct UiElement* ProceedButtonUi;
+        struct List_1_UiElement_* ControllerSelectable;
     };
 
     struct MeetingHud {
@@ -7089,9 +6707,9 @@ namespace app
     struct CustomNetworkTransform__Fields {
         struct InnerNetObject__Fields _;
         struct PlayerControl* myPlayer;
-        void* body;
-        void* sendQueue;
-        void* incomingPosQueue;
+        struct Rigidbody2D* body;
+        struct Queue_1_UnityEngine_Vector2_* sendQueue;
+        struct Queue_1_UnityEngine_Vector2_* incomingPosQueue;
         float rubberbandModifier;
         float idealSpeed;
         bool isPaused;
@@ -7099,10 +6717,10 @@ namespace app
         struct Vector2 lastPosition;
         struct Vector2 lastPosSent;
         struct Nullable_1_UnityEngine_Vector2_ tempSnapPosition;
-        void* debugPopPositions;
-        void* debugTargetPositions;
-        void* debugTruePositions;
-        void* debugNetLogger;
+        struct ITransformGhost* debugPopPositions;
+        struct ITransformGhost* debugTargetPositions;
+        struct ITransformGhost* debugTruePositions;
+        struct INetTransformLogger* debugNetLogger;
     };
 
     struct CustomNetworkTransform {
@@ -7245,16 +6863,14 @@ namespace app
 #pragma region InnerNetClient
 
 #if defined(_CPLUSPLUS_)
-    enum class MatchMakerModes__Enum : int32_t
-    {
+    enum class MatchMakerModes__Enum : int32_t {
         None = 0x00000000,
         Client = 0x00000001,
         HostAndClient = 0x00000002,
     };
 
 #else
-    enum MatchMakerModes__Enum
-    {
+    enum MatchMakerModes__Enum {
         MatchMakerModes__Enum_None = 0x00000000,
         MatchMakerModes__Enum_Client = 0x00000001,
         MatchMakerModes__Enum_HostAndClient = 0x00000002,
@@ -7299,8 +6915,7 @@ namespace app
 #endif
 
 #if defined(_CPLUSPLUS_)
-    enum class InnerNetClient_GameStates__Enum : int32_t
-    {
+    enum class InnerNetClient_GameStates__Enum : int32_t {
         NotJoined = 0x00000000,
         Joined = 0x00000001,
         Started = 0x00000002,
@@ -7308,8 +6923,7 @@ namespace app
     };
 
 #else
-    enum InnerNetClient_GameStates__Enum
-    {
+    enum InnerNetClient_GameStates__Enum {
         InnerNetClient_GameStates__Enum_NotJoined = 0x00000000,
         InnerNetClient_GameStates__Enum_Joined = 0x00000001,
         InnerNetClient_GameStates__Enum_Started = 0x00000002,
@@ -7323,19 +6937,19 @@ namespace app
         float MinSendInterval;
         uint32_t NetIdCnt;
         float timer;
-        void* SpawnableObjects;
-        void* NonAddressableSpawnableObjects;
+        struct AssetReference__Array* SpawnableObjects;
+        struct InnerNetObject__Array* NonAddressableSpawnableObjects;
         bool InOnlineScene;
-        void* DestroyedObjects;
-        void* allObjects;
-        void* allObjectsFast;
-        void* Streams;
+        struct HashSet_1_System_UInt32_* DestroyedObjects;
+        struct List_1_InnerNet_InnerNetObject_* allObjects;
+        struct Dictionary_2_System_UInt32_InnerNet_InnerNetObject_* allObjectsFast;
+        struct MessageWriter__Array* Streams;
         int32_t msgNum;
-        void* serverLogger;
+        struct Logger_2* serverLogger;
         struct String* networkAddress;
         int32_t networkPort;
         bool useDtls;
-        void* connection;
+        struct UnityUdpClientConnection* connection;
 #if defined(_CPLUSPLUS_)
         MatchMakerModes__Enum mode;
 #else
@@ -7350,7 +6964,7 @@ namespace app
         int32_t HostId;
         int32_t ClientId;
         struct List_1_InnerNet_ClientData_* allClients;
-        void* recentClients;
+        struct CircleBuffer_1_InnerNet_ClientData_* recentClients;
 #if defined(_CPLUSPLUS_)
         DisconnectReasons__Enum LastDisconnectReason;
 #else
@@ -7358,10 +6972,10 @@ namespace app
 #endif
         struct String* LastCustomDisconnect;
         uint8_t LastServerChatMode;
-        void* LastMatchmakerError;
-        void* PreSpawnDispatcher;
-        void* Dispatcher;
-        void* gameOptionsFactory;
+        struct HttpMatchmakerManager_MatchmakerError* LastMatchmakerError;
+        struct List_1_System_Action_* PreSpawnDispatcher;
+        struct List_1_System_Action_* Dispatcher;
+        struct GameOptionsFactory* gameOptionsFactory;
         bool _IsGamePublic_k__BackingField;
 #if defined(_CPLUSPLUS_)
         InnerNetClient_GameStates__Enum GameState;
@@ -7370,7 +6984,7 @@ namespace app
 #endif
         bool isConnecting;
         bool platformSpecificsChecked;
-        void* TempQueue;
+        struct List_1_System_Action_* TempQueue;
         bool appPaused;
     };
 
@@ -7405,7 +7019,7 @@ namespace app
     };
 
     struct InnerNetClient__StaticFields {
-        void* DontBotherLoggingTheseDisconnectReasons;
+        struct HashSet_1_DisconnectReasons_* DontBotherLoggingTheseDisconnectReasons;
         int32_t SecondsSuspendedBeforeDisconnect;
     };
 
@@ -7422,15 +7036,13 @@ namespace app
 #pragma region AmongUsClient
 
 #if defined(_CPLUSPLUS_)
-    enum class DiscoveryState__Enum : int32_t
-    {
+    enum class DiscoveryState__Enum : int32_t {
         Off = 0x00000000,
         Broadcast = 0x00000001,
     };
 
 #else
-    enum DiscoveryState__Enum
-    {
+    enum DiscoveryState__Enum {
         DiscoveryState__Enum_Off = 0x00000000,
         DiscoveryState__Enum_Broadcast = 0x00000001,
     };
@@ -7465,7 +7077,7 @@ namespace app
         struct String* OnlineScene;
         struct String* MainMenuScene;
         struct GameData* GameDataPrefab;
-        void* VoteBanPrefab;
+        struct VoteBanSystem* VoteBanPrefab;
         struct PlayerControl* PlayerPrefab;
         struct List_1_UnityEngine_AddressableAssets_AssetReference_* ShipPrefabs;
         int32_t TutorialMapId;
@@ -7475,14 +7087,15 @@ namespace app
 #else
         int32_t discoverState;
 #endif
-        void* DisconnectHandlers;
-        void* GameListHandlers;
+        struct List_1_IDisconnectHandler_* DisconnectHandlers;
+        struct List_1_IGameListHandler_* GameListHandlers;
 #if defined(_CPLUSPLUS_)
         CrossplayPrivilegeErrorType__Enum CrossplayPrivilegeError;
 #else
         int32_t CrossplayPrivilegeError;
 #endif
-        void* logger;
+        int32_t MenuTarget;
+        struct Logger_2* logger;
         struct AsyncOperationHandle_1_UnityEngine_GameObject_ ShipLoadingAsyncHandle;
     };
 
@@ -7492,8 +7105,7 @@ namespace app
         struct AmongUsClient__Fields fields;
     };
 
-    struct AmongUsClient__VTable
-    {
+    struct AmongUsClient__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -7517,13 +7129,11 @@ namespace app
         VirtualInvokeData OnGetGameList;
     };
 
-    struct AmongUsClient__StaticFields
-    {
+    struct AmongUsClient__StaticFields {
         struct AmongUsClient* Instance;
     };
 
-    struct AmongUsClient__Class
-    {
+    struct AmongUsClient__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct AmongUsClient__StaticFields* static_fields;
@@ -7534,8 +7144,7 @@ namespace app
 #pragma endregion
 
 #pragma region ClientData
-    struct __declspec(align(4)) ClientData__Fields
-    {
+    struct __declspec(align(4)) ClientData__Fields {
         int32_t Id;
         bool InScene;
         bool IsReady;
@@ -7550,27 +7159,23 @@ namespace app
         int32_t ColorId;
     };
 
-    struct ClientData
-    {
+    struct ClientData {
         struct ClientData__Class* klass;
         void* monitor;
         struct ClientData__Fields fields;
     };
 
-    struct ClientData__VTable
-    {
+    struct ClientData__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct ClientData__StaticFields
-    {
+    struct ClientData__StaticFields {
     };
 
-    struct ClientData__Class
-    {
+    struct ClientData__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ClientData__StaticFields* static_fields;
@@ -7587,13 +7192,13 @@ namespace app
 #pragma region LobbyBehaviour
     struct LobbyBehaviour__Fields {
         struct InnerNetObject__Fields _;
-        void* SpawnSound;
-        void* SpawnInClip;
-        void* SpawnPositions;
+        struct AudioClip* SpawnSound;
+        struct AnimationClip* SpawnInClip;
+        struct Vector2__Array* SpawnPositions;
         struct AudioClip* DropShipSound;
         struct AudioClip* MapTheme;
-        void* AllRooms;
-        void* logger;
+        struct SkeldShipRoom__Array* AllRooms;
+        struct Logger_2* logger;
         float lastFriendsCheckTime;
         float optionsTimer;
         int32_t currentExtensionId;
@@ -7605,8 +7210,7 @@ namespace app
         struct LobbyBehaviour__Fields fields;
     };
 
-    struct LobbyBehaviour__VTable
-    {
+    struct LobbyBehaviour__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -7620,13 +7224,11 @@ namespace app
         VirtualInvokeData Deserialize;
     };
 
-    struct LobbyBehaviour__StaticFields
-    {
+    struct LobbyBehaviour__StaticFields {
         struct LobbyBehaviour* Instance;
     };
 
-    struct LobbyBehaviour__Class
-    {
+    struct LobbyBehaviour__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct LobbyBehaviour__StaticFields* static_fields;
@@ -7655,20 +7257,17 @@ namespace app
         struct NoShadowBehaviour__Fields fields;
     };
 
-    struct NoShadowBehaviour__VTable
-    {
+    struct NoShadowBehaviour__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct NoShadowBehaviour__StaticFields
-    {
+    struct NoShadowBehaviour__StaticFields {
     };
 
-    struct NoShadowBehaviour__Class
-    {
+    struct NoShadowBehaviour__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct NoShadowBehaviour__StaticFields* static_fields;
@@ -7786,15 +7385,15 @@ namespace app
 #pragma region MushroomDoorSabotageMinigame
     struct MushroomDoorSabotageMinigame__Fields {
         struct Minigame__Fields _;
-        void* mushroomInvisibleSeconds;
-        void* mushroomVisibleSeconds;
+        struct FloatRange* mushroomInvisibleSeconds;
+        struct FloatRange* mushroomVisibleSeconds;
         struct TextMeshPro* counterText;
-        void* spawnPoints;
-        void* mushroomVariants;
+        struct Transform__Array* spawnPoints;
+        struct MushroomDoorSabotageMinigameMushroom__Array* mushroomVariants;
         struct OpenableDoor* myDoor;
         int32_t mushroomWhackCount;
-        void* spawnPointBag;
-        void* mushrooms;
+        struct List_1_UnityEngine_Transform_* spawnPointBag;
+        struct List_1_MushroomDoorSabotageMinigameMushroom_* mushrooms;
     };
 
     struct MushroomDoorSabotageMinigame {
@@ -7805,22 +7404,19 @@ namespace app
 #pragma endregion
 
 #pragma region SabotageTask
-    struct SabotageTask__Fields
-    {
+    struct SabotageTask__Fields {
         struct PlayerTask__Fields _;
         bool didContribute;
         void* Arrows;
     };
 
-    struct SabotageTask
-    {
+    struct SabotageTask {
         struct SabotageTask__Class* klass;
         void* monitor;
         struct SabotageTask__Fields fields;
     };
 
-    struct SabotageTask__VTable
-    {
+    struct SabotageTask__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -7835,12 +7431,10 @@ namespace app
         VirtualInvokeData GetMinigamePrefab;
     };
 
-    struct SabotageTask__StaticFields
-    {
+    struct SabotageTask__StaticFields {
     };
 
-    struct SabotageTask__Class
-    {
+    struct SabotageTask__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct SabotageTask__StaticFields* static_fields;
@@ -7851,22 +7445,20 @@ namespace app
 #pragma endregion
 
 #pragma region ElectricTask
-    struct ElectricTask__Fields
-    {
+    struct ElectricTask__Fields {
         struct SabotageTask__Fields _;
         bool isComplete;
         struct SwitchSystem* system;
         bool even;
     };
 
-    struct ElectricTask
-    {
+    struct ElectricTask {
         struct ElectricTask__Class* klass;
         void* monitor;
         struct ElectricTask__Fields fields;
     };
-    struct ElectricTask__VTable
-    {
+
+    struct ElectricTask__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -7881,12 +7473,10 @@ namespace app
         VirtualInvokeData GetMinigamePrefab;
     };
 
-    struct ElectricTask__StaticFields
-    {
+    struct ElectricTask__StaticFields {
     };
 
-    struct ElectricTask__Class
-    {
+    struct ElectricTask__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ElectricTask__StaticFields* static_fields;
@@ -7906,27 +7496,23 @@ namespace app
         struct SpriteRenderer__Array* bodyRenderers;
     };
 
-    struct DeadBody
-    {
+    struct DeadBody {
         struct DeadBody__Class* klass;
         void* monitor;
         struct DeadBody__Fields fields;
     };
 
-    struct DeadBody__VTable
-    {
+    struct DeadBody__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
     };
 
-    struct DeadBody__StaticFields
-    {
+    struct DeadBody__StaticFields {
     };
 
-    struct DeadBody__Class
-    {
+    struct DeadBody__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct DeadBody__StaticFields* static_fields;
@@ -7967,10 +7553,20 @@ namespace app
 #pragma endregion
 
 #pragma region LogicOptions
+    struct __declspec(align(4)) GameLogicComponent__Fields {
+        struct GameManager* Manager;
+        bool _IsDirty_k__BackingField;
+    };
+
+    struct LogicOptions__Fields {
+        struct GameLogicComponent__Fields _;
+        struct GameOptionsFactory* gameOptionsFactory;
+    };
+
     struct LogicOptions {
         struct LogicOptions__Class* klass;
         MonitorData* monitor;
-        //struct LogicOptions__Fields fields;
+        struct LogicOptions__Fields fields;
     };
 
     struct LogicOptions__VTable {
@@ -8034,16 +7630,14 @@ namespace app
 #pragma region IGameOptions
 
 #if defined(_CPLUSPLUS_)
-    enum class TaskBarMode__Enum : int32_t
-    {
+    enum class TaskBarMode__Enum : int32_t {
         Normal = 0x00000000,
         MeetingOnly = 0x00000001,
         Invisible = 0x00000002,
     };
 
 #else
-    enum TaskBarMode__Enum
-    {
+    enum TaskBarMode__Enum {
         TaskBarMode__Enum_Normal = 0x00000000,
         TaskBarMode__Enum_MeetingOnly = 0x00000001,
         TaskBarMode__Enum_Invisible = 0x00000002,
@@ -8140,6 +7734,7 @@ namespace app
         SeekerFinalMap = 0x00000008,
         SeekerPings = 0x00000009,
         ShowCrewmateNames = 0x0000000a,
+        Roles = 0x0000000b,
         ShapeshifterLeaveSkin = 0x000003e8,
         ImpostorsCanSeeProtect = 0x0000044c,
         NoisemakerImpostorAlert = 0x00000514,
@@ -8158,6 +7753,7 @@ namespace app
         BoolOptionNames__Enum_SeekerFinalMap = 0x00000008,
         BoolOptionNames__Enum_SeekerPings = 0x00000009,
         BoolOptionNames__Enum_ShowCrewmateNames = 0x0000000a,
+        BoolOptionNames__Enum_Roles = 0x0000000b,
         BoolOptionNames__Enum_ShapeshifterLeaveSkin = 0x000003e8,
         BoolOptionNames__Enum_ImpostorsCanSeeProtect = 0x0000044c,
         BoolOptionNames__Enum_NoisemakerImpostorAlert = 0x00000514,
@@ -8181,6 +7777,7 @@ namespace app
         NumShortTasks = 0x0000000b,
         NumLongTasks = 0x0000000c,
         TaskBarMode = 0x0000000d,
+        Tag = 0x0000000e,
         CrewmatesRemainingForVitals = 0x00000064,
         CrewmateVentUses = 0x00000065,
         ImpostorPlayerID = 0x00000066,
@@ -8203,6 +7800,7 @@ namespace app
         Int32OptionNames__Enum_NumShortTasks = 0x0000000b,
         Int32OptionNames__Enum_NumLongTasks = 0x0000000c,
         Int32OptionNames__Enum_TaskBarMode = 0x0000000d,
+        Int32OptionNames__Enum_Tag = 0x0000000e,
         Int32OptionNames__Enum_CrewmatesRemainingForVitals = 0x00000064,
         Int32OptionNames__Enum_CrewmateVentUses = 0x00000065,
         Int32OptionNames__Enum_ImpostorPlayerID = 0x00000066,
@@ -8320,8 +7918,7 @@ namespace app
 #pragma endregion
 
 #pragma region BinaryReader
-    struct __declspec(align(4)) BinaryReader__Fields
-    {
+    struct __declspec(align(4)) BinaryReader__Fields {
         void* m_stream;
         struct Byte__Array* m_buffer;
         void* m_decoder;
@@ -8334,15 +7931,13 @@ namespace app
         bool m_leaveOpen;
     };
 
-    struct BinaryReader
-    {
+    struct BinaryReader {
         struct BinaryReader__Class* klass;
         void* monitor;
         struct BinaryReader__Fields fields;
     };
 
-    struct BinaryReader__VTable
-    {
+    struct BinaryReader__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -8372,12 +7967,10 @@ namespace app
         VirtualInvokeData FillBuffer;
     };
 
-    struct BinaryReader__StaticFields
-    {
+    struct BinaryReader__StaticFields {
     };
 
-    struct BinaryReader__Class
-    {
+    struct BinaryReader__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct BinaryReader__StaticFields* static_fields;
@@ -8389,8 +7982,7 @@ namespace app
 
 #pragma region PlainDoor
 
-    struct SomeKindaDoor__Fields
-    {
+    struct SomeKindaDoor__Fields {
         struct MonoBehaviour__Fields _;
     };
 
@@ -8433,6 +8025,7 @@ namespace app
         struct OpenableDoor__Fields _;
         void* wallCollider;
         struct Collider2D* shadowColl;
+        struct Collider2D* bottomColl;
         void* mushrooms;
         void* openSound;
         void* closeSound;
@@ -8448,22 +8041,19 @@ namespace app
 #pragma endregion
 
 #pragma region AutoOpenDoor
-    struct AutoOpenDoor__Fields
-    {
+    struct AutoOpenDoor__Fields {
         struct PlainDoor__Fields _;
         float ClosedTimer;
         float CooldownTimer;
     };
 
-    struct AutoOpenDoor
-    {
+    struct AutoOpenDoor {
         struct AutoOpenDoor__Class* klass;
         void* monitor;
         struct AutoOpenDoor__Fields fields;
     };
 
-    struct AutoOpenDoor__VTable
-    {
+    struct AutoOpenDoor__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -8476,12 +8066,10 @@ namespace app
         VirtualInvokeData Start;
     };
 
-    struct AutoOpenDoor__StaticFields
-    {
+    struct AutoOpenDoor__StaticFields {
     };
 
-    struct AutoOpenDoor__Class
-    {
+    struct AutoOpenDoor__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct AutoOpenDoor__StaticFields* static_fields;
@@ -8498,29 +8086,27 @@ namespace app
         struct Vent* Left;
         struct Vent* Right;
         struct Vent* Center;
-        void* Buttons;
-        void* CleaningIndicators;
-        void* EnterVentAnim;
-        void* ExitVentAnim;
+        struct ButtonBehavior__Array* Buttons;
+        struct GameObject__Array* CleaningIndicators;
+        struct AnimationClip* EnterVentAnim;
+        struct AnimationClip* ExitVentAnim;
         struct Vector3 Offset;
         float spreadAmount;
         float spreadShift;
         struct SpriteRenderer* myRend;
-        void* myAnim;
+        struct SpriteAnim* myAnim;
         int32_t numFramesUntilPlayerDisappearsOnEnter;
         int32_t numFramesUntilPlayerReappearsOnExit;
         struct GameObject* additionalExitAnimation;
     };
 
-    struct Vent
-    {
+    struct Vent {
         struct Vent__Class* klass;
         void* monitor;
         struct Vent__Fields fields;
     };
 
-    struct Vent__VTable
-    {
+    struct Vent__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -8533,103 +8119,17 @@ namespace app
         VirtualInvokeData Use;
     };
 
-    struct Vent__StaticFields
-    {
+    struct Vent__StaticFields {
         struct Vent* currentVent;
     };
 
-    struct Vent__Class
-    {
+    struct Vent__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Vent__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct Vent__VTable vtable;
-    };
-#pragma endregion
-
-#pragma region StatsManager_Stats
-
-    struct __declspec(align(4)) StatsManager_Stats__Fields {
-        float banPoints;
-        int64_t lastGameStarted;
-        float FastestCrewmateWin_HideAndSeek;
-        float FastestImpostorWin_HideAndSeek;
-        void* gameplayStats;
-        void* winReasons;
-        void* loseReasons;
-        void* drawReasons;
-        void* mapWins;
-        void* roleWins;
-    };
-
-    struct StatsManager_Stats {
-        struct StatsManager_Stats__Class* klass;
-        MonitorData* monitor;
-        struct StatsManager_Stats__Fields fields;
-    };
-
-    struct StatsManager_Stats__VTable {
-        VirtualInvokeData Equals;
-        VirtualInvokeData Finalize;
-        VirtualInvokeData GetHashCode;
-        VirtualInvokeData ToString;
-    };
-
-    struct StatsManager_Stats__StaticFields {
-        void* SimpleStats;
-    };
-
-    struct StatsManager_Stats__Class {
-        Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
-        struct StatsManager_Stats__StaticFields* static_fields;
-        const Il2CppRGCTXData* rgctx_data;
-        Il2CppClass_1 _1;
-        struct StatsManager_Stats__VTable vtable;
-    };
-
-#pragma endregion
-
-#pragma region StatsManager
-    struct __declspec(align(4)) StatsManager__Fields
-    {
-        struct StatsManager_Stats* stats;
-        bool loadedStats;
-        void* logger;
-    };
-
-    struct StatsManager
-    {
-        struct StatsManager__Class* klass;
-        void* monitor;
-        struct StatsManager__Fields fields;
-    };
-
-    struct StatsManager__VTable
-    {
-        VirtualInvokeData Equals;
-        VirtualInvokeData Finalize;
-        VirtualInvokeData GetHashCode;
-        VirtualInvokeData ToString;
-        VirtualInvokeData LoadStats;
-        VirtualInvokeData SaveStats;
-    };
-
-    struct StatsManager__StaticFields
-    {
-        struct StatsManager* Instance;
-    };
-
-    struct StatsManager__Class
-    {
-        Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
-        struct StatsManager__StaticFields* static_fields;
-        const Il2CppRGCTXData* rgctx_data;
-        Il2CppClass_1 _1;
-        struct StatsManager__VTable vtable;
     };
 #pragma endregion
 
@@ -8654,16 +8154,14 @@ namespace app
 #endif
 
 #if defined(_CPLUSPLUS_)
-    enum class NormalPlayerTask_TimerState__Enum : int32_t
-    {
+    enum class NormalPlayerTask_TimerState__Enum : int32_t {
         NotStarted = 0x00000000,
         Started = 0x00000001,
         Finished = 0x00000002,
     };
 
 #else
-    enum NormalPlayerTask_TimerState__Enum
-    {
+    enum NormalPlayerTask_TimerState__Enum {
         NormalPlayerTask_TimerState__Enum_NotStarted = 0x00000000,
         NormalPlayerTask_TimerState__Enum_Started = 0x00000001,
         NormalPlayerTask_TimerState__Enum_Finished = 0x00000002,
@@ -8671,8 +8169,7 @@ namespace app
 
 #endif
 
-    struct NormalPlayerTask__Fields
-    {
+    struct NormalPlayerTask__Fields {
         struct PlayerTask__Fields _;
 #if defined(_CPLUSPLUS_)
         NormalPlayerTask_TaskLength__Enum Length;
@@ -8690,7 +8187,7 @@ namespace app
 #endif
         float TaskTimer;
         struct Byte__Array* Data;
-        void* Arrow;
+        struct ArrowBehaviour* Arrow;
         bool useMultipleText;
         int32_t maxNumStepsStage1;
 #if defined(_CPLUSPLUS_)
@@ -8706,15 +8203,13 @@ namespace app
         bool arrowSuspended;
     };
 
-    struct NormalPlayerTask
-    {
+    struct NormalPlayerTask {
         struct NormalPlayerTask__Class* klass;
         void* monitor;
         struct NormalPlayerTask__Fields fields;
     };
 
-    struct NormalPlayerTask__VTable
-    {
+    struct NormalPlayerTask__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -8731,12 +8226,10 @@ namespace app
         VirtualInvokeData FixedUpdate;
     };
 
-    struct NormalPlayerTask__StaticFields
-    {
+    struct NormalPlayerTask__StaticFields {
     };
 
-    struct NormalPlayerTask__Class
-    {
+    struct NormalPlayerTask__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct NormalPlayerTask__StaticFields* static_fields;
@@ -8808,8 +8301,7 @@ namespace app
         struct Color32 VisorColor;
     };
 
-    struct Palette__Class
-    {
+    struct Palette__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct Palette__StaticFields* static_fields;
@@ -8822,8 +8314,7 @@ namespace app
 #pragma region SaveManager
 
 #if defined(_CPLUSPLUS_)
-    enum class ControlTypes__Enum : int32_t
-    {
+    enum class ControlTypes__Enum : int32_t {
         VirtualJoystick = 0x00000000,
         ScreenJoystick = 0x00000001,
         Keyboard = 0x00000002,
@@ -8831,8 +8322,7 @@ namespace app
     };
 
 #else
-    enum ControlTypes__Enum
-    {
+    enum ControlTypes__Enum {
         ControlTypes__Enum_VirtualJoystick = 0x00000000,
         ControlTypes__Enum_ScreenJoystick = 0x00000001,
         ControlTypes__Enum_Keyboard = 0x00000002,
@@ -8848,21 +8338,18 @@ namespace app
 #pragma endregion
 
 #pragma region DestroyableSingleton_1_RoleManager_
-    struct DestroyableSingleton_1_RoleManager___Fields
-    {
+    struct DestroyableSingleton_1_RoleManager___Fields {
         struct MonoBehaviour__Fields _;
         bool DontDestroy;
     };
 
-    struct DestroyableSingleton_1_RoleManager_
-    {
+    struct DestroyableSingleton_1_RoleManager_ {
         struct DestroyableSingleton_1_RoleManager___Class* klass;
         void* monitor;
         struct DestroyableSingleton_1_RoleManager___Fields fields;
     };
 
-    struct DestroyableSingleton_1_RoleManager___VTable
-    {
+    struct DestroyableSingleton_1_RoleManager___VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -8871,13 +8358,11 @@ namespace app
         VirtualInvokeData OnDestroy;
     };
 
-    struct DestroyableSingleton_1_RoleManager___StaticFields
-    {
+    struct DestroyableSingleton_1_RoleManager___StaticFields {
         struct RoleManager* _instance;
     };
 
-    struct DestroyableSingleton_1_RoleManager___Class
-    {
+    struct DestroyableSingleton_1_RoleManager___Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct DestroyableSingleton_1_RoleManager___StaticFields* static_fields;
@@ -8888,8 +8373,7 @@ namespace app
 #pragma endregion
 
 #pragma region EngineerRole
-    struct EngineerRole__Fields
-    {
+    struct EngineerRole__Fields {
         struct RoleBehaviour__Fields _;
         struct Vent* currentTarget;
         float cooldownSecondsRemaining;
@@ -8898,8 +8382,7 @@ namespace app
         bool isExitVentQueued;
     };
 
-    struct EngineerRole
-    {
+    struct EngineerRole {
         struct EngineerRole__Class* klass;
         void* monitor;
         struct EngineerRole__Fields fields;
@@ -8931,12 +8414,10 @@ namespace app
         VirtualInvokeData AppendTaskHint;
     };
 
-    struct EngineerRole__StaticFields
-    {
+    struct EngineerRole__StaticFields {
     };
 
-    struct EngineerRole__Class
-    {
+    struct EngineerRole__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct EngineerRole__StaticFields* static_fields;
@@ -8958,15 +8439,13 @@ namespace app
         struct RoleEffectAnimation* appear_PoofAnim;
     };
 
-    struct RoleManager
-    {
+    struct RoleManager {
         struct RoleManager__Class* klass;
         void* monitor;
         struct RoleManager__Fields fields;
     };
 
-    struct RoleManager__VTable
-    {
+    struct RoleManager__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
@@ -8975,13 +8454,11 @@ namespace app
         VirtualInvokeData OnDestroy;
     };
 
-    struct RoleManager__StaticFields
-    {
+    struct RoleManager__StaticFields {
         void* GhostRoles;
     };
 
-    struct RoleManager__Class
-    {
+    struct RoleManager__Class {
         Il2CppClass_0 _0;
         Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct RoleManager__StaticFields* static_fields;
@@ -9035,17 +8512,18 @@ namespace app
     struct AccountManager__Fields {
         struct DestroyableSingleton_1_AccountManager___Fields _;
         struct AccountTab* accountTab;
-        void* enterGuardianEmailWindow;
-        void* updateGuardianEmailWindow;
-        void* guardianEmailConfirmWindow;
-        void* genericInfoDisplayBox;
-        void* enterDateOfBirthScreen;
+        struct GameObject* accountWindow;
+        struct PermissionsRequest* enterGuardianEmailWindow;
+        struct UpdateGuardianEmail* updateGuardianEmailWindow;
+        struct InfoTextBox* guardianEmailConfirmWindow;
+        struct InfoTextBox* genericInfoDisplayBox;
+        struct AgeGateScreen* enterDateOfBirthScreen;
         struct GameObject* waitingText;
         struct GameObject* postLoadWaiting;
         struct GameObject* privacyPolicyBg;
-        void* signInScreen;
-        void* PrivacyPolicy;
-        void* chatModeMenuScreen;
+        struct SignInScreen* signInScreen;
+        struct PrivacyPolicyScreen* PrivacyPolicy;
+        struct IChatModeDisplay* chatModeMenuScreen;
 #if defined(_CPLUSPLUS_)
         KWSPermissionStatus__Enum freeChatAllowed;
 #else
@@ -9066,7 +8544,7 @@ namespace app
 #else
         int32_t accountLinkingAllowed;
 #endif
-        void* OnLoggedInStatusChange;
+        struct Action* OnLoggedInStatusChange;
 #if defined(_CPLUSPLUS_)
         EOSManager_AccountLoginStatus__Enum prevLoggedInStatus;
 #else
@@ -9162,10 +8640,30 @@ namespace app
     WRAPPER_IL2CPP_DICTIONARY(System_String, List_1_AmongUs_GameOptions_GameModes, \
         struct String*, struct List_1_AmongUs_GameOptions_GameModes_*);
 
+    struct AchievementManager_1__Fields {
+        void* _;
+        struct Logger_2* logger;
+        bool gameStarted;
+#if defined(_CPLUSPLUS_)
+        RoleTypes__Enum myRole;
+#else
+        uint16_t myRole;
+#endif
+        int32_t cardSwipesThisMatch;
+        int32_t ventsUsedThisMatch;
+        bool meetingCalledThisMatch;
+        int32_t killsThisMatch;
+        bool sabotageCalledLocally;
+        int32_t timesVoted;
+        int32_t timesVotedForImp;
+        int32_t winMap;
+        struct Dictionary_2_System_String_List_1_AchievementManager_AchievementProgressValue_* statName2AchievementProgressValues;
+    };
+
     struct AchievementManager_1 {
         struct AchievementManager_1__Class* klass;
         MonitorData* monitor;
-        //struct AchievementManager_1__Fields fields;
+        struct AchievementManager_1__Fields fields;
     };
 
     struct AchievementManager_1__VTable {
@@ -9233,6 +8731,7 @@ namespace app
     };
 #pragma endregion
 
+#pragma region KillButton
     struct KillButton__Fields {
         void* _;
         struct PlayerControl* currentTarget;
@@ -9263,6 +8762,7 @@ namespace app
         Il2CppClass_1 _1;
         struct KillButton__VTable vtable;
     };
+#pragma endregion
 
 #pragma region DestroyableSingleton_1_GameStartManager_
     struct DestroyableSingleton_1_GameStartManager___Fields {
@@ -9479,6 +8979,7 @@ namespace app
         struct GameObject* GameStartTextParent;
         struct TextMeshPro* GameStartText;
         struct SpriteRenderer* StartButtonClient;
+        struct TextMeshPro* GameStartTextClient;
         struct ActionMapGlyphDisplay* StartButtonGlyph;
         struct GameObject* StartButtonGlyphContainer;
         struct TextMeshPro* RulesPresetText;
@@ -9495,6 +8996,7 @@ namespace app
         float countDownTimer;
         struct PassiveButton* StartButton;
         struct GameObject* RulesViewPanel;
+        struct GameObject* RulesEditPanel;
         struct HostInfoPanel* HostInfoPanel;
         struct PassiveButton* EditButton;
         struct Vector3 GameOptionsPosition;
@@ -9521,28 +9023,28 @@ namespace app
 #pragma region GameOverReason__Enum
 #if defined(_CPLUSPLUS_)
     enum class GameOverReason__Enum : int32_t {
-        HumansByVote = 0x00000000,
-        HumansByTask = 0x00000001,
-        ImpostorByVote = 0x00000002,
-        ImpostorByKill = 0x00000003,
-        ImpostorBySabotage = 0x00000004,
+        CrewmatesByVote = 0x00000000,
+        CrewmatesByTask = 0x00000001,
+        ImpostorsByVote = 0x00000002,
+        ImpostorsByKill = 0x00000003,
+        ImpostorsBySabotage = 0x00000004,
         ImpostorDisconnect = 0x00000005,
-        HumansDisconnect = 0x00000006,
-        HideAndSeek_ByTimer = 0x00000007,
-        HideAndSeek_ByKills = 0x00000008,
+        CrewmateDisconnect = 0x00000006,
+        HideAndSeek_CrewmatesByTimer = 0x00000007,
+        HideAndSeek_ImpostorsByKills = 0x00000008,
     };
 
 #else
     enum GameOverReason__Enum {
-        GameOverReason__Enum_HumansByVote = 0x00000000,
-        GameOverReason__Enum_HumansByTask = 0x00000001,
-        GameOverReason__Enum_ImpostorByVote = 0x00000002,
-        GameOverReason__Enum_ImpostorByKill = 0x00000003,
-        GameOverReason__Enum_ImpostorBySabotage = 0x00000004,
+        GameOverReason__Enum_CrewmatesByVote = 0x00000000,
+        GameOverReason__Enum_CrewmatesByTask = 0x00000001,
+        GameOverReason__Enum_ImpostorsByVote = 0x00000002,
+        GameOverReason__Enum_ImpostorsByKill = 0x00000003,
+        GameOverReason__Enum_ImpostorsBySabotage = 0x00000004,
         GameOverReason__Enum_ImpostorDisconnect = 0x00000005,
-        GameOverReason__Enum_HumansDisconnect = 0x00000006,
-        GameOverReason__Enum_HideAndSeek_ByTimer = 0x00000007,
-        GameOverReason__Enum_HideAndSeek_ByKills = 0x00000008,
+        GameOverReason__Enum_CrewmateDisconnect = 0x00000006,
+        GameOverReason__Enum_HideAndSeek_CrewmatesByTimer = 0x00000007,
+        GameOverReason__Enum_HideAndSeek_ImpostorsByKills = 0x00000008,
     };
 
 #endif
@@ -9836,15 +9338,15 @@ namespace app
         SetName = 0x06,
         CheckColor = 0x07,
         SetColor = 0x08,
-        SetHat = 0x09,
-        SetSkin = 0x0a,
+        SetHat_Deprecated = 0x09,
+        SetSkin_Deprecated = 0x0a,
         ReportDeadBody = 0x0b,
         MurderPlayer = 0x0c,
         SendChat = 0x0d,
         StartMeeting = 0x0e,
         SetScanner = 0x0f,
         SendChatNote = 0x10,
-        SetPet = 0x11,
+        SetPet_Deprecated = 0x11,
         SetStartCounter = 0x12,
         EnterVent = 0x13,
         ExitVent = 0x14,
@@ -9861,8 +9363,8 @@ namespace app
         SendQuickChat = 0x21,
         BootFromVent = 0x22,
         UpdateSystem = 0x23,
-        SetVisor = 0x24,
-        SetNamePlate = 0x25,
+        SetVisor_Deprecated = 0x24,
+        SetNamePlate_Deprecated = 0x25,
         SetLevel = 0x26,
         SetHatStr = 0x27,
         SetSkinStr = 0x28,
@@ -9901,15 +9403,15 @@ namespace app
         RpcCalls__Enum_SetName = 0x06,
         RpcCalls__Enum_CheckColor = 0x07,
         RpcCalls__Enum_SetColor = 0x08,
-        RpcCalls__Enum_SetHat = 0x09,
-        RpcCalls__Enum_SetSkin = 0x0a,
+        RpcCalls__Enum_SetHat_Deprecated = 0x09,
+        RpcCalls__Enum_SetSkin_Deprecated = 0x0a,
         RpcCalls__Enum_ReportDeadBody = 0x0b,
         RpcCalls__Enum_MurderPlayer = 0x0c,
         RpcCalls__Enum_SendChat = 0x0d,
         RpcCalls__Enum_StartMeeting = 0x0e,
         RpcCalls__Enum_SetScanner = 0x0f,
         RpcCalls__Enum_SendChatNote = 0x10,
-        RpcCalls__Enum_SetPet = 0x11,
+        RpcCalls__Enum_SetPet_Deprecated = 0x11,
         RpcCalls__Enum_SetStartCounter = 0x12,
         RpcCalls__Enum_EnterVent = 0x13,
         RpcCalls__Enum_ExitVent = 0x14,
@@ -9926,8 +9428,8 @@ namespace app
         RpcCalls__Enum_SendQuickChat = 0x21,
         RpcCalls__Enum_BootFromVent = 0x22,
         RpcCalls__Enum_UpdateSystem = 0x23,
-        RpcCalls__Enum_SetVisor = 0x24,
-        RpcCalls__Enum_SetNamePlate = 0x25,
+        RpcCalls__Enum_SetVisor_Deprecated = 0x24,
+        RpcCalls__Enum_SetNamePlate_Deprecated = 0x25,
         RpcCalls__Enum_SetLevel = 0x26,
         RpcCalls__Enum_SetHatStr = 0x27,
         RpcCalls__Enum_SetSkinStr = 0x28,
@@ -10078,11 +9580,7 @@ namespace app
         bool updateAlways;
         struct Vector2 anchorPoint;
         struct Vector3 DistanceFromEdge;
-#if defined(_CPLUSPLUS_)
-        void* Alignment;
-#else
         int32_t Alignment;
-#endif
     };
 
     struct AspectPosition {
@@ -10227,6 +9725,7 @@ namespace app
 #pragma region GameOptionsFactory
     struct __declspec(align(4)) GameOptionsFactory__Fields {
         struct ILogger_1* logger;
+        struct Dictionary_2_System_Byte_AmongUs_GameOptions_IGameOptionsMigrator_* migrators;
     };
 
     struct GameOptionsFactory {
@@ -10274,6 +9773,7 @@ namespace app
     struct DisconnectPopup__Fields {
         struct DestroyableSingleton_1_DisconnectPopup___Fields _;
         struct TextMeshPro* _textArea;
+        struct TransitionOpen* transitionOpen;
         struct StringNames__Enum__Array* QuickChatNames;
         struct UiElement* BackButton;
         struct List_1_SelectableHyperLink_* selectableHyperLinks;
@@ -10310,14 +9810,13 @@ namespace app
 #pragma endregion
 
 #pragma region PlayerStatsData
-    struct PlayerStatsData__Fields {
-        void* _;
+    struct __declspec(align(4)) PlayerStatsData__Fields {
         uint32_t level;
         uint32_t xp;
         uint32_t xpForNextLevel;
-        void* OnLevelChanged;
-        void* OnXpChanged;
-        void* OnXpForNextLevelChanged;
+        struct Dictionary_2_StatID_System_UInt32_* statsCache;
+        struct Dictionary_2_StatID_System_UInt32_* statsToIngest;
+        bool isTrackingStats;
     };
 
     struct PlayerStatsData {
@@ -10331,19 +9830,10 @@ namespace app
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
-        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_SaveStart;
-        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_SaveComplete;
-        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_LoadStart;
-        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_LoadComplete;
-        VirtualInvokeData SetValue;
-        VirtualInvokeData HandleChange;
-        VirtualInvokeData OnSaveStart;
-        VirtualInvokeData OnSaveComplete;
-        VirtualInvokeData OnLoadStart;
-        VirtualInvokeData OnLoadComplete;
     };
 
     struct PlayerStatsData__StaticFields {
+        struct Logger_2* Logger;
     };
 
     struct PlayerStatsData__Class {
@@ -10661,7 +10151,13 @@ namespace app
         int32_t GameId;
         uint8_t PlayerCount;
         struct String* HostName;
+        struct String* TrueHostName;
         struct String* HostPlatformName;
+#if defined(_CPLUSPLUS_)
+        QuickChatModes__Enum QuickChat;
+#else
+        int32_t QuickChat;
+#endif
 #if defined(_CPLUSPLUS_)
         Platforms__Enum Platform;
 #else
@@ -10672,6 +10168,7 @@ namespace app
         int32_t NumImpostors;
         uint8_t MapId;
         uint32_t Language;
+        struct IGameOptions* Options;
     };
 #pragma endregion
 
@@ -10815,9 +10312,183 @@ namespace app
     };
 #pragma endregion
 
+#pragma region PlayerBanData
+    struct PlayerBanData__Fields {
+        void* _;
+        float banPoints;
+        int64_t previousGameStartDate;
+        struct Action* OnBanPointsChanged;
+        struct Action* OnPreviousGameStartedDateChanged;
+    };
+
+    struct PlayerBanData {
+        struct PlayerBanData__Class* klass;
+        MonitorData* monitor;
+        struct PlayerBanData__Fields fields;
+    };
+
+    struct PlayerBanData__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_SaveStart;
+        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_SaveComplete;
+        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_LoadStart;
+        VirtualInvokeData AmongUs_Data_ISaveDataGroupControl_LoadComplete;
+        VirtualInvokeData SetValue;
+        VirtualInvokeData HandleChange;
+        VirtualInvokeData OnSaveStart;
+        VirtualInvokeData OnSaveComplete;
+        VirtualInvokeData OnLoadStart;
+        VirtualInvokeData OnLoadComplete;
+    };
+
+    struct PlayerBanData__StaticFields {
+    };
+
+    struct PlayerBanData__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct PlayerBanData__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PlayerBanData__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region GameContainer
+    struct GameContainer__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* tag1;
+        struct TextMeshPro* tag2;
+        struct SpriteRenderer* mapBackground;
+        struct SpriteRenderer* mapLogo;
+        struct Sprite__Array* mapBackgroundSprites;
+        struct Sprite__Array* mapLogoSprites;
+        struct TextMeshPro* capacity;
+        struct Action_1_InnerNet_GameListing_* OnMoreAction;
+        struct GameListing gameListing;
+    };
+
+    struct GameContainer {
+        struct GameContainer__Class* klass;
+        MonitorData* monitor;
+        struct GameContainer__Fields fields;
+    };
+
+    struct GameContainer__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData StartIcon;
+        VirtualInvokeData StopIcon;
+    };
+
+    struct GameContainer__StaticFields {
+    };
+
+    struct GameContainer__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct GameContainer__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct GameContainer__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region EndGameResult
+    struct __declspec(align(4)) EndGameResult__Fields {
+#if defined(_CPLUSPLUS_)
+        GameOverReason__Enum GameOverReason;
+#else
+        int32_t GameOverReason;
+#endif
+        bool ShowAd;
+        struct ProgressionManager_XpGrantResult* XpGrantResult;
+        struct ProgressionManager_CurrencyGrantResult* PodsGrantResult;
+        struct ProgressionManager_CurrencyGrantResult* BeansGrantResult;
+    };
+
+    struct EndGameResult {
+        struct EndGameResult__Class* klass;
+        MonitorData* monitor;
+        struct EndGameResult__Fields fields;
+    };
+    
+    struct EndGameResult__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct EndGameResult__StaticFields {
+        struct List_1_CachedPlayerData_* CachedWinners;
+        struct CachedPlayerData* CachedLocalPlayer;
+#if defined(_CPLUSPLUS_)
+        GameOverReason__Enum CachedGameOverReason;
+#else
+        int32_t CachedGameOverReason;
+#endif
+        bool CachedShowAd;
+        struct ProgressionManager_XpGrantResult* CachedXpGrantResult;
+        struct ProgressionManager_CurrencyGrantResult* CachedBeansGrantResult;
+        struct ProgressionManager_CurrencyGrantResult* CachedPodsGrantResult;
+    };
+
+    struct EndGameResult__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct EndGameResult__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct EndGameResult__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region ChatNotification
+    struct ChatNotification__Fields {
+        struct MonoBehaviour__Fields _;
+        struct PoolablePlayer* player;
+        struct TextMeshPro* chatText;
+        struct TextMeshPro* playerNameText;
+        struct TextMeshPro* playerColorText;
+        struct SpriteRenderer* background;
+        struct SpriteRenderer* maskArea;
+        float timeOnScreen;
+    };
+
+    struct ChatNotification {
+        struct ChatNotification__Class* klass;
+        MonitorData* monitor;
+        struct ChatNotification__Fields fields;
+    };
+
+    struct ChatNotification__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct ChatNotification__StaticFields {
+    };
+
+    struct ChatNotification__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct ChatNotification__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ChatNotification__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
-    typedef Il2CppObject ActivityManager;
     typedef Il2CppObject ImpostorRole;
     typedef Il2CppObject LogicGameFlowNormal;
     typedef Il2CppObject LogicGameFlowHnS;
@@ -10842,4 +10513,8 @@ namespace app
     typedef Il2CppObject HideAndSeekManager;
     typedef Il2CppObject NormalGameManager;
     typedef Il2CppObject QuickChatPhraseBuilderResult;
+    typedef Il2CppObject MapCountOverlay;
+    typedef Il2CppObject BanMenu;
+    typedef Il2CppObject IntroCutscene;
+    typedef Il2CppObject LogicOptionsHnS;
 }

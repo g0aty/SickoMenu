@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v4.2.1";
+    this->SickoVersion = "v4.3_rc2";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -29,7 +29,6 @@ void Settings::Load() {
         }
 
         if (State.selectedConfig != "") JSON_TRYGET("SelectedConfig", this->selectedConfig);
-        JSON_TRYGET("SelectedConfigInt", this->selectedConfigInt);
     }
     catch (...) {
         //Log.Info("Unable to load sicko-selected-config.json");
@@ -96,6 +95,13 @@ void Settings::Load() {
 
         JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
         JSON_TRYGET("DarkMode", this->DarkMode);
+        JSON_TRYGET("CustomGameTheme", this->CustomGameTheme);
+        JSON_TRYGET("GameTextColor_R", this->GameTextColor.x);
+        JSON_TRYGET("GameTextColor_G", this->GameTextColor.y);
+        JSON_TRYGET("GameTextColor_B", this->GameTextColor.z);
+        JSON_TRYGET("GameBgColor_R", this->GameBgColor.x);
+        JSON_TRYGET("GameBgColor_G", this->GameBgColor.y);
+        JSON_TRYGET("GameBgColor_B", this->GameBgColor.z);
         JSON_TRYGET("SeeVanishedPlayers", this->SeeVanishedPlayers);
         JSON_TRYGET("SelectedColorId", this->SelectedColorId);
         JSON_TRYGET("SnipeColor", this->SnipeColor);
@@ -185,6 +191,10 @@ void Settings::Load() {
         JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
+        JSON_TRYGET("UsePrefixAndSuffix", this->UsePrefixAndSuffix);
+        JSON_TRYGET("PrefixAndSuffixNewLines", this->PrefixAndSuffixNewLines);
+        JSON_TRYGET("NamePrefix", this->NamePrefix);
+        JSON_TRYGET("NameSuffix", this->NameSuffix);
         JSON_TRYGET("Font", this->Font);
         JSON_TRYGET("FontType", this->FontType);
         //JSON_TRYGET("Material", this->Material);
@@ -233,6 +243,9 @@ void Settings::Load() {
         JSON_TRYGET("ReportOnMurder", this->ReportOnMurder);
         JSON_TRYGET("PreventSelfReport", this->PreventSelfReport);
         //JSON_TRYGET("AutoRejoin", this->AutoRejoin);
+        JSON_TRYGET("OldStylePingText", this->OldStylePingText);
+        JSON_TRYGET("FastRoleReveal", this->FastRoleReveal);
+        JSON_TRYGET("NoSeekerAnim", this->NoSeekerAnim);
         JSON_TRYGET("NoClip", this->NoClip);
         JSON_TRYGET("KillInLobbies", this->KillInLobbies);
         JSON_TRYGET("KillInVanish", this->KillInVanish);
@@ -273,9 +286,7 @@ void Settings::Load() {
 
         JSON_TRYGET("ShowLobbyTimer", this->ShowLobbyTimer);
         JSON_TRYGET("ModDetection", this->ModDetection);
-        JSON_TRYGET("SickoDetection", this->SickoDetection);
-        JSON_TRYGET("AmongUsMenuDetection", this->AmongUsMenuDetection);
-        JSON_TRYGET("KillNetworkDetection", this->KillNetworkDetection);
+        JSON_TRYGET("BroadcastedMod", this->BroadcastedMod);
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
         JSON_TRYGET("SpectatorMode", this->SpectatorMode);
@@ -313,12 +324,34 @@ void Settings::Load() {
 
         JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
+        JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
     }
     catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
     }
 
     //Do not do any IL2CPP stuff here!  The constructors of most classes have not run yet!
+}
+
+void Settings::SaveConfig() {
+    auto path = getModulePath(hModule);
+    std::filesystem::create_directory(path.parent_path() / "sicko-config");
+
+    auto configPath = path.parent_path() / "sicko-selected-config.json";
+
+    if (this->selectedConfig != "") {
+        try {
+            nlohmann::ordered_json j = nlohmann::ordered_json{
+                { "SelectedConfig", this->selectedConfig },
+            };
+
+            std::ofstream outConfig(configPath);
+            outConfig << std::setw(4) << j << std::endl;
+        }
+        catch (...) {
+            //Log.Info("Unable to save sicko-selected-config.json");
+        }
+    }
 }
 
 void Settings::Save() {
@@ -331,7 +364,6 @@ void Settings::Save() {
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{
                 { "SelectedConfig", this->selectedConfig },
-                { "SelectedConfigInt", this->selectedConfigInt },
             };
 
             std::ofstream outConfig(configPath);
@@ -392,6 +424,13 @@ void Settings::Save() {
 
                 { "NoAbilityCD", this->NoAbilityCD },
                 { "DarkMode", this->DarkMode },
+                { "CustomGameTheme", this->CustomGameTheme },
+                { "GameTextColor_R", this->GameTextColor.x },
+                { "GameTextColor_G", this->GameTextColor.y },
+                { "GameTextColor_B", this->GameTextColor.z },
+                { "GameBgColor_R", this->GameBgColor.x },
+                { "GameBgColor_G", this->GameBgColor.y },
+                { "GameBgColor_B", this->GameBgColor.z },
                 { "SeeVanishedPlayers", this->SeeVanishedPlayers },
                 { "SelectedColorId", this->SelectedColorId },
                 { "SnipeColor", this->SnipeColor },
@@ -482,6 +521,10 @@ void Settings::Save() {
                 { "ReadAndSendAumChat", this->ReadAndSendAumChat },
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
+                { "UsePrefixAndSuffix", this->UsePrefixAndSuffix },
+                { "PrefixAndSuffixNewLines", this->PrefixAndSuffixNewLines },
+                { "NamePrefix", this->NamePrefix },
+                { "NameSuffix", this->NameSuffix },
                 { "Font", this->Font },
                 { "FontType", this->FontType },
                 //{ "Material", this->Material },
@@ -533,6 +576,9 @@ void Settings::Save() {
                 { "ReportOnMurder", this->ReportOnMurder },
                 { "PreventSelfReport", this->PreventSelfReport },
                 //{ "AutoRejoin", this->AutoRejoin },
+                { "OldStylePingText", this->OldStylePingText },
+                { "FastRoleReveal", this->FastRoleReveal },
+                { "NoSeekerAnim", this->NoSeekerAnim },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
                 { "KillInVanish", this->KillInVanish },
@@ -573,9 +619,7 @@ void Settings::Save() {
                 { "AutoStartGame", this->AutoStartGame },
                 { "AutoStartTimer", this->AutoStartTimer },
                 { "ModDetection", this->ModDetection },
-                { "SickoDetection", this->SickoDetection },
-                { "AmongUsMenuDetection", this->AmongUsMenuDetection },
-                { "KillNetworkDetection", this->KillNetworkDetection },
+                { "BroadcastedMod", this->BroadcastedMod },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
                 { "SpectatorMode", this->SpectatorMode },
@@ -612,6 +656,7 @@ void Settings::Save() {
                 { "ChatPresets", this->ChatPresets },
                 { "WhitelistFriendCodes", this->WhitelistFriendCodes },
                 { "BlacklistFriendCodes", this->BlacklistFriendCodes },
+                { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
             };
 
             std::ofstream outSettings(settingsPath);

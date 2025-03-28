@@ -188,162 +188,172 @@ void RevealAnonymousVotes() {
 void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Update executed");
 	try {
-		if (!State.PanicMode) {
-			const bool isBeforeResultsState = __this->fields.state < app::MeetingHud_VoteStates__Enum::Results;
-			il2cpp::Array playerStates(__this->fields.playerStates);
-			for (auto playerVoteArea : playerStates) {
-				if (!playerVoteArea) {
-					// oops: game bug
-					continue;
-				}
-				auto playerData = GetPlayerDataById(playerVoteArea->fields.TargetPlayerId);
-				auto localData = GetPlayerData(*Game::pLocalPlayer);
-				auto playerControl = GetPlayerControlById(playerVoteArea->fields.TargetPlayerId);
-				auto playerNameTMP = playerVoteArea->fields.NameText;
-				auto outfit = GetPlayerOutfit(playerData);
-				std::string playerName = convert_from_string(outfit->fields.PlayerName);
-				if ((playerData == GetPlayerData(*Game::pLocalPlayer) || State.CustomNameForEveryone) && State.CustomName && !State.ServerSideCustomName && !State.userName.empty()) {
-					if (State.CustomName && !State.ServerSideCustomName) {
-						playerName = GetCustomName(playerName);
+		const bool isBeforeResultsState = __this->fields.state < app::MeetingHud_VoteStates__Enum::Results;
+		il2cpp::Array playerStates(__this->fields.playerStates);
+		for (auto playerVoteArea : playerStates) {
+			if (!playerVoteArea) {
+				// oops: game bug
+				continue;
+			}
+			auto playerData = GetPlayerDataById(playerVoteArea->fields.TargetPlayerId);
+			auto localData = GetPlayerData(*Game::pLocalPlayer);
+			auto playerControl = GetPlayerControlById(playerVoteArea->fields.TargetPlayerId);
+			auto playerNameTMP = playerVoteArea->fields.NameText;
+			auto outfit = GetPlayerOutfit(playerData);
+			std::string playerName = convert_from_string(outfit->fields.PlayerName);
+			static uint8_t offset = 0; // This should be unsigned or modulo will give unexpected negative results
+			static int offsetCooldown = 0;
+			if (!State.PanicMode && (playerData == GetPlayerData(*Game::pLocalPlayer) || State.CustomNameForEveryone) && State.CustomName && !State.ServerSideCustomName && !State.userName.empty()) {
+				if (State.CustomName && !State.ServerSideCustomName) {
+					playerName = GetCustomName(playerName, false, 0, offset);
+					if (offsetCooldown <= 0) {
+						offset++;
+						offsetCooldown = int(0.2 * GetFps());
 					}
-				}
-
-				if (playerData && localData && outfit) {
-					if (State.PlayerColoredDots)
-					{
-						Color32&& nameColor = GetPlayerColor(outfit->fields.ColorId);
-						std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}> ●</color>",
-							nameColor.r, nameColor.g, nameColor.b,
-							nameColor.a);
-
-						playerName = "<#0000>● </color>" + playerName + dot;
-					}
-					if (State.RevealRoles)
-					{
-						std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
-						if (!playerData->fields.Disconnected) {
-							int completedTasks = 0;
-							int totalTasks = 0;
-							auto tasks = GetNormalPlayerTasks(playerControl);
-							for (auto task : tasks)
-							{
-								if (task == nullptr) continue;
-								if (task->fields.taskStep == task->fields.MaxStep) {
-									completedTasks++;
-									totalTasks++;
-								}
-								else
-									totalTasks++;
-							}
-							std::string tasksText = std::format("({}/{})", completedTasks, totalTasks);
-							if (totalTasks == 0 || (PlayerIsImpostor(playerData) && completedTasks == 0))
-								playerName = "<size=1.2>" + roleName + "\n</size>" + playerName + "\n<size=1.2><#0000>0";
-							else
-								playerName = "<size=1.2>" + roleName + " " + tasksText + "\n</size>" + playerName + "\n<size=1.2><#0000>0";
-						}
-						else
-							playerName = "<size=1.2>" + roleName + " (D/C)\n</size>" + playerName + "\n<size=1.2><#0000>0";
-						Color32&& roleColor = app::Color32_op_Implicit(GetRoleColor(playerData->fields.Role), NULL);
-
-						playerName = std::format("<color=#{:02x}{:02x}{:02x}{:02x}>{}",
-							roleColor.r, roleColor.g, roleColor.b,
-							roleColor.a, playerName);
-					}
-
-					if (IsHost() && State.TournamentMode) {
-						playerName = std::format("{}\n<size=1.2><#0f0>Player ID {}</color></size>", playerName, playerData->fields.PlayerId);
-					}
-
-					String* playerNameStr = convert_to_string(playerName);
-					TMP_Text_set_text((app::TMP_Text*)playerNameTMP, playerNameStr, NULL);
-				}
-
-				if (playerData)
-				{
-					bool didVote = (playerVoteArea->fields.VotedFor != Game::HasNotVoted);
-					// We are goign to check to see if they voted, then we are going to check to see who they voted for, finally we are going to check to see if we already recorded a vote for them
-					// votedFor will either contain the id of the person they voted for, 254 if they missed, or 255 if they didn't vote. We don't want to record people who didn't vote
-					if (didVote && playerVoteArea->fields.VotedFor != Game::MissedVote
-						&& playerVoteArea->fields.VotedFor != Game::DeadVote
-						&& State.voteMonitor.find(playerData->fields.PlayerId) == State.voteMonitor.end())
-					{
-						synchronized(Replay::replayEventMutex) {
-							State.liveReplayEvents.emplace_back(std::make_unique<CastVoteEvent>(GetEventPlayer(playerData).value(), GetEventPlayer(GetPlayerDataById(playerVoteArea->fields.VotedFor))));
-						}
-						State.voteMonitor[playerData->fields.PlayerId] = playerVoteArea->fields.VotedFor;
-						STREAM_DEBUG(ToString(playerData) << " voted for " << ToString(playerVoteArea->fields.VotedFor));
-						ManageCallout(playerData->fields.PlayerId, playerVoteArea->fields.VotedFor);
-
-						// avoid duplicate votes
-
-						if (isBeforeResultsState) {
-							if (playerVoteArea->fields.VotedFor != Game::SkippedVote) {
-								for (auto votedForArea : playerStates) {
-									if (votedForArea->fields.TargetPlayerId == playerVoteArea->fields.VotedFor) {
-										auto transform = app::Component_get_transform((app::Component_1*)votedForArea, nullptr);
-										MeetingHud_BloopAVoteIcon(__this, playerData, 0, transform, nullptr);
-										break;
-									}
-								}
-							}
-							else if (__this->fields.SkippedVoting) {
-								auto transform = app::GameObject_get_transform(__this->fields.SkippedVoting, nullptr);
-								MeetingHud_BloopAVoteIcon(__this, playerData, 0, transform, nullptr);
-							}
-							RevealAnonymousVotes();
-						}
-					}
-					else if (!didVote && State.voteMonitor.find(playerData->fields.PlayerId) != State.voteMonitor.end())
-					{
-						auto it = State.voteMonitor.find(playerData->fields.PlayerId);
-						auto dcPlayer = it->second;
-						State.voteMonitor.erase(it); //Likely disconnected player
-
-						// Remove all votes for disconnected player 
-						for (auto votedForArea : playerStates) {
-							if (votedForArea->fields.TargetPlayerId == dcPlayer) {
-								auto transform = app::Component_get_transform((app::Component_1*)votedForArea, nullptr);
-								Transform_RemoveVotes(transform, 1); // remove a vote
-								break;
-							}
-						}
-					}
+					else offsetCooldown--;
 				}
 			}
 
-			if (isBeforeResultsState) {
-				for (auto votedForArea : playerStates) {
-					if (!votedForArea) {
-						// oops: game bug
-						continue;
+			if (playerData && localData && outfit) {
+				if (!State.PanicMode && State.PlayerColoredDots)
+				{
+					Color32&& nameColor = GetPlayerColor(outfit->fields.ColorId);
+					std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}> ●</color>",
+						nameColor.r, nameColor.g, nameColor.b,
+						nameColor.a);
+
+					playerName = "<#0000>● </color>" + playerName + dot;
+				}
+				if (!State.PanicMode && State.RevealRoles)
+				{
+					std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
+					if (!playerData->fields.Disconnected) {
+						int completedTasks = 0;
+						int totalTasks = 0;
+						auto tasks = GetNormalPlayerTasks(playerControl);
+						for (auto task : tasks)
+						{
+							if (task == nullptr) continue;
+							if (task->fields.taskStep == task->fields.MaxStep) {
+								completedTasks++;
+								totalTasks++;
+							}
+							else
+								totalTasks++;
+						}
+						std::string tasksText = std::format("({}/{})", completedTasks, totalTasks);
+						if (totalTasks == 0 || (PlayerIsImpostor(playerData) && completedTasks == 0))
+							playerName = "<size=1.2>" + roleName + "\n</size>" + playerName + "\n<size=1.2><#0000>0";
+						else
+							playerName = "<size=1.2>" + roleName + " " + tasksText + "\n</size>" + playerName + "\n<size=1.2><#0000>0";
 					}
-					auto transform = app::Component_get_transform((app::Component_1*)votedForArea, nullptr);
-					auto voteSpreader = (VoteSpreader*)app::Component_GetComponent((app::Component_1*)transform, voteSpreaderType, nullptr);
-					if (!voteSpreader) continue;
-					for (auto spriteRenderer : il2cpp::List(voteSpreader->fields.Votes)) {
-						auto gameObject = app::Component_get_gameObject((app::Component_1*)spriteRenderer, nullptr);
-						app::GameObject_SetActive(gameObject, State.RevealVotes, nullptr);
-					}
+					else
+						playerName = "<size=1.2>" + roleName + " (D/C)\n</size>" + playerName + "\n<size=1.2><#0000>0";
+					Color32&& roleColor = app::Color32_op_Implicit(GetRoleColor(playerData->fields.Role), NULL);
+
+					playerName = std::format("<color=#{:02x}{:02x}{:02x}{:02x}>{}",
+						roleColor.r, roleColor.g, roleColor.b,
+						roleColor.a, playerName);
 				}
 
-				if (__this->fields.SkippedVoting) {
-					bool showSkipped = false;
-					for (const auto& pair : State.voteMonitor) {
-						if (pair.second == Game::SkippedVote) {
-							showSkipped = State.RevealVotes;
+				String* playerNameStr = convert_to_string(playerName);
+				TMP_Text_set_text((app::TMP_Text*)playerNameTMP, playerNameStr, NULL);
+			}
+
+			if (playerData)
+			{
+				bool didVote = (playerVoteArea->fields.VotedFor != Game::HasNotVoted);
+				// We are goign to check to see if they voted, then we are going to check to see who they voted for, finally we are going to check to see if we already recorded a vote for them
+				// votedFor will either contain the id of the person they voted for, 254 if they missed, or 255 if they didn't vote. We don't want to record people who didn't vote
+				if (didVote && playerVoteArea->fields.VotedFor != Game::MissedVote
+					&& playerVoteArea->fields.VotedFor != Game::DeadVote
+					&& State.voteMonitor.find(playerData->fields.PlayerId) == State.voteMonitor.end())
+				{
+					synchronized(Replay::replayEventMutex) {
+						State.liveReplayEvents.emplace_back(std::make_unique<CastVoteEvent>(GetEventPlayer(playerData).value(), GetEventPlayer(GetPlayerDataById(playerVoteArea->fields.VotedFor))));
+					}
+					State.voteMonitor[playerData->fields.PlayerId] = playerVoteArea->fields.VotedFor;
+					STREAM_DEBUG(ToString(playerData) << " voted for " << ToString(playerVoteArea->fields.VotedFor));
+					ManageCallout(playerData->fields.PlayerId, playerVoteArea->fields.VotedFor);
+
+					// avoid duplicate votes
+
+					if (isBeforeResultsState) {
+						if (playerVoteArea->fields.VotedFor != Game::SkippedVote) {
+							for (auto votedForArea : playerStates) {
+								if (votedForArea->fields.TargetPlayerId == playerVoteArea->fields.VotedFor) {
+									auto transform = app::Component_get_transform((app::Component_1*)votedForArea, nullptr);
+									MeetingHud_BloopAVoteIcon(__this, playerData, 0, transform, nullptr);
+									break;
+								}
+							}
+						}
+						else if (__this->fields.SkippedVoting) {
+							auto transform = app::GameObject_get_transform(__this->fields.SkippedVoting, nullptr);
+							MeetingHud_BloopAVoteIcon(__this, playerData, 0, transform, nullptr);
+						}
+						RevealAnonymousVotes();
+					}
+				}
+				else if (!didVote && State.voteMonitor.find(playerData->fields.PlayerId) != State.voteMonitor.end())
+				{
+					auto it = State.voteMonitor.find(playerData->fields.PlayerId);
+					auto dcPlayer = it->second;
+					State.voteMonitor.erase(it); //Likely disconnected player
+
+					// Remove all votes for disconnected player 
+					for (auto votedForArea : playerStates) {
+						if (votedForArea->fields.TargetPlayerId == dcPlayer) {
+							auto transform = app::Component_get_transform((app::Component_1*)votedForArea, nullptr);
+							Transform_RemoveVotes(transform, 1); // remove a vote
 							break;
 						}
 					}
-					app::GameObject_SetActive(__this->fields.SkippedVoting, showSkipped, nullptr);
 				}
 			}
 		}
-		il2cpp::Array playerStates(__this->fields.playerStates);
-		for (auto voteArea : playerStates) {
-			std::string namePlate = convert_from_string(GetPlayerOutfit(GetPlayerDataById(voteArea->fields.TargetPlayerId))->fields.NamePlateId);
-			auto col = (!State.PanicMode && State.DarkMode && (namePlate == "" || namePlate == "nameplate_NoPlate"))
-				? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
-			SpriteRenderer_set_color(voteArea->fields.Background, col, NULL);
+
+		if (isBeforeResultsState) {
+			for (auto votedForArea : playerStates) {
+				if (!votedForArea) {
+					// oops: game bug
+					continue;
+				}
+				auto transform = app::Component_get_transform((app::Component_1*)votedForArea, nullptr);
+				auto voteSpreader = (VoteSpreader*)app::Component_GetComponent((app::Component_1*)transform, voteSpreaderType, nullptr);
+				if (!voteSpreader) continue;
+				for (auto spriteRenderer : il2cpp::List(voteSpreader->fields.Votes)) {
+					auto gameObject = app::Component_get_gameObject((app::Component_1*)spriteRenderer, nullptr);
+					app::GameObject_SetActive(gameObject, !State.PanicMode && State.RevealVotes, nullptr);
+				}
+			}
+
+			if (__this->fields.SkippedVoting) {
+				bool showSkipped = false;
+				for (const auto& pair : State.voteMonitor) {
+					if (pair.second == Game::SkippedVote) {
+						showSkipped = !State.PanicMode && State.RevealVotes;
+						break;
+					}
+				}
+				app::GameObject_SetActive(__this->fields.SkippedVoting, showSkipped, nullptr);
+			}
+		}
+		il2cpp::Array playerStates2(__this->fields.playerStates);
+		for (auto voteArea : playerStates2) {
+			if (!State.PanicMode && State.CustomGameTheme) {
+				std::string namePlate = convert_from_string(GetPlayerOutfit(GetPlayerDataById(voteArea->fields.TargetPlayerId))->fields.NamePlateId);
+				auto bg32 = Color32();
+				bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
+				auto bg = Color32_op_Implicit_1(bg32, NULL);
+				if (namePlate == "" || namePlate == "nameplate_NoPlate") SpriteRenderer_set_color(voteArea->fields.Background, bg, NULL);
+			}
+			else {
+				std::string namePlate = convert_from_string(GetPlayerOutfit(GetPlayerDataById(voteArea->fields.TargetPlayerId))->fields.NamePlateId);
+				auto col = (!State.PanicMode && State.DarkMode && (namePlate == "" || namePlate == "nameplate_NoPlate"))
+					? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
+				SpriteRenderer_set_color(voteArea->fields.Background, col, NULL);
+			}
 		}
 	}
 	catch (...) {
@@ -353,6 +363,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 }
 
 void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_RpcVotingComplete executed");
 	if (!State.PanicMode) {
 		if (State.VoteOffPlayerId == Game::SkippedVote || (State.GodMode && exiled == GetPlayerData(*Game::pLocalPlayer))) {
 			exiled = NULL;
@@ -370,10 +381,12 @@ void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Ar
 }
 
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicOptions_GetAnonymousVotes executed");
 	return LogicOptions_GetAnonymousVotes(__this, method);
 }
 
 
 void dMeetingHud_CastVote(MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicOptions_GetAnonymousVotes executed");
 	MeetingHud_CastVote(__this, playerId, suspectIdx, method);
 }

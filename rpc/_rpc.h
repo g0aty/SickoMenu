@@ -203,6 +203,15 @@ public:
 	virtual void Process() override;
 };
 
+class FakeMurderPlayer : public RPCInterface {
+	PlayerControl* Player;
+	PlayerControl* target;
+	bool success;
+public:
+	FakeMurderPlayer(PlayerControl* Player, PlayerControl* target, bool success = true);
+	virtual void Process() override;
+};
+
 class RpcMurderLoop : public RPCInterface {
 	PlayerControl* Player;
 	PlayerControl* target;

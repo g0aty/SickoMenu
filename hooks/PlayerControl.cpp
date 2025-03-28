@@ -57,45 +57,28 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			auto localData = GetPlayerData(*Game::pLocalPlayer);
 			if (!playerData || !localData) return;
 
-			assert(Object_1_IsNotNull((Object_1*)__this->fields.cosmetics));
+			if (Object_1_IsNull((Object_1*)__this->fields.cosmetics)) return;
+
 			auto nameTextTMP = __this->fields.cosmetics->fields.nameText;
 
-			if (!State.PanicMode && State.ModDetection) {
-				if (State.SickoDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 420 call to detect usage
-					if (State.rpcCooldown == 0) {
-						//SickoMenu users can detect this rpc
-						MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)420, (SendOption__Enum)1, NULL);
-						MessageWriter_EndMessage(writer, NULL);
-						State.rpcCooldown = 5;//GetFps();
-					}
-					else {
-						State.rpcCooldown--;
-					}
+			if (!State.PanicMode && State.ModDetection && __this == *Game::pLocalPlayer && (IsInLobby() || State.BroadcastedMod == 1)) {
+				uint8_t rpcCall = (uint8_t)420;
+				switch (State.BroadcastedMod) {
+				case 1:
+					rpcCall = (uint8_t)42069;
+					break;
+				case 2:
+					rpcCall = (uint8_t)250;
+					break;
 				}
-
-				if (State.AmongUsMenuDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 42069 call to detect usage
-					if (State.rpcCooldown == 0) {
-						//AUM users can detect this rpc
-						MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)42069, (SendOption__Enum)1, NULL);
-						MessageWriter_WriteByte(writer, __this->fields.PlayerId, NULL); //AUM specifically sends the player ID with the RPC
-						MessageWriter_EndMessage(writer, NULL);
-						State.rpcCooldown = GetFps();
-					}
-					else {
-						State.rpcCooldown--;
-					}
+				if (State.rpcCooldown <= 0) {
+					//SickoMenu users can detect this rpc
+					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, rpcCall, (SendOption__Enum)1, NULL);
+					MessageWriter_EndMessage(writer, NULL);
+					State.rpcCooldown = int(0.5 * GetFps());
 				}
-
-				if (State.KillNetworkDetection && __this == *Game::pLocalPlayer && !IsInGame()) { //don't spam the rpc when you're not in the game, the menu only needs one 250 call to detect usage
-					if (State.rpcCooldown == 0) {
-						//KillNetwork users can detect this rpc
-						MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, (uint8_t)250, (SendOption__Enum)1, NULL);
-						MessageWriter_EndMessage(writer, NULL);
-						State.rpcCooldown = GetFps();
-					}
-					else {
-						State.rpcCooldown--;
-					}
+				else {
+					State.rpcCooldown--;
 				}
 			}
 
@@ -119,26 +102,32 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				playerName = convert_from_string(outfit->fields.PlayerName);
 
 			static int nameDelay = 0;
+			static uint8_t offset = 0; // This should be unsigned or modulo will give unexpected negative results
 
 			if (!State.PanicMode && State.CustomName) {
 				if ((IsHost() || !State.SafeMode) && State.ServerSideCustomName) {
 					if (nameDelay <= 0) {
-						for (auto p : GetAllPlayerControl()) {
-							auto customName = GetCustomName(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(p), nullptr)));
-							if (State.ForceNameForEveryone) customName = GetCustomName(State.hostUserName, true, p->fields.PlayerId);
-							if ((p == *Game::pLocalPlayer || State.CustomNameForEveryone) &&
-								customName != convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(p), nullptr))) {
-								if (IsInGame()) State.rpcQueue.push(new RpcForceName(p, customName));
-								if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(p, customName));
-							}
-							nameDelay = int(0.5 * GetFps());
+						auto customName = GetCustomName(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(__this), nullptr)), false, 0, offset);
+						if (State.ForceNameForEveryone) customName = GetCustomName(State.hostUserName, true, __this->fields.PlayerId);
+						if ((__this == *Game::pLocalPlayer || State.CustomNameForEveryone) &&
+							customName != convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(__this), nullptr))) {
+							if (IsInGame()) State.rpcQueue.push(new RpcForceName(__this, customName));
+							if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(__this, customName));
 						}
+						nameDelay = int(0.2 * GetFps());
+						offset++;
 					}
 					else nameDelay--;
 				}
 				else {
-					if (__this == *Game::pLocalPlayer || State.CustomNameForEveryone)
-						playerName = GetCustomName(playerName);
+					if (__this == *Game::pLocalPlayer || State.CustomNameForEveryone) {
+						if (nameDelay <= 0) {
+							offset++;
+							nameDelay = int(0.2 * GetFps());
+						}
+						else nameDelay--;
+						playerName = GetCustomName(playerName, false, 0, offset);
+					}
 				}
 			}
 
@@ -222,9 +211,14 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 				std::string localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
 				if (State.ModDetection) {
-					if (State.SickoDetection) localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
-					if (State.AmongUsMenuDetection) localPlayerMod = "<#f55>AmongUsMenu</color>";
-					if (State.KillNetworkDetection) localPlayerMod = "<#f00>KillNetwork</color>";
+					switch (State.BroadcastedMod) {
+					case 1:
+						localPlayerMod = "<#f55>AmongUsMenu</color>";
+						break;
+					case 2:
+						localPlayerMod = "<#f00>KillNetwork</color>";
+						break;
+					}
 				}
 
 				std::string modUsage = (__this == *Game::pLocalPlayer && State.ModDetection) || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
@@ -291,7 +285,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						}
 						std::string playerName = convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName);
 						State.SpeedrunOver = true; //prevent duplicate timer
-						GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorByKill, false, NULL);
+						GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorsByKill, false, NULL);
 					}
 				}
 
@@ -335,7 +329,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			}
 
 			if (IsInGame() && !shouldSeeName) {
-				playerName = "<#0000>" + playerName + "</color>";
+				playerName = "<#0000>" + RemoveHtmlTags(playerName) + "</color>";
 			}
 
 			if ((IsHost() || !State.SafeMode) && State.TeleportEveryone && (IsInGame() && !State.InMeeting)
@@ -455,8 +449,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			if (IsColorBlindMode()) {
 				auto colorBlindText = __this->fields.cosmetics->fields.colorBlindText;
 				String* text = TMP_Text_get_text((TMP_Text*)colorBlindText, NULL);
-				if ((State.ShowPlayerInfo && IsInLobby()) || (State.ShowKillCD && IsInGame() &&
-					playerData->fields.Role && playerData->fields.Role->fields.CanUseKillButton))
+				if (!State.PanicMode && ((State.ShowPlayerInfo && IsInLobby()) || (State.ShowKillCD && IsInGame() &&
+					playerData->fields.Role && playerData->fields.Role->fields.CanUseKillButton)))
 					text = convert_from_string(text).find("\n\n") == std::string::npos ? convert_to_string("\n\n" + convert_from_string(text)) : text;
 				else
 					text = convert_from_string(text).find("\n\n") != std::string::npos ? convert_to_string(convert_from_string(text).substr(2)) : text;
@@ -537,12 +531,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			bool shouldSeeGhost = (State.ShowGhosts && !State.PanicMode) || localData->fields.IsDead;
-			if (playerData->fields.IsDead) {
-				PlayerControl_set_Visible(__this, shouldSeeGhost, NULL);
-				__this->fields.invisibilityAlpha = shouldSeeGhost ? 1.f : 0.f;
-				GameObject_SetActive(Component_get_gameObject((Component_1*)__this->fields.cosmetics->fields.nameText, NULL), shouldSeeGhost, NULL);
-			}
+			/*bool shouldSeeGhost = (State.ShowGhosts && !State.PanicMode) || localData->fields.IsDead;
+			if (playerData->fields.IsDead && __this->fields.cosmetics != NULL) {
+				auto nameObject = Component_get_gameObject((Component_1*)__this->fields.cosmetics->fields.nameText, NULL);
+				GameObject_SetActive(nameObject, true, NULL);
+			}*/
 
 			bool shouldSeePhantom = __this == *Game::pLocalPlayer || PlayerIsImpostor(localData) || localData->fields.IsDead;
 			auto roleType = playerData->fields.RoleType;
@@ -765,7 +758,6 @@ bool dPlayerControl_get_CanMove(PlayerControl* __this, MethodInfo* method) {
 void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_OnGameStart executed");
 	try {
-		SaveGameOptions();
 		State.GameLoaded = true;
 		if (IsHost() && State.BattleRoyale) {
 			for (auto p : GetAllPlayerControl()) {
@@ -867,7 +859,7 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 	}
 	PlayerControl_MurderPlayer(__this, target, resultFlags, method);
 
-	if (*Game::pShipStatus == NULL) return;
+	if (Object_1_IsNull((Object_1*)*Game::pShipStatus)) return;
 	if (!State.PanicMode && State.ReportOnMurder && (!(__this == *Game::pLocalPlayer || PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))) || !State.PreventSelfReport)) {
 		PlayerControl_CmdReportDeadBody(*Game::pLocalPlayer, GetPlayerData(target), nullptr);
 	}
@@ -956,7 +948,7 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_StartMeeting executed");
 	State.BlinkPlayersTab = true;
-	if (*Game::pShipStatus == NULL) return;
+	if (Object_1_IsNull((Object_1*)*Game::pShipStatus)) return;
 	try {
 		if (!State.PanicMode && IsHost() && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) {
 			return;
@@ -983,6 +975,7 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 
 void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_HandleRpc executed");
+	int32_t pos = reader->fields._position, head = reader->fields.readHead;
 	try {
 		HandleRpc(__this, callId, reader);
 		SMAC_HandleRpc(__this, callId, reader);
@@ -999,7 +992,7 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 				}
 			}
 		}
-		if (*Game::pShipStatus == NULL && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting ||
+		if (Object_1_IsNull((Object_1*)*Game::pShipStatus) && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting ||
 				callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))
 			return;
 		if (IsHost() && ((((!State.PanicMode && State.DisableMeetings) || (State.BattleRoyale || State.TaskSpeedrun)) &&
@@ -1018,13 +1011,15 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 			PlayerIsImpostor(p) ? imp++ : crew++;
 		}
 		bool shouldCheckMeeting = (imp >= crew) || imp == 0;
-		if (State.NoGameEnd && shouldCheckMeeting &&
+		if (State.NoGameEnd && shouldCheckMeeting && IsHost() &&
 			(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting))
 			return;
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in PlayerControl_HandleRpc (PlayerControl)");
 	}
+	reader->fields._position = pos;
+	reader->fields.readHead = head;
 	PlayerControl_HandleRpc(__this, callId, reader, NULL);
 }
 
@@ -1033,7 +1028,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dRenderer_set_enabled executed");
 	try {//If we're already rendering it, lets skip checking if we should
 		if (!State.PanicMode) {
-			/*if ((IsInGame() || IsInLobby()) && !value && State.ShowGhosts)
+			if ((IsInGame() || IsInLobby()) && !value && State.ShowGhosts)
 			{
 				Transform* rendererTrans = app::Component_get_transform(reinterpret_cast<app::Component_1*>(__this), NULL);
 				if (rendererTrans != NULL)
@@ -1059,7 +1054,7 @@ void dRenderer_set_enabled(Renderer* __this, bool value, MethodInfo* method)
 						}
 					}
 				}
-			}*/
+			}
 		}
 	}
 	catch (...) {
@@ -1076,7 +1071,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 			if ((IsInGame() || IsInLobby()) && !value) { //If we're already rendering it, lets skip checking if we should
 				for (auto player : GetAllPlayerControl()) {
 					auto playerInfo = GetPlayerData(player);
-					if (!playerInfo || !player->fields.cosmetics) break; //This happens sometimes during loading
+					if (!playerInfo || !player->fields.cosmetics || !player->fields.visibilityItems) break; //This happens sometimes during loading
 					if (((playerInfo->fields.IsDead && State.ShowGhosts) || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible && State.ShowPhantoms)) ||
 						(!playerInfo->fields.IsDead && State.RevealRoles))
 					{
@@ -1107,8 +1102,6 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdReportDeadBody executed");
 	try {
-		if (*Game::pShipStatus == NULL) return;
-		if (ShipStatus__TypeInfo->static_fields->Instance == NULL) return;
 		if (!State.PanicMode && IsHost() && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) {
 			return;
 		}
@@ -1116,13 +1109,13 @@ void dPlayerControl_CmdReportDeadBody(PlayerControl* __this, NetworkedPlayerInfo
 	catch (...) {
 		Log.Debug("Exception occurred in CmdReportDeadBody (PlayerControl)");
 	}
+	if (Object_1_IsNull((Object_1*)*Game::pShipStatus)) return;
 	PlayerControl_CmdReportDeadBody(__this, target, method);
 }
 
 void dPlayerControl_RpcStartMeeting(PlayerControl* __this, NetworkedPlayerInfo* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_RpcStartMeeting executed");
 	try {
-		if (*Game::pShipStatus == NULL) return;
 		if (!State.PanicMode && IsHost() && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) {
 			return;
 		}
@@ -1130,6 +1123,7 @@ void dPlayerControl_RpcStartMeeting(PlayerControl* __this, NetworkedPlayerInfo* 
 	catch (...) {
 		Log.Debug("Exception occurred in PlayerControl_RpcStartMeeting (PlayerControl)");
 	}
+	if (Object_1_IsNull((Object_1*)*Game::pShipStatus)) return;
 	PlayerControl_RpcStartMeeting(__this, target, method);
 }
 
@@ -1191,7 +1185,7 @@ void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method) 
 
 void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dKillButton_SetTarget executed");
-	if (!State.PanicMode) {
+	if (!State.PanicMode && IsInGame()) {
 		try {
 			auto result = target;
 			bool amImpostor = PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer));
@@ -1513,6 +1507,7 @@ void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* 
 }
 
 PlayerBodyTypes__Enum dHideAndSeekManager_GetBodyType(HideAndSeekManager* __this, PlayerControl* player, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dHideAndSeekManager_GetBodyType executed");
 	if (!State.PanicMode && State.ChangeBodyType) {
 		bool isImpostor = PlayerIsImpostor(GetPlayerData(player));
 		switch (State.BodyType) {
@@ -1530,6 +1525,7 @@ PlayerBodyTypes__Enum dHideAndSeekManager_GetBodyType(HideAndSeekManager* __this
 }
 
 PlayerBodyTypes__Enum dNormalGameManager_GetBodyType(NormalGameManager* __this, PlayerControl* player, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dNormalGameManager_GetBodyType executed");
 	if (!State.PanicMode && State.ChangeBodyType) {
 		switch (State.BodyType) {
 		case 0:
@@ -1544,19 +1540,28 @@ PlayerBodyTypes__Enum dNormalGameManager_GetBodyType(NormalGameManager* __this, 
 }
 
 float dPlayerControl_get_CalculatedAlpha(PlayerControl* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_get_CalculatedAlpha executed");
 	return PlayerControl_get_CalculatedAlpha(__this, method);
 }
 
 bool dPlayerControl_get_Visible(PlayerControl* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_get_Visible executed");
 	return PlayerControl_get_Visible(__this, method);
 }
 
 bool dPlayerControl_IsFlashlightEnabled(PlayerControl* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_IsFlashlightEnabled executed");
 	if (!State.PanicMode && State.MaxVision) return false;
 	return PlayerControl_IsFlashlightEnabled(__this, method);
 }
 
 void dPlayerControl_OnDestroy(PlayerControl* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_OnDestroy executed");
 	State.BlinkPlayersTab = true;
 	PlayerControl_OnDestroy(__this, method);
+}
+
+void dBanMenu_Select(BanMenu* __this, int32_t clientId, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dBanMenu_Select executed");
+	BanMenu_Select(__this, clientId, method);
 }

@@ -17,7 +17,7 @@ namespace ReplayTab {
 			State.Save();
 		}
 		ImGui::SameLine();
-		if (ImGui::SliderInt("seconds", &State.Replay_LastSecondsValue, 1, 1200, "%d", ImGuiSliderFlags_AlwaysClamp))
+		if (SliderIntV2("seconds", &State.Replay_LastSecondsValue, 1, 1200, "%d", ImGuiSliderFlags_AlwaysClamp))
 		{
 			State.Save();
 		}

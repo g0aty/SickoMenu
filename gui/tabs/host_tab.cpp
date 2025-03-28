@@ -16,6 +16,8 @@ namespace HostTab {
 	static bool openSettings = false;
 	static bool openTournaments = false;
 
+	static bool hideRolesList = false;
+
 	void CloseOtherGroups(Groups group) {
 		openUtils = group == Groups::Utils;
 		openSettings = group == Groups::Settings;
@@ -76,88 +78,111 @@ namespace HostTab {
 			if (openUtils) {
 				if (IsInLobby()) {
 					ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-					bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
-					auto allPlayers = GetAllPlayerData();
-					auto playerAmount = allPlayers.size();
-					auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
-					for (size_t index = 0; index < playerAmount; index++) {
-						auto playerData = allPlayers[index];
-						if (playerData == nullptr) continue;
-						PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
-						if (playerCtrl == nullptr) continue;
-						State.assignedRolesPlayer[index] = playerCtrl;
-						if (State.assignedRolesPlayer[index] == nullptr)
-							continue;
+					if (!hideRolesList || !State.TournamentMode) {
+						bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
+						auto allPlayers = GetAllPlayerData();
+						auto playerAmount = allPlayers.size();
+						auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
+						for (size_t index = 0; index < playerAmount; index++) {
+							auto playerData = allPlayers[index];
+							if (playerData == nullptr) continue;
+							PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
+							if (playerCtrl == nullptr) continue;
+							State.assignedRolesPlayer[index] = playerCtrl;
+							if (State.assignedRolesPlayer[index] == nullptr)
+								continue;
 
-						auto outfit = GetPlayerOutfit(playerData);
-						if (outfit == NULL) continue;
-						const std::string& playerName = convert_from_string(outfit->fields.PlayerName);
-						//player colors in host tab by gdjkhp (https://github.com/GDjkhp/AmongUsMenu/commit/53b017183bac503c546f198e2bc03539a338462c)
-						if (CustomListBoxInt((playerName + "###" + ToString(playerData)).c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId))))
-						{
-							State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
-							State.scientists_amount = (int)GetRoleCount(RoleType::Scientist);
-							State.trackers_amount = (int)GetRoleCount(RoleType::Tracker);
-							State.noisemakers_amount = (int)GetRoleCount(RoleType::Noisemaker);
-							State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
-							State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
-							State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
-							if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount > maxImpostorAmount)
+							auto outfit = GetPlayerOutfit(playerData);
+							if (outfit == NULL) continue;
+							const std::string& playerName = convert_from_string(outfit->fields.PlayerName);
+							//player colors in host tab by gdjkhp (https://github.com/GDjkhp/AmongUsMenu/commit/53b017183bac503c546f198e2bc03539a338462c)
+							if (CustomListBoxInt((playerName + "###" + ToString(playerData)).c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId)), 0, RemoveHtmlTags(playerName).c_str()))
 							{
-								if (State.assignedRoles[index] == RoleType::Impostor)
-									State.assignedRoles[index] = RoleType::Random;
-								else if (State.assignedRoles[index] == RoleType::Shapeshifter)
-									State.assignedRoles[index] = RoleType::Random;
-								else if (State.assignedRoles[index] == RoleType::Phantom)
-									State.assignedRoles[index] = RoleType::Random;
+								State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
+								State.scientists_amount = (int)GetRoleCount(RoleType::Scientist);
+								State.trackers_amount = (int)GetRoleCount(RoleType::Tracker);
+								State.noisemakers_amount = (int)GetRoleCount(RoleType::Noisemaker);
 								State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
+								State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
 								State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
-								State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
-							}
+								if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount > maxImpostorAmount)
+								{
+									if (State.assignedRoles[index] == RoleType::Impostor)
+										State.assignedRoles[index] = RoleType::Random;
+									else if (State.assignedRoles[index] == RoleType::Shapeshifter)
+										State.assignedRoles[index] = RoleType::Random;
+									else if (State.assignedRoles[index] == RoleType::Phantom)
+										State.assignedRoles[index] = RoleType::Random;
+									State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
+									State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
+									State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
+								}
 
-							if (State.assignedRoles[index] == RoleType::Engineer || State.assignedRoles[index] == RoleType::Scientist ||
-								State.assignedRoles[index] == RoleType::Tracker || State.assignedRoles[index] == RoleType::Noisemaker ||
-								State.assignedRoles[index] == RoleType::Crewmate) {
-								if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.crewmates_amount >= (int)playerAmount)
-									State.assignedRoles[index] = RoleType::Random;
-							} //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps.
+								if (State.assignedRoles[index] == RoleType::Engineer || State.assignedRoles[index] == RoleType::Scientist ||
+									State.assignedRoles[index] == RoleType::Tracker || State.assignedRoles[index] == RoleType::Noisemaker ||
+									State.assignedRoles[index] == RoleType::Crewmate) {
+									if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.crewmates_amount >= (int)playerAmount)
+										State.assignedRoles[index] = RoleType::Random;
+								} //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps.
 
-							if (options.GetGameMode() == GameModes__Enum::HideNSeek)
-							{
-								if (State.assignedRoles[index] == RoleType::Shapeshifter)
-									State.assignedRoles[index] = RoleType::Impostor;
-								else if (State.assignedRoles[index] == RoleType::Phantom)
-									State.assignedRoles[index] = RoleType::Impostor;
-								else if (State.assignedRoles[index] == RoleType::Tracker)
-									State.assignedRoles[index] = RoleType::Engineer;
-								else if (State.assignedRoles[index] == RoleType::Noisemaker)
-									State.assignedRoles[index] = RoleType::Engineer;
-								else if (State.assignedRoles[index] == RoleType::Scientist)
-									State.assignedRoles[index] = RoleType::Engineer;
-								else if (State.assignedRoles[index] == RoleType::Crewmate)
-									State.assignedRoles[index] = RoleType::Engineer;
-								else if (State.assignedRoles[index] == RoleType::Engineer) // what?! lmao (see line 98)
-									State.assignedRoles[index] = RoleType::Engineer;
-							} //Assign other roles in hidenseek causes game bug.
-							//These are organized. Do not change the order unless you find it necessary.
-
-							if (!IsInGame()) {
 								if (options.GetGameMode() == GameModes__Enum::HideNSeek)
-									SetRoleAmount(RoleTypes__Enum::Engineer, 15);
-								else
-									SetRoleAmount(RoleTypes__Enum::Engineer, State.engineers_amount);
-								SetRoleAmount(RoleTypes__Enum::Scientist, State.scientists_amount);
-								SetRoleAmount(RoleTypes__Enum::Tracker, State.trackers_amount);
-								SetRoleAmount(RoleTypes__Enum::Noisemaker, State.noisemakers_amount);
-								SetRoleAmount(RoleTypes__Enum::Shapeshifter, State.shapeshifters_amount);
-								SetRoleAmount(RoleTypes__Enum::Phantom, State.phantoms_amount);
-								if (options.GetNumImpostors() <= State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount)
-									options.SetInt(app::Int32OptionNames__Enum::NumImpostors, State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount);
+								{
+									if (State.assignedRoles[index] == RoleType::Shapeshifter)
+										State.assignedRoles[index] = RoleType::Impostor;
+									else if (State.assignedRoles[index] == RoleType::Phantom)
+										State.assignedRoles[index] = RoleType::Impostor;
+									else if (State.assignedRoles[index] == RoleType::Tracker)
+										State.assignedRoles[index] = RoleType::Engineer;
+									else if (State.assignedRoles[index] == RoleType::Noisemaker)
+										State.assignedRoles[index] = RoleType::Engineer;
+									else if (State.assignedRoles[index] == RoleType::Scientist)
+										State.assignedRoles[index] = RoleType::Engineer;
+									else if (State.assignedRoles[index] == RoleType::Crewmate)
+										State.assignedRoles[index] = RoleType::Engineer;
+									else if (State.assignedRoles[index] == RoleType::Engineer) // what?! lmao (see line 98)
+										State.assignedRoles[index] = RoleType::Engineer;
+								} //Assign other roles in hidenseek causes game bug.
+								//These are organized. Do not change the order unless you find it necessary.
+
+								if (!IsInGame()) {
+									if (options.GetGameMode() == GameModes__Enum::HideNSeek)
+										SetRoleAmount(RoleTypes__Enum::Engineer, 15);
+									else
+										SetRoleAmount(RoleTypes__Enum::Engineer, State.engineers_amount);
+									SetRoleAmount(RoleTypes__Enum::Scientist, State.scientists_amount);
+									SetRoleAmount(RoleTypes__Enum::Tracker, State.trackers_amount);
+									SetRoleAmount(RoleTypes__Enum::Noisemaker, State.noisemakers_amount);
+									SetRoleAmount(RoleTypes__Enum::Shapeshifter, State.shapeshifters_amount);
+									SetRoleAmount(RoleTypes__Enum::Phantom, State.phantoms_amount);
+									if (options.GetNumImpostors() <= State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount)
+										options.SetInt(app::Int32OptionNames__Enum::NumImpostors, State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount);
+								}
 							}
 						}
+						if (shouldEndListBox)
+							ImGui::ListBoxFooter();
 					}
-					if (shouldEndListBox)
-						ImGui::ListBoxFooter();
+
+					if (State.TournamentMode) {
+						if (!hideRolesList) ImGui::NewLine();
+						if (ImGui::Button("Randomize Roles")) {
+							std::vector<Game::PlayerId> playerIds = {};
+							std::vector<Game::PlayerId> impostorIds = {};
+							for (auto p : GetAllPlayerControl()) {
+								if (p == NULL || GetPlayerData(p) == NULL) continue;
+								playerIds.push_back(p->fields.PlayerId);
+							}
+							for (int i = 0; i < GetMaxImpostorAmount(GetAllPlayerControl().size()); ++i) {
+								Game::PlayerId randImpostorId = playerIds[randi(0, playerIds.size() - 1)];
+								impostorIds.push_back(randImpostorId);
+								playerIds.erase(std::find(playerIds.begin(), playerIds.end(), randImpostorId));
+								State.assignedRoles[randImpostorId] = RoleType::Impostor;
+							}
+							for (auto i : playerIds)
+								State.assignedRoles[i] = RoleType::Crewmate;
+						}
+						ToggleButton("Hide Roles List", &hideRolesList);
+					}
 					ImGui::EndChild();
 				}
 				if (IsInLobby()) ImGui::SameLine();
@@ -175,10 +200,11 @@ namespace HostTab {
 
 				if (!State.SafeMode && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers) && newMaxPlayers != currentMaxPlayers) {
 					if (newMaxPlayers >= minPlayers && newMaxPlayers <= maxAllowedPlayers) {
-						if (newMaxPlayers == 4 || newMaxPlayers == 511) {
+						if (newMaxPlayers == 4 || newMaxPlayers == 255) {
 							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
 						}
 						GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, newMaxPlayers);
+						SyncAllSettings();
 					}
 					else {
 						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
@@ -309,10 +335,6 @@ namespace HostTab {
 					State.Save();
 				}
 
-				if (ToggleButton("Allow Killing in Lobbies", &State.KillInLobbies)) {
-					State.Save();
-				}
-
 				if (ToggleButton("Kill While Vanished", &State.KillInVanish)) {
 					State.Save();
 				}
@@ -396,7 +418,7 @@ namespace HostTab {
 							SyncAllSettings();
 						}
 						else v = options.GetBool(opt);
-						};
+					};
 
 					auto MakeInt = [&](const char* str, int& v, Int32OptionNames__Enum opt) {
 						if (ImGui::InputInt(str, &v)) {
@@ -404,7 +426,7 @@ namespace HostTab {
 							SyncAllSettings();
 						}
 						else v = options.GetInt(opt);
-						};
+					};
 
 					auto MakeFloat = [&](const char* str, float& v, FloatOptionNames__Enum opt) {
 						if (ImGui::InputFloat(str, &v)) {
@@ -412,7 +434,7 @@ namespace HostTab {
 							SyncAllSettings();
 						}
 						else v = options.GetFloat(opt);
-						};
+					};
 
 					if (gamemode == GameModes__Enum::Normal || gamemode == GameModes__Enum::NormalFools) {
 						static int emergencyMeetings = 1, emergencyCooldown = 1, discussionTime = 1,
@@ -435,6 +457,12 @@ namespace HostTab {
 						MakeFloat("Crewmate Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
 						MakeFloat("Impostor Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
 						MakeFloat("Kill Cooldown", killCooldown, FloatOptionNames__Enum::KillCooldown);
+						/*if (ImGui::InputFloat("Kill Cooldown", &killCooldown)) {
+							if (killCooldown == 0.f) killCooldown = 0.0001f;
+							options.SetFloat(FloatOptionNames__Enum::KillCooldown, killCooldown);
+							SyncAllSettings();
+						}
+						else killCooldown = options.GetFloat(FloatOptionNames__Enum::KillCooldown);*/
 						MakeInt("Kill Distance", killDistance, Int32OptionNames__Enum::KillDistance);
 						MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
 						MakeInt("# Common Tasks", commonTasks, Int32OptionNames__Enum::NumCommonTasks);
@@ -529,9 +557,23 @@ namespace HostTab {
 #pragma endregion
 			}
 			if (openTournaments && State.TournamentMode) {
-				if (ImGui::Button("Clear All Data")) {
+				if (ImGui::Button("Copy All Data") && State.tournamentFriendCodes.size() != 0) {
+					std::string data = "";
+					for (auto i : State.tournamentFriendCodes) {
+						float points = State.tournamentPoints[i], win = State.tournamentWinPoints[i],
+							callout = State.tournamentCalloutPoints[i], death = State.tournamentEarlyDeathPoints[i];
+						std::string text = std::format("\n{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
+							DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
+						data += text;
+					}
+					ClipboardHelper_PutClipboardString(convert_to_string(data.substr(1)), NULL);
+				}
+				ImGui::SameLine();
+				if (ColoredButton(ImVec4(1.f, 0.f, 0.f, 1.f), "Clear All Data")) {
 					State.tournamentPoints.clear();
 					State.tournamentKillCaps.clear();
+					State.tournamentWinPoints.clear();
+					State.tournamentEarlyDeathPoints.clear();
 				}
 
 				for (auto i : State.tournamentFriendCodes) {

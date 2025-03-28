@@ -607,8 +607,8 @@ namespace PlayersTab {
 						}
 						if (State.DiddyPartyMode && ImGui::Button("Rizz Up Player [Skibidi]")) {
 							std::vector<std::string> rizzLinesList = { "Do you have some Ohio rizz? Because you just turned my brain into pure jelly!",
-								"If beauty were a Skibidi Toilet, you'd be the one everyone’s trying to get next to!", "Is your name Ohio? Because you’re making my heart do the Skibidi!",
-								"Is your aura made of coffee? Because you’re brewing up some strong feelings in me!", "I see dat gyatt and I wanna fanum tax some of dat",
+								"If beauty were a Skibidi Toilet, you'd be the one everyoneâ€™s trying to get next to!", "Is your name Ohio? Because youâ€™re making my heart do the Skibidi!",
+								"Is your aura made of coffee? Because youâ€™re brewing up some strong feelings in me!", "I see dat gyatt and I wanna fanum tax some of dat",
 								"Am I Baby Gronk? Because you can be my Livvy Dunne", "Sup shawty, are you skibidi, because I could use that to my sigma", "Hey shawty, are you skibidi rizz in ohio?",
 								"Yer a rizzard Harry", "Remind me what a work of skibidi rizz looks like" };
 							if (IsInGame()) State.rpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, rizzLinesList[randi(0, rizzLinesList.size() - 1)], selectedPlayer.get_PlayerControl()));
@@ -920,16 +920,20 @@ namespace PlayersTab {
 							murderLoop = true;
 							murderCount = 200; //controls how many times the player is to be murdered
 						}
-						if (murderLoop && ImGui::Button(std::format("Stop Murder Loop ({})", 200 - murderCount).c_str())) {
+						if (murderLoop && ImGui::Button("Stop Murder Loop")) {
 							murderLoop = false;
 							murderCount = 0;
 						}
+						ImGui::SameLine();
+						ImGui::Text(std::format("({})", 200 - murderCount).c_str());
 					}
 
 					if (murderDelay <= 0) {
-						if (murderCount > 0 && selectedPlayer.has_value()) {
+						if (murderCount > 0) {
 							for (auto p : selectedPlayers) {
+								if (!p.has_value()) continue;
 								auto validPlayer = p.validate();
+								if (validPlayer.get_PlayerData()->fields.Disconnected) continue;
 								if (IsInGame()) {
 									State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
 								}
@@ -954,16 +958,20 @@ namespace PlayersTab {
 								farmLoop = true;
 								farmCount = 5000; //controls how many times the player is to be murdered
 							}
-							if (farmLoop && ImGui::Button(std::format("Stop Level Farm ({})", 10000 - 2 * farmCount).c_str())) {
+							if (farmLoop && ImGui::Button("Stop Level Farm")) {
 								farmLoop = false;
 								farmCount = 0;
 							}
+							ImGui::SameLine();
+							ImGui::Text(std::format("Stop Level Farm ({})", 10000 - 2 * farmCount).c_str());
 						}
 
 						if (farmDelay <= 0) {
-							if (farmCount > 0 && selectedPlayer.has_value()) {
+							if (farmCount > 0) {
 								for (auto p : selectedPlayers) {
+									if (!p.has_value()) continue;
 									auto validPlayer = p.validate();
+									if (validPlayer.get_PlayerData()->fields.Disconnected) continue;
 									State.taskRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 2, false));
 								}
 								farmDelay = 2;
@@ -985,10 +993,12 @@ namespace PlayersTab {
 						suicideLoop = true;
 						suicideCount = 200; //controls how many times the player is to be murdered
 					}
-					if (suicideLoop && ImGui::Button(std::format("Stop Suicide Loop ({})", 800 - murderCount * 4).c_str())) {
+					if (suicideLoop && ImGui::Button("Stop Suicide Loop")) {
 						suicideLoop = false;
 						suicideCount = 0;
 					}
+					ImGui::SameLine();
+					ImGui::Text(std::format("Stop Suicide Loop ({})", 800 - murderCount * 4).c_str());
 
 					if (suicideDelay <= 0) {
 						if (suicideCount > 0 && selectedPlayer.has_value()) {
@@ -1018,24 +1028,50 @@ namespace PlayersTab {
 					if (ImGui::Button("Kill Crewmates By")) {
 						for (auto player : GetAllPlayerControl()) {
 							if (!PlayerIsImpostor(GetPlayerData(player))) {
-								if (IsInGame())
-									State.rpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), player,
-										selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
-								else if (IsInLobby())
-									State.lobbyRpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), player,
-										selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+								if (!State.SafeMode) {
+									if (IsInGame()) {
+										State.rpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), player,
+											selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+									}
+									else if (IsInLobby()) {
+										State.lobbyRpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), player,
+											selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+									}
+								}
+								else {
+									if (IsInGame()) {
+										State.rpcQueue.push(new FakeMurderPlayer(selectedPlayer.get_PlayerControl(), player,
+											selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+									}
+									else if (IsInLobby()) {
+										State.lobbyRpcQueue.push(new FakeMurderPlayer(selectedPlayer.get_PlayerControl(), player,
+											selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+									}
+								}
 							}
 						}
 					}
 					if (ImGui::Button("Kill Impostors By") && IsInGame()) {
 						for (auto player : GetAllPlayerControl()) {
-							if (PlayerIsImpostor(GetPlayerData(player))) {
-								if (IsInGame())
+							if (!State.SafeMode) {
+								if (IsInGame()) {
 									State.rpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), player,
 										selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
-								else if (IsInLobby())
+								}
+								else if (IsInLobby()) {
 									State.lobbyRpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), player,
 										selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+								}
+							}
+							else {
+								if (IsInGame()) {
+									State.rpcQueue.push(new FakeMurderPlayer(selectedPlayer.get_PlayerControl(), player,
+										selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+								}
+								else if (IsInLobby()) {
+									State.lobbyRpcQueue.push(new FakeMurderPlayer(selectedPlayer.get_PlayerControl(), player,
+										selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+								}
 							}
 						}
 					}

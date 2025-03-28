@@ -128,34 +128,47 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	if (!State.SafeMode)
 		__this->fields.timeSinceLastMessage = 420.69f; //we can set this to anything more than or equal to 3 and it'll work
 
-	if ((!State.PanicMode || State.TempPanicMode) && State.DarkMode) {
-		auto gray32 = Color32();
-		gray32.r = 34; gray32.g = 34; gray32.b = 34; gray32.a = 255;
-		auto gray = Color32_op_Implicit_1(gray32, NULL);
-		auto green32 = Color32();
-		green32.r = 0; green32.g = 34; green32.b = 0; green32.a = 255;
-		auto green = Color32_op_Implicit_1(green32, NULL);
-		if (__this->fields.freeChatField != NULL) {
-			auto compoText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText);
-			compoText = "<#fff>" + compoText + "</color>";
-			__this->fields.freeChatField->fields.textArea->fields.compoText = convert_to_string(compoText);
-			auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
-			TMP_Text_set_color((app::TMP_Text*)outputText, Palette__TypeInfo->static_fields->White, NULL);
-			SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, gray, NULL);
+	if ((!State.PanicMode || State.TempPanicMode)) {
+		if (State.CustomGameTheme) {
+			auto bg32 = Color32();
+			bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
+			auto bg = Color32_op_Implicit_1(bg32, NULL);
+			auto text32 = Color32();
+			text32.r = int(State.GameTextColor.x * 255); text32.g = int(State.GameTextColor.y * 255); text32.b = int(State.GameTextColor.z * 255); text32.a = 255;
+			auto textCol = Color32_op_Implicit_1(text32, NULL);
+			if (__this->fields.freeChatField != NULL) {
+				auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
+				TMP_Text_set_color((app::TMP_Text*)outputText, textCol, NULL);
+				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, bg, NULL);
+			}
+			if (__this->fields.quickChatField != NULL) {
+				auto text = __this->fields.quickChatField->fields.text;
+				auto placeholderText = __this->fields.quickChatField->fields.placeholderText;
+				TMP_Text_set_color((app::TMP_Text*)text, textCol, NULL);
+				TMP_Text_set_color((app::TMP_Text*)placeholderText, textCol, NULL);
+				SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, bg, NULL);
+			}
 		}
-		if (__this->fields.quickChatField != NULL) {
-			auto text = __this->fields.quickChatField->fields.text;
-			auto placeholderText = __this->fields.quickChatField->fields.placeholderText;
-			TMP_Text_set_color((app::TMP_Text*)text, Palette__TypeInfo->static_fields->White, NULL);
-			TMP_Text_set_color((app::TMP_Text*)placeholderText, Palette__TypeInfo->static_fields->White, NULL);
-			SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, gray, NULL);
+		else if (State.DarkMode) {
+			auto gray32 = Color32();
+			gray32.r = 34; gray32.g = 34; gray32.b = 34; gray32.a = 255;
+			auto gray = Color32_op_Implicit_1(gray32, NULL);
+			if (__this->fields.freeChatField != NULL) {
+				auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
+				TMP_Text_set_color((app::TMP_Text*)outputText, Palette__TypeInfo->static_fields->White, NULL);
+				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, gray, NULL);
+			}
+			if (__this->fields.quickChatField != NULL) {
+				auto text = __this->fields.quickChatField->fields.text;
+				auto placeholderText = __this->fields.quickChatField->fields.placeholderText;
+				TMP_Text_set_color((app::TMP_Text*)text, Palette__TypeInfo->static_fields->White, NULL);
+				TMP_Text_set_color((app::TMP_Text*)placeholderText, Palette__TypeInfo->static_fields->White, NULL);
+				SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, gray, NULL);
+			}
 		}
 	}
 	else {
 		if (__this->fields.freeChatField != NULL) {
-			auto compoText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText);
-			compoText = RemoveHtmlTags(compoText);
-			__this->fields.freeChatField->fields.textArea->fields.compoText = convert_to_string(compoText);
 			auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
 			TMP_Text_set_color((app::TMP_Text*)outputText, Palette__TypeInfo->static_fields->Black, NULL);
 			SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, Palette__TypeInfo->static_fields->White, NULL);
@@ -209,7 +222,8 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 			"19 dollar fortnite card, who wants it?", "Erm, what the sigma?", "I'll take a double triple Grimace Shake on a gyatt",
 			"I know I'm a SIGMA but that doesnt mean I can't have a GYATT too", "Just put the fries in the bag bro", "Stay on the sigma grindset",
 			"Sigma Sigma on the wall, who is the skibidiest of them all?", "Duke Dennis did you pray today?", "What kinda bomboclat dawg are ya" };
-		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(brainrotList[randi(0, brainrotList.size() - 1)]), NULL);
+		auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+		PlayerControl_RpcSendChat(player, convert_to_string(brainrotList[randi(0, brainrotList.size() - 1)]), NULL);
 		State.MessageSent = true;
 	}
 
@@ -219,15 +233,17 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 			"Is your aura made of coffee? Because you’re brewing up some strong feelings in me!", "I see dat gyatt and I wanna fanum tax some of dat",
 			"Am I Baby Gronk? Because you can be my Livvy Dunne", "Sup shawty, are you skibidi, because I could use that to my sigma", "Hey shawty, are you skibidi rizz in ohio?",
 			"Yer a rizzard Harry", "Remind me what a work of skibidi rizz looks like" };
-		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(rizzLinesList[randi(0, rizzLinesList.size() - 1)]), NULL);
+		auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+		PlayerControl_RpcSendChat(player, convert_to_string(rizzLinesList[randi(0, rizzLinesList.size() - 1)]), NULL);
 		State.MessageSent = true;
 	}
 
 	ChatController_Update(__this, method);
 
-	if ((!State.PanicMode || State.TempPanicMode) && State.DarkMode && __this->fields.freeChatField != NULL) {
-		__this->fields.freeChatField->fields.textArea->fields.compoText = convert_to_string(RemoveHtmlTags(convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText)));
-	}
+	/*if ((!State.PanicMode || State.TempPanicMode) && (State.DarkMode || State.CustomGameTheme) && __this->fields.freeChatField != NULL) {
+		//__this->fields.freeChatField->fields.textArea->fields.compoText = convert_to_string(RemoveHtmlTags(convert_from_string(__this->fields.freeChatField->fields.textArea->fields.compoText)));
+	}*/
+	//nah fuck compoText
 }
 
 bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, MethodInfo* method)
@@ -249,7 +265,8 @@ void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, 
 			__this->fields.characterLimit = 120;
 	}
 	else __this->fields.characterLimit = 100;
-	inputCompo = convert_to_string(RemoveHtmlTags(convert_from_string(inputCompo))); // Fix #fff/color bug in text input field
+	//inputCompo = convert_to_string(RemoveHtmlTags(convert_from_string(inputCompo))); // Fix #fff/color bug in text input field
+	//nah fuck compoText
 
 	TextBoxTMP_SetText(__this, input, inputCompo, method);
 }
@@ -287,20 +304,38 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatBubble_SetText executed");
-	if ((!State.PanicMode || State.TempPanicMode) && State.DarkMode) {
-		auto black = Palette__TypeInfo->static_fields->Black;
-		bool isChatWarning = __this->fields.playerInfo == NULL;
-		if (!isChatWarning && __this->fields.playerInfo->fields.IsDead) black.a *= 0.75f;
-		SpriteRenderer_set_color(__this->fields.Background, black, NULL);
-		if (!isChatWarning) {
-			auto textArea = __this->fields.TextArea;
-			TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
+	if ((!State.PanicMode || State.TempPanicMode)) {
+		if (State.CustomGameTheme) {
+			auto bg32 = Color32();
+			bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
+			auto bg = Color32_op_Implicit_1(bg32, NULL);
+			auto text32 = Color32();
+			text32.r = int(State.GameTextColor.x * 255); text32.g = int(State.GameTextColor.y * 255); text32.b = int(State.GameTextColor.z * 255); text32.a = 255;
+			auto textCol = Color32_op_Implicit_1(text32, NULL);
+			bool isChatWarning = __this->fields.playerInfo == NULL;
+			if (!isChatWarning && __this->fields.playerInfo->fields.IsDead) bg.a *= 0.75f;
+			SpriteRenderer_set_color(__this->fields.Background, bg, NULL);
+			if (!isChatWarning) {
+				auto textArea = __this->fields.TextArea;
+				TMP_Text_set_color((app::TMP_Text*)textArea, textCol, NULL);
+			}
+		}
+		else if (State.DarkMode) {
+			auto black = Palette__TypeInfo->static_fields->Black;
+			bool isChatWarning = __this->fields.playerInfo == NULL;
+			if (!isChatWarning && __this->fields.playerInfo->fields.IsDead) black.a *= 0.75f;
+			SpriteRenderer_set_color(__this->fields.Background, black, NULL);
+			if (!isChatWarning) {
+				auto textArea = __this->fields.TextArea;
+				TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
+			}
 		}
 	}
 	ChatBubble_SetText(__this, chatText, method);
 }
 
 void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_SendFreeChat executed");
 	auto chatText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.text);
 	if (convert_to_string(UncensorLink(chatText))->fields.m_stringLength <= 120) chatText = UncensorLink(chatText);
 	if (chatText == "") return;
@@ -345,5 +380,29 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 	}
 	else {
 		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(chatText), NULL);
+	}
+}
+
+void dChatNotification_SetUp(ChatNotification* __this, PlayerControl* sender, String* text, MethodInfo* method) {
+	ChatNotification_SetUp(__this, sender, text, method);
+	if ((!State.PanicMode || State.TempPanicMode) && __this != NULL) {
+		if (State.CustomGameTheme && sender != NULL) {
+			auto bg32 = Color32();
+			bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
+			auto bg = Color32_op_Implicit_1(bg32, NULL);
+			auto text32 = Color32();
+			text32.r = int(State.GameTextColor.x * 255); text32.g = int(State.GameTextColor.y * 255); text32.b = int(State.GameTextColor.z * 255); text32.a = 255;
+			auto textCol = Color32_op_Implicit_1(text32, NULL);
+			if (GetPlayerData(sender)->fields.IsDead) bg.a *= 0.75f;
+			SpriteRenderer_set_color(__this->fields.background, bg, NULL);
+			auto textArea = __this->fields.chatText;
+			TMP_Text_set_color((app::TMP_Text*)textArea, textCol, NULL);
+		}
+		else if (State.DarkMode && sender != NULL) {
+			auto black = Palette__TypeInfo->static_fields->Black;
+			SpriteRenderer_set_color(__this->fields.background, black, NULL);
+			auto textArea = __this->fields.chatText;
+			TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
+		}
 	}
 }

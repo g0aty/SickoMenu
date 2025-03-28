@@ -100,15 +100,15 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 			return;
 		}
 		break;
-	case (uint8_t)RpcCalls__Enum::SetHat:
+	case (uint8_t)RpcCalls__Enum::SetHat_Deprecated:
 	case (uint8_t)RpcCalls__Enum::SetHatStr:
-	case (uint8_t)RpcCalls__Enum::SetVisor:
+	case (uint8_t)RpcCalls__Enum::SetVisor_Deprecated:
 	case (uint8_t)RpcCalls__Enum::SetVisorStr:
-	case (uint8_t)RpcCalls__Enum::SetSkin:
+	case (uint8_t)RpcCalls__Enum::SetSkin_Deprecated:
 	case (uint8_t)RpcCalls__Enum::SetSkinStr:
-	case (uint8_t)RpcCalls__Enum::SetPet:
+	case (uint8_t)RpcCalls__Enum::SetPet_Deprecated:
 	case (uint8_t)RpcCalls__Enum::SetPetStr:
-	case (uint8_t)RpcCalls__Enum::SetNamePlate:
+	case (uint8_t)RpcCalls__Enum::SetNamePlate_Deprecated:
 	case (uint8_t)RpcCalls__Enum::SetNamePlateStr:
 		if (!State.SafeMode) break;
 		if (State.SMAC_CheckCosmetics && IsInGame()) {

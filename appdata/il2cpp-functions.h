@@ -145,9 +145,12 @@ DO_APP_FUNC(void, ShipStatus_RpcCloseDoorsOfType, (ShipStatus* __this, SystemTyp
 DO_APP_FUNC(void, ShipStatus_RpcUpdateSystem, (ShipStatus* __this, SystemTypes__Enum systemType, uint8_t amount, MethodInfo* method), "Assembly-CSharp, System.Void ShipStatus::RpcUpdateSystem(SystemTypes, System.Byte)");
 DO_APP_FUNC(void, ShipStatus_UpdateSystem, (ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method), "Assembly-CSharp, System.Void ShipStatus::UpdateSystem(SystemTypes, PlayerControl, System.Byte)");
 
-DO_APP_FUNC(float, StatsManager_get_BanPoints, (StatsManager* __this, MethodInfo* method), "Assembly-CSharp, System.Single StatsManager::get_BanPoints()");
+/*DO_APP_FUNC(float, StatsManager_get_BanPoints, (StatsManager* __this, MethodInfo* method), "Assembly-CSharp, System.Single StatsManager::get_BanPoints()");
 DO_APP_FUNC(int32_t, StatsManager_get_BanMinutesLeft, (StatsManager* __this, MethodInfo* method), "Assembly-CSharp, System.Int32 StatsManager::get_BanMinutesLeft()");
-DO_APP_FUNC(bool, StatsManager_get_AmBanned, (StatsManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean StatsManager::get_AmBanned()");
+DO_APP_FUNC(bool, StatsManager_get_AmBanned, (StatsManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean StatsManager::get_AmBanned()");*/
+//DO_APP_FUNC(float, PlayerBanData_get_BanPoints, (PlayerBanData* __this, MethodInfo* method), "Assembly-CSharp, System.Single AmongUs.Data.Player.PlayerBanData::get_BanPoints()");
+DO_APP_FUNC(int32_t, PlayerBanData_get_BanMinutesLeft, (PlayerBanData* __this, MethodInfo* method), "Assembly-CSharp, System.Int32 AmongUs.Data.Player.PlayerBanData::get_BanMinutesLeft()");
+//DO_APP_FUNC(bool, PlayerBanData_get_IsBanned, (PlayerBanData* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean AmongUs.Data.Player.PlayerBanData::get_IsBanned()");
 
 DO_APP_FUNC(float, Vent_CanUse, (Vent* __this, NetworkedPlayerInfo* player, bool* canUse, bool* couldUse, MethodInfo* method), "Assembly-CSharp, System.Single Vent::CanUse(NetworkedPlayerInfo, System.Boolean&, System.Boolean&)");
 DO_APP_FUNC(float, Vent_get_UsableDistance, (Vent* __this, MethodInfo* method), "Assembly-CSharp, System.Single Vent::get_UsableDistance()");
@@ -177,7 +180,7 @@ DO_APP_FUNC(void, InnerNetClient_FinishRpcImmediately, (InnerNetClient* __this, 
 
 DO_APP_FUNC(void, MessageExtensions_WriteNetObject, (MessageWriter* self, InnerNetObject* obj, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.MessageExtensions::WriteNetObject(Hazel.MessageWriter, InnerNet.InnerNetObject)");
 
-//DO_APP_FUNC(bool, Constants_1_ShouldFlipSkeld, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldFlipSkeld()");
+DO_APP_FUNC(bool, AprilFoolsMode_ShouldFlipSkeld, (MethodInfo* method), "Assembly-CSharp, System.Boolean AprilFoolsMode::ShouldFlipSkeld()");
 //this causes issues with dleks
 //DO_APP_FUNC(bool, Constants_1_ShouldHorseAround, (MethodInfo* method), "Assembly-CSharp, System.Boolean Constants::ShouldHorseAround()");
 DO_APP_FUNC(Platforms__Enum, Constants_1_GetPlatformType, (MethodInfo* method), "Assembly-CSharp, Platforms Constants::GetPlatformType()");
@@ -217,7 +220,7 @@ DO_APP_FUNC(void, NetHelpers_WriteVector2, (Vector2 vec, MessageWriter* writer, 
 DO_APP_FUNC(void, AccountTab_Open, (AccountTab* __this, MethodInfo* method), "Assembly-CSharp, System.Void AccountTab::Open()");
 DO_APP_FUNC(void, FullAccount_CanSetCustomName, (FullAccount* __this, bool canSetName, MethodInfo* method), "Assembly-CSharp, System.Void FullAccount::CanSetCustomName(System.Boolean)");
 DO_APP_FUNC(void, FollowerCamera_Update, (FollowerCamera* __this, MethodInfo* method), "Assembly-CSharp, System.Void FollowerCamera::Update()");
-DO_APP_FUNC(void, AmongUsClient_OnGameEnd, (AmongUsClient* __this, void* endGameResult, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnGameEnd(EndGameResult)");
+DO_APP_FUNC(void, AmongUsClient_OnGameEnd, (AmongUsClient* __this, EndGameResult* endGameResult, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnGameEnd(EndGameResult)");
 
 DO_APP_FUNC(void, Debug_Log, (Object* message, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Debug::Log(System.Object)");
 DO_APP_FUNC(void, Debug_LogError, (Object* message, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Debug::LogError(System.Object)");
@@ -348,7 +351,6 @@ DO_APP_FUNC(bool, NetworkedPlayerInfo_Serialize, (NetworkedPlayerInfo* __this, M
 DO_APP_FUNC(void, NetworkedPlayerInfo_Deserialize, (NetworkedPlayerInfo* __this, MessageReader* reader, bool initialState, MethodInfo* method), "Assembly-CSharp, System.Void NetworkedPlayerInfo::Deserialize(Hazel.MessageReader, System.Boolean)");
 DO_APP_FUNC(bool, GameManager_DidImpostorsWin, (GameManager* __this, GameOverReason__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Boolean GameManager::DidImpostorsWin(GameOverReason)");
 DO_APP_FUNC(void, AmongUsClient_OnPlayerJoined, (AmongUsClient* __this, ClientData* data, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnPlayerJoined(InnerNet.ClientData)");
-DO_APP_FUNC(void*, AmongUsClient_CoJoinOnlineGameFromCode, (AmongUsClient* __this, int32_t gameId, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoJoinOnlineGameFromCode(System.Int32)");
 DO_APP_FUNC(int32_t, GameCode_GameNameToInt, (String* gameId, MethodInfo* method), "Assembly-CSharp, System.Int32 InnerNet.GameCode::GameNameToIntV2(System.String)");
 DO_APP_FUNC(PlayerStatsData*, PlayerData_get_Stats, (PlayerData* __this, MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Player.PlayerStatsData AmongUs.Data.Player.PlayerData::get_Stats()");
 DO_APP_FUNC(void, AbstractSaveData_Save, (AbstractSaveData* __this, MethodInfo* method), "Assembly-CSharp, System.Void AmongUs.Data.AbstractSaveData::Save()");
@@ -375,7 +377,7 @@ DO_APP_FUNC(void, MatchMakerGameButton_SetGame, (MatchMakerGameButton* __this, G
 DO_APP_FUNC(void, ModManager_LateUpdate, (ModManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void ModManager::LateUpdate()");
 DO_APP_FUNC(void, ModManager_ShowModStamp, (ModManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void ModManager::ShowModStamp()");
 DO_APP_FUNC(void, EndGameNavigation_ShowDefaultNavigation, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Void EndGameNavigation::ShowDefaultNavigation()");
-DO_APP_FUNC(void*, EndGameNavigation_CoJoinGame, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator EndGameNavigation::CoJoinGame()");
+//DO_APP_FUNC(void*, EndGameNavigation_CoJoinGame, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator EndGameNavigation::CoJoinGame()");
 DO_APP_FUNC(PlayerBodyTypes__Enum, HideAndSeekManager_GetBodyType, (HideAndSeekManager* __this, PlayerControl* player, MethodInfo* method), "Assembly-CSharp, PlayerBodyTypes HideAndSeekManager::GetBodyType(PlayerControl)");
 DO_APP_FUNC(PlayerBodyTypes__Enum, NormalGameManager_GetBodyType, (NormalGameManager* __this, PlayerControl* player, MethodInfo* method), "Assembly-CSharp, PlayerBodyTypes NormalGameManager::GetBodyType(PlayerControl)");
 DO_APP_FUNC(void, PlayerControl_SetInvisibility, (PlayerControl* __this, bool isActive, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetInvisibility(System.Boolean)");
@@ -390,3 +392,13 @@ DO_APP_FUNC(void, InnerNetObject_Despawn, (InnerNetObject* __this, MethodInfo* m
 DO_APP_FUNC(void, FriendsListUI_UpdateFriendCodeUI, (FriendsListUI* __this, MethodInfo* method), "Assembly-CSharp, System.Void FriendsListUI::UpdateFriendCodeUI()");
 DO_APP_FUNC(bool, PlayerControl_IsFlashlightEnabled, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean PlayerControl::IsFlashlightEnabled()");
 DO_APP_FUNC(void, PlayerControl_OnDestroy, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::OnDestroy()");
+DO_APP_FUNC(void, MapCountOverlay_OnEnable, (MapCountOverlay* __this, MethodInfo* method), "Assembly-CSharp, System.Void MapCountOverlay::OnEnable()");
+DO_APP_FUNC(void, MapCountOverlay_OnDisable, (MapCountOverlay* __this, MethodInfo* method), "Assembly-CSharp, System.Void MapCountOverlay::OnDisable()");
+DO_APP_FUNC(void, InnerNetClient_SendLateRejection, (InnerNetClient* __this, int32_t targetId, DisconnectReasons__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::SendLateRejection(System.Int32, DisconnectReasons)");
+DO_APP_FUNC(void, BanMenu_Select, (BanMenu* __this, int32_t clientId, MethodInfo* method), "Assembly-CSharp, System.Void BanMenu::Select(System.Int32)");
+DO_APP_FUNC(ClientData*, InnerNetClient_GetRecentClient, (InnerNetClient* __this, int32_t clientId, MethodInfo* method), "Assembly-CSharp, InnerNet.ClientData InnerNet.InnerNetClient::GetRecentClient(System.Int32)");
+DO_APP_FUNC(void*, IntroCutscene_ShowTeam, (IntroCutscene* __this, List_1_PlayerControl_* teamToShow, float duration, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator IntroCutscene::ShowTeam(System.Collections.Generic.List<PlayerControl>, System.Single)");
+DO_APP_FUNC(void*, IntroCutscene_ShowRole, (IntroCutscene* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator IntroCutscene::ShowRole()");
+DO_APP_FUNC(int32_t, LogicOptionsHnS_GetCrewmateLeadTime, (LogicOptionsHnS* __this, MethodInfo* method), "Assembly-CSharp, System.Int32 LogicOptionsHnS::GetCrewmateLeadTime()");
+DO_APP_FUNC(void, GameContainer_SetupGameInfo, (GameContainer* __this, MethodInfo* method), "Assembly-CSharp, System.Void GameContainer::SetupGameInfo()");
+DO_APP_FUNC(void, ChatNotification_SetUp, (ChatNotification* __this, PlayerControl* sender, String* text, MethodInfo* method), "Assembly-CSharp, System.Void ChatNotification::SetUp(PlayerControl, System.String)");

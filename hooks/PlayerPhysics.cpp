@@ -16,11 +16,13 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 	}*/
 	try {
 		auto player = __this->fields.myPlayer;
-		if (!State.TempPanicMode && !State.PanicMode && player != NULL) {
-			auto localData = GetPlayerData(*Game::pLocalPlayer);
+		auto playerData = GetPlayerData(player);
+		auto localData = GetPlayerData(*Game::pLocalPlayer);
+		if (player == NULL || playerData == NULL || localData == NULL) return;
+		if (Object_1_IsNull((Object_1*)player->fields.cosmetics)) return;
+		if (!State.TempPanicMode && !State.PanicMode) {
 			bool shouldSeePhantom = __this->fields.myPlayer == *Game::pLocalPlayer || PlayerIsImpostor(localData) || localData->fields.IsDead || State.ShowPhantoms;
 			bool shouldSeeGhost = localData->fields.IsDead || State.ShowGhosts;
-			auto playerData = GetPlayerData(player);
 			auto roleType = playerData->fields.RoleType;
 			bool isFullyVanished = std::find(State.vanishedPlayers.begin(), State.vanishedPlayers.end(), playerData->fields.PlayerId) != State.vanishedPlayers.end();
 			bool isDead = playerData->fields.IsDead;
@@ -43,6 +45,7 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 						SpriteRenderer_set_color(player->fields.cosmetics->fields.skin->fields.layer, Palette__TypeInfo->static_fields->ClearWhite, NULL);
 					}
 				}
+				GameObject_SetActive(nameText, player->fields.invisibilityAlpha > 0.f, NULL);
 			}
 			else if (!isDead) {
 				player->fields.invisibilityAlpha = isFullyVanished ? (shouldSeePhantom ? 0.5f : 0.f) : 1.f;
@@ -51,12 +54,11 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 				if (isSeekerBody) {
 					SpriteRenderer_set_color(player->fields.cosmetics->fields.skin->fields.layer, Palette__TypeInfo->static_fields->ClearWhite, NULL);
 				}
+				GameObject_SetActive(nameText, player->fields.invisibilityAlpha > 0.f, NULL);
 			}
-			else if (playerData->fields.IsDead) {
-				PlayerControl_set_Visible(player, shouldSeeGhost && !State.PanicMode, NULL);
-				player->fields.invisibilityAlpha = shouldSeeGhost && !State.PanicMode ? 1.f : 0.f;
+			else if (isDead) {
+				PlayerControl_set_Visible(player, shouldSeeGhost, NULL);
 			}
-			GameObject_SetActive(nameText, player->fields.invisibilityAlpha > 0.f, NULL);
 		}
 		app::PlayerPhysics_FixedUpdate(__this, method);
 	}

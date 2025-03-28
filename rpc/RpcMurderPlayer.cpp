@@ -40,6 +40,20 @@ void RpcMurderPlayer::Process()
 	State.LevelFarm = false;
 }
 
+FakeMurderPlayer::FakeMurderPlayer(PlayerControl* Player, PlayerControl* target, bool success)
+{
+	this->Player = Player;
+	this->target = target;
+	this->success = success;
+}
+
+void FakeMurderPlayer::Process()
+{
+	if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) return;
+	if (target == *Game::pLocalPlayer) GetPlayerData(target)->fields.IsDead = true; // Prevent sending RpcSetScanner in lobby
+	else PlayerControl_MurderPlayer(Player, target, MurderResultFlags__Enum::Succeeded, NULL);
+}
+
 RpcMurderLoop::RpcMurderLoop(PlayerControl* Player, PlayerControl* target, int count, bool onlyOnTarget)
 {
 	this->Player = Player;
@@ -351,66 +365,6 @@ RpcEndGame::RpcEndGame(GameOverReason__Enum reason)
 
 void RpcEndGame::Process()
 {
-	bool impostorWin = false;
-	switch (reason) {
-	case GameOverReason__Enum::HideAndSeek_ByKills:
-	case GameOverReason__Enum::ImpostorByKill:
-	case GameOverReason__Enum::ImpostorBySabotage:
-	case GameOverReason__Enum::ImpostorByVote:
-	case GameOverReason__Enum::HumansDisconnect:
-		impostorWin = true;
-		break;
-	}
-	std::string winnersText = "Game Winners: ";
-	int count = 0;
-	for (auto p : GetAllPlayerData()) {
-		if (State.TournamentMode) {
-			auto friendCode = convert_from_string(p->fields.FriendCode);
-			if (impostorWin) {
-				if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
-					State.tournamentPoints[friendCode] += 2; //AllImpsWin
-					LOG_DEBUG(std::format("Added 2 points to {} for all impostors win", ToString(p)).c_str());
-					State.tournamentWinPoints[friendCode] += 1;
-				}
-				else if (PlayerIsImpostor(p)) {
-					if (State.tournamentAliveImpostors.size() == 1 && !p->fields.IsDead) {
-						State.tournamentPoints[friendCode] += 2; //ImpWin
-						LOG_DEBUG(std::format("Added 2 points to {} for solo win", ToString(p)).c_str());
-						State.tournamentWinPoints[friendCode] += 2;
-					}
-					else {
-						State.tournamentPoints[friendCode] += 1; //ImpWin
-						LOG_DEBUG(std::format("Added 1 point to {} for impostor win", ToString(p)).c_str());
-						State.tournamentWinPoints[friendCode] += 1;
-					}
-				}
-			}
-			else {
-				if (PlayerIsImpostor(p)) {
-					State.tournamentPoints[friendCode] -= 1; //ImpLose
-					LOG_DEBUG(std::format("Deducted -1 point from {} for impostor loss", ToString(p)).c_str());
-				}
-				else {
-					State.tournamentPoints[friendCode] += 2; //CrewWin
-					LOG_DEBUG(std::format("Added 2 points to {} for crewmate win", ToString(p)).c_str());
-					State.tournamentWinPoints[friendCode] += 1;
-				}
-			}
-		}
-		auto name = convert_from_string(GetPlayerOutfit(p)->fields.PlayerName);
-		if ((impostorWin && PlayerIsImpostor(p)) || (!impostorWin && !PlayerIsImpostor(p))) {
-			winnersText += name + ", ";
-			count++;
-		}
-	}
-	if (count == 0) LOG_DEBUG("No one was a winner in the game.");
-	else LOG_DEBUG(winnersText.substr(0, (size_t)winnersText.size() - 2));
-	State.tournamentKillCaps.clear();
-	State.tournamentAssignedImpostors.clear();
-	State.tournamentAliveImpostors.clear();
-	State.tournamentCallers.clear();
-	State.tournamentCalledOut.clear();
-	State.tournamentFirstMeetingOver = false;
 	GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, reason, false, NULL);
 }
 

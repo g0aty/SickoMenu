@@ -927,7 +927,7 @@ Game::ColorId GetRandomColorId()
 	return colorId;
 }
 
-std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2) {
+std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2, int offset) {
 	std::vector<int> hex1 = { int(color1.x * 255), int(color1.y * 255), int(color1.z * 255), int(color1.w * 255) };
 	std::vector<int> hex2 = { int(color2.x * 255), int(color2.y * 255), int(color2.z * 255), int(color2.w * 255) };
 
@@ -956,17 +956,26 @@ std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2) {
 	}
 	int nameLength = int(properChars.size());
 	if (nameLength > 1) { //fix division by zero
-		float stepR = float((hex2[0] - hex1[0]) / (nameLength - 1));
-		float stepG = float((hex2[1] - hex1[1]) / (nameLength - 1));
-		float stepB = float((hex2[2] - hex1[2]) / (nameLength - 1));
-		float stepA = float((hex2[3] - hex1[3]) / (nameLength - 1));
 		std::string gradientText = "";
+		int mx = 2 * nameLength - 2;
 		for (int i = 0; i < nameLength; i++)
 		{
-			int r = int(hex1[0] + std::round(stepR * i));
-			int g = int(hex1[1] + std::round(stepG * i));
-			int b = int(hex1[2] + std::round(stepB * i));
-			int a = int(hex1[3] + std::round(stepA * i));
+			float stepR = float((hex2[0] - hex1[0]) / (nameLength - 1));
+			float stepG = float((hex2[1] - hex1[1]) / (nameLength - 1));
+			float stepB = float((hex2[2] - hex1[2]) / (nameLength - 1));
+			float stepA = float((hex2[3] - hex1[3]) / (nameLength - 1));
+
+			int k = (i + offset % mx) % mx;
+			if (k >= nameLength) k = mx - k;
+
+			int r = int(hex1[0] + std::round(stepR * k));
+			int g = int(hex1[1] + std::round(stepG * k));
+			int b = int(hex1[2] + std::round(stepB * k));
+			int a = int(hex1[3] + std::round(stepA * k));
+
+			if (std::clamp(r, 0, 255) != r || std::clamp(g, 0, 255) != g || std::clamp(b, 0, 255) != b || std::clamp(a, 0, 255) != a) {
+				LOG_DEBUG(std::format("For gradient name, k is {} and offset is", k, offset).c_str());
+			}
 
 			std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", r, g, b, a);
 			gradientText += colorCode + opener + properChars[i] + closer + "</color>";
@@ -1391,16 +1400,54 @@ void SetPlayerName(std::string_view name) {
 	app::PlayerCustomizationData_set_Name(customization, convert_to_string(name), nullptr);
 }
 
-std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
+std::string GetCustomName(std::string name, bool forceUnique, uint8_t id, int offset) {
 	name = RemoveHtmlTags(name);
+
+	if (State.UsePrefixAndSuffix) {
+		if (State.NamePrefix != "") {
+			auto prefix = RemoveHtmlTags(State.NamePrefix);
+			if (name.starts_with(prefix)) name = name.substr(prefix.size());
+		}
+		if (State.NameSuffix != "") {
+			auto suffix = RemoveHtmlTags(State.NameSuffix);
+			if (name.ends_with(suffix)) name = name.substr(0, name.size() - suffix.size());
+		}
+	}
+
 	std::string opener = "", closer = "";
 	if (State.RgbName) {
-		opener = State.rgbCode;
-		closer = "</color>";
+		if (State.RgbMethod == 0) {
+			opener = State.rgbCode;
+			closer = "</color>";
+		}
+		else {
+			std::string newName = "";
+			float rgbNameColor = 0.5f * offset;
+			std::vector<std::string> properChars = {};
+			String* blank = convert_to_string("");
+			std::string last_char = "";
+			for (size_t i = 0; i < name.length(); i++) {
+				if (convert_to_string(last_char + name[i]) == blank) {
+					last_char += name[i];
+					continue;
+				}
+				rgbNameColor += 0.5f;
+				constexpr auto tau = 2.f * 3.14159265358979323846f;
+				while (rgbNameColor > tau) rgbNameColor -= tau;
+				const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
+				auto color_r = calculate(rgbNameColor + 0.f);
+				auto color_g = calculate(rgbNameColor + 4.f);
+				auto color_b = calculate(rgbNameColor + 2.f);
+				std::string rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
+				newName += rgbCode + last_char + name[i] + "</color>";
+				last_char = "";
+			}
+			name = newName;
+		}
 	}
 
 	if (State.ColoredName && !State.RgbName) {
-		name = GetGradientUsername(name, State.NameColor1, State.NameColor2);
+		name = GetGradientUsername(name, State.NameColor1, State.NameColor2, State.ColorMethod == 0 ? 0 : offset);
 	}
 
 	if (State.ItalicName) {
@@ -1567,6 +1614,11 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id) {
 	}
 	if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
 
+	if (State.UsePrefixAndSuffix) {
+		if (State.NamePrefix != "") opener = State.NamePrefix + (State.PrefixAndSuffixNewLines ? "<br>" : "") + opener;
+		if (State.NameSuffix != "") closer = closer + (State.PrefixAndSuffixNewLines ? "<br>" : "") + State.NameSuffix;
+	}
+
 	return opener + name + closer;
 }
 
@@ -1599,12 +1651,13 @@ void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
+	if (!State.Enable_SMAC) return;
 	if (reason == "Overloading" && !(IsHost() && State.SMAC_HostPunishment >= 2)) return; // Don't spam logs for overloading, that causes overload as well
 	if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; // Avoid detecting yourself and practice mode dummies
 	if (reason == "Bad Sabotage" && !IsHost()) return; // Without host, we cannot detect who sent UpdateSystem rpc properly
 
 	auto pData = GetPlayerData(pCtrl);
-	std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pData, NULL)));
+	std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName));
 
 	std::string fc = convert_from_string(pData->fields.FriendCode);
 	auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
@@ -1612,46 +1665,51 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	if (fc != "" && State.SMAC_AddToBlacklist) {
 		if (it != State.WhitelistFriendCodes.end()) State.WhitelistFriendCodes.erase(it);
 		State.BlacklistFriendCodes.push_back(fc);
+		State.Save();
 	}
-	State.Save();
 
-	std::string cheaterMessage = "Player " + name + " has done an unauthorized action:\n" + reason;
 	if (IsHost()) {
 		switch (State.SMAC_HostPunishment) {
 		case 0:
-			LOG_INFO(cheaterMessage);
+			LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
 			break;
-		case 1:
+		case 1: {
+			auto realOutfit = GetPlayerOutfit(pData);
+			Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
+			const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
+			std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
+				int(State.GameBgColor.x * 255), int(State.GameBgColor.y * 255), int(State.GameBgColor.z * 255)) :
+				State.DarkMode ? "<#fff>" : "<#000>";
+			std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
+				colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
+				IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
+					" (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
 			//ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
-			ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string("<size=70%><b>" + cheaterMessage + "</b></size>"), NULL);
+			ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
 			break;
-			/*case 2:
-				if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
-				else {
-					if (cheaterMessage.size() > 120) {
-						cheaterMessage = "<#f00>Failed to send message to all players because message is too long.</color>\n" + cheaterMessage;
-						ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
-					}
-					else {
-						while (State.ChatCooldown < 3.f) continue;
-						PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
-					}
-				}
-				break;*/
+		}
 		case 2:
 		{
-			String* newName = convert_to_string(name + " has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
-			if (name.find(" by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: ") == std::string::npos)
-				PlayerControl_RpcSetName(pCtrl, newName, NULL);
-			InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
+			String* newName = convert_to_string(name + " <#fff>has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
+			if (name.find(" by SickoMenu Anticheat! Reason: ") == std::string::npos)
+				GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName = newName; // Set name for yourself as it doesn't show up fast enough for others
+			if (OnlineInGame || OnlineInLobby)
+				InnerNetClient_SendLateRejection((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, DisconnectReasons__Enum::PlatformUserBlock, NULL);
+			else
+				InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
+			// Troll user by kicking them due to being blocked
 			break;
 		}
 		case 3:
 		{
-			String* newName = convert_to_string(name + " has been banned by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: " + reason + "<size=0>");
-			if (name.find(" by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: ") == std::string::npos)
-				PlayerControl_RpcSetName(pCtrl, newName, NULL);
-			InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
+			String* newName = convert_to_string(name + " <#fff>has been banned by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
+			if (name.find(" by SickoMenu Anticheat! Reason: ") == std::string::npos)
+				GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName = newName; // Set name for yourself as it doesn't show up fast enough for others
+			if (OnlineInGame || OnlineInLobby)
+				InnerNetClient_SendLateRejection((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, DisconnectReasons__Enum::Hacking, NULL);
+			else
+				InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
+			// Show up as banned for hacking
 			break;
 		}
 		}
@@ -1659,34 +1717,23 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
 	else {
 		switch (State.SMAC_Punishment) {
 		case 0:
-			LOG_INFO(cheaterMessage);
+			LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
 			break;
-		case 1:
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+		case 1: {
+			auto realOutfit = GetPlayerOutfit(pData);
+			Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
+			const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
+			std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
+				int(State.GameBgColor.x * 255), int(State.GameBgColor.y * 255), int(State.GameBgColor.z * 255)) :
+				State.DarkMode ? "<#fff>" : "<#000>";
+			std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
+				colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
+				IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
+					" (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
+			//ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+			ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
 			break;
-			/*case 2:
-				if (!State.SafeMode) PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
-				else {
-					if (cheaterMessage.size() > 120) {
-						cheaterMessage = "<#f00>Failed to send message to all players because message is too long.</color>\n" + cheaterMessage;
-						ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
-					}
-					else {
-						while (State.ChatCooldown < 3.f) continue;
-						PlayerControl_RpcSendChat(pCtrl, convert_to_string(cheaterMessage), NULL);
-					}
-				}
-				break;
-			case 3:
-				if (State.SafeMode) {
-					//if (IsInGame()) State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, pCtrl, 200, true));
-					//else State.SMAC_AttemptBanLobby.push_back(pCtrl->fields.PlayerId);
-				}
-				else {
-					if (IsInGame()) State.rpcQueue.push(new RpcVoteKick(pCtrl, true));
-					else State.lobbyRpcQueue.push(new RpcVoteKick(pCtrl, true));
-				}
-				break;*/
+		}
 		}
 	}
 }

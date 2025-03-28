@@ -101,7 +101,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
     KeyBinds::WndProc(uMsg, wParam, lParam);
 
-    if (!State.PanicMode && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/) {
+    if (!State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/) {
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Menu)) State.ShowMenu = !State.ShowMenu;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Radar)) State.ShowRadar = !State.ShowRadar;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Console)) State.ShowConsole = !State.ShowConsole;
@@ -112,7 +112,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Zoom) && (IsInGame() || IsInLobby())) { State.EnableZoom = !State.EnableZoom; if (!State.EnableZoom) RefreshChat(); }
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Freecam) && (IsInGame() || IsInLobby())) {
             State.FreeCam = !State.FreeCam;
-            State.playerToFollow = PlayerSelection();
+            State.playerToFollow = {};
         }
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Close_Current_Room_Door) && IsInGame()) State.rpcQueue.push(new RpcCloseDoorsOfType(GetSystemTypes(GetTrueAdjustedPosition(*Game::pLocalPlayer)), false));
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Replay)) State.ShowReplay = !State.ShowReplay;
@@ -124,7 +124,10 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Complete_Tasks) && IsInGame()) CompleteAllTasks();
         if (State.EnableZoom && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f)  State.CameraHeight += 0.1f;
-            if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.1f >= 1.f) State.CameraHeight -= 0.1f;
+            if (ImGui::GetIO().MouseWheel > 0.f) {
+                State.CameraHeight -= 0.1f;
+                if (State.CameraHeight < 1.f) State.CameraHeight = 1.f;
+            }
         }
         if ((ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT)) && State.FreeCam && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f ) State.FreeCamSpeed += 0.05f;

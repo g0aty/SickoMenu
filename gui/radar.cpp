@@ -28,7 +28,7 @@ namespace Radar {
 	}
 
 	void OnClick() {
-		if (!(ImGui::IsKeyPressed(VK_SHIFT) || ImGui::IsKeyDown(VK_SHIFT)) && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
+		if (!ImGui::IsKeyPressed(VK_SHIFT) && !ImGui::IsKeyDown(VK_SHIFT) && !ImGui::IsKeyDown(VK_CONTROL) && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
 			ImVec2 mouse = ImGui::GetMousePos();
 			ImVec2 winpos = ImGui::GetWindowPos();
 			ImVec2 winsize = ImGui::GetWindowSize();

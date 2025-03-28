@@ -121,6 +121,28 @@ namespace DebugTab {
 			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Use these at your own risk.");
 			if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
 			if (ToggleButton("April Fools' Mode", &State.AprilFoolsMode)) State.Save();
+			static float timer = 0.0f;
+			static bool SafeModeNotification = false;
+			if (ToggleButton("Safe Mode", &State.SafeMode)) {
+				State.Save();
+				SafeModeNotification = true;
+				timer = static_cast<float>(ImGui::GetTime());
+			}
+
+			if (SafeModeNotification) {
+				float currentTime = static_cast<float>(ImGui::GetTime());
+
+				if (currentTime - timer < 5.0f) {
+					ImGui::SameLine();
+					if (State.SafeMode)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Safe Mode is Enabled!");
+					else
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Safe Mode is Disabled! (The likelihood of getting banned increases)");
+				}
+				else {
+					SafeModeNotification = false;
+				}
+			}
 		}
 
 		ImGui::EndChild();

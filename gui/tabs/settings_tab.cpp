@@ -26,6 +26,10 @@ namespace SettingsTab {
 		openKeybinds = group == Groups::Keybinds;
 	}
 
+	void CheckKeybindEdit(bool hotKey) {
+		State.KeybindsBeingEdited = State.KeybindsBeingEdited || hotKey;
+	}
+
 	void Render() {
 		ImGui::SameLine(100 * State.dpiScale);
 		ImGui::BeginChild("###Settings", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
@@ -114,7 +118,7 @@ namespace SettingsTab {
 
 			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
 			{
-				State.Save(); //save previous settings
+				State.SaveConfig();
 				State.Load();
 				State.Save(); //actually save the selected config
 			}
@@ -260,7 +264,6 @@ namespace SettingsTab {
 
 			static float timer = 0.0f;
 			static bool CosmeticsNotification = false;
-			static bool SafeModeNotification = false;
 
 			if (ToggleButton("Unlock Cosmetics", &State.UnlockCosmetics)) {
 				State.Save();
@@ -289,45 +292,9 @@ namespace SettingsTab {
 					Achievements::UnlockAll();
 			}
 
-			if (ToggleButton("Safe Mode", &State.SafeMode)) {
-				State.Save();
-				SafeModeNotification = true;
-				timer = static_cast<float>(ImGui::GetTime());
-			}
-
-			if (SafeModeNotification) {
-				float currentTime = static_cast<float>(ImGui::GetTime());
-
-				if (currentTime - timer < 5.0f) {
-					ImGui::SameLine();
-					if (State.SafeMode)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Safe Mode is Enabled!");
-					else
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Safe Mode is Disabled! (The likelihood of getting banned increases)");
-				}
-				else {
-					SafeModeNotification = false;
-				}
-			}
-
-			static int modToShow = 0;
-
-			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) {
-				if (!State.ModDetection) State.SickoDetection = State.AmongUsMenuDetection = State.KillNetworkDetection = false;
-				else {
-					State.SickoDetection = modToShow == 0;
-					State.AmongUsMenuDetection = modToShow == 1;
-					State.KillNetworkDetection = modToShow == 2;
-				}
-				State.Save();
-			}
+			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) State.Save();
 			ImGui::SameLine();
-			if (CustomListBoxInt(" ", &modToShow, MODS, 100.f * State.dpiScale)) {
-				State.SickoDetection = modToShow == 0;
-				State.AmongUsMenuDetection = modToShow == 1;
-				State.KillNetworkDetection = modToShow == 2;
-				State.Save();
-			}
+			if (CustomListBoxInt(" ", &State.BroadcastedMod, MODS, 100.f * State.dpiScale)) State.Save();
 
 			ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
 		}
@@ -401,134 +368,111 @@ namespace SettingsTab {
 		}
 
 		if (openKeybinds) {
-			if (HotKey(State.KeyBinds.Toggle_Menu)) {
-				State.Save();
-			}
+			State.KeybindsBeingEdited = false; // This should not stay on permanently
+
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Menu));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Menu");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Console)) {
-				State.Save();
-			}
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Console));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Console");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Radar))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Radar));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Radar");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Replay))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Replay));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Replay");
 
-			if (HotKey(State.KeyBinds.Toggle_ChatAlwaysActive)) {
-				State.Save();
-			}
+			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
+
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_ChatAlwaysActive));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Chat");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_ReadGhostMessages)) {
-				State.Save();
-			}
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_ReadGhostMessages));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Read Ghost Messages");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Sicko))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Sicko));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Panic Mode");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Hud))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Hud));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Enable/Disable HUD");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Freecam)) {
-				State.Save();
-			}
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Freecam));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Freecam");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Zoom))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Zoom));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Zoom");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Noclip))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Noclip));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("NoClip");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Toggle_Autokill))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Autokill));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Autokill");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Reset_Appearance))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Reset_Appearance));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Reset Appearance");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Randomize_Appearance))
-				State.Save();
+			CheckKeybindEdit(HotKey(State.KeyBinds.Randomize_Appearance));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Confuse Now");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Repair_Sabotage)) {
-				State.Save();
-			}
+			CheckKeybindEdit(HotKey(State.KeyBinds.Repair_Sabotage));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Repair All Sabotages");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Close_All_Doors)) {
-				State.Save();
-			}
+			CheckKeybindEdit(HotKey(State.KeyBinds.Close_All_Doors));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Close All Doors");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Close_Current_Room_Door)) {
-				State.Save();
-			}
+			CheckKeybindEdit(HotKey(State.KeyBinds.Close_Current_Room_Door));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Close Current Room Door");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (HotKey(State.KeyBinds.Complete_Tasks)) {
-				State.Save();
-			}
+			CheckKeybindEdit(HotKey(State.KeyBinds.Complete_Tasks));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Complete All Tasks");
 		}

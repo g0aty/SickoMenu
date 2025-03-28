@@ -15,5 +15,6 @@ void dAccountManager_UpdateKidAccountDisplay(AccountManager* __this, MethodInfo*
 }
 
 bool dAccountManager_CanPlayOnline(AccountManager* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) LOG_DEBUG("Hook dAccountManager_CanPlayOnline executed");
     return true;
 }

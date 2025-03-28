@@ -87,28 +87,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dInnerNetClient_Update executed");
     try {
-        if (State.versionShower != nullptr && (State.CurrentScene == "MainMenu" || State.CurrentScene == "FindAGame" ||
-            State.CurrentScene == "MMOnline" || State.CurrentScene == "MatchMaking")) {
-            // Constantly update VersionShower so that watermark gets displayed
-            if (!State.PanicMode) {
-                int watermarkSize = 100;
-                if (!State.HideWatermark) {
-                    if (State.CurrentScene == "FindAGame") watermarkSize = 60;
-                    else if (State.CurrentScene == "MainMenu") watermarkSize = 75;
-                }
-                std::string disableHostAnticheatText = State.CurrentScene == "FindAGame" && State.DisableHostAnticheat ? " ~ <#f00>+25 Mode is ON</color>" : "";
-                std::string watermarkOffset = State.CurrentScene == "MMOnline" ? "<#0000>00000</color>" : "";
-                std::string watermarkText = State.AprilFoolsMode ? std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by <#39f>g0aty</color>",
-                    State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson")) :
-                    std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
-                const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}{}</color></size></font>",
-                    watermarkSize, State.DarkMode ? "<#666>" : "<#fff>", State.versionShowerDefaultText,
-                    State.HideWatermark ? "" : watermarkText, disableHostAnticheatText, watermarkOffset);
-                TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(versionText), nullptr);
-            }
-            else TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(State.versionShowerDefaultText), nullptr);
-        }
-
         if (!State.PanicMode) {
             static bool onStart = true;
             if (!IsInLobby()) {
@@ -149,7 +127,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableVents = false;
 
                 if (!IsInLobby()) {
-                    State.selectedPlayer = PlayerSelection();
                     State.selectedPlayers = {};
                     State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
@@ -444,7 +421,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.Save();
             }
 
-            static int joinDelay = 500; //should be 10s
+            /*static int joinDelay = 500; //should be 10s
             if (joinDelay <= 0 && State.AutoJoinLobby) {
                 AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
                     GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
@@ -453,7 +430,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
             else {
                 joinDelay--;
-            }
+            }*/
 
             static int reportDelay = 0;
             if (reportDelay <= 0 && State.SpamReport && (IsHost() || !State.SafeMode) && IsInGame()) {
@@ -703,22 +680,17 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             static int ctrlRightClickDelay = 0;
 
             if ((IsInGame() || IsInLobby()) && !State.InMeeting && State.ShiftRightClickTP) {
-                if (ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-                    ImVec2 mouse = ImGui::GetMousePos();
-                    Vector2 target = {
-                        (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
-                        ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
-                    };
+                ImVec2 mouse = ImGui::GetMousePos();
+                Vector2 target = { mouse.x, (DirectX::GetWindowSize().y - mouse.y) };
+                bool isValid = target.x != 0.f && target.y != 0.f; // Prevent teleporting to origin
+                if (isValid && ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
                     if (IsInGame()) State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
                     if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
                 }
-                else if (ImGui::IsKeyDown(VK_CONTROL) && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+                else if (isValid && ImGui::IsKeyDown(VK_CONTROL) && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
                     if (ctrlRightClickDelay <= 0) {
                         ImVec2 mouse = ImGui::GetMousePos();
-                        Vector2 target = {
-                            (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
-                            ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
-                        };
+                        Vector2 target = { mouse.x, (DirectX::GetWindowSize().y - mouse.y) };
                         if (IsInGame()) State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
                         if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
                         ctrlRightClickDelay = int(0.1 * GetFps());
@@ -1018,12 +990,68 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
     CustomNetworkTransform_SnapTo(__this, position, minSid, method);
 }
 
-void dAmongUsClient_OnGameEnd(AmongUsClient* __this, void* endGameResult, MethodInfo* method) {
+void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResult, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnGameEnd executed");
     try {
         if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
             RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
         //fixes game crashing on ending with shapeshifter
+        bool impostorWin = false;
+        auto reason = endGameResult->fields.GameOverReason;
+        switch (reason) {
+        case GameOverReason__Enum::HideAndSeek_ImpostorsByKills:
+        case GameOverReason__Enum::ImpostorsByKill:
+        case GameOverReason__Enum::ImpostorsBySabotage:
+        case GameOverReason__Enum::ImpostorsByVote:
+        case GameOverReason__Enum::CrewmateDisconnect:
+            impostorWin = true;
+            break;
+        }
+        std::string winnersText = "Game Winners: ";
+        int count = 0;
+        for (auto p : GetAllPlayerData()) {
+            if (IsHost() && !State.PanicMode && State.TournamentMode) {
+                if (p == NULL) continue;
+                auto friendCode = convert_from_string(p->fields.FriendCode);
+                if (impostorWin) {
+                    if (State.tournamentAliveImpostors == State.tournamentAssignedImpostors && PlayerIsImpostor(p)) {
+                        State.tournamentPoints[friendCode] += 2; //AllImpsWin
+                        LOG_DEBUG(std::format("Added 2 points to {} for all impostors win", ToString(p)).c_str());
+                        State.tournamentWinPoints[friendCode] += 1;
+                    }
+                    else if (PlayerIsImpostor(p)) {
+                        if (State.tournamentAliveImpostors.size() == 1 && !p->fields.IsDead) {
+                            State.tournamentPoints[friendCode] += 2; //ImpWin
+                            LOG_DEBUG(std::format("Added 2 points to {} for solo win", ToString(p)).c_str());
+                            State.tournamentWinPoints[friendCode] += 2;
+                        }
+                        else {
+                            State.tournamentPoints[friendCode] += 1; //ImpWin
+                            LOG_DEBUG(std::format("Added 1 point to {} for impostor win", ToString(p)).c_str());
+                            State.tournamentWinPoints[friendCode] += 1;
+                        }
+                    }
+                }
+                else {
+                    if (PlayerIsImpostor(p)) {
+                        State.tournamentPoints[friendCode] -= 1; //ImpLose
+                        LOG_DEBUG(std::format("Deducted -1 point from {} for impostor loss", ToString(p)).c_str());
+                    }
+                    else {
+                        State.tournamentPoints[friendCode] += 2; //CrewWin
+                        LOG_DEBUG(std::format("Added 2 points to {} for crewmate win", ToString(p)).c_str());
+                        State.tournamentWinPoints[friendCode] += 1;
+                    }
+                }
+            }
+            auto name = convert_from_string(GetPlayerOutfit(p)->fields.PlayerName);
+            if ((impostorWin && PlayerIsImpostor(p)) || (!impostorWin && !PlayerIsImpostor(p))) {
+                winnersText += name + ", ";
+                count++;
+            }
+        }
+        if (count == 0) LOG_DEBUG("No one was a winner in the game.");
+        else LOG_DEBUG(winnersText.substr(0, (size_t)winnersText.size() - 2));
         onGameEnd();
     }
     catch (...) {
@@ -1065,56 +1093,9 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
 
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dGameManager_RpcEndGame executed");
-    try {
-        if (!State.PanicMode && IsHost() && State.NoGameEnd)
-            return;
-        if (State.BattleRoyale) {
-            uint8_t aliveCount = 0;
-            for (auto p : GetAllPlayerData()) {
-                if (!p->fields.IsDead) aliveCount++;
-                else if (p->fields.RoleType == RoleTypes__Enum::ImpostorGhost)
-                    PlayerControl_RpcSetRole(p->fields._object, RoleTypes__Enum::CrewmateGhost, false, NULL);
-            }
-            if (aliveCount != 1) return;
-            else endReason = GameOverReason__Enum::ImpostorByKill;
-        }
-        if (State.TaskSpeedrun) return;
-        if (IsHost()) {
-            bool impostorWin = false;
-            switch (endReason) {
-            case GameOverReason__Enum::HideAndSeek_ByKills:
-            case GameOverReason__Enum::ImpostorByKill:
-            case GameOverReason__Enum::ImpostorBySabotage:
-            case GameOverReason__Enum::ImpostorByVote:
-            case GameOverReason__Enum::HumansDisconnect:
-                impostorWin = true;
-                break;
-            }
-            std::string winnersText = "Game Winners:\n";
-            int count = 0;
-            for (auto p : GetAllPlayerData()) {
-                if (p == NULL) continue;
-                auto name = convert_from_string(GetPlayerOutfit(p)->fields.PlayerName);
-                if ((impostorWin && PlayerIsImpostor(p)) || (!impostorWin && !PlayerIsImpostor(p))) {
-                    winnersText += name + ", ";
-                    count++;
-                }
-            }
-            if (count == 0) LOG_DEBUG("No one was a winner in the game.");
-            else LOG_DEBUG(winnersText.substr(0, (size_t)winnersText.size() - 2));
-            State.tournamentKillCaps.clear();
-            State.tournamentAssignedImpostors.clear();
-            State.tournamentAliveImpostors.clear();
-            State.tournamentCallers.clear();
-            State.tournamentCalledOut.clear();
-            State.tournamentFirstMeetingOver = false;
-        }
-    }
-    catch (...) {
-        LOG_ERROR("Exception occurred in GameManager_RpcEndGame (InnerNetClient)");
-    }
-    if (State.TournamentMode) State.rpcQueue.push(new RpcEndGame(endReason));
-    else GameManager_RpcEndGame(__this, endReason, showAd, method);
+    if (!State.PanicMode && IsHost() && State.NoGameEnd)
+        return;
+    GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
 
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* killer, NetworkedPlayerInfo* victim, MethodInfo* method) {
@@ -1215,9 +1196,9 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
         switch (State.LastDisconnectReason) {
         case DisconnectReasons__Enum::Hacking: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string(std::format("You were banned for hacking.\n\n{}\n\n{}",
+                convert_to_string(std::format("You were banned for hacking.\n\n{}{}",
                     State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.",
-                    State.SafeMode ? "Please report this bug in Safe Mode on GitHub/Discord!" : "Disabling safe mode isn't recommended on official servers!")), NULL);
+                    State.SafeMode ? "" : "\n\nDisabling safe mode isn't recommended on official servers!")), NULL);
         }
         break;
         case DisconnectReasons__Enum::Kicked: {

@@ -23,6 +23,8 @@ public:
         0x00, // toggle freecam
         0x00, // close current room door
         VK_END, // toggle replay
+        0x00, //toggle chat always active
+        0x00, //toggle read ghost messages
         0x00, //toggle HUD
         0x00, //reset appearance
         0x00, //save appearance
@@ -152,6 +154,12 @@ public:
     bool ForceColorForEveryone = false;
     bool CustomName = false;
     bool RgbName = false;
+    int ColorMethod = 0;
+    int RgbMethod = 0;
+    bool UsePrefixAndSuffix = false;
+    bool PrefixAndSuffixNewLines = true;
+    std::string NamePrefix = "";
+    std::string NameSuffix = "";
     bool Font = false;
     int FontType = 0;
     //bool Material = false;
@@ -223,6 +231,9 @@ public:
     bool ReportOnMurder = false;
     bool PreventSelfReport = true;
     bool AutoRejoin = false;
+    bool OldStylePingText = false;
+    bool FastRoleReveal = false;
+    bool NoSeekerAnim = false;
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
@@ -343,6 +354,7 @@ public:
     bool FakeCameraUsage = false;
 
     bool LightMode = false;
+    bool CustomGameTheme = false;
     ImVec4 MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
     ImVec4 MenuGradientColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
     ImVec4 MenuGradientColor1 = ImVec4(1.f, 0.f, 0.424f, 1.f);
@@ -350,6 +362,8 @@ public:
     ImVec4 RgbColor = ImVec4(1.f, 0.071f, 0.f, 1.f);
     ImVec4 SelectedColor = ImVec4(1.f, 1.f, 1.f, 0.75f);
     ImVec4 SelectedReplayMapColor = ImVec4(1.f, 1.f, 1.f, 0.75f);
+    ImVec4 GameTextColor = ImVec4(0.f, 0.f, 0.f, 1.f);
+    ImVec4 GameBgColor = ImVec4(1.f, 1.f, 1.f, 1.f);
 
     Game::ColorId SelectedColorId = 0; // Red
     Game::ColorId RandomColorId = 0; // Red
@@ -403,6 +417,7 @@ public:
     bool MessageSent = false;
     bool ChatFocused = false;
     bool IsRevived = false;
+    bool IsAdminMapOpen = false;
 
     std::string chatMessage = "";
     std::string userName = "";
@@ -421,9 +436,7 @@ public:
     bool TempPanicMode = false; //prevent instant crash on joining lobby
     bool BlinkPlayersTab = false; //prevent instant crash on player leaving
     bool ModDetection = true;
-    bool SickoDetection = true;
-    bool AmongUsMenuDetection = false;
-    bool KillNetworkDetection = false;
+    int BroadcastedMod = 0;
     bool ForceLoginAsGuest = false;
     bool DisableHostAnticheat = false;
     bool TournamentMode = false;
@@ -444,6 +457,7 @@ public:
     std::map<std::string, Game::PlayerId> tournamentCorrectCallers;
     std::vector<Game::PlayerId> tournamentAllTasksCompleted;
     bool tournamentFirstMeetingOver = false;
+    GameOverReason__Enum tournamentGameOverReason = GameOverReason__Enum::CrewmatesByVote; // default value should not affect end result
 
     enum class MapType : uint8_t
     {
@@ -529,6 +543,7 @@ public:
 
     std::string lol = "";
     bool ProGamer = false;
+    bool KeybindsBeingEdited = false;
 
     bool Destruct_IgnoreWhitelist = false;
     bool OverloadEveryone = false;
@@ -541,6 +556,7 @@ public:
 
     void Load();
     void Save();
+    void SaveConfig();
     void Delete();
 };
 

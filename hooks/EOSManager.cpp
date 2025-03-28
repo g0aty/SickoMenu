@@ -64,7 +64,7 @@ QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsDa
 bool dEOSManager_IsFriendsListAllowed(EOSManager* __this, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_IsFriendsListAllowed executed");
-	return true;//app::EOSManager_IsFriendsListAllowed(__this, method);
+	return app::EOSManager_IsFriendsListAllowed(__this, method);
 }
 
 void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, MethodInfo* method) {

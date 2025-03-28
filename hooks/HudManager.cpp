@@ -77,6 +77,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 						CustomNetworkTransform_RpcSnapTo((*Game::pLocalPlayer)->fields.NetTransform, app::Vector2(0.f, 0.f), NULL);
 						(*Game::pLocalPlayer)->fields.moveable = false;
 						InnerNetClient_DisconnectInternal((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
+						InnerNetClient_EnqueueDisconnect((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
 						State.OutfitCooldown = 50;
 						if (State.PanicMode && State.TempPanicMode) {
 							State.PanicMode = false;
@@ -177,13 +178,6 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 	oss << std::put_time(&tm, "%m-%d");
 	if (oss.str() == "04-01") State.AprilFoolsMode = true;
 
-	/*if (State.PanicMode) return;
-	std::string watermarkText = std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
-	const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}</color></size></font>",
-		State.HideWatermark ? 100 : 60, State.DarkMode ? "<#666>" : "<#fff>", convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr)),
-		State.HideWatermark ? "" : watermarkText);
-	app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(versionText), nullptr);*/
-
 	std::string wtf = "lld.unemokcis";
 	std::string xd = "lld.noisrev";
 	wtf = strRev(wtf);
@@ -195,6 +189,23 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 		if (!State.TempPanicMode) State.PanicMode = false;
 		State.HideWatermark = false;
 	}
+
+	if (State.PanicMode) return;
+
+	int watermarkSize = 100;
+	if (!State.HideWatermark) {
+		if (State.CurrentScene == "FindAGame") watermarkSize = 60;
+		else if (State.CurrentScene == "MainMenu") watermarkSize = 75;
+	}
+	std::string disableHostAnticheatText = State.CurrentScene == "FindAGame" && State.DisableHostAnticheat ? " ~ <#f00>+25 Mode is ON</color>" : "";
+	std::string watermarkOffset = State.CurrentScene == "MMOnline" ? "<#0000>00000</color>" : "";
+	std::string watermarkText = State.AprilFoolsMode ? std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by <#39f>g0aty</color>",
+		State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson")) :
+		std::format(" ~ <#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>", State.SickoVersion);
+	const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}{}</color></size></font>",
+		watermarkSize, State.DarkMode ? "<#666>" : "<#fff>", State.versionShowerDefaultText,
+		State.HideWatermark ? "" : watermarkText, disableHostAnticheatText, watermarkOffset);
+	TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(versionText), nullptr);
 }
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
@@ -203,40 +214,41 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 	bool isFreeplay = ((InnerNetClient*)(*Game::pAmongUsClient))->fields.NetworkMode == NetworkModes__Enum::FreePlay;
 	app::PingTracker_Update(__this, method);
 	if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y += 3 * (State.CameraHeight - 1);
+	app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
 	if (isFreeplay) {
 		GameObject_SetActive(Component_get_gameObject((Component_1*)__this, NULL), true, NULL);
-		__this->fields.aspectPosition->fields.DistanceFromEdge = __this->fields.gamePos;
-		if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y += 3 * (State.CameraHeight - 1);
-		if (State.PanicMode) return app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(""), nullptr);
+		if ((State.PanicMode && !State.TempPanicMode) || State.OldStylePingText)
+			return app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(""), nullptr);
+		else {
+			__this->fields.aspectPosition->fields.DistanceFromEdge = __this->fields.gamePos;
+			if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y += 3 * (State.CameraHeight - 1);
+		}
 	}
-	app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
 	try {
 		if (!State.PanicMode || State.TempPanicMode) {
+			if (State.OldStylePingText) {
+				Vector3 oldDistFromEdge = Vector3(2.3f, 5.9f, 0.f);
+				if (!State.PanicMode && State.EnableZoom) oldDistFromEdge.y += 3 * (State.CameraHeight - 1);
+				__this->fields.aspectPosition->fields.DistanceFromEdge = oldDistFromEdge;
+			}
+			std::string sep = State.OldStylePingText ? "\n" : " ~ ";
 			std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
 			static int fps = GetFps();
 			static int fpsDelay = 0;
-			if (fpsDelay <= 0) {
+			if (fpsDelay <= 0 || GetFps() <= 30) {
 				fps = GetFps();
 				fpsDelay = int(0.5 * GetFps()); // 0.5 sec delay
 			}
 			else fpsDelay--;
-			std::string fpsText = "";
+			std::string fpsText = State.ShowFps ? sep : "";
 			if (State.ShowFps) {
-				if (fps <= 20) fpsText = std::format(" ~ FPS: <#f00>{}</color>", fps);
-				else if (fps <= 40) fpsText = std::format(" ~ <#ff0>FPS: {}</color>", fps);
-				else fpsText = std::format(" ~ <#0f0>FPS: {}</color>", fps);
+				if (fps <= 20) fpsText += std::format("FPS: <#f00>{}</color>", fps);
+				else if (fps <= 40) fpsText += std::format("<#ff0>FPS: {}</color>", fps);
+				else fpsText += std::format("<#0f0>FPS: {}</color>", fps);
 			}
-			int LobbyTime = (int)State.LobbyTimer;
-			std::string lobbyTimeDisplay = "";
-			/*if (IsHost() && IsInLobby() && State.ShowLobbyTimer) {
-				if (LobbyTime <= 60) lobbyTimeDisplay = std::format(" ~ (<#f00>{}:{}{}</color>)", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
-				else if (LobbyTime <= 180) lobbyTimeDisplay = std::format(" ~ (<#ff0>{}:{}{}</color>)", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
-				else if (LobbyTime >= 0) lobbyTimeDisplay = std::format(" ~ ({}<#0f0>{}:{}{}</color>)", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
-				else lobbyTimeDisplay = std::format(" ~ ({}<#0f0>0:00</color>)", State.JoinedAsHost ? "" : "~");
-			}*/
-			std::string autoKill = State.AutoKill ? " ~ <#f00>Autokill</color>" : "";
-			std::string noClip = State.NoClip ? " ~ NoClip" : "";
-			std::string freeCam = State.FreeCam ? " ~ Freecam" : "";
+			std::string autoKill = State.AutoKill ? (sep + "<#f00>Autokill</color>") : "";
+			std::string noClip = State.NoClip ? (sep + "NoClip") : "";
+			std::string freeCam = State.FreeCam ? (sep + "Freecam") : "";
 			std::string spectating = "";
 			if (auto playerToFollow = State.playerToFollow.validate(); playerToFollow.has_value()) {
 				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerToFollow.get_PlayerData());
@@ -244,22 +256,25 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 				std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>",
 					playerColor.r, playerColor.g, playerColor.b, playerColor.a);
 				auto name = RemoveHtmlTags(convert_from_string(outfit->fields.PlayerName));
-				if (name == "") spectating = " ~ Now Spectating";
-				else spectating = " ~ Now Spectating: " + colorCode + name + "</color>";
+				if (name == "") spectating = sep + "Now Spectating";
+				else spectating = sep + "Now Spectating: " + colorCode + name + "</color>";
 			}
 			uint8_t pingSize = 100;
-			if (!State.HideWatermark || spectating != "") pingSize = 75;
-			if (!State.HideWatermark && spectating != "") pingSize = 50;
+			if (!State.OldStylePingText) {
+				if (!State.HideWatermark || spectating != "") pingSize = 75;
+				if (!State.HideWatermark && spectating != "") pingSize = 50;
+			}
 			std::string hostText = State.ShowHost && IsInGame() ?
-				(IsHost() ? " ~ You are Host" : std::format(" ~ Host: {}", GetHostUsername(true))) : "";
-			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format(" Vote Kicks: {}", State.VoteKicks) : "";
-			std::string watermarkText = State.AprilFoolsMode ? std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by <#39f>g0aty</color> ~ ",
-				IsInGame() ? pingSize : 100, State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson")) :
-				std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color> ~ ", IsInGame() ? pingSize : 100, State.SickoVersion);
-			std::string pingText = (isFreeplay ? "<size=150%><#0000>0</color></size>\n" : "") +
-				std::format("{}{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
-					State.HideWatermark ? "" : watermarkText, ping, lobbyTimeDisplay, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
-			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
+				(IsHost() ? (sep + "You are Host") : std::format("{}Host: {}", sep, GetHostUsername(true))) : "";
+			std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format("{}Vote Kicks: {}", sep, State.VoteKicks) : "";
+			std::string watermarkText = State.AprilFoolsMode ? std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by <#39f>g0aty</color>{}",
+				IsInGame() ? pingSize : 100, State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson"), sep) :
+				std::format("<size={}%><#0f0>Sicko</color><#f00>Menu</color> <#fb0>{}</color> by <#39f>g0aty</color>{}", IsInGame() ? pingSize : 100, State.SickoVersion, sep);
+			std::string pingText = (isFreeplay && !State.OldStylePingText ? "<size=150%><#0000>0</color></size>\n" : "") +
+				std::format("{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
+					State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
+			app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, State.OldStylePingText ? 
+				app::TextAlignmentOptions__Enum::TopRight : app::TextAlignmentOptions__Enum::Top, nullptr);
 			app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
 		}
 		else {
@@ -289,10 +304,28 @@ void dModManager_LateUpdate(ModManager* __this, MethodInfo* method) {
 }
 
 void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dEndGameNavigation_ShowDefaultNavigation executed");
 	EndGameNavigation_ShowDefaultNavigation(__this, method);
-	if (!State.PanicMode && State.AutoRejoin) EndGameNavigation_CoJoinGame(__this, NULL);
 }
 
 void dFriendsListUI_UpdateFriendCodeUI(FriendsListUI* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dFriendsListUI_UpdateFriendCodeUI executed");
 	FriendsListUI_UpdateFriendCodeUI(__this, method);
+}
+
+void dMapCountOverlay_OnEnable(MapCountOverlay* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dMapCountOverlay_OnEnable executed");
+	State.IsAdminMapOpen = true;
+	MapCountOverlay_OnEnable(__this, method);
+}
+
+void dMapCountOverlay_OnDisable(MapCountOverlay* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dMapCountOverlay_OnDisable executed");
+	State.IsAdminMapOpen = false;
+	MapCountOverlay_OnDisable(__this, method);
+}
+
+void* dIntroCutscene_ShowTeam(IntroCutscene* __this, List_1_PlayerControl_* teamToShow, float duration, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dIntroCutscene_ShowTeam executed");
+	return IntroCutscene_ShowTeam(__this, teamToShow, duration, method);
 }

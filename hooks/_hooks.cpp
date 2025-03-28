@@ -12,6 +12,11 @@ using namespace Game;
 bool HookFunction(PVOID* ppPointer, PVOID pDetour, const char* functionName) {
 	if (const auto error = DetourAttach(ppPointer, pDetour); error != NO_ERROR) {
 		STREAM_ERROR("Failed to hook " << functionName << ", error " << error);
+		if (error == 6) {
+			MessageBox(NULL,
+				L"SickoMenu failed to hook with error 6!\nThis may be caused by a version of Among Us not supported by SickoMenu.\n\nPlease don’t post \"Please update\" stuff in the Issues section of the GitHub repository or on our bug reports forum on Discord. That’s not an issue. It always gets updated, just be patient. Day of launch updates are a privilege, not an expectation.",
+				L"SickoMenu", MB_ICONERROR);
+		}
 		return false;
 	}
 	//std::cout << "Hooked " << functionName << std::endl;
@@ -113,9 +118,9 @@ void DetourInitilization() {
 	HOOKFUNC(Vent_CanUse);
 	HOOKFUNC(Vent_EnterVent);
 	HOOKFUNC(Vent_ExitVent);
-	HOOKFUNC(StatsManager_get_AmBanned);
-	HOOKFUNC(StatsManager_get_BanMinutesLeft);
-	HOOKFUNC(StatsManager_get_BanPoints);
+	//HOOKFUNC(PlayerBanData_get_IsBanned);
+	HOOKFUNC(PlayerBanData_get_BanMinutesLeft);
+	//HOOKFUNC(PlayerBanData_get_BanPoints);
 	HOOKFUNC(AutoOpenDoor_DoUpdate);
 	HOOKFUNC(ChatBubble_SetName);
 	HOOKFUNC(ChatController_AddChat);
@@ -223,7 +228,8 @@ void DetourInitilization() {
 	HOOKFUNC(MeetingHud_RpcVotingComplete);
 	HOOKFUNC(AccountManager_CanPlayOnline);
 	HOOKFUNC(LogicOptions_GetAnonymousVotes);
-	HOOKFUNC(AssetReference_InstantiateAsync_1);
+	//HOOKFUNC(AssetReference_InstantiateAsync_1);
+	HOOKFUNC(AprilFoolsMode_ShouldFlipSkeld);
 	HOOKFUNC(MatchMakerGameButton_SetGame);
 	HOOKFUNC(ModManager_LateUpdate);
 	HOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
@@ -237,6 +243,13 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerPhysics_RpcExitVent);
 	HOOKFUNC(PlayerControl_IsFlashlightEnabled);
 	HOOKFUNC(PlayerControl_OnDestroy);
+	HOOKFUNC(MapCountOverlay_OnEnable);
+	HOOKFUNC(MapCountOverlay_OnDisable);
+	HOOKFUNC(BanMenu_Select);
+	HOOKFUNC(IntroCutscene_ShowTeam);
+	HOOKFUNC(LogicOptionsHnS_GetCrewmateLeadTime);
+	HOOKFUNC(GameContainer_SetupGameInfo);
+	HOOKFUNC(ChatNotification_SetUp);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -272,9 +285,9 @@ void DetourUninitialization()
 	UNHOOKFUNC(Vent_CanUse);
 	UNHOOKFUNC(Vent_EnterVent);
 	UNHOOKFUNC(Vent_ExitVent);
-	UNHOOKFUNC(StatsManager_get_AmBanned);
-	UNHOOKFUNC(StatsManager_get_BanMinutesLeft);
-	UNHOOKFUNC(StatsManager_get_BanPoints);
+	//UNHOOKFUNC(PlayerBanData_get_IsBanned);
+	UNHOOKFUNC(PlayerBanData_get_BanMinutesLeft);
+	//UNHOOKFUNC(PlayerBanData_get_BanPoints);
 	UNHOOKFUNC(AutoOpenDoor_DoUpdate);
 	UNHOOKFUNC(ChatBubble_SetName);
 	UNHOOKFUNC(ChatController_AddChat);
@@ -379,7 +392,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(MeetingHud_RpcVotingComplete);
 	UNHOOKFUNC(AccountManager_CanPlayOnline);
 	UNHOOKFUNC(LogicOptions_GetAnonymousVotes);
-	UNHOOKFUNC(AssetReference_InstantiateAsync_1);
+	//UNHOOKFUNC(AssetReference_InstantiateAsync_1);
+	UNHOOKFUNC(AprilFoolsMode_ShouldFlipSkeld);
 	UNHOOKFUNC(MatchMakerGameButton_SetGame);
 	UNHOOKFUNC(ModManager_LateUpdate);
 	UNHOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
@@ -393,6 +407,13 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerPhysics_RpcExitVent);
 	UNHOOKFUNC(PlayerControl_IsFlashlightEnabled);
 	UNHOOKFUNC(PlayerControl_OnDestroy);
+	UNHOOKFUNC(MapCountOverlay_OnEnable);
+	UNHOOKFUNC(MapCountOverlay_OnDisable);
+	UNHOOKFUNC(BanMenu_Select);
+	UNHOOKFUNC(IntroCutscene_ShowTeam);
+	UNHOOKFUNC(LogicOptionsHnS_GetCrewmateLeadTime);
+	UNHOOKFUNC(GameContainer_SetupGameInfo);
+	UNHOOKFUNC(ChatNotification_SetUp);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

@@ -162,6 +162,7 @@ namespace GameTab {
         }
 
         if (openGeneral) {
+            ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
             if (SteppedSliderFloat("Player Speed Multiplier", &State.PlayerSpeed, 0.f, 10.f, 0.05f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
                 State.PrevPlayerSpeed = State.PlayerSpeed;
             }
@@ -247,12 +248,20 @@ namespace GameTab {
             }
 
 
-            if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode) && ImGui::Button("Kill Everyone")) {
+            if (IsInGame() && (IsHost() || !State.SafeMode) && ImGui::Button("Kill Everyone")) {
                 for (auto player : GetAllPlayerControl()) {
-                    if (IsInGame())
-                        State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
-                    else if (IsInLobby())
-                        State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
+                    if (IsInGame() && (IsHost() || !State.SafeMode)) {
+                        if (IsInGame())
+                            State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
+                        else if (IsInLobby())
+                            State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
+                    }
+                    else {
+                        if (IsInGame())
+                            State.rpcQueue.push(new FakeMurderPlayer(*Game::pLocalPlayer, player));
+                        else if (IsInLobby())
+                            State.lobbyRpcQueue.push(new FakeMurderPlayer(*Game::pLocalPlayer, player));
+                    }
                 }
             }
             if (IsInLobby() && !State.SafeMode) ImGui::SameLine();
@@ -507,7 +516,7 @@ namespace GameTab {
 
         if (openAnticheat) {
             if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
-            if (IsHost()) CustomListBoxInt("Host Punishment­", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+            if (IsHost()) CustomListBoxInt("Host Punishment ", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
             else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();

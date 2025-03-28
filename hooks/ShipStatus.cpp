@@ -14,15 +14,6 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 	switch (__this->fields.Type) {
 	case ShipStatus_MapType__Enum::Ship:
 		if (State.mapType != Settings::MapType::Airship) State.mapType = Settings::MapType::Ship;
-		if (State.FlipSkeld && IsHost() && GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) != 3) {
-			GameOptions().SetByte(app::ByteOptionNames__Enum::MapId, 3);
-			auto gameOptionsManager = GameOptionsManager_get_Instance(NULL);
-			GameManager* gameManager = GameManager_get_Instance(NULL);
-			GameOptionsManager_set_GameHostOptions(gameOptionsManager, GameOptionsManager_get_CurrentGameOptions(gameOptionsManager, NULL), NULL);
-			LogicOptions_SyncOptions(GameManager_get_LogicOptions(gameManager, NULL), NULL);
-		}
-		if (GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) State.FlipSkeld = true;
-		else State.FlipSkeld = false;
 		break;
 	case ShipStatus_MapType__Enum::Hq:
 		State.mapType = Settings::MapType::Hq;
@@ -73,6 +64,15 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 
 		//if (!State.mapDoors.empty() && Constants_1_ShouldFlipSkeld(NULL))
 			//State.FlipSkeld = true; fix later
+
+		if (State.FlipSkeld && IsHost() && GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) != 3) {
+			GameOptions().SetByte(app::ByteOptionNames__Enum::MapId, 3);
+			auto gameOptionsManager = GameOptionsManager_get_Instance(NULL);
+			GameManager* gameManager = GameManager_get_Instance(NULL);
+			GameOptionsManager_set_GameHostOptions(gameOptionsManager, GameOptionsManager_get_CurrentGameOptions(gameOptionsManager, NULL), NULL);
+			LogicOptions_SyncOptions(GameManager_get_LogicOptions(gameManager, NULL), NULL);
+		}
+		if (!IsHost()) State.FlipSkeld = GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3;
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in ShipStatus_OnEnable (ShipStatus)");
@@ -82,6 +82,7 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 
 void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, int32_t amount, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_RpcUpdateSystem executed");
+
 	ShipStatus_RpcUpdateSystem(__this, systemType, amount, method);
 }
 
@@ -92,6 +93,19 @@ void dShipStatus_RpcCloseDoorsOfType(ShipStatus* __this, SystemTypes__Enum type,
 
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_HandleRpc executed");
+	if (callId != 27 && callId != 35) return;
+	int32_t pos = reader->fields._position, head = reader->fields.readHead;
+	auto systemType = (SystemTypes__Enum)MessageReader_ReadByte(reader, NULL);
+	reader->fields._position = pos;
+	reader->fields.readHead = head;
+	if (systemType == SystemTypes__Enum::Ventilation ||
+		(callId == 35 && systemType == SystemTypes__Enum::Security) ||
+		systemType == SystemTypes__Enum::Decontamination ||
+		systemType == SystemTypes__Enum::Decontamination2 ||
+		systemType == SystemTypes__Enum::Decontamination3 ||
+		(callId == 35 && systemType == SystemTypes__Enum::MedBay))
+		return ShipStatus_HandleRpc(__this, callId, reader, method);
+	if (!State.PanicMode && State.DisableSabotages) return;
 	ShipStatus_HandleRpc(__this, callId, reader, method);
 }
 
@@ -101,7 +115,7 @@ bool DetectCheatSabotageResult(PlayerControl* player, bool result) {
 }
 
 bool DetectCheatSabotage(SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount) {
-	uint8_t mapId = (uint8_t)State.mapType;
+	/*uint8_t mapId = (uint8_t)State.mapType;
 	if (systemType == SystemTypes__Enum::Sabotage && PlayerIsImpostor(GetPlayerData(player)))
 		return false;
 	else if (systemType == SystemTypes__Enum::LifeSupp &&
@@ -138,15 +152,13 @@ bool DetectCheatSabotage(SystemTypes__Enum systemType, PlayerControl* player, ui
 			return DetectCheatSabotageResult(player, false);
 		}
 	}
-	return DetectCheatSabotageResult(player, true);
+	return DetectCheatSabotageResult(player, true);*/
+	return false;
 }
 
 void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_UpdateSystem executed");
-	if (player == NULL) return;
 	LOG_DEBUG(std::format("SystemType {} updated with amount {}", (std::string)TranslateSystemTypes(systemType), amount).c_str());
-	if (!State.DisableSabotages || State.PanicMode || !IsHost())
-		return ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
 	if (systemType == SystemTypes__Enum::Ventilation ||
 		systemType == SystemTypes__Enum::Security ||
 		systemType == SystemTypes__Enum::Decontamination ||
@@ -154,5 +166,6 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
 		systemType == SystemTypes__Enum::Decontamination3 ||
 		systemType == SystemTypes__Enum::MedBay)
 		return ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
-	if (!DetectCheatSabotage(systemType, player, amount)) return ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
+	if (!State.PanicMode && State.DisableSabotages) return;
+	ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
 }

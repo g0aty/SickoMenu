@@ -60,6 +60,7 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 }
 
 bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dVent_TryMoveToVent executed");
 	if (!State.PanicMode && *Game::pLocalPlayer != NULL) {
 		bool wasVisible = PlayerControl_get_Visible(*Game::pLocalPlayer, NULL) && !(*Game::pLocalPlayer)->fields.walkingToVent && State.ShowPlayersInVents && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead;
 		if (wasVisible) {
@@ -77,7 +78,9 @@ bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodIn
 }*/
 
 void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerPhysics_RpcExitVent executed");
 	PlayerPhysics_RpcExitVent(__this, id, method);
-	if (State.FlipSkeld && IsHost() && *Game::pLocalPlayer != NULL && __this->fields.myPlayer != NULL && __this->fields.myPlayer == *Game::pLocalPlayer)
-		(*Game::pLocalPlayer)->fields.inVent = false; // Fix venting on Dleks
+	/*if (State.FlipSkeld && IsHost() && *Game::pLocalPlayer != NULL && __this->fields.myPlayer != NULL && __this->fields.myPlayer == *Game::pLocalPlayer)
+		(*Game::pLocalPlayer)->fields.inVent = false; // Fix venting on Dleks*/
+	// Not necessary with v16.0.0 :Cool:
 }

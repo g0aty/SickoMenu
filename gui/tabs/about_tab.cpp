@@ -81,8 +81,9 @@ namespace AboutTab {
             }
             ImGui::Text("SickoMenu is a free and open-source software.");
 
-            if (State.SickoVersion.find("pr") != std::string::npos) {
-                ImGui::TextColored(State.RgbColor, "You have access to pre-releases, enjoy!");
+            if (State.SickoVersion.find("pr") != std::string::npos || State.SickoVersion.find("rc") != std::string::npos) {
+                if (State.SickoVersion.find("pr") != std::string::npos) ImGui::TextColored(State.RgbColor, "You have access to pre-releases, enjoy!");
+                else ImGui::TextColored(State.RgbColor, "You have access to the release candidate, enjoy!");
                 BoldText("If you don't have access to the pre-release builds channel on our Discord and haven't self", ImVec4(0.f, 1.f, 0.f, 1.f));
                 BoldText("compiled, please report it to our support staff by making a ticket on our Discord server!", ImVec4(0.f, 1.f, 0.f, 1.f));
             }

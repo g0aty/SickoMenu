@@ -12,17 +12,221 @@ namespace SelfTab {
     enum Groups {
         Visuals,
         Utils,
-        Randomizers
+        Randomizers,
+        TextEditor
     };
 
     static bool openVisuals = true; //default to visual tab group
     static bool openUtils = false;
     static bool openRandomizers = false;
+    static bool openTextEditor = false;
+
+    static std::string originalText = "";
+    static std::string editedText = "";
+
+    static bool italicName = false;
+    static bool underlineName = false;
+    static bool strikethroughName = false;
+    static bool boldName = false;
+    static bool nobrName = false;
+    static ImVec4 nameColor1 = ImVec4(1.f, 1.f, 1.f, 1.f);
+    static ImVec4 nameColor2 = ImVec4(1.f, 1.f, 1.f, 1.f);
+    static bool coloredName = false;
+    static bool font = false;
+    static int fontType = 0;
+    static bool resizeName = false;
+    static float nameSize = 0.f;
+    static bool indentName = false;
+    static float indentLevel = 0.f;
+    static bool cspaceName = false;
+    static float cspaceLevel = 0.f;
+    static bool mspaceName = false;
+    static float mspaceLevel = 0.f;
+    static bool voffsetName = false;
+    static float voffsetLevel = 0.f;
+    static bool rotateName = false;
+    static float rotateAngle = 0.f;
 
     void CloseOtherGroups(Groups group) {
         openVisuals = group == Groups::Visuals;
         openUtils = group == Groups::Utils;
         openRandomizers = group == Groups::Randomizers;
+        openTextEditor = group == Groups::TextEditor;
+    }
+
+    std::string GetTextEditorName(std::string str) {
+        str = RemoveHtmlTags(str);
+
+        std::string opener = "", closer = "";
+
+        if (coloredName) {
+            str = GetGradientUsername(str, nameColor1, nameColor2);
+        }
+
+        if (italicName) {
+            opener += "<i>";
+            closer += "</i>";
+        }
+
+        if (underlineName && !coloredName) {
+            opener += "<u>";
+            closer += "</u>";
+        }
+
+        if (strikethroughName && !coloredName) {
+            opener += "<s>";
+            closer += "</s>";
+        }
+
+        if (boldName) {
+            opener += "<b>";
+            closer += "</b>";
+        }
+
+        if (nobrName) {
+            opener += "<nobr>";
+            closer += "</nobr>";
+        }
+
+        if (font) {
+            switch (fontType) {
+            case 0: {
+                opener += "<font=\"Barlow-Italic SDF\">";
+                break;
+            }
+            case 1: {
+                opener += "<font=\"Barlow-Medium SDF\">";
+                break;
+            }
+            case 2: {
+                opener += "<font=\"Barlow-Bold SDF\">";
+                break;
+            }
+            case 3: {
+                opener += "<font=\"Barlow-SemiBold SDF\">";
+                break;
+            }
+            case 4: {
+                opener += "<font=\"Barlow-SemiBold Masked\">";
+                break;
+            }
+            case 5: {
+                opener += "<font=\"Barlow-ExtraBold SDF\">";
+                break;
+            }
+            case 6: {
+                opener += "<font=\"Barlow-BoldItalic SDF\">";
+                break;
+            }
+            case 7: {
+                opener += "<font=\"Barlow-BoldItalic Masked\">";
+                break;
+            }
+            case 8: {
+                opener += "<font=\"Barlow-Black SDF\">";
+                break;
+            }
+            case 9: {
+                opener += "<font=\"Barlow-Light SDF\">";
+                break;
+            }
+            case 10: {
+                opener += "<font=\"Barlow-Regular SDF\">";
+                break;
+            }
+            case 11: {
+                opener += "<font=\"Barlow-Regular Masked\">";
+                break;
+            }
+            case 12: {
+                opener += "<font=\"Barlow-Regular Outline\">";
+                break;
+            }
+            case 13: {
+                opener += "<font=\"Brook SDF\">";
+                break;
+            }
+            case 14: {
+                opener += "<font=\"LiberationSans SDF\">";
+                break;
+            }
+            case 15: {
+                opener += "<font=\"NotoSansJP-Regular SDF\">";
+                break;
+            }
+            case 16: {
+                opener += "<font=\"VCR SDF\">";
+                break;
+            }
+            case 17: {
+                opener += "<font=\"CONSOLA SDF\">";
+                break;
+            }
+            case 18: {
+                opener += "<font=\"digital-7 SDF\">";
+                break;
+            }
+            case 19: {
+                opener += "<font=\"OCRAEXT SDF\">";
+                break;
+            }
+            case 20: {
+                opener += "<font=\"DIN_Pro_Bold_700 SDF\">";
+                break;
+            }
+            }
+            closer += "</font>";
+        }
+
+        /*if (State.Material) {
+            switch (State.MaterialType) {
+            case 0: {
+                opener += "<material=\"Barlow-Italic SDF Outline\">";
+                break;
+            }
+            case 1: {
+                opener += "<material=\"Barlow-BoldItalic SDF Outline\">";
+                break;
+            }
+            case 2: {
+                opener += "<material=\"Barlow-SemiBold SDF Outline\">";
+                break;
+            }
+                    closer += "</material>";
+            }
+        }*/
+
+        if (resizeName) {
+            opener += std::format("<size={}%>", nameSize * 100);
+            closer += "</size>";
+        }
+
+        if (indentName) {
+            opener += std::format("<line-indent={}>", indentLevel);
+            closer += "</line-indent>";
+        }
+
+        if (cspaceName) {
+            opener += std::format("<cspace={}>", cspaceLevel);
+            closer += "</cspace>";
+        }
+
+        if (mspaceName) {
+            opener += std::format("<mspace={}>", mspaceLevel);
+            closer += "</mspace>";
+        }
+
+        if (voffsetName) {
+            opener += std::format("<voffset={}>", voffsetLevel);
+            closer += "</voffset>";
+        }
+
+        if (rotateName) {
+            opener += std::format("<rotate={}>", rotateAngle);
+            closer += "<rotate=0>";
+        }
+
+        return opener + str + closer;
     }
 
     void Render() {
@@ -39,6 +243,10 @@ namespace SelfTab {
         if (TabGroup("Randomizers", openRandomizers)) {
             CloseOtherGroups(Groups::Randomizers);
         }
+        ImGui::SameLine();
+        if (TabGroup("Text Editor", openTextEditor)) {
+            CloseOtherGroups(Groups::TextEditor);
+        }
 
         if (openVisuals) {
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
@@ -53,20 +261,20 @@ namespace SelfTab {
             ToggleButton("Disable HUD", &State.DisableHud);
 
             if (ToggleButton("Freecam", &State.FreeCam)) {
-                State.playerToFollow = PlayerSelection();
+                State.playerToFollow = {};
                 State.Save();
             }
 
-            ImGui::SameLine(145.0f * State.dpiScale);
-            SteppedSliderFloat("  ", &State.FreeCamSpeed, 0.f, 10.f, 0.05f, "%.2fx Speed", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+            ImGui::SameLine(130.f * State.dpiScale);
+            SteppedSliderFloat("Speed", &State.FreeCamSpeed, 0.f, 10.f, 0.05f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
             if (ToggleButton("Zoom", &State.EnableZoom)) {
                 State.Save();
                 if (!State.EnableZoom) RefreshChat();
             }
 
-            ImGui::SameLine(145.0f * State.dpiScale);
-            SteppedSliderFloat("   ", &State.CameraHeight, 0.5f, 10.0f, 0.1f, "%.2fx Zoom", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+            ImGui::SameLine(130.f * State.dpiScale);
+            SteppedSliderFloat("Scale", &State.CameraHeight, 0.5f, 10.0f, 0.1f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
             ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
             ImGui::Separator();
@@ -97,23 +305,15 @@ namespace SelfTab {
             if (framesPassed == 0) State.RefreshChatButton = false;
             else framesPassed--;*/
 
-            if (IsHost() || !State.SafeMode) {
-                if (ToggleButton("Custom Name", &State.CustomName)) {
-                    State.Save();
-                }
-                ImGui::SameLine();
-                if (ToggleButton("Custom Name for Everyone", &State.CustomNameForEveryone)) {
-                    State.Save();
-                }
+            if (!IsHost() && State.SafeMode) {
+                ImGui::Text("Custom names are purely CLIENT-SIDED without host/disabled safe mode!");
             }
-            else {
-                if (ToggleButton("Custom Name (Client-sided ONLY)", &State.CustomName)) {
-                    State.Save();
-                }
-                ImGui::SameLine();
-                if (ToggleButton("Custom Name for Everyone (Client-sided ONLY)", &State.CustomNameForEveryone)) {
-                    State.Save();
-                }
+            if (ToggleButton("Custom Name", &State.CustomName)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Custom Name for Everyone", &State.CustomNameForEveryone)) {
+                State.Save();
             }
 
             if ((IsHost() || !State.SafeMode)) {
@@ -160,7 +360,19 @@ namespace SelfTab {
                     State.Save();
                 }
 
-                ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
+                if (CustomListBoxInt("Gradient Method", &State.ColorMethod, { "Static", "Left-to-Right" }, 80.f * State.dpiScale))
+                    State.Save();
+                ImGui::SameLine();
+                if (CustomListBoxInt("RGB Method", &State.RgbMethod, { "All-at-Once", "Left-to-Right" }, 80.f * State.dpiScale))
+                    State.Save();
+
+                if (ToggleButton("Enable Prefix and Suffix", &State.UsePrefixAndSuffix)) State.Save();
+                if (ToggleButton("New Lines for Prefix and Suffix", &State.PrefixAndSuffixNewLines)) State.Save();
+
+                if (InputString("Name Prefix", &State.NamePrefix)) State.Save();
+                if (InputString("Name Suffix", &State.NameSuffix)) State.Save();
+                if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: Prefix and/or suffix will be cleared from the ends of the name if it contains them."));
+                if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("This is done to prevent name overflowing."));
 
                 if (ToggleButton("Font", &State.Font)) {
                     State.Save();
@@ -169,10 +381,8 @@ namespace SelfTab {
                 if (CustomListBoxInt(" ", &State.FontType, FONTS, 160.f * State.dpiScale)) {
                     State.Save();
                 }
-                ImGui::Dummy(ImVec2(-5, -5) * State.dpiScale);
                 if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: The white nickname will not be visible in the chat"));
 
-                ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
 
                 /*if (ToggleButton("Material", &State.Material)) {
                     State.Save();
@@ -182,7 +392,6 @@ namespace SelfTab {
                     State.Save();
                 }*/
 
-                ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
                 if (ToggleButton("Size", &State.ResizeName)) {
                     State.Save();
                 }
@@ -192,7 +401,6 @@ namespace SelfTab {
                     State.Save();
                 }
 
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (ToggleButton("Indent", &State.IndentName)) {
                     State.Save();
                 }
@@ -202,7 +410,6 @@ namespace SelfTab {
                     State.Save();
                 }
 
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (ToggleButton("Cspace", &State.CspaceName)) {
                     State.Save();
                 }
@@ -212,7 +419,6 @@ namespace SelfTab {
                     State.Save();
                 }
 
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (ToggleButton("Mspace", &State.MspaceName)) {
                     State.Save();
                 }
@@ -222,7 +428,6 @@ namespace SelfTab {
                     State.Save();
                 }
 
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (ToggleButton("Voffset", &State.VoffsetName)) {
                     State.Save();
                 }
@@ -231,14 +436,12 @@ namespace SelfTab {
                 if (ImGui::InputFloat("Name Voffset", &State.NameVoffset)) {
                     State.Save();
                 }
-
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (ToggleButton("Rotate", &State.RotateName)) {
                     State.Save();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::InputFloat("Name Rotate", &State.NameRotate)) {
+                if (ImGui::InputFloat("Rotation Angle", &State.NameRotate)) {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
@@ -305,8 +508,6 @@ namespace SelfTab {
             if (ToggleButton("Disable Lobby Music", &State.DisableLobbyMusic)) {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (ToggleButton("Dark Mode", &State.DarkMode)) State.Save();
 
             if (ToggleButton("Show Host", &State.ShowHost)) {
                 State.Save();
@@ -332,6 +533,24 @@ namespace SelfTab {
                 if (CustomListBoxInt("Type", &State.BodyType, BODYTYPES, 75.f * State.dpiScale))
                     State.Save();
             }*/
+
+            if (ToggleButton("Old Ping Text", &State.OldStylePingText)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Custom Game Theme", &State.CustomGameTheme)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Dark Mode", &State.DarkMode)) State.Save();
+
+            if (State.CustomGameTheme) {
+                if (ImGui::ColorEdit3("Background Color", (float*)&State.GameBgColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview))
+                    State.Save();
+                ImGui::SameLine();
+                if (ImGui::ColorEdit3("Text Color", (float*)&State.GameTextColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview))
+                    State.Save();
+            }
+
+            if (ToggleButton("Fast Role Reveal", &State.FastRoleReveal)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("No Seeker Animation", &State.NoSeekerAnim)) State.Save();
 
             if (State.InMeeting && ImGui::Button("Move in Meeting"))
             {
@@ -408,10 +627,6 @@ namespace SelfTab {
             ImGui::SameLine();
             if ((IsHost() || !State.SafeMode || !State.PatchProtect) && ToggleButton(IsHost() ? "God Mode" : "Visual Protection", &State.GodMode))
                 State.Save();
-            /*ImGui::SameLine();
-            if (ToggleButton("Auto-Rejoin", &State.AutoRejoin)) {
-                State.Save();
-            }*/
 
             if (ToggleButton("(Shift/Ctrl + Right Click) to Teleport", &State.ShiftRightClickTP)) {
                 State.Save();
@@ -763,6 +978,127 @@ namespace SelfTab {
                             State.cyclerUserNames.erase(State.cyclerUserNames.begin() + selectedNameIndex);
                     }
                 }
+            }
+        }
+        if (openTextEditor) {
+            InputString("Input", &originalText);
+            editedText = GetTextEditorName(originalText);
+            InputString("Output", &editedText);
+            ImGui::SameLine();
+            if (ImGui::Button("Copy")) ClipboardHelper_PutClipboardString(convert_to_string(editedText), NULL);
+
+            if (ToggleButton("Italics", &italicName)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Underline", &underlineName)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Strikethrough", &strikethroughName)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Bold", &boldName)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Nobr", &nobrName)) {
+                State.Save();
+            }
+
+            if (ImGui::ColorEdit4("Starting Gradient Color", (float*)&nameColor1, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ImGui::ColorEdit4("Ending Gradient Color", (float*)&nameColor2, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Colored", &coloredName)) {
+                State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
+
+            if (ToggleButton("Font", &font)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (CustomListBoxInt(" ", &fontType, FONTS, 160.f * State.dpiScale)) {
+                State.Save();
+            }
+            ImGui::Dummy(ImVec2(-5, -5) * State.dpiScale);
+            if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: The white nickname will not be visible in the chat"));
+
+            ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
+
+            /*if (ToggleButton("Material", &State.Material)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (CustomListBoxInt(" Some materials are not supported", &State.MaterialType, MATERIALS, 160.f * State.dpiScale)) {
+                State.Save();
+            }*/
+
+            ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
+            if (ToggleButton("Size", &resizeName)) {
+                State.Save();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::InputFloat("Name Size", &nameSize)) {
+                State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if (ToggleButton("Indent", &indentName)) {
+                State.Save();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::InputFloat("Name Indent", &indentLevel)) {
+                State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if (ToggleButton("Cspace", &cspaceName)) {
+                State.Save();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::InputFloat("Name Cspace", &cspaceLevel)) {
+                State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if (ToggleButton("Mspace", &mspaceName)) {
+                State.Save();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::InputFloat("Name Mspace", &mspaceLevel)) {
+                State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if (ToggleButton("Voffset", &voffsetName)) {
+                State.Save();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::InputFloat("Name Voffset", &voffsetLevel)) {
+                State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if (ToggleButton("Rotate", &rotateName)) {
+                State.Save();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::InputFloat("Rotation Angle", &rotateAngle)) {
+                State.Save();
             }
         }
         ImGui::EndChild();

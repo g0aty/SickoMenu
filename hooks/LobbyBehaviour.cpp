@@ -40,7 +40,9 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
 }
 
 void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method) {
-	if (State.PanicMode || !State.ShowLobbyInfo) return MatchMakerGameButton_SetGame(__this, gameListing, method);
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dMatchMakerGameButton_SetGame executed");
+	/*if (State.PanicMode || !State.ShowLobbyInfo) return MatchMakerGameButton_SetGame(__this, gameListing, method);
+	MatchMakerGameButton_SetGame(__this, gameListing, method);
 	auto platform = gameListing.Platform;
 	std::string platformId = "Unknown";
 	switch (platform) {
@@ -79,23 +81,73 @@ void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gam
 		break;
 	}
 	std::string lobbyCode = IsStreamerMode() ? "" : convert_from_string(InnerNet_GameCode_IntToGameName(gameListing.GameId, NULL));
-
-	/*	std::string glitchDisplay = "";
-		if (!State.PanicMode && State.ShowLobbyInfo) {
-			std::string codeEnding = lobbyCode.substr(lobbyCode.length() - 4);
-			if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " *";
-		}
-
-		lobbyCode += glitchDisplay;
-	*/
 	int LobbyTime = (std::max)(0, int(gameListing.Age));
 	std::string lobbyTimeDisplay = "";
 	if (State.ShowLobbyTimer) {
 		lobbyTimeDisplay = std::format(" ~ <#0f0>Age: {}:{}{}</color>", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
 	}
-	std::string hostName = convert_from_string(gameListing.HostName);
-	gameListing.HostName = convert_to_string(std::format("<size=50%>{} <#fb0>{}</color>\n<#b0f>{}</color>{}</size>", hostName, lobbyCode, platformId, lobbyTimeDisplay/*, ServerMode*/));
-	MatchMakerGameButton_SetGame(__this, gameListing, method);
+	std::string hostName = std::format("<size=50%>{} <#fb0>{}</color>\n<#b0f>{}</color>{}</size>", convert_from_string(gameListing.TrueHostName), lobbyCode, platformId, lobbyTimeDisplay, ServerMode);
+	TMP_Text_set_text((TMP_Text*)__this->fields.NameText, convert_to_string(hostName), NULL);
+	TMP_Text_set_text((TMP_Text*)__this->fields.SmallNameText, convert_to_string(hostName), NULL);
+	*/ // Deprecated
+}
+
+void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dGameContainer_SetupGameInfo executed");
+	if (State.PanicMode || !State.ShowLobbyInfo) return GameContainer_SetupGameInfo(__this, method);
+	GameContainer_SetupGameInfo(__this, method);
+	auto gameListing = __this->fields.gameListing;
+	auto platform = gameListing.Platform;
+	std::string platformId = "Unknown";
+	switch (platform) {
+	case Platforms__Enum::StandaloneEpicPC:
+		platformId = "Epic Games";
+		break;
+	case Platforms__Enum::StandaloneSteamPC:
+		platformId = "Steam";
+		break;
+	case Platforms__Enum::StandaloneMac:
+		platformId = "Mac";
+		break;
+	case Platforms__Enum::StandaloneWin10:
+		platformId = "Microsoft Store";
+		break;
+	case Platforms__Enum::StandaloneItch:
+		platformId = "itch.io";
+		break;
+	case Platforms__Enum::IPhone:
+		platformId = "iOS/iPadOS";
+		break;
+	case Platforms__Enum::Android:
+		platformId = "Android";
+		break;
+	case Platforms__Enum::Switch:
+		platformId = "Nintendo Switch";
+		break;
+	case Platforms__Enum::Xbox:
+		platformId = "Xbox";
+		break;
+	case Platforms__Enum::Playstation:
+		platformId = "Playstation";
+		break;
+	default:
+		platformId = "Unknown";
+		break;
+	}
+	std::string lobbyCode = IsStreamerMode() ? "******" : convert_from_string(InnerNet_GameCode_IntToGameName(gameListing.GameId, NULL));
+	int LobbyTime = (std::max)(0, int(gameListing.Age));
+	std::string lobbyTimeDisplay = "";
+	if (State.ShowLobbyTimer) {
+		lobbyTimeDisplay = std::format("\n<#0f0>Age: {}:{}{}</color>", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+	}
+	std::string playerCountCol = "<#0f0>";
+	if (gameListing.PlayerCount == 4) playerCountCol = "<#ff0>";
+	if (gameListing.PlayerCount < 4) playerCountCol = "<#f00>";
+	std::string playerCount = playerCountCol + convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields.capacity, NULL)) + "</color>";
+	std::string trueHostName = convert_from_string(gameListing.TrueHostName);
+	std::string separator = "<#0000>000000000000000</color>"; // The crewmate icon gets aligned properly with this
+	std::string playerCountDisplay = std::format("<size=40%>{}\n{}\n{}\n<#fb0>{}</color>\n<#b0f>{}</color>{}\n{}</size>", separator, trueHostName, playerCount, lobbyCode, platformId, lobbyTimeDisplay, separator);
+	TMP_Text_set_text((TMP_Text*)__this->fields.capacity, convert_to_string(playerCountDisplay), NULL);
 }
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {

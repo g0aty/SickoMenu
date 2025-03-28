@@ -2,7 +2,7 @@
    <img src="SickoBanner.png">
   </p>
 
-<h1 align="center">👺 SickoMenu v4.2.1</h1>
+<h1 align="center">👺 SickoMenu v4.3</h1>
 A powerful utility for Among Us designed to enrich your game experience with custom features!
 
 **⚠️ Intended for educational and experimental use only.**
@@ -80,7 +80,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 > [!NOTE]
 > This method uses CrossOver. If you have ANY other ways to use this with other software, refer to the contributing section!
 > 
-**Method 1:-**
+**Method 1:**
 
 1. Install a bottle of CrossOver, install Steam in it and install Among Us.
 2. Open the C drive inside of CrossOver (there should be a button). Quit CrossOver. A Finder window will open.
@@ -89,7 +89,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 5. Select it and click **Add**, then **Apply** and **OK**.
 6. Start Among Us and press **Command+⌦** to show SickoMenu.
 
-**Method 2:-**
+**Method 2:**
 
 1. Download from [PlayOnMac](https://www.playonmac.com) and install it.
 2. Open PlayOnMac and click **Install**.
@@ -108,7 +108,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
    - Add `version` to the overrides and set it to **Native (Windows)**.
 7.Run Among Us through Steam in PlayOnMac. Use the hotkey **Command + Delete** to toggle the mod menu.
 
-**Method 3:- (recommended)**
+**Method 3: (recommended)**
 
 1. Open **Terminal** and install Wine via Homebrew.
    ```bash
@@ -147,13 +147,13 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 - Use **Command + Delete** to toggle SickoMenu in-game.
 
 ---
-### **Note:-**
-**For Method 2:-**
+### **Note:**
+**For Method 2:**
 - macOS Catalina+ Users: macOS versions ≥10.15 lack 32-bit support, which may cause issues. Use **Wine-Staging** (via Homebrew) for better compatibility:
   ```bash
   brew install --cask wine-stable
   ```
-  **For Method 3:-**
+  **For Method 3:**
 - The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
 
 ---
