@@ -237,6 +237,8 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerPhysics_RpcExitVent);
 	HOOKFUNC(PlayerControl_IsFlashlightEnabled);
 	HOOKFUNC(PlayerControl_OnDestroy);
+	HOOKFUNC(PlayerControl_RpcPlayAnimation);
+	HOOKFUNC(PlayerControl_RpcSetScanner);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -393,7 +395,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerPhysics_RpcExitVent);
 	UNHOOKFUNC(PlayerControl_IsFlashlightEnabled);
 	UNHOOKFUNC(PlayerControl_OnDestroy);
-
+	UNHOOKFUNC(PlayerControl_RpcPlayAnimation);
+	UNHOOKFUNC(PlayerControl_RpcSetScanner);
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 
 	DetourTransactionCommit();

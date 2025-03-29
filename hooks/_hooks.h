@@ -151,3 +151,5 @@ QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsDa
 void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* method);
 bool dPlayerControl_IsFlashlightEnabled(PlayerControl* __this, MethodInfo* method);
 void dPlayerControl_OnDestroy(PlayerControl* __this, MethodInfo* method);
+void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method);
+void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method);

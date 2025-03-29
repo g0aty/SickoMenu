@@ -1000,7 +1000,7 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 			}
 		}
 		if (*Game::pShipStatus == NULL && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting ||
-				callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))
+			callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))
 			return;
 		if (IsHost() && ((((!State.PanicMode && State.DisableMeetings) || (State.BattleRoyale || State.TaskSpeedrun)) &&
 			(callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting)) ||
@@ -1086,7 +1086,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 							break;
 						}
 					}
-					else if ((playerInfo->fields.IsDead  || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible))
+					else if ((playerInfo->fields.IsDead || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible))
 						&& !State.RevealRoles) {
 						auto nameObject = Component_get_gameObject((Component_1*)player->fields.cosmetics->fields.nameText, NULL);
 						if (nameObject == __this) {
@@ -1559,4 +1559,25 @@ bool dPlayerControl_IsFlashlightEnabled(PlayerControl* __this, MethodInfo* metho
 void dPlayerControl_OnDestroy(PlayerControl* __this, MethodInfo* method) {
 	State.BlinkPlayersTab = true;
 	PlayerControl_OnDestroy(__this, method);
+}
+void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method) {
+	if (State.bypasvisoff) {
+		PlayerControl_PlayAnimation(__this, animType, NULL);
+		auto writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::PlayAnimation), SendOption__Enum::None, NULL);
+		MessageWriter_WriteByte(writer, animType, NULL);
+		MessageWriter_EndMessage(writer, NULL);
+		return;
+	}
+	PlayerControl_RpcPlayAnimation(__this, animType, NULL);
+}
+void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method) {
+	if (State.bypasvisoff) {
+		PlayerControl_SetScanner(__this, value, __this->fields.scannerCount + 1);
+		auto writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, NULL);
+		MessageWriter_WriteBoolean(writer, value, NULL);
+		MessageWriter_WriteByte(writer, __this->fields.scannerCount + 1, NULL);
+		MessageWriter_EndMessage(writer, NULL);
+		return;
+	}
+	PlayerControl_RpcSetScanner(__this, value, NULL);
 }

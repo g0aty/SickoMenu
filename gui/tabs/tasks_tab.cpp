@@ -59,6 +59,8 @@ namespace TasksTab {
 			//}
 
 			GameOptions options;
+			if (!options.GetBool(app::BoolOptionNames__Enum::VisualTasks))
+				ToggleButton("Bypass Visuals Off", &State.bypasvisoff);
 			if (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) {
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Visual tasks are turned OFF in this lobby.");
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Any animations (other than cameras) are client-sided only!");

@@ -541,7 +541,7 @@ public:
     bool BrainrotEveryone = false;
     bool RizzUpEveryone = false;
     bool DiddyPartyMode = false;
-
+    bool bypasvisoff = false;
     void Load();
     void Save();
     void Delete();
