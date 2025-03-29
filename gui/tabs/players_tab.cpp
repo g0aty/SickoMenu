@@ -914,7 +914,7 @@ namespace PlayersTab {
 					}
 				}
 
-				if (IsHost() || !State.SafeMode) {
+				if ((IsHost() || !State.SafeMode) && selectedPlayers.size() == 1) {
 					if (IsInGame()) {
 						if (!murderLoop && ImGui::Button("Murder Loop")) {
 							murderLoop = true;
@@ -929,17 +929,12 @@ namespace PlayersTab {
 					}
 
 					if (murderDelay <= 0) {
-						if (murderCount > 0) {
-							for (auto p : selectedPlayers) {
-								if (!p.has_value()) continue;
-								auto validPlayer = p.validate();
-								if (validPlayer.get_PlayerData()->fields.Disconnected) continue;
-								if (IsInGame()) {
-									State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
-								}
-								else if (IsInLobby()) {
-									State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 1, false));
-								}
+						if (murderCount > 0 && selectedPlayer.has_value() && !selectedPlayer.get_PlayerData()->fields.Disconnected) {
+							if (IsInGame()) {
+								State.rpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 1, false));
+							}
+							else if (IsInLobby()) {
+								State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 1, false));
 							}
 							murderDelay = 5;
 							murderCount--;
@@ -963,17 +958,12 @@ namespace PlayersTab {
 								farmCount = 0;
 							}
 							ImGui::SameLine();
-							ImGui::Text(std::format("Stop Level Farm ({})", 10000 - 2 * farmCount).c_str());
+							ImGui::Text(std::format("({})", 10000 - 2 * farmCount).c_str());
 						}
 
 						if (farmDelay <= 0) {
-							if (farmCount > 0) {
-								for (auto p : selectedPlayers) {
-									if (!p.has_value()) continue;
-									auto validPlayer = p.validate();
-									if (validPlayer.get_PlayerData()->fields.Disconnected) continue;
-									State.taskRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, validPlayer.get_PlayerControl(), 2, false));
-								}
+							if (farmCount > 0 && selectedPlayer.has_value() && !selectedPlayer.get_PlayerData()->fields.Disconnected) {
+								State.taskRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 2, false));
 								farmDelay = 2;
 								farmCount--;
 							}
@@ -987,7 +977,7 @@ namespace PlayersTab {
 					}
 				}
 
-				if (!State.SafeMode && IsInGame()) {
+				if (!State.SafeMode && IsInGame() && selectedPlayers.size() == 1) {
 					ImGui::SameLine();
 					if (!suicideLoop && ImGui::Button("Suicide Loop")) {
 						suicideLoop = true;
@@ -1001,17 +991,14 @@ namespace PlayersTab {
 					ImGui::Text(std::format("Stop Suicide Loop ({})", 800 - murderCount * 4).c_str());
 
 					if (suicideDelay <= 0) {
-						if (suicideCount > 0 && selectedPlayer.has_value()) {
-							for (auto p : selectedPlayers) {
-								auto validPlayer = p.validate();
-								if (IsInGame()) {
-									State.rpcQueue.push(new RpcMurderPlayer(validPlayer.get_PlayerControl(), validPlayer.get_PlayerControl(),
-										validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
-								}
-								else if (IsInLobby()) {
-									State.lobbyRpcQueue.push(new RpcMurderPlayer(validPlayer.get_PlayerControl(), validPlayer.get_PlayerControl(),
-										validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
-								}
+						if (suicideCount > 0 && selectedPlayer.has_value() && !selectedPlayer.get_PlayerData()->fields.Disconnected) {
+							if (IsInGame()) {
+								State.rpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl(),
+									selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+							}
+							else if (IsInLobby()) {
+								State.lobbyRpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl(),
+									selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
 							}
 							suicideDelay = 15;
 							suicideCount--;

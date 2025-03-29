@@ -128,7 +128,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 	if (!State.SafeMode)
 		__this->fields.timeSinceLastMessage = 420.69f; //we can set this to anything more than or equal to 3 and it'll work
 
-	if ((!State.PanicMode || State.TempPanicMode)) {
+	if ((!State.PanicMode || State.TempPanicMode) && (State.CustomGameTheme || State.DarkMode)) {
 		if (State.CustomGameTheme) {
 			auto bg32 = Color32();
 			bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
@@ -139,31 +139,56 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 			if (__this->fields.freeChatField != NULL) {
 				auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
 				TMP_Text_set_color((app::TMP_Text*)outputText, textCol, NULL);
-				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, bg, NULL);
+				auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
+				bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
+				if (!isHighlighted)
+					SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, bg, NULL);
+				else if (State.DarkMode) {
+					auto green32 = Color32();
+					green32.r = 34; green32.g = 100; green32.b = 34; green32.a = 255;
+					auto green = Color32_op_Implicit_1(green32, NULL);
+					SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, green, NULL);
+				}
 			}
 			if (__this->fields.quickChatField != NULL) {
 				auto text = __this->fields.quickChatField->fields.text;
 				auto placeholderText = __this->fields.quickChatField->fields.placeholderText;
 				TMP_Text_set_color((app::TMP_Text*)text, textCol, NULL);
 				TMP_Text_set_color((app::TMP_Text*)placeholderText, textCol, NULL);
-				SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, bg, NULL);
+				auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
+				bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
+				if (!isHighlighted)
+					SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, bg, NULL);
+				else if (State.DarkMode) {
+					auto green32 = Color32();
+					green32.r = 34; green32.g = 100; green32.b = 34; green32.a = 255;
+					auto green = Color32_op_Implicit_1(green32, NULL);
+					SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, green, NULL);
+				}
 			}
 		}
 		else if (State.DarkMode) {
 			auto gray32 = Color32();
 			gray32.r = 34; gray32.g = 34; gray32.b = 34; gray32.a = 255;
 			auto gray = Color32_op_Implicit_1(gray32, NULL);
+			auto green32 = Color32();
+			green32.r = 34; green32.g = 100; green32.b = 34; green32.a = 255;
+			auto green = Color32_op_Implicit_1(green32, NULL);
 			if (__this->fields.freeChatField != NULL) {
 				auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
 				TMP_Text_set_color((app::TMP_Text*)outputText, Palette__TypeInfo->static_fields->White, NULL);
-				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, gray, NULL);
+				auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
+				bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
+				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, isHighlighted ? green : gray, NULL);
 			}
 			if (__this->fields.quickChatField != NULL) {
 				auto text = __this->fields.quickChatField->fields.text;
 				auto placeholderText = __this->fields.quickChatField->fields.placeholderText;
 				TMP_Text_set_color((app::TMP_Text*)text, Palette__TypeInfo->static_fields->White, NULL);
 				TMP_Text_set_color((app::TMP_Text*)placeholderText, Palette__TypeInfo->static_fields->White, NULL);
-				SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, gray, NULL);
+				auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
+				bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
+				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, isHighlighted ? green : gray, NULL);
 			}
 		}
 	}
@@ -171,12 +196,18 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		if (__this->fields.freeChatField != NULL) {
 			auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
 			TMP_Text_set_color((app::TMP_Text*)outputText, Palette__TypeInfo->static_fields->Black, NULL);
-			SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, Palette__TypeInfo->static_fields->White, NULL);
+			auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
+			bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
+			if (!isHighlighted)
+				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, Palette__TypeInfo->static_fields->White, NULL);
 		}
 		if (__this->fields.quickChatField != NULL) {
 			auto text = __this->fields.quickChatField->fields.text;
 			TMP_Text_set_color((app::TMP_Text*)text, Palette__TypeInfo->static_fields->Black, NULL);
-			SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, Palette__TypeInfo->static_fields->White, NULL);
+			auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
+			bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
+			if (!isHighlighted)
+				SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, Palette__TypeInfo->static_fields->White, NULL);
 		}
 	}
 
@@ -249,15 +280,21 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dTextBoxTMP_IsCharAllowed executed");
+	if (__this->fields.ForceUppercase) return TextBoxTMP_IsCharAllowed(__this, unicode_char, method);
+	// Patch lobby codes
+
 	//0x08 is backspace, 0x0D is carriage return, 0x7F is delete character, 0x3C is <, 0x3E is >, 0x5B is [
 	//lobby codes force uppercase, and we don't change that to fix joining a lobby with code not working
-	if (!__this->fields.ForceUppercase) return (unicode_char != 0x08 && unicode_char != 0x0D && unicode_char != 0x7F && ((State.SafeMode && unicode_char != 0x3C && unicode_char != 0x3E && unicode_char != 0x5B) || !State.SafeMode));
+	if (!State.PanicMode) return (unicode_char != 0x08 && unicode_char != 0x0D && unicode_char != 0x7F && ((State.SafeMode && unicode_char != 0x3C && unicode_char != 0x3E && unicode_char != 0x5B) || !State.SafeMode));
 	return TextBoxTMP_IsCharAllowed(__this, unicode_char, method);
 }
 
 void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dTextBoxTMP_SetText executed");
+	if (__this->fields.ForceUppercase) return TextBoxTMP_SetText(__this, input, inputCompo, method);
+	// Patch lobby codes
+
 	if (!State.PanicMode) {
 		if (!State.SafeMode)
 			__this->fields.characterLimit = 2147483647;

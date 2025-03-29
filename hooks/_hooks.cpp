@@ -250,6 +250,7 @@ void DetourInitilization() {
 	HOOKFUNC(LogicOptionsHnS_GetCrewmateLeadTime);
 	HOOKFUNC(GameContainer_SetupGameInfo);
 	HOOKFUNC(ChatNotification_SetUp);
+	HOOKFUNC(FindAGameManager_Update);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -414,6 +415,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(LogicOptionsHnS_GetCrewmateLeadTime);
 	UNHOOKFUNC(GameContainer_SetupGameInfo);
 	UNHOOKFUNC(ChatNotification_SetUp);
+	UNHOOKFUNC(FindAGameManager_Update);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

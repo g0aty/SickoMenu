@@ -660,19 +660,6 @@ namespace GameTab {
             if (IsInLobby() && ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {
                 State.Save();
             }
-            if (IsHost() && ImGui::Button("Remove Map")) {
-                State.taskRpcQueue.push(new DestroyMap());
-            }
-            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            if ((IsHost()) && ToggleButton("Ban Everyone", &State.BanEveryone))
-            {
-                State.Save();
-            }
-            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            if ((IsHost()) && ToggleButton("Kick Everyone", &State.KickEveryone))
-            {
-                State.Save();
-            }
             if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
             if (State.AprilFoolsMode) {
                 ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? "Diddy Party Mode" : (IsChatCensored() || IsStreamerMode() ? "F***son Mode" : "Fuckson Mode"));
@@ -684,6 +671,19 @@ namespace GameTab {
                 if (State.DiddyPartyMode && ToggleButton("Rizz Up Everyone [Skibidi]", &State.RizzUpEveryone)) {
                     if (State.ChatSpam) State.ChatSpam = false;
                     if (State.BrainrotEveryone) State.BrainrotEveryone = false;
+                    State.Save();
+                }
+            }
+            if (IsHost()) {
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+                if (((IsInGame() && Object_1_IsNotNull((Object_1*)*Game::pShipStatus)) || (IsInLobby() && Object_1_IsNotNull((Object_1*)*Game::pLobbyBehaviour)))
+                    && ImGui::Button(IsInLobby() ? "Remove Lobby" : "Remove Map")) {
+                    State.taskRpcQueue.push(new DestroyMap());
+                }
+                if (ToggleButton("Ban Everyone", &State.BanEveryone)) {
+                    State.Save();
+                }
+                if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
                     State.Save();
                 }
             }

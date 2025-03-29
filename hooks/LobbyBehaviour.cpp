@@ -191,3 +191,10 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 	}
 	GameStartManager_Update(__this, method);
 }
+
+static int findGameOffset = 0;
+
+void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method) {
+	FindAGameManager_Update(__this, method);
+	// Useful for later
+}

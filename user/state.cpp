@@ -72,6 +72,7 @@ void Settings::Load() {
         JSON_TRYGET("MenuGradientColor1_G", this->MenuGradientColor1.y);
         JSON_TRYGET("MenuGradientColor1_B", this->MenuGradientColor1.z);
         JSON_TRYGET("MenuGradientColor1_A", this->MenuGradientColor1.w);
+        JSON_TRYGET("MenuGradientColor1_A", this->MenuGradientColor1.w);
         JSON_TRYGET("MenuGradientColor2_R", this->MenuGradientColor2.x);
         JSON_TRYGET("MenuGradientColor2_G", this->MenuGradientColor2.y);
         JSON_TRYGET("MenuGradientColor2_B", this->MenuGradientColor2.z);
@@ -138,6 +139,7 @@ void Settings::Load() {
         JSON_TRYGET("DisableMeetings", this->DisableMeetings);
         JSON_TRYGET("DisableSabotages", this->DisableSabotages);
         JSON_TRYGET("DisableAllVotekicks", this->DisableAllVotekicks);
+        JSON_TRYGET("DisableRoleManager", this->DisableRoleManager);
 
         JSON_TRYGET("ShowRadar", this->ShowRadar);
         JSON_TRYGET("ShowRadar_DeadBodies", this->ShowRadar_DeadBodies);
@@ -325,6 +327,7 @@ void Settings::Load() {
         JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
+        JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
     }
     catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
@@ -468,6 +471,7 @@ void Settings::Save() {
                 { "DisableMeetings", this->DisableMeetings },
                 { "DisableSabotages", this->DisableSabotages },
                 { "DisableAllVotekicks", this->DisableAllVotekicks },
+                { "DisableRoleManager", this->DisableRoleManager },
 
                 { "ShowRadar", this->ShowRadar },
                 { "ShowRadar_DeadBodies", this->ShowRadar_DeadBodies },
@@ -657,6 +661,7 @@ void Settings::Save() {
                 { "WhitelistFriendCodes", this->WhitelistFriendCodes },
                 { "BlacklistFriendCodes", this->BlacklistFriendCodes },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
+                { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },
             };
 
             std::ofstream outSettings(settingsPath);

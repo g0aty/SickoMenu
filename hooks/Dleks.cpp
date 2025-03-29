@@ -28,7 +28,7 @@ bool dConstants_1_IsVersionModded(MethodInfo* method) {
 }*/
 
 bool dAprilFoolsMode_ShouldFlipSkeld(MethodInfo* method) {
-    if (IsHost() && State.FlipSkeld) return true;
+    if (IsHost()) return State.FlipSkeld;
     State.FlipSkeld = AprilFoolsMode_ShouldFlipSkeld(method);
     return State.FlipSkeld;
 }

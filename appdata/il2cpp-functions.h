@@ -402,3 +402,4 @@ DO_APP_FUNC(void*, IntroCutscene_ShowRole, (IntroCutscene* __this, MethodInfo* m
 DO_APP_FUNC(int32_t, LogicOptionsHnS_GetCrewmateLeadTime, (LogicOptionsHnS* __this, MethodInfo* method), "Assembly-CSharp, System.Int32 LogicOptionsHnS::GetCrewmateLeadTime()");
 DO_APP_FUNC(void, GameContainer_SetupGameInfo, (GameContainer* __this, MethodInfo* method), "Assembly-CSharp, System.Void GameContainer::SetupGameInfo()");
 DO_APP_FUNC(void, ChatNotification_SetUp, (ChatNotification* __this, PlayerControl* sender, String* text, MethodInfo* method), "Assembly-CSharp, System.Void ChatNotification::SetUp(PlayerControl, System.String)");
+DO_APP_FUNC(void, FindAGameManager_Update, (FindAGameManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void FindAGameManager::Update()");

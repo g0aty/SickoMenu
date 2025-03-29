@@ -98,6 +98,7 @@ public:
     bool DisableMeetings = false;
     bool DisableSabotages = false;
     bool DisableAllVotekicks = false;
+    bool DisableRoleManager = false;
     bool DisableKills = false;
     bool BattleRoyale = false;
     bool TaskSpeedrun = false;
@@ -545,8 +546,8 @@ public:
     bool ProGamer = false;
     bool KeybindsBeingEdited = false;
 
-    bool Destruct_IgnoreWhitelist = false;
-    bool Ban_IgnoreWhitelist = false;
+    bool Destruct_IgnoreWhitelist = true;
+    bool Ban_IgnoreWhitelist = true;
     bool OverloadEveryone = false;
     bool LagEveryone = false;
     bool BanEveryone = false;

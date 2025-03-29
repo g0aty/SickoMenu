@@ -143,6 +143,8 @@ namespace DebugTab {
 					SafeModeNotification = false;
 				}
 			}
+
+			ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
 		}
 
 		ImGui::EndChild();

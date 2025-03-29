@@ -295,8 +295,6 @@ namespace SettingsTab {
 			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) State.Save();
 			ImGui::SameLine();
 			if (CustomListBoxInt(" ", &State.BroadcastedMod, MODS, 100.f * State.dpiScale)) State.Save();
-
-			ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
 		}
 		if (openSpoofing) {
 			if (ToggleButton("Spoof Guest Account", &State.SpoofGuestAccount)) {

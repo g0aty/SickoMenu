@@ -10487,6 +10487,91 @@ namespace app {
     };
 #pragma endregion
 
+#pragma region FindAGameManager
+    struct FindAGameManager__Fields {
+        void* _;
+        struct FilterPopUp* filterPopUp;
+        struct ServerDropdown* serverDropdown;
+        struct PassiveButton* serverButton;
+        struct TextMeshPro__Array* serverTexts;
+        struct GameContainer__Array* gameContainers;
+        struct PassiveButton* refreshButton;
+        struct GameObject* animLoad;
+        struct FindGameMoreInfoPopup* findGameMoreInfoPopUp;
+        struct GameObject* clearFilterPop;
+        struct TextMeshPro__Array* filtersFoundNums;
+        struct TextMeshPro* matchesFoundText;
+        struct AudioClip* findGameSFX;
+        struct AudioClip* foundGameSFX;
+        struct Transform* container;
+        struct TextMeshPro* modeText;
+        struct PassiveButton* clearFilterButton;
+        struct TextMeshPro* TotalText;
+        float timer;
+        struct Coroutine* refreshFilterCoroutine;
+        bool animating;
+        struct GameFilterSet* classicFilterSet;
+        struct GameFilterSet* hnsFilterSet;
+        struct UiElement* BackButton;
+        struct UiElement* DefaultButtonSelected;
+        struct List_1_UiElement_* ControllerSelectable;
+        struct Logger_2* logger;
+    };
+
+    struct FindAGameManager {
+        struct FindAGameManager__Class* klass;
+        MonitorData* monitor;
+        struct FindAGameManager__Fields fields;
+    };
+
+    struct FindAGameManager__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData OnDestroy;
+        VirtualInvokeData HandleList;
+        VirtualInvokeData StartIcon;
+        VirtualInvokeData StopIcon;
+    };
+
+    struct FindAGameManager__StaticFields {
+    };
+
+    struct FindAGameManager__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct FindAGameManager__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct FindAGameManager__VTable vtable;
+    };
+
+    struct GameContainer__Array {
+        struct GameContainer__Array__Class* klass;
+        MonitorData* monitor;
+        Il2CppArrayBounds* bounds;
+        il2cpp_array_size_t max_length;
+        struct GameContainer* vector[32];
+    };
+
+    struct GameContainer__Array__VTable {
+    };
+
+    struct GameContainer__Array__StaticFields {
+    };
+
+    struct GameContainer__Array__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct GameContainer__Array__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct GameContainer__Array__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ImpostorRole;

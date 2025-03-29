@@ -78,7 +78,7 @@ namespace HostTab {
 			if (openUtils) {
 				if (IsInLobby()) {
 					ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-					if (!hideRolesList || !State.TournamentMode) {
+					if (!State.DisableRoleManager && (!hideRolesList || !State.TournamentMode)) {
 						bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
 						auto allPlayers = GetAllPlayerData();
 						auto playerAmount = allPlayers.size();
@@ -162,9 +162,11 @@ namespace HostTab {
 						if (shouldEndListBox)
 							ImGui::ListBoxFooter();
 					}
+					if (!State.DisableRoleManager) ImGui::NewLine();
+					ToggleButton("Disable Role Selection", &State.DisableRoleManager);
 
 					if (State.TournamentMode) {
-						if (!hideRolesList) ImGui::NewLine();
+						if (!State.DisableRoleManager || !hideRolesList) ImGui::NewLine();
 						if (ImGui::Button("Randomize Roles")) {
 							std::vector<Game::PlayerId> playerIds = {};
 							std::vector<Game::PlayerId> impostorIds = {};
@@ -172,7 +174,8 @@ namespace HostTab {
 								if (p == NULL || GetPlayerData(p) == NULL) continue;
 								playerIds.push_back(p->fields.PlayerId);
 							}
-							for (int i = 0; i < GetMaxImpostorAmount(GetAllPlayerControl().size()); ++i) {
+							int maxImpostors = (std::min)((int)GetAllPlayerControl().size(), GetMaxImpostorAmount(GetAllPlayerControl().size()));
+							for (int i = 0; i < maxImpostors; ++i) {
 								Game::PlayerId randImpostorId = playerIds[randi(0, playerIds.size() - 1)];
 								impostorIds.push_back(randImpostorId);
 								playerIds.erase(std::find(playerIds.begin(), playerIds.end(), randImpostorId));

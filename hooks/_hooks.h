@@ -159,3 +159,4 @@ void* dIntroCutscene_ShowTeam (IntroCutscene* __this, List_1_PlayerControl_* tea
 int32_t dLogicOptionsHnS_GetCrewmateLeadTime(LogicOptionsHnS* __this, MethodInfo* method);
 void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method);
 void dChatNotification_SetUp(ChatNotification* __this, PlayerControl* sender, String* text, MethodInfo* method);
+void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method);

@@ -10,6 +10,7 @@ static int preChosenImpCount = 0;
 
 void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dRoleManager_SelectRoles executed");
+	if (State.DisableRoleManager) return RoleManager_SelectRoles(__this, method);
 	std::vector<uint8_t> assignedPlayers;
 	GameOptions options;
 	auto allPlayers = GetAllPlayerControl();
