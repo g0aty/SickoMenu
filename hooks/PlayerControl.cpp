@@ -1081,7 +1081,7 @@ void dGameObject_SetActive(GameObject* __this, bool value, MethodInfo* method)
 							break;
 						}
 					}
-					else if ((playerInfo->fields.IsDead  || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible))
+					else if ((playerInfo->fields.IsDead || (!playerInfo->fields.IsDead && player->fields.shouldAppearInvisible))
 						&& !State.RevealRoles) {
 						auto nameObject = Component_get_gameObject((Component_1*)player->fields.cosmetics->fields.nameText, NULL);
 						if (nameObject == __this) {
@@ -1564,4 +1564,27 @@ void dPlayerControl_OnDestroy(PlayerControl* __this, MethodInfo* method) {
 void dBanMenu_Select(BanMenu* __this, int32_t clientId, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dBanMenu_Select executed");
 	BanMenu_Select(__this, clientId, method);
+}
+
+void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method) {
+	if (State.BypassVisualTasks) {
+		PlayerControl_PlayAnimation(__this, animType, NULL);
+		auto writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::PlayAnimation), SendOption__Enum::None, NULL);
+		MessageWriter_WriteByte(writer, animType, NULL);
+		MessageWriter_EndMessage(writer, NULL);
+		return;
+	}
+	PlayerControl_RpcPlayAnimation(__this, animType, NULL);
+}
+
+void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method) {
+	if (State.BypassVisualTasks) {
+		PlayerControl_SetScanner(__this, value, __this->fields.scannerCount + 1);
+		auto writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, NULL);
+		MessageWriter_WriteBoolean(writer, value, NULL);
+		MessageWriter_WriteByte(writer, __this->fields.scannerCount + 1, NULL);
+		MessageWriter_EndMessage(writer, NULL);
+		return;
+	}
+	PlayerControl_RpcSetScanner(__this, value, NULL);
 }

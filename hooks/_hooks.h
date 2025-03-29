@@ -160,3 +160,5 @@ int32_t dLogicOptionsHnS_GetCrewmateLeadTime(LogicOptionsHnS* __this, MethodInfo
 void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method);
 void dChatNotification_SetUp(ChatNotification* __this, PlayerControl* sender, String* text, MethodInfo* method);
 void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method);
+void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method);
+void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method);

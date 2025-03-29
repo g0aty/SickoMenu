@@ -557,7 +557,7 @@ public:
     bool BrainrotEveryone = false;
     bool RizzUpEveryone = false;
     bool DiddyPartyMode = false;
-
+    bool BypassVisualTasks = false;
     void Load();
     void Save();
     void SaveConfig();

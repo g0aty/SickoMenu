@@ -328,6 +328,7 @@ void Settings::Load() {
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
         JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
+        JSON_TRYGET("BypassVisualTasks", this->BypassVisualTasks);
     }
     catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
@@ -662,6 +663,7 @@ void Settings::Save() {
                 { "BlacklistFriendCodes", this->BlacklistFriendCodes },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
                 { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },
+                { "BypassVisualTasks", this->BypassVisualTasks },
             };
 
             std::ofstream outSettings(settingsPath);

@@ -59,6 +59,9 @@ namespace TasksTab {
 			//}
 
 			GameOptions options;
+			if (!options.GetBool(app::BoolOptionNames__Enum::VisualTasks) && ToggleButton("Bypass Visual Tasks Being Off", &State.BypassVisualTasks))
+				State.Save();
+
 			if (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) {
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Visual tasks are turned OFF in this lobby.");
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Any animations (other than cameras) are client-sided only!");
@@ -67,7 +70,7 @@ namespace TasksTab {
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Animations other than cameras are client-sided only in Hide n Seek!");
 
 			if (State.mapType == Settings::MapType::Ship) {
-				if ((options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
+				if (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
 					if (ImGui::Button("Play Shields Animation (Client-sided)"))
 					{
 						State.rpcQueue.push(new RpcPlayAnimation(1));
@@ -82,7 +85,7 @@ namespace TasksTab {
 			}
 
 			if (State.mapType == Settings::MapType::Ship) {
-				if ((options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
+				if (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
 					if (ImGui::Button("Play Trash Animation (Client-sided)"))
 					{
 						State.rpcQueue.push(new RpcPlayAnimation(10));
@@ -98,7 +101,7 @@ namespace TasksTab {
 
 			if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Pb) {
 
-				if ((options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
+				if (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
 					if (ToggleButton("Play Weapons Animation (Client-sided)", &State.PlayWeaponsAnimation))
 					{
 						State.Save();
@@ -112,7 +115,7 @@ namespace TasksTab {
 				}
 			}
 
-			if ((options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
+			if (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
 				if (ToggleButton("Play Medbay Scan Animation (Client-sided)", &State.PlayMedbayScan))
 				{
 					if (State.PlayMedbayScan)

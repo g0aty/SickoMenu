@@ -1,7 +1,7 @@
 #include "pch-il2cpp.h"
 #include "_rpc.h"
 #include "game.h"
-
+#include "state.hpp"
 RpcSetScanner::RpcSetScanner(bool playAnimation)
 {
 	this->playAnimation = playAnimation;
@@ -9,6 +9,16 @@ RpcSetScanner::RpcSetScanner(bool playAnimation)
 
 void RpcSetScanner::Process()
 {
+	if (State.BypassVisualTasks) {
+		PlayerControl_SetScanner(*Game::pLocalPlayer, playAnimation, (*Game::pLocalPlayer)->fields.scannerCount + 1);
+		auto writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
+			uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, NULL);
+		MessageWriter_WriteBoolean(writer, playAnimation, NULL);
+		MessageWriter_WriteByte(writer, (*Game::pLocalPlayer)->fields.scannerCount + 1, NULL);
+		MessageWriter_EndMessage(writer, NULL);
+		return;
+	}
+
 	PlayerControl_RpcSetScanner(*Game::pLocalPlayer, playAnimation, NULL);
 }
 
@@ -25,7 +35,7 @@ void RpcForceScanner::Process()
 	//PlayerControl_RpcSetScanner(Player, playAnimation, NULL);
 
 	for (auto p : GetAllPlayerControl()) {
-		MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId, 
+		MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
 			uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, p->fields._.OwnerId, NULL);
 		MessageWriter_WriteBoolean(writer, playAnimation, NULL);
 		MessageWriter_WriteByte(writer, Player->fields.scannerCount + 1, NULL);

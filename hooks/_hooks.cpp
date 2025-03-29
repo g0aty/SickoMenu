@@ -251,6 +251,8 @@ void DetourInitilization() {
 	HOOKFUNC(GameContainer_SetupGameInfo);
 	HOOKFUNC(ChatNotification_SetUp);
 	HOOKFUNC(FindAGameManager_Update);
+	HOOKFUNC(PlayerControl_RpcPlayAnimation);
+	HOOKFUNC(PlayerControl_RpcSetScanner);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -416,6 +418,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(GameContainer_SetupGameInfo);
 	UNHOOKFUNC(ChatNotification_SetUp);
 	UNHOOKFUNC(FindAGameManager_Update);
+	UNHOOKFUNC(PlayerControl_RpcPlayAnimation);
+	UNHOOKFUNC(PlayerControl_RpcSetScanner);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 
