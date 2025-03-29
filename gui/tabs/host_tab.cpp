@@ -200,8 +200,8 @@ namespace HostTab {
 				const int32_t currentMaxPlayers = options.GetMaxPlayers();
 				const int32_t minPlayers = 4, maxAllowedPlayers = static_cast<int32_t>(Game::MAX_PLAYERS);
 				int32_t newMaxPlayers = std::clamp(currentMaxPlayers, minPlayers, maxAllowedPlayers);
-
-				if (!State.SafeMode && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers) && newMaxPlayers != currentMaxPlayers) {
+#define LocalInLobby (((*Game::pAmongUsClient)->fields._.NetworkMode == NetworkModes__Enum::LocalGame) && ((*Game::pAmongUsClient)->fields._.GameState == InnerNetClient_GameStates__Enum::Joined))
+				if ((LocalInLobby || !State.SafeMode) && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers) && newMaxPlayers != currentMaxPlayers) {
 					if (newMaxPlayers >= minPlayers && newMaxPlayers <= maxAllowedPlayers) {
 						if (newMaxPlayers == 4 || newMaxPlayers == 255) {
 							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
