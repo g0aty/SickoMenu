@@ -5,6 +5,47 @@
 #include "game.h"
 #include "logger.h"
 #include "DirectX.h"
+#include "gui-helpers.hpp"
+#include <hunspell/hunspell.hxx>
+#include <sstream>
+#include <string>
+#include <vector>
+
+class SpellChecker {
+private:
+    std::unique_ptr<Hunspell> spell;
+    std::string lastError;
+
+public:
+    SpellChecker(const std::string& affPath, const std::string& dicPath) {
+        try {
+            spell = std::make_unique<Hunspell>(affPath.c_str(), dicPath.c_str());
+            if (!spell) throw std::runtime_error("Failed to initialize spell checker");
+        } catch (const std::exception& e) {
+            lastError = e.what();
+        }
+    }
+
+    bool isCorrect(const std::string& word) const {
+        if (!spell) return false;
+        return spell->spell(word.c_str());
+    }
+
+    const std::string& getLastError() const { return lastError; }
+};
+
+void HighlightMisspelledWords(SpellChecker& checker, const std::string& text) {
+    std::istringstream iss(text);
+    std::string word;
+    while (iss >> word) {
+        if (!checker.isCorrect(word)) {
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s ", word.c_str());
+        } else {
+            ImGui::Text("%s ", word.c_str());
+        }
+    }
+}
+
 
 using namespace ImGui;
 
