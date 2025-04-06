@@ -20,4 +20,4 @@ namespace Menu {
 	void Init();
 	void Render();
 }
-
+void LogError(const std::string& message);
