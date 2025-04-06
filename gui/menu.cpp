@@ -21,6 +21,28 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+
+void LogError(const std::string& message) {
+    std::ofstream log("sickomenu_error.log", std::ios::app);
+    if (!log.is_open()) return;
+
+    std::time_t now = std::time(nullptr);
+    std::tm localTime{};
+#ifdef _WIN32
+    localtime_s(&localTime, &now);
+#else
+    localtime_r(&now, &localTime);
+#endif
+
+    std::ostringstream timeStream;
+    timeStream << std::put_time(&localTime, "[%Y-%m-%d %H:%M:%S] ");
+
+    log << timeStream.str() << message << "\n";
+}
 
 namespace Menu {
 	static bool openAbout = false;
