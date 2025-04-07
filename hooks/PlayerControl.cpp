@@ -976,6 +976,34 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_HandleRpc executed");
 	int32_t pos = reader->fields._position, head = reader->fields.readHead;
+	if (callId == (uint8_t) RpcCalls__Enum::ProtectPlayer) {
+		bool shouldCancel = true;
+		// 1 packed-int + 1 int
+		switch ((int32_t) MessageReader_get_BytesRemaining(reader, NULL)) {
+			case 9:
+				if ((MessageReader_ReadByte(reader, NULL) & 0x80) == 0)
+					break;
+				// fall through
+			case 8:
+				if ((MessageReader_ReadByte(reader, NULL) & 0x80) == 0)
+					break;
+			case 7:
+				if ((MessageReader_ReadByte(reader, NULL) & 0x80) == 0)
+					break;
+			case 6:
+				if ((MessageReader_ReadByte(reader, NULL) & 0x80) == 0)
+					break;
+			case 5:
+				if ((MessageReader_ReadByte(reader, NULL) & 0x80) == 0)
+					shouldCancel = false;
+		}
+		if (shouldCancel) {
+			SMAC_OnCheatDetected(__this, "Overloading");
+			return;
+		}
+		reader->fields._position = pos;
+		reader->fields.readHead = head;
+	}
 	try {
 		HandleRpc(__this, callId, reader);
 		SMAC_HandleRpc(__this, callId, reader);
