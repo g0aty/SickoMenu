@@ -2,9 +2,79 @@
 #include "game_tab.h"
 #include "game.h"
 #include "gui-helpers.hpp"
-#include "utility.h"
 #include "state.hpp"
 #include "logger.h"
+#include "gui-helpers.hpp"
+#include "utility.h"
+
+
+void RenderGameTab() {
+    try {
+        SpellChecker spellChecker("path_to_aff_file", "path_to_dic_file");
+        if (!spellChecker.getLastError().empty()) {
+            ImGui::TextColored(ImVec4(1,0,0,1), "Spell checker error: %s", 
+                spellChecker.getLastError().c_str());
+            return;
+        }
+
+        static char chatMessage[256] = "Ths is a smaple text with sme misspelled wrds.";
+
+        if (ImGui::InputText("Chat", chatMessage, IM_ARRAYSIZE(chatMessage))) {
+            if (autoCorrectionEnabled && strlen(chatMessage) > 0) {
+                std::string corrected = correctSpelling(chatMessage, spellChecker);
+                if (corrected != chatMessage) {
+                    strncpy_s(chatMessage, corrected.c_str(), sizeof(chatMessage));
+                }
+            }
+        }
+
+        if (autoCorrectionEnabled) {
+            HighlightMisspelledWords(spellChecker, chatMessage);
+        }
+
+        if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
+        if (State.SMAC_CheckBadWords) {
+            static std::string newWord = "";
+            InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
+            if (newWord != "" && ImGui::Button("Add Word")) {
+                State.SMAC_BadWords.push_back(newWord);
+                State.Save();
+                newWord = "";
+            }
+        }
+
+        if (IsInGame() || IsInLobby()) {
+            if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && 
+                ImGui::Button("Scan Everyone")) {
+                for (auto p : GetAllPlayerControl()) {
+                    if (IsInGame()) State.rpcQueue.push(new RpcForceScanner(p, true));
+                    else State.lobbyRpcQueue.push(new RpcForceScanner(p, true));
+                }
+            }
+        }
+
+        if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode)) {
+            if (ImGui::Button("Kill Everyone")) {
+                for (auto player : GetAllPlayerControl()) {
+                    if (IsInGame()) {
+                        State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
+                    } else if (IsInLobby()) {
+                        State.lobbyRpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, player));
+                    }
+                }
+            }
+        }
+
+        if (State.InMeeting && (IsHost() || !State.SafeMode) && 
+            ImGui::Button("End Meeting")) {
+            State.rpcQueue.push(new RpcEndMeeting());
+            State.InMeeting = false;
+        }
+    } catch (const std::exception& e) {
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Error: %s", e.what());
+    }
+}
+
 /*#include <hunspell/hunspell.hxx>
 #include <sstream>
 #include <string>
