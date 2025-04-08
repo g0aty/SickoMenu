@@ -297,36 +297,39 @@ namespace SettingsTab {
 			if (CustomListBoxInt(" ", &State.BroadcastedMod, MODS, 100.f * State.dpiScale)) State.Save();
 		}
 		if (openSpoofing) {
-			if (ToggleButton("Spoof Guest Account", &State.SpoofGuestAccount)) {
+			/*if (ToggleButton("Spoof Guest Account", &State.SpoofGuestAccount)) {
 				State.Save();
 			}
 			if (State.SpoofGuestAccount) {
 				ImGui::SameLine();
-				if (ToggleButton("Use Custom Guest Friend Code", &State.UseGuestFriendCode)) {
+				if (ToggleButton("Use Custom Guest Friend Code", &State.UseNewFriendCode)) {
 					State.Save();
 				}
-				if (State.UseGuestFriendCode) {
-					if (InputString("Guest Friend Code", &State.GuestFriendCode)) {
+				if (State.UseNewFriendCode) {
+					if (InputString("Guest Friend Code", &State.NewFriendCode)) {
 						State.Save();
 					}
 					ImGui::Text("Guest friend code should be <= 10 characters long and cannot have a hashtag.");
 				}
 				ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "Pro Tip: You can bypass the free chat restriction using a space after your custom friend");
 				ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "code!");
-
-				/*if (ToggleButton("Use Custom Guest PUID", &State.UseGuestPuid)) {
-					State.Save();
-				}
-				if (State.UseGuestPuid) {
-					ImGui::SameLine();
-					if (InputString("Guest PUID", &State.GuestPuid)) {
-						State.Save();
-					}
-				}*/
-			}
+			}*/
 			/*if (ImGui::Button("Force Login as Guest")) {
 				State.ForceLoginAsGuest = true;
 			}*/
+			if (ToggleButton("Spoof Guest Account (Quick Chat ONLY)", &State.SpoofGuestAccount)) {
+				State.Save();
+			}
+			if (ToggleButton("Use Custom Friend Code (For New/Guest Account ONLY)", &State.UseNewFriendCode)) {
+				State.Save();
+			}
+			if (State.UseNewFriendCode) {
+				ImGui::SetNextItemWidth(150 * State.dpiScale); // Adjust the width of the input box
+				if (InputString("Friend Code (For New/Guest Account ONLY)", &State.NewFriendCode)) {
+					State.Save();
+				}
+				ImGui::Text("This new friend code should be <= 10 characters long and cannot have spaces.");
+			}
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
 			}

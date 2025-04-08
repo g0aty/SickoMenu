@@ -3,7 +3,7 @@
 #include "logger.h"
 #include "state.hpp"
 
-static bool isRestrictedGuestAccount = false;
+static bool isGuestAccount = false;
 
 void fakeSuccessfulLogin(EOSManager* eosManager)
 {
@@ -27,7 +27,7 @@ void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
 		return;
 	}
 	EOSManager_StartTempAccountFlow(__this, method);
-	isRestrictedGuestAccount = true;
+	isGuestAccount = true;
 	EOSManager_CloseStartupWaitScreen(__this, method);
 }
 
@@ -51,14 +51,14 @@ void dEOSManager_InitializePlatformInterface(EOSManager* __this, MethodInfo* met
 
 bool dEOSManager_IsFreechatAllowed(EOSManager* __this, MethodInfo* method)
 {
-	bool ret = !isRestrictedGuestAccount || IsInGame() || IsInLobby();
+	bool ret = !isGuestAccount || IsInGame() || IsInLobby();
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_IsFreechatAllowed executed");
 	return ret;
 }
 
 QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method) {
 	if (IsInGame() || IsInLobby()) return QuickChatModes__Enum::FreeChatOrQuickChat;
-	return !isRestrictedGuestAccount || IsInGame() || IsInLobby() ? MultiplayerSettingsData_get_ChatMode(__this, value, method) : QuickChatModes__Enum::QuickChatOnly;
+	return !isGuestAccount || IsInGame() || IsInLobby() ? MultiplayerSettingsData_get_ChatMode(__this, value, method) : QuickChatModes__Enum::QuickChatOnly;
 }
 
 bool dEOSManager_IsFriendsListAllowed(EOSManager* __this, MethodInfo* method)
@@ -173,14 +173,13 @@ void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter
 
 void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEditAccountUsername_SaveUsername executed");
-	if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
+	if (State.UseNewFriendCode && State.NewFriendCode != "") {
 		std::string newFriendCode = "";
-		for (auto i : State.GuestFriendCode) {
-			newFriendCode += tolower(i);
+		for (auto i : State.NewFriendCode) {
 			if (newFriendCode.ends_with(" ")) {
-				isRestrictedGuestAccount = false;
 				break;
 			}
+			newFriendCode += tolower(i);
 		}
 		TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);
 	}
@@ -201,7 +200,6 @@ void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* 
 			}
 			TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);
 		}
-		isRestrictedGuestAccount = true;
 	}
 	EditAccountUsername_SaveUsername(__this, method);
 }

@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v4.3";
+    this->SickoVersion = "v4.3.1";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -84,10 +84,10 @@ void Settings::Load() {
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
         JSON_TRYGET("FakeLevel", this->FakeLevel);
         JSON_TRYGET("SpoofFriendCode", this->SpoofFriendCode);
-        JSON_TRYGET("UseGuestFriendCode", this->UseGuestFriendCode);
+        JSON_TRYGET("UseNewFriendCode", this->UseNewFriendCode);
         //JSON_TRYGET("GuestPuid", this->GuestPuid);
         //JSON_TRYGET("UseGuestPuid", this->UseGuestPuid);
-        JSON_TRYGET("GuestFriendCode", this->GuestFriendCode);
+        JSON_TRYGET("NewFriendCode", this->NewFriendCode);
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
@@ -413,8 +413,8 @@ void Settings::Save() {
                 { "SpoofLevel", this->SpoofLevel },
                 { "FakeLevel", this->FakeLevel },
                 { "SpoofFriendCode", this->SpoofFriendCode },
-                { "UseGuestFriendCode", this->UseGuestFriendCode },
-                { "GuestFriendCode", this->GuestFriendCode },
+                { "UseNewFriendCode", this->UseNewFriendCode },
+                { "NewFriendCode", this->NewFriendCode },
                 //{ "UseGuestPuid", this->UseGuestPuid },
                 //{ "GuestPuid", this->GuestPuid },
                 { "FakeFriendCode", this->FakeFriendCode },

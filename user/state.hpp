@@ -55,9 +55,9 @@ public:
     bool ShowKeybinds = true;
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
-    bool UseGuestFriendCode = false;
+    bool UseNewFriendCode = false;
     bool UseGuestPuid = false;
-    std::string GuestFriendCode = "";
+    std::string NewFriendCode = "";
     std::string FakeFriendCode = "";
     std::string GuestPuid = "";
     std::string FakePuid = "";
