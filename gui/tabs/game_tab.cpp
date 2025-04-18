@@ -645,9 +645,9 @@ namespace GameTab {
         }
 
         if (openDestruct) {
-            if (ToggleButton("Ignore Whitelisted Players [Exploits]", &State.Destruct_IgnoreWhitelist)) {
+            /*if (ToggleButton("Ignore Whitelisted Players [Exploits]", &State.Destruct_IgnoreWhitelist)) {
                 State.Save();
-            }
+            }*/
             if (ToggleButton("Ignore Whitelisted Players [Ban/Kick]", &State.Ban_IgnoreWhitelist)) {
                 State.Save();
             }
