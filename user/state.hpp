@@ -317,8 +317,6 @@ public:
     //std::vector<Game::PlayerId> aumUsers;
     //std::vector<Game::PlayerId> sickoUsers;
     std::vector<Game::PlayerId> vanishedPlayers;
-    std::vector<Game::PlayerId> overloadedPlayers;
-    std::vector<Game::PlayerId> laggedPlayers;
     std::map<Game::PlayerId, std::string> modUsers;
     int32_t rpcCooldown = 15;
     int32_t playerKilledId = 0;
@@ -407,8 +405,6 @@ public:
     bool OcclusionCulling = false;
     bool ShowUnityLogs = true;
     bool ShowHookLogs = false;
-
-    bool PatchProtect = false;
 
     float LobbyTimer = 600.f;
     bool ShowLobbyTimer = false;
@@ -548,8 +544,6 @@ public:
 
     bool Destruct_IgnoreWhitelist = true;
     bool Ban_IgnoreWhitelist = true;
-    bool OverloadEveryone = false;
-    bool LagEveryone = false;
     bool BanEveryone = false;
     bool KickEveryone = false;
 

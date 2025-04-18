@@ -277,7 +277,7 @@ namespace GameTab {
                 if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy(outfit->fields.ColorId, convert_from_string(outfit->fields.PlayerName)));
                 if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy(outfit->fields.ColorId, convert_from_string(outfit->fields.PlayerName)));
             }*/
-            if ((IsInGame() || IsInLobby()) && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
+            if ((IsInGame() || IsInLobby()) && ((IsHost() && IsInGame()) || !State.SafeMode)) {
                 ImGui::SameLine();
                 if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
                     for (auto player : GetAllPlayerControl()) {
@@ -478,7 +478,7 @@ namespace GameTab {
                 if (State.RizzUpEveryone) State.RizzUpEveryone = false;
                 State.Save();
             }
-            if ((IsHost() || !State.SafeMode) && State.ChatSpamMode) ImGui::SameLine();
+            if (((IsHost() && IsInGame()) || !State.SafeMode) && State.ChatSpamMode) ImGui::SameLine();
             if ((IsHost() || !State.SafeMode) && State.ChatSpamMode && ToggleButton("Spam by Everyone", &State.ChatSpamEveryone))
             {
                 State.Save();
@@ -649,12 +649,6 @@ namespace GameTab {
                 State.Save();
             }
             if (ToggleButton("Ignore Whitelisted Players [Ban/Kick]", &State.Ban_IgnoreWhitelist)) {
-                State.Save();
-            }
-            if (ToggleButton("Overload Everyone [Slow]", &State.OverloadEveryone)) {
-                State.Save();
-            }
-            if (ToggleButton("Lag Everyone [Fast]", &State.LagEveryone)) {
                 State.Save();
             }
             if (IsInLobby() && ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {

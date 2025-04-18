@@ -21,7 +21,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 				}
 			}
 		}
-		if (State.GodMode && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
+		if (State.GodMode && ((IsHost() && IsInGame()) || !State.SafeMode)) {
 			PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
 		}
 	}

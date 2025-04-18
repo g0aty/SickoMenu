@@ -549,7 +549,7 @@ namespace PlayersTab {
 							State.lobbyRpcQueue.push(new CmdCheckProtect(*Game::pLocalPlayer, State.selectedPlayer));
 					}
 				}
-				else if (IsHost() || !State.SafeMode || !State.PatchProtect) {
+				else if ((IsHost() && IsInGame()) || !State.SafeMode) {
 					if (ImGui::Button("Protect")) {
 						for (auto p : selectedPlayers) {
 							app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(p.validate().get_PlayerData());
@@ -576,23 +576,8 @@ namespace PlayersTab {
 						}
 					}
 				}*/
-				if (selectedPlayers.size() == 1 && !selectedPlayer.is_LocalPlayer() && (IsInMultiplayerGame() || IsInLobby()) && (IsHost() || !State.SafeMode || !State.PatchProtect || State.AprilFoolsMode)) {
-					ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Destructive");
-					if (!State.PatchProtect) {
-						auto res1 = std::find(State.overloadedPlayers.begin(), State.overloadedPlayers.end(), State.selectedPlayer.get_PlayerId());
-						auto res2 = std::find(State.laggedPlayers.begin(), State.laggedPlayers.end(), State.selectedPlayer.get_PlayerId());
-						if (res1 == State.overloadedPlayers.end()) {
-							if (ImGui::Button("Overload [Slow]")) {
-								State.overloadedPlayers.push_back(State.selectedPlayer.get_PlayerId());
-							}
-						}
-						if (res2 == State.laggedPlayers.end()) {
-							if (ImGui::Button("Lag [Fast]")) {
-								State.laggedPlayers.push_back(State.selectedPlayer.get_PlayerId());
-							}
-						}
-					}
-					if (State.AprilFoolsMode && State.ChatCooldown >= 3.5f) {
+				if (selectedPlayers.size() == 1 && !selectedPlayer.is_LocalPlayer() && (IsInMultiplayerGame() || IsInLobby()) && State.AprilFoolsMode) {
+					if (State.ChatCooldown >= 3.5f) {
 						if (ImGui::Button("Mog Player [Sigma]")) {
 							std::vector<std::string> brainrotList = { "Crazy? I was crazy once. They locked me in a room. A rubber room with Fucksons, and Fucksons give me rats.",
 								"I like my cheese drippy bruh", "Imagine if Ninja got a low taper fade", "I woke up in Ohio, feeling kinda fly", "What trollface are you?",
@@ -703,7 +688,7 @@ namespace PlayersTab {
 			}
 
 			if (openTrolling && selectedPlayer.has_value()) {
-				if (IsHost() || !State.SafeMode) {
+				if ((IsHost() && IsInGame()) || !State.SafeMode) {
 					if (ImGui::Button("Send Blank Chat As")) {
 						for (auto p : selectedPlayers) {
 							if (IsInGame()) State.rpcQueue.push(new RpcSendChatNote(p.validate().get_PlayerControl(), 1));

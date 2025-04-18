@@ -47,8 +47,6 @@ static void onGameEnd() {
         State.IsRevived = false;
         State.protectMonitor.clear();
         State.vanishedPlayers.clear();
-        State.overloadedPlayers.clear();
-        State.laggedPlayers.clear();
         State.VoteKicks = 0;
         State.OutfitCooldown = 50;
         State.CanChangeOutfit = false;
@@ -702,7 +700,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 }
             }
 
-            if ((IsInGame() || IsInLobby()) && State.GodMode && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
+            if ((IsInGame() || IsInLobby()) && State.GodMode && ((IsHost() && IsInGame()) || !State.SafeMode)) {
                 if (State.protectMonitor.find((*Game::pLocalPlayer)->fields.PlayerId) == State.protectMonitor.end()) {
                     PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
                 }
@@ -736,31 +734,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     autoStartedGame = true;
                     InnerNetClient_SendStartGame(__this, NULL);
                 }
-                
-                static int overloadDelay = 0;
-                if ((IsInLobby() || IsInGame()) && (State.OverloadEveryone || State.overloadedPlayers.size() != 0 ||
-                    State.LagEveryone || State.laggedPlayers.size() != 0) && overloadDelay <= 0 && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
-                    bool lag = State.LagEveryone || State.laggedPlayers.size() != 0;
-                    uint8_t count = 0;
-                    for (auto p : GetAllPlayerControl()) {
-                        if (State.Destruct_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(),
-                            convert_from_string(GetPlayerData(p)->fields.FriendCode)) != State.WhitelistFriendCodes.end()) continue;
-                        if (!lag && !State.OverloadEveryone && std::find(State.overloadedPlayers.begin(), State.overloadedPlayers.end(),
-                            p->fields.PlayerId) == State.overloadedPlayers.end()) continue;
-                        if (lag && !State.LagEveryone && std::find(State.laggedPlayers.begin(), State.laggedPlayers.end(),
-                            p->fields.PlayerId) == State.laggedPlayers.end()) continue;
-                        if (p != *Game::pLocalPlayer) {
-                            for (int i = 0; i < (lag ? 2 : 1); ++i) {
-                                auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, 
-                                    (uint8_t)RpcCalls__Enum::ProtectPlayer, SendOption__Enum::None, p->fields._.OwnerId, NULL);
-                                InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-                            }
-                            count++;
-                        }
-                    }
-                    overloadDelay = 0;//int((lag ? 0.3 : 0.1) * GetFps());
-                }
-                else overloadDelay--;
 
                 static int sabotageDelay = 0;
                 static bool fixSabotage = false;
@@ -924,14 +897,6 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
 
             if (State.modUsers.find(playerId) != State.modUsers.end())
                 State.modUsers.erase(playerId);
-
-            auto it1 = std::find(State.overloadedPlayers.begin(), State.overloadedPlayers.end(), playerId);
-            if (it1 != State.overloadedPlayers.end())
-                State.overloadedPlayers.erase(it1);
-
-            auto it2 = std::find(State.laggedPlayers.begin(), State.laggedPlayers.end(), playerId);
-            if (it2 != State.laggedPlayers.end())
-                State.laggedPlayers.erase(it2);
 
             if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                 synchronized(Replay::replayEventMutex) {

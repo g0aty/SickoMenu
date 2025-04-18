@@ -416,7 +416,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 								InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 								ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(State.chatMessage), false, NULL);
 							}
-							else if (State.ChatSpamMode == 1 || (State.ChatSpamMode == 2 && (IsHost() || !State.SafeMode))) {
+							else if (State.ChatSpamMode == 1 || (State.ChatSpamMode == 2 && ((IsHost() && IsInGame()) || !State.SafeMode))) {
 								PlayerControl_RpcSendChatNote(player, p->fields.PlayerId, (ChatNoteTypes__Enum)1, NULL);
 							}
 						}
@@ -1482,9 +1482,8 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
 void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdCheckProtect executed");
 	if (!State.PanicMode) {
-		if ((State.RealRole != RoleTypes__Enum::GuardianAngel || State.NoAbilityCD) && (IsHost() || !State.SafeMode || !State.PatchProtect)) {
+		if (IsHost() && IsInGame())
 			PlayerControl_RpcProtectPlayer(__this, target, GetPlayerOutfit(GetPlayerData(__this))->fields.ColorId, NULL);
-		}
 		else
 			PlayerControl_CmdCheckProtect(__this, target, method);
 	}

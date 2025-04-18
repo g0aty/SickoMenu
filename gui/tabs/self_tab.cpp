@@ -625,7 +625,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if ((IsHost() || !State.SafeMode || !State.PatchProtect) && ToggleButton(IsHost() ? "God Mode" : "Visual Protection", &State.GodMode))
+            if (((IsHost() && IsInGame()) || !State.SafeMode) && ToggleButton(IsHost() ? "God Mode" : "Visual Protection", &State.GodMode))
                 State.Save();
 
             if (ToggleButton("(Shift/Ctrl + Right Click) to Teleport", &State.ShiftRightClickTP)) {
