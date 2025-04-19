@@ -685,10 +685,16 @@ namespace GameTab {
                     State.Save();
                 }
                 ImGui::SameLine();
-                if (State.KickAFK && IsInGame() && ToggleButton("Activate AFK Notifications", &State.NotificationsAFK)) {
+                if (State.KickAFK && ToggleButton("Activate AFK Notifications", &State.NotificationsAFK)) {
                     State.Save();
                 }
-                if (IsInGame() && State.KickAFK && ImGui::CollapsingHeader("Advanced Options"))
+                ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+                std::string header = "Anti AFK ~ Advanced Options";
+                if (!IsInGame()) {
+                    header += " [GAME-MATCH]";
+                }
+
+                if (ImGui::CollapsingHeader(header.c_str()))
                 {
                     if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
                         State.Save();
