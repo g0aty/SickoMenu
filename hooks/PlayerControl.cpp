@@ -788,7 +788,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				info.hasReceivedWarning = true;
 
 				std::string nickname = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
-				int secondsLeft = static_cast<int>(std::clamp(remainingTime, 0.0f, State.NotificationTimeWarn));
+				int secondsLeft = static_cast<int>(std::clamp(remainingTime, 0.0f, State.NotificationTimeWarn)) + 1; // <== Time fix on notifications
 				std::string warning = std::format("<#FFF>{}</color> <#ff033e>will be kicked in {} seconds due to inactivity!</color>", nickname, secondsLeft);
 
 				auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
