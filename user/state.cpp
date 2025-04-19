@@ -328,6 +328,10 @@ void Settings::Load() {
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
         JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
+        JSON_TRYGET("TimerAFK", this->TimerAFK);
+        JSON_TRYGET("AddExtraTime", this->AddExtraTime);
+        JSON_TRYGET("ExtraTimeThreshold", this->ExtraTimeThreshold);
+        JSON_TRYGET("NotificationTimeWarn", this->NotificationTimeWarn);
         JSON_TRYGET("BypassVisualTasks", this->BypassVisualTasks);
     }
     catch (...) {
@@ -663,6 +667,10 @@ void Settings::Save() {
                 { "BlacklistFriendCodes", this->BlacklistFriendCodes },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
                 { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },
+                { "TimerAFK", this->TimerAFK },
+                { "AddExtraTime", this->AddExtraTime },
+                { "ExtraTimeThreshold", this->ExtraTimeThreshold },
+                { "NotificationTimeWarn", this->NotificationTimeWarn },
                 { "BypassVisualTasks", this->BypassVisualTasks },
             };
 
