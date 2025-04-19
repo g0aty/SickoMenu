@@ -680,6 +680,18 @@ namespace GameTab {
                 if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
                     State.Save();
                 }
+                                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+                if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (IsInGame() && SteppedSliderFloat("Sec", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                    State.Save();
+                }
+                if (IsInGame()) {
+                    ImGui::SetCursorPosX(150);
+                    ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Recommended Time: 75 Seconds");
+                }
             }
         }
 
