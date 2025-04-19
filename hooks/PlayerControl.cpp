@@ -10,6 +10,18 @@
 #include <optional>
 #include "logger.h"
 
+using namespace std::chrono;
+
+struct PlayerActivityInfo {
+	Vector2 lastPosition;
+	time_point<steady_clock> lastMoveTime;
+	bool hasEnteredGame = false;
+	bool hasReceivedWarning = false;
+	bool hasReceivedExtraTimeInMeeting = false;
+};
+
+std::unordered_map<int, PlayerActivityInfo> playerActivityMap;
+
 void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CompleteTask executed");
 	try {
@@ -719,6 +731,83 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			synchronized(instance.m_DrawingMutex) {
 				instance.LocalPosition = localScreenPosition;
 				instance.m_Players[playerData->fields.PlayerId] = espPlayerData;
+			}
+		}
+		
+		if (!State.KickAFK) return;
+
+		static bool wasInMeeting = false;
+		wasInMeeting = State.InMeeting;
+
+		if (wasInMeeting && !State.InMeeting) {
+			for (auto& [id, info] : playerActivityMap) {
+				info.hasReceivedExtraTimeInMeeting = false;
+			}
+		}
+
+		for (auto player : GetAllPlayerControl()) {
+			if (player == *Game::pLocalPlayer) continue;
+
+			auto* playerData = GetPlayerData(player);
+			if (!playerData) continue;
+
+			if (State.Ban_IgnoreWhitelist &&
+				std::ranges::find(State.WhitelistFriendCodes, convert_from_string(playerData->fields.FriendCode)) != State.WhitelistFriendCodes.end()) {
+				continue;
+			}
+
+			int playerId = player->fields._.OwnerId;
+			Vector2 currentPosition = GetTrueAdjustedPosition(player);
+			auto& info = playerActivityMap[playerId];
+
+			if (!info.hasEnteredGame) {
+				info = { currentPosition, steady_clock::now(), true, false, false };
+				continue;
+			}
+
+			auto now = steady_clock::now();
+			if (currentPosition.x != info.lastPosition.x || currentPosition.y != info.lastPosition.y) {
+				info.lastPosition = currentPosition;
+				info.lastMoveTime = now;
+				info.hasReceivedWarning = false;
+				continue;
+			}
+
+			float elapsed = duration_cast<duration<float>>(now - info.lastMoveTime).count();
+			float remainingTime = State.TimerAFK - elapsed;
+
+			if (State.InMeeting) {
+				if (remainingTime < 16.0f && !info.hasReceivedExtraTimeInMeeting) {
+					info.lastMoveTime -= duration_cast<steady_clock::duration>(duration<float>(30.0f));
+					info.hasReceivedExtraTimeInMeeting = true;
+				}
+				continue;
+			}
+
+			if (remainingTime <= 16.0f && !info.hasReceivedWarning) {
+				info.hasReceivedWarning = true;
+
+				std::string nickname = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
+				std::string warning = std::format("<#FFF>{}</color> <#ff033e>can be kicked in {} seconds due to inactivity!</color>", nickname, static_cast<int>(remainingTime));
+
+				auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
+				if (notifier) {
+					auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
+					auto colorBackup = notifier->fields.disconnectColor;
+
+					notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+					notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
+
+					NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(warning), NULL);
+
+					notifier->fields.playerDisconnectSprite = spriteBackup;
+					notifier->fields.disconnectColor = colorBackup;
+				}
+			}
+
+			if (elapsed > State.TimerAFK) {
+				InnerNetClient_SendLateRejection((InnerNetClient*)(*Game::pAmongUsClient), playerId, DisconnectReasons__Enum::MatchmakerInactivity, NULL);
+				playerActivityMap.erase(playerId);
 			}
 		}
 	}
