@@ -680,6 +680,29 @@ namespace GameTab {
                 if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
                     State.Save();
                 }
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+                if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (State.KickAFK && IsInGame() && ToggleButton("Activate AFK Notifications", &State.NotificationsAFK)) {
+                    State.Save();
+                }
+                if (IsInGame() && State.KickAFK && ImGui::CollapsingHeader("Advanced Options"))
+                {
+                    if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                        State.Save();
+                    }
+                    if (SteppedSliderFloat("Extra Time at The Meeting", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                        State.Save();
+                    }
+                    if (SteppedSliderFloat("Minimum Sec to Extra Time", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                        State.Save();
+                    }
+                    if (State.NotificationsAFK && SteppedSliderFloat("Warn-AFK Notifications Time", &State.NotificationTimeWarn, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                        State.Save();
+                    }
+                }
             }
         }
 
