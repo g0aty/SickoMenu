@@ -546,6 +546,8 @@ public:
     bool Ban_IgnoreWhitelist = true;
     bool BanEveryone = false;
     bool KickEveryone = false;
+    bool KickAFK = false;
+    float TimerAFK = 40.f;
 
     bool AprilFoolsMode = false;
     bool BrainrotEveryone = false;
