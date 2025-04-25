@@ -538,6 +538,8 @@ public:
     std::vector<std::string> WhitelistFriendCodes = {};
     std::vector<std::string> BlacklistFriendCodes = {};
 
+    std::vector<std::string> LockedNames = {};
+
     std::string lol = "";
     bool ProGamer = false;
     bool KeybindsBeingEdited = false;
@@ -552,6 +554,8 @@ public:
     float AddExtraTime = 15.0f;
     float ExtraTimeThreshold = 5.0f;
     float NotificationTimeWarn = 5.0f;
+    bool KickByLockedName = false;
+    bool ShowPDataByNC = false;
 
     bool AprilFoolsMode = false;
     bool BrainrotEveryone = false;
