@@ -562,6 +562,11 @@ public:
     bool RizzUpEveryone = false;
     bool DiddyPartyMode = false;
     bool BypassVisualTasks = false;
+
+    std::unordered_map<int32_t, std::chrono::steady_clock::time_point> Rpc101OverloadTimestamps;
+    std::chrono::steady_clock::time_point lastRpc101WindowStart = std::chrono::steady_clock::now();
+    int rpc101Counter = 0;
+    const int RPC101_LIMIT = 30;
     void Load();
     void Save();
     void SaveConfig();
