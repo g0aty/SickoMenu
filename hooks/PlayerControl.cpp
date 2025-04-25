@@ -238,10 +238,25 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						__this == *Game::pLocalPlayer ? localPlayerMod : State.modUsers.at(playerData->fields.PlayerId)) : "";
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				std::string listed = "";
-				if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end())
-					listed = "<#0ff>[+]</color> ";
-				else if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end())
+				bool isBlacklisted = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end();
+				bool isWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end();
+				bool isNameLocked = std::find(State.LockedNames.begin(), State.LockedNames.end(), playerName) != State.LockedNames.end();
+
+				if (isNameLocked && isBlacklisted) {
+					listed = "<#FA0>[!]</color> + <#F00>[-]</color> ";
+				}
+				else if (isNameLocked && isWhitelisted) {
+					listed = "<#FA0>[!]</color> + <#0FF>[+]</color> ";
+				}
+				else if (isBlacklisted) {
 					listed = "<#f00>[-]</color> ";
+				}
+				else if (isWhitelisted) {
+					listed = "<#0ff>[+]</color> ";
+				}
+				else if (isNameLocked) {
+					listed = "<#FA0>[!]</color> ";
+				}
 				std::string levelText = std::format("{}<#f00>ID {}</color> <#0f0>Level {}</color> <#b0f>({})</color>{}</color>", listed, playerData->fields.PlayerId, playerLevel, platformId, modUsage);
 				if (IsStreamerMode())
 					friendCode = "Friend Code Hidden";
