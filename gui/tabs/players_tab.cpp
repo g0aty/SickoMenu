@@ -492,6 +492,7 @@ namespace PlayersTab {
 					}
 
 					std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+					std::string nickname = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(selectedPlayer.get_PlayerData())->fields.PlayerName));
 
 					if (selectedPlayers.size() == 1 && friendCode != "") {
 						Game::PlayerId playerId = selectedPlayer.get_PlayerControl()->fields.PlayerId;
@@ -517,6 +518,22 @@ namespace PlayersTab {
 							else if (ImGui::Button("Add to Whitelist")) {
 								State.WhitelistFriendCodes.push_back(friendCode);
 								State.Save();
+							}
+						}
+						ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+						if (selectedPlayers.size() == 1 && nickname != "") {
+							Game::PlayerId playerId = selectedPlayer.get_PlayerControl()->fields.PlayerId;
+							if (std::find(State.LockedNames.begin(), State.LockedNames.end(), nickname) != State.LockedNames.end()) {
+								if (ImGui::Button("Remove Nickname from Name-Checker")) {
+									State.LockedNames.erase(std::remove(State.LockedNames.begin(), State.LockedNames.end(), nickname), State.LockedNames.end());
+									State.Save();
+								}
+							}
+							else {
+								if (ImGui::Button("Add Nickname to Name-Checker")) {
+									State.LockedNames.push_back(nickname);
+									State.Save();
+								}
 							}
 						}
 					}
