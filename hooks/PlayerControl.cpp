@@ -807,7 +807,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			}
 
 			if (elapsed > State.TimerAFK) {
-				InnerNetClient_SendLateRejection((InnerNetClient*)(*Game::pAmongUsClient), playerId, DisconnectReasons__Enum::MatchmakerInactivity, NULL);
+				app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerId, false, NULL);
 				playerActivityMap.erase(playerId);
 			}
 		}
