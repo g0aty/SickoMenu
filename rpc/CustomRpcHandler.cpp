@@ -49,22 +49,62 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 	break;
 	case (uint8_t)101:
 	{
+		using namespace std::chrono;
+
+		auto now = steady_clock::now();
+		if (duration_cast<seconds>(now - State.lastRpc101WindowStart).count() >= 1) {
+			State.lastRpc101WindowStart = now;
+			State.rpc101Counter = 0;
+		}
+
+		if (++State.rpc101Counter > State.RPC101_LIMIT) {
+			if (player && player != *Game::pLocalPlayer) {
+				int32_t playerId = player->fields.PlayerId;
+
+				auto it = State.Rpc101OverloadTimestamps.find(playerId);
+				if (it == State.Rpc101OverloadTimestamps.end() || duration_cast<seconds>(now - it->second).count() >= 3) {
+					State.Rpc101OverloadTimestamps[playerId] = now;
+
+					std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(player))->fields.PlayerName));
+					std::string actionMessage = std::format("<b>Player <#FFF>\"{}\"</color> has exceeded the rate-limit of AUM Chat!</b>", name);
+
+					auto notifier = (NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier);
+					if (notifier != NULL) {
+						auto disconnectSprite = new Sprite(*notifier->fields.playerDisconnectSprite);
+						notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+						notifier->fields.playerDisconnectSound;
+						auto color = notifier->fields.disconnectColor;
+						notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
+						NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(actionMessage), NULL);
+						notifier->fields.playerDisconnectSprite = disconnectSprite;
+						notifier->fields.disconnectColor = color;
+					}
+				}
+			}
+			break;
+		}
+
 		std::string playerName = convert_from_string(MessageReader_ReadString(reader, NULL));
-		//we have to get only the message, however aum sends the player's name before this
 		std::string message = convert_from_string(MessageReader_ReadString(reader, NULL));
 		uint32_t colorId = MessageReader_ReadInt32(reader, NULL);
-		if (message.size() == 0) break;
+
+		if (message.empty()) break;
+
 		if (!State.PanicMode && State.ReadAndSendAumChat) {
 			NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
 			bool wasDead = false;
+
 			if (player != NULL && GetPlayerData(player)->fields.IsDead && local != NULL && !local->fields.IsDead) {
-				local->fields.IsDead = true; //see aum chat of ghosts
+				local->fields.IsDead = true;
 				wasDead = true;
 			}
+
 			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#f55><b>[AUM Chat]</b></color>\n" + message), false, NULL);
+
 			if (wasDead) {
 				local->fields.IsDead = false;
 			}
+
 			STREAM_DEBUG("AUM Chat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
 	}
