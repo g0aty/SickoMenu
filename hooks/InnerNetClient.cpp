@@ -791,6 +791,57 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableSabotages = false;
             }
         }
+        
+        static std::unordered_set<std::string> forbiddenNames;
+
+        if (State.KickByLockedName) {
+            const auto allPlayers = GetAllPlayerControl();
+            const std::unordered_set<std::string> bannedNamesSet(State.LockedNames.begin(), State.LockedNames.end());
+
+            std::unordered_set<std::string> currentNames;
+
+            for (auto* pc : allPlayers) {
+                if (!pc || pc == *Game::pLocalPlayer) continue;
+
+                auto* pd = GetPlayerDataById(pc->fields.PlayerId);
+                if (!pd) continue;
+
+                const std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pc))->fields.PlayerName));
+                const std::string puid = convert_from_string(pd->fields.Puid);
+                const std::string fc = convert_from_string(pd->fields.FriendCode);
+
+                currentNames.insert(name);
+
+                if (!bannedNamesSet.contains(name) || !forbiddenNames.insert(name).second) continue;
+
+                const std::string finalPuid = puid.empty() ? "<#F00>NONE</color>" : puid;
+                const std::string finalFC = fc.empty() ? "<#F00>NONE</color>" : fc;
+
+                app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
+
+                if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
+                    auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
+                    const auto colorBackup = notifier->fields.disconnectColor;
+
+                    notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+                    notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
+
+                    const std::string kickMsg = std::format("<#FFF><b>{}</color> kicked by Name-Checker!</b>", name);
+                    NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(kickMsg), NULL);
+
+                    notifier->fields.playerDisconnectSprite = spriteBackup;
+                    notifier->fields.disconnectColor = colorBackup;
+                }
+
+                if (State.ShowPDataByNC) {
+                    const std::string pdataMsg = std::format("<#ff033e><font=\"Barlow-Regular Outline\"><b>Name-Checker ~ Player Data:\n<voffset=-0.5>*</voffset> [<#FFF>{}</color>]\n\n<size=75%>Product User ID: <#FFF>{}</color>\nFriend Code: <#FFF>{}</b></font></size></color>", name, finalPuid, finalFC);
+                    ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(pdataMsg), NULL);
+                }
+            }
+
+            for (auto it = forbiddenNames.begin(); it != forbiddenNames.end(); )
+                it = currentNames.contains(*it) ? std::next(it) : forbiddenNames.erase(it);
+        }
     }
     catch (Exception* ex) {
         onGameEnd();
