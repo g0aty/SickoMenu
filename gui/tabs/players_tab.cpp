@@ -140,13 +140,29 @@ namespace PlayersTab {
 
 				ImVec4 nameColor = State.LightMode ? AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Black) : AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
 				if (IsInMultiplayerGame() || IsInLobby()) {
-					if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), playerFc) != State.BlacklistFriendCodes.end()) {
+					bool isBlacklisted = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), playerFc) != State.BlacklistFriendCodes.end();
+					bool isWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), playerFc) != State.WhitelistFriendCodes.end();
+					bool isNameLocked = std::find(State.LockedNames.begin(), State.LockedNames.end(), playerName) != State.LockedNames.end();
+
+					if (isNameLocked && isBlacklisted) {
+						playerName = "[!] + [-] " + playerName;
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+					}
+					else if (isNameLocked && isWhitelisted) {
+						playerName = "[!] + [+] " + playerName;
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
+					}
+					else if (isBlacklisted) {
 						playerName = "[-] " + playerName;
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
 					}
-					else if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), playerFc) != State.WhitelistFriendCodes.end()) {
+					else if (isWhitelisted) {
 						playerName = "[+] " + playerName;
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
+					}
+					else if (isNameLocked) {
+						playerName = "[!] " + playerName;
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
 					}
 					else if (PlayerIsImpostor(localData) && PlayerIsImpostor(playerData))
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
