@@ -326,6 +326,7 @@ void Settings::Load() {
 
         JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
+        JSON_TRYGET("LockedNames", this->LockedNames);
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
         JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
         JSON_TRYGET("TimerAFK", this->TimerAFK);
@@ -665,6 +666,7 @@ void Settings::Save() {
                 { "ChatPresets", this->ChatPresets },
                 { "WhitelistFriendCodes", this->WhitelistFriendCodes },
                 { "BlacklistFriendCodes", this->BlacklistFriendCodes },
+                { "LockedNames", this->LockedNames },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
                 { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },
                 { "TimerAFK", this->TimerAFK },
