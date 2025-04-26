@@ -64,57 +64,67 @@ namespace SettingsTab {
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
-			// sorry to anyone trying to read this code it is pretty messy
-#pragma region New config menu, needs fixing
-			/*
 			std::vector<std::string> CONFIGS = GetAllConfigs();
 			CONFIGS.push_back("[New]");
 			CONFIGS.push_back("[Delete]");
 
 			std::vector<const char*> CONFIGS_CHAR;
+			CONFIGS_CHAR.reserve(CONFIGS.size());
 
 			for (const std::string& str : CONFIGS) {
-				char* ch = new char[str.size() + 1];
-				std::copy(str.begin(), str.end(), ch);
-				ch[str.size()] = '\0';
-				CONFIGS_CHAR.push_back(ch);
+				CONFIGS_CHAR.push_back(str.c_str());
 			}
-
-			bool isNewConfig = CONFIGS.size() == 1;
-			bool isDelete = false;
 
 			int& selectedConfigInt = State.selectedConfigInt;
-			std::string selectedConfig = CONFIGS[selectedConfigInt];
 
-			if (CustomListBoxInt("Configs", &selectedConfigInt, CONFIGS_CHAR), 100 * State.dpiScale, ImVec4(0,0,0,0), ImGuiComboFlags_NoArrowButton) {
+			bool isNewConfig = selectedConfigInt == CONFIGS.size() - 2;
+			bool isDelete = selectedConfigInt == CONFIGS.size() - 1;
+
+			if (CustomListBoxInt("Configs", &selectedConfigInt, CONFIGS_CHAR, 100 * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_NoArrowButton)) {
 				isNewConfig = selectedConfigInt == CONFIGS.size() - 2;
 				isDelete = selectedConfigInt == CONFIGS.size() - 1;
-				if (!isNewConfig && !isDelete) State.selectedConfig = CONFIGS[selectedConfigInt];
-				State.Save();
-				State.Load();
+
+				if (!isNewConfig && !isDelete) {
+					State.selectedConfig = CONFIGS[selectedConfigInt];
+					State.Save();
+					State.Load();
+				}
 			}
 
-			if (isNewConfig || isDelete) {
+			if (isNewConfig) {
 				InputString("Name", &State.selectedConfig);
-				if (isNewConfig && (ImGui::Button(CheckConfigExists(State.selectedConfig) ? "Overwrite" : "Save"))) {
+
+				if (!State.selectedConfig.empty() && ImGui::Button(CheckConfigExists(State.selectedConfig) ? "Overwrite" : "Save")) {
 					State.Save();
 					CONFIGS = GetAllConfigs();
+					CONFIGS.push_back("[New]");
+					CONFIGS.push_back("[Delete]");
 
-					selectedConfigInt = std::distance(CONFIGS.begin(), std::find(CONFIGS.begin(), CONFIGS.end(), State.selectedConfig));
+					auto it = std::find(CONFIGS.begin(), CONFIGS.end(), State.selectedConfig);
+					if (it != CONFIGS.end())
+						selectedConfigInt = static_cast<int>(std::distance(CONFIGS.begin(), it));
 				}
+			}
 
-				if (isDelete && CheckConfigExists(State.selectedConfig)) {
-					if (ImGui::Button("Delete")) {
-						selectedConfigInt--;
-						State.Delete();
-						CONFIGS = GetAllConfigs();
-						if (selectedConfigInt < 0) selectedConfigInt = 0;
-					}
+			if (isDelete) {
+				InputString("Name", &State.selectedConfig);
+
+				if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Delete")) {
+					State.Delete();
+					CONFIGS = GetAllConfigs();
+					CONFIGS.push_back("[New]");
+					CONFIGS.push_back("[Delete]");
+
+					selectedConfigInt--;
+					if (selectedConfigInt < 0)
+						selectedConfigInt = 0;
 				}
-			}*/
-#pragma endregion
+			}
 
-			InputString("Config Name", &State.selectedConfig);
+
+#pragma region OLD CONFIG:
+
+			/*InputString("Config Name", &State.selectedConfig);
 
 			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
 			{
@@ -130,7 +140,9 @@ namespace SettingsTab {
 			if (!CheckConfigExists(State.selectedConfig)) {
 				ImGui::Text("Config name not found!");
 				ImGui::SameLine();
-			}
+			}*/
+
+#pragma endregion
 
 			/*if (ToggleButton("Adjust by DPI", &State.AdjustByDPI)) {
 				if (!State.AdjustByDPI) {
