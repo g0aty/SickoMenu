@@ -6392,8 +6392,6 @@ namespace app {
         bool DontDestroy;
     };
 
-    typedef Il2CppObject NotificationPopper;
-
     struct HudManager__Fields {
         struct DestroyableSingleton_1_HudManager___Fields _;
         struct FollowerCamera* PlayerCam;
@@ -6475,6 +6473,62 @@ namespace app {
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct HudManager__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region NotificationPopper
+    struct NotificationPopper__Fields {
+        typedef Il2CppObject NotificationPopper;
+        struct MonoBehaviour__Fields _;
+        struct LobbyNotificationMessage* notificationMessageOrigin;
+        struct Sprite* playerDisconnectSprite;
+        struct Sprite* settingsChangeSprite;
+        struct AudioClip* playerDisconnectSound;
+        struct AudioClip* settingsChangeSound;
+        float spacingY;
+        int32_t maxMessages;
+        struct Color disconnectColor;
+        struct Color settingsChangeColor;
+        struct AspectPosition* aspectPosition;
+        struct List_1_LobbyNotificationMessage_* activeMessages;
+        int32_t lastMessageKey;
+    };
+
+    struct NotificationPopper {
+        struct NotificationPopper__Class* klass;
+        MonitorData* monitor;
+        struct NotificationPopper__Fields fields;
+    };
+#pragma endregion
+
+#pragma region Sprite
+    struct Sprite__Fields {
+        struct Object_1__Fields _;
+    };
+
+    struct Sprite {
+        struct Sprite__Class* klass;
+        MonitorData* monitor;
+        struct Sprite__Fields fields;
+    };
+
+    struct Sprite__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct Sprite__StaticFields {
+    };
+
+    struct Sprite__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct Sprite__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct Sprite__VTable vtable;
     };
 #pragma endregion
 
