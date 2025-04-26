@@ -140,13 +140,29 @@ namespace PlayersTab {
 
 				ImVec4 nameColor = State.LightMode ? AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Black) : AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
 				if (IsInMultiplayerGame() || IsInLobby()) {
-					if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), playerFc) != State.BlacklistFriendCodes.end()) {
+					bool isBlacklisted = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), playerFc) != State.BlacklistFriendCodes.end();
+					bool isWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), playerFc) != State.WhitelistFriendCodes.end();
+					bool isNameLocked = std::find(State.LockedNames.begin(), State.LockedNames.end(), playerName) != State.LockedNames.end();
+
+					if (isNameLocked && isBlacklisted) {
+						playerName = "[!] + [-] " + playerName;
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+					}
+					else if (isNameLocked && isWhitelisted) {
+						playerName = "[!] + [+] " + playerName;
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
+					}
+					else if (isBlacklisted) {
 						playerName = "[-] " + playerName;
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
 					}
-					else if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), playerFc) != State.WhitelistFriendCodes.end()) {
+					else if (isWhitelisted) {
 						playerName = "[+] " + playerName;
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
+					}
+					else if (isNameLocked) {
+						playerName = "[!] " + playerName;
+						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
 					}
 					else if (PlayerIsImpostor(localData) && PlayerIsImpostor(playerData))
 						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
@@ -476,6 +492,7 @@ namespace PlayersTab {
 					}
 
 					std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+					std::string nickname = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(selectedPlayer.get_PlayerData())->fields.PlayerName));
 
 					if (selectedPlayers.size() == 1 && friendCode != "") {
 						Game::PlayerId playerId = selectedPlayer.get_PlayerControl()->fields.PlayerId;
@@ -501,6 +518,22 @@ namespace PlayersTab {
 							else if (ImGui::Button("Add to Whitelist")) {
 								State.WhitelistFriendCodes.push_back(friendCode);
 								State.Save();
+							}
+						}
+						ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+						if (selectedPlayers.size() == 1 && nickname != "") {
+							Game::PlayerId playerId = selectedPlayer.get_PlayerControl()->fields.PlayerId;
+							if (std::find(State.LockedNames.begin(), State.LockedNames.end(), nickname) != State.LockedNames.end()) {
+								if (ImGui::Button("Remove Nickname from Name-Checker")) {
+									State.LockedNames.erase(std::remove(State.LockedNames.begin(), State.LockedNames.end(), nickname), State.LockedNames.end());
+									State.Save();
+								}
+							}
+							else {
+								if (ImGui::Button("Add Nickname to Name-Checker")) {
+									State.LockedNames.push_back(nickname);
+									State.Save();
+								}
 							}
 						}
 					}
