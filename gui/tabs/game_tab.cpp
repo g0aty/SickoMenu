@@ -709,6 +709,40 @@ namespace GameTab {
                         State.Save();
                     }
                 }
+                ImGui::Dummy(ImVec2(15, 15)* State.dpiScale);
+                if (ToggleButton("Kick By Name-Checker", &State.KickByLockedName)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (State.KickByLockedName && ToggleButton("Show Player Data Notifications", &State.ShowPDataByNC)) {
+                    State.Save();
+                }
+                if (State.KickByLockedName) {
+                    ImGui::Text("Blocked Names");
+                    if (State.LockedNames.empty())
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in Name-Checker!");
+                    static std::string newName = "";
+                    InputString("New Nickname", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
+                    if (newName != "") ImGui::SameLine();
+                    if (newName != "" && ImGui::Button("Add")) {
+                        State.LockedNames.push_back(newName);
+                        State.Save();
+                        newName = "";
+                    }
+
+                    if (!State.LockedNames.empty()) {
+                        static int selectedName = 0;
+                        selectedName = std::clamp(selectedName, 0, (int)State.LockedNames.size() - 1);
+                        std::vector<const char*> bNameVector(State.LockedNames.size(), nullptr);
+                        for (size_t i = 0; i < State.LockedNames.size(); i++) {
+                            bNameVector[i] = State.LockedNames[i].c_str();
+                        }
+                        CustomListBoxInt("Nickname to Delete", &selectedName, bNameVector);
+                        ImGui::SameLine();
+                        if (ImGui::Button("Delete"))
+                            State.LockedNames.erase(State.LockedNames.begin() + selectedName);
+                    }
+                }
             }
         }
 

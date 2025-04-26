@@ -538,6 +538,8 @@ public:
     std::vector<std::string> WhitelistFriendCodes = {};
     std::vector<std::string> BlacklistFriendCodes = {};
 
+    std::vector<std::string> LockedNames = {};
+
     std::string lol = "";
     bool ProGamer = false;
     bool KeybindsBeingEdited = false;
@@ -553,11 +555,20 @@ public:
     float ExtraTimeThreshold = 5.0f;
     float NotificationTimeWarn = 5.0f;
 
+    bool KickByLockedName = false;
+    bool ShowPDataByNC = false;
+
     bool AprilFoolsMode = false;
     bool BrainrotEveryone = false;
     bool RizzUpEveryone = false;
     bool DiddyPartyMode = false;
     bool BypassVisualTasks = false;
+
+    std::unordered_map<int32_t, std::chrono::steady_clock::time_point> Rpc101OverloadTimestamps;
+    std::chrono::steady_clock::time_point lastRpc101WindowStart = std::chrono::steady_clock::now();
+    int rpc101Counter = 0;
+    const int RPC101_LIMIT = 30;
+
     void Load();
     void Save();
     void SaveConfig();
