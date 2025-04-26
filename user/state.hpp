@@ -538,6 +538,8 @@ public:
     std::vector<std::string> WhitelistFriendCodes = {};
     std::vector<std::string> BlacklistFriendCodes = {};
 
+    std::vector<std::string> LockedNames = {};
+
     std::string lol = "";
     bool ProGamer = false;
     bool KeybindsBeingEdited = false;
