@@ -40,7 +40,7 @@ namespace PlayersTab {
 	static int farmDelay = 0;
 
 	void Render() {
-		if ((IsInGame() || IsInLobby()) && !State.BlinkPlayersTab) {
+		if ((IsInGame() || IsInLobby())) {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::BeginChild("players#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 			if (!State.selectedPlayer.has_value() || State.selectedPlayer.validate().is_Disconnected()) {
@@ -56,6 +56,35 @@ namespace PlayersTab {
 				if (!validPlayer.has_value() || validPlayer.is_Disconnected()) continue;
 				selectedPlayers.push_back(PlayerSelection(playerCtrl));
 			}
+
+			State.currentPlayers.clear();
+			for (auto playerCtrl : GetAllPlayerControl()) {
+				if (playerCtrl == NULL) continue;
+				auto playerData = GetPlayerData(playerCtrl);
+				if (playerData == NULL || playerData->fields.Disconnected) continue;
+				State.currentPlayers.insert(playerData->fields.PlayerId);
+			}
+
+			for (auto it = State.knownPlayers.begin(); it != State.knownPlayers.end(); ) {
+				if (State.currentPlayers.find(*it) == State.currentPlayers.end()) {
+					State.newPlayersAppear.erase(*it);
+					State.finishedPlayers.erase(*it);
+					it = State.knownPlayers.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+
+			for (auto it = State.newPlayersAppear.begin(); it != State.newPlayersAppear.end(); ) {
+				if (State.finishedPlayers.find(it->first) != State.finishedPlayers.end()) {
+					it = State.newPlayersAppear.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+
 			for (auto playerCtrl : GetAllPlayerControl()) {
 				if (playerCtrl == NULL) continue;
 				const auto& player = PlayerSelection(playerCtrl);
@@ -191,7 +220,36 @@ namespace PlayersTab {
 				if (playerData->fields.IsDead)
 					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
 
-				ImGui::TextColored(nameColor, playerName.c_str());
+				if (!playerName.empty()) {
+					uint8_t playerId = player.get_PlayerId();
+					State.currentPlayers.insert(playerId);
+
+					if (State.knownPlayers.find(playerId) == State.knownPlayers.end() && State.finishedPlayers.find(playerId) == State.finishedPlayers.end()) {
+						State.knownPlayers.insert(playerId);
+						State.newPlayersAppear[playerId] = std::chrono::steady_clock::now();
+					}
+
+					float alpha = 1.0f;
+					auto it = State.newPlayersAppear.find(playerId);
+					if (it != State.newPlayersAppear.end()) {
+						auto now = std::chrono::steady_clock::now();
+						float elapsed = std::chrono::duration<float>(now - it->second).count();
+
+						if (elapsed < State.appearDuration) {
+							float t = elapsed / State.appearDuration;
+							t = sinf(t * 3.14159265f / 2.0f);
+							alpha = t;
+						}
+						else {
+							alpha = 1.0f;
+							State.newPlayersAppear.erase(playerId);
+							State.finishedPlayers.insert(playerId);
+						}
+					}
+
+					nameColor.w *= alpha;
+					ImGui::TextColored(nameColor, playerName.c_str());
+				}
 			}
 			if (shouldEndListBox)
 				ImGui::ListBoxFooter();
@@ -1402,7 +1460,8 @@ namespace PlayersTab {
 			suicideCount = 0;
 		}
 
-		static int blinkDelay = 0;
+#pragma region Blinking tab? No more!
+		/*static int blinkDelay = 0;
 		static bool isBlinking = false;
 		if (State.BlinkPlayersTab && !isBlinking) {
 			blinkDelay = 5;
@@ -1414,6 +1473,7 @@ namespace PlayersTab {
 				State.BlinkPlayersTab = false;
 				isBlinking = false;
 			}
-		}
+		}*/
+#pragma endregion
 	}
 }
