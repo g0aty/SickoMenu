@@ -569,6 +569,12 @@ public:
     int rpc101Counter = 0;
     const int RPC101_LIMIT = 30;
 
+    std::unordered_map<uint8_t, std::chrono::steady_clock::time_point> newPlayersAppear;
+    std::unordered_set<uint8_t> knownPlayers;
+    std::unordered_set<uint8_t> finishedPlayers;
+    std::unordered_set<uint8_t> currentPlayers;
+    static constexpr float appearDuration = 0.5f;
+
     void Load();
     void Save();
     void SaveConfig();
