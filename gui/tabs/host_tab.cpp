@@ -9,11 +9,13 @@ namespace HostTab {
 	enum Groups {
 		Utils,
 		Settings,
+		HostTools,
 		Tournaments
 	};
 
 	static bool openUtils = true; //default to utils tab group
 	static bool openSettings = false;
+	static bool openHostTools = false;
 	static bool openTournaments = false;
 
 	static bool hideRolesList = false;
@@ -21,9 +23,9 @@ namespace HostTab {
 	void CloseOtherGroups(Groups group) {
 		openUtils = group == Groups::Utils;
 		openSettings = group == Groups::Settings;
+		openHostTools = group == Groups::HostTools;
 		openTournaments = group == Groups::Tournaments;
 	}
-
 	/*std::string GetPlayerNameFromFriendCode(std::string friendCode) {
 		for (auto p : GetAllPlayerData()) {
 			if (p->fields.FriendCode == convert_to_string(friendCode))
@@ -67,6 +69,10 @@ namespace HostTab {
 				if (TabGroup("Settings", openSettings)) {
 					CloseOtherGroups(Groups::Settings);
 				}
+			}
+			ImGui::SameLine();
+			if (TabGroup("Host Tools", openHostTools)) {
+					CloseOtherGroups(Groups::HostTools);
 			}
 			if (State.TournamentMode) {
 				ImGui::SameLine();
@@ -559,6 +565,88 @@ namespace HostTab {
 				}
 #pragma endregion
 			}
+
+			if (openHostTools) {
+				if (ToggleButton("Ignore Whitelisted Players [Ban/Kick]", &State.Ban_IgnoreWhitelist)) {
+					State.Save();
+				}
+				ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+				if (ToggleButton("Ban Everyone", &State.BanEveryone)) {
+					State.Save();
+				}
+				if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
+					State.Save();
+				}
+				ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+				if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
+					State.Save();
+				}
+				ImGui::SameLine();
+				if (State.KickAFK && ToggleButton("Activate AFK Notifications", &State.NotificationsAFK)) {
+					State.Save();
+				}
+				ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
+				std::string header = "Kick AFK Players ~ Advanced Options";
+				if (!IsInGame()) {
+					header += " [GAME-MATCH ONLY]";
+				}
+
+				if (ImGui::CollapsingHeader(header.c_str()))
+				{
+					if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+						State.Save();
+					}
+					if (SteppedSliderFloat("Extra Time at The Meeting", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+						State.Save();
+					}
+					if (SteppedSliderFloat("Minimum Sec to Extra Time", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+						State.Save();
+					}
+					if (State.NotificationsAFK && SteppedSliderFloat("Warn-AFK Notifications Time", &State.NotificationTimeWarn, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+						State.Save();
+					}
+				}
+				ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
+				if (ToggleButton("Kick By Name-Checker", &State.KickByLockedName)) {
+					State.Save();
+				}
+				ImGui::SameLine();
+				if (State.KickByLockedName && ToggleButton("Show Player Data Notifications", &State.ShowPDataByNC)) {
+					State.Save();
+				}
+				if (State.KickByLockedName) {
+					ImGui::Text("Blocked Names");
+					if (State.LockedNames.empty())
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in Name-Checker!");
+					static std::string newName = "";
+					InputString("New Nickname", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
+					if (newName != "") ImGui::SameLine();
+					if (newName != "" && ImGui::Button("Add")) {
+						State.LockedNames.push_back(newName);
+						State.Save();
+						newName = "";
+					}
+
+					if (!State.LockedNames.empty()) {
+						static int selectedName = 0;
+						selectedName = std::clamp(selectedName, 0, (int)State.LockedNames.size() - 1);
+						std::vector<const char*> bNameVector(State.LockedNames.size(), nullptr);
+						for (size_t i = 0; i < State.LockedNames.size(); i++) {
+							bNameVector[i] = State.LockedNames[i].c_str();
+						}
+						CustomListBoxInt("Nickname to Delete", &selectedName, bNameVector);
+						ImGui::SameLine();
+						if (ImGui::Button("Delete"))
+							State.LockedNames.erase(State.LockedNames.begin() + selectedName);
+					}
+				}
+				ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+				if (((IsInGame() && Object_1_IsNotNull((Object_1*)*Game::pShipStatus)) || (IsInLobby() && Object_1_IsNotNull((Object_1*)*Game::pLobbyBehaviour)))
+					&& ImGui::Button(IsInLobby() ? "Remove Lobby" : "Remove Map")) {
+					State.taskRpcQueue.push(new DestroyMap());
+				}
+			}
+			
 			if (openTournaments && State.TournamentMode) {
 				if (ImGui::Button("Copy All Data") && State.tournamentFriendCodes.size() != 0) {
 					std::string data = "";
