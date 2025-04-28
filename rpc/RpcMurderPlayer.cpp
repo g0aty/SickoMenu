@@ -291,9 +291,36 @@ void DestroyMap::Process()
 {
 	InnerNetObject* netObj = NULL;
 	if (IsInLobby() && LobbyBehaviour__TypeInfo->static_fields->Instance) netObj = (InnerNetObject*)(LobbyBehaviour__TypeInfo->static_fields->Instance);
-	else if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance)netObj = (InnerNetObject*)(ShipStatus__TypeInfo->static_fields->Instance);
+	else if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance) netObj = (InnerNetObject*)(ShipStatus__TypeInfo->static_fields->Instance);
 	if (netObj == NULL) return;
 	InnerNetObject_Despawn(netObj, NULL);
+
+	std::string MapMode;
+
+	if (IsInLobby())
+		MapMode = "Lobby";
+	else
+		MapMode = "Map";
+
+	std::string RemovedMapNotification = std::format("<#ff033e><b>{} Successfully Removed!</b></color>", MapMode);
+
+	auto notifier = (NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier);
+	if (notifier == nullptr) return;
+
+	auto disconnectSprite = new Sprite(*notifier->fields.settingsChangeSprite);
+	auto oldSprite = notifier->fields.playerDisconnectSprite;
+	auto oldSound = notifier->fields.playerDisconnectSound;
+	auto oldColor = notifier->fields.disconnectColor;
+
+	notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+	notifier->fields.playerDisconnectSound = notifier->fields.settingsChangeSound;
+	notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
+
+	NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(RemovedMapNotification), nullptr);
+
+	notifier->fields.playerDisconnectSprite = oldSprite;
+	notifier->fields.playerDisconnectSound = oldSound;
+	notifier->fields.disconnectColor = oldColor;
 }
 
 RpcRevive::RpcRevive(PlayerControl* Player)
