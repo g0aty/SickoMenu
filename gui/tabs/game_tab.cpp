@@ -117,21 +117,18 @@ namespace GameTab {
         General,
         Chat,
         Anticheat,
-        Destruct,
         Options
     };
 
     static bool openGeneral = true;
     static bool openChat = false;
     static bool openAnticheat = false;
-    static bool openDestruct = false;
     static bool openOptions = false;
 
     void CloseOtherGroups(Groups group) {
         openGeneral = group == Groups::General;
         openChat = group == Groups::Chat;
         openAnticheat = group == Groups::Anticheat;
-        openDestruct = group == Groups::Destruct;
         openOptions = group == Groups::Options;
     }
 
@@ -148,10 +145,6 @@ namespace GameTab {
         ImGui::SameLine();
         if (TabGroup("Anticheat", openAnticheat)) {
             CloseOtherGroups(Groups::Anticheat);
-        }
-        ImGui::SameLine();
-        if (TabGroup("Destruct", openDestruct)) {
-            CloseOtherGroups(Groups::Destruct);
         }
 
         if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
@@ -512,6 +505,24 @@ namespace GameTab {
                 if (ImGui::Button("Remove"))
                     State.ChatPresets.erase(State.ChatPresets.begin() + selectedPresetIndex);
             }
+
+            
+#pragma region Diddy Things :trolley_crazy:
+
+            if (State.AprilFoolsMode) {
+                ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? "Diddy Party Mode" : (IsChatCensored() || IsStreamerMode() ? "F***son Mode" : "Fuckson Mode"));
+                if (ToggleButton("Mog Everyone [Sigma]", &State.BrainrotEveryone)) {
+                    if (State.ChatSpam) State.ChatSpam = false;
+                    if (State.RizzUpEveryone) State.RizzUpEveryone = false;
+                    State.Save();
+                }
+                if (State.DiddyPartyMode && ToggleButton("Rizz Up Everyone [Skibidi]", &State.RizzUpEveryone)) {
+                    if (State.ChatSpam) State.ChatSpam = false;
+                    if (State.BrainrotEveryone) State.BrainrotEveryone = false;
+                    State.Save();
+                }
+            }
+#pragma endregion
         }
 
         if (openAnticheat) {
@@ -640,108 +651,6 @@ namespace GameTab {
                     ImGui::SameLine();
                     if (ImGui::Button("Remove"))
                         State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
-                }
-            }
-        }
-
-        if (openDestruct) {
-            /*if (ToggleButton("Ignore Whitelisted Players [Exploits]", &State.Destruct_IgnoreWhitelist)) {
-                State.Save();
-            }*/
-            if (ToggleButton("Ignore Whitelisted Players [Ban/Kick]", &State.Ban_IgnoreWhitelist)) {
-                State.Save();
-            }
-            if (IsInLobby() && ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {
-                State.Save();
-            }
-            if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
-            if (State.AprilFoolsMode) {
-                ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? "Diddy Party Mode" : (IsChatCensored() || IsStreamerMode() ? "F***son Mode" : "Fuckson Mode"));
-                if (ToggleButton("Mog Everyone [Sigma]", &State.BrainrotEveryone)) {
-                    if (State.ChatSpam) State.ChatSpam = false;
-                    if (State.RizzUpEveryone) State.RizzUpEveryone = false;
-                    State.Save();
-                }
-                if (State.DiddyPartyMode && ToggleButton("Rizz Up Everyone [Skibidi]", &State.RizzUpEveryone)) {
-                    if (State.ChatSpam) State.ChatSpam = false;
-                    if (State.BrainrotEveryone) State.BrainrotEveryone = false;
-                    State.Save();
-                }
-            }
-            if (IsHost()) {
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-                if (((IsInGame() && Object_1_IsNotNull((Object_1*)*Game::pShipStatus)) || (IsInLobby() && Object_1_IsNotNull((Object_1*)*Game::pLobbyBehaviour)))
-                    && ImGui::Button(IsInLobby() ? "Remove Lobby" : "Remove Map")) {
-                    State.taskRpcQueue.push(new DestroyMap());
-                }
-                if (ToggleButton("Ban Everyone", &State.BanEveryone)) {
-                    State.Save();
-                }
-                if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
-                    State.Save();
-                }
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-                if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
-                    State.Save();
-                }
-                ImGui::SameLine();
-                if (State.KickAFK && ToggleButton("Activate AFK Notifications", &State.NotificationsAFK)) {
-                    State.Save();
-                }
-                ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
-                std::string header = "Anti AFK ~ Advanced Options";
-                if (!IsInGame()) {
-                    header += " [GAME-MATCH]";
-                }
-
-                if (ImGui::CollapsingHeader(header.c_str()))
-                {
-                    if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
-                    }
-                    if (SteppedSliderFloat("Extra Time at The Meeting", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
-                    }
-                    if (SteppedSliderFloat("Minimum Sec to Extra Time", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
-                    }
-                    if (State.NotificationsAFK && SteppedSliderFloat("Warn-AFK Notifications Time", &State.NotificationTimeWarn, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
-                    }
-                }
-                ImGui::Dummy(ImVec2(15, 15)* State.dpiScale);
-                if (ToggleButton("Kick By Name-Checker", &State.KickByLockedName)) {
-                    State.Save();
-                }
-                ImGui::SameLine();
-                if (State.KickByLockedName && ToggleButton("Show Player Data Notifications", &State.ShowPDataByNC)) {
-                    State.Save();
-                }
-                if (State.KickByLockedName) {
-                    ImGui::Text("Blocked Names");
-                    if (State.LockedNames.empty())
-                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in Name-Checker!");
-                    static std::string newName = "";
-                    InputString("New Nickname", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
-                    if (newName != "") ImGui::SameLine();
-                    if (newName != "" && ImGui::Button("Add")) {
-                        State.LockedNames.push_back(newName);
-                        State.Save();
-                        newName = "";
-                    }
-
-                    if (!State.LockedNames.empty()) {
-                        static int selectedName = 0;
-                        selectedName = std::clamp(selectedName, 0, (int)State.LockedNames.size() - 1);
-                        std::vector<const char*> bNameVector(State.LockedNames.size(), nullptr);
-                        for (size_t i = 0; i < State.LockedNames.size(); i++) {
-                            bNameVector[i] = State.LockedNames[i].c_str();
-                        }
-                        CustomListBoxInt("Nickname to Delete", &selectedName, bNameVector);
-                        ImGui::SameLine();
-                        if (ImGui::Button("Delete"))
-                            State.LockedNames.erase(State.LockedNames.begin() + selectedName);
-                    }
                 }
             }
         }
