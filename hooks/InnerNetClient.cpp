@@ -792,13 +792,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
         }
         
-        static std::unordered_set<std::string> forbiddenNames;
-
         if (State.KickByLockedName) {
             const auto allPlayers = GetAllPlayerControl();
-            const std::unordered_set<std::string> bannedNamesSet(State.LockedNames.begin(), State.LockedNames.end());
 
-            std::unordered_set<std::string> currentNames;
+            const std::unordered_set<std::string> BannedNamesSet(State.LockedNames.begin(), State.LockedNames.end());
 
             for (auto* pc : allPlayers) {
                 if (!pc || pc == *Game::pLocalPlayer) continue;
@@ -810,17 +807,20 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 const std::string puid = convert_from_string(pd->fields.Puid);
                 const std::string fc = convert_from_string(pd->fields.FriendCode);
 
-                currentNames.insert(name);
+                State.CurrentNames.insert(name);
 
-                if (!bannedNamesSet.contains(name) || !forbiddenNames.insert(name).second) continue;
+                if (!BannedNamesSet.contains(name)) continue;
 
                 if (State.Ban_IgnoreWhitelist &&
                     std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) != State.WhitelistFriendCodes.end()) {
                     continue;
                 }
 
-                const std::string finalPuid = puid.empty() ? "<#F00>NONE</color>" : puid;
-                const std::string finalFC = fc.empty() ? "<#F00>NONE</color>" : fc;
+                State.CurrentForbiddenNames.insert(name);
+
+                if (State.ForbiddenNames.contains(name)) continue;
+
+                State.ForbiddenNames.insert(name);
 
                 app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
 
@@ -839,13 +839,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 }
 
                 if (State.ShowPDataByNC) {
-                    const std::string pdataMsg = std::format("<#ff033e><font=\"Barlow-Regular Outline\"><b>Name-Checker ~ Player Data:\n<voffset=-0.5>*</voffset> [<#FFF>{}</color>]\n\n<size=75%>Product User ID: <#FFF>{}</color>\nFriend Code: <#FFF>{}</b></font></size></color>", name, finalPuid, finalFC);
+                    const std::string pdataMsg = std::format("<#ff033e><font=\"Barlow-Regular Outline\"><b>Name-Checker ~ Player Data:\n<voffset=-0.5>*</voffset> [<#FFF>{}</color>]\n\n<size=75%>Product User ID: <#FFF>{}</color>\nFriend Code: <#FFF>{}</b></font></size></color>", name, puid.empty() ? "<#F00>NONE</color>" : puid, fc.empty() ? "<#F00>NONE</color>" : fc);
                     ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(pdataMsg), NULL);
                 }
             }
 
-            for (auto it = forbiddenNames.begin(); it != forbiddenNames.end(); )
-                it = currentNames.contains(*it) ? std::next(it) : forbiddenNames.erase(it);
+            State.ForbiddenNames = std::move(State.CurrentForbiddenNames);
         }
     }
     catch (Exception* ex) {
