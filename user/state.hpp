@@ -564,16 +564,25 @@ public:
     bool DiddyPartyMode = false;
     bool BypassVisualTasks = false;
 
+    // Anti-Overload [RPC 101 | Dependencies]
     std::unordered_map<int32_t, std::chrono::steady_clock::time_point> Rpc101OverloadTimestamps;
     std::chrono::steady_clock::time_point lastRpc101WindowStart = std::chrono::steady_clock::now();
     int rpc101Counter = 0;
     const int RPC101_LIMIT = 30;
 
+
+    // Player tab [Crash-fix | Dependencies]
     std::unordered_map<uint8_t, std::chrono::steady_clock::time_point> newPlayersAppear;
     std::unordered_set<uint8_t> knownPlayers;
     std::unordered_set<uint8_t> finishedPlayers;
     std::unordered_set<uint8_t> currentPlayers;
     static constexpr float appearDuration = 0.5f;
+
+
+    // Name-Checker [Dependencies]
+    std::unordered_set<std::string> ForbiddenNames;
+    std::unordered_set<std::string> CurrentForbiddenNames;
+    std::unordered_set<std::string> CurrentNames;
 
     void Load();
     void Save();
