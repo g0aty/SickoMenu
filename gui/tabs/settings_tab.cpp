@@ -60,6 +60,14 @@ namespace SettingsTab {
 			if (ToggleButton("Panic Warning", &State.PanicWarning)) {
 				State.Save();
 			}
+			ImGui::SameLine();
+			if (ToggleButton("Extra Commands", &State.ExtraCommands)) {
+				State.Save();
+			}
+
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Type \"/help\" in chat to see all available commands.");
+			}
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
