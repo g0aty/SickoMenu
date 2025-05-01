@@ -481,3 +481,43 @@ void RpcBootFromVent::Process()
 
 	PlayerPhysics_RpcBootFromVent(Player->fields.MyPhysics, ventId, NULL);
 }
+
+PunishEveryone::PunishEveryone(PlayerControl* Player, bool isBan)
+{
+
+}
+
+void PunishEveryone::Process() {
+	auto allPlayers = GetAllPlayerControl();
+	std::vector<app::PlayerControl*> playersToPunish;
+
+	for (auto playerControl : allPlayers) {
+		if (!playerControl || playerControl == *Game::pLocalPlayer) continue;
+
+		auto playerData = GetPlayerDataById(playerControl->fields.PlayerId);
+		if (!playerData) continue;
+
+		if (State.Ban_IgnoreWhitelist &&
+			std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(),
+				convert_from_string(playerData->fields.FriendCode)) != State.WhitelistFriendCodes.end()) {
+			continue;
+		}
+
+		playersToPunish.push_back(playerControl);
+	}
+
+	if (playersToPunish.empty()) {
+		const std::string emptyMsg = std::format("<#F00><font=\"Barlow-Regular Outline\"><b>No players found!</b></font></color>");
+		ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(emptyMsg), NULL);
+		return;
+	}
+
+	for (auto playerControl : playersToPunish) {
+		app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, isBan, NULL);
+	}
+
+	const std::string resultMsg = isBan
+		? std::format("<#ff033e><font=\"Barlow-Regular Outline\"><b>Everyone Has Been Banned!</b></font></color>")
+		: std::format("<#ff033e><font=\"Barlow-Regular Outline\"><b>Everyone Has Been Kicked!</b></font></color>");
+	ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(resultMsg), NULL);
+}
