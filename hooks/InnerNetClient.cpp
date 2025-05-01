@@ -846,6 +846,43 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             State.ForbiddenNames = std::move(State.CurrentForbiddenNames);
         }
+
+        if (State.KickByWhitelist) {
+            const auto allPlayers = GetAllPlayerControl();
+
+            for (auto* pc : allPlayers) {
+                if (!pc) continue;
+
+                if (pc->fields.PlayerId == (*Game::pLocalPlayer)->fields.PlayerId) continue;
+
+                auto* pd = GetPlayerDataById(pc->fields.PlayerId);
+                if (!pd) continue;
+
+                const std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pc))->fields.PlayerName));
+                const std::string fc = convert_from_string(pd->fields.FriendCode);
+
+                if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) != State.WhitelistFriendCodes.end()) {
+                    continue;
+                }
+
+                InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
+
+                if (State.WhitelistNotifications && State.NotifiedFriendCodes.find(fc) == State.NotifiedFriendCodes.end()) {
+                    State.NotifiedFriendCodes.insert(fc);
+
+                    std::string pdataMsg = std::format("<font=\"Barlow-Regular Outline\"><b><#FFF>({})</color> <#ff033e>tried to join to your server, but was kicked by a whitelist.</color></b></font></material>\n\n", fc);
+
+                    if (State.ExtraCommands) {
+                        pdataMsg += std::format("<font=\"Barlow-Regular Outline\"><b><#0F0>Use the command: <#fff>\"/Add {}\"</color>\nto whitelist player!</color></b></font></material>", fc);
+                    }
+
+                    ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(pdataMsg), NULL);
+                }
+            }
+        }
+        if (!IsInLobby() && !IsInGame()) {
+            State.NotifiedFriendCodes.clear();
+        }
     }
     catch (Exception* ex) {
         onGameEnd();

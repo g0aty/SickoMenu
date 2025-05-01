@@ -93,6 +93,7 @@ void Settings::Load() {
         JSON_TRYGET("FakePlatform", this->FakePlatform);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         JSON_TRYGET("PanicWarning", this->PanicWarning);
+        JSON_TRYGET("ExtraCommands", this->ExtraCommands);
 
         JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
         JSON_TRYGET("DarkMode", this->DarkMode);
@@ -430,6 +431,7 @@ void Settings::Save() {
                 { "FakePlatform", this->FakePlatform },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
                 { "PanicWarning", this->PanicWarning },
+                { "ExtraCommands", this->ExtraCommands },
 
                 { "NoAbilityCD", this->NoAbilityCD },
                 { "DarkMode", this->DarkMode },

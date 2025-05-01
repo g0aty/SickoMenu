@@ -383,6 +383,92 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 			if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), chatText.substr(5), true));
 			return; //we don't want the chat to know we're using "aum"
 		}
+		
+// Added as an extension to the "Whitelisted Players Only" feature and other commands
+		if (State.ExtraCommands) {
+			std::string chatTextLower = strToLower(chatText);
+
+			if (chatTextLower == "/help") {
+				std::string msg =
+					"<#87cefa><font=\"Barlow-Regular Outline\"><b>"
+					"<size=120%>Available Commands:</size><size=75%>\n\n"
+					"<#ff033e>/Add</color> ~ <#ff033e>Add Player to the Whitelist</color>\n"
+					"<#ff033e>/Remove</color> ~ <#ff033e>Remove Player From the Whitelist</color>\n"
+					"<#ff033e>/Kick All</color> ~ <#ff033e>Kick Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
+					"<#ff033e>/Ban All</color> ~ <#ff033e>Ban Everyone</color>  <#fb0>[HOST ONLY]</color>"
+					"</size></b></font></color>";
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+			if (chatTextLower == "/add" || chatTextLower == "/add ") {
+				std::string msg = "<#aaaaaa><font=\"Barlow-Regular Outline\"><b>Usage: /add <FriendCode></b></font></color>";
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+			if (chatTextLower.substr(0, 5) == "/add ") {
+				std::string fc = chatText.substr(5);
+				if (!fc.empty()) {
+					if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) == State.WhitelistFriendCodes.end()) {
+						State.WhitelistFriendCodes.push_back(fc);
+
+						std::string msg = std::format("<#5aff3d><font=\"Barlow-Regular Outline\"><b>\"{}\" Added to Whitelist.</b></font></color>", fc);
+						ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					}
+					else {
+						std::string msg = std::format("<#ffd93d><font=\"Barlow-Regular Outline\"><b>\"{}\" Already in Whitelist.</b></font></color>", fc);
+						ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					}
+				}
+				return;
+			}
+
+			if (chatTextLower == "/remove" || chatTextLower == "/remove ") {
+				std::string msg = "<#aaaaaa><font=\"Barlow-Regular Outline\"><b>Usage: /remove <FriendCode></b></font></color>";
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+			if (chatTextLower.substr(0, 8) == "/remove ") {
+				std::string fc = chatText.substr(8);
+				auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
+				if (it != State.WhitelistFriendCodes.end()) {
+					State.WhitelistFriendCodes.erase(it);
+
+					std::string msg = std::format("<#ff5c5c><font=\"Barlow-Regular Outline\"><b>\"{}\" Removed from Whitelist.</b></font></color>", fc);
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				}
+				else {
+					std::string msg = std::format("<#ff0000><font=\"Barlow-Regular Outline\"><b>\"{}\" Not found in Whitelist.</b></font></color>", fc);
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				}
+				return;
+			}
+
+			if (chatTextLower == "/kick all") {
+				bool isBan = false;
+				if (IsInGame()) {
+					State.rpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+				}
+				else if (IsInLobby()) {
+					State.lobbyRpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+				}
+				return;
+			}
+
+			if (chatTextLower == "/ban all") {
+				bool isBan = true;
+				if (IsInGame()) {
+					State.rpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+				}
+				else if (IsInLobby()) {
+					State.lobbyRpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+				}
+				return;
+			}
+		}
+		
 		if (State.activeWhisper && State.playerToWhisper.has_value()) {
 			MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
 				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,
