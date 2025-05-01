@@ -710,6 +710,13 @@ namespace GameTab {
                     }
                 }
                 ImGui::Dummy(ImVec2(15, 15)* State.dpiScale);
+                if (ToggleButton("Whitelisted Players Only", &State.KickByWhitelist)) {
+                    State.Save();
+                }
+                if (State.KickByWhitelist) ImGui::SameLine();
+                if (State.KickByWhitelist && ToggleButton("Enable WL Notifications", &State.WhitelistNotifications)) {
+                    State.Save();
+                }
                 if (ToggleButton("Kick By Name-Checker", &State.KickByLockedName)) {
                     State.Save();
                 }
