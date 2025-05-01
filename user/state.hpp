@@ -584,6 +584,12 @@ public:
     std::unordered_set<std::string> CurrentForbiddenNames;
     std::unordered_set<std::string> CurrentNames;
 
+    // Advanced Whitelist + Extra Commands [Dependencies]
+    std::unordered_set<std::string> NotifiedFriendCodes;
+    bool KickByWhitelist = false;
+    bool WhitelistNotifications = false;
+    bool ExtraCommands = false;
+
     void Load();
     void Save();
     void SaveConfig();
