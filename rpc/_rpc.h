@@ -480,3 +480,11 @@ public:
 	RpcBootFromVent(PlayerControl* Player, int ventId);
 	virtual void Process() override;
 };
+
+class PunishEveryone : public RPCInterface {
+public:
+	PlayerControl* Player;
+	bool isBan;
+	PunishEveryone(PlayerControl* Player, bool isBan);
+	virtual void Process() override;
+};
