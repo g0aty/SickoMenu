@@ -590,6 +590,13 @@ public:
     bool WhitelistNotifications = false;
     bool ExtraCommands = false;
 
+    // Ban Auto-Leave Players [Dependencies]
+    std::unordered_map<std::string, int> joinLeaveCount;
+    std::unordered_set<std::string> activeFriendCodes;
+    bool BanLeavers = false;
+    bool BL_AutoLeavers = false;
+    float LeaveCount = 1.0;
+
     void Load();
     void Save();
     void SaveConfig();
