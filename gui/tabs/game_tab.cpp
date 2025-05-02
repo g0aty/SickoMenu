@@ -674,13 +674,14 @@ namespace GameTab {
                     && ImGui::Button(IsInLobby() ? "Remove Lobby" : "Remove Map")) {
                     State.taskRpcQueue.push(new DestroyMap());
                 }
+                ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
                 if (ToggleButton("Ban Everyone", &State.BanEveryone)) {
                     State.Save();
                 }
                 if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
                     State.Save();
                 }
-                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+                ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
                 if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
                     State.Save();
                 }
@@ -688,12 +689,11 @@ namespace GameTab {
                 if (State.KickAFK && ToggleButton("Activate AFK Notifications", &State.NotificationsAFK)) {
                     State.Save();
                 }
-                ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
                 std::string header = "Anti AFK ~ Advanced Options";
                 if (!IsInGame()) {
                     header += " [GAME-MATCH]";
                 }
-
+                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
                 if (ImGui::CollapsingHeader(header.c_str()))
                 {
                     if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
@@ -709,7 +709,9 @@ namespace GameTab {
                         State.Save();
                     }
                 }
-                ImGui::Dummy(ImVec2(15, 15)* State.dpiScale);
+                ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
                 if (ToggleButton("Whitelisted Players Only", &State.KickByWhitelist)) {
                     State.Save();
                 }
@@ -717,6 +719,24 @@ namespace GameTab {
                 if (State.KickByWhitelist && ToggleButton("Enable WL Notifications", &State.WhitelistNotifications)) {
                     State.Save();
                 }
+                ImGui::Dummy(ImVec2(15, 15)* State.dpiScale);
+                if (ToggleButton("Ban Auto-Rejoin Players", &State.BanLeavers)) {
+                    State.Save();
+                }
+                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+                if (ImGui::CollapsingHeader("BA-RP ~ Advanced Options"))
+                {
+                    if (SteppedSliderFloat("Maximum Rejoins", &State.LeaveCount, 1.f, 15.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                        State.Save();
+                    }
+                    ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+                    if (ToggleButton("Blacklist Auto-Rejoin Players", &State.BL_AutoLeavers)) {
+                        State.Save();
+                    }
+                }
+                ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
                 if (ToggleButton("Kick By Name-Checker", &State.KickByLockedName)) {
                     State.Save();
                 }
