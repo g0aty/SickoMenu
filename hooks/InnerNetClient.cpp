@@ -883,6 +883,67 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         if (!IsInLobby() && !IsInGame()) {
             State.NotifiedFriendCodes.clear();
         }
+
+        if (State.BanLeavers) {
+            auto allPlayers = GetAllPlayerControl();
+            std::unordered_set<std::string> currentFriendCodes;
+
+            std::string localFC;
+            if (*Game::pLocalPlayer) {
+                if (auto* localPD = GetPlayerDataById((*Game::pLocalPlayer)->fields.PlayerId)) {
+                    localFC = convert_from_string(localPD->fields.FriendCode);
+                }
+            }
+
+            for (auto* pc : allPlayers) {
+                if (!pc || pc == *Game::pLocalPlayer) continue;
+
+                auto* pd = GetPlayerDataById(pc->fields.PlayerId);
+                if (!pd) continue;
+
+                const std::string fc = convert_from_string(pd->fields.FriendCode);
+                if (fc == localFC) continue;
+
+                currentFriendCodes.insert(fc);
+
+                if (State.Ban_IgnoreWhitelist && std::ranges::find(State.WhitelistFriendCodes, fc) != State.WhitelistFriendCodes.end()) continue;
+
+                State.activeFriendCodes.insert(fc);
+
+                if (State.joinLeaveCount[fc] > static_cast<int>(State.LeaveCount) - 1) {
+                    app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, true, nullptr);
+
+                    if (State.BL_AutoLeavers && std::ranges::find(State.BlacklistFriendCodes, fc) == State.BlacklistFriendCodes.end()) {
+                        State.BlacklistFriendCodes.push_back(fc);
+                    }
+
+                    State.activeFriendCodes.erase(fc);
+                }
+            }
+
+            for (const auto& fc : State.activeFriendCodes) {
+                if (fc != localFC && currentFriendCodes.find(fc) == currentFriendCodes.end()) {
+                    State.joinLeaveCount[fc]++;
+                }
+            }
+
+            for (auto it = State.activeFriendCodes.begin(); it != State.activeFriendCodes.end(); ) {
+                if (currentFriendCodes.find(*it) == currentFriendCodes.end() && *it != localFC)
+                    it = State.activeFriendCodes.erase(it);
+                else
+                    ++it;
+            }
+
+            if (!localFC.empty()) {
+                State.joinLeaveCount[localFC] = 0;
+                State.activeFriendCodes.erase(localFC);
+            }
+        }
+
+        if (!IsInLobby() && !IsInGame()) {
+            State.joinLeaveCount.clear();
+            State.activeFriendCodes.clear();
+        }
     }
     catch (Exception* ex) {
         onGameEnd();
