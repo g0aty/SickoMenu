@@ -831,7 +831,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
                     notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
 
-                    const std::string kickMsg = std::format("<#FFF><b>{}</color> kicked by Name-Checker!</b>", name);
+                    const std::string kickMsg = std::format("<#FFF><b>{}</color> detected by Name-Checker!</b>", name);
                     NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(kickMsg), NULL);
 
                     notifier->fields.playerDisconnectSprite = spriteBackup;
