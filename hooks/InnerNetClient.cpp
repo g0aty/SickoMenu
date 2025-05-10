@@ -9,6 +9,7 @@
 #include "profiler.h"
 #include <sstream>
 #include "esp.hpp"
+#include <chrono>
 
 using namespace std::string_view_literals;
 
@@ -943,6 +944,59 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         if (!IsInLobby() && !IsInGame()) {
             State.joinLeaveCount.clear();
             State.activeFriendCodes.clear();
+        }
+
+        if (State.BanWarned || State.KickWarned) {
+            auto allPlayers = GetAllPlayerControl();
+            std::unordered_set<std::string> currentNotifiedCodes;
+
+            for (auto playerControl : allPlayers) {
+                if (!playerControl || playerControl == *Game::pLocalPlayer) continue;
+
+                auto playerData = GetPlayerDataById(playerControl->fields.PlayerId);
+                if (!playerData) continue;
+
+                std::string friendCode = convert_from_string(playerData->fields.FriendCode);
+
+                if (State.Ban_IgnoreWhitelist &&
+                    std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end()) {
+                    continue;
+                }
+
+                int warnCount = State.WarnedFriendCodes[friendCode];
+
+                if (warnCount >= State.MaxWarns) {
+                    currentNotifiedCodes.insert(friendCode);
+
+                    if (State.NotifiedWarnedPlayers.contains(friendCode)) continue;
+
+                    State.NotifiedWarnedPlayers.insert(friendCode);
+
+                    if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
+
+                        auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
+                        Color colorBackup = notifier->fields.disconnectColor;
+
+                        notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+                        notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
+
+                        std::string action = State.BanWarned ? "banned" : "kicked";
+                        std::string kickMsg = std::format("<#FFF><b>\"{}\" was {} for receiving {} warns</b>", friendCode, action, State.MaxWarns);
+                        NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(kickMsg), NULL);
+
+                        notifier->fields.playerDisconnectSprite = spriteBackup;
+                        notifier->fields.disconnectColor = colorBackup;
+                    }
+
+                    if (State.BanWarned) {
+                        app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, true, NULL);
+                    }
+                    else if (State.KickWarned) {
+                        app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, false, NULL);
+                    }
+                }
+            }
+            State.NotifiedWarnedPlayers = std::move(currentNotifiedCodes);
         }
     }
     catch (Exception* ex) {
