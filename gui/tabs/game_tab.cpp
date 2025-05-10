@@ -161,6 +161,18 @@ namespace GameTab {
             }
         }
 
+        enum WarnViewType {
+            WarnView_List = 0,
+            WarnView_Manual,
+            WarnView_COUNT
+        };
+
+        static int selectedWarnView = 0;
+        const char* warnViewModes[WarnView_COUNT] = {
+            "List View",
+            "Manual Warn"
+        };
+
         if (openGeneral) {
             ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
             if (SteppedSliderFloat("Player Speed Multiplier", &State.PlayerSpeed, 0.f, 10.f, 0.05f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
@@ -674,14 +686,14 @@ namespace GameTab {
                     && ImGui::Button(IsInLobby() ? "Remove Lobby" : "Remove Map")) {
                     State.taskRpcQueue.push(new DestroyMap());
                 }
-                ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
+                ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
                 if (ToggleButton("Ban Everyone", &State.BanEveryone)) {
                     State.Save();
                 }
                 if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
                     State.Save();
                 }
-                ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
+                ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
                 if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
                     State.Save();
                 }
@@ -693,7 +705,7 @@ namespace GameTab {
                 if (!IsInGame()) {
                     header += " [GAME-MATCH]";
                 }
-                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (ImGui::CollapsingHeader(header.c_str()))
                 {
                     if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
@@ -709,9 +721,9 @@ namespace GameTab {
                         State.Save();
                     }
                 }
-                ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                 ImGui::Separator();
-                ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                 if (ToggleButton("Whitelisted Players Only", &State.KickByWhitelist)) {
                     State.Save();
                 }
@@ -719,28 +731,28 @@ namespace GameTab {
                 if (State.KickByWhitelist && ToggleButton("Enable WL Notifications", &State.WhitelistNotifications)) {
                     State.Save();
                 }
-                ImGui::Dummy(ImVec2(15, 15)* State.dpiScale);
+                ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
                 if (ToggleButton("Ban Auto-Rejoin Players", &State.BanLeavers)) {
                     State.Save();
                 }
-                ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (ImGui::CollapsingHeader("BA-RP ~ Advanced Options"))
                 {
                     if (SteppedSliderFloat("Maximum Rejoins", &State.LeaveCount, 1.f, 15.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
                         State.Save();
                     }
-                    ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+                    ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                     if (ToggleButton("Blacklist Auto-Rejoin Players", &State.BL_AutoLeavers)) {
                         State.Save();
                     }
                 }
-                ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                 ImGui::Separator();
-                ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                 if (ToggleButton("Kick By Name-Checker", &State.KickByLockedName)) {
                     State.Save();
                 }
-                ImGui::SameLine();
+                if (State.KickByLockedName) ImGui::SameLine();
                 if (State.KickByLockedName && ToggleButton("Show Player Data Notifications", &State.ShowPDataByNC)) {
                     State.Save();
                 }
@@ -770,7 +782,138 @@ namespace GameTab {
                             State.LockedNames.erase(State.LockedNames.begin() + selectedName);
                     }
                 }
+                ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
+                ImGui::BeginGroup();
+                if (ToggleButton("Kick Warned Players", &State.KickWarned)) {
+                    State.Save();
+                }
+                if (ToggleButton("Ban Warned Players", &State.BanWarned)) {
+                    State.Save();
+                }
+
+                ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+
+                ImGui::PushItemWidth(80);
+                ImGui::InputInt("Max Warns", &State.MaxWarns);
+                if (State.minFpsThreshold < 1)
+                    State.minFpsThreshold = 1;
+                ImGui::PopItemWidth();
+                ImGui::EndGroup();
             }
+            if (IsHost()) ImGui::SameLine();
+            ImGui::BeginGroup();
+            ImGui::PushItemWidth(150);
+            if (!IsHost()) ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            ImGui::Combo("Warn View Mode", &selectedWarnView, warnViewModes, WarnView_COUNT);
+            ImGui::PopItemWidth();
+
+
+            if (selectedWarnView == WarnView_List) {
+                if (!State.WarnedFriendCodes.empty()) {
+                    ImGui::Text("Warned Players");
+
+                    std::string localFC = "";
+                    if (Game::pLocalPlayer && *Game::pLocalPlayer) {
+                        localFC = convert_from_string((*Game::pLocalPlayer)->fields.FriendCode);
+                    }
+
+                    std::vector<std::string> warnedList;
+                    std::vector<std::string> fcKeys;
+
+                    for (const auto& [fc, count] : State.WarnedFriendCodes) {
+                        if (count <= 0 || fc == localFC)
+                            continue;
+
+                        warnedList.push_back(std::format("{} ({} warn{})", fc, count, count == 1 ? "" : "s"));
+                        fcKeys.push_back(fc);
+                    }
+
+                    if (!warnedList.empty()) {
+                        static int selectedWarned = 0;
+                        selectedWarned = std::clamp(selectedWarned, 0, (int)warnedList.size() - 1);
+
+                        std::vector<const char*> warnedCStrs;
+                        for (const auto& entry : warnedList) warnedCStrs.push_back(entry.c_str());
+
+                        ImGui::PushItemWidth(200);
+                        CustomListBoxInt("Warned FriendCodes", &selectedWarned, warnedCStrs);
+                        ImGui::PopItemWidth();
+
+                        ImGui::SameLine();
+                        if (ImGui::Button("Remove")) {
+                            if (selectedWarned >= 0 && selectedWarned < (int)fcKeys.size()) {
+                                std::string fc = fcKeys[selectedWarned];
+                                State.WarnedFriendCodes.erase(fc);
+                                State.WarnReasons.erase(fc);
+                                selectedWarned = 0;
+                                State.Save();
+                            }
+                        }
+
+                        std::string selectedFc = fcKeys[selectedWarned];
+                        auto& warnReasons = State.WarnReasons[selectedFc];
+
+                        if (!warnReasons.empty()) {
+                            ImGui::Text("Warn Reasons:");
+
+                            static int selectedReason = 0;
+                            selectedReason = std::clamp(selectedReason, 0, (int)warnReasons.size() - 1);
+
+                            std::vector<std::string> numberedReasons;
+                            numberedReasons.reserve(warnReasons.size());
+                            for (size_t i = 0; i < warnReasons.size(); ++i) {
+                                numberedReasons.push_back(std::format("[{}] {}", i + 1, warnReasons[i]));
+                            }
+
+                            std::vector<const char*> reasonCStrs;
+                            for (const auto& str : numberedReasons) reasonCStrs.push_back(str.c_str());
+
+                            ImGui::PushItemWidth(200);
+                            ImGui::ListBox("##WarnReasonList", &selectedReason, reasonCStrs.data(), (int)reasonCStrs.size());
+                            ImGui::PopItemWidth();
+
+                            ImGui::SameLine();
+                            if (ImGui::Button("Delete")) {
+                                if (selectedReason >= 0 && selectedReason < (int)warnReasons.size()) {
+                                    warnReasons.erase(warnReasons.begin() + selectedReason);
+                                    selectedReason = 0;
+
+                                    if (--State.WarnedFriendCodes[selectedFc] <= 0) {
+                                        State.WarnedFriendCodes.erase(selectedFc);
+                                        State.WarnReasons.erase(selectedFc);
+                                        selectedWarned = 0;
+                                    }
+
+                                    State.Save();
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "No warned players.");
+                    }
+                }
+            }
+            else if (selectedWarnView == WarnView_Manual) {
+                static std::string friendCodeToWarn;
+                static std::string warnReason;
+
+                ImGui::PushItemWidth(200);
+                InputString("FriendCode", &friendCodeToWarn);
+                InputString("Reason", &warnReason);
+                ImGui::PopItemWidth();
+
+                if (ImGui::Button("Submit Warn") && !friendCodeToWarn.empty() && !warnReason.empty()) {
+                    State.WarnedFriendCodes[friendCodeToWarn]++;
+                    State.WarnReasons[friendCodeToWarn].push_back(warnReason);
+                    State.Save();
+
+                    friendCodeToWarn.clear();
+                    warnReason.clear();
+                }
+            }
+
+            ImGui::EndGroup();
         }
 
         if (openOptions) {
