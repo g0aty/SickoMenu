@@ -10656,4 +10656,6 @@ namespace app {
     typedef Il2CppObject BanMenu;
     typedef Il2CppObject IntroCutscene;
     typedef Il2CppObject LogicOptionsHnS;
+    typedef Il2CppObject FreeplayPopover;
+    typedef Il2CppObject MapNames__Enum;
 }

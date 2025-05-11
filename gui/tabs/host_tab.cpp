@@ -167,7 +167,7 @@ namespace HostTab {
 
 					if (State.TournamentMode) {
 						if (!State.DisableRoleManager || !hideRolesList) ImGui::NewLine();
-						if (ImGui::Button("Randomize Roles")) {
+						if (AnimatedButton("Randomize Roles")) {
 							std::vector<Game::PlayerId> playerIds = {};
 							std::vector<Game::PlayerId> impostorIds = {};
 							for (auto p : GetAllPlayerControl()) {
@@ -220,7 +220,7 @@ namespace HostTab {
 				/*if (IsInLobby() && ToggleButton("Flip Skeld", &State.FlipSkeld))
 					State.Save();*/ //to be fixed later
 				ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-				if (IsInLobby() && ImGui::Button("Force Start of Game"))
+				if (IsInLobby() && AnimatedButton("Force Start of Game"))
 				{
 					app::InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
 				}
@@ -277,7 +277,7 @@ namespace HostTab {
 					State.Save();
 				}*/
 
-				if ((State.mapType == Settings::MapType::Airship) && IsInGame() && ImGui::Button("Switch Moving Platform Side"))
+				if ((State.mapType == Settings::MapType::Airship) && IsInGame() && AnimatedButton("Switch Moving Platform Side"))
 				{
 					State.rpcQueue.push(new RpcUsePlatform());
 				}
@@ -288,7 +288,7 @@ namespace HostTab {
 					}
 				}
 
-				if (State.InMeeting && ImGui::Button("End Meeting")) {
+				if (State.InMeeting && AnimatedButton("End Meeting")) {
 					State.rpcQueue.push(new RpcEndMeeting());
 					State.InMeeting = false;
 				}
@@ -303,7 +303,7 @@ namespace HostTab {
 
 						ImGui::SameLine();
 
-						if (ImGui::Button("End Game")) {
+						if (AnimatedButton("End Game")) {
 							State.rpcQueue.push(new RpcEndGame(GameOverReason__Enum(std::clamp(State.SelectedGameEndReasonId, 0, 8))));
 						}
 					}
@@ -322,7 +322,7 @@ namespace HostTab {
 					State.Save();
 				}
 
-				/*if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ImGui::Button("Revive Yourself"))
+				/*if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && AnimatedButton("Revive Yourself"))
 				{
 					if (PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))) {
 						if (IsInGame()) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
@@ -560,13 +560,13 @@ namespace HostTab {
 #pragma endregion
 			}
 			if (openTournaments && State.TournamentMode) {
-				if (ImGui::Button("Copy All Data") && State.tournamentFriendCodes.size() != 0) {
+				if (AnimatedButton("Copy All Data") && State.tournamentFriendCodes.size() != 0) {
 					std::string data = "";
 					for (auto i : State.tournamentFriendCodes) {
 						float points = State.tournamentPoints[i], win = State.tournamentWinPoints[i],
 							callout = State.tournamentCalloutPoints[i], death = State.tournamentEarlyDeathPoints[i];
-						std::string text = std::format("\n{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
-							DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
+						std::string text = std::format("\n{}: {} Normal, {} +SV", i, DisplayScore(points), DisplayScore(callout)/*,
+							DisplayScore(win), DisplayScore(death)).c_str()*/); // +W, +D are not required anymore
 						data += text;
 					}
 					ClipboardHelper_PutClipboardString(convert_to_string(data.substr(1)), NULL);
@@ -584,7 +584,7 @@ namespace HostTab {
 						callout = State.tournamentCalloutPoints[i], death = State.tournamentEarlyDeathPoints[i];
 					std::string text = std::format("{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
 						DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
-					if (IsInLobby() && State.ChatCooldown >= 3.f && text.size() <= 120 && ImGui::Button("Send")) {
+					if (IsInLobby() && State.ChatCooldown >= 3.f && text.size() <= 120 && AnimatedButton("Send")) {
 						//in ideal conditions a message longer than 120 characters should not be possible
 						State.lobbyRpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, text));
 						State.MessageSent = true;

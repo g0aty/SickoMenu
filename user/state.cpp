@@ -93,6 +93,8 @@ void Settings::Load() {
         JSON_TRYGET("FakePlatform", this->FakePlatform);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         JSON_TRYGET("PanicWarning", this->PanicWarning);
+        JSON_TRYGET("DisableAnimations", this->DisableAnimations);
+        JSON_TRYGET("AnimationSpeed", this->AnimationSpeed);
         JSON_TRYGET("ExtraCommands", this->ExtraCommands);
 
         JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
@@ -191,7 +193,7 @@ void Settings::Load() {
         JSON_TRYGET("ShowLobbyInfo", this->ShowLobbyInfo);
         JSON_TRYGET("ChatAlwaysActive", this->ChatAlwaysActive);
         JSON_TRYGET("ReadGhostMessages", this->ReadGhostMessages);
-        JSON_TRYGET("ReadAndSendAumChat", this->ReadAndSendAumChat);
+        JSON_TRYGET("ReadAndSendSickoChat", this->ReadAndSendSickoChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
         JSON_TRYGET("UsePrefixAndSuffix", this->UsePrefixAndSuffix);
@@ -431,6 +433,8 @@ void Settings::Save() {
                 { "FakePlatform", this->FakePlatform },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
                 { "PanicWarning", this->PanicWarning },
+                { "DisableAnimations", this->DisableAnimations },
+                { "AnimationSpeed", this->AnimationSpeed },
                 { "ExtraCommands", this->ExtraCommands },
 
                 { "NoAbilityCD", this->NoAbilityCD },
@@ -530,7 +534,7 @@ void Settings::Save() {
                 { "ShowLobbyInfo", this->ShowLobbyInfo },
                 { "ChatAlwaysActive", this->ChatAlwaysActive },
                 { "ReadGhostMessages", this->ReadGhostMessages },
-                { "ReadAndSendAumChat", this->ReadAndSendAumChat },
+                { "ReadAndSendSickoChat", this->ReadAndSendSickoChat },
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
                 { "UsePrefixAndSuffix", this->UsePrefixAndSuffix },

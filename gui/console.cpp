@@ -47,7 +47,7 @@ namespace ConsoleGui
 		titleCol.w = 1.f;
 		ImGui::TextColored(titleCol, "Console");
 		ImGui::SameLine(ImGui::GetWindowWidth() - 20 * State.dpiScale);
-		if (ImGui::Button("-")) State.ShowConsole = false; //minimize button
+		if (AnimatedButton("-")) State.ShowConsole = false; //minimize button
 		ImGui::BeginChild("console#filter", ImVec2(520, 20) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 		ImGui::Text("Event Filter: ");
 		ImGui::SameLine();
@@ -60,7 +60,7 @@ namespace ConsoleGui
 		}
 		ImGui::EndChild();
 		ImGui::BeginChild("console#clear", ImVec2(520, 40) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-		if (ImGui::Button("Clear Console")) {
+		if (AnimatedButton("Clear Console")) {
 			synchronized(Replay::replayEventMutex) {
 				State.liveReplayEvents.clear();
 			}

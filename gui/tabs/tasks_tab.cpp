@@ -22,14 +22,14 @@ namespace TasksTab {
 			}
 
 			if (tasks.size() != tasksCompleted) {
-				if (ImGui::Button("Complete All Tasks")) {
+				if (AnimatedButton("Complete All Tasks")) {
 					CompleteAllTasks();
 				}
 			}
 			if (!State.SafeMode) {
 				ImGui::SameLine();
 			}
-			if (!State.SafeMode && ImGui::Button("Complete Everyone's Tasks")) {
+			if (!State.SafeMode && AnimatedButton("Complete Everyone's Tasks")) {
 				for (auto player : GetAllPlayerControl()) {
 					CompleteAllTasks(player);
 				}
@@ -38,7 +38,7 @@ namespace TasksTab {
 			ImGui::NewLine();
 
 			for (auto task : tasks) {
-				if (!NormalPlayerTask_get_IsComplete(task, NULL) && ImGui::Button(("Complete##Button" + std::to_string(task->fields._._Id_k__BackingField)).c_str())) {
+				if (!NormalPlayerTask_get_IsComplete(task, NULL) && AnimatedButton(("Complete##Button" + std::to_string(task->fields._._Id_k__BackingField)).c_str())) {
 					State.taskRpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
 				}
 
@@ -71,13 +71,13 @@ namespace TasksTab {
 
 			if (State.mapType == Settings::MapType::Ship) {
 				if (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
-					if (ImGui::Button("Play Shields Animation (Client-sided)"))
+					if (AnimatedButton("Play Shields Animation (Client-sided)"))
 					{
 						State.rpcQueue.push(new RpcPlayAnimation(1));
 					}
 				}
 				else {
-					if (ImGui::Button("Play Shields Animation"))
+					if (AnimatedButton("Play Shields Animation"))
 					{
 						State.rpcQueue.push(new RpcPlayAnimation(1));
 					}
@@ -86,13 +86,13 @@ namespace TasksTab {
 
 			if (State.mapType == Settings::MapType::Ship) {
 				if (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek) {
-					if (ImGui::Button("Play Trash Animation (Client-sided)"))
+					if (AnimatedButton("Play Trash Animation (Client-sided)"))
 					{
 						State.rpcQueue.push(new RpcPlayAnimation(10));
 					}
 				}
 				else {
-					if (ImGui::Button("Play Trash Animation"))
+					if (AnimatedButton("Play Trash Animation"))
 					{
 						State.rpcQueue.push(new RpcPlayAnimation(10));
 					}

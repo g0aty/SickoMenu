@@ -162,3 +162,4 @@ void dChatNotification_SetUp(ChatNotification* __this, PlayerControl* sender, St
 void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method);
 void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method);
 void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method);
+void dFreeplayPopover_PlayMap(FreeplayPopover* __this, MapNames__Enum map, MethodInfo* method);

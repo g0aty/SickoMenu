@@ -66,7 +66,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 					State.Rpc101OverloadTimestamps[playerId] = now;
 
 					std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(player))->fields.PlayerName));
-					std::string actionMessage = std::format("<b>Player <#FFF>\"{}\"</color> has exceeded the rate-limit of AUM Chat!</b>", name);
+					std::string actionMessage = std::format("<b>Player <#FFF>\"{}\"</color> has exceeded the rate-limit of SickoChat!</b>", name);
 
 					auto notifier = (NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier);
 					if (notifier != NULL) {
@@ -90,7 +90,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 
 		if (message.empty()) break;
 
-		if (!State.PanicMode && State.ReadAndSendAumChat) {
+		if (!State.PanicMode && State.ReadAndSendSickoChat) {
 			NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
 			bool wasDead = false;
 
@@ -99,13 +99,19 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 				wasDead = true;
 			}
 
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string("<#f55><b>[AUM Chat]</b></color>\n" + message), false, NULL);
+			NetworkedPlayerInfo* pData = GetPlayerData(player);
+
+			std::string oldName = convert_from_string(GetPlayerOutfit(pData)->fields.PlayerName);
+			std::string prefix = "<b><#fb0>[<#0f0>Sicko</color><#f00>Chat</color>]</color></b> ~ ";
+			GetPlayerOutfit(pData)->fields.PlayerName = convert_to_string(prefix + oldName);
+			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(message), false, NULL);
+			GetPlayerOutfit(pData)->fields.PlayerName = convert_to_string(oldName);
 
 			if (wasDead) {
 				local->fields.IsDead = false;
 			}
 
-			STREAM_DEBUG("AUM Chat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			STREAM_DEBUG("SickoChat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 		}
 	}
 	break;

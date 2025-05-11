@@ -67,6 +67,8 @@ public:
     int FakePlatform = 0;
     bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
+    bool DisableAnimations = false;
+    float AnimationSpeed = 1.f;
 
     bool AdjustByDPI = true;
     float dpiScale = 1.f;
@@ -271,7 +273,7 @@ public:
     bool ChatAlwaysActive = false;
     bool ChatActiveOriginalState = false;
     bool ReadGhostMessages = false;
-    bool ReadAndSendAumChat = false;
+    bool ReadAndSendSickoChat = false;
     bool ShiftRightClickTP = false;
     bool TeleportEveryone = false;
     bool RotateEveryone = false;
@@ -543,6 +545,7 @@ public:
     std::string lol = "";
     bool ProGamer = false;
     bool KeybindsBeingEdited = false;
+    bool IsFreePlay = false;
 
     bool Destruct_IgnoreWhitelist = true;
     bool Ban_IgnoreWhitelist = true;

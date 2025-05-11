@@ -104,7 +104,7 @@ namespace SettingsTab {
 
 			if (isNewConfig || isDelete) {
 				InputString("Name", &State.selectedConfig);
-				if (isNewConfig && (ImGui::Button(CheckConfigExists(State.selectedConfig) ? "Overwrite" : "Save"))) {
+				if (isNewConfig && (AnimatedButton(CheckConfigExists(State.selectedConfig) ? "Overwrite" : "Save"))) {
 					State.Save();
 					CONFIGS = GetAllConfigs();
 
@@ -112,7 +112,7 @@ namespace SettingsTab {
 				}
 
 				if (isDelete && CheckConfigExists(State.selectedConfig)) {
-					if (ImGui::Button("Delete")) {
+					if (AnimatedButton("Delete")) {
 						selectedConfigInt--;
 						State.Delete();
 						CONFIGS = GetAllConfigs();
@@ -124,14 +124,14 @@ namespace SettingsTab {
 
 			InputString("Config Name", &State.selectedConfig);
 
-			if (CheckConfigExists(State.selectedConfig) && ImGui::Button("Load Config"))
+			if (CheckConfigExists(State.selectedConfig) && AnimatedButton("Load Config"))
 			{
 				State.SaveConfig();
 				State.Load();
 				State.Save(); //actually save the selected config
 			}
 			if (CheckConfigExists(State.selectedConfig)) ImGui::SameLine();
-			if (ImGui::Button("Save Config"))
+			if (AnimatedButton("Save Config"))
 			{
 				State.Save();
 			}
@@ -196,7 +196,7 @@ namespace SettingsTab {
 				State.Save();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("Reset Menu Theme"))
+			if (AnimatedButton("Reset Menu Theme"))
 			{
 				State.MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
 			}
@@ -233,7 +233,7 @@ namespace SettingsTab {
 			}
 
 			if (IsNameValid(State.userName) || IsHost() || !State.SafeMode) {
-				if ((IsInGame() || IsInLobby()) && ImGui::Button("Set Name")) {
+				if ((IsInGame() || IsInLobby()) && AnimatedButton("Set Name")) {
 					if (IsInGame())
 						State.rpcQueue.push(new RpcSetName(State.userName));
 					else if (IsInLobby())
@@ -242,7 +242,7 @@ namespace SettingsTab {
 				}
 				if (IsNameValid(State.userName)) {
 					if ((IsInGame() || IsInLobby())) ImGui::SameLine();
-					if (ImGui::Button("Set as Account Name")) {
+					if (AnimatedButton("Set as Account Name")) {
 						SetPlayerName(State.userName);
 						LOG_INFO("Successfully set account name to \"" + State.userName + "\"");
 					}
@@ -296,7 +296,7 @@ namespace SettingsTab {
 			if (Achievements::IsSupported())
 			{
 				ImGui::SameLine();
-				if (ImGui::Button("Unlock All Achievements"))
+				if (AnimatedButton("Unlock All Achievements"))
 					Achievements::UnlockAll();
 			}
 
@@ -322,7 +322,7 @@ namespace SettingsTab {
 				ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "Pro Tip: You can bypass the free chat restriction using a space after your custom friend");
 				ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), "code!");
 			}*/
-			/*if (ImGui::Button("Force Login as Guest")) {
+			/*if (AnimatedButton("Force Login as Guest")) {
 				State.ForceLoginAsGuest = true;
 			}*/
 			if (ToggleButton("Spoof Guest Account (Quick Chat ONLY)", &State.SpoofGuestAccount)) {

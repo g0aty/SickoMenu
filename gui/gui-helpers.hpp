@@ -6,6 +6,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
 #include "imgui/imgui_internal.h"
+#include "state.hpp"
 
 static inline ImVec2 operator+(const ImVec2& lhs, const float scalar) { return ImVec2(lhs.x + scalar, lhs.y + scalar); }
 static inline ImVec2 operator-(const ImVec2& lhs, const float scalar) { return ImVec2(lhs.x - scalar, lhs.y - scalar); }
@@ -30,3 +31,4 @@ bool TabGroup(const char* label, bool highlight = false);
 bool ColoredButton(ImVec4 col, const char* label);
 void BoldText(const char* text, ImVec4 col = ImVec4(0.f, 0.f, 0.f, 0.f));
 bool SliderIntV2(const char* label, int* v, int v_min, int v_max, const char* format, ImGuiSliderFlags flags);
+bool AnimatedButton(const char* label, const ImVec2& size = ImVec2(0, 0));

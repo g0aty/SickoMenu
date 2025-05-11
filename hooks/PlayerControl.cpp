@@ -275,7 +275,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 
-			if (IsInGame() && (State.RevealRoles || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && shouldSeeName && !State.PanicMode)
+			if (IsInGame() && ((State.RevealRoles && shouldSeeName) || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && !State.PanicMode)
 			{
 				std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
 				int completedTasks = 0;
@@ -288,12 +288,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						completedTasks++;
 						totalTasks++;
 					}
-					else
-						totalTasks++;
+					else totalTasks++;
 				}
 
-				if (totalTasks != 0 && completedTasks == totalTasks) {
-					if (IsHost() && State.TournamentMode &&
+				if (totalTasks != 0 && PlayerControl_AllTasksCompleted(__this, NULL)) {
+					if (IsHost() && State.TournamentMode && !PlayerIsImpostor(playerData) &&
 						std::find(State.tournamentAllTasksCompleted.begin(), State.tournamentAllTasksCompleted.end(), playerData->fields.PlayerId) == State.tournamentAllTasksCompleted.end()) {
 						UpdatePoints(playerData, 1);
 						LOG_DEBUG(std::format("Added 1 point to {} for completing tasks", ToString(playerData)).c_str());

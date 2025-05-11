@@ -412,14 +412,14 @@ void RpcForceDetectAum::Process()
 	MessageWriter_EndMessage(rpcMessage, NULL);
 }
 
-RpcForceAumChat::RpcForceAumChat(const PlayerSelection& target, std::string_view msg, bool completeForce)
+RpcForceSickoChat::RpcForceSickoChat(const PlayerSelection& target, std::string_view msg, bool completeForce)
 {
 	this->target = target;
 	this->msg = msg;
 	this->completeForce = completeForce;
 }
 
-void RpcForceAumChat::Process()
+void RpcForceSickoChat::Process()
 {
 	PlayerControl* player = target.validate().get_PlayerControl();
 	String* playerName = NetworkedPlayerInfo_get_PlayerName(target.validate().get_PlayerData(), NULL);
@@ -430,8 +430,13 @@ void RpcForceAumChat::Process()
 	MessageWriter_WriteString(rpcMessage, convert_to_string(msg), NULL);
 	MessageWriter_WriteInt32(rpcMessage, outfit->fields.ColorId, NULL);
 	MessageWriter_EndMessage(rpcMessage, NULL);
-	std::string chatVisual = "<#f55><b>[AUM Chat]</b></color>\n" + msg;
-	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(chatVisual), false, NULL);
+
+	NetworkedPlayerInfo* pData = GetPlayerData(player);
+	std::string oldName = convert_from_string(GetPlayerOutfit(pData)->fields.PlayerName);
+	std::string prefix = "<b><#fb0>[<#0f0>Sicko</color><#f00>Chat</color>]</color></b> ~ ";
+	GetPlayerOutfit(pData)->fields.PlayerName = convert_to_string(prefix + oldName);
+	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(msg), false, NULL);
+	GetPlayerOutfit(pData)->fields.PlayerName = convert_to_string(oldName);
 }
 
 RpcSyncSettings::RpcSyncSettings() {

@@ -67,7 +67,7 @@ void RenderMenu() {
             static std::string newWord = "";
             InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
             ImGui::SameLine();
-            if (ImGui::Button("Add Word")) {
+            if (AnimatedButton("Add Word")) {
                 State.SMAC_BadWords.push_back(newWord);
                 State.Save();
                 newWord = "";
@@ -197,14 +197,14 @@ namespace GameTab {
                 CustomListBoxInt(" ", &State.SelectedColorId, COLORS, 85.0f * State.dpiScale);
             }
             ImGui::SameLine();
-            if (ImGui::Button("Random Color"))
+            if (AnimatedButton("Random Color"))
             {
                 State.SelectedColorId = GetRandomColorId();
             }
 
             if (IsInGame() || IsInLobby()) {
                 ImGui::SameLine();
-                if (ImGui::Button("Set Color"))
+                if (AnimatedButton("Set Color"))
                 {
                     if (IsHost() || !State.SafeMode) {
                         if (IsInGame())
@@ -235,20 +235,20 @@ namespace GameTab {
             if (InputString("Lobby Code", &State.AutoJoinLobbyCode))
                 State.Save();
 
-            if (ImGui::Button("Join Lobby")) {
+            if (AnimatedButton("Join Lobby")) {
                 AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
                     GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
                     NULL);
             }*/
 
             if (IsInGame() || IsInLobby()) ImGui::SameLine();
-            if ((IsInGame() || IsInLobby()) && ImGui::Button("Reset Appearance"))
+            if ((IsInGame() || IsInLobby()) && AnimatedButton("Reset Appearance"))
             {
                 ControlAppearance(false);
             }
 
 
-            if (IsInGame() && (IsHost() || !State.SafeMode) && ImGui::Button("Kill Everyone")) {
+            if (IsInGame() && (IsHost() || !State.SafeMode) && AnimatedButton("Kill Everyone")) {
                 for (auto player : GetAllPlayerControl()) {
                     if (IsInGame() && (IsHost() || !State.SafeMode)) {
                         if (IsInGame())
@@ -265,21 +265,21 @@ namespace GameTab {
                 }
             }
             if (IsInLobby() && !State.SafeMode) ImGui::SameLine();
-            if (IsInLobby() && !State.SafeMode && ImGui::Button("Allow Everyone to NoClip")) {
+            if (IsInLobby() && !State.SafeMode && AnimatedButton("Allow Everyone to NoClip")) {
                 for (auto p : GetAllPlayerControl()) {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
                 }
                 State.NoClip = true;
                 ShowHudNotification("Allowed everyone to NoClip!");
             }
-            /*if (IsHost() && (IsInGame() || IsInLobby()) && ImGui::Button("Spawn Dummy")) {
+            /*if (IsHost() && (IsInGame() || IsInLobby()) && AnimatedButton("Spawn Dummy")) {
                 auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
                 if (IsInGame()) State.rpcQueue.push(new RpcSpawnDummy(outfit->fields.ColorId, convert_from_string(outfit->fields.PlayerName)));
                 if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpawnDummy(outfit->fields.ColorId, convert_from_string(outfit->fields.PlayerName)));
             }*/
             if ((IsInGame() || IsInLobby()) && ((IsHost() && IsInGame()) || !State.SafeMode)) {
                 ImGui::SameLine();
-                if (ImGui::Button(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
+                if (AnimatedButton(IsHost() ? "Protect Everyone" : "Visual Protect Everyone")) {
                     for (auto player : GetAllPlayerControl()) {
                         uint8_t colorId = GetPlayerOutfit(GetPlayerData(player))->fields.ColorId;
                         if (IsInGame())
@@ -299,7 +299,7 @@ namespace GameTab {
             }
 
             if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode)) {
-                if (ImGui::Button("Kill All Crewmates")) {
+                if (AnimatedButton("Kill All Crewmates")) {
                     for (auto player : GetAllPlayerControl()) {
                         if (!PlayerIsImpostor(GetPlayerData(player))) {
                             if (IsInGame())
@@ -310,7 +310,7 @@ namespace GameTab {
                     }
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("Kill All Impostors")) {
+                if (AnimatedButton("Kill All Impostors")) {
                     for (auto player : GetAllPlayerControl()) {
                         if (PlayerIsImpostor(GetPlayerData(player))) {
                             if (IsInGame())
@@ -324,7 +324,7 @@ namespace GameTab {
                 }
                 if (!State.SafeMode) {
                     ImGui::SameLine();
-                    if (ImGui::Button("Suicide Crewmates")) {
+                    if (AnimatedButton("Suicide Crewmates")) {
                         for (auto player : GetAllPlayerControl()) {
                             if (!PlayerIsImpostor(GetPlayerData(player))) {
                                 if (IsInGame())
@@ -337,7 +337,7 @@ namespace GameTab {
                         }
                     }
                     ImGui::SameLine();
-                    if (ImGui::Button("Suicide Impostors")) {
+                    if (AnimatedButton("Suicide Impostors")) {
                         for (auto player : GetAllPlayerControl()) {
                             if (PlayerIsImpostor(GetPlayerData(player))) {
                                 if (IsInGame())
@@ -376,7 +376,7 @@ namespace GameTab {
                     ImGui::SetNextItemWidth(100 * State.dpiScale);
                     CustomListBoxInt("Vent", &ventId, allVents);
                     ImGui::SameLine();
-                    if (ImGui::Button("Teleport All to Vent")) {
+                    if (AnimatedButton("Teleport All to Vent")) {
                         for (auto p : GetAllPlayerControl()) {
                             State.rpcQueue.push(new RpcBootFromVent(p, (State.mapType == Settings::MapType::Hq) ? ventId + 1 : ventId)); //MiraHQ vents start from 1 instead of 0
                         }
@@ -385,31 +385,31 @@ namespace GameTab {
             }
 
             if (IsInGame() || IsInLobby()) {
-                if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && ImGui::Button("Scan Everyone")) {
+                if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && AnimatedButton("Scan Everyone")) {
                     for (auto p : GetAllPlayerControl()) {
                         if (IsInGame()) State.rpcQueue.push(new RpcForceScanner(p, true));
                         else State.lobbyRpcQueue.push(new RpcForceScanner(p, true));
                     }
                 }
                 if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) ImGui::SameLine();
-                if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && ImGui::Button("Stop Scanning Everyone")) {
+                if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && AnimatedButton("Stop Scanning Everyone")) {
                     for (auto p : GetAllPlayerControl()) {
                         if (IsInGame()) State.rpcQueue.push(new RpcForceScanner(p, false));
                         else State.lobbyRpcQueue.push(new RpcForceScanner(p, false));
                     }
                 }
                 if (IsInGame() && !State.InMeeting && !State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) ImGui::SameLine();
-                if (IsInGame() && !State.InMeeting && ImGui::Button("Kick Everyone From Vents")) {
+                if (IsInGame() && !State.InMeeting && AnimatedButton("Kick Everyone From Vents")) {
                     State.rpcQueue.push(new RpcBootAllVents());
                 }
                 if ((IsHost() || !State.SafeMode) && State.InMeeting) ImGui::SameLine();
-                if ((IsHost() || !State.SafeMode) && State.InMeeting && ImGui::Button("End Meeting")) {
+                if ((IsHost() || !State.SafeMode) && State.InMeeting && AnimatedButton("End Meeting")) {
                     State.rpcQueue.push(new RpcEndMeeting());
                     State.InMeeting = false;
                 }
 
                 if (!State.SafeMode && !IsHost()) {
-                    if (ImGui::Button("Set Name for Everyone")) {
+                    if (AnimatedButton("Set Name for Everyone")) {
                         for (auto p : GetAllPlayerControl()) {
                             if (IsInGame()) State.rpcQueue.push(new RpcForceName(p, std::format("{}<size=0><{}></size>", State.hostUserName, p->fields.PlayerId)));
                             if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(p, std::format("{}<size=0><{}></size>", State.hostUserName, p->fields.PlayerId)));
@@ -424,7 +424,7 @@ namespace GameTab {
                         State.Save();
                     }
 
-                    if (ImGui::Button("Set Color for Everyone")) {
+                    if (AnimatedButton("Set Color for Everyone")) {
                         for (auto p : GetAllPlayerControl()) {
                             if (IsInGame()) State.rpcQueue.push(new RpcForceColor(p, State.HostSelectedColorId));
                             if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceColor(p, State.HostSelectedColorId));
@@ -450,7 +450,7 @@ namespace GameTab {
             else if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) State.Save();
             if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && IsChatValid(State.chatMessage)) {
                 ImGui::SameLine();
-                if (ImGui::Button("Send"))
+                if (AnimatedButton("Send"))
                 {
                     auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
                         State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
@@ -459,16 +459,16 @@ namespace GameTab {
                     State.MessageSent = true;
                 }
             }
-            if ((IsInGame() || IsInLobby()) && State.ReadAndSendAumChat) ImGui::SameLine();
-            if (State.ReadAndSendAumChat && (IsInGame() || IsInLobby()) && ImGui::Button("Send to AUM"))
+            if ((IsInGame() || IsInLobby()) && State.ReadAndSendSickoChat) ImGui::SameLine();
+            if (State.ReadAndSendSickoChat && (IsInGame() || IsInLobby()) && AnimatedButton("Send to AUM"))
             {
                 auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
                     State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
                 if (IsInGame()) {
-                    State.rpcQueue.push(new RpcForceAumChat(PlayerSelection(player), State.chatMessage, true));
+                    State.rpcQueue.push(new RpcForceSickoChat(PlayerSelection(player), State.chatMessage, true));
                 }
                 else if (IsInLobby()) {
-                    State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(player), State.chatMessage, true));
+                    State.lobbyRpcQueue.push(new RpcForceSickoChat(PlayerSelection(player), State.chatMessage, true));
                 }
             }
 
@@ -488,7 +488,7 @@ namespace GameTab {
                     { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
             }
 
-            if (std::find(State.ChatPresets.begin(), State.ChatPresets.end(), State.chatMessage) == State.ChatPresets.end() && ImGui::Button("Add Message as Preset")) {
+            if (std::find(State.ChatPresets.begin(), State.ChatPresets.end(), State.chatMessage) == State.ChatPresets.end() && AnimatedButton("Add Message as Preset")) {
                 State.ChatPresets.push_back(State.chatMessage);
                 State.Save();
             }
@@ -504,12 +504,12 @@ namespace GameTab {
                 }
                 CustomListBoxInt("Message to Send/Remove", &selectedPresetIndex, presetVector);
                 auto msg = State.ChatPresets[selectedPresetIndex];
-                if (ImGui::Button("Set as Chat Message"))
+                if (AnimatedButton("Set as Chat Message"))
                 {
                     State.chatMessage = msg;
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("Remove"))
+                if (AnimatedButton("Remove"))
                     State.ChatPresets.erase(State.ChatPresets.begin() + selectedPresetIndex);
             }
         }
@@ -531,7 +531,7 @@ namespace GameTab {
                 static std::string newBFriendCode = "";
                 InputString("New Friend Code", &newBFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
                 if (newBFriendCode != "") ImGui::SameLine();
-                if (newBFriendCode != "" && ImGui::Button("Add")) {
+                if (newBFriendCode != "" && AnimatedButton("Add")) {
                     State.BlacklistFriendCodes.push_back(newBFriendCode);
                     State.Save();
                     newBFriendCode = "";
@@ -546,7 +546,7 @@ namespace GameTab {
                     }
                     CustomListBoxInt("Player to Delete", &selectedBCodeIndex, bCodeVector);
                     ImGui::SameLine();
-                    if (ImGui::Button("Delete"))
+                    if (AnimatedButton("Delete"))
                         State.BlacklistFriendCodes.erase(State.BlacklistFriendCodes.begin() + selectedBCodeIndex);
                 }
             }
@@ -557,7 +557,7 @@ namespace GameTab {
                 static std::string newWFriendCode = "";
                 InputString("New Friend Code\n", &newWFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
                 if (newWFriendCode != "") ImGui::SameLine();
-                if (newWFriendCode != "" && ImGui::Button("Add\n")) {
+                if (newWFriendCode != "" && AnimatedButton("Add\n")) {
                     State.WhitelistFriendCodes.push_back(newWFriendCode);
                     State.Save();
                     newWFriendCode = "";
@@ -572,7 +572,7 @@ namespace GameTab {
                     }
                     CustomListBoxInt("Player to Delete\n", &selectedWCodeIndex, wCodeVector);
                     ImGui::SameLine();
-                    if (ImGui::Button("Delete\n"))
+                    if (AnimatedButton("Delete\n"))
                         State.WhitelistFriendCodes.erase(State.WhitelistFriendCodes.begin() + selectedWCodeIndex);
                 }
             }
@@ -624,7 +624,7 @@ namespace GameTab {
                 static std::string newWord = "";
                 InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
-                if (ImGui::Button("Add Word")) {
+                if (AnimatedButton("Add Word")) {
                     State.SMAC_BadWords.push_back(newWord);
                     State.Save();
                     newWord = "";
@@ -638,7 +638,7 @@ namespace GameTab {
                     }
                     CustomListBoxInt("Word to Remove", &selectedWordIndex, wordVector);
                     ImGui::SameLine();
-                    if (ImGui::Button("Remove"))
+                    if (AnimatedButton("Remove"))
                         State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
                 }
             }
@@ -671,7 +671,7 @@ namespace GameTab {
             if (IsHost()) {
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (((IsInGame() && Object_1_IsNotNull((Object_1*)*Game::pShipStatus)) || (IsInLobby() && Object_1_IsNotNull((Object_1*)*Game::pLobbyBehaviour)))
-                    && ImGui::Button(IsInLobby() ? "Remove Lobby" : "Remove Map")) {
+                    && AnimatedButton(IsInLobby() ? "Remove Lobby" : "Remove Map")) {
                     State.taskRpcQueue.push(new DestroyMap());
                 }
                 ImGui::Dummy(ImVec2(7, 7)* State.dpiScale);
@@ -751,7 +751,7 @@ namespace GameTab {
                     static std::string newName = "";
                     InputString("New Nickname", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     if (newName != "") ImGui::SameLine();
-                    if (newName != "" && ImGui::Button("Add")) {
+                    if (newName != "" && AnimatedButton("Add")) {
                         State.LockedNames.push_back(newName);
                         State.Save();
                         newName = "";
@@ -766,7 +766,7 @@ namespace GameTab {
                         }
                         CustomListBoxInt("Nickname to Delete", &selectedName, bNameVector);
                         ImGui::SameLine();
-                        if (ImGui::Button("Delete"))
+                        if (AnimatedButton("Delete"))
                             State.LockedNames.erase(State.LockedNames.begin() + selectedName);
                     }
                 }

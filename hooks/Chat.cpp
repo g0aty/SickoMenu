@@ -378,9 +378,9 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 	if (chatText == "") return;
 	if (!State.PanicMode) {
 		auto playerToChatAs = (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-		if (State.ReadAndSendAumChat && chatText.substr(0, 5) == "/aum ") {
-			if (IsInGame()) State.rpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), chatText.substr(5), true));
-			if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceAumChat(PlayerSelection(playerToChatAs), chatText.substr(5), true));
+		if (State.ReadAndSendSickoChat && chatText.substr(0, 4) == "/sc ") {
+			if (IsInGame()) State.rpcQueue.push(new RpcForceSickoChat(PlayerSelection(playerToChatAs), chatText.substr(4), true));
+			if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceSickoChat(PlayerSelection(playerToChatAs), chatText.substr(4), true));
 			return; //we don't want the chat to know we're using "aum"
 		}
 		

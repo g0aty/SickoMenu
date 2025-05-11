@@ -292,12 +292,12 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Read and Send AUM Chat", &State.ReadAndSendAumChat)) {
+            if (ToggleButton("Read and Send SickoChat", &State.ReadAndSendSickoChat)) {
                 State.Save();
             }
-            if (State.ReadAndSendAumChat) ImGui::Text("Send AUM chat messages in regular chat by typing \"/aum [message]\"!");
+            if (State.ReadAndSendSickoChat) ImGui::Text("Send SickoChat messages in regular chat by typing \"/sc [message]\"!");
             /*static int framesPassed = 0;
-            if (ImGui::Button("Refresh Chat Button")) {
+            if (AnimatedButton("Refresh Chat Button")) {
                 State.RefreshChatButton = true;
                 framesPassed = 100;
             }
@@ -552,7 +552,7 @@ namespace SelfTab {
             ImGui::SameLine();
             if (ToggleButton("No Seeker Animation", &State.NoSeekerAnim)) State.Save();
 
-            if (State.InMeeting && ImGui::Button("Move in Meeting"))
+            if (State.InMeeting && AnimatedButton("Move in Meeting"))
             {
                 if (IsHost()) State.rpcQueue.push(new RpcEndMeeting());
                 else State.rpcQueue.push(new EndMeeting());
@@ -659,7 +659,7 @@ namespace SelfTab {
             }
             if (IsInGame() || IsInLobby())
                 ImGui::SameLine();
-            if ((IsInGame() || IsInLobby()) && ImGui::Button("Get Current Position"))
+            if ((IsInGame() || IsInLobby()) && AnimatedButton("Get Current Position"))
             {
                 Vector2 position = GetTrueAdjustedPosition(*Game::pLocalPlayer);
                 State.xCoordinate = position.x;
@@ -668,7 +668,7 @@ namespace SelfTab {
             if (IsInGame() || IsInLobby())
                 ImGui::SameLine();
 
-            if ((IsInGame() || IsInLobby()) && ImGui::Button("Teleport To"))
+            if ((IsInGame() || IsInLobby()) && AnimatedButton("Teleport To"))
             {
                 Vector2 position = GetTrueAdjustedPosition(*Game::pLocalPlayer);
                 Vector2 target = { (State.RelativeTeleport ? position.x : 0.f) + State.xCoordinate, (State.RelativeTeleport ? position.y : 0.f) + State.yCoordinate };
@@ -681,7 +681,7 @@ namespace SelfTab {
             }
             if (!State.SafeMode && (IsInGame() || IsInLobby())) {
                 ImGui::SameLine();
-                if (ImGui::Button("Teleport Everyone To"))
+                if (AnimatedButton("Teleport Everyone To"))
                 {
                     Vector2 position = GetTrueAdjustedPosition(*Game::pLocalPlayer);
                     Vector2 target = { (State.RelativeTeleport ? position.x : 0.f) + State.xCoordinate, (State.RelativeTeleport ? position.y : 0.f) + State.yCoordinate };
@@ -699,7 +699,7 @@ namespace SelfTab {
             if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale))
                 State.Save();
             ImGui::SameLine();
-            if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && ImGui::Button("Set Role")) {
+            if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && AnimatedButton("Set Role")) {
                 State.FakeRole = std::clamp(State.FakeRole, 0, 10);
                 if (IsInGame())
                     State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum(State.FakeRole)));
@@ -707,7 +707,7 @@ namespace SelfTab {
                     State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum(State.FakeRole)));
             }
             if (IsHost() || !State.SafeMode) ImGui::SameLine();
-            if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && ImGui::Button("Set for Everyone")) {
+            if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && AnimatedButton("Set for Everyone")) {
                 State.FakeRole = std::clamp(State.FakeRole, 0, 10);
                 if (IsInGame()) {
                     for (auto player : GetAllPlayerControl())
@@ -755,7 +755,7 @@ namespace SelfTab {
                 roleAllowed = false;
                 break;
             }
-            if ((IsInGame() || IsInLobby()) && (roleAllowed || (IsHost() || !State.SafeMode)) && ImGui::Button("Set Fake Role")) {
+            if ((IsInGame() || IsInLobby()) && (roleAllowed || (IsHost() || !State.SafeMode)) && AnimatedButton("Set Fake Role")) {
                 if (IsInGame())
                     State.rpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRole)));
                 else if (IsInLobby())
@@ -857,7 +857,7 @@ namespace SelfTab {
                     static std::string newName = "";
                     InputString("New Name", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     ImGui::SameLine();
-                    if (ImGui::Button("Add Name")) {
+                    if (AnimatedButton("Add Name")) {
                         State.cyclerUserNames.push_back(newName);
                         State.Save();
                         newName = "";
@@ -874,7 +874,7 @@ namespace SelfTab {
                         }
                         CustomListBoxInt("Cycler Name to Delete", &selectedNameIndex, nameVector);
                         ImGui::SameLine();
-                        if (ImGui::Button("Delete"))
+                        if (AnimatedButton("Delete"))
                             State.cyclerUserNames.erase(State.cyclerUserNames.begin() + selectedNameIndex);
                     }
                 }
@@ -885,14 +885,14 @@ namespace SelfTab {
             }
 
             if (ImGui::CollapsingHeader("Confuser Options")) {
-                if ((IsInGame() || IsInLobby()) && ImGui::Button("Confuse Now")) {
+                if ((IsInGame() || IsInLobby()) && AnimatedButton("Confuse Now")) {
                     ControlAppearance(true);
                 }
                 if (IsInGame() || IsInLobby()) {
                     if (IsHost() || !State.SafeMode)
                         ImGui::SameLine();
                 }
-                if ((IsInGame() || IsInLobby()) && !State.SafeMode && ImGui::Button("Randomize Everyone")) {
+                if ((IsInGame() || IsInLobby()) && !State.SafeMode && AnimatedButton("Randomize Everyone")) {
                     std::queue<RPCInterface*>* queue = nullptr;
                     if (IsInGame())
                         queue = &State.rpcQueue;
@@ -957,7 +957,7 @@ namespace SelfTab {
                     static std::string newName = "";
                     InputString("New Name ", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     ImGui::SameLine();
-                    if (ImGui::Button("Add Name ")) {
+                    if (AnimatedButton("Add Name ")) {
                         State.cyclerUserNames.push_back(newName);
                         State.Save();
                         newName = "";
@@ -974,7 +974,7 @@ namespace SelfTab {
                         }
                         CustomListBoxInt("Confuser Name to Delete", &selectedNameIndex, nameVector);
                         ImGui::SameLine();
-                        if (ImGui::Button("Delete "))
+                        if (AnimatedButton("Delete "))
                             State.cyclerUserNames.erase(State.cyclerUserNames.begin() + selectedNameIndex);
                     }
                 }
@@ -985,7 +985,7 @@ namespace SelfTab {
             editedText = GetTextEditorName(originalText);
             InputString("Output", &editedText);
             ImGui::SameLine();
-            if (ImGui::Button("Copy")) ClipboardHelper_PutClipboardString(convert_to_string(editedText), NULL);
+            if (AnimatedButton("Copy")) ClipboardHelper_PutClipboardString(convert_to_string(editedText), NULL);
 
             if (ToggleButton("Italics", &italicName)) {
                 State.Save();

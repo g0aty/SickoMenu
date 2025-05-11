@@ -118,14 +118,14 @@ void ManageCallout(uint8_t playerId, uint8_t suspectIdx) {
 		std::find(State.tournamentCallers.begin(), State.tournamentCallers.end(), voterFc) == State.tournamentCallers.end() &&
 		std::find(State.tournamentCalledOut.begin(), State.tournamentCalledOut.end(), targetFc) == State.tournamentCalledOut.end()) {
 		if (PlayerIsImpostor(target)) {
-			UpdatePoints(voter, 1.5); //CorrectCallout
-			State.tournamentCalloutPoints[voterFc] += 1.5;
+			UpdatePoints(voter, 1.f); //CorrectCallout
+			State.tournamentCalloutPoints[voterFc] += 1.f;
 			LOG_DEBUG("Correct callout by " + ToString(target));
 			State.tournamentCorrectCallers[voterFc] = target->fields.PlayerId;
 		}
 		else {
-			UpdatePoints(voter, -1.5); //IncorrectCallout
-			State.tournamentCalloutPoints[voterFc] -= 1.5;
+			UpdatePoints(voter, -1.f); //IncorrectCallout
+			State.tournamentCalloutPoints[voterFc] -= 1.f;
 			LOG_DEBUG("Incorrect callout by " + ToString(target));
 		}
 		State.tournamentCallers.push_back(voterFc);

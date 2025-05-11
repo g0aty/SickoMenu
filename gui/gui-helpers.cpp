@@ -519,30 +519,68 @@ bool InputStringWithHint(const char* label, const char* hint, std::string* str, 
 	return InputTextWithHint(label, hint, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
 }
 
-bool ToggleButton(const char* str_id, bool* v)
-{
-	ImVec4* colors = GetStyle().Colors;
-	ImVec2 p = GetCursorScreenPos();
-	ImDrawList* draw_list = GetWindowDrawList();
+bool ToggleButton(const char* str_id, bool* v) {
+	if (State.DisableAnimations) {
+		ImVec4* colors = GetStyle().Colors;
+		ImVec2 p = GetCursorScreenPos();
+		ImDrawList* draw_list = GetWindowDrawList();
 
-	float height = GetFrameHeight();
+		float height = GetFrameHeight();
+		float width = height * 1.55f;
+		float radius = height * 0.50f;
+		InvisibleButton(str_id, ImVec2(width, height));
+		bool result = false;
+		if (IsItemClicked()) {
+			*v = !*v;
+			result = true;
+		}
+
+		if (IsItemHovered())
+			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f);
+		else
+			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBgActive] : colors[ImGuiCol_FrameBg]), height * 0.50f);
+		draw_list->AddCircleFilled(ImVec2(p.x + radius + (*v ? 1 : 0) * (width - radius * 2.0f), p.y + radius), radius - 1.5f, GetColorU32(colors[ImGuiCol_CheckMark]));
+		SameLine();
+		Text(str_id);
+		return result;
+	}
+	ImVec4* colors = ImGui::GetStyle().Colors;
+	ImVec2 p = ImGui::GetCursorScreenPos();
+	ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+	float height = ImGui::GetFrameHeight();
 	float width = height * 1.55f;
 	float radius = height * 0.50f;
-	InvisibleButton(str_id, ImVec2(width, height));
-	bool result = false;
-	if (IsItemClicked()) {
+	ImGui::InvisibleButton(str_id, ImVec2(width, height));
+	bool clicked = ImGui::IsItemClicked();
+
+	static std::map<ImGuiID, float> anims; // ID -> progress
+	ImGuiID id = ImGui::GetItemID();
+	float& t = anims[id]; // animation progress
+
+	if (clicked) {
 		*v = !*v;
-		result = true;
 	}
 
-	if (IsItemHovered())
-		draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f);
-	else
-		draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBgActive] : colors[ImGuiCol_FrameBg]), height * 0.50f);
-	draw_list->AddCircleFilled(ImVec2(p.x + radius + (*v ? 1 : 0) * (width - radius * 2.0f), p.y + radius), radius - 1.5f, GetColorU32(colors[ImGuiCol_CheckMark]));
-	SameLine();
-	Text(str_id);
-	return result;
+	float target = *v ? 1.0f : 0.0f;
+	float animation_speed = 5.0f * State.AnimationSpeed; // in units per second
+	if (t != target) {
+		float delta = animation_speed * ImGui::GetIO().DeltaTime;
+		t = ImClamp(t + ((target > t) ? delta : -delta), 0.0f, 1.0f);
+	}
+
+	// Apply smoothstep easing to t
+	float t_eased = t * t * (3.0f - 2.0f * t); // SmoothStep
+
+	ImU32 bg_col = ImGui::GetColorU32(ImLerp(colors[ImGuiCol_FrameBg], colors[ImGuiCol_FrameBgActive], ImGui::IsItemHovered() ? 0.5f : t_eased));
+	draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), bg_col, height * 0.5f);
+
+	float knob_x = ImLerp(p.x + radius, p.x + width - radius, t_eased);
+	draw_list->AddCircleFilled(ImVec2(knob_x, p.y + radius), radius - 1.5f, ImGui::GetColorU32(colors[ImGuiCol_CheckMark]));
+
+	ImGui::SameLine();
+	ImGui::Text(str_id);
+	return clicked;
 }
 
 bool TabGroup(const char* label, bool highlight)
@@ -560,7 +598,7 @@ bool TabGroup(const char* label, bool highlight)
 	PushStyleColor(ImGuiCol_Button, highlight ? activeCol : defaultCol);
 	PushStyleColor(ImGuiCol_ButtonHovered, hoveredCol);
 	PushStyleColor(ImGuiCol_ButtonActive, activeCol);
-	bool selected = Button(label);
+	bool selected = AnimatedButton(label);
 	PopStyleColor(3);
 	PopID();
 	return selected;
@@ -572,7 +610,7 @@ bool ColoredButton(ImVec4 col, const char* label) {
 	PushStyleColor(ImGuiCol_Text, col);
 	PushStyleColor(ImGuiCol_ButtonHovered, hoveredCol);
 	PushStyleColor(ImGuiCol_ButtonActive, activeCol);
-	bool ret = Button(label);
+	bool ret = AnimatedButton(label);
 	PopStyleColor(3);
 	return ret;
 }
@@ -711,4 +749,107 @@ bool SteppedSliderFloat(const char* label, float* v, float v_min, float v_max, f
 
 	*v = v_min + float(v_i) * v_step;
 	return valueChanged;
+}
+
+
+struct PulseAnimState {
+	float t = 1.0f; // Animation time from 0 to 1
+	bool active = false;
+};
+
+bool AnimatedButton(const char* label, const ImVec2& size) {
+	if (State.DisableAnimations) return ImGui::Button(label, size);
+	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	if (window->SkipItems)
+		return false;
+
+	ImGuiID id = ImGui::GetID(label);
+	ImVec2 pos = ImGui::GetCursorScreenPos();
+	ImVec2 button_size = ImGui::CalcItemSize(size, ImGui::CalcTextSize(label).x + ImGui::GetStyle().FramePadding.x * 2.0f, ImGui::GetFrameHeight());
+	ImRect bb(pos, pos + button_size);
+
+	ImGui::ItemSize(bb);
+	if (!ImGui::ItemAdd(bb, id))
+		return false;
+
+	bool hovered, held;
+	bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
+
+	static std::map<ImGuiID, PulseAnimState> anims;
+	PulseAnimState& pulseAnimState = anims[id];
+
+	if (pressed) {
+		pulseAnimState.t = 0.0f;
+		pulseAnimState.active = true;
+	}
+
+	if (pulseAnimState.active) {
+		pulseAnimState.t += ImGui::GetIO().DeltaTime * State.AnimationSpeed / 0.2f;
+		if (pulseAnimState.t >= 1.0f) {
+			pulseAnimState.t = 1.0f;
+			pulseAnimState.active = false;
+		}
+	}
+
+	// Draw button base
+	ImU32 bg_col = ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
+	window->DrawList->AddRectFilled(bb.Min, bb.Max, bg_col, ImGui::GetStyle().FrameRounding);
+
+	// Pulse overlay
+	if (pulseAnimState.t < 1.0f) {
+		float alpha = sinf(pulseAnimState.t * 3.1415926f); // Pulse curve (sine)
+		ImVec4 pulse_col = ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram);
+		pulse_col.w *= alpha;
+		ImU32 pulse_u32 = ImGui::GetColorU32(pulse_col);
+		window->DrawList->AddRectFilled(bb.Min, bb.Max, pulse_u32, ImGui::GetStyle().FrameRounding);
+	}
+
+	// Label
+	ImVec2 text_size = ImGui::CalcTextSize(label);
+	ImVec2 text_pos = ImVec2(
+		bb.Min.x + (button_size.x - text_size.x) * 0.5f,
+		bb.Min.y + (button_size.y - text_size.y) * 0.5f
+	);
+	ImGui::RenderText(text_pos, label);
+
+	return pressed;
+}
+
+bool SelectableV2(const char* label, bool selected, float pulse_duration = 0.6f) {
+	ImGuiID id = ImGui::GetID(label);
+	ImVec2 pos = ImGui::GetCursorScreenPos();
+	ImVec2 size = ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetFrameHeight());
+
+	ImGui::PushID(label);
+	bool clicked = ImGui::Selectable("##hidden", selected, 0, size); // hidden selectable
+	ImGui::PopID();
+
+	ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+	// Animation state
+	static std::map<ImGuiID, float> pulse_anim;
+	float& t = pulse_anim[id];
+
+	if (clicked)
+		t = 0.0f;
+
+	if (t < 1.0f)
+		t += ImGui::GetIO().DeltaTime / pulse_duration;
+
+	float alpha = sinf(t * IM_PI); // Pulse effect (fast fade-in, fade-out)
+
+	// Colors
+	ImVec4 base_col = ImGui::GetStyleColorVec4(ImGuiCol_Header);
+	base_col.w *= alpha; // Apply pulse alpha
+	ImU32 col = ImGui::GetColorU32(base_col);
+
+	draw_list->AddRectFilled(pos, pos + size, col, ImGui::GetStyle().FrameRounding);
+
+	// Text
+	ImVec2 text_size = ImGui::CalcTextSize(label);
+	ImVec2 text_pos = ImVec2(pos.x + ImGui::GetStyle().FramePadding.x, pos.y + (size.y - text_size.y) * 0.5f);
+	ImU32 text_col = ImGui::GetColorU32(ImGuiCol_Text);
+	draw_list->AddText(text_pos, text_col, label);
+
+	return clicked;
 }

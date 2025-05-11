@@ -24,7 +24,7 @@ namespace SabotageTab {
                 ImGui::Separator();
                 ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
             }
-            if (ImGui::Button("Repair Sabotage")) {
+            if (AnimatedButton("Repair Sabotage")) {
                 RepairSabotage(*Game::pLocalPlayer);
             }
 
@@ -37,7 +37,7 @@ namespace SabotageTab {
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Sabotages have been disabled. Nothing can be sabotaged.");
             //i skidded some code from https://github.com/scp222thj/MalumMenu/
 
-            if (ImGui::Button("Sabotage All")) {
+            if (AnimatedButton("Sabotage All")) {
                 if (State.mapType != Settings::MapType::Fungle) {
                     for (size_t i = 0; i < 5; i++)
                         State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
@@ -59,7 +59,7 @@ namespace SabotageTab {
                 State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
             }
 
-            if (ImGui::Button("Random Sabotage")) {
+            if (AnimatedButton("Random Sabotage")) {
                 switch (State.mapType) {
                 case Settings::MapType::Pb:
                 {
@@ -117,36 +117,36 @@ namespace SabotageTab {
                 }
             }
 
-            if (State.mapType != Settings::MapType::Fungle && ImGui::Button("Sabotage Lights")) {
+            if (State.mapType != Settings::MapType::Fungle && AnimatedButton("Sabotage Lights")) {
                 for (size_t i = 0; i < 5; i++)
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
             }
             if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle) {
-                if (ImGui::Button("Sabotage Reactor")) {
+                if (AnimatedButton("Sabotage Reactor")) {
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128));
                 }
             }
             else if (State.mapType == Settings::MapType::Pb) {
-                if (ImGui::Button("Sabotage Seismic Stabilizers")) {
+                if (AnimatedButton("Sabotage Seismic Stabilizers")) {
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 128));
                 }
             }
             else if (State.mapType == Settings::MapType::Airship) {
-                if (ImGui::Button("Sabotage Crash Course")) {
+                if (AnimatedButton("Sabotage Crash Course")) {
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 128));
                 }
             }
             if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq) {
-                if (ImGui::Button("Sabotage Oxygen")) {
+                if (AnimatedButton("Sabotage Oxygen")) {
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 128));
                 }
             }
             if (State.mapType == Settings::MapType::Fungle) {
-                if (ImGui::Button("Activate Mushroom Mixup")) {
+                if (AnimatedButton("Activate Mushroom Mixup")) {
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 1));
                 }
             }
-            if (ImGui::Button("Sabotage Comms")) {
+            if (AnimatedButton("Sabotage Comms")) {
                 State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 128));
             }
 

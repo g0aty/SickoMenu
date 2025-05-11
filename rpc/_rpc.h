@@ -450,12 +450,12 @@ public:
 	virtual void Process() override;
 };
 
-class RpcForceAumChat : public RPCInterface {
+class RpcForceSickoChat : public RPCInterface {
 	PlayerSelection target;
 	std::string msg;
 	bool completeForce;
 public:
-	RpcForceAumChat(const PlayerSelection& target, std::string_view msg, bool completeForce = false);
+	RpcForceSickoChat(const PlayerSelection& target, std::string_view msg, bool completeForce = false);
 	virtual void Process() override;
 };
 

@@ -97,9 +97,6 @@
     <ClCompile Include="hooks\ShipStatus.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
-    <ClCompile Include="hooks\StatsManager.cpp">
-      <Filter>hooks</Filter>
-    </ClCompile>
     <ClCompile Include="hooks\Vent.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
@@ -318,6 +315,9 @@
     </ClCompile>
     <ClCompile Include="appdata\il2cpp-functions.cpp">
       <Filter>appdata</Filter>
+    </ClCompile>
+    <ClCompile Include="hooks\PlayerBanData.cpp">
+      <Filter>hooks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

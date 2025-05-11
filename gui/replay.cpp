@@ -478,7 +478,7 @@ namespace Replay
 		titleCol.w = 1.f;
 		ImGui::TextColored(titleCol, "Replay");
 		ImGui::SameLine(ImGui::GetWindowWidth() - 20 * State.dpiScale);
-		if (ImGui::Button("-")) State.ShowReplay = false; //minimize button
+		if (AnimatedButton("-")) State.ShowReplay = false; //minimize button
 
 		ImGui::BeginChild("replay#filter", ImVec2(0, 20) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 		ImGui::Text("Event Filter: ");

@@ -17,7 +17,7 @@ namespace DebugTab {
 		ImGui::BeginChild("###Debug", ImVec2(500, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 #ifndef _VERSION
-		if (ImGui::Button("Unload DLL"))
+		if (AnimatedButton("Unload DLL"))
 		{
 			SetEvent(hUnloadEvent);
 		}
@@ -26,15 +26,15 @@ namespace DebugTab {
 		ToggleButton("Enable Occlusion Culling", &State.OcclusionCulling);
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-		if (ImGui::Button("Force Load Settings"))
+		if (AnimatedButton("Force Load Settings"))
 		{
 			State.Load();
 		}
-		if (ImGui::Button("Force Save Settings"))
+		if (AnimatedButton("Force Save Settings"))
 		{
 			State.Save();
 		}
-		if (ImGui::Button("Clear RPC Queues"))
+		if (AnimatedButton("Clear RPC Queues"))
 		{
 			State.rpcQueue = std::queue<RPCInterface*>();
 			State.lobbyRpcQueue = std::queue<RPCInterface*>();
@@ -64,7 +64,7 @@ namespace DebugTab {
 			ImGui::Text("ReplayIsLive: %s", (State.Replay_IsLive) ? "True" : "False");
 			ImGui::Text("ReplayIsPlaying: %s", (State.Replay_IsPlaying) ? "True" : "False");
 
-			if (ImGui::Button("Re-simplify polylines (check console)"))
+			if (AnimatedButton("Re-simplify polylines (check console)"))
 			{
 				SYNCHRONIZED(Replay::replayEventMutex);
 				for (auto& playerPolylinePair : State.replayWalkPolylineByPlayer)
@@ -95,7 +95,7 @@ namespace DebugTab {
 
 		if (ImGui::CollapsingHeader("Profiler##debug"))
 		{
-			if (ImGui::Button("Clear Stats"))
+			if (AnimatedButton("Clear Stats"))
 			{
 				Profiler::ClearStats();
 			}
@@ -145,6 +145,19 @@ namespace DebugTab {
 			}
 
 			ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
+		}
+
+		if (ImGui::CollapsingHeader("ImGui Playground##debug")) {
+			static bool testBool1 = false;
+			ToggleButton("Test Bool 1", &testBool1);
+			static bool testBool2 = true;
+			ToggleButton("Test Bool 2", &testBool2);
+			if (ToggleButton("Disable Animations", &State.DisableAnimations))
+				State.Save();
+			if (ImGui::InputFloat("Animation Speed", &State.AnimationSpeed))
+				State.Save();
+			AnimatedButton("Test Animated Button 1");
+			AnimatedButton("Test Animated Button 2");
 		}
 
 		ImGui::EndChild();

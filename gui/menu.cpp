@@ -51,7 +51,7 @@ namespace Menu {
 				  "Chat Message", "Send", "Send to AUM", "Spam", "Chat Presets", "Attempt to Crash", "Overload Everyone", "Lag Everyone", "Enable Anticheat (SMAC)",
 				  "Whitelist", "Blacklist"}},
 		{"Self", {"Max Vision", "Wallhack", "Disable HUD", "Freecam", "Zoom", "Always show Chat Button", "Allow Ctrl+(C/V) in Chat", "Read Messages by Ghosts",
-				  "Read and Send AUM Chat", "Custom Name", "Custom Name for Everyone", "Server-sided Custom Name", "Reveal Roles", "Abbrv. Role", "Player Colored Dots Next To Names",
+				  "Read and Send SickoChat", "Custom Name", "Custom Name for Everyone", "Server-sided Custom Name", "Reveal Roles", "Abbrv. Role", "Player Colored Dots Next To Names",
 				  "Show Player Info in Lobby", "Reveal Votes", "See Ghosts", "See Protections", "See Kill Cooldown", "Disable Kill Animation", "Dark Mode",
 				  "Show Host", "Hide Watermark", "Show Vote Kicks", "Show FPS",
 				  "Unlock Vents", "Move While in Vent & Shapeshifting", "Always Move", "No Shapeshift Animation", "Copy Lobby Code on Disconnect", "NoClip",
@@ -160,7 +160,7 @@ namespace Menu {
 				else ImGui::TextColored(DiddyCol, IsChatCensored() || IsStreamerMode() ? " [F***son Mode]" : " [Fuckson Mode]");
 			}
 			ImGui::SameLine(ImGui::GetWindowWidth() - 19 * State.dpiScale);
-			if (ImGui::Button("-")) State.ShowMenu = false; //minimize button
+			if (AnimatedButton("-")) State.ShowMenu = false; //minimize button
 			//ImGui::BeginTabBar("AmongUs#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 			// Search field
