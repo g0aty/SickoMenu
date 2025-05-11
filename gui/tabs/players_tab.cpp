@@ -784,7 +784,7 @@ namespace PlayersTab {
 
 				ImGui::NewLine();
 
-				if (IsInLobby() || IsInMultiplayerGame()) {
+				if ((IsInLobby() || IsInMultiplayerGame()) && (!selectedPlayer.is_LocalPlayer() && selectedPlayers.size() == 1)) {
 					if (ImGui::Button("Add Warn")) {
 						if (strlen(warnReasonBuf) > 0) {
 							State.WarnedFriendCodes[WarnedfriendCode] = warnCount + 1;
