@@ -776,6 +776,67 @@ namespace PlayersTab {
 							ImGui::ListBoxFooter();
 					}
 				}
+
+				std::string WarnedfriendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+				auto it = State.WarnedFriendCodes.find(WarnedfriendCode);
+				int warnCount = (it != State.WarnedFriendCodes.end()) ? it->second : 0;
+				static char warnReasonBuf[128] = "";
+
+				ImGui::NewLine();
+
+				if (IsInLobby() || IsInMultiplayerGame()) {
+					if (ImGui::Button("Add Warn")) {
+						if (strlen(warnReasonBuf) > 0) {
+							State.WarnedFriendCodes[WarnedfriendCode] = warnCount + 1;
+							State.WarnReasons[WarnedfriendCode].push_back(warnReasonBuf);
+							warnReasonBuf[0] = '\0';
+							State.Save();
+						}
+					}
+					ImGui::SameLine();
+					ImGui::Text("Total Warns: %d", warnCount);
+
+					ImGui::InputText("Warn Reason", warnReasonBuf, IM_ARRAYSIZE(warnReasonBuf));
+					ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Requirement: Enter Warn Reason.");
+
+					ImGui::NewLine();
+
+					auto& warnReasons = State.WarnReasons[WarnedfriendCode];
+					if (!warnReasons.empty()) {
+						ImGui::Text("Warn Reasons:");
+
+						static int selectedReason = 0;
+						selectedReason = std::clamp(selectedReason, 0, (int)warnReasons.size() - 1);
+
+						std::vector<std::string> numberedReasons;
+						numberedReasons.reserve(warnReasons.size());
+						for (size_t i = 0; i < warnReasons.size(); ++i) {
+							numberedReasons.push_back(std::format("[{}] {}", i + 1, warnReasons[i]));
+						}
+
+						std::vector<const char*> reasonCStrs;
+						for (const auto& str : numberedReasons) reasonCStrs.push_back(str.c_str());
+
+						ImGui::PushItemWidth(200);
+						ImGui::ListBox("##WarnReasonList", &selectedReason, reasonCStrs.data(), (int)reasonCStrs.size());
+						ImGui::PopItemWidth();
+
+						ImGui::SameLine();
+						if (ImGui::Button("Delete")) {
+							if (selectedReason >= 0 && selectedReason < (int)warnReasons.size()) {
+								warnReasons.erase(warnReasons.begin() + selectedReason);
+								selectedReason = 0;
+
+								if (--State.WarnedFriendCodes[WarnedfriendCode] <= 0) {
+									State.WarnedFriendCodes.erase(WarnedfriendCode);
+									State.WarnReasons.erase(WarnedfriendCode);
+								}
+
+								State.Save();
+							}
+						}
+					}
+				}
 			}
 
 			if (openTrolling && selectedPlayer.has_value()) {
