@@ -5,6 +5,13 @@
 #include "state.hpp"
 #include <regex>
 
+std::string trim(const std::string& str) {
+	const auto start = str.find_first_not_of(" \t\n\r");
+	if (start == std::string::npos) return "";
+	const auto end = str.find_last_not_of(" \t\n\r");
+	return str.substr(start, end - start + 1);
+}
+
 static std::string strToLower(std::string str) {
 	std::string new_str = "";
 	for (auto i : str) {
@@ -394,6 +401,9 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 					"<size=120%>Available Commands:</size><size=75%>\n\n"
 					"<#ff033e>/Add</color> ~ <#ff033e>Add Player to the Whitelist</color>\n"
 					"<#ff033e>/Remove</color> ~ <#ff033e>Remove Player From the Whitelist</color>\n"
+					"<#ff033e>/Warn</color> ~ <#ff033e>Warn Player</color>\n"
+					"<#ff033e>/Unwarn</color> ~ <#ff033e>Unwarn Player</color>\n"
+					"<#ff033e>/CheckWarns</color> ~ <#ff033e>Check All Warns of Selected Player</color>\n"
 					"<#ff033e>/Kick All</color> ~ <#ff033e>Kick Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
 					"<#ff033e>/Ban All</color> ~ <#ff033e>Ban Everyone</color>  <#fb0>[HOST ONLY]</color>"
 					"</size></b></font></color>";
@@ -401,8 +411,10 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				return;
 			}
 
+
+
 			if (chatTextLower == "/add" || chatTextLower == "/add ") {
-				std::string msg = "<#aaaaaa><font=\"Barlow-Regular Outline\"><b>Usage: /add <FriendCode></b></font></color>";
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /add <FriendCode></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -413,19 +425,21 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 					if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) == State.WhitelistFriendCodes.end()) {
 						State.WhitelistFriendCodes.push_back(fc);
 
-						std::string msg = std::format("<#5aff3d><font=\"Barlow-Regular Outline\"><b>\"{}\" Added to Whitelist.</b></font></color>", fc);
+						std::string msg = std::format("<#5cff83><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Added to Whitelist.</b></font></color>", fc);
 						ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					}
 					else {
-						std::string msg = std::format("<#ffd93d><font=\"Barlow-Regular Outline\"><b>\"{}\" Already in Whitelist.</b></font></color>", fc);
+						std::string msg = std::format("<#ffd93d><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Already in Whitelist.</b></font></color>", fc);
 						ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					}
 				}
 				return;
 			}
 
+
+
 			if (chatTextLower == "/remove" || chatTextLower == "/remove ") {
-				std::string msg = "<#aaaaaa><font=\"Barlow-Regular Outline\"><b>Usage: /remove <FriendCode></b></font></color>";
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /remove <FriendCode></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -436,15 +450,134 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				if (it != State.WhitelistFriendCodes.end()) {
 					State.WhitelistFriendCodes.erase(it);
 
-					std::string msg = std::format("<#ff5c5c><font=\"Barlow-Regular Outline\"><b>\"{}\" Removed from Whitelist.</b></font></color>", fc);
+					std::string msg = std::format("<#ff5c5c><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Removed from Whitelist.</b></font></color>", fc);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				else {
-					std::string msg = std::format("<#ff0000><font=\"Barlow-Regular Outline\"><b>\"{}\" Not found in Whitelist.</b></font></color>", fc);
+					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Not found in Whitelist.</b></font></color>", fc);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				return;
 			}
+
+
+
+			if (chatTextLower == "/warn" || chatTextLower == "/warn ") {
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /warn <FriendCode> <Reason></b></font></color>";
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+			if (chatTextLower.substr(0, 6) == "/warn ") {
+				std::string args = trim(chatText.substr(6));
+				size_t spacePos = args.find(' ');
+				if (spacePos == std::string::npos) {
+					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /warn <FriendCode> <Reason></b></font></color>";
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					return;
+				}
+
+				std::string fc = trim(args.substr(0, spacePos));
+				std::string warnReason = trim(args.substr(spacePos + 1));
+
+				if (warnReason.empty()) {
+					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Warn reason cannot be empty.</b></font></color>";
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					return;
+				}
+
+				int& warnCount = State.WarnedFriendCodes[fc];
+				warnCount++;
+				State.WarnReasons[fc].push_back(warnReason);
+				State.Save();
+
+				std::string msg = std::format("<#ff5c5c><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Was Warned. Reason: \"{}\". Total warns: {}</b></font></color>", fc, warnReason, warnCount);
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+
+
+			if (chatTextLower == "/unwarn" || chatTextLower == "/unwarn ") {
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /unwarn <FriendCode> <ReasonNumber></b></font></color>";
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+			if (chatTextLower.substr(0, 8) == "/unwarn ") {
+				std::string args = chatText.substr(8);
+				size_t spacePos = args.find(' ');
+				if (spacePos == std::string::npos) {
+					std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /unwarn <FriendCode> <ReasonNumber></b></font></color>";
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					return;
+				}
+
+				std::string fc = args.substr(0, spacePos);
+				std::string numberStr = args.substr(spacePos + 1);
+
+				int reasonIndex = -1;
+				try {
+					reasonIndex = std::stoi(numberStr) - 1;
+				}
+				catch (...) {
+					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Invalid <ReasonNumber>.</b></font></color>";
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					return;
+				}
+
+				auto it = State.WarnReasons.find(fc);
+				if (it != State.WarnReasons.end() && reasonIndex >= 0 && reasonIndex < (int)it->second.size()) {
+					it->second.erase(it->second.begin() + reasonIndex);
+
+					if (--State.WarnedFriendCodes[fc] <= 0) {
+						State.WarnedFriendCodes.erase(fc);
+						State.WarnReasons.erase(fc);
+					}
+
+					State.Save();
+
+					std::string msg = std::format("<#5cff83><size=-0.24><font=\"Barlow-Regular Outline\"><b>Removed Reason [#{}] for \"{}\".</b></font></color>", reasonIndex + 1, fc);
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				}
+				else {
+					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Invalid <FriendCode> or <ReasonNumber>.</b></font></color>");
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				}
+
+				return;
+			}
+
+
+
+			if (chatTextLower == "/checkwarns" || chatTextLower == "/checkwarns ") {
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /checkwarns <FriendCode></b></font></color>";
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+			if (chatTextLower.substr(0, 12) == "/checkwarns ") {
+				std::string fc = chatText.substr(12);
+				auto it = State.WarnReasons.find(fc);
+
+				if (it != State.WarnReasons.end() && !it->second.empty()) {
+					std::string allReasons;
+					for (size_t i = 0; i < it->second.size(); ++i) {
+						allReasons += std::format("[{}] {}", i + 1, it->second[i]);
+						if (i + 1 < it->second.size())
+							allReasons += "\n";
+					}
+					std::string msg = std::format("<#ffff00><size=-0.24><font=\"Barlow-Regular Outline\"><b>All warns for <#FFF>\"{}\":\n\n{}</b></font></color>", fc, allReasons);
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				}
+				else {
+					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>No warns found for \"{}\".</b></font></color>", fc);
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				}
+				return;
+			}
+
+
 
 			if (chatTextLower == "/kick all") {
 				bool isBan = false;

@@ -327,6 +327,8 @@ void Settings::Load() {
 
         JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
+        JSON_TRYGET("WarnedFriendCodes", this->WarnedFriendCodes);
+        JSON_TRYGET("WarnReasons", this->WarnReasons);
         JSON_TRYGET("LockedNames", this->LockedNames);
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
         JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
@@ -384,6 +386,24 @@ void Settings::Save() {
         }
         auto settingsPath = path.parent_path() /
             std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? this->selectedConfig : "default");
+
+        for (auto it = this->WarnReasons.begin(); it != this->WarnReasons.end(); ) {
+            if (it->second.empty() || this->WarnedFriendCodes[it->first] <= 0) {
+                it = this->WarnReasons.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
+
+        for (auto it = this->WarnedFriendCodes.begin(); it != this->WarnedFriendCodes.end(); ) {
+            if (it->second <= 0 || this->WarnReasons[it->first].empty()) {
+                it = this->WarnedFriendCodes.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
 
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{
@@ -668,6 +688,8 @@ void Settings::Save() {
                 { "ChatPresets", this->ChatPresets },
                 { "WhitelistFriendCodes", this->WhitelistFriendCodes },
                 { "BlacklistFriendCodes", this->BlacklistFriendCodes },
+                { "WarnedFriendCodes", this->WarnedFriendCodes },
+                { "WarnReasons", this->WarnReasons },
                 { "LockedNames", this->LockedNames },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
                 { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },

@@ -597,6 +597,14 @@ public:
     bool BL_AutoLeavers = false;
     float LeaveCount = 1.0;
 
+    // Kick/Ban Warned Players [Dependencies]
+    std::unordered_map<std::string, int> WarnedFriendCodes;
+    std::unordered_map<std::string, std::vector<std::string>> WarnReasons;
+    std::unordered_set<std::string> NotifiedWarnedPlayers;
+    int MaxWarns = 1;
+    bool BanWarned = false;
+    bool KickWarned = false;
+
     void Load();
     void Save();
     void SaveConfig();
