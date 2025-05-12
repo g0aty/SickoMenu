@@ -607,6 +607,7 @@ public:
     bool KickWarned = false;
     bool NotifyWarned = false;
 
+    // Auto-Exit Due Low FPS
     std::chrono::steady_clock::time_point lastFrameTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point lowFpsStartTime = {};
     bool LeaveDueLFPS = false;
