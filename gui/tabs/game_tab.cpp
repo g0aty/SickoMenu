@@ -798,8 +798,8 @@ namespace GameTab {
 
                 ImGui::PushItemWidth(80);
                 ImGui::InputInt("Max Warns", &State.MaxWarns);
-                if (State.minFpsThreshold < 1)
-                    State.minFpsThreshold = 1;
+                if (State.MaxWarns < 1)
+                    State.MaxWarns = 1;
                 ImGui::PopItemWidth();
                 ImGui::EndGroup();
             }
