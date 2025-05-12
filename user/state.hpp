@@ -598,12 +598,15 @@ public:
     float LeaveCount = 1.0;
 
     // Kick/Ban Warned Players [Dependencies]
+    // Kick/Ban Warned Players [Dependencies]
     std::unordered_map<std::string, int> WarnedFriendCodes;
     std::unordered_map<std::string, std::vector<std::string>> WarnReasons;
     std::unordered_set<std::string> NotifiedWarnedPlayers;
+    double LastWarnTime = -100.f;
     int MaxWarns = 1;
     bool BanWarned = false;
     bool KickWarned = false;
+    bool NotifyWarned = false;
 
     void Load();
     void Save();
