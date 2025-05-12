@@ -598,7 +598,6 @@ public:
     float LeaveCount = 1.0;
 
     // Kick/Ban Warned Players [Dependencies]
-    // Kick/Ban Warned Players [Dependencies]
     std::unordered_map<std::string, int> WarnedFriendCodes;
     std::unordered_map<std::string, std::vector<std::string>> WarnReasons;
     std::unordered_set<std::string> NotifiedWarnedPlayers;
@@ -607,6 +606,11 @@ public:
     bool BanWarned = false;
     bool KickWarned = false;
     bool NotifyWarned = false;
+
+    std::chrono::steady_clock::time_point lastFrameTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point lowFpsStartTime = {};
+    bool LeaveDueLFPS = false;
+    int minFpsThreshold = 15;
 
     void Load();
     void Save();
