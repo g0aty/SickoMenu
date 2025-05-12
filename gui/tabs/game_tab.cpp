@@ -790,6 +790,9 @@ namespace GameTab {
                 if (ToggleButton("Ban Warned Players", &State.BanWarned)) {
                     State.Save();
                 }
+                if (ToggleButton("Notify Warned Player", &State.NotifyWarned)) {
+                    State.Save();
+                }
 
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
 
