@@ -693,6 +693,9 @@ namespace GameTab {
                 if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
                     State.Save();
                 }
+                if (SteppedSliderFloat("Kick/Ban Delay", &State.AutoPunishDelay, 0.f, 10.f, 0.1f, "%.1f", ImGuiSliderFlags_NoInput)) {
+                    State.Save();
+                }
                 ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
                 if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
                     State.Save();

@@ -130,9 +130,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     //State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
-                    
-                    State.BanEveryone = false;
-                    State.KickEveryone = false;
                 }
             }
             else {
@@ -792,6 +789,56 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.DisableSabotages = false;
             }
         }
+
+        if (State.BanEveryone || State.KickEveryone) {
+            auto allPlayers = GetAllPlayerControl();
+
+            uint32_t localPlayerId = 0;
+            if (Game::pLocalPlayer && *Game::pLocalPlayer)
+                localPlayerId = (*Game::pLocalPlayer)->fields.PlayerId;
+
+            auto now = std::chrono::steady_clock::now();
+
+            for (auto playerControl : allPlayers) {
+                if (!playerControl || playerControl->fields.PlayerId == localPlayerId) continue;
+
+                auto playerData = GetPlayerDataById(playerControl->fields.PlayerId);
+                if (!playerData) continue;
+
+                if (State.Ban_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.WhitelistFriendCodes.end()) {
+                    continue;
+                }
+
+                uint32_t playerId = playerControl->fields.PlayerId;
+
+                if (State.playerPunishTimers.find(playerId) == State.playerPunishTimers.end()) {
+                    State.playerPunishTimers[playerId] = now;
+                }
+
+                float delaySeconds = State.AutoPunishDelay;
+                auto elapsed = std::chrono::duration<float>(now - State.playerPunishTimers[playerId]).count();
+
+                if (elapsed >= delaySeconds) {
+                    bool ShouldBan = State.BanEveryone;
+                    app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, ShouldBan, NULL);
+                    State.playerPunishTimers.erase(playerId);
+                }
+            }
+
+            std::vector<uint32_t> activeIds;
+            for (auto player : allPlayers) {
+                if (player) activeIds.push_back(player->fields.PlayerId);
+            }
+
+            for (auto it = State.playerPunishTimers.begin(); it != State.playerPunishTimers.end();) {
+                if (std::find(activeIds.begin(), activeIds.end(), it->first) == activeIds.end()) {
+                    it = State.playerPunishTimers.erase(it);
+                }
+                else {
+                    ++it;
+                }
+            }
+        }
         
         if (State.KickByLockedName) {
             const auto allPlayers = GetAllPlayerControl();
@@ -1065,32 +1112,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     }
     else {
         AutoRepairSabotageDelay--;
-    }
-
-    static int AutoPunish = 10;
-
-    if (State.BanEveryone || State.KickEveryone) {
-        auto allPlayers = GetAllPlayerControl();
-
-        for (auto playerControl : allPlayers) {
-            if (!playerControl || playerControl == *Game::pLocalPlayer) continue;
-
-            auto playerData = GetPlayerDataById(playerControl->fields.PlayerId);
-            if (!playerData) continue;
-
-            if (State.Ban_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), convert_from_string(playerData->fields.FriendCode)) != State.WhitelistFriendCodes.end()) {
-                continue;
-            }
-
-            if (AutoPunish <= 0) {
-                bool ShouldBan = State.BanEveryone;
-                app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, ShouldBan, NULL);
-                AutoPunish = 10; // Preventing the absence of notifications & self-ban/kick
-            }
-            else {
-                AutoPunish--;
-            }
-        }
     }
 }
 
