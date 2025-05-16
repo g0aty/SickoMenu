@@ -208,6 +208,20 @@ namespace SettingsTab {
 				State.Save();
 			}
 
+			ImGui::Dummy(ImVec2(1, 1) * State.dpiScale);
+
+			if (ToggleButton("Auto-Exit Due Low FPS", &State.LeaveDueLFPS)) {
+				State.Save();
+			}
+			ImGui::SameLine();
+			ImGui::PushItemWidth(80);
+			ImGui::InputInt("Minimum FPS", &State.minFpsThreshold);
+			if (State.minFpsThreshold < 0)
+				State.minFpsThreshold = 0;
+			ImGui::PopItemWidth();
+
+			ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+
 #ifdef _DEBUG
 			if (ToggleButton("Show Debug Tab", &State.showDebugTab)) {
 				State.Save();

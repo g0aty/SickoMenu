@@ -36,9 +36,3 @@ bool dAprilFoolsMode_ShouldFlipSkeld(MethodInfo* method) {
     State.FlipSkeld = AprilFoolsMode_ShouldFlipSkeld(method);
     return State.FlipSkeld;
 }
-
-void dFreeplayPopover_PlayMap(FreeplayPopover* __this, MapNames__Enum map, MethodInfo* method) {
-	LogIfEnabled("Hook dFreeplayPopover_PlayMap executed");
-    State.IsFreePlay = true;
-	FreeplayPopover_PlayMap(__this, map, method);
-}

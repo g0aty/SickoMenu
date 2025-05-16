@@ -5,6 +5,7 @@
 #include "utility.h"
 #include "gui-helpers.hpp"
 #include <future>
+#include <_hooks.h>
 
 namespace PlayersTab {
 
@@ -784,15 +785,47 @@ namespace PlayersTab {
 
 				ImGui::NewLine();
 
-				if (IsInLobby() || IsInMultiplayerGame()) {
-					if (ImGui::Button("Add Warn")) {
-						if (strlen(warnReasonBuf) > 0) {
-							State.WarnedFriendCodes[WarnedfriendCode] = warnCount + 1;
-							State.WarnReasons[WarnedfriendCode].push_back(warnReasonBuf);
-							warnReasonBuf[0] = '\0';
-							State.Save();
+				if ((IsInLobby() || IsInMultiplayerGame()) && (!selectedPlayer.is_LocalPlayer() && selectedPlayers.size() == 1)) {
+
+					double currentTime = ImGui::GetTime();
+					bool cooldownActive = (State.NotifyWarned && (currentTime - State.LastWarnTime < 3.0));
+
+					ImVec2 buttonSize = ImVec2(0, 0);
+					buttonSize = ImGui::CalcTextSize("Add Warn");
+					buttonSize.x += ImGui::GetStyle().FramePadding.x * 2;
+					buttonSize.y += ImGui::GetStyle().FramePadding.y * 2;
+
+					if (!cooldownActive) {
+						if (ImGui::Button("Add Warn")) {
+							if (strlen(warnReasonBuf) > 0) {
+								std::string reasonStr = warnReasonBuf;
+								State.WarnedFriendCodes[WarnedfriendCode] = warnCount + 1;
+								State.WarnReasons[WarnedfriendCode].push_back(reasonStr);
+								warnReasonBuf[0] = '\0';
+								State.Save();
+
+								if (State.NotifyWarned) {
+									State.LastWarnTime = currentTime;
+
+									for (auto& player : GetAllPlayerControl()) {
+										if (!player) continue;
+										auto pdata = GetPlayerDataById(player->fields.PlayerId);
+										if (!pdata) continue;
+
+										std::string fc = convert_from_string(pdata->fields.FriendCode);
+										if (fc == WarnedfriendCode) {
+											SendPrivateWarnMessage(player, reasonStr.c_str(), warnCount + 1);
+											break;
+										}
+									}
+								}
+							}
 						}
 					}
+					else {
+						ImGui::Dummy(buttonSize);
+					}
+
 					ImGui::SameLine();
 					ImGui::Text("Total Warns: %d", warnCount);
 

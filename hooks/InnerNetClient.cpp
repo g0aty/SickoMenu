@@ -998,6 +998,39 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
             State.NotifiedWarnedPlayers = std::move(currentNotifiedCodes);
         }
+
+        static bool hasExited = false;
+        static bool wasLowFps = false;
+
+        if (State.LeaveDueLFPS) {
+            const auto currentTime = std::chrono::steady_clock::now();
+            const std::chrono::duration<float> elapsed = currentTime - State.lastFrameTime;
+            State.lastFrameTime = currentTime;
+
+            const float fps = 1.0f / elapsed.count();
+
+            if (IsInLobby() || IsInGame()) {
+                if (fps < static_cast<float>(State.minFpsThreshold)) {
+                    if (!wasLowFps) {
+                        State.lowFpsStartTime = currentTime;
+                        wasLowFps = true;
+                    }
+                    else {
+                        if (!hasExited && std::chrono::duration<float>(currentTime - State.lowFpsStartTime).count() >= 0.35f) {
+                            app::AmongUsClient_ExitGame((*Game::pAmongUsClient), DisconnectReasons__Enum::ExitGame, NULL);
+                            hasExited = true;
+                        }
+                    }
+                }
+                else {
+                    wasLowFps = false;
+                }
+            }
+            else {
+                hasExited = false;
+                wasLowFps = false;
+            }
+        }
     }
     catch (Exception* ex) {
         onGameEnd();

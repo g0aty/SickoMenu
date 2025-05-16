@@ -16,6 +16,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 float dVent_CanUse(Vent* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method);
 int32_t dPlayerBanData_get_BanMinutesLeft(PlayerBanData* __this, MethodInfo* method);
 void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method);
+void SendPrivateWarnMessage(PlayerControl* toPlayer, const std::string& reason, int totalWarns);
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method);
 void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo* method);
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method);
@@ -162,4 +163,3 @@ void dChatNotification_SetUp(ChatNotification* __this, PlayerControl* sender, St
 void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method);
 void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method);
 void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method);
-void dFreeplayPopover_PlayMap(FreeplayPopover* __this, MapNames__Enum map, MethodInfo* method);

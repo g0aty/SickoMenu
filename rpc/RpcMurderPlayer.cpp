@@ -512,7 +512,7 @@ void PunishEveryone::Process() {
 	}
 
 	if (playersToPunish.empty()) {
-		const std::string emptyMsg = std::format("<#F00><font=\"Barlow-Regular Outline\"><b>No players found!</b></font></color>");
+		const std::string emptyMsg = std::format("<#F00><size=-0.24><font=\"Barlow-Regular Outline\"><b>No players found!</b></font></color>");
 		ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(emptyMsg), NULL);
 		return;
 	}
@@ -522,7 +522,7 @@ void PunishEveryone::Process() {
 	}
 
 	const std::string resultMsg = isBan
-		? std::format("<#ff033e><font=\"Barlow-Regular Outline\"><b>Everyone Has Been Banned!</b></font></color>")
-		: std::format("<#ff033e><font=\"Barlow-Regular Outline\"><b>Everyone Has Been Kicked!</b></font></color>");
+		? std::format("<#ff033e><size=-0.24><font=\"Barlow-Regular Outline\"><b>Everyone Has Been Banned!</b></font></color>")
+		: std::format("<#ff033e><size=-0.24><font=\"Barlow-Regular Outline\"><b>Everyone Has Been Kicked!</b></font></color>");
 	ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(resultMsg), NULL);
 }

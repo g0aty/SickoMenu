@@ -35,6 +35,22 @@ void doSabotageFlash() {
 	RepairSabotage(*Game::pLocalPlayer);
 }
 
+void SendPrivateWarnMessage(PlayerControl* toPlayer, const std::string& reason, int totalWarns) {
+	if (!State.NotifyWarned || !toPlayer) return;
+
+	if (!*Game::pLocalPlayer) return;
+
+	std::string message = std::format("You were warned by Reason: {}\n\nTotal warns: {}", reason, totalWarns);
+	if (message.length() > 120) {
+		message = message.substr(0, 120);
+	}
+
+	MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,toPlayer->fields._.OwnerId, NULL);
+
+	MessageWriter_WriteString(writer, convert_to_string(message), NULL);
+	InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+}
+
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_AddChat executed");
 	censor = IsChatCensored(); // Fix chat not being censored
@@ -487,6 +503,20 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				warnCount++;
 				State.WarnReasons[fc].push_back(warnReason);
 				State.Save();
+
+				if (State.NotifyWarned) {
+					for (auto& player : GetAllPlayerControl()) {
+						if (!player) continue;
+						auto pdata = GetPlayerDataById(player->fields.PlayerId);
+						if (!pdata) continue;
+
+						std::string playerFC = convert_from_string(pdata->fields.FriendCode);
+						if (playerFC == fc) {
+							SendPrivateWarnMessage(player, warnReason, warnCount);
+							break;
+						}
+					}
+				}
 
 				std::string msg = std::format("<#ff5c5c><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Was Warned. Reason: \"{}\". Total warns: {}</b></font></color>", fc, warnReason, warnCount);
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);

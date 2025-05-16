@@ -604,9 +604,17 @@ public:
     std::unordered_map<std::string, int> WarnedFriendCodes;
     std::unordered_map<std::string, std::vector<std::string>> WarnReasons;
     std::unordered_set<std::string> NotifiedWarnedPlayers;
+    double LastWarnTime = -100.f;
     int MaxWarns = 1;
     bool BanWarned = false;
     bool KickWarned = false;
+    bool NotifyWarned = false;
+
+    // Auto-Exit Due Low FPS
+    std::chrono::steady_clock::time_point lastFrameTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point lowFpsStartTime = {};
+    bool LeaveDueLFPS = false;
+    int minFpsThreshold = 15;
 
     void Load();
     void Save();
