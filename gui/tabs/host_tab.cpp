@@ -491,7 +491,7 @@ namespace HostTab {
 						static bool protectVisible = false;
 
 						MakeFloat("Protect Cooldown", protectCooldown, FloatOptionNames__Enum::GuardianAngelCooldown);
-						MakeFloat("Protection Duration", protectCooldown, FloatOptionNames__Enum::ProtectionDurationSeconds);
+						MakeFloat("Protection Duration", protectDuration, FloatOptionNames__Enum::ProtectionDurationSeconds);
 						MakeBool("Protect Visible to Impostors", protectVisible, BoolOptionNames__Enum::ImpostorsCanSeeProtect);
 #pragma endregion
 #pragma region Shapeshifter
@@ -582,8 +582,8 @@ namespace HostTab {
 				for (auto i : State.tournamentFriendCodes) {
 					float points = State.tournamentPoints[i], win = State.tournamentWinPoints[i],
 						callout = State.tournamentCalloutPoints[i], death = State.tournamentEarlyDeathPoints[i];
-					std::string text = std::format("{}: {} Normal, {} +W, {} +C, {} +D", i, DisplayScore(points),
-						DisplayScore(win), DisplayScore(callout), DisplayScore(death)).c_str();
+					std::string text = std::format("{}: {} Normal, {} +SV", i, DisplayScore(points), DisplayScore(callout)/*,
+							DisplayScore(win), DisplayScore(death)).c_str()*/); // +W, +D are not required anymore
 					if (IsInLobby() && State.ChatCooldown >= 3.f && text.size() <= 120 && AnimatedButton("Send")) {
 						//in ideal conditions a message longer than 120 characters should not be possible
 						State.lobbyRpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, text));

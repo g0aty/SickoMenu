@@ -749,7 +749,7 @@ namespace GameTab {
                 ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                 ImGui::Separator();
                 ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
-                if (ToggleButton("Kick By Name-Checker", &State.KickByLockedName)) {
+                if (ToggleButton("Warn/Kick By Name-Checker", &State.KickByLockedName)) {
                     State.Save();
                 }
                 if (State.KickByLockedName) ImGui::SameLine();
@@ -795,8 +795,6 @@ namespace GameTab {
 
                 ImGui::PushItemWidth(80);
                 ImGui::InputInt("Max Warns", &State.MaxWarns);
-                if (State.minFpsThreshold < 1)
-                    State.minFpsThreshold = 1;
                 ImGui::PopItemWidth();
                 ImGui::EndGroup();
             }

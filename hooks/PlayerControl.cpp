@@ -536,7 +536,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (State.FollowerCam != nullptr) {
 					auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
 					bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
-					if (State.EnableZoom && !State.InMeeting && !chatOpen && (IsInGame() || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
+					if (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
 						Camera_set_orthographicSize(State.FollowerCam, State.CameraHeight * 3, NULL);
 					else
 						Camera_set_orthographicSize(State.FollowerCam, 3.0f, NULL);

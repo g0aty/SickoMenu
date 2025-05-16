@@ -36,7 +36,7 @@ static void onGameEnd() {
         State.modUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
-        State.EnableZoom = false;
+        //State.EnableZoom = false;
         State.FreeCam = false;
         State.MatchEnd = std::chrono::system_clock::now();
         std::fill(State.assignedRoles.begin(), State.assignedRoles.end(), RoleType::Random); //Clear Pre assigned roles to avoid bugs.
@@ -127,7 +127,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 if (!IsInLobby()) {
                     State.selectedPlayers = {};
-                    State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
+                    //State.EnableZoom = false; //intended as we don't want stuff like the taskbar and danger meter disappearing on game start
                     State.FreeCam = false; //moving after game start / on joining new game
                     State.ChatFocused = false; //failsafe
                     
@@ -1393,10 +1393,10 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dDisconnectPopup_DoShow executed");
     DisconnectPopup_DoShow(__this, method);
     if (!State.PanicMode) {
-        switch (State.LastDisconnectReason) {
+        switch (((InnerNetClient*)(*Game::pAmongUsClient))->fields.LastDisconnectReason) {
         case DisconnectReasons__Enum::Hacking: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string(std::format("You were banned for hacking.\n\n{}{}",
+                convert_to_string(std::format("You were banned for dating.\n\n{}{}",
                     State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.",
                     State.SafeMode ? "" : "\n\nDisabling safe mode isn't recommended on official servers!")), NULL);
         }

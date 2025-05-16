@@ -383,9 +383,10 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 	auto chatText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.text);
 	if (convert_to_string(UncensorLink(chatText))->fields.m_stringLength <= 120) chatText = UncensorLink(chatText);
 	if (chatText == "") return;
+	std::string chatTextLower = strToLower(chatText);
 	if (!State.PanicMode) {
 		auto playerToChatAs = (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-		if (State.ReadAndSendSickoChat && chatText.substr(0, 4) == "/sc ") {
+		if (State.ReadAndSendSickoChat && chatTextLower.substr(0, 4) == "/sc ") {
 			if (IsInGame()) State.rpcQueue.push(new RpcForceSickoChat(PlayerSelection(playerToChatAs), chatText.substr(4), true));
 			if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceSickoChat(PlayerSelection(playerToChatAs), chatText.substr(4), true));
 			return; //we don't want the chat to know we're using "aum"
@@ -393,25 +394,21 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 		
 // Added as an extension to the "Whitelisted Players Only" feature and other commands
 		if (State.ExtraCommands) {
-			std::string chatTextLower = strToLower(chatText);
-
 			if (chatTextLower == "/help") {
 				std::string msg =
 					"<#87cefa><font=\"Barlow-Regular Outline\"><b>"
 					"<size=120%>Available Commands:</size><size=75%>\n\n"
-					"<#ff033e>/Add</color> ~ <#ff033e>Add Player to the Whitelist</color>\n"
-					"<#ff033e>/Remove</color> ~ <#ff033e>Remove Player From the Whitelist</color>\n"
-					"<#ff033e>/Warn</color> ~ <#ff033e>Warn Player</color>\n"
-					"<#ff033e>/Unwarn</color> ~ <#ff033e>Unwarn Player</color>\n"
-					"<#ff033e>/CheckWarns</color> ~ <#ff033e>Check All Warns of Selected Player</color>\n"
-					"<#ff033e>/Kick All</color> ~ <#ff033e>Kick Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
-					"<#ff033e>/Ban All</color> ~ <#ff033e>Ban Everyone</color>  <#fb0>[HOST ONLY]</color>"
+					"<#ff033e>/add</color> ~ <#ff033e>Add Player to the Whitelist</color>\n"
+					"<#ff033e>/remove</color> ~ <#ff033e>Remove Player From the Whitelist</color>\n"
+					"<#ff033e>/warn</color> ~ <#ff033e>Warn Player</color>\n"
+					"<#ff033e>/unwarn</color> ~ <#ff033e>Unwarn Player</color>\n"
+					"<#ff033e>/checkwarns</color> ~ <#ff033e>Check All Warns of Selected Player</color>\n"
+					"<#ff033e>/kick all</color> ~ <#ff033e>Kick Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
+					"<#ff033e>/ban all</color> ~ <#ff033e>Ban Everyone</color>  <#fb0>[HOST ONLY]</color>"
 					"</size></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
-
-
 
 			if (chatTextLower == "/add" || chatTextLower == "/add ") {
 				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /add <FriendCode></b></font></color>";

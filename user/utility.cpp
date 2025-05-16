@@ -792,7 +792,8 @@ std::string ToString(__maybenull PlayerControl* player) {
 std::string ToString(__maybenull NetworkedPlayerInfo* data) {
 	if (data) {
 		if (const auto outfit = GetPlayerOutfit(data))
-			return std::format("<#{} {}>", +data->fields.PlayerId, convert_from_string(NetworkedPlayerInfo_get_PlayerName(data, nullptr)));
+			return std::format("<#{} {}> (Friend Code: {})", +data->fields.PlayerId, convert_from_string(outfit->fields.PlayerName),
+				convert_from_string(data->fields.FriendCode));
 		return std::format("<#{}>", +data->fields.PlayerId);
 	}
 	return "<Unknown>";
