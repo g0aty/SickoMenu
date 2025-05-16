@@ -613,6 +613,9 @@ public:
     bool LeaveDueLFPS = false;
     int minFpsThreshold = 15;
 
+    // Ban|Kick Everyone (Cycled) [Dependency]
+    std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> playerPunishTimers;
+
     void Load();
     void Save();
     void SaveConfig();
