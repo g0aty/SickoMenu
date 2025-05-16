@@ -549,6 +549,7 @@ public:
     bool BanEveryone = false;
     bool KickEveryone = false;
     bool KickAFK = false;
+    float AutoPunishDelay = 0.f;
     bool NotificationsAFK = false;
     float TimerAFK = 40.f;
     float AddExtraTime = 15.0f;
@@ -612,6 +613,9 @@ public:
     std::chrono::steady_clock::time_point lowFpsStartTime = {};
     bool LeaveDueLFPS = false;
     int minFpsThreshold = 15;
+
+    // Ban/kick Everyone [Dependency]
+    std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> playerPunishTimers;
 
     void Load();
     void Save();
