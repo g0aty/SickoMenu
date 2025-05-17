@@ -551,6 +551,7 @@ public:
     bool KickAFK = false;
     float AutoPunishDelay = 0.f;
     bool NotificationsAFK = false;
+    bool SecondChance = false;
     float TimerAFK = 40.f;
     float AddExtraTime = 15.0f;
     float ExtraTimeThreshold = 5.0f;
