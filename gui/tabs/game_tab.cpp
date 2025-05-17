@@ -697,11 +697,15 @@ namespace GameTab {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-                if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
+                const char* buttonLabel = IsInGame() ? "Kick AFK Players" : "Kick AFK Players [GAME ONLY]";
+                if (ToggleButton(buttonLabel, &State.KickAFK)) {
                     State.Save();
                 }
-                ImGui::SameLine();
-                if (State.KickAFK && ToggleButton("Activate AFK Notifications", &State.NotificationsAFK)) {
+                if (State.KickAFK) ImGui::SameLine();
+                if (State.KickAFK && ToggleButton("Enable AFK Notifications", &State.NotificationsAFK)) {
+                    State.Save();
+                }
+                if (State.KickAFK && ToggleButton("AFK - Second Chance", &State.SecondChance)) {
                     State.Save();
                 }
                 std::string header = "Anti AFK ~ Advanced Options";
@@ -709,15 +713,15 @@ namespace GameTab {
                     header += " [GAME-MATCH]";
                 }
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-                if (ImGui::CollapsingHeader(header.c_str()))
+                if (State.KickAFK && ImGui::CollapsingHeader(header.c_str()))
                 {
                     if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
                         State.Save();
                     }
-                    if (SteppedSliderFloat("Extra Time at The Meeting", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                    if (State.SecondChance && SteppedSliderFloat("Extra Time", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
                         State.Save();
                     }
-                    if (SteppedSliderFloat("Minimum Sec to Extra Time", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                    if (State.SecondChance && SteppedSliderFloat("Min Time Before Adding", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
                         State.Save();
                     }
                     if (State.NotificationsAFK && SteppedSliderFloat("Warn-AFK Notifications Time", &State.NotificationTimeWarn, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
