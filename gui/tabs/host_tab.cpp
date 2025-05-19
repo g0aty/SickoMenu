@@ -7,7 +7,7 @@
 
 namespace HostTab {
 	enum Groups {
-		Utils, //sss
+		Utils,
 		Settings,
 		Tournaments
 	};
@@ -79,6 +79,25 @@ namespace HostTab {
 				if (IsInLobby()) {
 					ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 					if (!State.DisableRoleManager && (!hideRolesList || !State.TournamentMode)) {
+						if (ToggleButton("Always Impostor", &State.AlwaysImpostor)) {
+							State.Save();
+						}
+
+						if (State.AlwaysImpostor && IsHost()) {
+							auto allPlayers = GetAllPlayerData();
+							for (size_t index = 0; index < allPlayers.size(); index++) {
+								auto playerData = allPlayers[index];
+								if (playerData == nullptr) continue;
+								PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
+								if (playerCtrl == nullptr) continue;
+								
+								if (*Game::pLocalPlayer == playerCtrl) {
+									State.assignedRoles[index] = RoleType::Impostor;
+									break;
+								}
+							}
+						}
+
 						bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
 						auto allPlayers = GetAllPlayerData();
 						auto playerAmount = allPlayers.size();

@@ -494,6 +494,7 @@ public:
     int AutoStartTimer = 60;
 
     bool AutoOpenDoors = false;
+    bool AlwaysImpostor = false;
 
     Settings()
     {
