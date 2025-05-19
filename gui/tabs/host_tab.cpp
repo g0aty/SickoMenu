@@ -5,6 +5,8 @@
 #include "state.hpp"
 #include "gui-helpers.hpp"
 
+bool editingAutoStartPlayerCount = false;
+
 namespace HostTab {
 	enum Groups {
 		Utils,
@@ -306,10 +308,13 @@ namespace HostTab {
                 if (State.AutoStartGamePlayers) {
                     ImGui::Text("Start at");
                     ImGui::SameLine();
-                    if (ImGui::InputInt("players##autostart", &State.AutoStartPlayerCount)) {
-                        State.AutoStartPlayerCount = std::clamp(State.AutoStartPlayerCount, 1, (int)Game::MAX_PLAYERS);
+                    ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
+                    editingAutoStartPlayerCount = ImGui::IsItemActive();
+                    if (ImGui::InputInt("players##autostart", &State.AutoStartPlayerCount, 1, 100, flags)) {
+                        State.AutoStartPlayerCount = std::clamp(State.AutoStartPlayerCount, 1, 15);
                         State.Save();
                     }
+                    editingAutoStartPlayerCount = ImGui::IsItemActive();
                 }
 
 				//if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
