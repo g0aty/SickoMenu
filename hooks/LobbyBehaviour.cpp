@@ -37,6 +37,15 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
 		LogicOptions_SyncOptions(GameManager_get_LogicOptions(gameManager, NULL), NULL);
 	}
 	State.LobbyTimer -= Time_get_deltaTime(NULL);
+
+	if (IsHost() && State.AutoStartGamePlayers && IsInLobby()) {
+		int playerCount = (int)GetAllPlayerData().size();
+		if (playerCount >= State.AutoStartPlayerCount) {
+			app::InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
+			State.AutoStartGamePlayers = false;
+			State.Save();
+		}
+	}
 }
 
 void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method) {

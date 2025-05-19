@@ -301,6 +301,17 @@ namespace HostTab {
 						State.Save();
 				}
 
+                if (ToggleButton("Autostart game (players)", &State.AutoStartGamePlayers))
+                    State.Save();
+                if (State.AutoStartGamePlayers) {
+                    ImGui::Text("Start at");
+                    ImGui::SameLine();
+                    if (ImGui::InputInt("players##autostart", &State.AutoStartPlayerCount)) {
+                        State.AutoStartPlayerCount = std::clamp(State.AutoStartPlayerCount, 1, (int)Game::MAX_PLAYERS);
+                        State.Save();
+                    }
+                }
+
 				//if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
 
 				/*if (ToggleButton("Disable Specific RPC Call ID", &State.DisableCallId))
