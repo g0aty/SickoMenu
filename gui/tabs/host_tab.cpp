@@ -303,7 +303,7 @@ namespace HostTab {
 						State.Save();
 				}
 
-                if (ToggleButton("Autostart game (players)", &State.AutoStartGamePlayers))
+                if (ToggleButton("Autostart Game (Players)", &State.AutoStartGamePlayers))
                     State.Save();
                 if (State.AutoStartGamePlayers) {
                     ImGui::Text("Start at");
