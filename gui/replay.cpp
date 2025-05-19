@@ -562,6 +562,9 @@ namespace Replay
 		ImGui::Dummy(ImVec2(1.0f, 5.0f) * State.dpiScale);
 
 		ImGui::BeginChild("replay#control", ImVec2(0,0), false, ImGuiWindowFlags_NoBackground);
+
+		if (State.Replay_IsLive && State.MatchCurrent != State.MatchLive)
+			State.MatchCurrent = State.MatchLive;
 		
 		SliderChrono("##replay_slider", &State.MatchCurrent, &State.MatchStart, &State.MatchLive, fmt, ImGuiSliderFlags_None);
 		

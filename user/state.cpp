@@ -724,6 +724,13 @@ void Settings::Save() {
     }
 }
 
+void Settings::ClearReplayData() {
+    liveReplayEvents.clear();
+    replayWalkPolylineByPlayer.clear();
+    lastWalkEventPosPerPlayer.fill(ImVec2());
+    replayDeathTimePerPlayer.fill(std::chrono::system_clock::time_point());
+}
+
 void Settings::Delete() {
     auto path = getModulePath(hModule);
 

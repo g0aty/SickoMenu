@@ -10,6 +10,15 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dExileController_ReEnableGameplay executed");
 	app::ExileController_ReEnableGameplay(__this, method);
 
+	if (State.Replay_ClearAfterMeeting) {
+		State.ClearReplayData();
+		State.Replay_IsLive = true;
+		State.Replay_IsPlaying = true;
+		State.ShowReplay = true;
+		State.MatchCurrent = State.MatchLive;
+		if (State.ShowHookLogs) LOG_DEBUG("Replay Cleaned After Meeting");
+	}
+
 	try {// ESP: Reset Kill Cooldown
 		for (auto pc : GetAllPlayerControl()) {
 			if (auto player = PlayerSelection(pc).validate();

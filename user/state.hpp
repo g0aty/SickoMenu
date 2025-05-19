@@ -622,6 +622,7 @@ public:
     void Save();
     void SaveConfig();
     void Delete();
+    void ClearReplayData();
 };
 
 extern Settings State;
