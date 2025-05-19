@@ -81,6 +81,21 @@ namespace HostTab {
 					if (!State.DisableRoleManager && (!hideRolesList || !State.TournamentMode)) {
 						if (ToggleButton("Always Impostor", &State.AlwaysImpostor)) {
 							State.Save();
+
+							if (!State.AlwaysImpostor) {
+								auto allPlayers = GetAllPlayerData();
+								for (size_t index = 0; index < allPlayers.size(); index++) {
+									auto playerData = allPlayers[index];
+									if (playerData == nullptr) continue;
+									PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
+									if (playerCtrl == nullptr) continue;
+									
+									if (*Game::pLocalPlayer == playerCtrl) {
+										State.assignedRoles[index] = RoleType::Random;
+										break;
+									}
+								}
+							}
 						}
 
 						if (State.AlwaysImpostor && IsHost()) {
