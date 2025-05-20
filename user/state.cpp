@@ -325,11 +325,6 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_BadWords", this->SMAC_BadWords);
         JSON_TRYGET("ChatPresets", this->ChatPresets);
 
-        JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
-        JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
-        JSON_TRYGET("WarnedFriendCodes", this->WarnedFriendCodes);
-        JSON_TRYGET("WarnReasons", this->WarnReasons);
-        JSON_TRYGET("LockedNames", this->LockedNames);
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
         JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
         JSON_TRYGET("TimerAFK", this->TimerAFK);
@@ -338,6 +333,29 @@ void Settings::Load() {
         JSON_TRYGET("NotificationTimeWarn", this->NotificationTimeWarn);
         JSON_TRYGET("BypassVisualTasks", this->BypassVisualTasks);
         JSON_TRYGET("AlwaysImpostor", this->AlwaysImpostor);
+
+        JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
+        JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
+        JSON_TRYGET("WarnedFriendCodes", this->WarnedFriendCodes);
+        JSON_TRYGET("WarnReasons", this->WarnReasons);
+        JSON_TRYGET("LockedNames", this->LockedNames);
+
+        // Temp-Ban: Time calculation, and saving...
+        if (j.contains("TempBannedFriendCodes") && j["TempBannedFriendCodes"].is_object()) {
+            for (auto& [fc, info] : j["TempBannedFriendCodes"].items()) {
+                if (info.contains("until") && info["until"].is_number_integer()) {
+                    int64_t until = info["until"].get<int64_t>();
+                    std::string reason = "Temporary ban";
+                    if (info.contains("Type:") && info["Type:"].is_string()) {
+                        reason = info["Type:"].get<std::string>();
+                    }
+                    this->TempBannedFriendCodes[fc] = {
+                        std::chrono::system_clock::time_point(std::chrono::seconds(until)),
+                        reason
+                    };
+                }
+            }
+        }
     }
     catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
@@ -687,11 +705,6 @@ void Settings::Save() {
                 { "SMAC_CheckBadWords", this->SMAC_CheckBadWords },
                 { "SMAC_BadWords", this->SMAC_BadWords },
                 { "ChatPresets", this->ChatPresets },
-                { "WhitelistFriendCodes", this->WhitelistFriendCodes },
-                { "BlacklistFriendCodes", this->BlacklistFriendCodes },
-                { "WarnedFriendCodes", this->WarnedFriendCodes },
-                { "WarnReasons", this->WarnReasons },
-                { "LockedNames", this->LockedNames },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
                 { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },
                 { "TimerAFK", this->TimerAFK },
@@ -700,6 +713,25 @@ void Settings::Save() {
                 { "NotificationTimeWarn", this->NotificationTimeWarn },
                 { "BypassVisualTasks", this->BypassVisualTasks },
                 { "AlwaysImpostor", this->AlwaysImpostor },
+
+                { "WhitelistFriendCodes", this->WhitelistFriendCodes },
+                { "BlacklistFriendCodes", this->BlacklistFriendCodes },
+                { "WarnedFriendCodes", this->WarnedFriendCodes },
+                { "WarnReasons", this->WarnReasons },
+                { "LockedNames", this->LockedNames },
+
+                // Temp-Ban: Time calculation, and saving...
+                { "TempBannedFriendCodes", [&]() {
+                        nlohmann::ordered_json banList = nlohmann::ordered_json::object();
+                        for (const auto& [fc, info] : this->TempBannedFriendCodes) {
+                            auto until = std::chrono::duration_cast<std::chrono::seconds>(info.first.time_since_epoch()).count();
+                            banList[fc] = {
+                                { "until", until }
+                            };
+                        }
+                        return banList;
+                    }()
+                }
             };
 
             std::ofstream outSettings(settingsPath);

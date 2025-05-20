@@ -1078,6 +1078,67 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 wasLowFps = false;
             }
         }
+
+        if (State.TempBanEnabled) {
+            auto allPlayers = GetAllPlayerControl();
+
+            auto now = std::chrono::system_clock::now();
+
+            for (auto* playerControl : allPlayers) {
+                if (!playerControl) continue;
+
+                auto* playerData = GetPlayerDataById(playerControl->fields.PlayerId);
+                if (!playerData) continue;
+
+                std::string friendCode = convert_from_string(playerData->fields.FriendCode);
+                if (friendCode.empty()) continue;
+
+                std::string localFriendCode;
+                if (Game::pLocalPlayer && *Game::pLocalPlayer) {
+                    auto* localPD = GetPlayerDataById((*Game::pLocalPlayer)->fields.PlayerId);
+                    if (localPD) localFriendCode = convert_from_string(localPD->fields.FriendCode);
+                }
+                if (friendCode == localFriendCode) continue;
+
+                if (State.Ban_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end()) {
+                    continue;
+                }
+
+                auto banIt = State.TempBannedFriendCodes.find(friendCode);
+                if (banIt != State.TempBannedFriendCodes.end()) {
+                    if (now < banIt->second.first) {
+                        app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, false, NULL);
+                    }
+                    else {
+                        State.TempBannedFriendCodes.erase(banIt);
+                        State.PlayerPunishTimersFC.erase(friendCode);
+                        State.TempBanHistoryFC.erase(friendCode);
+                    }
+                }
+            }
+
+            std::unordered_set<std::string> activeFCs;
+            for (auto* player : allPlayers) {
+                if (!player) continue;
+                auto* pd = GetPlayerDataById(player->fields.PlayerId);
+                if (!pd) continue;
+                std::string fc = convert_from_string(pd->fields.FriendCode);
+                if (!fc.empty()) activeFCs.insert(fc);
+            }
+            for (auto it = State.PlayerPunishTimersFC.begin(); it != State.PlayerPunishTimersFC.end();) {
+                if (activeFCs.find(it->first) == activeFCs.end()) {
+                    it = State.PlayerPunishTimersFC.erase(it);
+                }
+                else {
+                    ++it;
+                }
+            }
+        }
+        else {
+            State.TempBannedFriendCodes.clear();
+            State.PlayerPunishTimersFC.clear();
+            State.TempBanHistoryFC.clear();
+        }
     }
     catch (Exception* ex) {
         onGameEnd();
