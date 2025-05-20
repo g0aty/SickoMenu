@@ -235,6 +235,29 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		}
 		break;
 	}
+	case (uint8_t)RpcCalls__Enum::CompleteTask: {
+		if (State.SMAC_CheckTaskCompletion && IsInGame()) {
+			uint8_t playerId = player->fields.PlayerId;
+			auto now = std::chrono::steady_clock::now();
+			auto it = State.lastTaskCompletionTime.find(playerId);
+			if (it != State.lastTaskCompletionTime.end()) {
+				float elapsedTime = std::chrono::duration<float>(now - it->second).count();
+				if (elapsedTime < State.TASK_DETECTION_WINDOW) {
+					State.taskCompletionCounter[playerId]++;
+					if (State.taskCompletionCounter[playerId] > State.MAX_TASK_COMPLETIONS) {
+						SMAC_OnCheatDetected(player, "Abnormal Task Completion");
+						return;
+					}
+				} else {
+					State.taskCompletionCounter[playerId] = 1;
+				}
+			} else {
+				State.taskCompletionCounter[playerId] = 1;
+			}
+			State.lastTaskCompletionTime[playerId] = now;
+		}
+		break;
+	}
 	}
 }
 

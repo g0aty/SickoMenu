@@ -613,8 +613,17 @@ namespace GameTab {
             ImGui::SameLine();
             if (ToggleButton("Abnormal Vanish", &State.SMAC_CheckVanish)) State.Save();
 
+
             if (ToggleButton("Abnormal Meetings/Body Reports", &State.SMAC_CheckReport)) State.Save();
             ImGui::SameLine();
+            if (ToggleButton("Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
+            ImGui::SameLine();
+           
+            if (ToggleButton("Abnormal Chat", &State.SMAC_CheckChat)) State.Save();
+
+            if (ToggleButton("Abnormal Task Completion", &State.SMAC_CheckTaskCompletion)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
             if (ToggleButton("Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
             if (State.SMAC_CheckLevel && ImGui::InputInt("Level >=", &State.SMAC_HighLevel)) {
                 State.Save();
@@ -622,13 +631,6 @@ namespace GameTab {
             if (State.SMAC_CheckLevel && ImGui::InputInt("Level <=", &State.SMAC_LowLevel)) {
                 State.Save();
             }
-
-            if (ToggleButton("Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
-            ImGui::SameLine();
-            if (ToggleButton("Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
-            ImGui::SameLine();
-            if (ToggleButton("Abnormal Chat", &State.SMAC_CheckChat)) State.Save();
-
             if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
             if (State.SMAC_CheckBadWords) {
                 if (State.SMAC_BadWords.empty())
