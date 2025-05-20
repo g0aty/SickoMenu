@@ -492,8 +492,10 @@ public:
     bool LevelFarm = false;
     bool AutoStartGame = false;
     int AutoStartTimer = 60;
-
+    bool AutoStartGamePlayers = false;
+    int AutoStartPlayerCount = 15;
     bool AutoOpenDoors = false;
+    bool AlwaysImpostor = false;
 
     Settings()
     {

@@ -337,6 +337,7 @@ void Settings::Load() {
         JSON_TRYGET("ExtraTimeThreshold", this->ExtraTimeThreshold);
         JSON_TRYGET("NotificationTimeWarn", this->NotificationTimeWarn);
         JSON_TRYGET("BypassVisualTasks", this->BypassVisualTasks);
+        JSON_TRYGET("AlwaysImpostor", this->AlwaysImpostor);
     }
     catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
@@ -698,6 +699,7 @@ void Settings::Save() {
                 { "ExtraTimeThreshold", this->ExtraTimeThreshold },
                 { "NotificationTimeWarn", this->NotificationTimeWarn },
                 { "BypassVisualTasks", this->BypassVisualTasks },
+                { "AlwaysImpostor", this->AlwaysImpostor },
             };
 
             std::ofstream outSettings(settingsPath);

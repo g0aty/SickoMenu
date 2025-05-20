@@ -5,6 +5,8 @@
 #include "state.hpp"
 #include "gui-helpers.hpp"
 
+bool editingAutoStartPlayerCount = false;
+
 namespace HostTab {
 	enum Groups {
 		Utils,
@@ -79,6 +81,40 @@ namespace HostTab {
 				if (IsInLobby()) {
 					ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 					if (!State.DisableRoleManager && (!hideRolesList || !State.TournamentMode)) {
+						if (ToggleButton("Always Impostor", &State.AlwaysImpostor)) {
+							State.Save();
+
+							if (!State.AlwaysImpostor) {
+								auto allPlayers = GetAllPlayerData();
+								for (size_t index = 0; index < allPlayers.size(); index++) {
+									auto playerData = allPlayers[index];
+									if (playerData == nullptr) continue;
+									PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
+									if (playerCtrl == nullptr) continue;
+									
+									if (*Game::pLocalPlayer == playerCtrl) {
+										State.assignedRoles[index] = RoleType::Random;
+										break;
+									}
+								}
+							}
+						}
+
+						if (State.AlwaysImpostor && IsHost()) {
+							auto allPlayers = GetAllPlayerData();
+							for (size_t index = 0; index < allPlayers.size(); index++) {
+								auto playerData = allPlayers[index];
+								if (playerData == nullptr) continue;
+								PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
+								if (playerCtrl == nullptr) continue;
+								
+								if (*Game::pLocalPlayer == playerCtrl) {
+									State.assignedRoles[index] = RoleType::Impostor;
+									break;
+								}
+							}
+						}
+
 						bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
 						auto allPlayers = GetAllPlayerData();
 						auto playerAmount = allPlayers.size();
@@ -266,6 +302,20 @@ namespace HostTab {
 					if (ImGui::InputInt("sec", &State.AutoStartTimer))
 						State.Save();
 				}
+
+                if (ToggleButton("Autostart Game (Players)", &State.AutoStartGamePlayers))
+                    State.Save();
+                if (State.AutoStartGamePlayers) {
+                    ImGui::Text("Start at");
+                    ImGui::SameLine();
+                    ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
+                    editingAutoStartPlayerCount = ImGui::IsItemActive();
+                    if (ImGui::InputInt("players##autostart", &State.AutoStartPlayerCount, 1, 100, flags)) {
+                        State.AutoStartPlayerCount = std::clamp(State.AutoStartPlayerCount, 1, 15);
+                        State.Save();
+                    }
+                    editingAutoStartPlayerCount = ImGui::IsItemActive();
+                }
 
 				//if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
 
