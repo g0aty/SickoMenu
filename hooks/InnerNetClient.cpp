@@ -1162,6 +1162,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
             if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                 synchronized(Replay::replayEventMutex) {
                     State.liveReplayEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
+                    State.liveConsoleEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
                 }
             }
         }

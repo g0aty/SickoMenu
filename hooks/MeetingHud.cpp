@@ -33,6 +33,14 @@ void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
 		State.InMeeting = false;
 		calloutOver = false;
 		if (IsHost() && State.TournamentMode && !State.tournamentFirstMeetingOver) State.tournamentFirstMeetingOver = true;
+		if (State.Replay_ClearAfterMeeting) {
+			Replay::Reset();
+			synchronized(Replay::replayEventMutex) {
+				State.liveReplayEvents.clear();
+			}
+			State.MatchStart = std::chrono::system_clock::now();
+			State.MatchCurrent = State.MatchStart;
+		}
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in MeetingHud_Close (MeetingHud)");
@@ -271,6 +279,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 				{
 					synchronized(Replay::replayEventMutex) {
 						State.liveReplayEvents.emplace_back(std::make_unique<CastVoteEvent>(GetEventPlayer(playerData).value(), GetEventPlayer(GetPlayerDataById(playerVoteArea->fields.VotedFor))));
+						State.liveConsoleEvents.emplace_back(std::make_unique<CastVoteEvent>(GetEventPlayer(playerData).value(), GetEventPlayer(GetPlayerDataById(playerVoteArea->fields.VotedFor))));
 					}
 					State.voteMonitor[playerData->fields.PlayerId] = playerVoteArea->fields.VotedFor;
 					STREAM_DEBUG(ToString(playerData) << " voted for " << ToString(playerVoteArea->fields.VotedFor));

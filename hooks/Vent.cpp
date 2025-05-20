@@ -40,6 +40,7 @@ void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo * method) {
 		app::Vector2 ventVector2D = { ventVector.x, ventVector.y };
 		synchronized(Replay::replayEventMutex) {
 			State.liveReplayEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_ENTER));
+			State.liveConsoleEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_ENTER));
 		}
 		if (State.confuser && State.confuseOnVent && pc == *Game::pLocalPlayer)
 			ControlAppearance(true);
@@ -54,6 +55,7 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 		app::Vector2 ventVector2D = { ventVector.x, ventVector.y };
 		synchronized(Replay::replayEventMutex) {
 			State.liveReplayEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_EXIT));
+			State.liveConsoleEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_EXIT));
 		}
 	}
 	return Vent_ExitVent(__this, pc, method);

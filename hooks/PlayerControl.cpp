@@ -33,6 +33,7 @@ void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo
 
 		synchronized(Replay::replayEventMutex) {
 			State.liveReplayEvents.emplace_back(std::make_unique<TaskCompletedEvent>(GetEventPlayerControl(__this).value(), taskType, PlayerControl_GetTruePosition(__this, NULL)));
+			State.liveConsoleEvents.emplace_back(std::make_unique<TaskCompletedEvent>(GetEventPlayerControl(__this).value(), taskType, PlayerControl_GetTruePosition(__this, NULL)));
 		}
 	}
 	catch (...) {
@@ -900,12 +901,14 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 			if (!PlayerIsImpostor(killerData) || (PlayerIsImpostor(killerData) && (killerData->fields.IsDead || (victimData->fields.IsDead || PlayerIsImpostor(victimData))))) {
 				synchronized(Replay::replayEventMutex) {
 					State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(killer.value(), CHEAT_ACTIONS::CHEAT_KILL_IMPOSTOR));
+					State.liveConsoleEvents.emplace_back(std::make_unique<CheatDetectedEvent>(killer.value(), CHEAT_ACTIONS::CHEAT_KILL_IMPOSTOR));
 				}
 				if (State.SafeMode && State.Enable_SMAC && State.SMAC_CheckMurder)
 					SMAC_OnCheatDetected(__this, "Abnormal Murder Player");
 			}
 			synchronized(Replay::replayEventMutex) {
 				State.liveReplayEvents.emplace_back(std::make_unique<KillEvent>(killer.value(), victim.value(), PlayerControl_GetTruePosition(__this, NULL), PlayerControl_GetTruePosition(target, NULL)));
+				State.liveConsoleEvents.emplace_back(std::make_unique<KillEvent>(killer.value(), victim.value(), PlayerControl_GetTruePosition(__this, NULL), PlayerControl_GetTruePosition(target, NULL)));
 				State.replayDeathTimePerPlayer[target->fields.PlayerId] = std::chrono::system_clock::now();
 			}
 		}
@@ -1069,6 +1072,7 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 			}
 			synchronized(Replay::replayEventMutex) {
 				State.liveReplayEvents.emplace_back(std::make_unique<ReportDeadBodyEvent>(GetEventPlayerControl(__this).value(), GetEventPlayer(target), PlayerControl_GetTruePosition(__this, NULL), GetTargetPosition(target)));
+				State.liveConsoleEvents.emplace_back(std::make_unique<ReportDeadBodyEvent>(GetEventPlayerControl(__this).value(), GetEventPlayer(target), PlayerControl_GetTruePosition(__this, NULL), GetTargetPosition(target)));
 			}
 		}
 	}
@@ -1237,6 +1241,7 @@ void dPlayerControl_Shapeshift(PlayerControl* __this, PlayerControl* target, boo
 	try {
 		synchronized(Replay::replayEventMutex) {
 			State.liveReplayEvents.emplace_back(std::make_unique<ShapeShiftEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));
+			State.liveConsoleEvents.emplace_back(std::make_unique<ShapeShiftEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));
 		}
 	}
 	catch (...) {
@@ -1250,6 +1255,7 @@ void dPlayerControl_ProtectPlayer(PlayerControl* __this, PlayerControl* target, 
 	try {
 		if (SYNCHRONIZED(Replay::replayEventMutex); target != nullptr) {
 			State.liveReplayEvents.emplace_back(std::make_unique<ProtectPlayerEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));
+			State.liveConsoleEvents.emplace_back(std::make_unique<ProtectPlayerEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));
 		}
 		else {
 			SMAC_OnCheatDetected(__this, "Overloading");
@@ -1570,6 +1576,8 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
 	}*/
 	synchronized(Replay::replayEventMutex) {
 		State.liveReplayEvents.emplace_back(std::make_unique<PhantomEvent>(GetEventPlayerControl(__this).value(),
+			isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));
+		State.liveConsoleEvents.emplace_back(std::make_unique<PhantomEvent>(GetEventPlayerControl(__this).value(),
 			isActive ? PHANTOM_ACTIONS::PHANTOM_VANISH : PHANTOM_ACTIONS::PHANTOM_APPEAR));
 	}
 	auto pData = GetPlayerData(__this);

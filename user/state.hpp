@@ -308,6 +308,7 @@ public:
     // any code that modifies State.liveReplayEvents or any other collection should use the Replay.replayEventMutex
     // failure to do so will invalidate any existing iterator of any thread which will lead to rare and hard to diagnose crashes
     std::vector<std::unique_ptr<EventInterface>> liveReplayEvents;
+    std::vector<std::unique_ptr<EventInterface>> liveConsoleEvents;
     std::array<ImVec2, Game::MAX_PLAYERS> lastWalkEventPosPerPlayer;
     std::array<std::chrono::system_clock::time_point, Game::MAX_PLAYERS> replayDeathTimePerPlayer;
     std::map<Game::PlayerId, Replay::WalkEvent_LineData> replayWalkPolylineByPlayer;

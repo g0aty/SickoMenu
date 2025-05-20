@@ -48,7 +48,7 @@ namespace ConsoleGui
 		ImGui::TextColored(titleCol, "Console");
 		ImGui::SameLine(ImGui::GetWindowWidth() - 20 * State.dpiScale);
 		if (AnimatedButton("-")) State.ShowConsole = false; //minimize button
-		ImGui::BeginChild("console#filter", ImVec2(520, 20) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
+		ImGui::BeginChild("console#filter", ImVec2(520, 40) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 		ImGui::Text("Event Filter: ");
 		ImGui::SameLine();
 		CustomListBoxIntMultiple("Event Types", &ConsoleGui::event_filter, 100.f * State.dpiScale);
@@ -58,14 +58,11 @@ namespace ConsoleGui
 			ImGui::SameLine();
 			CustomListBoxPlayerSelectionMultiple("Players", &ConsoleGui::player_filter, 150.f * State.dpiScale);
 		}
-		ImGui::EndChild();
-		ImGui::BeginChild("console#clear", ImVec2(520, 40) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 		if (AnimatedButton("Clear Console")) {
 			synchronized(Replay::replayEventMutex) {
-				State.liveReplayEvents.clear();
+				State.liveConsoleEvents.clear();
 			}
 		}
-		ImGui::SameLine();
 		ImGui::EndChild();
 		ImGui::Separator();
 		ImGui::BeginChild("console#scroll", ImVec2(511, 270) * State.dpiScale, true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoBackground);
@@ -86,12 +83,12 @@ namespace ConsoleGui
 		}
 
 		synchronized(Replay::replayEventMutex) {
-			size_t i = State.liveReplayEvents.size() - 1;
-			for (auto rit = State.liveReplayEvents.rbegin(); rit != State.liveReplayEvents.rend(); ++rit, --i) {
+			size_t i = State.liveConsoleEvents.size() - 1;
+			for (auto rit = State.liveConsoleEvents.rbegin(); rit != State.liveConsoleEvents.rend(); ++rit, --i) {
 				EventInterface* evt = (*rit).get();
 				if (evt == NULL)
 				{
-					STREAM_ERROR("State.liveReplayEvents[" << i << "] was NULL (liveReplayEvents.size(): " << State.liveReplayEvents.size() << ")");
+					STREAM_ERROR("State.liveConsoleEvents[" << i << "] was NULL (liveConsoleEvents.size(): " << State.liveConsoleEvents.size() << ")");
 					continue;
 				}
 				if (evt->getType() == EVENT_TYPES::EVENT_WALK)

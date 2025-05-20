@@ -210,7 +210,7 @@ namespace SettingsTab {
 
 			ImGui::Dummy(ImVec2(1, 1) * State.dpiScale);
 
-			if (ToggleButton("Auto-Exit Due Low FPS", &State.LeaveDueLFPS)) {
+			if (ToggleButton("Auto-Exit Due To Low FPS", &State.LeaveDueLFPS)) {
 				State.Save();
 			}
 			ImGui::SameLine();

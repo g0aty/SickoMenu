@@ -55,7 +55,8 @@ namespace DebugTab {
 					numWalkPoints += pair.second.pendingPoints.size() + pair.second.simplifiedPoints.size();
 				}
 				ImGui::Text("Num Walk Points: %d", numWalkPoints);
-				ImGui::Text("Num Live Events: %d", State.liveReplayEvents.size());
+				ImGui::Text("Num Live Replay Events: %d", State.liveReplayEvents.size());
+				ImGui::Text("Num Live Console Events: %d", State.liveConsoleEvents.size());
 			}
 
 			ImGui::Text("ReplayMatchStart: %s", std::format("{:%OH:%OM:%OS}", State.MatchStart).c_str());
