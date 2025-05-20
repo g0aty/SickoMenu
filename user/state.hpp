@@ -529,6 +529,7 @@ public:
     bool SMAC_CheckLevel = true;
     bool SMAC_CheckVent = true;
     bool SMAC_CheckSabotage = true;
+    bool SMAC_CheckTaskCompletion = true;
     int SMAC_HighLevel = 10000;
     int SMAC_LowLevel = 0;
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
@@ -574,6 +575,11 @@ public:
     int rpc101Counter = 0;
     const int RPC101_LIMIT = 30;
 
+    // Task anomaly detection [SMAC | Dependencies]
+    std::unordered_map<uint8_t, std::chrono::steady_clock::time_point> lastTaskCompletionTime;
+    std::unordered_map<uint8_t, int> taskCompletionCounter;
+    int MAX_TASK_COMPLETIONS = 3; // Max tasks that can be completed in the detection window
+    float TASK_DETECTION_WINDOW = 2.0f; //time in seconds 
 
     // Player tab [Crash-fix | Dependencies]
     std::unordered_map<uint8_t, std::chrono::steady_clock::time_point> newPlayersAppear;
@@ -581,7 +587,6 @@ public:
     std::unordered_set<uint8_t> finishedPlayers;
     std::unordered_set<uint8_t> currentPlayers;
     static constexpr float appearDuration = 0.5f;
-
 
     // Name-Checker [Dependencies]
     std::unordered_set<std::string> ForbiddenNames;
