@@ -8,6 +8,11 @@
 #include "game.h"
 #include "replay.hpp"
 
+template<typename T>
+constexpr T SafeMax(const T& a, const T& b) {
+    return (a > b) ? a : b;
+}
+
 class Settings {
 public:
 
@@ -619,6 +624,19 @@ public:
 
     // Ban/kick Everyone [Dependency]
     std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> playerPunishTimers;
+
+    // Temp-Ban [Dependencies]
+    bool TempBanEnabled = true;
+    int TempBanDuration = 60; /// Seconds
+    std::string TBanFC = "";
+    std::unordered_map<std::string, std::chrono::system_clock::time_point> TempBanHistoryFC;
+    std::unordered_map<std::string, std::pair<std::chrono::system_clock::time_point, std::string>> TempBannedFriendCodes;
+    std::unordered_map<std::string, std::chrono::system_clock::time_point> PlayerPunishTimersFC;
+
+    int BanDays = 0;
+    int BanHours = 0;
+    int BanMinutes = 0;
+    int BanSeconds = 0;
 
     void Load();
     void Save();
