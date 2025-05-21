@@ -8,6 +8,11 @@
 #include "game.h"
 #include "replay.hpp"
 
+template<typename T>
+constexpr T SafeMax(const T& a, const T& b) {
+    return (a > b) ? a : b;
+}
+
 class Settings {
 public:
 
@@ -495,8 +500,11 @@ public:
     bool LevelFarm = false;
     bool AutoStartGame = false;
     int AutoStartTimer = 60;
-
+    bool AutoStartGamePlayers = false;
+    int AutoStartPlayerCount = 15;
     bool AutoOpenDoors = false;
+    bool AutoHostRole = false;
+    RoleType HostRoleToSet = RoleType::Impostor;
 
     Settings()
     {
@@ -530,6 +538,7 @@ public:
     bool SMAC_CheckLevel = true;
     bool SMAC_CheckVent = true;
     bool SMAC_CheckSabotage = true;
+    bool SMAC_CheckTaskCompletion = true;
     int SMAC_HighLevel = 10000;
     int SMAC_LowLevel = 0;
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
@@ -555,6 +564,7 @@ public:
     bool KickAFK = false;
     float AutoPunishDelay = 0.f;
     bool NotificationsAFK = false;
+    bool SecondChance = false;
     float TimerAFK = 40.f;
     float AddExtraTime = 15.0f;
     float ExtraTimeThreshold = 5.0f;
@@ -575,6 +585,11 @@ public:
     int rpc101Counter = 0;
     const int RPC101_LIMIT = 30;
 
+    // Task anomaly detection [SMAC | Dependencies]
+    std::unordered_map<uint8_t, std::chrono::steady_clock::time_point> lastTaskCompletionTime;
+    std::unordered_map<uint8_t, int> taskCompletionCounter;
+    int MAX_TASK_COMPLETIONS = 3; // Max tasks that can be completed in the detection window
+    float TASK_DETECTION_WINDOW = 2.0f; //time in seconds 
 
     // Player tab [Crash-fix | Dependencies]
     std::unordered_map<uint8_t, std::chrono::steady_clock::time_point> newPlayersAppear;
@@ -582,7 +597,6 @@ public:
     std::unordered_set<uint8_t> finishedPlayers;
     std::unordered_set<uint8_t> currentPlayers;
     static constexpr float appearDuration = 0.5f;
-
 
     // Name-Checker [Dependencies]
     std::unordered_set<std::string> ForbiddenNames;
@@ -620,6 +634,19 @@ public:
 
     // Ban/kick Everyone [Dependency]
     std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> playerPunishTimers;
+
+    // Temp-Ban [Dependencies]
+    bool TempBanEnabled = true;
+    int TempBanDuration = 60; /// Seconds
+    std::string TBanFC = "";
+    std::unordered_map<std::string, std::chrono::system_clock::time_point> TempBanHistoryFC;
+    std::unordered_map<std::string, std::pair<std::chrono::system_clock::time_point, std::string>> TempBannedFriendCodes;
+    std::unordered_map<std::string, std::chrono::system_clock::time_point> PlayerPunishTimersFC;
+
+    int BanDays = 0;
+    int BanHours = 0;
+    int BanMinutes = 0;
+    int BanSeconds = 0;
 
     void Load();
     void Save();

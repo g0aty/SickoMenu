@@ -750,14 +750,19 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 		}
 		
 		if (State.KickAFK) {
-			static bool wasInMeeting = false;
-			wasInMeeting = State.InMeeting;
+			static bool wasInMeetingLastFrame = false;
 
-			if (wasInMeeting && !State.InMeeting) {
+			float extraTime = State.SecondChance ? State.AddExtraTime : 0.0f;
+			float extraTimeThreshold = State.SecondChance ? State.ExtraTimeThreshold : 0.0f;
+
+			if (wasInMeetingLastFrame && !State.InMeeting) {
 				for (auto& [id, info] : playerActivityMap) {
 					info.hasReceivedExtraTimeInMeeting = false;
 				}
 			}
+			wasInMeetingLastFrame = State.InMeeting;
+
+			std::vector<int> toKick;
 
 			for (auto player : GetAllPlayerControl()) {
 				if (player == *Game::pLocalPlayer) continue;
@@ -774,10 +779,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					continue;
 				}
 
-				if (!State.KickAFK) continue;
-
-
 				auto now = steady_clock::now();
+
 				if (currentPosition.x != info.lastPosition.x || currentPosition.y != info.lastPosition.y) {
 					info.lastPosition = currentPosition;
 					info.lastMoveTime = now;
@@ -789,42 +792,44 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				float remainingTime = State.TimerAFK - elapsed;
 
 				if (State.InMeeting) {
-					if (remainingTime < State.ExtraTimeThreshold && !info.hasReceivedExtraTimeInMeeting) {
-						info.lastMoveTime -= duration_cast<steady_clock::duration>(duration<float>(State.AddExtraTime));
+					if (remainingTime < extraTimeThreshold && !info.hasReceivedExtraTimeInMeeting) {
+						info.lastMoveTime -= duration_cast<steady_clock::duration>(duration<float>(extraTime));
 						info.hasReceivedExtraTimeInMeeting = true;
 					}
 					continue;
 				}
 
-				if (State.NotificationsAFK && remainingTime <= State.NotificationTimeWarn && !info.hasReceivedWarning) {
+				if (IsInGame() && State.NotificationsAFK && remainingTime <= State.NotificationTimeWarn && !info.hasReceivedWarning) {
 					info.hasReceivedWarning = true;
 
 					std::string nickname = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
 					int secondsLeft = static_cast<int>(std::clamp(remainingTime, 0.0f, State.NotificationTimeWarn)) + 1;
-					std::string warning = std::format(
-						"<#FFF>{}</color> <#ff033e>will be kicked in {} seconds due to inactivity!</color>",
-						nickname, secondsLeft
-					);
+
+					std::string warning = std::format("<#FFF>{}</color> <#ff033e>will be kicked in {} seconds due to inactivity!</color>", nickname, secondsLeft);
 
 					auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
 					if (notifier) {
-						auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
-						auto colorBackup = notifier->fields.disconnectColor;
+						Sprite spriteBackup = *notifier->fields.playerDisconnectSprite;
+						Color colorBackup = notifier->fields.disconnectColor;
 
 						notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
 						notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
 
-						NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(warning), NULL);
+						NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(warning), nullptr);
 
-						notifier->fields.playerDisconnectSprite = spriteBackup;
+						notifier->fields.playerDisconnectSprite = &spriteBackup;
 						notifier->fields.disconnectColor = colorBackup;
 					}
 				}
 
 				if (elapsed > State.TimerAFK) {
-					app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerId, false, NULL);
-					playerActivityMap.erase(playerId);
+					toKick.push_back(playerId);
 				}
+			}
+
+			for (int id : toKick) {
+				app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), id, false, nullptr);
+				playerActivityMap.erase(id);
 			}
 		}
 	}

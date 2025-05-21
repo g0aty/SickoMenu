@@ -8,6 +8,8 @@
 
 //std::unordered_set<std::string> glitchEndings = { "IJPG", "YTHG", "WYWG", "KHQG", "FUGG", "UFLG", "KJQG", "ZQCG", "GEWG", "NPPG", "SZAF", "PATG", "PJDG", "TPYG", "JTFG", "VDXG", "DHSG", "TQQG", "ALGG", "UMPG", "GFXG", "RGGG", "HQXG", "LDQG", "ZLHG", "WMPG", "TAGG", "FBGG", "EJYG", "AOTG", "LCAF", "DORG", "ZCQG" };
 
+extern bool editingAutoStartPlayerCount;
+
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dLobbyBehaviour_Start executed");
@@ -37,6 +39,17 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
 		LogicOptions_SyncOptions(GameManager_get_LogicOptions(gameManager, NULL), NULL);
 	}
 	State.LobbyTimer -= Time_get_deltaTime(NULL);
+
+	
+	if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
+		int playerCount = (int)GetAllPlayerData().size();
+		if (playerCount >= State.AutoStartPlayerCount) {
+			app::InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
+			State.AutoStartGamePlayers = false;
+			State.Save();
+		}
+	}
+	
 }
 
 void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method) {

@@ -1501,6 +1501,39 @@ namespace PlayersTab {
 
 				CustomListBoxInt("  ", &reportReason, REPORTREASONS);
 
+				ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+
+				if (State.TempBanEnabled && IsHost() && !selectedPlayer.is_LocalPlayer()) {
+					ImGui::PushItemWidth(200);
+					if (ImGui::InputInt("Days", &State.BanDays) && State.BanDays < 0) State.BanDays = 0;
+					if (ImGui::InputInt("Hours", &State.BanHours) && State.BanHours < 0) State.BanHours = 0;
+					if (ImGui::InputInt("Minutes", &State.BanMinutes) && State.BanMinutes < 0) State.BanMinutes = 0;
+					if (ImGui::InputInt("Seconds", &State.BanSeconds) && State.BanSeconds < 0) State.BanSeconds = 0;
+					ImGui::PopItemWidth();
+
+					if (ImGui::Button("Confirm TempBan")) {
+						std::string targetFriendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+						if (!targetFriendCode.empty()) {
+							auto now = std::chrono::system_clock::now();
+
+							int totalSeconds = 0;
+							totalSeconds += SafeMax(0, State.BanDays) * 86400;
+							totalSeconds += SafeMax(0, State.BanHours) * 3600;
+							totalSeconds += SafeMax(0, State.BanMinutes) * 60;
+							totalSeconds += SafeMax(0, State.BanSeconds);
+
+							State.TempBanDuration = totalSeconds;
+
+							State.TempBannedFriendCodes[targetFriendCode] = std::make_pair(now + std::chrono::seconds(State.TempBanDuration), "Temporary ban");
+
+							State.TempBanHistoryFC.erase(targetFriendCode);
+							State.PlayerPunishTimersFC.erase(targetFriendCode);
+
+							State.Save();
+						}
+					}
+				}
+
 				if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
 					ImGui::NewLine(); //force a new line
 					if (InputString("Username", &forcedName)) {

@@ -613,8 +613,17 @@ namespace GameTab {
             ImGui::SameLine();
             if (ToggleButton("Abnormal Vanish", &State.SMAC_CheckVanish)) State.Save();
 
+
             if (ToggleButton("Abnormal Meetings/Body Reports", &State.SMAC_CheckReport)) State.Save();
             ImGui::SameLine();
+            if (ToggleButton("Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
+            ImGui::SameLine();
+           
+            if (ToggleButton("Abnormal Chat", &State.SMAC_CheckChat)) State.Save();
+
+            if (ToggleButton("Abnormal Task Completion", &State.SMAC_CheckTaskCompletion)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
             if (ToggleButton("Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
             if (State.SMAC_CheckLevel && ImGui::InputInt("Level >=", &State.SMAC_HighLevel)) {
                 State.Save();
@@ -622,13 +631,6 @@ namespace GameTab {
             if (State.SMAC_CheckLevel && ImGui::InputInt("Level <=", &State.SMAC_LowLevel)) {
                 State.Save();
             }
-
-            if (ToggleButton("Abnormal Venting", &State.SMAC_CheckVent)) State.Save();
-            ImGui::SameLine();
-            if (ToggleButton("Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
-            ImGui::SameLine();
-            if (ToggleButton("Abnormal Chat", &State.SMAC_CheckChat)) State.Save();
-
             if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
             if (State.SMAC_CheckBadWords) {
                 if (State.SMAC_BadWords.empty())
@@ -697,11 +699,15 @@ namespace GameTab {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-                if (IsInGame() && ToggleButton("Kick AFK Players", &State.KickAFK)) {
+                const char* buttonLabel = IsInGame() ? "Kick AFK Players" : "Kick AFK Players [GAME ONLY]";
+                if (ToggleButton(buttonLabel, &State.KickAFK)) {
                     State.Save();
                 }
-                ImGui::SameLine();
-                if (State.KickAFK && ToggleButton("Activate AFK Notifications", &State.NotificationsAFK)) {
+                if (State.KickAFK) ImGui::SameLine();
+                if (State.KickAFK && ToggleButton("Enable AFK Notifications", &State.NotificationsAFK)) {
+                    State.Save();
+                }
+                if (State.KickAFK && ToggleButton("AFK - Second Chance", &State.SecondChance)) {
                     State.Save();
                 }
                 std::string header = "Anti AFK ~ Advanced Options";
@@ -709,15 +715,15 @@ namespace GameTab {
                     header += " [GAME-MATCH]";
                 }
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-                if (ImGui::CollapsingHeader(header.c_str()))
+                if (State.KickAFK && ImGui::CollapsingHeader(header.c_str()))
                 {
                     if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
                         State.Save();
                     }
-                    if (SteppedSliderFloat("Extra Time at The Meeting", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                    if (State.SecondChance && SteppedSliderFloat("Extra Time", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
                         State.Save();
                     }
-                    if (SteppedSliderFloat("Minimum Sec to Extra Time", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
+                    if (State.SecondChance && SteppedSliderFloat("Min Time Before Adding", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
                         State.Save();
                     }
                     if (State.NotificationsAFK && SteppedSliderFloat("Warn-AFK Notifications Time", &State.NotificationTimeWarn, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
@@ -905,7 +911,7 @@ namespace GameTab {
                 static std::string warnReason;
 
                 ImGui::PushItemWidth(200);
-                InputString("FriendCode", &friendCodeToWarn);
+                InputString("FriendCode##warn", &friendCodeToWarn);
                 InputString("Reason", &warnReason);
                 ImGui::PopItemWidth();
 
@@ -920,6 +926,103 @@ namespace GameTab {
             }
 
             ImGui::EndGroup();
+
+            ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+
+
+            if (ImGui::CollapsingHeader("Temp-Ban System"))
+            {
+
+                ImGui::BeginGroup();
+
+                ImGui::PushItemWidth(150);
+                InputString("FriendCode", &State.TBanFC);
+
+                if (ImGui::InputInt("Days", &State.BanDays) && State.BanDays < 0) State.BanDays = 0;
+                if (ImGui::InputInt("Hours", &State.BanHours) && State.BanHours < 0) State.BanHours = 0;
+                if (ImGui::InputInt("Minutes", &State.BanMinutes) && State.BanMinutes < 0) State.BanMinutes = 0;
+                if (ImGui::InputInt("Seconds", &State.BanSeconds) && State.BanSeconds < 0) State.BanSeconds = 0;
+                ImGui::PopItemWidth();
+
+                if (ImGui::Button("Submit Temp-Ban") && !State.TBanFC.empty()) {
+                    int totalSeconds = 0;
+                    totalSeconds += SafeMax(0, State.BanDays) * 86400;
+                    totalSeconds += SafeMax(0, State.BanHours) * 3600;
+                    totalSeconds += SafeMax(0, State.BanMinutes) * 60;
+                    totalSeconds += SafeMax(0, State.BanSeconds);
+
+                    if (totalSeconds > 0) {
+                        auto now = std::chrono::system_clock::now();
+                        auto banEndTime = now + std::chrono::seconds(totalSeconds);
+                        State.TempBannedFriendCodes[State.TBanFC] = { banEndTime, std::to_string(now.time_since_epoch().count()) };
+                        State.TBanFC.clear();
+                        State.BanDays = State.BanHours = State.BanMinutes = State.BanSeconds = 0;
+                        State.Save();
+                    }
+                }
+                ImGui::EndGroup();
+                ImGui::SameLine();
+
+                ImGui::BeginGroup();
+                ImGui::Text("Temp-Banned Players:");
+
+                auto now = std::chrono::system_clock::now();
+                for (auto it = State.TempBannedFriendCodes.begin(); it != State.TempBannedFriendCodes.end(); ) {
+                    if (now >= it->second.first) {
+                        State.TempBanHistoryFC[it->first] = now;
+                        it = State.TempBannedFriendCodes.erase(it);
+                    }
+                    else {
+                        ++it;
+                    }
+                }
+
+                if (State.TempBannedFriendCodes.empty()) {
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No players are temporarily banned.");
+                }
+                else {
+                    static int selectedTempBanIndex = 0;
+                    std::vector<std::string> displayList;
+                    std::vector<std::string> friendCodeList;
+
+                    for (const auto& [fc, banInfo] : State.TempBannedFriendCodes) {
+                        auto timeLeft = std::chrono::duration_cast<std::chrono::seconds>(banInfo.first - now).count();
+                        if (timeLeft < 0) timeLeft = 0;
+
+                        int d = static_cast<int>(timeLeft / 86400);
+                        int h = static_cast<int>((timeLeft % 86400) / 3600);
+                        int m = static_cast<int>((timeLeft % 3600) / 60);
+                        int s = static_cast<int>(timeLeft % 60);
+
+                        char buffer[128];
+                        snprintf(buffer, sizeof(buffer), "%s | %02dd:%02dh:%02dm:%02ds", fc.c_str(), d, h, m, s);
+
+                        displayList.push_back(buffer);
+                        friendCodeList.push_back(fc);
+                    }
+
+                    std::vector<const char*> displayCStrs;
+                    for (auto& s : displayList) displayCStrs.push_back(s.c_str());
+
+                    selectedTempBanIndex = std::clamp(selectedTempBanIndex, 0, (int)displayCStrs.size() - 1);
+                    CustomListBoxInt("Select TempBan", &selectedTempBanIndex, displayCStrs);
+
+                    if (ImGui::Button("Unban")) {
+                        if (selectedTempBanIndex >= 0 && selectedTempBanIndex < (int)friendCodeList.size()) {
+                            std::string targetFC = friendCodeList[selectedTempBanIndex];
+                            State.TempBannedFriendCodes.erase(targetFC);
+                            State.PlayerPunishTimersFC.erase(targetFC);
+                            State.TempBanHistoryFC.erase(targetFC);
+                            State.Save();
+                        }
+                    }
+                }
+                ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Note: Temporary Ban Features\nWorks for Host Only!");
+                ImGui::EndGroup();
+            }
         }
 
         if (openOptions) {

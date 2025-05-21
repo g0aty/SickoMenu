@@ -414,13 +414,15 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				std::string msg =
 					"<#87cefa><font=\"Barlow-Regular Outline\"><b>"
 					"<size=120%>Available Commands:</size><size=75%>\n\n"
-					"<#ff033e>/add</color> ~ <#ff033e>Add Player to the Whitelist</color>\n"
-					"<#ff033e>/remove</color> ~ <#ff033e>Remove Player From the Whitelist</color>\n"
-					"<#ff033e>/warn</color> ~ <#ff033e>Warn Player</color>\n"
-					"<#ff033e>/unwarn</color> ~ <#ff033e>Unwarn Player</color>\n"
-					"<#ff033e>/checkwarns</color> ~ <#ff033e>Check All Warns of Selected Player</color>\n"
-					"<#ff033e>/kick all</color> ~ <#ff033e>Kick Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
-					"<#ff033e>/ban all</color> ~ <#ff033e>Ban Everyone</color>  <#fb0>[HOST ONLY]</color>"
+					"<#ff033e>/Add</color> ~ <#ff033e>Add Player to the Whitelist</color>\n"
+					"<#ff033e>/Remove</color> ~ <#ff033e>Remove Player From the Whitelist</color>\n"
+					"<#ff033e>/Warn</color> ~ <#ff033e>Warn Player</color>\n"
+					"<#ff033e>/Unwarn</color> ~ <#ff033e>Unwarn Player</color>\n"
+					"<#ff033e>/CheckWarns</color> ~ <#ff033e>Check All Warns of Selected Player</color>\n\n"
+					"<#ff033e>/Kick All</color> ~ <#ff033e>Kick Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
+					"<#ff033e>/Ban All</color> ~ <#ff033e>Ban Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
+					"<#ff033e>/Temp-Ban</color> ~ <#ff033e>Set a Temporary Ban</color>  <#fb0>[HOST ONLY]</color>\n"
+					"<#ff033e>/Unban</color> ~ <#ff033e>Unban Player</color>  <#fb0>[HOST ONLY]</color>"
 					"</size></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
@@ -624,6 +626,133 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				}
 				else if (IsInLobby()) {
 					State.lobbyRpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+				}
+				return;
+			}
+
+			
+
+
+			if (chatTextLower == "/temp-ban" || chatTextLower == "/temp-ban ") {
+				std::string msg = 
+					"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
+					"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Outline\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+			if (chatTextLower.substr(0, 10) == "/temp-ban ") {
+				std::string args = trim(chatText.substr(10));
+
+				size_t spacePos = args.find(' ');
+				if (args.empty() || spacePos == std::string::npos) {
+					std::string msg = 
+						"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
+						"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Outline\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					return;
+				}
+
+				std::string fc = trim(args.substr(0, spacePos));
+				std::string timeStr = trim(args.substr(spacePos + 1));
+
+				if (fc.empty() || timeStr.empty()) {
+					std::string msg = 
+						"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
+						"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Outline\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					return;
+				}
+
+				int totalSeconds = 0;
+				std::smatch match;
+				std::regex re(R"((\d+)([dhms]))", std::regex_constants::icase);
+				auto begin = std::sregex_iterator(timeStr.begin(), timeStr.end(), re);
+				auto end = std::sregex_iterator();
+
+				for (auto it = begin; it != end; ++it) {
+					int value = std::stoi((*it)[1].str());
+					char unit = tolower((*it)[2].str()[0]);		
+
+					switch (unit) {
+					case 'd': totalSeconds += value * 86400; break;
+					case 'h': totalSeconds += value * 3600; break;
+					case 'm': totalSeconds += value * 60; break;
+					case 's': totalSeconds += value; break;
+					}
+				}
+
+				if (totalSeconds <= 0) {
+					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Invalid or zero time duration.</b></font></color>";
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					return;
+				}
+
+				auto now = std::chrono::system_clock::now();
+				auto banEndTime = now + std::chrono::seconds(totalSeconds);
+
+				State.TempBannedFriendCodes[fc] = { banEndTime, std::to_string(now.time_since_epoch().count()) };
+				State.Save();
+
+				// Don't use huge numbers, for example "999999999999999999d", it cause int overflowing => Runtime Error
+
+				int days = totalSeconds / 86400;
+				int hours = (totalSeconds % 86400) / 3600;
+				int minutes = (totalSeconds % 3600) / 60;
+				int seconds = totalSeconds % 60;
+
+				std::string durationStr;
+				if (days > 0)    durationStr += std::format("{} day{}", days, days == 1 ? "" : "s");
+				if (hours > 0) {
+					if (!durationStr.empty()) durationStr += " ";
+					durationStr += std::format("{} hour{}", hours, hours == 1 ? "" : "s");
+				}
+				if (minutes > 0) {
+					if (!durationStr.empty()) durationStr += " ";
+					durationStr += std::format("{} minute{}", minutes, minutes == 1 ? "" : "s");
+				}
+				if (seconds > 0) {
+					if (!durationStr.empty()) durationStr += " ";
+					durationStr += std::format("{} second{}", seconds, seconds == 1 ? "" : "s");
+				}
+
+				if (durationStr.empty()) {
+					durationStr = "0 seconds";
+				}
+
+				std::string msg = std::format("<#ffa500><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Temporarily Banned for {}.</b></font></color>", fc, durationStr);
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+
+
+			if (chatTextLower == "/unban" || chatTextLower == "/unban ") {
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /unban <FriendCode></b></font></color>";
+				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				return;
+			}
+
+			if (chatTextLower.substr(0, 7) == "/unban ") {
+				std::string fc = trim(chatText.substr(7));
+
+				if (fc.empty()) {
+					std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /unban <FriendCode></b></font></color>";
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+					return;
+				}
+
+				auto it = State.TempBannedFriendCodes.find(fc);
+				if (it != State.TempBannedFriendCodes.end()) {
+					State.TempBannedFriendCodes.erase(it);
+					State.Save();
+
+					std::string msg = std::format("<#00ff00><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" has been unbanned.</b></font></color>", fc);
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
+				}
+				else {
+					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>No temporary ban found for \"{}\".</b></font></color>", fc);
+					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				return;
 			}

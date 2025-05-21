@@ -29,6 +29,11 @@ static bool OpenDoor(OpenableDoor* door) {
     return true;
 }
 
+const ptrdiff_t GetRoleCount(RoleType role)
+{
+    return std::count_if(State.assignedRoles.cbegin(), State.assignedRoles.cend(), [role](RoleType i) {return i == role; });
+}
+
 static void onGameEnd() {
     try {
         LOG_DEBUG("Reset All");
@@ -1078,6 +1083,111 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 wasLowFps = false;
             }
         }
+
+        if (State.TempBanEnabled) {
+            auto allPlayers = GetAllPlayerControl();
+
+            auto now = std::chrono::system_clock::now();
+
+            for (auto* playerControl : allPlayers) {
+                if (!playerControl) continue;
+
+                auto* playerData = GetPlayerDataById(playerControl->fields.PlayerId);
+                if (!playerData) continue;
+
+                std::string friendCode = convert_from_string(playerData->fields.FriendCode);
+                if (friendCode.empty()) continue;
+
+                std::string localFriendCode;
+                if (Game::pLocalPlayer && *Game::pLocalPlayer) {
+                    auto* localPD = GetPlayerDataById((*Game::pLocalPlayer)->fields.PlayerId);
+                    if (localPD) localFriendCode = convert_from_string(localPD->fields.FriendCode);
+                }
+                if (friendCode == localFriendCode) continue;
+
+                if (State.Ban_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end()) {
+                    continue;
+                }
+
+                auto banIt = State.TempBannedFriendCodes.find(friendCode);
+                if (banIt != State.TempBannedFriendCodes.end()) {
+                    if (now < banIt->second.first) {
+                        app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, false, NULL);
+                    }
+                    else {
+                        State.TempBannedFriendCodes.erase(banIt);
+                        State.PlayerPunishTimersFC.erase(friendCode);
+                        State.TempBanHistoryFC.erase(friendCode);
+                    }
+                }
+            }
+
+            std::unordered_set<std::string> activeFCs;
+            for (auto* player : allPlayers) {
+                if (!player) continue;
+                auto* pd = GetPlayerDataById(player->fields.PlayerId);
+                if (!pd) continue;
+                std::string fc = convert_from_string(pd->fields.FriendCode);
+                if (!fc.empty()) activeFCs.insert(fc);
+            }
+            for (auto it = State.PlayerPunishTimersFC.begin(); it != State.PlayerPunishTimersFC.end();) {
+                if (activeFCs.find(it->first) == activeFCs.end()) {
+                    it = State.PlayerPunishTimersFC.erase(it);
+                }
+                else {
+                    ++it;
+                }
+            }
+        }
+        else {
+            State.TempBannedFriendCodes.clear();
+            State.PlayerPunishTimersFC.clear();
+            State.TempBanHistoryFC.clear();
+        }
+
+        if (IsInLobby() && IsHost() && GameOptions().HasOptions()) {
+            GameOptions options;
+            if (State.AutoHostRole) {
+                auto allPlayers = GetAllPlayerData();
+                for (size_t index = 0; index < allPlayers.size(); index++) {
+                    auto playerData = allPlayers[index];
+                    if (playerData == nullptr) continue;
+                    PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
+                    if (playerCtrl == nullptr) continue;
+
+                    if (*Game::pLocalPlayer == playerCtrl && State.assignedRoles[index] != State.HostRoleToSet) {
+                        State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
+                        State.scientists_amount = (int)GetRoleCount(RoleType::Scientist);
+                        State.trackers_amount = (int)GetRoleCount(RoleType::Tracker);
+                        State.noisemakers_amount = (int)GetRoleCount(RoleType::Noisemaker);
+                        State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
+                        State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
+                        State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
+                        if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom) {
+                            if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount >= GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
+                                State.assignedRoles[index] = RoleType::Random;
+                                State.AutoHostRole = false;
+                            }
+                            else {
+                                if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Impostor;
+                                State.assignedRoles[index] = State.HostRoleToSet;
+                            }
+                        }
+                        else {
+                            if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.crewmates_amount >= (int)GetAllPlayerData().size() - 1) {
+                                State.assignedRoles[index] = RoleType::Random;
+                                State.AutoHostRole = false;
+                            }
+                            else {
+                                if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Engineer;
+                                State.assignedRoles[index] = State.HostRoleToSet;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
     }
     catch (Exception* ex) {
         onGameEnd();
@@ -1447,36 +1557,37 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dDisconnectPopup_DoShow executed");
     DisconnectPopup_DoShow(__this, method);
-    if (!State.PanicMode) {
+    bool shouldCopyCode = State.AutoCopyLobbyCode && State.LastLobbyJoined != "";
+    if (!State.PanicMode || State.TempPanicMode) {
         switch (((InnerNetClient*)(*Game::pAmongUsClient))->fields.LastDisconnectReason) {
         case DisconnectReasons__Enum::Hacking: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
-                convert_to_string(std::format("You were banned for dating.\n\n{}{}",
-                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.",
+                convert_to_string(std::format("You were banned for hacking.\n\n{}{}",
+                    shouldCopyCode ? "Lobby Code has been copied to the clipboard." : "Please stop.",
                     State.SafeMode ? "" : "\n\nDisabling safe mode isn't recommended on official servers!")), NULL);
         }
         break;
-        case DisconnectReasons__Enum::Kicked: {
+        /*case DisconnectReasons__Enum::Kicked: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("You were kicked from the lobby.\n\n{}",
-                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby if it hasn't started.")), NULL);
+                    shouldCopyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby if it hasn't started.")), NULL);
         }
         break;
         case DisconnectReasons__Enum::Banned: {
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("You were banned from the lobby.\n\n{}",
-                    State.AutoCopyLobbyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby by changing your IP address.")), NULL);
+                    shouldCopyCode ? "Lobby Code has been copied to the clipboard." : "You can rejoin the lobby by changing your IP address.")), NULL);
         }
-        break;
+        break;*/
         default: {
             std::string prevText = convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields._textArea, NULL));
             TMP_Text_set_text((TMP_Text*)__this->fields._textArea,
                 convert_to_string(std::format("{}{}", prevText,
-                    State.AutoCopyLobbyCode ? "\nLobby Code has been copied to the clipboard." : "")), NULL);
+                    shouldCopyCode ? "\n\nLobby Code has been copied to the clipboard." : "")), NULL);
         }
         break;
         }
-        if (State.AutoCopyLobbyCode) ClipboardHelper_PutClipboardString(convert_to_string(State.LastLobbyJoined), NULL);
+        if (shouldCopyCode) ClipboardHelper_PutClipboardString(convert_to_string(State.LastLobbyJoined), NULL);
     }
 }
 
