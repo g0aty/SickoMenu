@@ -290,10 +290,10 @@ bool cctor_finished(Il2CppClass* klass)
 	}
 	//If we don't have a static constructor, no need to wait
 	if (!klass->has_cctor) return true; 
-	if (!klass->cctor_finished) {
+	if (!klass->cctor_finished_or_no_cctor) {
 		// enforce to call 'Runtime::ClassInit'
 		il2cpp_runtime_class_init(klass);
-		if (!klass->cctor_finished) {
+		if (!klass->cctor_finished_or_no_cctor) {
 			STREAM_ERROR("Class " << klass->name << " il2cpp_runtime_class_init() failure");
 			return false;
 		}

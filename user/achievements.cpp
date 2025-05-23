@@ -25,7 +25,7 @@ namespace Achievements {
 		if (!manager) return;
 
 		ScopedThreadAttacher managedThreadAttached;
-		il2cpp::Dictionary achievementGameModeKey = manager->klass->static_fields->AchievementGameModeKey;
+		/*il2cpp::Dictionary achievementGameModeKey = manager->klass->static_fields->AchievementGameModeKey;
 		for (auto pair : achievementGameModeKey) {
 			il2cpp::List list = pair.value;
 			if (!list.contains(app::GameModes__Enum::Normal)) {
@@ -35,6 +35,6 @@ namespace Achievements {
 				list.add(app::GameModes__Enum::HideNSeek);
 			}
 			app::AchievementManager_1_UnlockAchievement(manager, pair.key, nullptr);
-		}
+		}*/
 	}
 }

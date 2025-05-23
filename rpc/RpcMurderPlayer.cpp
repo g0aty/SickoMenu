@@ -405,7 +405,7 @@ void RpcForceDetectAum::Process()
 {
 	if (!target.has_value()) return;
 	PlayerControl* player = target.validate().get_PlayerControl();
-	MessageWriter* rpcMessage = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), (completeForce ? player : *Game::pLocalPlayer)->fields._.NetId, (uint8_t)42069, SendOption__Enum::Reliable, NULL);
+	MessageWriter* rpcMessage = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (completeForce ? player : *Game::pLocalPlayer)->fields._.NetId, (uint8_t)42069, SendOption__Enum::Reliable, -1, NULL);
 	MessageWriter_WriteByte(rpcMessage, player->fields.PlayerId, NULL);
 	//we do a little trolling >:)
 	//aum only checks for the player id thus making it, so we can send whoever we want to (even as ourselves)
@@ -423,7 +423,7 @@ void RpcForceSickoChat::Process()
 {
 	PlayerControl* player = target.validate().get_PlayerControl();
 	String* playerName = NetworkedPlayerInfo_get_PlayerName(target.validate().get_PlayerData(), NULL);
-	MessageWriter* rpcMessage = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), (completeForce ? player : *Game::pLocalPlayer)->fields._.NetId, 101, SendOption__Enum::Reliable, NULL);
+	MessageWriter* rpcMessage = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (completeForce ? player : *Game::pLocalPlayer)->fields._.NetId, 101, SendOption__Enum::Reliable, -1, NULL);
 	auto outfit = GetPlayerOutfit(GetPlayerData(player));
 	//aum only checks for the player name and color, so we can send in anything we want (even as ourselves)
 	MessageWriter_WriteString(rpcMessage, playerName, NULL);

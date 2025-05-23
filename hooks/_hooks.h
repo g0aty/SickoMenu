@@ -108,7 +108,7 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method);
 void dMushroomDoorSabotageMinigame_Begin(MushroomDoorSabotageMinigame* __this, PlayerTask* task, MethodInfo* method);
 //void* dAmongUsClient_CoStartGameHost(AmongUsClient* __this, MethodInfo* method);
-float dConsole_1_CanUse(Console_1* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method);
+float dConsole_CanUse(Console* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method);
 void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method);
 void dZiplineConsole_SetDestinationCooldown(ZiplineConsole* __this, MethodInfo* method);
 void dMushroomWallDoor_SetDoorway(MushroomWallDoor* __this, bool open, MethodInfo* method);

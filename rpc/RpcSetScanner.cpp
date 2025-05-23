@@ -11,8 +11,8 @@ void RpcSetScanner::Process()
 {
 	if (State.BypassVisualTasks) {
 		PlayerControl_SetScanner(*Game::pLocalPlayer, playAnimation, (*Game::pLocalPlayer)->fields.scannerCount + 1);
-		auto writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
-			uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, NULL);
+		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
+			uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, -1, NULL);
 		MessageWriter_WriteBoolean(writer, playAnimation, NULL);
 		MessageWriter_WriteByte(writer, (*Game::pLocalPlayer)->fields.scannerCount + 1, NULL);
 		MessageWriter_EndMessage(writer, NULL);

@@ -11,11 +11,11 @@ void fakeSuccessfulLogin(EOSManager* eosManager)
 	/*eosManager->fields.loginFlowFinished = true;
 	EOSManager_HasFinishedLoginFlow(eosManager, NULL);*/
 	auto player = app::DataManager_get_Player(nullptr);
-	static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
+	static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "account");
 	LOG_ASSERT(field != nullptr);
 	auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
 	//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
-	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->Il2CppClass.klass, "loginStatus");
+	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->klass, "loginStatus");
 	auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
 	il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
 }
@@ -88,11 +88,11 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	//EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
 	if (State.SpoofGuestAccount) {
 		auto player = app::DataManager_get_Player(nullptr);
-		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
+		static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "account");
 		LOG_ASSERT(field != nullptr);
 		auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
 		//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
-		static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->Il2CppClass.klass, "loginStatus");
+		static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->klass, "loginStatus");
 		auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
 		auto loggedOut = EOSManager_AccountLoginStatus__Enum::Offline;
 		if ((int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) != (int)loggedOut)
@@ -112,11 +112,11 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 
 	if (State.ForceLoginAsGuest) {
 		auto player = app::DataManager_get_Player(nullptr);
-		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "account");
+		static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "account");
 		LOG_ASSERT(field != nullptr);
 		auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
 		//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
-		static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->Il2CppClass.klass, "loginStatus");
+		static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->klass, "loginStatus");
 		auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
 		auto loggedOut = EOSManager_AccountLoginStatus__Enum::Offline;
 		if ((int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) != (int)loggedOut)

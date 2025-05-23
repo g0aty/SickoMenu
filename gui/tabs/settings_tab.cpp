@@ -307,12 +307,12 @@ namespace SettingsTab {
 				}
 			}
 
-			if (Achievements::IsSupported())
+			/*if (Achievements::IsSupported())
 			{
 				ImGui::SameLine();
 				if (AnimatedButton("Unlock All Achievements"))
 					Achievements::UnlockAll();
-			}
+			}*/
 
 			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) State.Save();
 			ImGui::SameLine();

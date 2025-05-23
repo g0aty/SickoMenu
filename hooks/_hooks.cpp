@@ -200,7 +200,7 @@ void DetourInitilization() {
 	HOOKFUNC(ImpostorRole_FindClosestTarget);
 	HOOKFUNC(MushroomDoorSabotageMinigame_Begin);
 	//HOOKFUNC(AmongUsClient_CoStartGameHost);
-	HOOKFUNC(Console_1_CanUse);
+	HOOKFUNC(Console_CanUse);
 	HOOKFUNC(Ladder_SetDestinationCooldown);
 	HOOKFUNC(ZiplineConsole_SetDestinationCooldown);
 	HOOKFUNC(MushroomWallDoor_SetDoorway);
@@ -367,7 +367,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(ImpostorRole_FindClosestTarget);
 	UNHOOKFUNC(MushroomDoorSabotageMinigame_Begin);
 	//UNHOOKFUNC(AmongUsClient_CoStartGameHost);
-	UNHOOKFUNC(Console_1_CanUse);
+	UNHOOKFUNC(Console_CanUse);
 	UNHOOKFUNC(Ladder_SetDestinationCooldown);
 	UNHOOKFUNC(ZiplineConsole_SetDestinationCooldown);
 	UNHOOKFUNC(MushroomWallDoor_SetDoorway);

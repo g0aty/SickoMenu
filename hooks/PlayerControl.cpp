@@ -86,7 +86,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 				if (State.rpcCooldown <= 0) {
 					//SickoMenu users can detect this rpc
-					MessageWriter* writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, rpcCall, (SendOption__Enum)1, NULL);
+					MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, rpcCall, (SendOption__Enum)1, -1, NULL);
 					MessageWriter_EndMessage(writer, NULL);
 					State.rpcCooldown = int(0.5 * GetFps());
 				}
@@ -1410,8 +1410,8 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
 	return result;
 }
 
-float dConsole_1_CanUse(Console_1* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dConsole_1_CanUse executed");
+float dConsole_CanUse(Console* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dConsole_CanUse executed");
 	try {
 		if (!State.PanicMode) {
 			std::vector<int> sabotageTaskIds = { 0, 1, 2 }; //don't prevent impostor from fixing sabotages
@@ -1422,9 +1422,9 @@ float dConsole_1_CanUse(Console_1* __this, NetworkedPlayerInfo* pc, bool* canUse
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Exception occurred in Console_1_CanUse (PlayerControl)");
+		LOG_ERROR("Exception occurred in Console_CanUse (PlayerControl)");
 	}
-	return Console_1_CanUse(__this, pc, canUse, couldUse, method);
+	return Console_CanUse(__this, pc, canUse, couldUse, method);
 }
 
 void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method) {
@@ -1686,7 +1686,7 @@ void dBanMenu_Select(BanMenu* __this, int32_t clientId, MethodInfo* method) {
 void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method) {
 	if (State.BypassVisualTasks) {
 		PlayerControl_PlayAnimation(__this, animType, NULL);
-		auto writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::PlayAnimation), SendOption__Enum::None, NULL);
+		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::PlayAnimation), SendOption__Enum::None, -1, NULL);
 		MessageWriter_WriteByte(writer, animType, NULL);
 		MessageWriter_EndMessage(writer, NULL);
 		return;
@@ -1697,7 +1697,7 @@ void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, Me
 void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method) {
 	if (State.BypassVisualTasks) {
 		PlayerControl_SetScanner(__this, value, __this->fields.scannerCount + 1);
-		auto writer = InnerNetClient_StartRpc((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, NULL);
+		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, -1, NULL);
 		MessageWriter_WriteBoolean(writer, value, NULL);
 		MessageWriter_WriteByte(writer, __this->fields.scannerCount + 1, NULL);
 		MessageWriter_EndMessage(writer, NULL);
