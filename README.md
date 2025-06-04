@@ -5,17 +5,38 @@
 <h1 align="center">👺 SickoMenu v4.3.2</h1>
 A powerful utility for Among Us designed to enrich your game experience with custom features!
 
-**⚠️ Intended for educational and experimental use only.**
+**Intended for educational and experimental use only.**
 
-Join our very own Discord server for support, bug reports, and sneak peeks!
-### Vanity Invite: https://discord.gg/sickos
-### Permanent invite: https://dsc.gg/sickos
+Join our very own Discord server for support, bug reports, and sneak peeks!  
+### Vanity Invite: https://discord.gg/sickos  
+### Permanent invite: https://dsc.gg/sickos  
+
 ---
+
 ## ⚠️ Disclaimer
-This project is **strictly for educational purposes** to study game mechanics and anti-cheat systems. It is **not endorsed by Innersloth LLC**, and we strongly discourage use in public matches. By downloading, you accept full responsibility for any consequences.I (g0aty) am not responsible for any repercussions.
+This project is developed and maintained by **g0aty**, with contributions from other developers.  
+It is intended **solely for educational and non-commercial research purposes**, such as exploring game mechanics and studying anti-cheat systems.
+
+This project is **not affiliated with, endorsed, or supported by Innersloth LLC** in any capacity.
+
+By downloading, installing, or using this software, you acknowledge and agree that:
+
+- You are solely responsible for how you use it.
+- You will not use it to violate Innersloth’s [Terms of Service](https://www.innersloth.com/terms/) or disrupt public gameplay.
+- The developers, including **g0aty** and all contributors, **assume no responsibility or liability** for:
+  - Any direct or indirect consequences of misuse,
+  - Violations of third-party rules or terms,
+  - Game bans, data loss, or damage caused by use of this utility.
+
+---
 
 **Legal Notice:**  
-Portions of materials used are property of Innersloth LLC. © Innersloth LLC. This mod complies with Innersloth's [Modding Policy](https://www.innersloth.com/policies/) for non-malicious private use.
+Portions of the game referenced or interacted with may be intellectual property of Innersloth LLC. © Innersloth LLC.  
+This project is designed to comply with their [Modding Policy](https://www.innersloth.com/policies/) for private and non-malicious experimentation.
+
+> ⚠️ Use responsibly. This software is provided "as is", **without any warranties** or guarantees of safety, support, or fitness for purpose.
+
+---
 
 ## 🛑 Ethical Use Protocol
 **By using SickoMenu, you agree to:**
@@ -31,15 +52,19 @@ Portions of materials used are property of Innersloth LLC. © Innersloth LLC. Th
 
 ## ⚙️ Features
 A huge amount of features!!
-  - NoClip (`CTRL`)  
-  - Ghost Visibility  
-  - Confuser (May disrupt gameplay)  
-- **Cosmetic/UI Enhancements**:  
-  - Zoom Out  
-  - Better AUM Chat (`/aum [message]`)  
-- **Full Feature List**: [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
+- NoClip (`CTRL`)  
+- Ghost Visibility  
+- Confuser (May disrupt gameplay)  
 
-> 🔸 Features marked with **!** may impact game balance. Always obtain lobby consent
+**Cosmetic/UI Enhancements:**  
+- Zoom Out  
+- Better AUM Chat (`/aum [message]`)  
+
+**Full Feature List:** [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
+
+> 🔸 Features marked with **"!"** may impact game balance. Always obtain lobby consent
+
+---
 
 ## 📸 Screenshot
 <p align="center">
