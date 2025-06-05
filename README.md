@@ -14,7 +14,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 ---
 
 ## ⚠️ Disclaimer
-This project is developed and maintained by **g0aty**, with contributions from other developers.  
+This project is maintained by **g0aty**, with contributions from other developers.  
 It is intended **solely for educational and non-commercial research purposes**, such as exploring game mechanics and studying anti-cheat systems.
 
 This project is **not affiliated with, endorsed, or supported by Innersloth LLC** in any capacity.
