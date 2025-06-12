@@ -206,6 +206,9 @@ namespace PlayersTab {
 						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
 							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
 
+						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#ADD8E6>HostGuard</color>")
+							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LightBlue);
+
 						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#0f0>Sicko</color><#f00>Menu</color>")
 							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->AcceptedGreen);
 					}
