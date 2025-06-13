@@ -47,6 +47,16 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		}
 	}
 	break;
+	case (uint8_t)176:
+    	{
+        	uint8_t playerId = player->fields.PlayerId;
+        	if (State.modUsers.find(playerId) == State.modUsers.end()) {
+            		State.modUsers.insert({ playerId, "<#ADD8E6>HostGuard</color>" });
+            		STREAM_DEBUG("RPC Received for a HostGuard user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+            		//Check Build -> https://t.me/UnrealHost/193 (Developer: Loot)
+        	}
+    	}
+    	break;
 	case (uint8_t)101:
 	{
 		using namespace std::chrono;
