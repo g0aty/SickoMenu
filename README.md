@@ -57,7 +57,7 @@ A huge amount of features!!
 
 **Cosmetic/UI Enhancements:**  
 - Zoom Out  
-- Better AUM Chat (`/aum [message]`)  
+- SickoMenu Chat (`/sc [message]`)  
 
 **Full Feature List:** [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
 
