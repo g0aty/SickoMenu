@@ -20,6 +20,7 @@ void SendPrivateWarnMessage(PlayerControl* toPlayer, const std::string& reason, 
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method);
 void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo* method);
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method);
+void dGameStartManager_ReallyBegin(GameStartManager* __this, bool neverShow, MethodInfo* method);
 void dHudManager_Update(HudManager* __this, MethodInfo* method);
 Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo* method);
 void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method);
@@ -163,3 +164,10 @@ void dChatNotification_SetUp(ChatNotification* __this, PlayerControl* sender, St
 void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method);
 void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method);
 void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method);
+void dFreeChatInputField_UpdateCharCount(FreeChatInputField* __this, MethodInfo* method);
+void dObjectPoolBehavior_InitPool(ObjectPoolBehavior* __this, PoolableBehavior* prefab, MethodInfo* method);
+void dPlayerControl_RpcSetRole(PlayerControl* __this, RoleTypes__Enum roleType, bool canOverrideRole, MethodInfo* method);
+void dShipStatus_AddTasksFromList(ShipStatus* __this, int32_t* start, int32_t count, void* tasks, void* usedTaskTypes, List_1_NormalPlayerTask_* unusedTasks, MethodInfo* method);
+void* dPlayerControl_Start(PlayerControl* __this, MethodInfo* method);
+void dMainMenuManager_LateUpdate(MainMenuManager* __this, MethodInfo* method);
+AudioSource* dSoundManager_PlaySound(SoundManager* __this, AudioClip* clip, bool loop, float volume, AudioMixerGroup* audioMixer, MethodInfo* method);

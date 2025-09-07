@@ -24,6 +24,7 @@ namespace KeyBinds {
         uint8_t Randomize_Appearance;
         uint8_t Complete_Tasks;
         uint8_t Toggle_Sicko;
+        uint8_t Cancel_Start;
     };
 
     void WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);

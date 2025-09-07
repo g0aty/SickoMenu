@@ -206,8 +206,11 @@ namespace PlayersTab {
 						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
 							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
 
-						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#0f0>Sicko</color><#f00>Menu</color>")
-							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->AcceptedGreen);
+						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#ADD8E6>HostGuard</color>")
+							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LightBlue);
+
+						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#ff006c>SickoMenu</color>")
+							nameColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
 					}
 				}
 
@@ -581,6 +584,8 @@ namespace PlayersTab {
 						}
 						ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
 						if (selectedPlayers.size() == 1 && nickname != "") {
+							std::transform(nickname.begin(), nickname.end(), nickname.begin(), ::tolower);
+							// Convert the name into lowercase
 							Game::PlayerId playerId = selectedPlayer.get_PlayerControl()->fields.PlayerId;
 							if (std::find(State.LockedNames.begin(), State.LockedNames.end(), nickname) != State.LockedNames.end()) {
 								if (AnimatedButton("Remove Nickname from Name-Checker")) {
@@ -1239,6 +1244,7 @@ namespace PlayersTab {
 					if (selectedPlayers.size() == 1 && AnimatedButton("Shift Everyone To"))
 					{
 						for (auto player : GetAllPlayerControl()) {
+							if (player == selectedPlayer.get_PlayerControl()) continue; //skip the player itself
 							if (IsInGame()) {
 								State.rpcQueue.push(new RpcShapeshift(player, State.selectedPlayer, !State.AnimationlessShapeshift));
 							}
@@ -1503,12 +1509,17 @@ namespace PlayersTab {
 
 				ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
 
-				if (State.TempBanEnabled && IsHost() && !selectedPlayer.is_LocalPlayer()) {
+				/*if (State.EnableTempBan && IsHost() && !selectedPlayer.is_LocalPlayer()) {
 					ImGui::PushItemWidth(200);
-					if (ImGui::InputInt("Days", &State.BanDays) && State.BanDays < 0) State.BanDays = 0;
-					if (ImGui::InputInt("Hours", &State.BanHours) && State.BanHours < 0) State.BanHours = 0;
-					if (ImGui::InputInt("Minutes", &State.BanMinutes) && State.BanMinutes < 0) State.BanMinutes = 0;
-					if (ImGui::InputInt("Seconds", &State.BanSeconds) && State.BanSeconds < 0) State.BanSeconds = 0;
+					static std::string friendCodeToTempBan;
+					static int banDays = 0;
+					static int banHours = 0;
+					static int banMinutes = 0;
+					static int banSeconds = 0;
+					if (ImGui::InputInt("Days", &banDays) && banDays < 0) banDays = 0;
+					if (ImGui::InputInt("Hours", &banHours) && banHours < 0) banHours = std::clamp(banHours, 0, 23);
+					if (ImGui::InputInt("Minutes", &banMinutes) && banMinutes < 0) banMinutes = std::clamp(banMinutes, 0, 59);
+					if (ImGui::InputInt("Seconds", &banSeconds) && banSeconds < 0) banSeconds = std::clamp(banSeconds, 0, 59);
 					ImGui::PopItemWidth();
 
 					if (ImGui::Button("Confirm TempBan")) {
@@ -1517,22 +1528,32 @@ namespace PlayersTab {
 							auto now = std::chrono::system_clock::now();
 
 							int totalSeconds = 0;
-							totalSeconds += SafeMax(0, State.BanDays) * 86400;
-							totalSeconds += SafeMax(0, State.BanHours) * 3600;
-							totalSeconds += SafeMax(0, State.BanMinutes) * 60;
-							totalSeconds += SafeMax(0, State.BanSeconds);
+							totalSeconds += SafeMax(0, banDays) * 86400;
+							totalSeconds += SafeMax(0, banHours) * 3600;
+							totalSeconds += SafeMax(0, banMinutes) * 60;
+							totalSeconds += SafeMax(0, banSeconds);
 
-							State.TempBanDuration = totalSeconds;
-
-							State.TempBannedFriendCodes[targetFriendCode] = std::make_pair(now + std::chrono::seconds(State.TempBanDuration), "Temporary ban");
-
-							State.TempBanHistoryFC.erase(targetFriendCode);
-							State.PlayerPunishTimersFC.erase(targetFriendCode);
-
+							if (totalSeconds > 0) {
+								auto now = std::chrono::system_clock::now();
+								auto banEndTime = now + std::chrono::seconds(totalSeconds);
+								int banEndSaveTime = static_cast<int>(banEndTime.time_since_epoch().count());
+								//State.TempBannedFriendCodes[State.TBanFC] = {banEndTime, std::to_string(now.time_since_epoch().count())};
+								//State.TBanFC.clear();
+								//State.BanDays = State.BanHours = State.BanMinutes = State.BanSeconds = 0;
+								State.TempBannedFCs[friendCodeToTempBan] = banEndSaveTime;
+								State.Save();
+								auto p = selectedPlayer.get_PlayerControl();
+								if (IsInGame()) {
+									State.rpcQueue.push(new PunishPlayer(p, false));
+								}
+								if (IsInLobby()) {
+									State.lobbyRpcQueue.push(new PunishPlayer(p, false));
+								}
+							}
 							State.Save();
 						}
 					}
-				}
+				}*/
 
 				if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
 					ImGui::NewLine(); //force a new line

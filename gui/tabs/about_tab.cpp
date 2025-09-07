@@ -24,10 +24,11 @@ namespace AboutTab {
         openCredits = group == Groups::Credits;
     }
 
-    const ImVec4 SickoCol = ImVec4(0.f, 1.f, 0.f, 1.0f);
-    const ImVec4 MenuCol = ImVec4(1.f, 0.f, 0.f, 1.0f);
+    const ImVec4 SickoCol = ImVec4(1.f, 0.f, 0.424f, 1.f);
+    const ImVec4 RedCol = ImVec4(1.f, 0.f, 0.f, 1.0f);
     const ImVec4 AumCol = ImVec4(1.f, 0.3333f, 0.3333f, 1.0f);
     const ImVec4 GoldCol = ImVec4(1.f, 0.7333f, 0.f, 1.0f);
+    const ImVec4 GoatCol = ImVec4(0.937f, 0.004f, 0.263f, 1.0f);
     const ImVec4 DevCol = ImVec4(0.102f, 0.7373f, 0.6118f, 1.0f);
     const ImVec4 ContributorCol = ImVec4(0.3804f, 0.4314f, 0.7961f, 1.0f);
 
@@ -45,21 +46,17 @@ namespace AboutTab {
         if (openWelcome) {
             ImGui::Text(std::format("Welcome {}to ", State.HasOpenedMenuBefore ? "back " : "").c_str());
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(SickoCol, "Sicko");
-            ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(MenuCol, "Menu");
+            ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(GoldCol, std::format(" {}", State.SickoVersion).c_str());
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::Text(" by ");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(DevCol, "g0aty");
+            ImGui::TextColored(GoatCol, "g0aty");
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::Text("!");
 
-            ImGui::TextColored(SickoCol, "Sicko");
-            ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(MenuCol, "Menu");
+            ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::Text(" is a powerful utility for Among Us.");
             ImGui::Text("It aims to improve the game experience for all players!");
@@ -79,7 +76,10 @@ namespace AboutTab {
             if (ColoredButton(ContributorCol, "Join our Discord!")) {
                 OpenLink("https://dsc.gg/sickos"); //SickoMenu discord invite
             }
-            ImGui::Text("SickoMenu is a free and open-source software.");
+
+            ImGui::TextColored(SickoCol, "SickoMenu");
+            ImGui::SameLine(0.0f, 0.0f);
+            ImGui::Text(" is a free and open-source software.");
 
             if (State.SickoVersion.find("pr") != std::string::npos || State.SickoVersion.find("rc") != std::string::npos) {
                 if (State.SickoVersion.find("pr") != std::string::npos) ImGui::TextColored(State.RgbColor, "You have access to pre-releases, enjoy!");
@@ -108,15 +108,13 @@ namespace AboutTab {
         }
 
         if (openCredits) {
-            ImGui::TextColored(SickoCol, "Sicko");
-            ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(MenuCol, "Menu");
+            ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::Text(" is a fork of");
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(AumCol, " AmongUsMenu");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(MenuCol, " (archived)");
+            ImGui::TextColored(RedCol, " (archived)");
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::Text(", go check it out!");
 
@@ -124,7 +122,7 @@ namespace AboutTab {
                 OpenLink("https://github.com/BitCrackers/AmongUsMenu");
             }
             BoldText("Lead Developer", GoldCol);
-            if (ColoredButton(GoldCol, "g0aty")) {
+            if (ColoredButton(GoatCol, "g0aty")) {
                 OpenLink("https://github.com/g0aty");
             }
 
@@ -214,9 +212,7 @@ namespace AboutTab {
 
             ImGui::Text("Thank you for making ");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(SickoCol, "Sicko");
-            ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(MenuCol, "Menu");
+            ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::Text(" possible!");
         }

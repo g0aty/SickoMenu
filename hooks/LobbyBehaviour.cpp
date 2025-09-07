@@ -8,7 +8,10 @@
 
 //std::unordered_set<std::string> glitchEndings = { "IJPG", "YTHG", "WYWG", "KHQG", "FUGG", "UFLG", "KJQG", "ZQCG", "GEWG", "NPPG", "SZAF", "PATG", "PJDG", "TPYG", "JTFG", "VDXG", "DHSG", "TQQG", "ALGG", "UMPG", "GFXG", "RGGG", "HQXG", "LDQG", "ZLHG", "WMPG", "TAGG", "FBGG", "EJYG", "AOTG", "LCAF", "DORG", "ZCQG" };
 
-extern bool editingAutoStartPlayerCount;
+static std::string getHexCodeFromImVec4(ImVec4 vec) {
+	return std::format("<#{:02x}{:02x}{:02x}{:02x}>",
+		int(vec.x * 255), int(vec.y * 255), int(vec.z * 255), int(vec.w * 255));
+}
 
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 {
@@ -38,18 +41,6 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
 		GameOptionsManager_set_GameHostOptions(gameOptionsManager, GameOptionsManager_get_CurrentGameOptions(gameOptionsManager, NULL), NULL);
 		LogicOptions_SyncOptions(GameManager_get_LogicOptions(gameManager, NULL), NULL);
 	}
-	State.LobbyTimer -= Time_get_deltaTime(NULL);
-
-	
-	if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
-		int playerCount = (int)GetAllPlayerData().size();
-		if (playerCount >= State.AutoStartPlayerCount) {
-			app::InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
-			State.AutoStartGamePlayers = false;
-			State.Save();
-		}
-	}
-	
 }
 
 void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method) {
@@ -150,59 +141,91 @@ void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
 	std::string lobbyCode = IsStreamerMode() ? "******" : convert_from_string(InnerNet_GameCode_IntToGameName(gameListing.GameId, NULL));
 	int LobbyTime = (std::max)(0, int(gameListing.Age));
 	std::string lobbyTimeDisplay = "";
+
+	std::string ageCol = getHexCodeFromImVec4(State.AgeColor);
+	std::string daterCol = getHexCodeFromImVec4(State.DaterNamesColor);
+	std::string nameCheckerCol = getHexCodeFromImVec4(State.NameCheckerColor);
+	std::string lobbyCodeCol = getHexCodeFromImVec4(State.LobbyCodeColor);
+	std::string platformCol = getHexCodeFromImVec4(State.PlatformColor);
+
 	if (State.ShowLobbyTimer) {
-		lobbyTimeDisplay = std::format("\n<#0f0>Age: {}:{}{}</color>", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+		lobbyTimeDisplay = std::format("\n{}Age: {}:{}{}</color>", ageCol, int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
 	}
 	std::string playerCountCol = "<#0f0>";
 	if (gameListing.PlayerCount == 4) playerCountCol = "<#ff0>";
 	if (gameListing.PlayerCount < 4) playerCountCol = "<#f00>";
 	std::string playerCount = playerCountCol + convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields.capacity, NULL)) + "</color>";
 	std::string trueHostName = convert_from_string(gameListing.TrueHostName);
+	if (IsDater(trueHostName, gameListing.MaxPlayers)) trueHostName = daterCol + trueHostName + "</color>"; // Color for daters
+	const std::unordered_set<std::string> BannedNamesSet(State.LockedNames.begin(), State.LockedNames.end());
+	if (BannedNamesSet.find(trueHostName) != BannedNamesSet.end()) trueHostName = nameCheckerCol + trueHostName + "</color>"; // Yellow color for banned names
 	std::string separator = "<#0000>000000000000000</color>"; // The crewmate icon gets aligned properly with this
-	std::string playerCountDisplay = std::format("<size=40%>{}\n{}\n{}\n<#fb0>{}</color>\n<#b0f>{}</color>{}\n{}</size>", separator, trueHostName, playerCount, lobbyCode, platformId, lobbyTimeDisplay, separator);
+	std::string playerCountDisplay = std::format("<size=40%>{}\n{}\n{}\n{}{}</color>\n{}{}</color>{}\n{}</size>",
+		separator, trueHostName, playerCount, lobbyCodeCol, lobbyCode, platformCol, platformId, lobbyTimeDisplay, separator);
 	TMP_Text_set_text((TMP_Text*)__this->fields.capacity, convert_to_string(playerCountDisplay), NULL);
 }
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dGameStartManager_Update executed");
 	try {
+		if (*Game::pLobbyBehaviour != NULL)
+			State.LobbyTimer -= Time_get_deltaTime(NULL);
 		std::string LobbyCode = convert_from_string(InnerNet_GameCode_IntToGameName((*Game::pAmongUsClient)->fields._.GameId, NULL));
-		int LobbyTime = (int)State.LobbyTimer;
-		std::string lobbyTimeDisplay = "";
-		if (!State.PanicMode && State.ShowLobbyTimer && IsHost()) {
-			if (LobbyTime < 0)
-				lobbyTimeDisplay = std::format(" <#0f0>({}0:00)</color>", State.JoinedAsHost ? "" : "~");
-			else if (LobbyTime <= 60)
-				lobbyTimeDisplay = std::format(" <#f00>({}{}:{}{})</color>", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
-			else if (LobbyTime <= 180)
-				lobbyTimeDisplay = std::format(" <#ff0>({}{}:{}{})</color>", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
-			else
-				lobbyTimeDisplay = std::format(" ({}{}:{}{})", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
-		}
-		/*std::string glitchDisplay = "";
-		if (!State.PanicMode && State.ShowLobbyInfo) {
-			std::string codeEnding = LobbyCode.substr(LobbyCode.length() - 4);
-			if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " * ";
-		}*/
+		if (LobbyCode != "LWQQQQ" && LobbyCode != "QQQQQQ") {
+			int LobbyTime = (int)State.LobbyTimer;
+			std::string lobbyTimeDisplay = "";
+			if (!State.PanicMode && State.ShowLobbyTimer && IsHost()) {
+				if (LobbyTime < 0)
+					lobbyTimeDisplay = std::format(" <#0f0>({}0:00)</color>", State.JoinedAsHost ? "" : "~");
+				else if (LobbyTime <= 60)
+					lobbyTimeDisplay = std::format(" <#f00>({}{}:{}{})</color>", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+				else if (LobbyTime <= 180)
+					lobbyTimeDisplay = std::format(" <#ff0>({}{}:{}{})</color>", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+				else
+					lobbyTimeDisplay = std::format(" ({}{}:{}{})", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+			}
+			/*std::string glitchDisplay = "";
+			if (!State.PanicMode && State.ShowLobbyInfo) {
+				std::string codeEnding = LobbyCode.substr(LobbyCode.length() - 4);
+				if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " * ";
+			}*/
 
-		if (State.HideCode && IsStreamerMode() && !State.PanicMode && LobbyCode != "") {
-			std::string customCode = State.HideCode && IsStreamerMode() ? State.customCode : "******";
-			if (State.RgbLobbyCode)
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
-			else
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(/*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
-		}
-		else {
-			if (State.RgbLobbyCode && !State.PanicMode)
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ LobbyCode + lobbyTimeDisplay), NULL);
-			else
-				TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode + /*glitchDisplay +*/ lobbyTimeDisplay), NULL);
+			if (State.HideCode && IsStreamerMode() && !State.PanicMode && LobbyCode != "") {
+				std::string customCode = State.HideCode && IsStreamerMode() ? State.customCode : "******";
+				if (State.RgbLobbyCode)
+					TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
+				else
+					TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(/*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
+			}
+			else {
+				if (State.RgbLobbyCode && !State.PanicMode)
+					TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ LobbyCode + lobbyTimeDisplay), NULL);
+				else
+					TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode + /*glitchDisplay +*/ lobbyTimeDisplay), NULL);
+			}
 		}
 	}
 	catch (...) {
 		LOG_ERROR("Exception occurred in GameStartManager_Update (LobbyBehaviour)");
 	}
+	State.IsStartCountdownActive = __this->fields.startState == GameStartManager_StartingStates__Enum::Countdown;
+	if (IsHost() && State.IsStartCountdownActive && State.CancelingStartGame) {
+		GameStartManager_ResetStartState(__this, NULL);
+	}
+	State.CancelingStartGame = false;
+	bool buttonCheck = __this->fields.LastPlayerCount >= __this->fields.MinPlayers;
+	__this->fields.MinPlayers = !State.PanicMode && State.AlwaysAllowStart ? (std::min)(__this->fields.LastPlayerCount, 4) : 4;
+	if (buttonCheck != (__this->fields.LastPlayerCount >= __this->fields.MinPlayers)) {
+		PassiveButton_SetButtonEnableState((PassiveButton*)__this->fields.StartButton, __this->fields.LastPlayerCount >= __this->fields.MinPlayers, NULL);
+		__this->fields.LastPlayerCount++;
+		GameStartManager_Update(__this, method);
+		__this->fields.LastPlayerCount--;
+	}
 	GameStartManager_Update(__this, method);
+	TMP_Text_set_text((TMP_Text*)__this->fields.PlayerCounter, convert_to_string(std::format("{}/{}", __this->fields.LastPlayerCount, GameOptions().GetMaxPlayers())), NULL);
+	TMP_Text_set_color((TMP_Text*)__this->fields.PlayerCounter, Color(
+		(float)(__this->fields.LastPlayerCount <= __this->fields.MinPlayers),
+		(float)(__this->fields.LastPlayerCount >= __this->fields.MinPlayers), 0.f, 1.f), NULL);
 }
 
 static int findGameOffset = 0;
@@ -210,4 +233,12 @@ static int findGameOffset = 0;
 void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method) {
 	FindAGameManager_Update(__this, method);
 	// Useful for later
+}
+
+void dGameStartManager_ReallyBegin(GameStartManager* __this, bool neverShow, MethodInfo* method) {
+	GameStartManager_ReallyBegin(__this, neverShow, method);
+	if (IsHost() && State.ModifyStartCountdown) {
+		__this->fields.countDownTimer = State.StartCountdown + 0.0001f;
+		// The game adds 0.0001f to the countdown timer, so we add it here too to keep it consistent
+	}
 }

@@ -4,6 +4,8 @@
 #include "utility.h"
 #include "state.hpp"
 
+extern void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method);
+
 RpcMurderPlayer::RpcMurderPlayer(PlayerControl* Player, PlayerControl* target, bool success)
 {
 	this->Player = Player;
@@ -182,7 +184,7 @@ void RpcSendChat::Process()
 		MessageWriter_WriteString(writer, convert_to_string(msg), NULL);
 		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 	}
-	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
+	dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, Player, convert_to_string(msg), false, NULL);
 }
 
 RpcSendChatNote::RpcSendChatNote(PlayerControl* player, int32_t type)
@@ -431,12 +433,9 @@ void RpcForceSickoChat::Process()
 	MessageWriter_WriteInt32(rpcMessage, outfit->fields.ColorId, NULL);
 	MessageWriter_EndMessage(rpcMessage, NULL);
 
-	NetworkedPlayerInfo* pData = GetPlayerData(player);
-	std::string oldName = convert_from_string(GetPlayerOutfit(pData)->fields.PlayerName);
-	std::string prefix = "<b><#fb0>[<#0f0>Sicko</color><#f00>Chat</color>]</color></b> ~ ";
-	GetPlayerOutfit(pData)->fields.PlayerName = convert_to_string(prefix + oldName);
-	ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(msg), false, NULL);
-	GetPlayerOutfit(pData)->fields.PlayerName = convert_to_string(oldName);
+	State.IsProcessingSickoChat = true;
+	dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(msg), false, NULL);
+	State.IsProcessingSickoChat = false;
 }
 
 RpcSyncSettings::RpcSyncSettings() {
@@ -487,9 +486,9 @@ void RpcBootFromVent::Process()
 	PlayerPhysics_RpcBootFromVent(Player->fields.MyPhysics, ventId, NULL);
 }
 
-PunishEveryone::PunishEveryone(PlayerControl* Player, bool isBan)
+PunishEveryone::PunishEveryone(bool isBan)
 {
-
+	this->isBan = isBan;
 }
 
 void PunishEveryone::Process() {
@@ -525,4 +524,14 @@ void PunishEveryone::Process() {
 		? std::format("<#ff033e><size=-0.24><font=\"Barlow-Regular Outline\"><b>Everyone Has Been Banned!</b></font></color>")
 		: std::format("<#ff033e><size=-0.24><font=\"Barlow-Regular Outline\"><b>Everyone Has Been Kicked!</b></font></color>");
 	ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(resultMsg), NULL);
+}
+
+PunishPlayer::PunishPlayer(PlayerControl* player, bool isBan)
+{
+	this->Player = player;
+	this->isBan = isBan;
+}
+
+void PunishPlayer::Process() {
+	app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.OwnerId, isBan, NULL);
 }

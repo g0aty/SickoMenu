@@ -117,6 +117,8 @@ namespace DebugTab {
 
 		ImGui::Text(std::format("Active Scene: {}", State.CurrentScene).c_str());
 
+		ImGui::Text(std::format("Current FPS: {}", GetFps()).c_str());
+
 		if (ImGui::CollapsingHeader("Experiments##debug")) {
 			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "These features are in development and can break at any time.");
 			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Use these at your own risk.");
@@ -146,19 +148,6 @@ namespace DebugTab {
 			}
 
 			ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
-		}
-
-		if (ImGui::CollapsingHeader("ImGui Playground##debug")) {
-			static bool testBool1 = false;
-			ToggleButton("Test Bool 1", &testBool1);
-			static bool testBool2 = true;
-			ToggleButton("Test Bool 2", &testBool2);
-			if (ToggleButton("Disable Animations", &State.DisableAnimations))
-				State.Save();
-			if (ImGui::InputFloat("Animation Speed", &State.AnimationSpeed))
-				State.Save();
-			AnimatedButton("Test Animated Button 1");
-			AnimatedButton("Test Animated Button 2");
 		}
 
 		ImGui::EndChild();

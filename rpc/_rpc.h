@@ -483,8 +483,15 @@ public:
 
 class PunishEveryone : public RPCInterface {
 public:
+	bool isBan;
+	PunishEveryone(bool isBan);
+	virtual void Process() override;
+};
+
+class PunishPlayer : public RPCInterface {
+public:
 	PlayerControl* Player;
 	bool isBan;
-	PunishEveryone(PlayerControl* Player, bool isBan);
+	PunishPlayer(PlayerControl* Player, bool isBan);
 	virtual void Process() override;
 };

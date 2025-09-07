@@ -246,29 +246,35 @@ namespace HostTab {
 				const int32_t minPlayers = 4, maxAllowedPlayers = static_cast<int32_t>(Game::MAX_PLAYERS);
 				int32_t newMaxPlayers = std::clamp(currentMaxPlayers, minPlayers, maxAllowedPlayers);
 #define LocalInLobby (((*Game::pAmongUsClient)->fields._.NetworkMode == NetworkModes__Enum::LocalGame) && ((*Game::pAmongUsClient)->fields._.GameState == InnerNetClient_GameStates__Enum::Joined))
-				if ((LocalInLobby || !State.SafeMode) && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers) && newMaxPlayers != currentMaxPlayers) {
-					if (newMaxPlayers >= minPlayers && newMaxPlayers <= maxAllowedPlayers) {
-						if (newMaxPlayers == 4 || newMaxPlayers == 255) {
-							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
-						}
-						GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, newMaxPlayers);
-						SyncAllSettings();
-					}
-					else {
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Number of players must be between %d and %d", minPlayers, maxAllowedPlayers);
-						newMaxPlayers = currentMaxPlayers;
-					}
-					State.Save();
+				if ((LocalInLobby || !State.SafeMode) && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers)) {
+					newMaxPlayers = std::clamp(newMaxPlayers, minPlayers, maxAllowedPlayers);
+					GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, newMaxPlayers);
+					SyncAllSettings();
 				}
 
 
 				/*if (IsInLobby() && ToggleButton("Flip Skeld", &State.FlipSkeld))
 					State.Save();*/ //to be fixed later
 				if (IsInLobby()) ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-				if (IsInLobby() && AnimatedButton("Force Start of Game"))
-				{
+				if (IsInLobby() && AnimatedButton("Force Start of Game")) {
 					app::InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
 				}
+				if (IsInLobby() && State.IsStartCountdownActive &&
+					ColoredButton(ImVec4(1.f, 0.f, 0.f, 1.f), "Cancel Start of Game")) {
+					State.CancelingStartGame = true;
+				}
+
+				if (ToggleButton("Always Allow Start Button", &State.AlwaysAllowStart))
+					State.Save();
+
+				if (ToggleButton("Modify Start Countdown", &State.ModifyStartCountdown))
+					State.Save();
+
+				if (State.ModifyStartCountdown && ImGui::InputInt("Countdown Time", &State.StartCountdown)) {
+					State.StartCountdown = std::clamp(State.StartCountdown, 1, 127);
+					State.Save();
+				}
+
 				if (ToggleButton("Disable Meetings", &State.DisableMeetings))
 					State.Save();
 
@@ -325,6 +331,9 @@ namespace HostTab {
                     }
                     editingAutoStartPlayerCount = ImGui::IsItemActive();
                 }
+
+				if (ToggleButton("Ignore RPCs", &State.IgnoreRPCs))
+					State.Save();
 
 				//if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
 
@@ -398,6 +407,10 @@ namespace HostTab {
 				}
 
 				if (ToggleButton("Kill While Vanished", &State.KillInVanish)) {
+					State.Save();
+				}
+
+				if (ToggleButton("Disable Medbay Scan", &State.DisableMedbayScan)) {
 					State.Save();
 				}
 
@@ -635,6 +648,7 @@ namespace HostTab {
 					State.tournamentPoints.clear();
 					State.tournamentKillCaps.clear();
 					State.tournamentWinPoints.clear();
+					State.tournamentCalloutPoints.clear();
 					State.tournamentEarlyDeathPoints.clear();
 				}
 

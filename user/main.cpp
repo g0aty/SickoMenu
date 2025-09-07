@@ -62,7 +62,14 @@ bool GameVersionCheck() {
 #define GAME_STATIC_POINTER(f,c,m) \
 	do \
 	{ \
-		assert(cctor_finished(c##__TypeInfo->_0.klass)); \
+		if (!cctor_finished(c##__TypeInfo->_0.klass)) { \
+			if (MessageBox(NULL, \
+				L"SickoMenu does not support Among Us versions past v16.0.5 as of now!\n\nMake sure you downgrade your Among Us instance to v16.0.0 / v16.0.2 and use SickoMenu. If you're wondering about playing with players on the latest version, your game's version will automatically be spoofed so you can play with them!\n\nClick OK to exit the game. Your browser will then open a downgrading guide.", \
+				L"SickoMenu", MB_ICONINFORMATION)) { \
+				OpenLink("https://textbin.net/rruqqrlgaw"); \
+				ExitProcess(0); \
+			} \
+		}; \
 		f = &(c##__TypeInfo->static_fields->m); \
 		std::ostringstream ss; \
 		ss << std::internal << std::setfill('0') << std::hex << std::setw(8) \
@@ -108,12 +115,13 @@ void Run(LPVOID lpParam) {
 #define DO_APP_FUNC(r, n, p, s) if(!n) LOG_ERROR("Unable to locate " #n)
 #include "il2cpp-functions.h"
 #undef DO_APP_FUNC
-	/*
+	
 	auto domain = il2cpp_domain_get();
 	auto assembly = il2cpp_domain_assembly_open(domain, "Assembly-CSharp");
-	auto klass = il2cpp_class_from_name(assembly->image, "", "MovingPlatformBehaviour");
-	output_class_methods(klass);
-	*/
+	//auto klass = il2cpp_class_from_name(assembly->image, "", "MovingPlatformBehaviour");
+	//output_class_methods(klass);
+	//output_assembly_methods(assembly);
+	
 #endif
 	GAME_STATIC_POINTER(Game::pAmongUsClient, app::AmongUsClient, Instance);
 	GAME_STATIC_POINTER(Game::pGameData, app::GameData, Instance);

@@ -207,6 +207,7 @@ void KeyBinds::to_json(nlohmann::ordered_json& j, KeyBinds::Config value)
         {"Randomize_Appearance", value.Randomize_Appearance},
         {"Complete_Tasks", value.Complete_Tasks},
         {"Toggle_Sicko", value.Toggle_Sicko},
+        {"Cancel_Start", value.Cancel_Start},
     };
 }
 

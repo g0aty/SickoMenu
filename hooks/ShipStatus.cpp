@@ -11,6 +11,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_CalculateLightRadius executed");
 	if (IsHost() && State.TaskSpeedrun && State.GameLoaded && State.mapType != Settings::MapType::Airship)
 		State.SpeedrunTimer += Time_get_deltaTime(NULL);
+	CosmeticsCache_PopulateFromPlayers(__this->fields._CosmeticsCache_k__BackingField, NULL);
 	switch (__this->fields.Type) {
 	case ShipStatus_MapType__Enum::Ship:
 		if (State.mapType != Settings::MapType::Airship) State.mapType = Settings::MapType::Ship;
@@ -168,4 +169,20 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
 		return ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
 	if (!State.PanicMode && State.DisableSabotages) return;
 	ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
+}
+
+void dShipStatus_AddTasksFromList(ShipStatus* __this, int32_t* start, int32_t count, void* tasks, void* usedTaskTypes, List_1_NormalPlayerTask_* unusedTasks, MethodInfo* method) {
+	if (State.DisableMedbayScan) {
+		il2cpp::List<List_1_NormalPlayerTask_> tasks = unusedTasks;
+		size_t max = tasks.size();
+		size_t medScanIndex = max;
+		for (size_t i = 0; i < max; i++) {
+			if (tasks[i]->fields._.TaskType == TaskTypes__Enum::SubmitScan) {
+				medScanIndex = i;
+			}
+		}
+		if (medScanIndex != max) tasks.erase(medScanIndex);
+		unusedTasks = tasks.get();
+	}
+	ShipStatus_AddTasksFromList(__this, start, count, tasks, usedTaskTypes, unusedTasks, method);
 }

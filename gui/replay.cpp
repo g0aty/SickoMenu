@@ -65,6 +65,7 @@ namespace Replay
 				// free all storage
 				State.liveReplayEvents.shrink_to_fit();
 				std::map<Game::PlayerId, Replay::WalkEvent_LineData>().swap(State.replayWalkPolylineByPlayer);
+				State.liveReplayEvents.clear();
 			}
 			else {
 				for (auto& pair : State.replayWalkPolylineByPlayer)
@@ -93,6 +94,7 @@ namespace Replay
 		State.Replay_IsPlaying = false;
 	}
 
+	// --- RenderPolyline: Guard against empty vectors and size mismatches ---
 	void RenderPolyline(ImDrawList* drawList, float cursorPosX, float cursorPosY, 
 		std::vector<ImVec2>& points, const std::vector<std::chrono::system_clock::time_point>& timeStamps, Game::ColorId colorId, 
 		bool isUsingMinTimeFilter, const std::chrono::system_clock::time_point& minTimeFilter, bool isUsingMaxTimeFilter, const std::chrono::system_clock::time_point& maxTimeFilter)
@@ -103,8 +105,12 @@ namespace Replay
 			STREAM_ERROR("Min time filter is greater than max time filter (min: " << std::format("{:%OH:%OM:%OS}", minTimeFilter) << " max: " << std::format("{:%OH:%OM:%OS}", maxTimeFilter) << ")");
 			return;
 		}
-		// this is annoying, but we have to transform the points, render, then untransform
-		// if we store the transformed points then moving the replay window will cause everything to break..
+		if (points.empty() || timeStamps.empty()) return; // Prevent underflow and OOB
+		if (points.size() != timeStamps.size()) {
+			STREAM_ERROR("Replay polyline: points.size() != timeStamps.size()");
+			return;
+		}
+
 		auto xOffset = getMapXOffsetSkeld(0);
 		for (auto& point : points)
 		{
@@ -112,13 +118,10 @@ namespace Replay
 			point.y = point.y * State.dpiScale + cursorPosY;
 		}
 
-		// earliestTimeIndex will be the very first event to be shown, lastTimeIndex will be the very last even to be shown
 		size_t earliestTimeIndex = 0, lastTimeIndex = points.size() - 1;
 		bool collectionHasElementsToFilterMin = false, collectionHasElementsToFilterMax = false;
 		if ((isUsingMinTimeFilter == true) || (isUsingMaxTimeFilter))
 		{
-			// now we figure out the last index that matches the minTimeFilter
-			// then we'll do some quik pointer mafs to pass to the AddPolyline call
 			for (size_t index = 0; isUsingMinTimeFilter && index < timeStamps.size(); index++)
 			{
 				const std::chrono::system_clock::time_point& timestamp = timeStamps.at(index);
@@ -147,8 +150,10 @@ namespace Replay
 				// so we want to draw only a portion of the total collection
 				// this portion starts from the index of the last matching event and should continue to the end of the collection
 				if (!isUsingMaxTimeFilter || collectionHasElementsToFilterMax) {
-					size_t numPoints = lastTimeIndex - earliestTimeIndex  + 1;
-					drawList->AddPolyline(points.data() + earliestTimeIndex, (int)numPoints, GetReplayPlayerColor(colorId), false, 1.f * State.dpiScale);
+					if (lastTimeIndex >= earliestTimeIndex && lastTimeIndex < points.size()) {
+						size_t numPoints = lastTimeIndex - earliestTimeIndex + 1;
+						drawList->AddPolyline(points.data() + earliestTimeIndex, (int)numPoints, GetReplayPlayerColor(colorId), false, 1.f * State.dpiScale);
+					}
 				}
 			}
 		}
@@ -209,6 +214,7 @@ namespace Replay
 		Profiler::EndSample("ReplayPolyline");
 	}
 
+	// --- RenderPlayerIcons: Guard against empty vectors and underflow ---
 	void RenderPlayerIcons(ImDrawList* drawList, float cursorPosX, float cursorPosY, Settings::MapType MapType, bool isUsingEventFilter, bool isUsingPlayerFilter, 
 		bool isUsingMinTimeFilter, const std::chrono::system_clock::time_point& minTimeFilter, bool isUsingMaxTimeFilter, const std::chrono::system_clock::time_point& maxTimeFilter)
 	{
@@ -219,7 +225,6 @@ namespace Replay
 			STREAM_ERROR("Min time filter is greater than max time filter (min: " << std::format("{:%OH:%OM:%OS}", minTimeFilter) << " max: " << std::format("{:%OH:%OM:%OS}", maxTimeFilter) << ")");
 			return;
 		}
-		// event filter
 		if ((isUsingEventFilter == true) && (Replay::event_filter[(int)EVENT_TYPES::EVENT_WALK].second == false))
 			return;
 
@@ -312,22 +317,22 @@ namespace Replay
 			float player_mapY = (playerPos.y - halfImageHeight);
 			float player_mapXMax = (playerPos.x + halfImageWidth);
 			float player_mapYMax = (playerPos.y + halfImageHeight);
-
 			const ImVec2& p_min = ImVec2(player_mapX, player_mapY) * State.dpiScale + ImVec2(cursorPosX, cursorPosY);
 			const ImVec2& p_max = ImVec2(player_mapXMax, player_mapYMax) * State.dpiScale + ImVec2(cursorPosX, cursorPosY);
 
-			drawList->AddImage((void*)icon.iconImage.shaderResourceView,
-				p_min, p_max,
-				ImVec2(0.0f, 0.0f),
-				ImVec2(1.0f, 1.0f),
-				GetReplayPlayerColor(plrLineData.colorId));
-			drawList->AddImage((void*)visorIcon.iconImage.shaderResourceView,
-				p_min, p_max,
-				ImVec2(0.0f, 0.0f),
-				ImVec2(1.0f, 1.0f),
-				State.RevealRoles ?
-				ImGui::GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerDataById(plrLineData.playerId)->fields.Role))) :
-				ImGui::GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->VisorColor)));
+			if (State.Replay_DrawIcons) {
+				drawList->AddImage((void*)icon.iconImage.shaderResourceView,
+					p_min, p_max,
+					ImVec2(0.0f, 0.0f),
+					ImVec2(1.0f, 1.0f),
+					GetReplayPlayerColor(plrLineData.colorId));
+				drawList->AddImage((void*)visorIcon.iconImage.shaderResourceView,
+					p_min, p_max,
+					ImVec2(0.0f, 0.0f),
+					ImVec2(1.0f, 1.0f),
+					State.RevealRoles ?
+					ImGui::GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerDataById(plrLineData.playerId)->fields.Role))) :
+					ImGui::GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->VisorColor)));
 
 			auto plrInfo = GetPlayerDataById(plrLineData.playerId);
 			if ((plrInfo != NULL) &&
@@ -339,10 +344,34 @@ namespace Replay
 					p_min, p_max,
 					ImVec2(0.0f, 0.0f),
 					ImVec2(1.0f, 1.0f));
+			}
+			else {
+				auto color = GetReplayPlayerColor(plrLineData.colorId);
+				auto statusColor = State.RevealRoles ?
+					ImGui::GetColorU32(AmongUsColorToImVec4(GetRoleColor(GetPlayerDataById(plrLineData.playerId)->fields.Role))) :
+					ImGui::GetColorU32(AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ClearWhite));
+				auto dotCenter = ImVec2((p_min.x + p_max.x) / 2.f, (p_min.y + p_max.y) / 2.f);
+
+				if ((State.RevealRoles || PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))) && PlayerIsImpostor(GetPlayerDataById(plrLineData.playerId))) {
+					ImVec2 topLeft = ImVec2(dotCenter.x - 4.5F * State.dpiScale, dotCenter.y - 4.5F * State.dpiScale);
+					ImVec2 bottomRight = ImVec2(dotCenter.x + 4.5F * State.dpiScale, dotCenter.y + 4.5F * State.dpiScale);
+
+					// Draw a filled rectangle
+					drawList->AddRectFilled(topLeft, bottomRight, color, 1.f);
+
+					// Draw a rectangle outline
+					drawList->AddRect(topLeft, bottomRight, statusColor, 1.f, 15, 2.f);
+				}
+				else {
+					drawList->AddCircleFilled(dotCenter, 4.5F * State.dpiScale, color);
+					drawList->AddCircle(dotCenter, (4.5F + 0.5F) * State.dpiScale, statusColor, 0, 2.0F);
+				}
+			}
 		}
 		Profiler::EndSample("ReplayPlayerIcons");
 	}
 
+	// --- RenderEventIcons: Defensive dynamic_cast and null checks ---
 	void RenderEventIcons(ImDrawList* drawList, float cursorPosX, float cursorPosY, Settings::MapType MapType, bool isUsingEventFilter, bool isUsingPlayerFilter,
 		bool isUsingMinTimeFilter, const std::chrono::system_clock::time_point& minTimeFilter,  bool isUsingMaxTimeFilter, const std::chrono::system_clock::time_point& maxTimeFilter)
 	{
@@ -356,14 +385,13 @@ namespace Replay
 
 		const auto& map = maps[(size_t)MapType];
 		
-		for (std::vector<std::unique_ptr<EventInterface>>::iterator it = State.liveReplayEvents.begin(); it != State.liveReplayEvents.end(); ++it)
+		for (auto it = State.liveReplayEvents.begin(); it != State.liveReplayEvents.end(); ++it)
 		{
 			EventInterface* curEvent = (*it).get();
 			EVENT_TYPES evtType = curEvent->getType();
 			std::chrono::system_clock::time_point evtTime = curEvent->GetTimeStamp();
 			EVENT_PLAYER evtPlayerSource = curEvent->getSource();
 
-			// filters
 			if ((isUsingMaxTimeFilter == true) && (evtTime > maxTimeFilter))
 				continue;
 			if ((isUsingMinTimeFilter == true) && (evtTime < minTimeFilter))
@@ -376,10 +404,10 @@ namespace Replay
 					(Replay::player_filter[evtPlayerSource.playerId].first.has_value() == false)))
 				continue;
 
-			// processing
 			if (evtType == EVENT_TYPES::EVENT_KILL)
 			{
 				auto kill_event = dynamic_cast<KillEvent*>(curEvent);
+				if (!kill_event) continue; // Defensive
 				auto position = kill_event->GetTargetPosition();
 				IconTexture icon = icons.at(ICON_TYPES::KILL);
 				float mapX = map.x_offset + (position.x - (icon.iconImage.imageWidth * icon.scale * 0.5f)) * map.scale;
@@ -396,6 +424,7 @@ namespace Replay
 			else if (evtType == EVENT_TYPES::EVENT_VENT)
 			{
 				auto vent_event = dynamic_cast<VentEvent*>(curEvent);
+				if (!vent_event) continue;
 				auto position = vent_event->GetPosition();
 				ICON_TYPES iconType;
 
@@ -404,11 +433,9 @@ namespace Replay
 					case VENT_ACTIONS::VENT_ENTER:
 						iconType = ICON_TYPES::VENT_IN;
 						break;
-
 					case VENT_ACTIONS::VENT_EXIT:
 						iconType = ICON_TYPES::VENT_OUT;
 						break;
-
 					default:
 						iconType = ICON_TYPES::VENT_IN;
 						break;
@@ -429,6 +456,7 @@ namespace Replay
 			else if (evtType == EVENT_TYPES::EVENT_TASK)
 			{
 				auto task_event = dynamic_cast<TaskCompletedEvent*>(curEvent);
+				if (!task_event) continue;
 				auto position = task_event->GetPosition();
 				IconTexture icon = icons.at(ICON_TYPES::TASK);
 				float mapX = map.x_offset + (position.x - (icon.iconImage.imageWidth * icon.scale * 0.5f)) * map.scale;
@@ -445,6 +473,7 @@ namespace Replay
 			else if (evtType == EVENT_TYPES::EVENT_REPORT || evtType == EVENT_TYPES::EVENT_MEETING)
 			{
 				auto report_event = dynamic_cast<ReportDeadBodyEvent*>(curEvent);
+				if (!report_event) continue;
 				auto position = report_event->GetPosition();
 				IconTexture icon = icons.at(ICON_TYPES::REPORT);
 				float mapX = map.x_offset + (position.x - (icon.iconImage.imageWidth * icon.scale * 0.5f)) * map.scale;
@@ -468,7 +497,7 @@ namespace Replay
 		Replay::Init();
 
 		const auto& map = maps[(size_t)State.mapType];
-		ImGui::SetNextWindowSize(ImVec2((map.mapImage.imageWidth * 0.5f) + 50.0f, (map.mapImage.imageHeight * 0.5f) + 90.f) * State.dpiScale, ImGuiCond_None);
+		ImGui::SetNextWindowSize(ImVec2((std::max)(516.f * State.dpiScale, (map.mapImage.imageWidth * 0.5f) + 50.0f), (map.mapImage.imageHeight * 0.5f) + 90.f) * State.dpiScale, ImGuiCond_None);
 		ImGui::Begin("###Replay", &State.ShowReplay, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 		static ImVec4 titleCol = State.MenuThemeColor;
 		if (State.RgbMenuTheme)
@@ -564,7 +593,10 @@ namespace Replay
 		ImGui::BeginChild("replay#control", ImVec2(0,0), false, ImGuiWindowFlags_NoBackground);
 		
 		SliderChrono("##replay_slider", &State.MatchCurrent, &State.MatchStart, &State.MatchLive, fmt, ImGuiSliderFlags_None);
-		
+		ImGui::SameLine();
+		if (AnimatedButton("Clear All Data"))
+			Replay::Reset(true);
+
 		ImGui::EndChild();
 
 		ImGui::End();

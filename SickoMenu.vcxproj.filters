@@ -444,9 +444,6 @@
     <ClInclude Include="user\resources.h">
       <Filter>user</Filter>
     </ClInclude>
-    <ClInclude Include="user\state.hpp">
-      <Filter>user</Filter>
-    </ClInclude>
     <ClInclude Include="user\utility.h">
       <Filter>user</Filter>
     </ClInclude>
@@ -506,6 +503,9 @@
     </ClInclude>
     <ClInclude Include="gui\tabs\about_tab.h">
       <Filter>gui\tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="user\state.hpp">
+      <Filter>user</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -297,10 +297,23 @@ bool SliderChrono(const char* label, void* p_data, const void* p_min, const void
 
 	// Render grab
 	if (grab_bb.Max.x > grab_bb.Min.x) {
-		window->DrawList->AddCircleFilled((grab_bb.Min + grab_bb.Max) / 2, 8 * State.dpiScale, GetColorU32(ImGuiCol_SliderGrabActive));
+		ImVec2 knob_center = (grab_bb.Min + grab_bb.Max) * 0.5f;
+		float knob_radius = 8.0f * State.dpiScale;
+
+		ImVec2 knob_min = knob_center - ImVec2(knob_radius, knob_radius);
+		ImVec2 knob_max = knob_center + ImVec2(knob_radius, knob_radius);
+
+		window->DrawList->AddRectFilled(knob_min, knob_max,
+			GetColorU32(ImGuiCol_SliderGrabActive),
+			knob_radius * State.RoundingRadiusMultiplier);
+
 		if (&p_data != &p_min) {
-			ImVec2 maxActive = ImVec2(grab_bb.Max.x - 14 * State.dpiScale, grab_bb.Max.y - 2.f * State.dpiScale);
-			RenderFrame(frameMin, maxActive, GetColorU32(ImGuiCol_ButtonActive), true, g.Style.FrameRounding);
+			ImVec2 maxActive = ImVec2(grab_bb.Max.x - 14 * State.dpiScale,
+				grab_bb.Max.y - 2.f * State.dpiScale);
+			RenderFrame(frameMin, maxActive,
+				GetColorU32(ImGuiCol_ButtonActive),
+				true,
+				g.Style.FrameRounding* State.RoundingRadiusMultiplier);
 		}
 	}
 		//window->DrawList->AddRectFilled(grab_bb.Min, grab_bb.Max, GetColorU32(g.ActiveId == id ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab), style.GrabRounding);
@@ -315,7 +328,12 @@ bool SliderChrono(const char* label, void* p_data, const void* p_min, const void
 
 	ImU32 liveColor = (State.Replay_IsLive) ? ColorConvertFloat4ToU32(ImVec4(255.0f, 0.f, 0.f, 255.0f)) : ColorConvertFloat4ToU32(ImVec4(128.f, 128.f, 128.f, 255.0f));
 	const ImVec2 circlePos(window->DC.CursorPos.x, window->DC.CursorPos.y + 9.5f * State.dpiScale);
-	window->DrawList->AddCircleFilled(circlePos, 5.0f * State.dpiScale, liveColor);
+	float radius = 5.0f * State.dpiScale;
+	ImVec2 rect_min = circlePos - ImVec2(radius, radius);
+	ImVec2 rect_max = circlePos + ImVec2(radius, radius);
+	window->DrawList->AddRectFilled(rect_min, rect_max,
+		liveColor,
+		radius * State.RoundingRadiusMultiplier);
 	SameLine(0.0f * State.dpiScale, 18.f * State.dpiScale);
 	Text("Live");
 
@@ -572,11 +590,24 @@ bool ToggleButton(const char* str_id, bool* v) {
 	// Apply smoothstep easing to t
 	float t_eased = t * t * (3.0f - 2.0f * t); // SmoothStep
 
-	ImU32 bg_col = ImGui::GetColorU32(ImLerp(colors[ImGuiCol_FrameBg], colors[ImGuiCol_FrameBgActive], ImGui::IsItemHovered() ? 0.5f : t_eased));
-	draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), bg_col, height * 0.5f);
+	float rounding = radius * State.RoundingRadiusMultiplier;
+
+	ImU32 bg_col = ImGui::GetColorU32(
+		ImLerp(colors[ImGuiCol_FrameBg], colors[ImGuiCol_FrameBgActive],
+			ImGui::IsItemHovered() ? 0.5f : t_eased));
+
+	draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), bg_col, rounding);
 
 	float knob_x = ImLerp(p.x + radius, p.x + width - radius, t_eased);
-	draw_list->AddCircleFilled(ImVec2(knob_x, p.y + radius), radius - 1.5f, ImGui::GetColorU32(colors[ImGuiCol_CheckMark]));
+	float knob_size = (radius - 1.5f) * 2.0f; // knob width/height
+	float knob_rounding = (radius - 1.5f) * State.RoundingRadiusMultiplier;
+
+	ImVec2 knob_min(knob_x - knob_size * 0.5f, p.y + radius - knob_size * 0.5f);
+	ImVec2 knob_max(knob_x + knob_size * 0.5f, p.y + radius + knob_size * 0.5f);
+
+	draw_list->AddRectFilled(knob_min, knob_max,
+		ImGui::GetColorU32(colors[ImGuiCol_CheckMark]),
+		knob_rounding);
 
 	ImGui::SameLine();
 	ImGui::Text(str_id);
@@ -715,10 +746,23 @@ bool SliderScalarV2(const char* label, ImGuiDataType data_type, void* p_data, co
 
 	// Render grab
 	if (grab_bb.Max.x > grab_bb.Min.x) {
-		window->DrawList->AddCircleFilled((grab_bb.Min + grab_bb.Max) / 2, 8 * State.dpiScale, GetColorU32(ImGuiCol_SliderGrabActive));
+		ImVec2 knob_center = (grab_bb.Min + grab_bb.Max) * 0.5f;
+		float knob_radius = 8.0f * State.dpiScale;
+
+		ImVec2 knob_min = knob_center - ImVec2(knob_radius, knob_radius);
+		ImVec2 knob_max = knob_center + ImVec2(knob_radius, knob_radius);
+
+		window->DrawList->AddRectFilled(knob_min, knob_max,
+			GetColorU32(ImGuiCol_SliderGrabActive),
+			knob_radius * State.RoundingRadiusMultiplier);
+
 		if (&p_data != &p_min) {
-			ImVec2 maxActive = ImVec2(grab_bb.Max.x - 14 * State.dpiScale, grab_bb.Max.y - 2.f * State.dpiScale);
-			RenderFrame(frameMin, maxActive, GetColorU32(ImGuiCol_ButtonActive), true, g.Style.FrameRounding);
+			ImVec2 maxActive = ImVec2(grab_bb.Max.x - 14 * State.dpiScale,
+				grab_bb.Max.y - 2.f * State.dpiScale);
+			RenderFrame(frameMin, maxActive,
+				GetColorU32(ImGuiCol_ButtonActive),
+				true,
+				g.Style.FrameRounding * State.RoundingRadiusMultiplier);
 		}
 	}
 
@@ -765,7 +809,9 @@ bool AnimatedButton(const char* label, const ImVec2& size) {
 
 	ImGuiID id = ImGui::GetID(label);
 	ImVec2 pos = ImGui::GetCursorScreenPos();
-	ImVec2 button_size = ImGui::CalcItemSize(size, ImGui::CalcTextSize(label).x + ImGui::GetStyle().FramePadding.x * 2.0f, ImGui::GetFrameHeight());
+	const char* label_end = ImGui::FindRenderedTextEnd(label);
+	float text_width = ImGui::CalcTextSize(label, label_end).x;
+	ImVec2 button_size = ImGui::CalcItemSize(size, text_width + ImGui::GetStyle().FramePadding.x * 2.0f, ImGui::GetFrameHeight());
 	ImRect bb(pos, pos + button_size);
 
 	ImGui::ItemSize(bb);
@@ -803,14 +849,14 @@ bool AnimatedButton(const char* label, const ImVec2& size) {
 		ImU32 pulse_u32 = ImGui::GetColorU32(pulse_col);
 		window->DrawList->AddRectFilled(bb.Min, bb.Max, pulse_u32, ImGui::GetStyle().FrameRounding);
 	}
-
+	
 	// Label
-	ImVec2 text_size = ImGui::CalcTextSize(label);
+	ImVec2 text_size = ImGui::CalcTextSize(label, label_end);
 	ImVec2 text_pos = ImVec2(
 		bb.Min.x + (button_size.x - text_size.x) * 0.5f,
 		bb.Min.y + (button_size.y - text_size.y) * 0.5f
 	);
-	ImGui::RenderText(text_pos, label);
+	ImGui::RenderText(text_pos, label, label_end);
 
 	return pressed;
 }

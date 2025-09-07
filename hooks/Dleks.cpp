@@ -16,7 +16,24 @@ bool ShouldDisableHostAnticheat() {
 
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
     LogIfEnabled("Hook dConstants_1_GetBroadcastVersion executed");
-    int32_t baseVersion = Constants_1_GetBroadcastVersion(method);
+    if (State.CurrentScene == "" || State.CurrentScene == "SplashIntro" || State.CurrentScene == "MatchMaking" || State.CurrentScene == "Tutorial" ||
+        (State.CurrentScene == "MainMenu" && State.ShouldIgnoreBroadcastVersionHook)) {
+        // This should not lead to unexpected behavior with unexpected disconnections
+        return Constants_1_GetBroadcastVersion(method);
+	}
+    int32_t baseVersion = 50632950;
+    if (State.SpoofAUVersion) {
+        switch (State.FakeAUVersion) {
+		case 0: // AU v16.0.0 / v16.0.2
+			baseVersion = 50614950;
+			break;
+		case 1: // AU v16.0.5 / v16.1.0
+			baseVersion = 50632950;
+			break;
+        }
+    }
+    else int32_t baseVersion = Constants_1_GetBroadcastVersion(method);
+    // This is the broadcast version for v16.1.0
     return baseVersion + (ShouldDisableHostAnticheat() ? AnticheatPenalty : 0);
 }
 
@@ -35,4 +52,10 @@ bool dAprilFoolsMode_ShouldFlipSkeld(MethodInfo* method) {
     if (IsHost()) return State.FlipSkeld;
     State.FlipSkeld = AprilFoolsMode_ShouldFlipSkeld(method);
     return State.FlipSkeld;
+}
+
+void dMainMenuManager_LateUpdate(MainMenuManager* __this, MethodInfo* method) {
+    LogIfEnabled("Hook dMainMenuManager_OpenOnlineMenu executed");
+    MainMenuManager_LateUpdate(__this, method);
+    State.ShouldIgnoreBroadcastVersionHook = GameObject_GetActive(__this->fields.gameModeButtons, NULL);
 }

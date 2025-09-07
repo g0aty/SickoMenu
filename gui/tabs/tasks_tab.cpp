@@ -37,13 +37,16 @@ namespace TasksTab {
 
 			ImGui::NewLine();
 
-			for (auto task : tasks) {
-				if (!NormalPlayerTask_get_IsComplete(task, NULL) && AnimatedButton(("Complete##Button" + std::to_string(task->fields._._Id_k__BackingField)).c_str())) {
+			for (size_t i = 0; i < tasks.size(); ++i) {
+				auto task = tasks[i];
+				if (!NormalPlayerTask_get_IsComplete(task, NULL) && AnimatedButton(("Complete##" + std::to_string(task->fields._._Id_k__BackingField)).c_str())) {
 					State.taskRpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
 				}
+				else if (NormalPlayerTask_get_IsComplete(task, NULL)) {
+					ColoredButton(ImVec4(0.f, 1.f, 0.f, 1.f), ("Completed!##" + std::to_string(task->fields._._Id_k__BackingField)).c_str());
+				}
 
-				if (!NormalPlayerTask_get_IsComplete(task, NULL))
-					ImGui::SameLine();
+				ImGui::SameLine();
 
 				auto taskIncompleteCol = State.LightMode ? AmongUsColorToImVec4(app::Palette__TypeInfo->static_fields->Black) : AmongUsColorToImVec4(app::Palette__TypeInfo->static_fields->White);
 

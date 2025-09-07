@@ -12,17 +12,22 @@ namespace ReplayTab {
 		if (ToggleButton("Show Replay", &State.ShowReplay)) {
 			State.Save();
 		}
-		if (ToggleButton("Show only last", &State.Replay_ShowOnlyLastSeconds))
+		if (ToggleButton("Show Only Last", &State.Replay_ShowOnlyLastSeconds))
 		{
 			State.Save();
 		}
 		ImGui::SameLine();
-		if (SliderIntV2("seconds", &State.Replay_LastSecondsValue, 1, 1200, "%d", ImGuiSliderFlags_AlwaysClamp))
+		if (SliderIntV2("Seconds", &State.Replay_LastSecondsValue, 1, 1200, "%d", ImGuiSliderFlags_AlwaysClamp))
 		{
 			State.Save();
 		}
 
-		if (ToggleButton("Clear after meeting", &State.Replay_ClearAfterMeeting))
+		if (ToggleButton("Clear After Meeting", &State.Replay_ClearAfterMeeting))
+		{
+			State.Save();
+		}
+
+		if (ToggleButton("Draw Player Icons", &State.Replay_DrawIcons))
 		{
 			State.Save();
 		}

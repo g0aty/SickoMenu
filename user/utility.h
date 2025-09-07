@@ -228,6 +228,17 @@ std::string GetGitBranch();
 void ImpersonateName(__maybenull NetworkedPlayerInfo* data);
 void ImpersonateOutfit(NetworkedPlayerInfo_PlayerOutfit* outfit);
 Game::ColorId GetRandomColorId();
+float srgbToLinear(float c);
+int linearToSrgb(float c);
+// Convert linear RGB to OkLAB
+struct OkLAB {
+	float L;
+	float a;
+	float b;
+};
+OkLAB rgbToOkLab(float r, float g, float b);
+void okLabToRgb(const OkLAB& lab, float& r, float& g, float& b);
+OkLAB lerpOkLab(const OkLAB& c1, const OkLAB& c2, float t);
 std::string GetGradientUsername(std::string str, ImVec4 color1 = ImVec4(1.f, 1.f, 1.f, 1.f), ImVec4 color2 = ImVec4(1.f, 1.f, 1.f, 1.f), int offset = 0);
 void RefreshChat(bool alsoShow = false);
 void SaveOriginalAppearance();
@@ -246,6 +257,7 @@ std::vector<std::string> GetAllConfigs();
 bool CheckConfigExists(std::string configName);
 void UpdatePoints(NetworkedPlayerInfo* playerData, float points);
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason);
+bool IsDater(std::string username, int playerCount = 4);
 
 /// <summary>
 /// Simplifies a list of points by ensuring the distance between consecutive points is greater than the squared distance threshold; all other points are discarded.

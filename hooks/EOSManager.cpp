@@ -27,7 +27,7 @@ void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
 		return;
 	}
 	EOSManager_StartTempAccountFlow(__this, method);
-	isGuestAccount = true;
+	//isGuestAccount = true;
 	EOSManager_CloseStartupWaitScreen(__this, method);
 }
 

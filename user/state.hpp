@@ -34,7 +34,8 @@ public:
         0x00, //reset appearance
         0x00, //save appearance
         0x00, //complete tasks
-        VK_PAUSE //toggle SickoMenu
+        VK_PAUSE, //toggle SickoMenu
+        0x00 //cancel start
     };
 
     std::string selectedConfig = "default";
@@ -72,8 +73,11 @@ public:
     int FakePlatform = 0;
     bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
+    bool SpoofAUVersion = true;
+    int FakeAUVersion = 1;
     bool DisableAnimations = false;
     float AnimationSpeed = 1.f;
+    float RoundingRadiusMultiplier = 1.f;
 
     bool AdjustByDPI = true;
     float dpiScale = 1.f;
@@ -120,6 +124,7 @@ public:
     int CrashChatSpamMode = 1;
     bool AutoJoinLobby = false;
     std::string AutoJoinLobbyCode = "";
+    bool IgnoreRPCs = false;
 
     bool ShowProtections = false;
     std::map<Game::PlayerId, std::pair<Game::ColorId, float/*Time*/>> protectMonitor;
@@ -128,6 +133,9 @@ public:
     bool RefreshChatButton = false;
     bool RevealVotes = false;
     bool RevealAnonymousVotes = false;
+    bool ShowChatTimer = false;
+    bool ExtendChatLimit = false;
+    bool ExtendChatHistory = false;
 
     bool ShowKillCD = false;
 
@@ -170,6 +178,8 @@ public:
     std::string NameSuffix = "";
     bool Font = false;
     int FontType = 0;
+    bool ChatFont = false;
+    int ChatFontType = 0;
     //bool Material = false;
     //int MaterialType = 0;
     bool CustomRgbName = false;
@@ -240,8 +250,11 @@ public:
     bool PreventSelfReport = true;
     bool AutoRejoin = false;
     bool OldStylePingText = false;
-    bool FastRoleReveal = false;
     bool NoSeekerAnim = false;
+    bool BetterChatNotifications = false;
+    bool BetterLobbyCodeInput = false;
+    bool BetterMessageSounds = false;
+	AudioClip* MessageSound = NULL;
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
@@ -305,6 +318,7 @@ public:
     bool Replay_ShowOnlyLastSeconds = false;
     int Replay_LastSecondsValue = 1;
     bool Replay_ClearAfterMeeting = false;
+    bool Replay_DrawIcons = true;
     std::chrono::system_clock::time_point MatchStart;
     std::chrono::system_clock::time_point MatchCurrent;
     std::chrono::system_clock::time_point MatchEnd;
@@ -347,6 +361,7 @@ public:
 
     float CameraHeight = 3.0;
     Camera* FollowerCam = nullptr;
+    Camera* ShadowCam = nullptr;
     bool EnableZoom = false;
 
     VersionShower* versionShower = nullptr;
@@ -371,6 +386,29 @@ public:
     ImVec4 SelectedReplayMapColor = ImVec4(1.f, 1.f, 1.f, 0.75f);
     ImVec4 GameTextColor = ImVec4(0.f, 0.f, 0.f, 1.f);
     ImVec4 GameBgColor = ImVec4(1.f, 1.f, 1.f, 1.f);
+
+    ImVec4 CrewmateGhostColor = ImVec4(1.f, 1.f, 1.f, 0.5f);
+    ImVec4 CrewmateColor = ImVec4(1.f, 1.f, 1.f, 1.f);
+    ImVec4 EngineerColor = ImVec4(0.f, 1.f, 1.f, 1.f);
+    ImVec4 GuardianAngelColor = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
+    ImVec4 ScientistColor = ImVec4(0.2f, 0.2f, 1.f, 1.f);
+    ImVec4 ImpostorColor = ImVec4(1.f, 0.1f, 0.1f, 1.f);
+    ImVec4 ShapeshifterColor = ImVec4(1.f, 0.67f, 0.f, 1.f);
+    ImVec4 ImpostorGhostColor = ImVec4(0.25f, 0.25f, 0.25f, 0.5f);
+    ImVec4 NoisemakerColor = ImVec4(0.f, 1.f, 0.47f, 1.f);
+    ImVec4 TrackerColor = ImVec4(0.65f, 0.36f, 1.f, 1.f);
+    ImVec4 PhantomColor = ImVec4(0.53f, 0.f, 0.f, 1.f);
+
+    ImVec4 HostColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
+    ImVec4 PlayerIdColor = ImVec4(1.f, 0.f, 0.f, 1.f);
+    ImVec4 LevelColor = ImVec4(0.f, 1.f, 0.f, 1.f);
+    ImVec4 PlatformColor = ImVec4(0.73f, 0.f, 1.f, 1.f);
+    ImVec4 ModUsageColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
+    ImVec4 NameCheckerColor = ImVec4(1.f, 0.67f, 0.f, 1.f);
+    ImVec4 FriendCodeColor = ImVec4(0.2f, 0.6f, 1.f, 1.f);
+    ImVec4 DaterNamesColor = ImVec4(1.f, 0.f, 0.f, 1.f);
+    ImVec4 LobbyCodeColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
+    ImVec4 AgeColor = ImVec4(0.f, 1.f, 0.f, 1.f);
 
     Game::ColorId SelectedColorId = 0; // Red
     Game::ColorId RandomColorId = 0; // Red
@@ -446,6 +484,11 @@ public:
     bool DisableHostAnticheat = false;
     bool TournamentMode = false;
     bool SpectatorMode = false;
+    bool CancelingStartGame = false;
+    bool IsStartCountdownActive = false;
+    bool AlwaysAllowStart = false;
+    bool ModifyStartCountdown = false;
+    int StartCountdown = 10;
 
     std::unordered_set<std::string> Friends;
     std::unordered_set<Game::PlayerId> InGameFriends;
@@ -556,6 +599,8 @@ public:
     bool ProGamer = false;
     bool KeybindsBeingEdited = false;
     bool IsFreePlay = false;
+    bool IsProcessingSickoChat = false;
+    bool ShouldIgnoreBroadcastVersionHook = false;
 
     bool Destruct_IgnoreWhitelist = true;
     bool Ban_IgnoreWhitelist = true;
@@ -636,17 +681,24 @@ public:
     std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> playerPunishTimers;
 
     // Temp-Ban [Dependencies]
-    bool TempBanEnabled = true;
+    /*bool TempBanEnabled = true;
     int TempBanDuration = 60; /// Seconds
     std::string TBanFC = "";
     std::unordered_map<std::string, std::chrono::system_clock::time_point> TempBanHistoryFC;
     std::unordered_map<std::string, std::pair<std::chrono::system_clock::time_point, std::string>> TempBannedFriendCodes;
-    std::unordered_map<std::string, std::chrono::system_clock::time_point> PlayerPunishTimersFC;
+    std::unordered_map<std::string, std::chrono::system_clock::time_point> PlayerPunishTimersFC;*/
 
-    int BanDays = 0;
+	// Temp-Ban Optimized [Dependencies]
+    bool EnableTempBan = false;
+	std::unordered_map<std::string, int> TempBannedFCs;
+
+    // Disable Tasks
+    bool DisableMedbayScan = false;
+
+    /*int BanDays = 0;
     int BanHours = 0;
     int BanMinutes = 0;
-    int BanSeconds = 0;
+    int BanSeconds = 0;*/
 
     void Load();
     void Save();

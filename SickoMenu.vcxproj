@@ -367,6 +367,7 @@
     <ClInclude Include="user\logger.h" />
     <ClInclude Include="user\profiler.h" />
     <ClInclude Include="user\resources.h" />
+    <ClInclude Include="user\state.hpp" />
     <ClInclude Include="user\utility.h" />
     <ClInclude Include="framework\il2cpp-appdata.h" />
     <ClInclude Include="appdata\il2cpp-types.h" />
@@ -387,7 +388,6 @@
     <ClInclude Include="includes\json.hpp" />
     <ClInclude Include="user\game.h" />
     <ClInclude Include="user\main.h" />
-    <ClInclude Include="user\state.hpp" />
     <ClInclude Include="framework\version.h" />
   </ItemGroup>
   <ItemGroup>
@@ -546,7 +546,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch-il2cpp.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)appdata;$(ProjectDir)events;$(ProjectDir)framework;$(ProjectDir)gui;$(ProjectDir)hooks;$(ProjectDir)includes;$(ProjectDir)resources;$(ProjectDir)rpc;$(ProjectDir)user;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)appdata;$(ProjectDir)events;$(ProjectDir)framework;$(ProjectDir)gui;$(ProjectDir)hooks;$(ProjectDir)includes;$(ProjectDir)resources;$(ProjectDir)rpc;$(ProjectDir)user;$(ProjectDir);</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -566,6 +566,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <ModuleDefinitionFile>framework/version.def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>

@@ -112,17 +112,17 @@ void ApplyTheme()
 	}
 
 	style.WindowPadding = ImVec2(6, 4);
-	style.WindowRounding = 4.0f;
+	style.WindowRounding = 8.0f * State.RoundingRadiusMultiplier;
 	style.FramePadding = ImVec2(5, 2);
-	style.FrameRounding = 3.0f;
+	style.FrameRounding = 6.0f * State.RoundingRadiusMultiplier;
 	style.ItemSpacing = ImVec2(7, 1);
 	style.ItemInnerSpacing = ImVec2(1, 1);
 	style.TouchExtraPadding = ImVec2(0, 0);
 	style.IndentSpacing = 6.0f;
 	style.ScrollbarSize = 12.0f;
-	style.ScrollbarRounding = 16.0f;
+	style.ScrollbarRounding = 16.0f * State.RoundingRadiusMultiplier;
 	style.GrabMinSize = 20.0f;
-	style.GrabRounding = 2.0f;
+	style.GrabRounding = 2.0f * State.RoundingRadiusMultiplier;
 
 	style.WindowTitleAlign.x = 0.50f;
 
@@ -175,12 +175,35 @@ void ApplyTheme()
 	else gradientDelay--;
 
 	if (State.GradientMenuTheme) {
-		float stepR = float((State.MenuGradientColor2.x - State.MenuGradientColor1.x) / 100);
-		float stepG = float((State.MenuGradientColor2.y - State.MenuGradientColor1.y) / 100);
-		float stepB = float((State.MenuGradientColor2.z - State.MenuGradientColor1.z) / 100);
-		State.MenuGradientColor = ImVec4(State.MenuGradientColor1.x + stepR * gradientStep,
-			State.MenuGradientColor1.y + stepG * gradientStep,
-			State.MenuGradientColor1.z + stepB * gradientStep,
-			State.MenuThemeColor.w);
+		// Convert ImVec4 RGB (0..1 floats) into 0..255 sRGB
+		float r1 = State.MenuGradientColor1.x * 255.0f;
+		float g1 = State.MenuGradientColor1.y * 255.0f;
+		float b1 = State.MenuGradientColor1.z * 255.0f;
+
+		float r2 = State.MenuGradientColor2.x * 255.0f;
+		float g2 = State.MenuGradientColor2.y * 255.0f;
+		float b2 = State.MenuGradientColor2.z * 255.0f;
+
+		// Convert to linear -> OkLAB
+		OkLAB c1 = rgbToOkLab(srgbToLinear(r1), srgbToLinear(g1), srgbToLinear(b1));
+		OkLAB c2 = rgbToOkLab(srgbToLinear(r2), srgbToLinear(g2), srgbToLinear(b2));
+
+		// Normalized t (0..1)
+		float t = gradientStep / 100.0f;
+
+		// Interpolate in OkLAB
+		OkLAB c = lerpOkLab(c1, c2, t);
+
+		// Convert back to linear RGB
+		float rl, gl, bl;
+		okLabToRgb(c, rl, gl, bl);
+
+		// Convert linear -> sRGB [0..1]
+		float r = linearToSrgb(rl) / 255.0f;
+		float g = linearToSrgb(gl) / 255.0f;
+		float b = linearToSrgb(bl) / 255.0f;
+
+		// Keep original alpha
+		State.MenuGradientColor = ImVec4(r, g, b, State.MenuThemeColor.w);
 	}
 }

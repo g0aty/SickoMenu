@@ -14,6 +14,15 @@
 using namespace std::string_view_literals;
 
 static bool autoStartedGame = false;
+extern bool editingAutoStartPlayerCount;
+
+static std::string strToLower(std::string str) {
+    std::string new_str = "";
+    for (auto i : str) {
+        new_str += char(std::tolower(i));
+    }
+    return new_str;
+}
 
 static bool OpenDoor(OpenableDoor* door) {
     if ("PlainDoor"sv == door->klass->name) {
@@ -38,6 +47,7 @@ static void onGameEnd() {
     try {
         LOG_DEBUG("Reset All");
         Replay::Reset();
+        State.liveReplayEvents.clear();
         State.modUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
@@ -619,6 +629,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 static int forceNameDelay = 0;
                 if (forceNameDelay <= 0) {
                     for (auto player : GetAllPlayerControl()) {
+                        if (player == *Game::pLocalPlayer && State.SetName) continue;
                         if (!(State.CustomName && State.ServerSideCustomName && (player == *Game::pLocalPlayer || State.CustomNameForEveryone))) {
                             auto outfit = GetPlayerOutfit(GetPlayerData(player));
                             std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(player), nullptr));
@@ -738,6 +749,16 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     InnerNetClient_SendStartGame(__this, NULL);
                 }
 
+                if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount && !autoStartedGame) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
+                    int playerCount = (int)GetAllPlayerData().size();
+                    if (playerCount >= State.AutoStartPlayerCount) {
+                        autoStartedGame = true;
+                        InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
+                        State.AutoStartGamePlayers = false;
+                        State.Save();
+                    }
+                }
+
                 static int sabotageDelay = 0;
                 static bool fixSabotage = false;
                 if (sabotageDelay <= 0) {
@@ -814,6 +835,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     continue;
                 }
 
+                if (playerData->fields.ClientId == (*Game::pAmongUsClient)->fields._.ClientId) continue;
+                // IS skill issues moment
+
                 uint32_t playerId = playerControl->fields.PlayerId;
 
                 if (State.playerPunishTimers.find(playerId) == State.playerPunishTimers.end()) {
@@ -856,7 +880,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 auto* pd = GetPlayerDataById(pc->fields.PlayerId);
                 if (!pd) continue;
 
-                const std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pc))->fields.PlayerName));
+                const std::string name = strToLower(RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pc))->fields.PlayerName)));
                 const std::string puid = convert_from_string(pd->fields.Puid);
                 const std::string fc = convert_from_string(pd->fields.FriendCode);
 
@@ -868,6 +892,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) != State.WhitelistFriendCodes.end()) {
                     continue;
                 }
+
+				if (pd->fields.ClientId == (*Game::pAmongUsClient)->fields._.ClientId) continue; // Don't kick yourself
 
                 State.CurrentForbiddenNames.insert(name);
 
@@ -1084,66 +1110,17 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
         }
 
-        if (State.TempBanEnabled) {
-            auto allPlayers = GetAllPlayerControl();
-
-            auto now = std::chrono::system_clock::now();
-
-            for (auto* playerControl : allPlayers) {
-                if (!playerControl) continue;
-
-                auto* playerData = GetPlayerDataById(playerControl->fields.PlayerId);
-                if (!playerData) continue;
-
-                std::string friendCode = convert_from_string(playerData->fields.FriendCode);
-                if (friendCode.empty()) continue;
-
-                std::string localFriendCode;
-                if (Game::pLocalPlayer && *Game::pLocalPlayer) {
-                    auto* localPD = GetPlayerDataById((*Game::pLocalPlayer)->fields.PlayerId);
-                    if (localPD) localFriendCode = convert_from_string(localPD->fields.FriendCode);
-                }
-                if (friendCode == localFriendCode) continue;
-
-                if (State.Ban_IgnoreWhitelist && std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end()) {
-                    continue;
-                }
-
-                auto banIt = State.TempBannedFriendCodes.find(friendCode);
-                if (banIt != State.TempBannedFriendCodes.end()) {
-                    if (now < banIt->second.first) {
-                        app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, false, NULL);
-                    }
-                    else {
-                        State.TempBannedFriendCodes.erase(banIt);
-                        State.PlayerPunishTimersFC.erase(friendCode);
-                        State.TempBanHistoryFC.erase(friendCode);
-                    }
-                }
-            }
-
-            std::unordered_set<std::string> activeFCs;
-            for (auto* player : allPlayers) {
-                if (!player) continue;
-                auto* pd = GetPlayerDataById(player->fields.PlayerId);
-                if (!pd) continue;
-                std::string fc = convert_from_string(pd->fields.FriendCode);
-                if (!fc.empty()) activeFCs.insert(fc);
-            }
-            for (auto it = State.PlayerPunishTimersFC.begin(); it != State.PlayerPunishTimersFC.end();) {
-                if (activeFCs.find(it->first) == activeFCs.end()) {
-                    it = State.PlayerPunishTimersFC.erase(it);
+        /*if (State.EnableTempBan) {
+            int now = static_cast<int>(std::chrono::system_clock::now().time_since_epoch().count());
+            for (auto it = State.TempBannedFCs.begin(); it != State.TempBannedFCs.end(); ) {
+                if (now >= it->second) {
+                    State.TempBannedFCs.erase(it);
                 }
                 else {
                     ++it;
                 }
             }
-        }
-        else {
-            State.TempBannedFriendCodes.clear();
-            State.PlayerPunishTimersFC.clear();
-            State.TempBanHistoryFC.clear();
-        }
+        }*/
 
         if (IsInLobby() && IsHost() && GameOptions().HasOptions()) {
             GameOptions options;
@@ -1447,6 +1424,10 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
 void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dInnerNetClient_EnqueueDisconnect executed");
     try {
+		std::string reasonStr = convert_from_string(stringReason);
+		if (reason == DisconnectReasons__Enum::Error &&
+            (reasonStr == "Timeout while waiting for player ID assignment" || reasonStr == "Timeout while waiting for player data containers"))
+            return;
         State.FollowerCam = nullptr;
         onGameEnd(); //removed antiban cuz it glitches the game
     }

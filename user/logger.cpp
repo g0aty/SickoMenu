@@ -20,7 +20,7 @@ void SickoLogger::Create()
 	this->filePath = logPath;
 }
 
-void SickoLogger::Write(std::string_view verbosity, std::string_view source, std::string_view message)
+void SickoLogger::Write(std::string_view verbosity, std::string_view source, std::string_view message, bool write)
 {
 	std::stringstream ss;
 	// FIXME: std::chrono::current_zone requires Windows 10 version 1903/19H1 or later.
@@ -34,14 +34,16 @@ void SickoLogger::Write(std::string_view verbosity, std::string_view source, std
 	ss << "[" << verbosity << " - " << source << "] " << message << std::endl;
 	std::cout << ss.str();
 
-	std::ofstream file(this->filePath, std::ios_base::app);
-	file << ss.str();
-	file.close();
+	if (write) {
+		std::ofstream file(this->filePath, std::ios_base::app);
+		file << ss.str();
+		file.close();
+	}
 }
 
-void SickoLogger::Debug(std::string_view source, std::string_view message)
+void SickoLogger::Debug(std::string_view source, std::string_view message, bool write)
 {
-	Write("DEBUG", source, message);
+	Write("DEBUG", source, message, write);
 }
 
 void SickoLogger::Error(std::string_view source, std::string_view message)

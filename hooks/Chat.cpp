@@ -20,6 +20,93 @@ static std::string strToLower(std::string str) {
 	return new_str;
 }
 
+float calculateChatNewlineSize(std::string playerName) {
+	float result = 0.f;
+	float maxSize = 100.f;  // track per-line maximum
+	size_t i = 0;
+
+	while (i < playerName.size()) {
+		// Handle <br>
+		if (i + 3 < playerName.size() && playerName.compare(i, 4, "<br>") == 0) {
+			result += maxSize;
+			maxSize = 100.f;
+			i += 4;
+			continue;
+		}
+
+		// Handle newline
+		if (playerName[i] == '\n') {
+			result += maxSize;
+			maxSize = 100.f;
+			i++;
+			continue;
+		}
+
+		// Handle <size=...>
+		if (i + 6 < playerName.size() && playerName.compare(i, 6, "<size=") == 0) {
+			i += 6;
+			size_t endPos = playerName.find('>', i);
+			if (endPos == std::string::npos) break;
+
+			std::string valueStr = playerName.substr(i, endPos - i);
+			bool isPercent = false;
+
+			if (!valueStr.empty() && valueStr.back() == '%') {
+				isPercent = true;
+				valueStr.pop_back();
+			}
+
+			try {
+				float value = std::stof(valueStr);
+				if (isPercent) {
+					maxSize = (std::max)(maxSize, value);
+				}
+				else {
+					maxSize = (std::max)(maxSize, value * 40.f);
+				}
+			}
+			catch (...) {
+				// ignore invalid values
+			}
+
+			i = endPos + 1;
+			continue;
+		}
+
+		// Handle <voffset=...>
+		if (i + 9 < playerName.size() && playerName.compare(i, 9, "<voffset=") == 0) {
+			i += 9;
+			size_t endPos = playerName.find('>', i);
+			if (endPos == std::string::npos) break;
+
+			std::string valueStr = playerName.substr(i, endPos - i);
+
+			try {
+				float value = std::stof(valueStr);
+				if (value < 0) {
+					result += (-value) * 40.f;
+				}
+			}
+			catch (...) {
+				// ignore invalid values
+			}
+
+			i = endPos + 1;
+			continue;
+		}
+
+		i++; // normal character
+	}
+
+	// Add last line's size
+	result += maxSize;
+
+	// Subtract 100%
+	result -= 100.f;
+
+	return result;
+}
+
 void doSabotageFlash() {
 	if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle)
 		ShipStatus_RpcUpdateSystem(*Game::pShipStatus, SystemTypes__Enum::Reactor, 128, NULL);
@@ -51,6 +138,29 @@ void SendPrivateWarnMessage(PlayerControl* toPlayer, const std::string& reason, 
 	InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 }
 
+void ChangeChatNotificationBackground(ChatNotification* chatNotif, PlayerControl* sender) {
+	if ((!State.PanicMode || State.TempPanicMode) && chatNotif != NULL) {
+		if (State.CustomGameTheme && sender != NULL) {
+			auto bg32 = Color32();
+			bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
+			auto bg = Color32_op_Implicit_1(bg32, NULL);
+			auto text32 = Color32();
+			text32.r = int(State.GameTextColor.x * 255); text32.g = int(State.GameTextColor.y * 255); text32.b = int(State.GameTextColor.z * 255); text32.a = 255;
+			auto textCol = Color32_op_Implicit_1(text32, NULL);
+			if (GetPlayerData(sender)->fields.IsDead) bg.a *= 0.75f;
+			SpriteRenderer_set_color(chatNotif->fields.background, bg, NULL);
+			auto textArea = chatNotif->fields.chatText;
+			TMP_Text_set_color((app::TMP_Text*)textArea, textCol, NULL);
+		}
+		else if (State.DarkMode && sender != NULL) {
+			auto black = Color(0.133f, 0.133f, 0.133f, 1.f);
+			SpriteRenderer_set_color(chatNotif->fields.background, black, NULL);
+			auto textArea = chatNotif->fields.chatText;
+			TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
+		}
+	}
+}
+
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_AddChat executed");
 	censor = IsChatCensored(); // Fix chat not being censored
@@ -58,6 +168,20 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 		auto player = GetPlayerData(sourcePlayer);
 		auto local = GetPlayerData(*Game::pLocalPlayer);
 		std::string message = RemoveHtmlTags(convert_from_string(chatText));
+		std::string newChatText = RemoveHtmlTags(convert_from_string(chatText));
+		if (State.BetterChatNotifications && __this->fields.state == ChatControllerState__Enum::Closed && !GetPlayerData(sourcePlayer)->fields.IsDead) {
+			auto chatNotif = __this->fields.chatNotification;
+			ChatNotification_SetUp(chatNotif, sourcePlayer, chatText, NULL);
+			ChangeChatNotificationBackground(chatNotif, sourcePlayer);
+		}
+		std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(player, nullptr));
+		if (State.CustomName && !State.ServerSideCustomName && (sourcePlayer == *Game::pLocalPlayer || State.CustomNameForEveryone)) {
+			playerName = GetCustomName(playerName);
+		}
+		float newlineSize = calculateChatNewlineSize(playerName);
+		if (newlineSize > 0.f) {
+			newChatText = std::format("<size={}%><#0000>0</color></size>\n", newlineSize) + newChatText;
+		}
 		if (State.ReadGhostMessages) {
 			bool wasDead = false;
 
@@ -65,16 +189,23 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 				local->fields.IsDead = true;
 				wasDead = true;
 			}
+			if (State.BetterChatNotifications && __this->fields.state == ChatControllerState__Enum::Closed) {
+				auto chatNotif = __this->fields.chatNotification;
+				ChatNotification_SetUp(chatNotif, sourcePlayer, chatText, NULL);
+				ChangeChatNotificationBackground(chatNotif, sourcePlayer);
+			}
+			chatText = convert_to_string(newChatText);
 			ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
-
-			std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(player, nullptr));
 			auto outfit = GetPlayerOutfit(player);
 			uint32_t colorId = outfit->fields.ColorId;
 			if (wasDead) {
 				local->fields.IsDead = false;
 			}
 		}
-		else ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
+		else {
+			chatText = convert_to_string(newChatText);
+			ChatController_AddChat(__this, sourcePlayer, chatText, censor, method);
+		}
 		if (State.Enable_SMAC) {
 			if (State.SMAC_CheckChat && ((IsInGame() && !State.InMeeting && !player->fields.IsDead) || chatText->fields.m_stringLength > 120)) {
 				SMAC_OnCheatDetected(sourcePlayer, "Abnormal Chat");
@@ -89,6 +220,12 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 					}
 				}
 			}
+		}
+		if (State.BetterMessageSounds && (State.ReadGhostMessages || !player->fields.IsDead) && 
+			(sourcePlayer != *Game::pLocalPlayer ||
+			(State.BetterChatNotifications && __this->fields.state == ChatControllerState__Enum::Closed))) {
+			auto audioSource = SoundManager_PlaySound(SoundManager__TypeInfo->static_fields->instance, (AudioClip*)__this->fields.messageSound, false, 1.f, NULL, NULL);
+			AudioSource_set_pitch(audioSource, 0.5f + (float)sourcePlayer->fields.PlayerId / 15, NULL);
 		}
 	}
 	else {
@@ -135,19 +272,51 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 					else
 						playerName = convert_to_string(dot + " " + convert_from_string(playerName));
 				}
+				if (State.IsProcessingSickoChat) {
+					std::string prefix = "<size=90%><#fb0>[<#0f0>Sicko</color><#f00>Chat</color>]</color> ";
+					playerName = convert_to_string(prefix + convert_from_string(playerName) + "</size>");
+				}
 			}
 		}
 	}
 	ChatBubble_SetName(__this, playerName, isDead, voted, color, method);
 }
 
-void dChatController_Update(ChatController* __this, MethodInfo* method)
-{
+static float copyNotificationTimer = 0.f;
+static bool isTextCut = false;
+
+void dChatController_Update(ChatController* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_Update executed");
-	__this->fields.freeChatField->fields.textArea->fields.characterLimit = State.SafeMode ? 120 : 2147483647;
-	__this->fields.freeChatField->fields.textArea->fields.allowAllCharacters = true;
-	__this->fields.freeChatField->fields.textArea->fields.AllowEmail = true;
-	__this->fields.freeChatField->fields.textArea->fields.AllowSymbols = true;
+	auto freeChatField = __this->fields.freeChatField;
+	int length = freeChatField->fields.textArea->fields.text->fields.m_stringLength;
+
+	auto pool = __this->fields.chatBubblePool;
+	if (pool->fields.poolSize == 20 && State.ExtendChatHistory) {
+		pool->fields.poolSize = 127; // Weird glitches happen to the chat if we extend it past 127
+		ObjectPoolBehavior_ReclaimOldest(pool, NULL);
+	}
+	if (pool->fields.poolSize == 127 && !State.ExtendChatHistory) {
+		pool->fields.poolSize = 20;
+		ObjectPoolBehavior_ReclaimOldest(pool, NULL);
+	}
+	
+	if (__this->fields.state != ChatControllerState__Enum::Closed) {
+		freeChatField->fields.textArea->fields.characterLimit = State.SafeMode ? (State.ExtendChatLimit ? 120 : 100) : 2147483647;
+		freeChatField->fields.textArea->fields.allowAllCharacters = true;
+		freeChatField->fields.textArea->fields.AllowEmail = true;
+		freeChatField->fields.textArea->fields.AllowSymbols = true;
+
+		freeChatField->fields.charCountText->fields._.m_enableWordWrapping = false;
+		int charLimit = freeChatField->fields.textArea->fields.characterLimit;
+		std::string chatCooldownText = "";
+		if (State.ShowChatTimer)
+			chatCooldownText = State.ChatCooldown >= 3.f ? (length == 0 ? "" : "<#0f0>You can chat now!</color> ") : std::format("<#f00>Wait for {:.1f} seconds!</color> ", 3 - State.ChatCooldown);
+		if (copyNotificationTimer > 0.f) chatCooldownText = std::format("<#0f0>{} text to clipboard!</color> ", isTextCut ? "Cut" : "Copied", copyNotificationTimer);
+		std::string charCountColor = std::format("<#{}{}0>", length >= 0.75 * charLimit ? "f" : "0", length != charLimit && length >= 0.75 * charLimit ? "f" : "0");
+		std::string updatedText = std::format("{}{}{}/{}</color>", chatCooldownText, charCountColor, length, charLimit);
+		TMP_Text_set_text((TMP_Text*)freeChatField->fields.charCountText, convert_to_string(updatedText), NULL);
+	}
+
 	if (!State.SafeMode)
 		__this->fields.timeSinceLastMessage = 420.69f; //we can set this to anything more than or equal to 3 and it'll work
 
@@ -234,16 +403,27 @@ void dChatController_Update(ChatController* __this, MethodInfo* method)
 		}
 	}
 
+	State.MessageSound = (AudioClip*)__this->fields.messageSound;
+
 	auto chatText = __this->fields.freeChatField->fields.textArea->fields.text;
+	__this->fields.freeChatField->fields.textArea->fields.AllowPaste = State.ChatPaste && !State.PanicMode && length == 0;
+	// Only allow pasting if the field is empty and chat paste is enabled
 	bool isCtrl = ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3);
 	bool isCpressed = ImGui::IsKeyPressed(0x43) || ImGui::IsKeyDown(0x63);
 	bool isXpressed = ImGui::IsKeyPressed(0x58) || ImGui::IsKeyDown(0x78);
 	if (State.ChatPaste && isCtrl && (isCpressed || isXpressed) && convert_from_string(chatText) != "") {
 		ClipboardHelper_PutClipboardString(chatText, NULL); //ctrl+c
+		copyNotificationTimer = 1.5f; // Show copy notification for 1.5 seconds
+		if (isXpressed) {
+			FreeChatInputField_Clear(__this->fields.freeChatField, NULL); //ctrl+x
+			isTextCut = true; // Set flag to indicate text was cut
+		}
+		else isTextCut = false; // Reset flag if only copied
 	}
-	if (State.ChatPaste && isCtrl && isXpressed && convert_from_string(chatText) != "") {
-		auto text = chatText;
-		text = convert_to_string("");
+
+	if (copyNotificationTimer > 0.f) {
+		copyNotificationTimer -= Time_get_deltaTime(NULL);
+		if (copyNotificationTimer <= 0.f) copyNotificationTimer = 0.f;
 	}
 
 	if (State.MessageSent && State.SafeMode) {
@@ -315,14 +495,18 @@ bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, Method
 void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dTextBoxTMP_SetText executed");
-	if (__this->fields.ForceUppercase) return TextBoxTMP_SetText(__this, input, inputCompo, method);
+	if (__this->fields.ForceUppercase) {
+		__this->fields.SendOnFullChars = State.PanicMode || !State.BetterLobbyCodeInput;
+		__this->fields.ClearOnFocus = State.PanicMode || !State.BetterLobbyCodeInput;
+		return TextBoxTMP_SetText(__this, input, inputCompo, method);
+	}
 	// Patch lobby codes
 
 	if (!State.PanicMode) {
 		if (!State.SafeMode)
 			__this->fields.characterLimit = 2147483647;
 		else
-			__this->fields.characterLimit = 120;
+			__this->fields.characterLimit = State.ExtendChatLimit ? 120 : 100;
 	}
 	else __this->fields.characterLimit = 100;
 	//inputCompo = convert_to_string(RemoveHtmlTags(convert_from_string(inputCompo))); // Fix #fff/color bug in text input field
@@ -331,27 +515,37 @@ void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, 
 	TextBoxTMP_SetText(__this, input, inputCompo, method);
 }
 
-std::string UncensorLink(const std::string& text) {
-	// Regular expression pattern to match URLs and email addresses
-	std::string pattern = R"((http[s]?://)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(/[\w-./?%&=]*)?|([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+))";
+std::string UncensorLink(std::string text, std::string dotReplacer = ",") {
+	std::string pattern = R"((http[s]?://)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(/[\w\-./?%&=]*)?|([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+))";
 	std::regex regex(pattern);
 
-	// Result string to store the censored output
-	std::string result = text;
-	auto begin = std::sregex_iterator(text.begin(), text.end(), regex);
-	auto end = std::sregex_iterator();
+	std::string result;
+	std::sregex_iterator begin(text.begin(), text.end(), regex);
+	std::sregex_iterator end;
 
-	// Iterate through each match and replace periods with commas
-	for (std::sregex_iterator i = begin; i != end; ++i) {
-		std::string censored = i->str();
-		// Replace periods with commas in the match
-		for (auto& ch : censored) {
-			if (ch == '.') {
-				ch = ',';
-			}
+	size_t lastPos = 0;
+
+	for (auto it = begin; it != end; ++it) {
+		auto matchPos = it->position();
+		auto matchLen = it->length();
+
+		// Append the part before the match
+		result += text.substr(lastPos, matchPos - lastPos);
+
+		// Censor the match
+		std::string censored = it->str();
+		size_t pos = 0;
+		while ((pos = censored.find(".", pos)) != std::string::npos) {
+			censored.replace(pos, 1, dotReplacer);
+			pos += dotReplacer.length(); // move past the inserted text
 		}
-		result.replace(i->position(), i->length(), censored);
+		result += censored;
+
+		lastPos = matchPos + matchLen;
 	}
+
+	// Append the rest of the string after the last match
+	result += text.substr(lastPos);
 
 	return result;
 }
@@ -381,7 +575,7 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 			}
 		}
 		else if (State.DarkMode) {
-			auto black = Palette__TypeInfo->static_fields->Black;
+			auto black = Color(0.133f, 0.133f, 0.133f, 1.f);
 			bool isChatWarning = __this->fields.playerInfo == NULL;
 			if (!isChatWarning && __this->fields.playerInfo->fields.IsDead) black.a *= 0.75f;
 			SpriteRenderer_set_color(__this->fields.Background, black, NULL);
@@ -390,6 +584,105 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 				TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
 			}
 		}
+
+		if (State.IsProcessingSickoChat) {
+			auto darkGold = Color(0.6f, 0.4f, 0.f, 1.f);
+			if (__this->fields.playerInfo->fields.IsDead) darkGold.a *= 0.75f;
+			SpriteRenderer_set_color(__this->fields.Background, darkGold, NULL);
+		}
+
+		if (State.ChatFont) {
+			std::string opener = "";
+
+			switch (State.ChatFontType) {
+			case 0: {
+				opener = "<font=\"Barlow-Italic SDF\">";
+				break;
+			}
+			case 1: {
+				opener = "<font=\"Barlow-Medium SDF\">";
+				break;
+			}
+			case 2: {
+				opener = "<font=\"Barlow-Bold SDF\">";
+				break;
+			}
+			case 3: {
+				opener = "<font=\"Barlow-SemiBold SDF\">";
+				break;
+			}
+			case 4: {
+				opener = "<font=\"Barlow-SemiBold Masked\">";
+				break;
+			}
+			case 5: {
+				opener = "<font=\"Barlow-ExtraBold SDF\">";
+				break;
+			}
+			case 6: {
+				opener = "<font=\"Barlow-BoldItalic SDF\">";
+				break;
+			}
+			case 7: {
+				opener = "<font=\"Barlow-BoldItalic Masked\">";
+				break;
+			}
+			case 8: {
+				opener = "<font=\"Barlow-Black SDF\">";
+				break;
+			}
+			case 9: {
+				opener = "<font=\"Barlow-Light SDF\">";
+				break;
+			}
+			case 10: {
+				opener = "<font=\"Barlow-Regular SDF\">";
+				break;
+			}
+			case 11: {
+				opener = "<font=\"Barlow-Regular Masked\">";
+				break;
+			}
+			case 12: {
+				opener = "<font=\"Barlow-Regular Outline\">";
+				break;
+			}
+			case 13: {
+				opener = "<font=\"Brook SDF\">";
+				break;
+			}
+			case 14: {
+				opener = "<font=\"LiberationSans SDF\">";
+				break;
+			}
+			case 15: {
+				opener = "<font=\"NotoSansJP-Regular SDF\">";
+				break;
+			}
+			case 16: {
+				opener = "<font=\"VCR SDF\">";
+				break;
+			}
+			case 17: {
+				opener = "<font=\"CONSOLA SDF\">";
+				break;
+			}
+			case 18: {
+				opener = "<font=\"digital-7 SDF\">";
+				break;
+			}
+			case 19: {
+				opener = "<font=\"OCRAEXT SDF\">";
+				break;
+			}
+			case 20: {
+				opener = "<font=\"DIN_Pro_Bold_700 SDF\">";
+				break;
+			}
+			}
+
+			chatText = convert_to_string(opener + convert_from_string(chatText) + "</font>");
+		}
 	}
 	ChatBubble_SetText(__this, chatText, method);
 }
@@ -397,7 +690,8 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_SendFreeChat executed");
 	auto chatText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.text);
-	if (convert_to_string(UncensorLink(chatText))->fields.m_stringLength <= 120) chatText = UncensorLink(chatText);
+	if (convert_to_string(UncensorLink(chatText, ".­"))->fields.m_stringLength > 120) chatText = UncensorLink(chatText);
+	else chatText = UncensorLink(chatText, ".­");
 	if (chatText == "") return;
 	std::string chatTextLower = strToLower(chatText);
 	if (!State.PanicMode) {
@@ -412,24 +706,24 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 		if (State.ExtraCommands) {
 			if (chatTextLower == "/help") {
 				std::string msg =
-					"<#87cefa><font=\"Barlow-Regular Outline\"><b>"
+					"<#87cefa><font=\"Barlow-Regular Masked\"><b>"
 					"<size=120%>Available Commands:</size><size=75%>\n\n"
-					"<#ff033e>/Add</color> ~ <#ff033e>Add Player to the Whitelist</color>\n"
-					"<#ff033e>/Remove</color> ~ <#ff033e>Remove Player From the Whitelist</color>\n"
-					"<#ff033e>/Warn</color> ~ <#ff033e>Warn Player</color>\n"
-					"<#ff033e>/Unwarn</color> ~ <#ff033e>Unwarn Player</color>\n"
-					"<#ff033e>/CheckWarns</color> ~ <#ff033e>Check All Warns of Selected Player</color>\n\n"
-					"<#ff033e>/Kick All</color> ~ <#ff033e>Kick Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
-					"<#ff033e>/Ban All</color> ~ <#ff033e>Ban Everyone</color>  <#fb0>[HOST ONLY]</color>\n"
-					"<#ff033e>/Temp-Ban</color> ~ <#ff033e>Set a Temporary Ban</color>  <#fb0>[HOST ONLY]</color>\n"
-					"<#ff033e>/Unban</color> ~ <#ff033e>Unban Player</color>  <#fb0>[HOST ONLY]</color>"
+					"<#ff033e>/add</color> ~ <#ff033e>Add Player's Friend Code to the Whitelist</color>\n"
+					"<#ff033e>/remove</color> ~ <#ff033e>Remove Player's Friend Code From the Whitelist</color>\n"
+					"<#ff033e>/warn</color> ~ <#ff033e>Warn Player by Friend Code</color>\n"
+					"<#ff033e>/unwarn</color> ~ <#ff033e>Unwarn Player by Friend Code</color>\n"
+					"<#ff033e>/checkwarns</color> ~ <#ff033e>Check All Warns of Player by Friend Code</color>\n\n";
+				if (IsHost()) msg +=
+					"<#ff033e>/kick all</color> ~ <#ff033e>Kick Everyone</color>\n"
+					"<#ff033e>/ban all</color> ~ <#ff033e>Ban Everyone</color>\n"
 					"</size></b></font></color>";
+				else msg += "</size></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
 
 			if (chatTextLower == "/add" || chatTextLower == "/add ") {
-				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /add <FriendCode></b></font></color>";
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /add <FriendCode></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -440,11 +734,11 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 					if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) == State.WhitelistFriendCodes.end()) {
 						State.WhitelistFriendCodes.push_back(fc);
 
-						std::string msg = std::format("<#5cff83><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Added to Whitelist.</b></font></color>", fc);
+						std::string msg = std::format("<#5cff83><size=-0.24><font=\"Barlow-Regular Masked\"><b>\"{}\" Added to Whitelist.</b></font></color>", fc);
 						ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					}
 					else {
-						std::string msg = std::format("<#ffd93d><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Already in Whitelist.</b></font></color>", fc);
+						std::string msg = std::format("<#ffd93d><size=-0.24><font=\"Barlow-Regular Masked\"><b>\"{}\" Already in Whitelist.</b></font></color>", fc);
 						ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					}
 				}
@@ -454,7 +748,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 
 
 			if (chatTextLower == "/remove" || chatTextLower == "/remove ") {
-				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /remove <FriendCode></b></font></color>";
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /remove <FriendCode></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -465,11 +759,11 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				if (it != State.WhitelistFriendCodes.end()) {
 					State.WhitelistFriendCodes.erase(it);
 
-					std::string msg = std::format("<#ff5c5c><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Removed from Whitelist.</b></font></color>", fc);
+					std::string msg = std::format("<#ff5c5c><size=-0.24><font=\"Barlow-Regular Masked\"><b>\"{}\" Removed from Whitelist.</b></font></color>", fc);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				else {
-					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Not found in Whitelist.</b></font></color>", fc);
+					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>\"{}\" Not found in Whitelist.</b></font></color>", fc);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				return;
@@ -478,7 +772,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 
 
 			if (chatTextLower == "/warn" || chatTextLower == "/warn ") {
-				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /warn <FriendCode> <Reason></b></font></color>";
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /warn <FriendCode> <Reason></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -487,7 +781,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				std::string args = trim(chatText.substr(6));
 				size_t spacePos = args.find(' ');
 				if (spacePos == std::string::npos) {
-					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /warn <FriendCode> <Reason></b></font></color>";
+					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /warn <FriendCode> <Reason></b></font></color>";
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					return;
 				}
@@ -496,7 +790,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				std::string warnReason = trim(args.substr(spacePos + 1));
 
 				if (warnReason.empty()) {
-					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Warn reason cannot be empty.</b></font></color>";
+					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>Warn reason cannot be empty.</b></font></color>";
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					return;
 				}
@@ -520,7 +814,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 					}
 				}
 
-				std::string msg = std::format("<#ff5c5c><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Was Warned. Reason: \"{}\". Total warns: {}</b></font></color>", fc, warnReason, warnCount);
+				std::string msg = std::format("<#ff5c5c><size=-0.24><font=\"Barlow-Regular Masked\"><b>\"{}\" Was Warned. Reason: \"{}\". Total warns: {}</b></font></color>", fc, warnReason, warnCount);
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -528,7 +822,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 
 
 			if (chatTextLower == "/unwarn" || chatTextLower == "/unwarn ") {
-				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /unwarn <FriendCode> <ReasonNumber></b></font></color>";
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /unwarn <FriendCode> <ReasonNumber></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -537,7 +831,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				std::string args = chatText.substr(8);
 				size_t spacePos = args.find(' ');
 				if (spacePos == std::string::npos) {
-					std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /unwarn <FriendCode> <ReasonNumber></b></font></color>";
+					std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /unwarn <FriendCode> <ReasonNumber></b></font></color>";
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					return;
 				}
@@ -550,7 +844,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 					reasonIndex = std::stoi(numberStr) - 1;
 				}
 				catch (...) {
-					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Invalid <ReasonNumber>.</b></font></color>";
+					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>Invalid <ReasonNumber>.</b></font></color>";
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					return;
 				}
@@ -566,11 +860,11 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 
 					State.Save();
 
-					std::string msg = std::format("<#5cff83><size=-0.24><font=\"Barlow-Regular Outline\"><b>Removed Reason [#{}] for \"{}\".</b></font></color>", reasonIndex + 1, fc);
+					std::string msg = std::format("<#5cff83><size=-0.24><font=\"Barlow-Regular Masked\"><b>Removed Reason [#{}] for \"{}\".</b></font></color>", reasonIndex + 1, fc);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				else {
-					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Invalid <FriendCode> or <ReasonNumber>.</b></font></color>");
+					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>Invalid <FriendCode> or <ReasonNumber>.</b></font></color>");
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 
@@ -580,7 +874,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 
 
 			if (chatTextLower == "/checkwarns" || chatTextLower == "/checkwarns ") {
-				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /checkwarns <FriendCode></b></font></color>";
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /checkwarns <FriendCode></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -596,11 +890,11 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 						if (i + 1 < it->second.size())
 							allReasons += "\n";
 					}
-					std::string msg = std::format("<#ffff00><size=-0.24><font=\"Barlow-Regular Outline\"><b>All warns for <#FFF>\"{}\":\n\n{}</b></font></color>", fc, allReasons);
+					std::string msg = std::format("<#ffff00><size=-0.24><font=\"Barlow-Regular Masked\"><b>All warns for <#FFF>\"{}\":\n\n{}</b></font></color>", fc, allReasons);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				else {
-					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>No warns found for \"{}\".</b></font></color>", fc);
+					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>No warns found for \"{}\".</b></font></color>", fc);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				return;
@@ -611,10 +905,10 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 			if (chatTextLower == "/kick all") {
 				bool isBan = false;
 				if (IsInGame()) {
-					State.rpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+					State.rpcQueue.push(new PunishEveryone(isBan));
 				}
 				else if (IsInLobby()) {
-					State.lobbyRpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+					State.lobbyRpcQueue.push(new PunishEveryone(isBan));
 				}
 				return;
 			}
@@ -622,21 +916,18 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 			if (chatTextLower == "/ban all") {
 				bool isBan = true;
 				if (IsInGame()) {
-					State.rpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+					State.rpcQueue.push(new PunishEveryone(isBan));
 				}
 				else if (IsInLobby()) {
-					State.lobbyRpcQueue.push(new PunishEveryone(*Game::pLocalPlayer, isBan));
+					State.lobbyRpcQueue.push(new PunishEveryone(isBan));
 				}
 				return;
 			}
 
-			
-
-
-			if (chatTextLower == "/temp-ban" || chatTextLower == "/temp-ban ") {
+			/*if (chatTextLower == "/temp-ban" || chatTextLower == "/temp-ban ") {
 				std::string msg = 
-					"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
-					"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Outline\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
+					"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
+					"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Masked\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -647,8 +938,8 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				size_t spacePos = args.find(' ');
 				if (args.empty() || spacePos == std::string::npos) {
 					std::string msg = 
-						"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
-						"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Outline\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
+						"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
+						"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Masked\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					return;
 				}
@@ -658,8 +949,8 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 
 				if (fc.empty() || timeStr.empty()) {
 					std::string msg = 
-						"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
-						"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Outline\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
+						"<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /temp-ban <FriendCode> <Time></b></font></color>\n"
+						"<#aaaaaa><size=-0.75><font=\"Barlow-Regular Masked\"><b>- EXAMPLE: /temp-ban user#0000 1d 1h 1m 1s</color>";
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					return;
 				}
@@ -683,15 +974,15 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				}
 
 				if (totalSeconds <= 0) {
-					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>Invalid or zero time duration.</b></font></color>";
+					std::string msg = "<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>Invalid or zero time duration.</b></font></color>";
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					return;
 				}
 
-				auto now = std::chrono::system_clock::now();
-				auto banEndTime = now + std::chrono::seconds(totalSeconds);
+				int now = static_cast<int>(std::chrono::system_clock::now().time_since_epoch().count());
+				auto banEndTime = now + totalSeconds;
 
-				State.TempBannedFriendCodes[fc] = { banEndTime, std::to_string(now.time_since_epoch().count()) };
+				State.TempBannedFCs[fc] = banEndTime;
 				State.Save();
 
 				// Don't use huge numbers, for example "999999999999999999d", it cause int overflowing => Runtime Error
@@ -720,7 +1011,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 					durationStr = "0 seconds";
 				}
 
-				std::string msg = std::format("<#ffa500><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" Temporarily Banned for {}.</b></font></color>", fc, durationStr);
+				std::string msg = std::format("<#ffa500><size=-0.24><font=\"Barlow-Regular Masked\"><b>\"{}\" Temporarily Banned for {}.</b></font></color>", fc, durationStr);
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -728,7 +1019,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 
 
 			if (chatTextLower == "/unban" || chatTextLower == "/unban ") {
-				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /unban <FriendCode></b></font></color>";
+				std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /unban <FriendCode></b></font></color>";
 				ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				return;
 			}
@@ -737,25 +1028,25 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				std::string fc = trim(chatText.substr(7));
 
 				if (fc.empty()) {
-					std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Outline\"><b>Usage: /unban <FriendCode></b></font></color>";
+					std::string msg = "<#aaaaaa><size=-0.24><font=\"Barlow-Regular Masked\"><b>Usage: /unban <FriendCode></b></font></color>";
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 					return;
 				}
 
-				auto it = State.TempBannedFriendCodes.find(fc);
-				if (it != State.TempBannedFriendCodes.end()) {
-					State.TempBannedFriendCodes.erase(it);
+				auto it = State.TempBannedFCs.find(fc);
+				if (it != State.TempBannedFCs.end()) {
+					State.TempBannedFCs.erase(it);
 					State.Save();
 
-					std::string msg = std::format("<#00ff00><size=-0.24><font=\"Barlow-Regular Outline\"><b>\"{}\" has been unbanned.</b></font></color>", fc);
+					std::string msg = std::format("<#00ff00><size=-0.24><font=\"Barlow-Regular Masked\"><b>\"{}\" has been unbanned.</b></font></color>", fc);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				else {
-					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Outline\"><b>No temporary ban found for \"{}\".</b></font></color>", fc);
+					std::string msg = std::format("<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>No temporary ban found for \"{}\".</b></font></color>", fc);
 					ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(msg), NULL);
 				}
 				return;
-			}
+			}*/
 		}
 		
 		if (State.activeWhisper && State.playerToWhisper.has_value()) {
@@ -796,25 +1087,32 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 }
 
 void dChatNotification_SetUp(ChatNotification* __this, PlayerControl* sender, String* text, MethodInfo* method) {
+	if (!State.PanicMode && State.BetterChatNotifications) return;
 	ChatNotification_SetUp(__this, sender, text, method);
-	if ((!State.PanicMode || State.TempPanicMode) && __this != NULL) {
-		if (State.CustomGameTheme && sender != NULL) {
-			auto bg32 = Color32();
-			bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
-			auto bg = Color32_op_Implicit_1(bg32, NULL);
-			auto text32 = Color32();
-			text32.r = int(State.GameTextColor.x * 255); text32.g = int(State.GameTextColor.y * 255); text32.b = int(State.GameTextColor.z * 255); text32.a = 255;
-			auto textCol = Color32_op_Implicit_1(text32, NULL);
-			if (GetPlayerData(sender)->fields.IsDead) bg.a *= 0.75f;
-			SpriteRenderer_set_color(__this->fields.background, bg, NULL);
-			auto textArea = __this->fields.chatText;
-			TMP_Text_set_color((app::TMP_Text*)textArea, textCol, NULL);
-		}
-		else if (State.DarkMode && sender != NULL) {
-			auto black = Palette__TypeInfo->static_fields->Black;
-			SpriteRenderer_set_color(__this->fields.background, black, NULL);
-			auto textArea = __this->fields.chatText;
-			TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
-		}
-	}
+	ChangeChatNotificationBackground(__this, sender);
+}
+
+void dFreeChatInputField_UpdateCharCount(FreeChatInputField* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dFreeChatInputField_UpdateCharCount executed");
+	FreeChatInputField_UpdateCharCount(__this, method);
+	__this->fields.charCountText->fields._.m_enableWordWrapping = false;
+	int length = __this->fields.textArea->fields.text->fields.m_stringLength;
+	int charLimit = __this->fields.textArea->fields.characterLimit;
+	std::string chatCooldownText = "";
+	if (State.ShowChatTimer)
+		chatCooldownText = State.ChatCooldown >= 3.f ? (length == 0 ? "" : "<#0f0>You can chat now!</color> ") : std::format("<#f00>Wait for {:.1f} seconds!</color> ", 3 - State.ChatCooldown);
+	if (copyNotificationTimer > 0.f) chatCooldownText = std::format("<#0f0>{} text to clipboard!</color> ", isTextCut ? "Cut" : "Copied", copyNotificationTimer);
+	std::string charCountColor = std::format("<#{}{}0>", length >= 0.75 * charLimit ? "f" : "0", length != charLimit && length >= 0.75 * charLimit ? "f" : "0");
+	std::string updatedText = std::format("{}{}{}/{}</color>", chatCooldownText, charCountColor, length, charLimit);
+	TMP_Text_set_text((TMP_Text*)__this->fields.charCountText, convert_to_string(updatedText), NULL);
+}
+
+void dObjectPoolBehavior_InitPool(ObjectPoolBehavior* __this, PoolableBehavior* prefab, MethodInfo* method) {
+	ObjectPoolBehavior_InitPool(__this, prefab, method);
+}
+
+AudioSource* dSoundManager_PlaySound(SoundManager* __this, AudioClip* clip, bool loop, float volume, AudioMixerGroup* audioMixer, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dSoundManager_PlaySound executed");
+	if (State.BetterMessageSounds && State.MessageSound != NULL && clip == State.MessageSound) volume = 0.f;
+	return SoundManager_PlaySound(__this, clip, loop, volume, audioMixer, method);
 }

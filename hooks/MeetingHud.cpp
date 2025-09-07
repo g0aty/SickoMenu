@@ -350,17 +350,16 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 		}
 		il2cpp::Array playerStates2(__this->fields.playerStates);
 		for (auto voteArea : playerStates2) {
+			std::string namePlate = convert_from_string(GetPlayerOutfit(GetPlayerDataById(voteArea->fields.TargetPlayerId))->fields.NamePlateId);
+			std::unordered_set<std::string> noPlateSet = { "", "nameplate_NoPlate", "nameplate_Transparent", "nameplate_bsb2_notes", "nameplate_bsb2_breach", "nameplate_bsb2_frame", "nameplate_bsb2_error", "nameplate_racing_beanCar" };
+			if (!noPlateSet.contains(namePlate)) continue;
 			if (!State.PanicMode && State.CustomGameTheme) {
-				std::string namePlate = convert_from_string(GetPlayerOutfit(GetPlayerDataById(voteArea->fields.TargetPlayerId))->fields.NamePlateId);
-				auto bg32 = Color32();
-				bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
-				auto bg = Color32_op_Implicit_1(bg32, NULL);
-				if (namePlate == "" || namePlate == "nameplate_NoPlate") SpriteRenderer_set_color(voteArea->fields.Background, bg, NULL);
+				auto bg = Color(State.GameBgColor.x, State.GameBgColor.y, State.GameBgColor.z, State.GameBgColor.w);
+				SpriteRenderer_set_color(voteArea->fields.Background, bg, NULL);
 			}
 			else {
-				std::string namePlate = convert_from_string(GetPlayerOutfit(GetPlayerDataById(voteArea->fields.TargetPlayerId))->fields.NamePlateId);
-				auto col = (!State.PanicMode && State.DarkMode && (namePlate == "" || namePlate == "nameplate_NoPlate"))
-					? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
+				auto col = (!State.PanicMode && State.DarkMode)
+					? Color(0.133f, 0.133f, 0.133f, 1.f) : Palette__TypeInfo->static_fields->White;
 				SpriteRenderer_set_color(voteArea->fields.Background, col, NULL);
 			}
 		}

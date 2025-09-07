@@ -169,13 +169,16 @@ namespace SabotageTab {
                 }
             }
             ImGui::SameLine();
-            if (ToggleButton("Disable Lights [Auto Movement Switches]", &State.DisableLightSwitches)) State.Save();
+            if (ToggleButton("Disable Lights [Auto Moving Switches]", &State.DisableLightSwitches)) State.Save();
 
             if (ToggleButton("Disable Fix Comms", &State.DisableComms)) State.Save();
 
             if (ToggleButton("Spam Sabotage Reactor", &State.DisableReactor)) State.Save();
 
             if ((State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq) && ToggleButton("Spam Sabotage Oxygen", &State.DisableOxygen))
+                State.Save();
+
+            if (State.mapType == Settings::MapType::Fungle && ToggleButton("Infinite Mushroom Mixup", &State.InfiniteMushroomMixup))
                 State.Save();
 
             ImGui::EndChild();

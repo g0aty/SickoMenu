@@ -112,26 +112,35 @@ int main() {
 }
 
 */
+
+static std::string strToLower(std::string str) {
+    std::string new_str = "";
+    for (auto i : str) {
+        new_str += char(std::tolower(i));
+    }
+    return new_str;
+}
+
 namespace GameTab {
     enum Groups {
         General,
         Chat,
         Anticheat,
-        Destruct,
+        Utils,
         Options
     };
 
     static bool openGeneral = true;
     static bool openChat = false;
     static bool openAnticheat = false;
-    static bool openDestruct = false;
+    static bool openUtils = false;
     static bool openOptions = false;
 
     void CloseOtherGroups(Groups group) {
         openGeneral = group == Groups::General;
         openChat = group == Groups::Chat;
         openAnticheat = group == Groups::Anticheat;
-        openDestruct = group == Groups::Destruct;
+        openUtils = group == Groups::Utils;
         openOptions = group == Groups::Options;
     }
 
@@ -150,8 +159,8 @@ namespace GameTab {
             CloseOtherGroups(Groups::Anticheat);
         }
         ImGui::SameLine();
-        if (TabGroup("Destruct", openDestruct)) {
-            CloseOtherGroups(Groups::Destruct);
+        if (TabGroup("Utils", openUtils)) {
+            CloseOtherGroups(Groups::Utils);
         }
 
         if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
@@ -540,10 +549,17 @@ namespace GameTab {
                 ImGui::Text("Blacklist");
                 if (State.BlacklistFriendCodes.empty())
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in blacklist!");
+                else {
+                    ImGui::SameLine(0.f, 0.f);
+                    ImGui::Text(" (%d Users Blacklisted)", State.BlacklistFriendCodes.size());
+                }
                 static std::string newBFriendCode = "";
+				bool isInBlacklistAlready = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), newBFriendCode) != State.BlacklistFriendCodes.end();
                 InputString("New Friend Code", &newBFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
-                if (newBFriendCode != "") ImGui::SameLine();
-                if (newBFriendCode != "" && AnimatedButton("Add")) {
+                if (isInBlacklistAlready)
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user is already blacklisted!");
+                if (newBFriendCode != "" && !isInBlacklistAlready) ImGui::SameLine();
+                if (newBFriendCode != "" && !isInBlacklistAlready && AnimatedButton("Add")) {
                     State.BlacklistFriendCodes.push_back(newBFriendCode);
                     State.Save();
                     newBFriendCode = "";
@@ -566,10 +582,17 @@ namespace GameTab {
                 ImGui::Text("Whitelist");
                 if (State.WhitelistFriendCodes.empty())
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in whitelist!");
+                else {
+                    ImGui::SameLine(0.f, 0.f);
+                    ImGui::Text(" (%d Users Whitelisted)", State.WhitelistFriendCodes.size());
+                }
                 static std::string newWFriendCode = "";
+                static bool isInWhitelistAlready = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), newWFriendCode) != State.WhitelistFriendCodes.end();
                 InputString("New Friend Code\n", &newWFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
-                if (newWFriendCode != "") ImGui::SameLine();
-                if (newWFriendCode != "" && AnimatedButton("Add\n")) {
+                if (isInWhitelistAlready)
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user is already whitelisted!");
+                if (newWFriendCode != "" && !isInWhitelistAlready) ImGui::SameLine();
+                if (newWFriendCode != "" && !isInWhitelistAlready && AnimatedButton("Add\n")) {
                     State.WhitelistFriendCodes.push_back(newWFriendCode);
                     State.Save();
                     newWFriendCode = "";
@@ -658,7 +681,7 @@ namespace GameTab {
             }
         }
 
-        if (openDestruct) {
+        if (openUtils) {
             /*if (ToggleButton("Ignore Whitelisted Players [Exploits]", &State.Destruct_IgnoreWhitelist)) {
                 State.Save();
             }*/
@@ -773,6 +796,7 @@ namespace GameTab {
                     InputString("New Nickname", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     if (newName != "") ImGui::SameLine();
                     if (newName != "" && AnimatedButton("Add")) {
+						newName = strToLower(newName);
                         State.LockedNames.push_back(newName);
                         State.Save();
                         newName = "";
@@ -931,34 +955,53 @@ namespace GameTab {
             ImGui::Separator();
             ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-
-            if (ImGui::CollapsingHeader("Temp-Ban System"))
+            /*if (ToggleButton("Enable Temp-Ban System", &State.EnableTempBan)) {
+                State.Save();
+			}
+            if (State.EnableTempBan && ImGui::CollapsingHeader("Temp-Ban System"))
             {
-
+				static std::string friendCodeToTempBan;
+                static int banDays = 0;
+                static int banHours = 0;
+                static int banMinutes = 0;
+                static int banSeconds = 0;
                 ImGui::BeginGroup();
 
                 ImGui::PushItemWidth(150);
-                InputString("FriendCode", &State.TBanFC);
+                InputString("Friend Code", &friendCodeToTempBan);
 
-                if (ImGui::InputInt("Days", &State.BanDays) && State.BanDays < 0) State.BanDays = 0;
-                if (ImGui::InputInt("Hours", &State.BanHours) && State.BanHours < 0) State.BanHours = 0;
-                if (ImGui::InputInt("Minutes", &State.BanMinutes) && State.BanMinutes < 0) State.BanMinutes = 0;
-                if (ImGui::InputInt("Seconds", &State.BanSeconds) && State.BanSeconds < 0) State.BanSeconds = 0;
+                if (ImGui::InputInt("Days", &banDays) && banDays < 0) banDays = 0;
+                if (ImGui::InputInt("Hours", &banHours) && banHours < 0) banHours = std::clamp(banHours, 0, 23);
+                if (ImGui::InputInt("Minutes", &banMinutes) && banMinutes < 0) banMinutes = std::clamp(banMinutes, 0, 59);
+                if (ImGui::InputInt("Seconds", &banSeconds) && banSeconds < 0) banSeconds = std::clamp(banSeconds, 0, 59);
                 ImGui::PopItemWidth();
 
-                if (ImGui::Button("Submit Temp-Ban") && !State.TBanFC.empty()) {
+                if (!friendCodeToTempBan.empty() && ImGui::Button("Submit Temp-Ban")) {
                     int totalSeconds = 0;
-                    totalSeconds += SafeMax(0, State.BanDays) * 86400;
-                    totalSeconds += SafeMax(0, State.BanHours) * 3600;
-                    totalSeconds += SafeMax(0, State.BanMinutes) * 60;
-                    totalSeconds += SafeMax(0, State.BanSeconds);
+                    totalSeconds += SafeMax(0, banDays) * 86400;
+                    totalSeconds += SafeMax(0, banHours) * 3600;
+                    totalSeconds += SafeMax(0, banMinutes) * 60;
+                    totalSeconds += SafeMax(0, banSeconds);
 
                     if (totalSeconds > 0) {
                         auto now = std::chrono::system_clock::now();
                         auto banEndTime = now + std::chrono::seconds(totalSeconds);
-                        State.TempBannedFriendCodes[State.TBanFC] = { banEndTime, std::to_string(now.time_since_epoch().count()) };
-                        State.TBanFC.clear();
-                        State.BanDays = State.BanHours = State.BanMinutes = State.BanSeconds = 0;
+						int banEndSaveTime = static_cast<int>(banEndTime.time_since_epoch().count());
+                        //State.TempBannedFriendCodes[State.TBanFC] = {banEndTime, std::to_string(now.time_since_epoch().count())};
+                        //State.TBanFC.clear();
+                        //State.BanDays = State.BanHours = State.BanMinutes = State.BanSeconds = 0;
+                        State.TempBannedFCs[friendCodeToTempBan] = banEndSaveTime;
+                        if (IsInGame() || IsInLobby()) {
+                            for (auto p : GetAllPlayerControl()) {
+                                if (convert_from_string(p->fields.FriendCode) != friendCodeToTempBan) continue;
+                                if (IsInGame()) {
+                                    State.rpcQueue.push(new PunishPlayer(p, false));
+                                }
+                                if (IsInLobby()) {
+                                    State.lobbyRpcQueue.push(new PunishPlayer(p, false));
+                                }
+                            }
+                        }
                         State.Save();
                     }
                 }
@@ -969,17 +1012,16 @@ namespace GameTab {
                 ImGui::Text("Temp-Banned Players:");
 
                 auto now = std::chrono::system_clock::now();
-                for (auto it = State.TempBannedFriendCodes.begin(); it != State.TempBannedFriendCodes.end(); ) {
-                    if (now >= it->second.first) {
-                        State.TempBanHistoryFC[it->first] = now;
-                        it = State.TempBannedFriendCodes.erase(it);
+                for (auto it = State.TempBannedFCs.begin(); it != State.TempBannedFCs.end(); ) {
+                    if (now.time_since_epoch().count() >= it->second) {
+                        State.TempBannedFCs.erase(it);
                     }
                     else {
-                        ++it;
+						++it;
                     }
                 }
 
-                if (State.TempBannedFriendCodes.empty()) {
+                if (State.TempBannedFCs.empty()) {
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No players are temporarily banned.");
                 }
                 else {
@@ -987,8 +1029,8 @@ namespace GameTab {
                     std::vector<std::string> displayList;
                     std::vector<std::string> friendCodeList;
 
-                    for (const auto& [fc, banInfo] : State.TempBannedFriendCodes) {
-                        auto timeLeft = std::chrono::duration_cast<std::chrono::seconds>(banInfo.first - now).count();
+                    for (const auto& [fc, banTime] : State.TempBannedFCs) {
+                        auto timeLeft = banTime - now.time_since_epoch().count();
                         if (timeLeft < 0) timeLeft = 0;
 
                         int d = static_cast<int>(timeLeft / 86400);
@@ -1012,9 +1054,7 @@ namespace GameTab {
                     if (ImGui::Button("Unban")) {
                         if (selectedTempBanIndex >= 0 && selectedTempBanIndex < (int)friendCodeList.size()) {
                             std::string targetFC = friendCodeList[selectedTempBanIndex];
-                            State.TempBannedFriendCodes.erase(targetFC);
-                            State.PlayerPunishTimersFC.erase(targetFC);
-                            State.TempBanHistoryFC.erase(targetFC);
+                            State.TempBannedFCs.erase(targetFC);
                             State.Save();
                         }
                     }
@@ -1022,7 +1062,7 @@ namespace GameTab {
                 ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Note: Temporary Ban Features\nWorks for Host Only!");
                 ImGui::EndGroup();
-            }
+            }*/
         }
 
         if (openOptions) {

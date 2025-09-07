@@ -58,6 +58,11 @@ static std::string DisplayScore(float f) {
 	return std::format("{}", f == (int)f ? (int)f : f);
 }
 
+static std::string getHexCodeFromImVec4(ImVec4 vec) {
+	return std::format("<#{:02x}{:02x}{:02x}{:02x}>",
+		int(vec.x * 255), int(vec.y * 255), int(vec.z * 255), int(vec.w * 255));
+}
+
 float dPlayerControl_fixedUpdateTimer = 50;
 float dPlayerControl_fixedUpdateCount = 0;
 void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
@@ -110,9 +115,14 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			}
 
 			auto outfit = GetPlayerOutfit(playerData, true);
+			auto client = InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), __this, NULL);
 			std::string playerName = "<Unknown>";
 			if (outfit != NULL)
 				playerName = convert_from_string(outfit->fields.PlayerName);
+			else if (client != NULL) {
+				playerName = convert_from_string(client->fields.PlayerName);
+				PlayerControl_SetName(__this, client->fields.PlayerName, NULL);
+			}
 
 			static int nameDelay = 0;
 			static uint8_t offset = 0; // This should be unsigned or modulo will give unexpected negative results
@@ -121,9 +131,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if ((IsHost() || !State.SafeMode) && State.ServerSideCustomName) {
 					if (nameDelay <= 0) {
 						auto customName = GetCustomName(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(__this), nullptr)), false, 0, offset);
-						if (State.ForceNameForEveryone) customName = GetCustomName(State.hostUserName, true, __this->fields.PlayerId);
+						if (State.ForceNameForEveryone && !(__this == *Game::pLocalPlayer && State.SetName)) customName = GetCustomName(State.hostUserName, true, __this->fields.PlayerId);
 						if ((__this == *Game::pLocalPlayer || State.CustomNameForEveryone) &&
-							customName != convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(__this), nullptr))) {
+							customName != convert_from_string(
+								State.SetName && __this == *Game::pLocalPlayer ? convert_to_string(State.userName) :
+								NetworkedPlayerInfo_get_PlayerName(GetPlayerData(__this), nullptr))) {
 							if (IsInGame()) State.rpcQueue.push(new RpcForceName(__this, customName));
 							if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceName(__this, customName));
 						}
@@ -136,7 +148,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					if (__this == *Game::pLocalPlayer || State.CustomNameForEveryone) {
 						if (nameDelay <= 0) {
 							offset++;
-							nameDelay = int(0.2 * GetFps());
+							nameDelay = int(0.1 / Time_get_fixedDeltaTime(NULL));
 						}
 						else nameDelay--;
 						playerName = GetCustomName(playerName, false, 0, offset);
@@ -222,7 +234,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						break;
 					}
 				}
-				std::string localPlayerMod = "<#0f0>Sicko</color><#f00>Menu</color>";
+				std::string localPlayerMod = State.modUsers.find((*Game::pLocalPlayer)->fields.PlayerId) == State.modUsers.end() ? "<#0f0>Sicko</color><#f00>Menu</color>" : State.modUsers.at((*Game::pLocalPlayer)->fields.PlayerId);
 				if (State.ModDetection) {
 					switch (State.BroadcastedMod) {
 					case 1:
@@ -235,7 +247,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 
 				std::string modUsage = (__this == *Game::pLocalPlayer && State.ModDetection) || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end() ?
-					std::format(" <#fb0>[{} User]</color>",
+					std::format(" {}[{} User]</color>", getHexCodeFromImVec4(State.ModUsageColor),
 						__this == *Game::pLocalPlayer ? localPlayerMod : State.modUsers.at(playerData->fields.PlayerId)) : "";
 				std::string friendCode = convert_from_string(playerData->fields.FriendCode);
 				std::string listed = "";
@@ -243,36 +255,45 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				bool isWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end();
 				bool isNameLocked = std::find(State.LockedNames.begin(), State.LockedNames.end(), playerName) != State.LockedNames.end();
 
+				std::string nameCheckerCol = getHexCodeFromImVec4(State.NameCheckerColor);
+				std::string playerIdCol = getHexCodeFromImVec4(State.PlayerIdColor);
+				std::string levelCol = getHexCodeFromImVec4(State.LevelColor);
+				std::string platformCol = getHexCodeFromImVec4(State.PlatformColor);
+				std::string hostCol = getHexCodeFromImVec4(State.HostColor);
+				std::string friendCol = getHexCodeFromImVec4(State.FriendCodeColor);
+
 				if (isNameLocked && isBlacklisted) {
-					listed = "<#FA0>[!]</color> + <#F00>[-]</color> ";
+					listed = nameCheckerCol + "[!]</color> + " + playerIdCol + "[-]</color> ";
 				}
 				else if (isNameLocked && isWhitelisted) {
-					listed = "<#FA0>[!]</color> + <#0FF>[+]</color> ";
+					listed = nameCheckerCol + "[!]</color> + " + levelCol + "[+]</color> ";
 				}
 				else if (isBlacklisted) {
-					listed = "<#f00>[-]</color> ";
+					listed = playerIdCol + "[-]</color> ";
 				}
 				else if (isWhitelisted) {
-					listed = "<#0ff>[+]</color> ";
+					listed = levelCol + "[+]</color> ";
 				}
 				else if (isNameLocked) {
-					listed = "<#FA0>[!]</color> ";
+					listed = nameCheckerCol + "[!]</color> ";
 				}
-				std::string levelText = std::format("{}<#f00>ID {}</color> <#0f0>Level {}</color> <#b0f>({})</color>{}</color>", listed, playerData->fields.PlayerId, playerLevel, platformId, modUsage);
+
+				std::string levelText = std::format("{}{}ID {}</color> {}Level {}</color> {}({})</color>{}</color>",
+					listed, playerIdCol, playerData->fields.PlayerId, levelCol, playerLevel, platformCol, platformId, modUsage);
 				if (IsStreamerMode())
 					friendCode = "Friend Code Hidden";
 				std::string hostFriendCode = convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.FriendCode);
 				if (client != NULL && client == host) {
 					if (friendCode == "" && !IsStreamerMode())
-						playerName = "<size=1.4><#fb0>[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>No Friend Code</color><#0000>0</color>";
+						playerName = "<size=1.4>" + hostCol + "[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color" + friendCol + "No Friend Code</color><#0000>0</color>";
 					else
-						playerName = "<size=1.4><#fb0>[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>" + friendCode + "</color><#0000>0</color>";
+						playerName = "<size=1.4>" + hostCol + "[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color>" + friendCol + friendCode + "</color><#0000>0</color>";
 				}
 				else {
 					if (friendCode == "" && !IsStreamerMode())
-						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>No Friend Code</color><#0000>0</color>";
+						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color>" + friendCol + "No Friend Code</color><#0000>0</color>";
 					else
-						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color><#39f>" + friendCode + "</color><#0000>0</color>";
+						playerName = "<size=1.4>" + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color>" + friendCol + friendCode + "</color><#0000>0</color>";
 				}
 			}
 
@@ -391,19 +412,14 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					if (!State.SafeMode && State.RotateServerSide) {
 						if (rotateDelay <= 0) {
 							Vector2 position = GetTrueAdjustedPosition(*Game::pLocalPlayer);
-							float num = (State.RotateRadius * cos(f)) + position.x;
-							float num2 = (State.RotateRadius * sin(f)) + position.y;
-							Vector2 target = { num, num2 };
-							if (IsInGame()) {
-								for (auto player : GetAllPlayerControl()) {
-									if (player != *Game::pLocalPlayer)
-										State.rpcQueue.push(new RpcForceSnapTo(player, target));
-								}
-							}
-							else if (IsInLobby()) {
-								for (auto player : GetAllPlayerControl()) {
-									if (player != *Game::pLocalPlayer)
-										State.lobbyRpcQueue.push(new RpcForceSnapTo(player, target));
+							for (auto player : GetAllPlayerControl()) {
+								auto rotationOffset = (360 * player->fields.PlayerId / GetAllPlayerControl().size());
+								float num = (State.RotateRadius * cos(f + rotationOffset)) + position.x;
+								float num2 = (State.RotateRadius * sin(f + rotationOffset)) + position.y;
+								Vector2 target = { num, num2 };
+								if (player != *Game::pLocalPlayer) {
+									if (IsInGame()) State.rpcQueue.push(new RpcForceSnapTo(player, target));
+									if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceSnapTo(player, target));
 								}
 							}
 							rotateDelay = 25 * float(GetAllPlayerControl().size());
@@ -415,12 +431,13 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 					}
 					else {
 						Vector2 position = GetTrueAdjustedPosition(*Game::pLocalPlayer);
-						float num = (State.RotateRadius * cos(f)) + position.x;
-						float num2 = (State.RotateRadius * sin(f)) + position.y;
-						Vector2 target = { num, num2 };
 						if (rotateDelay <= 0) {
 							for (auto player : GetAllPlayerControl()) {
 								if (player == *Game::pLocalPlayer) continue;
+								auto rotationOffset = (360 * player->fields.PlayerId / GetAllPlayerControl().size());
+								float num = (State.RotateRadius * cos(f + rotationOffset)) + position.x;
+								float num2 = (State.RotateRadius * sin(f + rotationOffset)) + position.y;
+								Vector2 target = { num, num2 };
 								CustomNetworkTransform_SnapTo(player->fields.NetTransform, target, player->fields.NetTransform->fields.lastSequenceId + 1, NULL);
 								rotateDelay = 0;//25 * float(GetAllPlayerControl().size());
 								f += 360 * 0.017453292f / float(GetAllPlayerControl().size());
@@ -433,6 +450,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 				if (State.ChatSpam && (IsInGame() || IsInLobby())) {
 					static float spamDelay = 15;
+					static int chatCount = 0;
 					auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
 					for (auto p : GetAllPlayerControl()) {
 						if (p == player || State.ChatSpamEveryone) {
@@ -537,10 +555,21 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				if (State.FollowerCam != nullptr) {
 					auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
 					bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
-					if (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
+					float oldCamHeight = Camera_get_orthographicSize(State.FollowerCam, NULL);
+					float camHeight = (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) ?
+						(State.CameraHeight * 3) : 3.f;
+					float del = camHeight - oldCamHeight;
+					float step = std::abs(del) * Time_get_fixedDeltaTime(NULL) * 10;
+					if (del < 0) {
+						Camera_set_orthographicSize(State.FollowerCam, (std::max)(camHeight, oldCamHeight - step), NULL);
+					}
+					if (del > 0) {
+						Camera_set_orthographicSize(State.FollowerCam, (std::min)(camHeight, oldCamHeight + step), NULL);
+					}
+					/*if (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
 						Camera_set_orthographicSize(State.FollowerCam, State.CameraHeight * 3, NULL);
 					else
-						Camera_set_orthographicSize(State.FollowerCam, 3.0f, NULL);
+						Camera_set_orthographicSize(State.FollowerCam, 3.0f, NULL);*/
 
 					Transform* cameraTransform = Component_get_transform((Component_1*)State.FollowerCam, NULL);
 					Vector3 cameraVector3 = Transform_get_position(cameraTransform, NULL);
@@ -630,9 +659,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 						xOffset = 1;
 					}
 					float magnitude = (xOffset == 0 && yOffset == 0) ? 1 : sqrt(xOffset * xOffset + yOffset * yOffset);
+					float del = Time_get_fixedDeltaTime(NULL) * 2; // in seconds
 					//check for zero and prevent you from moving ~1.414 times faster diagonally
-					State.camPos.x += float(0.1f * State.FreeCamSpeed * xOffset / magnitude);
-					State.camPos.y += float(0.1f * State.FreeCamSpeed * yOffset / magnitude);
+					State.camPos.x += float(del * State.FreeCamSpeed * xOffset / magnitude);
+					State.camPos.y += float(del * State.FreeCamSpeed * yOffset / magnitude);
 				}
 
 				Transform_set_position(cameraTransform, { State.camPos.x, State.camPos.y }, NULL);
@@ -749,92 +779,94 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 			}
 		}
 		
-		if (State.KickAFK) {
-			static bool wasInMeetingLastFrame = false;
+		if (IsHost()) {
+			if (State.KickAFK) {
+				static bool wasInMeetingLastFrame = false;
 
-			float extraTime = State.SecondChance ? State.AddExtraTime : 0.0f;
-			float extraTimeThreshold = State.SecondChance ? State.ExtraTimeThreshold : 0.0f;
+				float extraTime = State.SecondChance ? State.AddExtraTime : 0.0f;
+				float extraTimeThreshold = State.SecondChance ? State.ExtraTimeThreshold : 0.0f;
 
-			if (wasInMeetingLastFrame && !State.InMeeting) {
-				for (auto& [id, info] : playerActivityMap) {
-					info.hasReceivedExtraTimeInMeeting = false;
-				}
-			}
-			wasInMeetingLastFrame = State.InMeeting;
-
-			std::vector<int> toKick;
-
-			for (auto player : GetAllPlayerControl()) {
-				if (player == *Game::pLocalPlayer) continue;
-
-				auto* playerData = GetPlayerData(player);
-				if (!playerData) continue;
-
-				int playerId = player->fields._.OwnerId;
-				Vector2 currentPosition = GetTrueAdjustedPosition(player);
-				auto& info = playerActivityMap[playerId];
-
-				if (!info.hasEnteredGame) {
-					info = { currentPosition, steady_clock::now(), true, false, false };
-					continue;
-				}
-
-				auto now = steady_clock::now();
-
-				if (currentPosition.x != info.lastPosition.x || currentPosition.y != info.lastPosition.y) {
-					info.lastPosition = currentPosition;
-					info.lastMoveTime = now;
-					info.hasReceivedWarning = false;
-					continue;
-				}
-
-				float elapsed = duration_cast<duration<float>>(now - info.lastMoveTime).count();
-				float remainingTime = State.TimerAFK - elapsed;
-
-				if (State.InMeeting) {
-					if (remainingTime < extraTimeThreshold && !info.hasReceivedExtraTimeInMeeting) {
-						info.lastMoveTime -= duration_cast<steady_clock::duration>(duration<float>(extraTime));
-						info.hasReceivedExtraTimeInMeeting = true;
-					}
-					continue;
-				}
-
-				if (IsInGame() && State.NotificationsAFK && remainingTime <= State.NotificationTimeWarn && !info.hasReceivedWarning) {
-					info.hasReceivedWarning = true;
-
-					std::string nickname = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName));
-					int secondsLeft = static_cast<int>(std::clamp(remainingTime, 0.0f, State.NotificationTimeWarn)) + 1;
-
-					std::string warning = std::format("<#FFF>{}</color> <#ff033e>will be kicked in {} seconds due to inactivity!</color>", nickname, secondsLeft);
-
-					auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
-					if (notifier) {
-						Sprite spriteBackup = *notifier->fields.playerDisconnectSprite;
-						Color colorBackup = notifier->fields.disconnectColor;
-
-						notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
-						notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
-
-						NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(warning), nullptr);
-
-						notifier->fields.playerDisconnectSprite = &spriteBackup;
-						notifier->fields.disconnectColor = colorBackup;
+				if (wasInMeetingLastFrame && !State.InMeeting) {
+					for (auto& [id, info] : playerActivityMap) {
+						info.hasReceivedExtraTimeInMeeting = false;
 					}
 				}
+				wasInMeetingLastFrame = State.InMeeting;
 
-				if (elapsed > State.TimerAFK) {
-					toKick.push_back(playerId);
+				std::vector<int> toKick;
+
+				for (auto player : GetAllPlayerControl()) {
+					if (player == *Game::pLocalPlayer) continue;
+
+					auto* playerData2 = GetPlayerData(player);
+					if (!playerData2) continue;
+
+					int playerId = player->fields._.OwnerId;
+					Vector2 currentPosition = GetTrueAdjustedPosition(player);
+					auto& info = playerActivityMap[playerId];
+
+					if (!info.hasEnteredGame) {
+						info = { currentPosition, steady_clock::now(), true, false, false };
+						continue;
+					}
+
+					auto now = steady_clock::now();
+
+					if (currentPosition.x != info.lastPosition.x || currentPosition.y != info.lastPosition.y) {
+						info.lastPosition = currentPosition;
+						info.lastMoveTime = now;
+						info.hasReceivedWarning = false;
+						continue;
+					}
+
+					float elapsed = duration_cast<duration<float>>(now - info.lastMoveTime).count();
+					float remainingTime = State.TimerAFK - elapsed;
+
+					if (State.InMeeting) {
+						if (remainingTime < extraTimeThreshold && !info.hasReceivedExtraTimeInMeeting) {
+							info.lastMoveTime -= duration_cast<steady_clock::duration>(duration<float>(extraTime));
+							info.hasReceivedExtraTimeInMeeting = true;
+						}
+						continue;
+					}
+
+					if (IsInGame() && State.NotificationsAFK && remainingTime <= State.NotificationTimeWarn && !info.hasReceivedWarning) {
+						info.hasReceivedWarning = true;
+
+						std::string nickname = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(playerData2)->fields.PlayerName));
+						int secondsLeft = static_cast<int>(std::clamp(remainingTime, 0.0f, State.NotificationTimeWarn)) + 1;
+
+						std::string warning = std::format("<#FFF>{}</color> <#ff033e>will be kicked in {} seconds due to inactivity!</color>", nickname, secondsLeft);
+
+						auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
+						if (notifier) {
+							Sprite spriteBackup = *notifier->fields.playerDisconnectSprite;
+							Color colorBackup = notifier->fields.disconnectColor;
+
+							notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+							notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
+
+							NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(warning), nullptr);
+
+							notifier->fields.playerDisconnectSprite = &spriteBackup;
+							notifier->fields.disconnectColor = colorBackup;
+						}
+					}
+
+					if (elapsed > State.TimerAFK) {
+						toKick.push_back(playerId);
+					}
 				}
-			}
 
-			for (int id : toKick) {
-				app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), id, false, nullptr);
-				playerActivityMap.erase(id);
+				for (int id : toKick) {
+					app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), id, false, nullptr);
+					playerActivityMap.erase(id);
+				}
 			}
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Exception occurred in PlayerControl_FixedUpdate (PlayerControl)");
+		//LOG_ERROR("Exception occurred in PlayerControl_FixedUpdate (PlayerControl)");
 	}
 	PlayerControl_FixedUpdate(__this, method);
 }
@@ -1032,14 +1064,14 @@ void dPlayerControl_CmdCheckShapeshift(PlayerControl* __this, PlayerControl* tar
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdCheckShapeshift executed");
 	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, target, (!State.AnimationlessShapeshift && animate), method);
-	else PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
+	else if (IsInGame()) PlayerControl_CmdCheckShapeshift(__this, target, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
 }
 
 void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
 {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdCheckRevertShapeshift executed");
 	if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, __this, (!State.AnimationlessShapeshift && animate), method);
-	else PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
+	else if (IsInGame()) PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
 }
 
 /*void dPlayerControl_RpcRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
@@ -1091,6 +1123,8 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_HandleRpc executed");
 	int32_t pos = reader->fields._position, head = reader->fields.readHead;
 	try {
+		if (State.IgnoreRPCs && callId != (uint8_t)RpcCalls__Enum::CheckName && callId != (uint8_t)RpcCalls__Enum::CheckColor && callId != (uint8_t)RpcCalls__Enum::SendChat)
+			return;
 		HandleRpc(__this, callId, reader);
 		SMAC_HandleRpc(__this, callId, reader);
 		if (!State.PanicMode && IsHost() && State.TournamentMode && !(State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun)) && callId == (uint8_t)RpcCalls__Enum::ReportDeadBody) {
@@ -1114,6 +1148,8 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
 			((State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun)) &&
 				((callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType && State.mapType != Settings::MapType::Hq) || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
 			//we cannot prevent murderplayer because the player will force it
+			return;
+		if (!State.GameLoaded && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting))
 			return;
 		if (!State.PanicMode && State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder) {
 			//PlayerControl* target = MessageExtensions_ReadNetObject_1(reader, NULL);
@@ -1599,13 +1635,13 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
 
 void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_CmdCheckProtect executed");
-	if (!State.PanicMode) {
+	if (!State.PanicMode && IsInGame()) {
 		if (IsHost() && IsInGame())
 			PlayerControl_RpcProtectPlayer(__this, target, GetPlayerOutfit(GetPlayerData(__this))->fields.ColorId, NULL);
 		else
 			PlayerControl_CmdCheckProtect(__this, target, method);
 	}
-	else PlayerControl_CmdCheckProtect(__this, target, method);
+	else if (IsInGame()) PlayerControl_CmdCheckProtect(__this, target, method);
 }
 
 void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* method) {
@@ -1704,4 +1740,22 @@ void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo*
 		return;
 	}
 	PlayerControl_RpcSetScanner(__this, value, NULL);
+}
+
+void dPlayerControl_RpcSetRole(PlayerControl* __this, RoleTypes__Enum roleType, bool canOverrideRole, MethodInfo* method) {
+	if (IsHost() && State.GodMode && __this == *Game::pLocalPlayer &&
+		(roleType == RoleTypes__Enum::CrewmateGhost || roleType == RoleTypes__Enum::GuardianAngel || roleType == RoleTypes__Enum::ImpostorGhost)) return;
+	PlayerControl_RpcSetRole(__this, roleType, canOverrideRole, method);
+}
+
+void* dPlayerControl_Start(PlayerControl* __this, MethodInfo* method) {
+	auto ret = PlayerControl_Start(__this, method);
+	if (!State.PanicMode && (IsInGame() || IsInLobby()) && State.SMAC_PunishBlacklist && GetPlayerData(__this) != NULL) {
+		std::string friendCode = convert_from_string(GetPlayerData(__this)->fields.FriendCode);
+		bool isInBlacklistAlready = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end();
+		if (!friendCode.empty() && isInBlacklistAlready && __this->fields._.OwnerId != (*Game::pAmongUsClient)->fields._.ClientId) {
+			SMAC_OnCheatDetected(__this, "<#f00>Blacklisted!</color>");
+		}
+	}
+	return ret;
 }

@@ -253,6 +253,14 @@ void DetourInitilization() {
 	HOOKFUNC(FindAGameManager_Update);
 	HOOKFUNC(PlayerControl_RpcPlayAnimation);
 	HOOKFUNC(PlayerControl_RpcSetScanner);
+	HOOKFUNC(FreeChatInputField_UpdateCharCount);
+	HOOKFUNC(ObjectPoolBehavior_InitPool);
+	HOOKFUNC(PlayerControl_RpcSetRole);
+	HOOKFUNC(ShipStatus_AddTasksFromList);
+	HOOKFUNC(PlayerControl_Start);
+	HOOKFUNC(MainMenuManager_LateUpdate);
+	HOOKFUNC(SoundManager_PlaySound);
+	HOOKFUNC(GameStartManager_ReallyBegin);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -420,6 +428,14 @@ void DetourUninitialization()
 	UNHOOKFUNC(FindAGameManager_Update);
 	UNHOOKFUNC(PlayerControl_RpcPlayAnimation);
 	UNHOOKFUNC(PlayerControl_RpcSetScanner);
+	UNHOOKFUNC(FreeChatInputField_UpdateCharCount);
+	UNHOOKFUNC(ObjectPoolBehavior_InitPool);
+	UNHOOKFUNC(PlayerControl_RpcSetRole);
+	UNHOOKFUNC(ShipStatus_AddTasksFromList);
+	UNHOOKFUNC(PlayerControl_Start);
+	UNHOOKFUNC(MainMenuManager_LateUpdate);
+	UNHOOKFUNC(SoundManager_PlaySound);
+	UNHOOKFUNC(GameStartManager_ReallyBegin);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

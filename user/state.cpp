@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v4.3.2";
+    this->SickoVersion = "v4.4";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -92,9 +92,13 @@ void Settings::Load() {
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
+        JSON_TRYGET("SpoofAUVersion", this->SpoofAUVersion);
+        JSON_TRYGET("FakeAUVersion", this->FakeAUVersion);
         JSON_TRYGET("PanicWarning", this->PanicWarning);
         JSON_TRYGET("DisableAnimations", this->DisableAnimations);
         JSON_TRYGET("AnimationSpeed", this->AnimationSpeed);
+        JSON_TRYGET("RoundingRadiusMultiplier", this->RoundingRadiusMultiplier);
+		this->RoundingRadiusMultiplier = std::clamp(this->RoundingRadiusMultiplier, 0.f, 2.f);
         JSON_TRYGET("ExtraCommands", this->ExtraCommands);
 
         JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
@@ -202,6 +206,8 @@ void Settings::Load() {
         JSON_TRYGET("NameSuffix", this->NameSuffix);
         JSON_TRYGET("Font", this->Font);
         JSON_TRYGET("FontType", this->FontType);
+        JSON_TRYGET("ChatFont", this->ChatFont);
+        JSON_TRYGET("ChatFontType", this->ChatFontType);
         //JSON_TRYGET("Material", this->Material);
         //JSON_TRYGET("MaterialType", this->MaterialType);
         JSON_TRYGET("ResizeName", this->ResizeName);
@@ -249,8 +255,10 @@ void Settings::Load() {
         JSON_TRYGET("PreventSelfReport", this->PreventSelfReport);
         //JSON_TRYGET("AutoRejoin", this->AutoRejoin);
         JSON_TRYGET("OldStylePingText", this->OldStylePingText);
-        JSON_TRYGET("FastRoleReveal", this->FastRoleReveal);
         JSON_TRYGET("NoSeekerAnim", this->NoSeekerAnim);
+        JSON_TRYGET("BetterChatNotifications", this->BetterChatNotifications);
+        JSON_TRYGET("BetterLobbyCodeInput", this->BetterLobbyCodeInput);
+        JSON_TRYGET("BetterMessageSounds", this->BetterMessageSounds);
         JSON_TRYGET("NoClip", this->NoClip);
         JSON_TRYGET("KillInLobbies", this->KillInLobbies);
         JSON_TRYGET("KillInVanish", this->KillInVanish);
@@ -269,6 +277,9 @@ void Settings::Load() {
         //JSON_TRYGET("ShowHookLogs", this->ShowHookLogs);
 
         JSON_TRYGET("RevealAnonymousVotes", this->RevealAnonymousVotes);
+        JSON_TRYGET("ShowChatTimer", this->ShowChatTimer);
+        JSON_TRYGET("ExtendChatLimit", this->ExtendChatLimit);
+        JSON_TRYGET("ExtendChatHistory", this->ExtendChatHistory);
 
         JSON_TRYGET("ShiftRightClickTP", this->ShiftRightClickTP);
         JSON_TRYGET("RotateRadius", this->RotateRadius);
@@ -295,6 +306,9 @@ void Settings::Load() {
         JSON_TRYGET("DisableHostAnticheat", this->DisableHostAnticheat);
         JSON_TRYGET("TournamentMode", this->TournamentMode);
         JSON_TRYGET("SpectatorMode", this->SpectatorMode);
+        JSON_TRYGET("AlwaysAllowStart", this->AlwaysAllowStart);
+        JSON_TRYGET("ModifyStartCountdown", this->ModifyStartCountdown);
+        JSON_TRYGET("StartCountdown", this->StartCountdown);
 
         JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
@@ -343,8 +357,103 @@ void Settings::Load() {
         JSON_TRYGET("WarnReasons", this->WarnReasons);
         JSON_TRYGET("LockedNames", this->LockedNames);
 
+        JSON_TRYGET("DisableMedbayScan", this->DisableMedbayScan);
+
+        JSON_TRYGET("CrewmateGhostColor_R", this->CrewmateGhostColor.x);
+        JSON_TRYGET("CrewmateGhostColor_G", this->CrewmateGhostColor.y);
+        JSON_TRYGET("CrewmateGhostColor_B", this->CrewmateGhostColor.z);
+        JSON_TRYGET("CrewmateGhostColor_A", this->CrewmateGhostColor.w);
+        JSON_TRYGET("CrewmateColor_R", this->CrewmateColor.x);
+        JSON_TRYGET("CrewmateColor_G", this->CrewmateColor.y);
+        JSON_TRYGET("CrewmateColor_B", this->CrewmateColor.z);
+        JSON_TRYGET("CrewmateColor_A", this->CrewmateColor.w);
+        JSON_TRYGET("EngineerColor_R", this->EngineerColor.x);
+        JSON_TRYGET("EngineerColor_G", this->EngineerColor.y);
+        JSON_TRYGET("EngineerColor_B", this->EngineerColor.z);
+        JSON_TRYGET("EngineerColor_A", this->EngineerColor.w);
+        JSON_TRYGET("GuardianAngelColor_R", this->GuardianAngelColor.x);
+        JSON_TRYGET("GuardianAngelColor_G", this->GuardianAngelColor.y);
+        JSON_TRYGET("GuardianAngelColor_B", this->GuardianAngelColor.z);
+        JSON_TRYGET("GuardianAngelColor_A", this->GuardianAngelColor.w);
+        JSON_TRYGET("GuardianAngelColor_R", this->ScientistColor.x);
+        JSON_TRYGET("GuardianAngelColor_G", this->ScientistColor.y);
+        JSON_TRYGET("GuardianAngelColor_B", this->ScientistColor.z);
+        JSON_TRYGET("GuardianAngelColor_A", this->ScientistColor.w);
+        JSON_TRYGET("ScientistColor_R", this->ScientistColor.x);
+        JSON_TRYGET("ScientistColor_G", this->ScientistColor.y);
+        JSON_TRYGET("ScientistColor_B", this->ScientistColor.z);
+        JSON_TRYGET("ScientistColor_A", this->ScientistColor.w);
+        JSON_TRYGET("ImpostorColor_R", this->ImpostorColor.x);
+        JSON_TRYGET("ImpostorColor_G", this->ImpostorColor.y);
+        JSON_TRYGET("ImpostorColor_B", this->ImpostorColor.z);
+        JSON_TRYGET("ImpostorColor_A", this->ImpostorColor.w);
+        JSON_TRYGET("ShapeshifterColor_R", this->ShapeshifterColor.x);
+        JSON_TRYGET("ShapeshifterColor_G", this->ShapeshifterColor.y);
+        JSON_TRYGET("ShapeshifterColor_B", this->ShapeshifterColor.z);
+        JSON_TRYGET("ShapeshifterColor_A", this->ShapeshifterColor.w);
+        JSON_TRYGET("ImpostorGhostColor_R", this->ImpostorGhostColor.x);
+        JSON_TRYGET("ImpostorGhostColor_G", this->ImpostorGhostColor.y);
+        JSON_TRYGET("ImpostorGhostColor_B", this->ImpostorGhostColor.z);
+        JSON_TRYGET("ImpostorGhostColor_A", this->ImpostorGhostColor.w);
+        JSON_TRYGET("NoisemakerColor_R", this->NoisemakerColor.x);
+        JSON_TRYGET("NoisemakerColor_G", this->NoisemakerColor.y);
+        JSON_TRYGET("NoisemakerColor_B", this->NoisemakerColor.z);
+        JSON_TRYGET("NoisemakerColor_A", this->NoisemakerColor.w);
+        JSON_TRYGET("TrackerColor_R", this->TrackerColor.x);
+        JSON_TRYGET("TrackerColor_G", this->TrackerColor.y);
+        JSON_TRYGET("TrackerColor_B", this->TrackerColor.z);
+        JSON_TRYGET("TrackerColor_A", this->TrackerColor.w);
+        JSON_TRYGET("PhantomColor_R", this->PhantomColor.x);
+        JSON_TRYGET("PhantomColor_G", this->PhantomColor.y);
+        JSON_TRYGET("PhantomColor_B", this->PhantomColor.z);
+        JSON_TRYGET("PhantomColor_A", this->PhantomColor.w);
+
+        JSON_TRYGET("HostColor_R", this->HostColor.x);
+        JSON_TRYGET("HostColor_G", this->HostColor.y);
+        JSON_TRYGET("HostColor_B", this->HostColor.z);
+        JSON_TRYGET("HostColor_A", this->HostColor.w);
+        JSON_TRYGET("PlayerIdColor_R", this->PlayerIdColor.x);
+        JSON_TRYGET("PlayerIdColor_G", this->PlayerIdColor.y);
+        JSON_TRYGET("PlayerIdColor_B", this->PlayerIdColor.z);
+        JSON_TRYGET("PlayerIdColor_A", this->PlayerIdColor.w);
+        JSON_TRYGET("LevelColor_R", this->LevelColor.x);
+        JSON_TRYGET("LevelColor_G", this->LevelColor.y);
+        JSON_TRYGET("LevelColor_B", this->LevelColor.z);
+        JSON_TRYGET("LevelColor_A", this->LevelColor.w);
+        JSON_TRYGET("PlatformColor_R", this->PlatformColor.x);
+        JSON_TRYGET("PlatformColor_G", this->PlatformColor.y);
+        JSON_TRYGET("PlatformColor_B", this->PlatformColor.z);
+        JSON_TRYGET("PlatformColor_A", this->PlatformColor.w);
+        JSON_TRYGET("ModUsageColor_R", this->ModUsageColor.x);
+        JSON_TRYGET("ModUsageColor_G", this->ModUsageColor.y);
+        JSON_TRYGET("ModUsageColor_B", this->ModUsageColor.z);
+        JSON_TRYGET("ModUsageColor_A", this->ModUsageColor.w);
+        JSON_TRYGET("NameCheckerColor_R", this->NameCheckerColor.x);
+        JSON_TRYGET("NameCheckerColor_G", this->NameCheckerColor.y);
+        JSON_TRYGET("NameCheckerColor_B", this->NameCheckerColor.z);
+        JSON_TRYGET("NameCheckerColor_A", this->NameCheckerColor.w);
+        JSON_TRYGET("FriendCodeColor_R", this->FriendCodeColor.x);
+        JSON_TRYGET("FriendCodeColor_G", this->FriendCodeColor.y);
+        JSON_TRYGET("FriendCodeColor_B", this->FriendCodeColor.z);
+        JSON_TRYGET("FriendCodeColor_A", this->FriendCodeColor.w);
+        JSON_TRYGET("DaterNamesColor_R", this->DaterNamesColor.x);
+        JSON_TRYGET("DaterNamesColor_G", this->DaterNamesColor.y);
+        JSON_TRYGET("DaterNamesColor_B", this->DaterNamesColor.z);
+        JSON_TRYGET("DaterNamesColor_A", this->DaterNamesColor.w);
+        JSON_TRYGET("LobbyCodeColor_R", this->LobbyCodeColor.x);
+        JSON_TRYGET("LobbyCodeColor_G", this->LobbyCodeColor.y);
+        JSON_TRYGET("LobbyCodeColor_B", this->LobbyCodeColor.z);
+        JSON_TRYGET("LobbyCodeColor_A", this->LobbyCodeColor.w);
+        JSON_TRYGET("AgeColor_R", this->AgeColor.x);
+        JSON_TRYGET("AgeColor_G", this->AgeColor.y);
+        JSON_TRYGET("AgeColor_B", this->AgeColor.z);
+        JSON_TRYGET("AgeColor_A", this->AgeColor.w);
+
+        /*JSON_TRYGET("EnableTempBan", this->EnableTempBan);
+        JSON_TRYGET("TempBannedFCs", this->TempBannedFCs);*/
+
         // Temp-Ban: Time calculation, and saving...
-        if (j.contains("TempBannedFriendCodes") && j["TempBannedFriendCodes"].is_object()) {
+        /*if (j.contains("TempBannedFriendCodes") && j["TempBannedFriendCodes"].is_object()) {
             for (auto& [fc, info] : j["TempBannedFriendCodes"].items()) {
                 if (info.contains("until") && info["until"].is_number_integer()) {
                     int64_t until = info["until"].get<int64_t>();
@@ -358,7 +467,7 @@ void Settings::Load() {
                     };
                 }
             }
-        }
+        }*/
     }
     catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
@@ -454,9 +563,12 @@ void Settings::Save() {
                 { "SpoofPlatform", this->SpoofPlatform },
                 { "FakePlatform", this->FakePlatform },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
+                { "SpoofAUVersion", this->SpoofAUVersion },
+                { "FakeAUVersion", this->FakeAUVersion },
                 { "PanicWarning", this->PanicWarning },
                 { "DisableAnimations", this->DisableAnimations },
-                { "PanicWarning", this->AnimationSpeed },
+                { "AnimationSpeed", this->AnimationSpeed },
+                { "RoundingRadiusMultiplier", this->RoundingRadiusMultiplier },
                 { "ExtraCommands", this->ExtraCommands },
 
                 { "NoAbilityCD", this->NoAbilityCD },
@@ -565,6 +677,8 @@ void Settings::Save() {
                 { "NameSuffix", this->NameSuffix },
                 { "Font", this->Font },
                 { "FontType", this->FontType },
+                { "ChatFont", this->ChatFont },
+                { "ChatFontType", this->ChatFontType },
                 //{ "Material", this->Material },
                 //{ "MaterialType", this->MaterialType },
                 { "ResizeName", this->ResizeName },
@@ -615,8 +729,10 @@ void Settings::Save() {
                 { "PreventSelfReport", this->PreventSelfReport },
                 //{ "AutoRejoin", this->AutoRejoin },
                 { "OldStylePingText", this->OldStylePingText },
-                { "FastRoleReveal", this->FastRoleReveal },
                 { "NoSeekerAnim", this->NoSeekerAnim },
+                { "BetterChatNotifications", this->BetterChatNotifications },
+                { "BetterLobbyCodeInput", this->BetterLobbyCodeInput },
+                { "BetterMessageSounds", this->BetterMessageSounds },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
                 { "KillInVanish", this->KillInVanish },
@@ -624,6 +740,9 @@ void Settings::Save() {
 
                 { "RevealVotes", this->RevealVotes },
                 { "RevealAnonymousVotes", this->RevealAnonymousVotes },
+                { "ShowChatTimer", this->ShowChatTimer },
+                { "ExtendChatLimit", this->ExtendChatLimit },
+                { "ExtendChatHistory", this->ExtendChatHistory },
                 { "AdjustByDPI", this->AdjustByDPI },
                 { "ShowProtections", this->ShowProtections },
 
@@ -661,6 +780,9 @@ void Settings::Save() {
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
                 { "TournamentMode", this->TournamentMode },
                 { "SpectatorMode", this->SpectatorMode },
+                { "AlwaysAllowStart", this->AlwaysAllowStart },
+                { "ModifyStartCountdown", this->ModifyStartCountdown },
+                { "StartCountdown", this->StartCountdown },
 
                 { "Enable_SMAC", this->Enable_SMAC },
                 { "SMAC_Punishment", this->SMAC_Punishment },
@@ -708,8 +830,102 @@ void Settings::Save() {
                 { "WarnReasons", this->WarnReasons },
                 { "LockedNames", this->LockedNames },
 
+                { "DisableMedbayScan", this->DisableMedbayScan },
+
+                { "CrewmateGhostColor_R", this->CrewmateGhostColor.x },
+                { "CrewmateGhostColor_G", this->CrewmateGhostColor.y },
+                { "CrewmateGhostColor_B", this->CrewmateGhostColor.z },
+                { "CrewmateGhostColor_A", this->CrewmateGhostColor.w },
+                { "CrewmateColor_R", this->CrewmateColor.x },
+                { "CrewmateColor_G", this->CrewmateColor.y },
+                { "CrewmateColor_B", this->CrewmateColor.z },
+                { "CrewmateColor_A", this->CrewmateColor.w },
+                { "EngineerColor_R", this->EngineerColor.x },
+                { "EngineerColor_G", this->EngineerColor.y },
+                { "EngineerColor_B", this->EngineerColor.z },
+                { "EngineerColor_A", this->EngineerColor.w },
+                { "GuardianAngelColor_R", this->GuardianAngelColor.x },
+                { "GuardianAngelColor_G", this->GuardianAngelColor.y },
+                { "GuardianAngelColor_B", this->GuardianAngelColor.z },
+                { "GuardianAngelColor_A", this->GuardianAngelColor.w },
+                { "GuardianAngelColor_R", this->ScientistColor.x },
+                { "GuardianAngelColor_G", this->ScientistColor.y },
+                { "GuardianAngelColor_B", this->ScientistColor.z },
+                { "GuardianAngelColor_A", this->ScientistColor.w },
+                { "ScientistColor_R", this->ScientistColor.x },
+                { "ScientistColor_G", this->ScientistColor.y },
+                { "ScientistColor_B", this->ScientistColor.z },
+                { "ScientistColor_A", this->ScientistColor.w },
+                { "ImpostorColor_R", this->ImpostorColor.x },
+                { "ImpostorColor_G", this->ImpostorColor.y },
+                { "ImpostorColor_B", this->ImpostorColor.z },
+                { "ImpostorColor_A", this->ImpostorColor.w },
+                { "ShapeshifterColor_R", this->ShapeshifterColor.x },
+                { "ShapeshifterColor_G", this->ShapeshifterColor.y },
+                { "ShapeshifterColor_B", this->ShapeshifterColor.z },
+                { "ShapeshifterColor_A", this->ShapeshifterColor.w },
+                { "ImpostorGhostColor_R", this->ImpostorGhostColor.x },
+                { "ImpostorGhostColor_G", this->ImpostorGhostColor.y },
+                { "ImpostorGhostColor_B", this->ImpostorGhostColor.z },
+                { "ImpostorGhostColor_A", this->ImpostorGhostColor.w },
+                { "NoisemakerColor_R", this->NoisemakerColor.x },
+                { "NoisemakerColor_G", this->NoisemakerColor.y },
+                { "NoisemakerColor_B", this->NoisemakerColor.z },
+                { "NoisemakerColor_A", this->NoisemakerColor.w },
+                { "TrackerColor_R", this->TrackerColor.x },
+                { "TrackerColor_G", this->TrackerColor.y },
+                { "TrackerColor_B", this->TrackerColor.z },
+                { "TrackerColor_A", this->TrackerColor.w },
+                { "PhantomColor_R", this->PhantomColor.x },
+                { "PhantomColor_G", this->PhantomColor.y },
+                { "PhantomColor_B", this->PhantomColor.z },
+                { "PhantomColor_A", this->PhantomColor.w },
+                { "HostColor_R", this->HostColor.x },
+                { "HostColor_G", this->HostColor.y },
+                { "HostColor_B", this->HostColor.z },
+                { "HostColor_A", this->HostColor.w },
+                { "PlayerIdColor_R", this->PlayerIdColor.x },
+                { "PlayerIdColor_G", this->PlayerIdColor.y },
+                { "PlayerIdColor_B", this->PlayerIdColor.z },
+                { "PlayerIdColor_A", this->PlayerIdColor.w },
+                { "LevelColor_R", this->LevelColor.x },
+                { "LevelColor_G", this->LevelColor.y },
+                { "LevelColor_B", this->LevelColor.z },
+                { "LevelColor_A", this->LevelColor.w },
+                { "PlatformColor_R", this->PlatformColor.x },
+                { "PlatformColor_G", this->PlatformColor.y },
+                { "PlatformColor_B", this->PlatformColor.z },
+                { "PlatformColor_A", this->PlatformColor.w },
+                { "ModUsageColor_R", this->ModUsageColor.x },
+                { "ModUsageColor_G", this->ModUsageColor.y },
+                { "ModUsageColor_B", this->ModUsageColor.z },
+                { "ModUsageColor_A", this->ModUsageColor.w },
+                { "NameCheckerColor_R", this->NameCheckerColor.x },
+                { "NameCheckerColor_G", this->NameCheckerColor.y },
+                { "NameCheckerColor_B", this->NameCheckerColor.z },
+                { "NameCheckerColor_A", this->NameCheckerColor.w },
+                { "FriendCodeColor_R", this->FriendCodeColor.x },
+                { "FriendCodeColor_G", this->FriendCodeColor.y },
+                { "FriendCodeColor_B", this->FriendCodeColor.z },
+                { "FriendCodeColor_A", this->FriendCodeColor.w },
+                { "DaterNamesColor_R", this->DaterNamesColor.x },
+                { "DaterNamesColor_G", this->DaterNamesColor.y },
+                { "DaterNamesColor_B", this->DaterNamesColor.z },
+                { "DaterNamesColor_A", this->DaterNamesColor.w },
+                { "LobbyCodeColor_R", this->LobbyCodeColor.x },
+                { "LobbyCodeColor_G", this->LobbyCodeColor.y },
+                { "LobbyCodeColor_B", this->LobbyCodeColor.z },
+                { "LobbyCodeColor_A", this->LobbyCodeColor.w },
+                { "AgeColor_R", this->AgeColor.x },
+                { "AgeColor_G", this->AgeColor.y },
+                { "AgeColor_B", this->AgeColor.z },
+                { "AgeColor_A", this->AgeColor.w }
+
+                /*{"EnableTempBan", this->EnableTempBan},
+                { "TempBannedFCs", this->TempBannedFCs },*/
+
                 // Temp-Ban: Time calculation, and saving...
-                { "TempBannedFriendCodes", [&]() {
+                /*{"TempBannedFriendCodes", [&]() {
                         nlohmann::ordered_json banList = nlohmann::ordered_json::object();
                         for (const auto& [fc, info] : this->TempBannedFriendCodes) {
                             auto until = std::chrono::duration_cast<std::chrono::seconds>(info.first.time_since_epoch()).count();
@@ -719,7 +935,7 @@ void Settings::Save() {
                         }
                         return banList;
                     }()
-                }
+                }*/
             };
 
             std::ofstream outSettings(settingsPath);

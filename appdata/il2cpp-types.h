@@ -4760,6 +4760,8 @@ namespace app {
 
 #endif
 
+    typedef Il2CppObject CosmeticsCache;
+
     struct ShipStatus__Fields {
         struct InnerNetObject__Fields _;
         struct Color CameraColor;
@@ -5762,6 +5764,39 @@ namespace app {
 #pragma endregion
 
 #pragma region RoleEffectAnimation
+    struct AudioClip__Fields {
+        struct Object_1__Fields _;
+        struct AudioClip_PCMReaderCallback* m_PCMReaderCallback;
+        struct AudioClip_PCMSetPositionCallback* m_PCMSetPositionCallback;
+    };
+
+    struct AudioClip {
+        struct AudioClip__Class* klass;
+        MonitorData* monitor;
+        struct AudioClip__Fields fields;
+    };
+
+    struct AudioClip__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct AudioClip__StaticFields {
+    };
+
+    struct AudioClip__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AudioClip__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct AudioClip__VTable vtable;
+    };
+
+    typedef Il2CppObject AudioSource;
+
     struct RoleEffectAnimation__Fields {
         struct MonoBehaviour__Fields _;
 #if defined(_CPLUSPLUS_)
@@ -5978,6 +6013,8 @@ namespace app {
     };
 
 #endif
+
+	typedef Il2CppObject PassiveButton;
 
     struct ChatController__Fields {
         struct MonoBehaviour__Fields _;
@@ -10014,6 +10051,8 @@ namespace app {
 #pragma endregion
 
 #pragma region SoundManager
+	typedef Il2CppObject AudioMixerGroup;
+
     struct SoundManager__Fields {
         struct MonoBehaviour__Fields _;
         struct AudioMixer* mixer;
@@ -10623,6 +10662,215 @@ namespace app {
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct GameContainer__Array__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region ObjectPoolBehavior
+    struct ObjectPoolBehavior__Fields {
+        void* _;
+        int32_t poolSize;
+        struct List_1_PoolableBehavior_* inactiveChildren;
+        struct List_1_PoolableBehavior_* activeChildren;
+        struct PoolableBehavior* Prefab;
+        bool AutoInit;
+        bool DetachOnGet;
+        int32_t childIndex;
+    };
+
+    struct ObjectPoolBehavior {
+        struct ObjectPoolBehavior__Class* klass;
+        MonitorData* monitor;
+        struct ObjectPoolBehavior__Fields fields;
+    };
+
+    struct ObjectPoolBehavior__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Get;
+        VirtualInvokeData Reclaim;
+        VirtualInvokeData get_InUse;
+        VirtualInvokeData get_NotInUse;
+        VirtualInvokeData Awake;
+    };
+
+    struct ObjectPoolBehavior__StaticFields {
+    };
+
+    struct ObjectPoolBehavior__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct ObjectPoolBehavior__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ObjectPoolBehavior__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region List_1_NormalPlayerTask_
+    struct NormalPlayerTask__Array {
+        struct NormalPlayerTask__Array__Class* klass;
+        MonitorData* monitor;
+        Il2CppArrayBounds* bounds;
+        il2cpp_array_size_t max_length;
+        struct NormalPlayerTask* vector[32];
+    };
+
+    struct NormalPlayerTask__Array__VTable {
+    };
+
+    struct NormalPlayerTask__Array__StaticFields {
+    };
+
+    struct NormalPlayerTask__Array__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct NormalPlayerTask__Array__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct NormalPlayerTask__Array__VTable vtable;
+    };
+
+    struct __declspec(align(4)) List_1_NormalPlayerTask___Fields {
+        struct NormalPlayerTask__Array* _items;
+        int32_t _size;
+        int32_t _version;
+        struct Object* _syncRoot;
+    };
+
+    struct List_1_NormalPlayerTask_ {
+        struct List_1_NormalPlayerTask___Class* klass;
+        MonitorData* monitor;
+        struct List_1_NormalPlayerTask___Fields fields;
+    };
+
+    struct List_1_NormalPlayerTask___VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_Item;
+        VirtualInvokeData set_Item;
+        VirtualInvokeData IndexOf;
+        VirtualInvokeData Insert;
+        VirtualInvokeData RemoveAt;
+        VirtualInvokeData get_Count;
+        VirtualInvokeData System_Collections_Generic_ICollection_T__get_IsReadOnly;
+        VirtualInvokeData Add;
+        VirtualInvokeData Clear;
+        VirtualInvokeData Contains;
+        VirtualInvokeData CopyTo;
+        VirtualInvokeData Remove;
+        VirtualInvokeData System_Collections_Generic_IEnumerable_T__GetEnumerator;
+        VirtualInvokeData System_Collections_IEnumerable_GetEnumerator;
+        VirtualInvokeData System_Collections_IList_get_Item;
+        VirtualInvokeData System_Collections_IList_set_Item;
+        VirtualInvokeData System_Collections_IList_Add;
+        VirtualInvokeData System_Collections_IList_Contains;
+        VirtualInvokeData Clear_1;
+        VirtualInvokeData System_Collections_IList_get_IsReadOnly;
+        VirtualInvokeData System_Collections_IList_get_IsFixedSize;
+        VirtualInvokeData System_Collections_IList_IndexOf;
+        VirtualInvokeData System_Collections_IList_Insert;
+        VirtualInvokeData System_Collections_IList_Remove;
+        VirtualInvokeData RemoveAt_1;
+        VirtualInvokeData System_Collections_ICollection_CopyTo;
+        VirtualInvokeData get_Count_1;
+        VirtualInvokeData System_Collections_ICollection_get_SyncRoot;
+        VirtualInvokeData System_Collections_ICollection_get_IsSynchronized;
+        VirtualInvokeData get_Item_1;
+        VirtualInvokeData get_Count_2;
+    };
+
+    struct List_1_NormalPlayerTask___StaticFields {
+        struct NormalPlayerTask__Array* _emptyArray;
+    };
+
+    struct List_1_NormalPlayerTask___Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct List_1_NormalPlayerTask___StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct List_1_NormalPlayerTask___VTable vtable;
+    };
+#pragma endregion
+
+#pragma region MainMenuManager
+    struct MainMenuManager__Fields {
+        struct MonoBehaviour__Fields _;
+        struct AdDataCollectScreen* AdsPolicy;
+        struct PassiveButton* PlayOnlineButton;
+        struct HatManager* HatManagerRef;
+        struct CosmicubeManager* CosmicubeManagerRef;
+        struct PlayerCustomizationMenu* playerCustomizationPrefab;
+        struct AnnouncementPopUp* announcementPopUp;
+        struct GameObject* gameModeButtons;
+        struct GameObject* accountButtons;
+        struct PassiveButton* accountStatsButton;
+        struct GameObject* onlineButtons;
+        struct PassiveButton* backButtonOnline;
+        struct GameObject* enterCodeButtons;
+        struct SpriteMask* screenMask;
+        struct GameObject* mainMenuUI;
+        struct GameObject* rightPanelMask;
+        struct SpriteRenderer* screenTint;
+        struct PassiveButton* freePlayButton;
+        struct PassiveButton* entercodeField;
+        struct PassiveButton* playButton;
+        struct PassiveButton* inventoryButton;
+        struct PassiveButton* shopButton;
+        struct PassiveButton* myAccountButton;
+        struct PassiveButton* newsButton;
+        struct PassiveButton* settingsButton;
+        struct PassiveButton* creditsButton;
+        struct PassiveButton* quitButton;
+        struct FindGameButton* findGameButton;
+        struct PassiveButton* playLocalButton;
+        struct PassiveButton* howToPlayButton;
+        struct PassiveButton* accountCTAButton;
+        struct PassiveButton* createGameButton;
+        struct List_1_PassiveButton_* mainButtons;
+        struct GameObject* creditsScreen;
+        struct CreateGameOptions* createGameScreen;
+        struct SpriteRenderer* fullScreenSprite;
+        struct Transform* enterCodeContainer;
+        struct GameObject* enterCodeHeader;
+        struct Transform* onlineButtonsContainer;
+        struct GameObject* onlineHeader;
+        struct UiElement* DefaultButtonSelected;
+        struct List_1_UiElement_* ControllerSelectable;
+        struct List_1_PassiveButton_* disableOnStartup;
+        struct GameObject* NewStoreItemsIcon;
+        struct CosmicubeManager* cosmicubeManager;
+        bool animating;
+        bool finishStartup;
+    };
+
+    struct MainMenuManager {
+        struct MainMenuManager__Class* klass;
+        MonitorData* monitor;
+        struct MainMenuManager__Fields fields;
+    };
+
+    struct MainMenuManager__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct MainMenuManager__StaticFields {
+    };
+
+    struct MainMenuManager__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct MainMenuManager__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct MainMenuManager__VTable vtable;
     };
 #pragma endregion
 

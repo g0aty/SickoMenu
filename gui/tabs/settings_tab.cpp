@@ -13,16 +13,19 @@ namespace SettingsTab {
 	enum Groups {
 		General,
 		Spoofing,
+		Customization,
 		Keybinds
 	};
 
 	static bool openGeneral = true; //default to general tab group
 	static bool openSpoofing = false;
+	static bool openCustomization = false;
 	static bool openKeybinds = false;
 
 	void CloseOtherGroups(Groups group) {
 		openGeneral = group == Groups::General;
 		openSpoofing = group == Groups::Spoofing;
+		openCustomization = group == Groups::Customization;
 		openKeybinds = group == Groups::Keybinds;
 	}
 
@@ -39,6 +42,10 @@ namespace SettingsTab {
 		ImGui::SameLine();
 		if (TabGroup("Spoofing", openSpoofing)) {
 			CloseOtherGroups(Groups::Spoofing);
+		}
+		ImGui::SameLine();
+		if (TabGroup("Customization", openCustomization)) {
+			CloseOtherGroups(Groups::Customization);
 		}
 		ImGui::SameLine();
 		if (TabGroup("Keybinds", openKeybinds)) {
@@ -158,50 +165,8 @@ namespace SettingsTab {
 				State.dpiScale = (scaleIndex * 10 + 50) / 100.0f;
 				State.dpiChanged = true;
 			}*/
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(50 * State.dpiScale);
-			if (ImGui::InputFloat("Menu Scale", &State.dpiScale)) {
-				State.dpiScale = std::clamp(State.dpiScale, 0.5f, 3.f);
-				State.dpiChanged = true;
-				State.Save();
-			}
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-
-			if (ToggleButton("Light Mode", &State.LightMode)) State.Save();
-			ImGui::SameLine();
-			if (!State.GradientMenuTheme) {
-				if (ImGui::ColorEdit3("Menu Theme Color", (float*)&State.MenuThemeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
-					State.Save();
-				}
-			}
-			else {
-				if (ImGui::ColorEdit3("Gradient Color 1", (float*)&State.MenuGradientColor1, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
-					State.Save();
-				}
-				ImGui::SameLine();
-				if (ImGui::ColorEdit3("Gradient Color 2", (float*)&State.MenuGradientColor2, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
-					State.Save();
-				}
-			}
-			ImGui::SameLine();
-			if (ToggleButton("Gradient Theme", &State.GradientMenuTheme))
-				State.Save();
-
-			if (ToggleButton("Match Background with Theme", &State.MatchBackgroundWithTheme)) {
-				State.Save();
-			}
-			ImGui::SameLine();
-			if (ToggleButton("RGB Menu Theme", &State.RgbMenuTheme)) {
-				State.Save();
-			}
-			ImGui::SameLine();
-			if (AnimatedButton("Reset Menu Theme"))
-			{
-				State.MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
-			}
-
-			SteppedSliderFloat("Opacity", (float*)&State.MenuThemeColor.w, 0.1f, 1.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
 			if (ImGui::InputInt("FPS", &State.GameFPS)) {
 				State.GameFPS = std::clamp(State.GameFPS, 1, 2147483647);
@@ -374,19 +339,184 @@ namespace SettingsTab {
 					State.Save();
 			}
 
-			//if (ToggleButton("Disable Host Anticheat", &State.DisableHostAnticheat)) State.Save();
-			if (ToggleButton("Disable Host Anticheat (+25 Mode)", &State.DisableHostAnticheat)) {
+			if (ToggleButton("Disable Anticheat While Hosting (+25 Mode)", &State.DisableHostAnticheat)) {
 				if (!State.DisableHostAnticheat && State.BattleRoyale) {
 					State.BattleRoyale = false;
 					State.GameMode = 0;
 				}
 				State.Save();
 			}
-			if (State.DisableHostAnticheat) {
+			/*if (State.DisableHostAnticheat) {
 				BoldText("Warning (+25 Mode)", ImVec4(1.f, 0.f, 0.f, 1.f));
 				BoldText("With this option enabled, you can only find public lobbies with +25 enabled.");
 				BoldText("You may not find any public lobbies in the game listing due to this.");
 				BoldText("This is intended behaviour, do NOT report it as a bug.");
+			}*/
+			if (ToggleButton("Spoof Among Us Version", &State.SpoofAUVersion))
+				State.Save();
+			if (State.SpoofAUVersion) {
+				ImGui::SameLine();
+				if (CustomListBoxInt("Version", &State.FakeAUVersion, AUVERSIONS))
+					State.Save();
+			}
+		}
+
+		if (openCustomization) {
+			if (ToggleButton("Hide Watermark", &State.HideWatermark)) {
+				State.Save();
+			}
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (ToggleButton("Light Mode", &State.LightMode)) State.Save();
+			ImGui::SameLine();
+			if (!State.GradientMenuTheme) {
+				if (ImGui::ColorEdit3("Menu Theme Color", (float*)&State.MenuThemeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+			}
+			else {
+				if (ImGui::ColorEdit3("Gradient Color 1", (float*)&State.MenuGradientColor1, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+				ImGui::SameLine();
+				if (ImGui::ColorEdit3("Gradient Color 2", (float*)&State.MenuGradientColor2, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+					State.Save();
+				}
+			}
+			ImGui::SameLine();
+			if (ToggleButton("Gradient Theme", &State.GradientMenuTheme))
+				State.Save();
+
+			if (ToggleButton("Match Background with Theme", &State.MatchBackgroundWithTheme)) {
+				State.Save();
+			}
+			ImGui::SameLine();
+			if (ToggleButton("RGB Menu Theme", &State.RgbMenuTheme)) {
+				State.Save();
+			}
+			ImGui::SameLine();
+			if (AnimatedButton("Reset Menu Theme"))
+			{
+				State.MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
+			}
+
+			SteppedSliderFloat("Opacity", (float*)&State.MenuThemeColor.w, 0.1f, 1.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			if (ToggleButton("Dark Game Theme", &State.DarkMode)) State.Save();
+			ImGui::SameLine();
+			if (ToggleButton("Custom Game Theme", &State.CustomGameTheme)) State.Save();
+
+			if (State.CustomGameTheme) {
+				if (ImGui::ColorEdit3("Background Color", (float*)&State.GameBgColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview))
+					State.Save();
+				ImGui::SameLine();
+				if (ImGui::ColorEdit3("Text Color", (float*)&State.GameTextColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview))
+					State.Save();
+			}
+			if (ToggleButton("Change Chat Font", &State.ChatFont)) {
+				State.Save();
+			}
+			if (State.ChatFont) {
+				ImGui::SameLine();
+				if (CustomListBoxInt(" ", &State.ChatFontType, FONTS, 160.f * State.dpiScale)) {
+					State.Save();
+				}
+			}
+
+			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
+
+			if (ImGui::CollapsingHeader("GUI")) {
+				ImGui::SetNextItemWidth(50 * State.dpiScale);
+				if (ImGui::InputFloat("Menu Scale", &State.dpiScale)) {
+					State.dpiScale = std::clamp(State.dpiScale, 0.5f, 3.f);
+					State.dpiChanged = true;
+					State.Save();
+				}
+				if (ToggleButton("Disable Animations", &State.DisableAnimations))
+					State.Save();
+				if (ImGui::InputFloat("Animation Speed", &State.AnimationSpeed)) {
+					if (State.AnimationSpeed <= 0) State.AnimationSpeed = 1.f;
+					State.Save();
+				}
+				SteppedSliderFloat("Rounding Radius Multiplier", &State.RoundingRadiusMultiplier, 0.f, 2.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+			}
+
+			if (ImGui::CollapsingHeader("Role Colors")) {
+				ImGui::ColorEdit4("Crewmate Ghost", (float*)&State.CrewmateGhostColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(150.f * State.dpiScale);
+				ImGui::ColorEdit4("Crewmate", (float*)&State.CrewmateColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(300.f * State.dpiScale);
+				ImGui::ColorEdit4("Engineer", (float*)&State.EngineerColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+
+				ImGui::ColorEdit4("Guardian Angel", (float*)&State.GuardianAngelColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(150.f * State.dpiScale);
+				ImGui::ColorEdit4("Scientist", (float*)&State.ScientistColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(300.f * State.dpiScale);
+				ImGui::ColorEdit4("Impostor", (float*)&State.ImpostorColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				
+				ImGui::ColorEdit4("Shapeshifter", (float*)&State.ShapeshifterColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(150.f * State.dpiScale);
+				ImGui::ColorEdit4("Impostor Ghost", (float*)&State.ImpostorGhostColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(300.f * State.dpiScale);
+				ImGui::ColorEdit4("Noisemaker", (float*)&State.NoisemakerColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				
+				ImGui::ColorEdit4("Tracker", (float*)&State.TrackerColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(150.f * State.dpiScale);
+				ImGui::ColorEdit4("Phantom", (float*)&State.PhantomColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+
+				if (AnimatedButton("Reset Role Colors")) {
+					State.CrewmateGhostColor = ImVec4(1.f, 1.f, 1.f, 0.5f);
+					State.CrewmateColor = ImVec4(1.f, 1.f, 1.f, 1.f);
+					State.EngineerColor = ImVec4(0.f, 1.f, 1.f, 1.f);
+					State.GuardianAngelColor = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
+					State.ScientistColor = ImVec4(0.2f, 0.2f, 1.f, 1.f);
+					State.ImpostorColor = ImVec4(1.f, 0.1f, 0.1f, 1.f);
+					State.ShapeshifterColor = ImVec4(1.f, 0.67f, 0.f, 1.f);
+					State.ImpostorGhostColor = ImVec4(0.25f, 0.25f, 0.25f, 0.5f);
+					State.NoisemakerColor = ImVec4(0.f, 1.f, 0.47f, 1.f);
+					State.TrackerColor = ImVec4(0.65f, 0.36f, 1.f, 1.f);
+					State.PhantomColor = ImVec4(0.53f, 0.f, 0.f, 1.f);
+					State.Save();
+				}
+			}
+
+			if (ImGui::CollapsingHeader("Other Colors")) {
+				ImGui::ColorEdit4("Lobby Host", (float*)&State.HostColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(150.f * State.dpiScale);
+				ImGui::ColorEdit4("Player ID", (float*)&State.PlayerIdColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(300.f * State.dpiScale);
+				ImGui::ColorEdit4("Player Level", (float*)&State.LevelColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+
+				ImGui::ColorEdit4("Platform", (float*)&State.PlatformColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(150.f * State.dpiScale);
+				ImGui::ColorEdit4("Mod Usage", (float*)&State.ModUsageColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(300.f * State.dpiScale);
+				ImGui::ColorEdit4("Name-Checker", (float*)&State.NameCheckerColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+
+				ImGui::ColorEdit4("Friend Code", (float*)&State.FriendCodeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(150.f * State.dpiScale);
+				ImGui::ColorEdit4("Dater Names", (float*)&State.DaterNamesColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(300.f * State.dpiScale);
+				ImGui::ColorEdit4("Lobby Code", (float*)&State.LobbyCodeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				
+				ImGui::ColorEdit4("Lobby Age", (float*)&State.AgeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+
+				if (AnimatedButton("Reset Other Colors")) {
+					State.HostColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
+					State.PlayerIdColor = ImVec4(1.f, 0.f, 0.f, 1.f);
+					State.LevelColor = ImVec4(0.f, 1.f, 0.f, 1.f);
+					State.PlatformColor = ImVec4(0.73f, 0.f, 1.f, 1.f);
+					State.ModUsageColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
+					State.NameCheckerColor = ImVec4(1.f, 0.67f, 0.f, 1.f);
+					State.FriendCodeColor = ImVec4(0.2f, 0.6f, 1.f, 1.f);
+					State.DaterNamesColor = ImVec4(1.f, 0.f, 0.f, 1.f);
+					State.LobbyCodeColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
+					State.AgeColor = ImVec4(0.f, 1.f, 0.f, 1.f);
+					State.Save();
+				}
 			}
 		}
 
@@ -498,6 +628,12 @@ namespace SettingsTab {
 			CheckKeybindEdit(HotKey(State.KeyBinds.Complete_Tasks));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Complete All Tasks");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+			CheckKeybindEdit(HotKey(State.KeyBinds.Cancel_Start));
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Cancel Start Game");
 		}
 		ImGui::EndChild();
 	}

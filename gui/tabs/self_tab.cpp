@@ -377,12 +377,13 @@ namespace SelfTab {
                 if (ToggleButton("Font", &State.Font)) {
                     State.Save();
                 }
-                ImGui::SameLine();
-                if (CustomListBoxInt(" ", &State.FontType, FONTS, 160.f * State.dpiScale)) {
-                    State.Save();
+                if (State.Font) {
+                    ImGui::SameLine();
+                    if (CustomListBoxInt(" ", &State.FontType, FONTS, 160.f * State.dpiScale)) {
+                        State.Save();
+                    }
                 }
                 if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: The white nickname will not be visible in the chat"));
-
 
                 /*if (ToggleButton("Material", &State.Material)) {
                     State.Save();
@@ -508,12 +509,10 @@ namespace SelfTab {
             if (ToggleButton("Disable Lobby Music", &State.DisableLobbyMusic)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("Old Ping Text", &State.OldStylePingText)) State.Save();
 
             if (ToggleButton("Show Host", &State.ShowHost)) {
-                State.Save();
-            }
-            ImGui::SameLine();
-            if (ToggleButton("Hide Watermark", &State.HideWatermark)) {
                 State.Save();
             }
             ImGui::SameLine();
@@ -525,6 +524,18 @@ namespace SelfTab {
                 State.Save();
             }
 
+            if (ToggleButton("Show Chat Cooldown", &State.ShowChatTimer)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Extend Chat Character Limit", &State.ExtendChatLimit)) {
+                State.Save();
+            }
+
+            if (ToggleButton("Extend Chat History", &State.ExtendChatHistory)) {
+                State.Save();
+            }
+
             /*if (ToggleButton("Change Body Type", &State.ChangeBodyType)) {
                 State.Save();
             }
@@ -533,24 +544,6 @@ namespace SelfTab {
                 if (CustomListBoxInt("Type", &State.BodyType, BODYTYPES, 75.f * State.dpiScale))
                     State.Save();
             }*/
-
-            if (ToggleButton("Old Ping Text", &State.OldStylePingText)) State.Save();
-            ImGui::SameLine();
-            if (ToggleButton("Custom Game Theme", &State.CustomGameTheme)) State.Save();
-            ImGui::SameLine();
-            if (ToggleButton("Dark Mode", &State.DarkMode)) State.Save();
-
-            if (State.CustomGameTheme) {
-                if (ImGui::ColorEdit3("Background Color", (float*)&State.GameBgColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview))
-                    State.Save();
-                ImGui::SameLine();
-                if (ImGui::ColorEdit3("Text Color", (float*)&State.GameTextColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview))
-                    State.Save();
-            }
-
-            if (ToggleButton("Fast Role Reveal", &State.FastRoleReveal)) State.Save();
-            ImGui::SameLine();
-            if (ToggleButton("No Seeker Animation", &State.NoSeekerAnim)) State.Save();
 
             if (State.InMeeting && AnimatedButton("Move in Meeting"))
             {
@@ -566,8 +559,10 @@ namespace SelfTab {
             }
             ImGui::SameLine();
             if (ToggleButton("Move While in Vent & Shapeshifting", &State.MoveInVentAndShapeshift)) {
-                if (!State.MoveInVentAndShapeshift && (State.InMeeting || (*Game::pLocalPlayer)->fields.inVent)) {
+                if (*Game::pLocalPlayer == NULL) State.Save();
+                else if (!State.MoveInVentAndShapeshift && (State.InMeeting || (*Game::pLocalPlayer)->fields.inVent)) {
                     (*Game::pLocalPlayer)->fields.moveable = false;
+                    State.Save();
                 }
             }
             ImGui::SameLine();
@@ -586,12 +581,26 @@ namespace SelfTab {
             if (ToggleButton("NoClip", &State.NoClip)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("No Seeker Animation", &State.NoSeekerAnim)) State.Save();
 
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
             }
             ImGui::SameLine();
             if (ToggleButton("Infinite Kill Range", &State.InfiniteKillRange)) {
+                State.Save();
+            }
+
+            if (ToggleButton("Better Chat Notifications", &State.BetterChatNotifications)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Better Lobby Code Input", &State.BetterLobbyCodeInput)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Better Message Sounds", &State.BetterMessageSounds)) {
                 State.Save();
             }
 
