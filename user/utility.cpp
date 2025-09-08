@@ -1894,7 +1894,7 @@ bool checkAgainstDict(const std::string& str, const std::string& substr, const s
 
 std::string RemoveDiacritics(const std::string& input)
 {
-	static const std::unordered_map<char, char> diacriticMap = {
+	static const std::unordered_map<std::string, std::string> diacriticMap = {
 		// This list of mappings is specifically handpicked to target Among Us's font support.
 		// If it looks like some diacritics or other homoglyphs may be missing from here, that's probably why.
 		// This list is not fully complete and may be subject to change in the future.
@@ -1948,10 +1948,37 @@ std::string RemoveDiacritics(const std::string& input)
 	};
 
 	std::string output;
-	for (char c : input)
-	{
-		auto it = diacriticMap.find(c);
-		output += (it != diacriticMap.end()) ? it->second : c;
+	for (size_t i = 0; i < input.size();) {
+		unsigned char c = static_cast<unsigned char>(input[i]);
+		size_t len = 1;
+
+		// Detect UTF-8 sequence length
+		if ((c & 0x80) == 0x00) {
+			len = 1; // ASCII (0xxxxxxx)
+		}
+		else if ((c & 0xE0) == 0xC0) {
+			len = 2; // 110xxxxx
+		}
+		else if ((c & 0xF0) == 0xE0) {
+			len = 3; // 1110xxxx
+		}
+		else if ((c & 0xF8) == 0xF0) {
+			len = 4; // 11110xxx
+		}
+
+		// Extract full UTF-8 codepoint as substring
+		std::string key = input.substr(i, len);
+
+		// Replace if in map
+		auto it = diacriticMap.find(key);
+		if (it != diacriticMap.end()) {
+			output += it->second;
+		}
+		else {
+			output += key;
+		}
+
+		i += len;
 	}
 	return output;
 }
