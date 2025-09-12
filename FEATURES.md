@@ -36,11 +36,12 @@
 - **Use Custom Guest Friend Code** Changes your new friend code to whatever you want as long as it's valid (Default: OFF)
 - **Spoof Level** Spoofs your level in game (Default: OFF)
 - **Spoof Platform** Spoofs your platform to whatever you choose (Default: OFF)
+- **Spoof Game Version** Spoofs your game version to play with people on the latest version of Among Us (Default: ON: 16.0.5/16.1.0)
 ### Customization
 <img width="400" height="300" alt="Screenshot 2025-09-12 160946" src="https://github.com/user-attachments/assets/5e582be8-5ebc-4f2b-ace0-e399d8f8fb13" />
 
 - **Show/Hide Watermark** Shows/Hides the watermark
-- **Light Mode** Changes the game mode to Light
+- **Light Mode** Changes the menu's theme to Light
 - **Menu Theme Color** Changes the theme color of the menu
 - **Gradient Theme** Changes the gradient theme of the menu
 - **Match Background With Theme** Makes it so that the background of the menu is matching with its theme
