@@ -1,9 +1,14 @@
 # Features of SickoMenu
 > [!NOTE]
 > Pro Tip: Use `Ctrl + F` to search for specific features!
+## 📕 About
+<img width="400" height="300" alt="Screenshot 2025-09-12 160917" src="https://github.com/user-attachments/assets/cb5de8fd-2a2e-4125-b1f6-04f54f08cbed" /> <img width="400" height="300" alt="Screenshot 2025-09-12 160925" src="https://github.com/user-attachments/assets/7177f02b-5f40-4a65-bc30-f237e875e646" />
+
 
 ## ⚙️ Settings
 ### General
+<img width="400" height="300" alt="Screenshot 2025-09-12 160933" src="https://github.com/user-attachments/assets/de4445f1-6fc0-4b5c-8b6c-0878cf147150" />
+
 - **Keybinds** Show/Hide Menu/Console (Default: DELETE, HOME)
 - **Show Keybinds** Allows you to see and modify keybinds (Default: ON)
 - **Allow Keybinds while Chatting** Allows you to use keybinds while chatting (Default: OFF)
@@ -25,11 +30,34 @@
 - **Safe Mode** Disables certain features whenever there is an anticheat (Default: ON)
 - **Allow other SickoMenu users to see you're using SickoMenu** Allows SickoMenu users to see other SickoMenu users
 ### Spoofing
+<img width="400" height="300" alt="Screenshot 2025-09-12 160940" src="https://github.com/user-attachments/assets/db97a985-1527-45f1-ae33-c37551ce974f" />
+
 - **Spoof Guest Account** Spoofs your account to be a new guest account everytime you log in *(Works best with version.dll)* (Default: OFF)
 - **Use Custom Guest Friend Code** Changes your new friend code to whatever you want as long as it's valid (Default: OFF)
 - **Spoof Level** Spoofs your level in game (Default: OFF)
 - **Spoof Platform** Spoofs your platform to whatever you choose (Default: OFF)
+### Customization
+<img width="400" height="300" alt="Screenshot 2025-09-12 160946" src="https://github.com/user-attachments/assets/5e582be8-5ebc-4f2b-ace0-e399d8f8fb13" />
+
+- **Show/Hide Watermark** Shows/Hides the watermark
+- **Light Mode** Changes the game mode to Light
+- **Menu Theme Color** Changes the theme color of the menu
+- **Gradient Theme** Changes the gradient theme of the menu
+- **Match Background With Theme** Makes it so that the background of the menu is matching with its theme
+- **RGB Menu Theme** Changes the theme of the menu to RGB
+- **Dark Game Theme** Changes the game theme to Dark
+- **Custom Game Theme** Makes you choose your own custom game theme
+- **Change Chat Font** Changes the font of the chat
+- **Menu Scale** Changes the scale of the menu
+- **Enable/Disable Animations** Enables/Disables animations
+- **Animation Speed** Changes the speep of the animation
+- **Rounding Radious Multiplier** Changes the rounding radious multiplier
+- **Role colors** Changes the color shown for a certain role
+- **Other Colors** Changes other colors
+
 ### Keybinds
+<img width="400" height="300" alt="Screenshot 2025-09-12 160953" src="https://github.com/user-attachments/assets/f59fae7c-9955-4b0a-8efd-e1860a96cc0d" />
+
 - **Show/Hide Menu** (Default: DELETE)
 - **Show/Hide Console** (Default: HOME)
 - **Show/Hide Radar** (Default: Insert)
@@ -49,6 +77,8 @@
 
 ## 🎮 Game
 ### General
+<img width="400" height="300" alt="Screenshot 2025-09-12 161000" src="https://github.com/user-attachments/assets/c15b2af8-8d0d-4a65-89fb-ccbd0806919a" />
+
 - **Multiply Player Speed** Multiplies your speed by specified amount (Default: OFF)
 - **Modify Kill Distance** Modifies kill distance to the specified amount (Default: OFF)
 - **No Ability Cooldown** Removes ability cooldowns (kill cooldown, vent cooldown, etc.) (Default: OFF)
@@ -81,6 +111,8 @@ View the game options!
 
 ## 🤵 Self
 ### Visuals
+<img width="400" height="300" alt="Screenshot 2025-09-12 161033" src="https://github.com/user-attachments/assets/6d8ad959-f1e9-4a04-8262-2ab1e0fb7415" />
+
 - **Max Vision** See everything (walls still block vision) (Default: OFF)
 - **Wallhack** See everything (even through walls) (Default: OFF)
 - **Disable HUD** Disables HUD elements such as use, sabotage buttons
@@ -112,6 +144,8 @@ View the game options!
 - **Move in Meeting** Ends the meeting for yourself
 
 ### Utils
+<img width="400" height="300" alt="Screenshot 2025-09-12 161038" src="https://github.com/user-attachments/assets/ccec2cfd-19b1-4c3d-851d-159c51279f6f" />
+
 - **Unlock Vents** Allows you to vent even when your role doesn't allow you to (Default: OFF)
 - **Move While in Vent & Shapeshifting** Allows you to move in vent and while shapeshifting (Default: OFF)
 - **Always Move** Allows you to move in meetings and game menus such as tasks (Default: OFF)
@@ -141,12 +175,20 @@ View the game options!
 - **Disable Lobby Music** Completely disable the lobby music
 
 ### Randomizers
+<img width="400" height="300" alt="Screenshot 2025-09-12 161044" src="https://github.com/user-attachments/assets/23434fa5-10bd-4126-8d41-12842813a73d" />
+
 - **Cycler** Constantly cycles your cosmetics that you choose (Default: OFF)
 - **Cycle for Everyone** *(Only as host/Safe Mode disabled)* Constantly cycles everyone's name and color if chosen (Default: OFF)
 - **Confuser** Randomize your appearance at will or when certain conditions are met (Default: OFF)
 - **Randomize Everyone** *(Only with Safe Mode disabled)* Randomize everyone's appearances at will
+### Text Editor
+<img width="400" height="300" alt="Screenshot 2025-09-12 161050" src="https://github.com/user-attachments/assets/4923b66e-f7d6-472c-b178-713d88b22c6c" />
+
+Edit your own texts with features like colors , size and more! This allows you to set your name or bigger projects
 
 ## 🗺️ Radar
+<img width="400" height="300" alt="Screenshot 2025-09-12 161150" src="https://github.com/user-attachments/assets/3bbd0e24-65cf-4460-8210-fa4ff646dcb1" />
+
 - **Show Radar** Shows a radar of the current map with players (Default: OFF)
 - **Show Dead Bodies** Shows dead bodies on the radar (Default: OFF)
 - **Show Ghosts** Shows ghosts on the radar (Default: OFF)
@@ -159,12 +201,16 @@ View the game options!
 - **Extra Width/Height** Extends the radar to whatever width and height you choose
 
 ## ▶️ Replay
+<img width="400" height="300" alt="Screenshot 2025-09-12 161157" src="https://github.com/user-attachments/assets/5053389e-2ad3-46c1-b2e4-6681b4c4623d" />
+
 - **Show Replay** Shows a replay of all game events (Default: OFF)
 - **Show only last x seconds** Only shows the last x seconds (Default: OFF)
 - **Clear after Meeting** Clears the replay after meeting (Default: OFF)
 - **Replay Map Color** Changes the replay map's color
 
 ## 🩻 ESP
+<img width="400" height="300" alt="Screenshot 2025-09-12 161203" src="https://github.com/user-attachments/assets/1d39098b-afe6-427c-ab67-fa708fdd13ac" />
+
 - **Enable** Enables ESP (Default: OFF)
 - **Show Ghosts** Shows ghosts on ESP (Default: ON)
 - **Hide During Meetings** Hides ESP in meetings (Default: OFF)
@@ -173,6 +219,8 @@ View the game options!
 - **Role-based** Instead of player colors, use role colors for ESP and toggle roles you want to see (Default: OFF)
 
 ## 🤹 Players:
+<img width="400" height="300" alt="Screenshot 2025-09-12 161227" src="https://github.com/user-attachments/assets/7783108c-9bd8-470a-aec7-845695afbd03" />
+
 A dedicated player menu for viewing and manipulating players
 - **Call Meeting** Calls a meeting as yourself
 - **Skip Vote by All** *(Only as host/Safe Mode disabled)* Skips votes by everyone
@@ -194,6 +242,8 @@ A dedicated player menu for viewing and manipulating players
 - View the player's tasks (and complete them with Safe Mode disabled)
 
 ### Trolling
+<img width="400" height="300" alt="Screenshot 2025-09-12 161247" src="https://github.com/user-attachments/assets/25b76c4d-97ea-4a50-8a2c-3aea86ad7b33" />
+
 - **Allow Player to NoClip** *(Only as host/Safe Mode disabled)* Allows the selected player to walk through walls
 - **Force Meeting By** Forces an emergency meeting by the selected player
 - **Self-Report** Forces the selected player to report their own body
@@ -226,6 +276,8 @@ A dedicated player menu for viewing and manipulating players
 - **Chat As** *(Only with Safe Mode disabled)* Spoofs your chat messages from the selected player
 
 ## ✅ Tasks
+<img width="400" height="300" alt="Screenshot 2025-09-12 161253" src="https://github.com/user-attachments/assets/f4f6f3d4-848c-4d35-8ce0-1fd4efeb6111" />
+
 - **Complete All Tasks** Completes your tasks
 - **Complete Everyone's Tasks** *(Only with Safe Mode disabled)* Completes everyone's tasks
 - **Complete Specific Task** Completes the selected task
@@ -234,6 +286,8 @@ A dedicated player menu for viewing and manipulating players
 - **Fake Cameras in Use** Fakes the cameras being used when there's no one using them
 
 ## 🚨 Sabotage
+<img width="400" height="300" alt="Screenshot 2025-09-12 161300" src="https://github.com/user-attachments/assets/ec857216-c61b-430a-836a-830e76f4f0ba" />
+
 - **Disable Sabotages** *(Only as Host)* Prevents players from sabotaging stuff
 - **Repair Sabotage** Repairs the ongoing sabotage
 - **Auto repair Sabotage** Automatically repairs all sabotages (Default: OFF)
@@ -245,6 +299,8 @@ A dedicated player menu for viewing and manipulating players
 - **Infinite mushroom mixup** Activates mushroom mixup forever
 
 ## 🚪 Doors
+<img width="400" height="300" alt="Screenshot 2025-09-12 161307" src="https://github.com/user-attachments/assets/4a19c64e-086c-4039-812a-b31b322228ea" />
+
 - *All doors can be closed, pinned, or unpinned*
 - **Close All Doors** All doors will be closed
 - **Pin All Doors** All doors will be forever locked
@@ -252,6 +308,8 @@ A dedicated player menu for viewing and manipulating players
 - **Auto Open Doors** Automatically opens doors for you without going through a minigame
 
 ## 🫅 Host
+<img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/29761a1b-b017-449d-8bbe-989ca3868094" />
+
 - **Choose Roles** Select everyone's roles!
 - **Map** Change the map
 - **Custom Impostor Amount** Force your desired number of impostors to spawn (Default: OFF)
@@ -272,6 +330,8 @@ A dedicated player menu for viewing and manipulating players
 - **Show Lobby Timer** See when the server will close the lobby due to inactivity (Default: OFF)
 
 ## 🧑‍💻 Debug
+<img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/094a1abd-5a71-4e29-8f9c-452a10dd895e" />
+
 - **Enable Occlusion Culling** Allows culling of objects not in your field of view (Default: OFF)
 - **Force Load Settings** Forces the loading of settings from the settings file
 - **Force Save Settings** Force save your settings
