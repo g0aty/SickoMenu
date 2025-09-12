@@ -284,6 +284,7 @@ A dedicated player menu for viewing and manipulating players
 - **Play Animations** Plays the map-specific animations specified
 - **Play Medbay Scan Animation** Plays a medbay scan animation on yourself
 - **Fake Cameras in Use** Fakes the cameras being used when there's no one using them
+- **Bypass Visual Tasks Being Off** Others can still see your task visuals regardless of the game’s visual task settings.
 
 ## 🚨 Sabotage
 <img width="400" height="300" alt="Screenshot 2025-09-12 161300" src="https://github.com/user-attachments/assets/ec857216-c61b-430a-836a-830e76f4f0ba" />
