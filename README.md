@@ -180,15 +180,69 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
   **For Method 3:**
 - The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
 
+## ⬇️ Downgrading Among Us (If needed)
+- Since the latest update of Among Us 17.0.0 can't be spoofed due to new roles update , you can only use Sicko in 16.0.2 and spoof to 16.1.0 , here's the [link](https://textbin.net/rruqqrlgaw) for downgrading method or just read the text down here
+**Note** : We already know about the update , please be patient for the menu to be updated. Don't make bug reports for this or i'll be closed instantly.
+### For Steam :
+**Method 1** (Not Recommended) : 
+- Open Steam -> Library -> Among Us -> click the settings icon -> Properties -> Betas -> Public Betas, and launch the game from **Steam**!
+**Method 2** : 
+1. In a browser, open the Steam Console
+
+steam://open/console
+
+2. Type this command
+
+download_depot 945360 945361 1602714909229311555
+
+3. Go to the location it specifies when the depot download is complete:
+
+Depot download complete : "C:\Program Files\Steam\steamapps\... (etc, yours maybe different , you can set it as the location you want)"
+
+4. (Optional): Drag the contents of the files in the folder into a separate folder to keep
+
+5 (Important): Add a text file named steam_appid.txt (make sure you have file extensions visible!) to the folder
+
+6. Open it, and save it with the following text:
+945360
+
+7. Run Among Us from the EXE, do NOT run it from steam! Make sure steam is opened in the background. If you don't have steam_appid.txt in your AU folder , you'll get authentication error , same if you don't have steam opened in the background.
+
+AU 16.0.0 should now be at that location!
+Note: use a directory that does not need administrator privileges and is not in a cloud service like Onedrive, Steam messes itself up sometimes
+
+## For Epic Games :
+**Method :**
+Use the EpicGamesDowngrader tool by whichtwix:
+https://github.com/whichtwix/EpicGamesDowngrader
+Refer to the readme for any issues you might have!
+You may also follow this tutorial by Limehcik (It is in Russian, but it still helps with the installation!): https://www.youtube.com/watch?v=q4DFUfzd26g
+
+## For Itch.io : Make sure you have an older copy of Among Us somewhere else, then install SickoMenu there!
+
 ---
 ## ⌨️ Default Hotkeys
-- Show Menu - DELETE
-- Show Radar - INSERT
-- Show Console - HOME
-- Show Replay - END
+- Show/Hide Menu - DELETE
+- Show/Hide Radar - INSERT
+- Show/Hide Console - HOME
+- Show/Hide Replay - END
 - Repair Sabotage - PAGE DOWN (PgDn)
 - NoClip - CTRL
-- Panic / Disable SickoMenu - PAUSE BREAK (Break)
+- Panic / Disable SickoMenu / Enable SickoMenu after disabling - PAUSE BREAK (Break)
+## 🖊️ Changable Keybinds
+- Show/Hide chat
+- Read Ghost Messages (show ghost chat)
+- Freecam
+- Enable/Disable HUD (The button such as use/vent/kill)
+- Zoom
+- Auto Kill
+- Reset Appearance
+- Confuse Now
+- Repair All Sabotages
+- Close All Doors
+- Close Current Room Door
+- Complete All Tasks
+**Note** : Only those features are changable in the Keybinds settings , it's not planned to add more right now (maybe in the future).
 
 ## ⚒️ Compile (Configurations)
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
@@ -204,6 +258,9 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 
 - Debug_Version (With Debug Information and can be attached to process)
 - Release_Version (Optimized with all information stripped)
+
+## ❓ FAQ (Frequently Asked Questions) :
+- The [link](https://textbin.net/frtqdcip4k) for SickoMenu FAQ is here.
 
 ## 🙏 Special Thanks
 * The [BitCrackers](https://github.com/bitcrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
