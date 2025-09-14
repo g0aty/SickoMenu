@@ -327,7 +327,7 @@ A dedicated player menu for viewing and manipulating players
 - **Disable Kills** Prevents players from killing others (Cheaters can still bypass this as of now) (Default: OFF)
 - **Switch Moving Platform Side** *(Only on Airship)* Switches the moving platform's side
 - **Change Gamemode** : Allows you to change the game mode into different one (only Task Speedrun and Default is available right now)
-- **Spectator Mode** : Set your role to Ghost when the game start so you can spectate everyone
+- **Spectator Mode** : Set your role to Ghost when the game start so you can spectate everyone (Default : OFF)
 - **Disable Game Ending** Prevents the game from ending (Default: OFF)
 - **End Game** End the game at your own will for your desired reason
 - **Force Name for Everyone** Forces your desired name for everyone (Default: OFF)
