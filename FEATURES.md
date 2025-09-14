@@ -20,7 +20,7 @@
 - **RGB Menu Theme** Have an RGB accent color (Default: OFF)
 - **Opacity** Change the opacity of the Menu (Default: 100%)
 - **Show Debug Tab** *(Only for Debug)* Shows the Debug tab (Default: OFF)
-- **Set Name** Sets in-game name to the specified name provided that it's valid or you're a host/not in safe mode
+- **Set Name** Sets in-game name to the specified name provided that it's valid or you're not in safe mode
 - **Set as Account Name** Sets your account name to the specified name provided that it's valid
 - **Automatically Set Name** If your name is not the same as the username, set the username automatically (Default: OFF)
 - **Replace Streamer Mode Lobby Code** Changes the streamer mode hidden code from "******" to your custom text (Default: "SICKOS")
@@ -313,11 +313,21 @@ A dedicated player menu for viewing and manipulating players
 - **Choose Roles** Select everyone's roles!
 - **Map** Change the map
 - **Custom Impostor Amount** Force your desired number of impostors to spawn (Default: OFF)
-- **Force Start of Game** Forces the game to start
+- **Always Be A Specific Role** : Always set your role to your wanted role
+- **Modify Start Countdownn** : Change the start countdown into whatever number that you want
+- **Force Start Of Game** Forces the game to start
+- **Cancel Start Of Game** : Cancel the start when the game is starting in x seconds
+- **Auto Start Game** : Automatically starts the game after x seconds (changable)
+- **Auto Start Game (Player count)** : Automatically starts the game when reach the wanted number of players
+- **Ignore RPCs** : Ignoring most RPCs (Default : OFF)
 - **Disable Meetings** Disables meetings and body reports (Default: OFF)
+- **Disable All Votekicks** : Disables the votekick for everyone (Default : OFF)
 - **Disable Sabotages** Prevents players from sabotaging stuff (Default: OFF)
+- **Disable Medbay Scan** : Disables the Medbay scan for everyone (Default : OFF)
 - **Disable Kills** Prevents players from killing others (Cheaters can still bypass this as of now) (Default: OFF)
 - **Switch Moving Platform Side** *(Only on Airship)* Switches the moving platform's side
+- **Change Gamemode** : Allows you to change the game mode into different one (only Task Speedrun and Default is available right now)
+- **Spectator Mode** : Set your role to Ghost when the game start so you can spectate everyone
 - **Disable Game Ending** Prevents the game from ending (Default: OFF)
 - **End Game** End the game at your own will for your desired reason
 - **Force Name for Everyone** Forces your desired name for everyone (Default: OFF)
