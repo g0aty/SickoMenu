@@ -681,12 +681,9 @@ public:
     std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> playerPunishTimers;
 
     // Temp-Ban [Dependencies]
-    /*bool TempBanEnabled = true;
-    int TempBanDuration = 60; /// Seconds
-    std::string TBanFC = "";
-    std::unordered_map<std::string, std::chrono::system_clock::time_point> TempBanHistoryFC;
-    std::unordered_map<std::string, std::pair<std::chrono::system_clock::time_point, std::string>> TempBannedFriendCodes;
-    std::unordered_map<std::string, std::chrono::system_clock::time_point> PlayerPunishTimersFC;*/
+    bool TempBanEnabled = true;
+    std::unordered_map<std::string, std::chrono::system_clock::time_point> TempBannedFCs;
+    int64_t MAX_BAN_SECONDS = static_cast<int64_t>(100) * 365 * 86400; // also it prevents runtime error (int overflow)
 
 	// Temp-Ban Optimized [Dependencies]
     bool EnableTempBan = false;
