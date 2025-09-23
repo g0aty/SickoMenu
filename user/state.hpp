@@ -685,10 +685,6 @@ public:
     std::unordered_map<std::string, std::chrono::system_clock::time_point> TempBannedFCs;
     int64_t MAX_BAN_SECONDS = static_cast<int64_t>(100) * 365 * 86400; // also it prevents runtime error (int overflow)
 
-	// Temp-Ban Optimized [Dependencies]
-    bool EnableTempBan = false;
-	std::unordered_map<std::string, int> TempBannedFCs;
-
     // Disable Tasks
     bool DisableMedbayScan = false;
 
