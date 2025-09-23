@@ -533,5 +533,17 @@ PunishPlayer::PunishPlayer(PlayerControl* player, bool isBan)
 }
 
 void PunishPlayer::Process() {
-	app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.OwnerId, isBan, NULL);
+	if (!Player) return;
+
+	std::string selfFC;
+	if (Game::pLocalPlayer && *Game::pLocalPlayer) {
+		selfFC = convert_from_string((*Game::pLocalPlayer)->fields.FriendCode);
+	}
+
+	std::string targetFC = convert_from_string(Player->fields.FriendCode);
+	if (!selfFC.empty() && targetFC == selfFC) {
+		return;
+	}
+
+	app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.OwnerId, isBan, nullptr);
 }
