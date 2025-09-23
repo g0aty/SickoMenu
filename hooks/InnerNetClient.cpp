@@ -1110,17 +1110,36 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
         }
 
-        /*if (State.EnableTempBan) {
-            int now = static_cast<int>(std::chrono::system_clock::now().time_since_epoch().count());
-            for (auto it = State.TempBannedFCs.begin(); it != State.TempBannedFCs.end(); ) {
-                if (now >= it->second) {
-                    State.TempBannedFCs.erase(it);
+        if (State.TempBanEnabled) {
+            static auto lastCheck = std::chrono::system_clock::now();
+            auto now = std::chrono::system_clock::now();
+
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCheck).count() >= 100) /* <- trigger threshold (0,1 sec) */ {
+                for (auto it = State.TempBannedFCs.begin(); it != State.TempBannedFCs.end();) {
+                    if (now >= it->second) {
+                        it = State.TempBannedFCs.erase(it);
+                        State.Save();
+                    }
+                    else {
+                        if (IsInGame() || IsInLobby()) {
+                            for (auto p : GetAllPlayerControl()) {
+                                if (convert_from_string(p->fields.FriendCode) == it->first) {
+                                    // Re-ban temp-banned:
+                                    if (IsInGame()) {
+                                        State.rpcQueue.push(new PunishPlayer(p, false));
+                                    }
+                                    if (IsInLobby()) {
+                                        State.lobbyRpcQueue.push(new PunishPlayer(p, false));
+                                    }
+                                }
+                            }
+                        }
+                        ++it;
+                    }
                 }
-                else {
-                    ++it;
-                }
+                lastCheck = now;
             }
-        }*/
+        }
 
         if (IsInLobby() && IsHost() && GameOptions().HasOptions()) {
             GameOptions options;
