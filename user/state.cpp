@@ -923,7 +923,7 @@ void Settings::Save() {
                 { "AgeColor_R", this->AgeColor.x },
                 { "AgeColor_G", this->AgeColor.y },
                 { "AgeColor_B", this->AgeColor.z },
-                { "AgeColor_A", this->AgeColor.w }
+                { "AgeColor_A", this->AgeColor.w },
 
                 { "TempBanEnabled", this->TempBanEnabled },
 
