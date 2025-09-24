@@ -449,25 +449,29 @@ void Settings::Load() {
         JSON_TRYGET("AgeColor_B", this->AgeColor.z);
         JSON_TRYGET("AgeColor_A", this->AgeColor.w);
 
-        /*JSON_TRYGET("EnableTempBan", this->EnableTempBan);
-        JSON_TRYGET("TempBannedFCs", this->TempBannedFCs);*/
+        JSON_TRYGET("TempBanEnabled", this->TempBanEnabled);
 
-        // Temp-Ban: Time calculation, and saving...
-        /*if (j.contains("TempBannedFriendCodes") && j["TempBannedFriendCodes"].is_object()) {
+        // Temp-Ban: Loading
+        if (j.contains("TempBannedFriendCodes") && j["TempBannedFriendCodes"].is_object()) {
             for (auto& [fc, info] : j["TempBannedFriendCodes"].items()) {
-                if (info.contains("until") && info["until"].is_number_integer()) {
-                    int64_t until = info["until"].get<int64_t>();
-                    std::string reason = "Temporary ban";
-                    if (info.contains("Type:") && info["Type:"].is_string()) {
-                        reason = info["Type:"].get<std::string>();
+                if (info.contains("until")) {
+                    if (info["until"].is_string()) {
+                        std::string ts = info["until"].get<std::string>();
+                        std::tm tm{};
+                        std::istringstream ss(ts);
+                        ss >> std::get_time(&tm, "%y/%m/%d %H:%M:%S");
+                        if (!ss.fail()) {
+                            std::time_t t = std::mktime(&tm);
+                            this->TempBannedFCs[fc] = std::chrono::system_clock::from_time_t(t);
+                        }
                     }
-                    this->TempBannedFriendCodes[fc] = {
-                        std::chrono::system_clock::time_point(std::chrono::seconds(until)),
-                        reason
-                    };
+                    else if (info["until"].is_number_integer()) {
+                        int64_t until = info["until"].get<int64_t>();
+                        this->TempBannedFCs[fc] = std::chrono::system_clock::time_point(std::chrono::seconds(until));
+                    }
                 }
             }
-        }*/
+        }
     }
     catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
@@ -919,23 +923,27 @@ void Settings::Save() {
                 { "AgeColor_R", this->AgeColor.x },
                 { "AgeColor_G", this->AgeColor.y },
                 { "AgeColor_B", this->AgeColor.z },
-                { "AgeColor_A", this->AgeColor.w }
+                { "AgeColor_A", this->AgeColor.w },
 
-                /*{"EnableTempBan", this->EnableTempBan},
-                { "TempBannedFCs", this->TempBannedFCs },*/
+                { "TempBanEnabled", this->TempBanEnabled },
 
-                // Temp-Ban: Time calculation, and saving...
-                /*{"TempBannedFriendCodes", [&]() {
-                        nlohmann::ordered_json banList = nlohmann::ordered_json::object();
-                        for (const auto& [fc, info] : this->TempBannedFriendCodes) {
-                            auto until = std::chrono::duration_cast<std::chrono::seconds>(info.first.time_since_epoch()).count();
-                            banList[fc] = {
-                                { "until", until }
-                            };
-                        }
-                        return banList;
-                    }()
-                }*/
+                // Temp-Ban: Saving
+                { "TempBannedFriendCodes", [&]() {
+                    nlohmann::ordered_json banList = nlohmann::ordered_json::object();
+                    for (const auto& [fc, until] : this->TempBannedFCs) {
+                        std::time_t tt = std::chrono::system_clock::to_time_t(until);
+                        std::tm tm{};
+                        localtime_s(&tm, &tt);
+
+                        char buffer[32];
+                        std::strftime(buffer, sizeof(buffer), "%y/%m/%d %H:%M:%S", &tm);
+
+                        banList[fc] = {
+                            { "until", std::string(buffer) }
+                        };
+                    }
+                    return banList;
+                }() }
             };
 
             std::ofstream outSettings(settingsPath);
