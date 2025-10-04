@@ -14,19 +14,22 @@
 - **Allow Keybinds while Chatting** Allows you to use keybinds while chatting (Default: OFF)
 - **Always Show Menu on Startup** Shows the menu on startup (Default: ON)
 - **Panic** Disables the mod at will (Default: OFF)
+- **Extra Commands** Adds more features to the menu (Default: OFF)
+- **Save Config** Saves the menu settings you have already
+- **Load Config** Loads your last settings for the menu
 - **Adjust by DPI** Allows you to change scaling of the menu (Default: ON)
 - **Menu Scale** Change the size of the menu (Default: 100%)
 - **Menu Theme Color**: Change the accent color of the menu (Default: #801341)
 - **RGB Menu Theme** Have an RGB accent color (Default: OFF)
 - **Opacity** Change the opacity of the Menu (Default: 100%)
-- **Show Debug Tab** *(Only for Debug)* Shows the Debug tab (Default: OFF)
+- **Show Debug Tab** *(Only for Debug)* Shows the Debug tab below the Doors tab (Default: OFF)
 - **Set Name** Sets in-game name to the specified name provided that it's valid or you're a host/not in safe mode
 - **Set as Account Name** Sets your account name to the specified name provided that it's valid
 - **Automatically Set Name** If your name is not the same as the username, set the username automatically (Default: OFF)
 - **Replace Streamer Mode Lobby Code** Changes the streamer mode hidden code from "******" to your custom text (Default: "SICKOS")
 - **RGB Lobby Code** Makes the lobby code RGB (Default: OFF)
 - **Unlock All Achievements** Unlocks all Achievements
-- **Unlock Cosmetics** Unlocks every cosmetic (hats, visors, etc.) (Default: OFF)
+- **Unlock Cosmetics** Unlocks EVERY SINGLE cosmetic (hats, visors, etc.) (Default: OFF)
 - **Safe Mode** Disables certain features whenever there is an anticheat (Default: ON)
 - **Allow other mod users to see you're using ...** Allows other mod menu users to see that you are using either SickoMenu, AmongUsMenu, or KillNetwork. (Default: SickoMenu)
 ### Spoofing
@@ -47,6 +50,7 @@
 - **Gradient Theme** Changes the gradient theme of the menu
 - **Match Background With Theme** Makes it so that the background of the menu is matching with its theme
 - **RGB Menu Theme** Changes the theme of the menu to RGB
+- **Opacity** Changes the opacity of the menu on a scale of 1
 - **Dark Game Theme** Changes the game theme to Dark
 - **Custom Game Theme** Makes you choose your own custom game theme
 - **Change Chat Font** Changes the font of the chat
@@ -64,18 +68,21 @@
 - **Show/Hide Console** (Default: HOME)
 - **Show/Hide Radar** (Default: Insert)
 - **Show/Hide Replay** (Default: End)
+- **Show/Hide Chat** (Default: None)
+- **Read Ghost Messages** (Defaul: None)
 - **Panic (Disable SickoMenu)** (Default: PAUSE BREAK)
-- **Enable/Disable HUD** (Default: None)
 - **Enable/Disable HUD** (Default: None)
 - **Freecam** (Default: None)
 - **Zoom** (Default: None)
 - **NoClip** (Default: CTRL)
+- **Autokill** (Default: None)
 - **Reset Appearance** (Default: None)
 - **Confuse Now** (Default: None)
 - **Repair All Sabotages** (Default: PAGE DOWN)
 - **Close All Doors** (Default: None)
 - **Close Current Room Door** (Default: None)
 - **Complete All Tasks** (Default: None)
+- **Cancel Start Game** (Default: None)
 
 ## 🎮 Game
 ### General
@@ -85,6 +92,7 @@
 - **Modify Kill Distance** Modifies kill distance to the specified amount (Default: OFF)
 - **No Ability Cooldown** Removes ability cooldowns (kill cooldown, vent cooldown, etc.) (Default: OFF)
 - **Set Color** Sets your color to the specified color if it's available or you're host/not in safe mode
+- **Random Color** Sets your color to a random one
 - **Snipe Color** Snipes your color whenever it's available (Default: OFF)
 - **Send Chat** Sends a chat message to the game chat
 - **Send to AUM** Sends an AUM chat message that can be seen with AmongUsMenu or SickoMenu
@@ -154,14 +162,16 @@ View the game options!
 - **Shapeshift without Animation** Allows you to shapeshift without the animation (Default: OFF)
 - **Copy Lobby Code on Disconnect** Automatically copies the lobby code to your clipboard when you get disconnected unintentionally (Default: OFF)
 - **NoClip** Allows you to walk through walls (Default: OFF)
+- **No Seeker Animation** When playing Hide & Seek as a seeker, you won't appear as one (Default: OFF)
 - **Kill Other Impostors** *(Only with Safe Mode disabled)* Allows you to kill fellow impostors (Default: OFF)
 - **Unlock Kill Button** *(Only with Safe Mode disabled)* Allows you to use kill button at any time (Default: OFF)
 - **Allow Killing in Lobbies** *(Only with Safe Mode disabled)* Allows you to kill in lobbies (Default: OFF)
 - **Kill While Vanished** *(Only with Safe Mode disabled)* Allows you to kill while being vanished as a phantom (Default: OFF)
 - **Infinite Kill Range** Extends your kill reach (Default: OFF)
+- **Autokill** Instantly kills the closest player when the kill CD reaches 0 (Default: OFF)
 - **Bypass Guardian Angel Protections** Allows you to kill protected players (Default: OFF)
 - **Do Tasks as Impostor** Allows you to complete tasks as impostor (Default: OFF)
-- **Always Use Kill Exploit** Forces the kill exploit to always be used, thus bypassing Disable Kills (Default: OFF)
+- **Always Use Kill Exploit** *(Only with Safe Mode disabled)* Forces the kill exploit to always be used, thus bypassing Disable Kills (Default: OFF)
 - **Fake Alive** Appear to yourself as alive even if you're dead (Default: OFF)
 - **God Mode** Prevents you from dying (Default: OFF)
 - **(Shift + Right Click) to Teleport** Teleports you to wherever you clicked (Default: OFF)
@@ -180,6 +190,8 @@ View the game options!
 <img width="400" height="300" alt="Screenshot 2025-09-12 161044" src="https://github.com/user-attachments/assets/23434fa5-10bd-4126-8d41-12842813a73d" />
 
 - **Cycler** Constantly cycles your cosmetics that you choose (Default: OFF)
+- **Cycle During Meetings** Constantly cycles your cosmetics during meetings (Default: OFF)
+- **Cycle Between Players** Constantly cycles your avatar between other players' avatars (Default: OFF) 
 - **Cycle for Everyone** *(Only as host/Safe Mode disabled)* Constantly cycles everyone's name and color if chosen (Default: OFF)
 - **Confuser** Randomize your appearance at will or when certain conditions are met (Default: OFF)
 - **Randomize Everyone** *(Only with Safe Mode disabled)* Randomize everyone's appearances at will
@@ -208,7 +220,8 @@ Edit your own texts with features like colors , size and more! This allows you t
 - **Show Replay** Shows a replay of all game events (Default: OFF)
 - **Show only last x seconds** Only shows the last x seconds (Default: OFF)
 - **Clear after Meeting** Clears the replay after meeting (Default: OFF)
-- **Replay Map Color** Changes the replay map's color
+- **Draw Player Icons** Shows player icons on replay map (Default: OFF)
+- **Replay Map Color** Changes the replay map's color (Default: White)
 
 ## 🩻 ESP
 <img width="400" height="300" alt="Screenshot 2025-09-12 161203" src="https://github.com/user-attachments/assets/1d39098b-afe6-427c-ab67-fa708fdd13ac" />
