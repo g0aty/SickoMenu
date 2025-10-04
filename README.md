@@ -7,7 +7,7 @@ A powerful utility for Among Us designed to enrich your game experience with cus
 
 **Intended for educational and experimental use only.**
 
-Join our very own Discord server for support, bug reports, and sneak peeks!  
+Join our very own Discord server for support, bug reports, sneak peeks, lobby hosting, and chilling!  
 ### Vanity Invite: https://discord.gg/sickos  
 ### Permanent invite: https://dsc.gg/sickos 
 ---
@@ -43,9 +43,10 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 2. **Never exploit features in public matches** or to harass others.
 3. **Respect Innersloth's Terms of Service** and the integrity of the game.
 4. **Immediately disable the mod** (`PAUSE BREAK` hotkey) if joining public lobbies accidentally.
+5. **Have common sense!**
 
 > 🚫 Misuse may result in punitive actions on your Among Us account, including permanent bans. **We do not condone cheating.**  
-> Report unethical usage in our [Discord](https://discord.gg/sickos).
+> Report unethical usage of SickoMenu in our [Discord](https://discord.gg/sickos).
 
 ---
 
@@ -53,11 +54,15 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 A huge amount of features!!
 - NoClip (`CTRL`)  
 - Ghost Visibility  
-- Confuser (May disrupt gameplay)  
+- Confuser (May disrupt gameplay)
+- Speed Multiplier
+- Powerful Host-Only Features
 
 **Cosmetic/UI Enhancements:**  
 - Zoom Out  
-- SickoMenu Chat (`/sc [message]`)  
+- SickoMenu Chat (`/sc [message]`)
+- ESP
+- Styling your name (See screenshot below for example)
 
 **Full Feature List:** [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
 
@@ -80,6 +85,10 @@ A huge amount of features!!
 - ❌ Switch/Xbox/Playstation (Not Supported)
 
 ## ⬇️ Download & Install
+
+> [!NOTE]
+> You may need to downgrade your game version for SickoMenu to work properly with Among Us.
+>
 ### For Windows
 You can find the latest release [here](https://github.com/g0aty/SickoMenu/releases/latest).
 Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in your Among Us directory (the folder containing `Among Us.exe`).
