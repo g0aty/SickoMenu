@@ -14,7 +14,7 @@
 - **Allow Keybinds while Chatting** Allows you to use keybinds while chatting (Default: OFF)
 - **Always Show Menu on Startup** Shows the menu on startup (Default: ON)
 - **Panic** Disables the mod at will (Default: OFF)
-- **Extra Commands** Adds more features to the menu (Default: OFF)
+- **Extra Commands** Adds more commands to the menu (Default: OFF)
 - **Save Config** Saves the menu settings you have already
 - **Load Config** Loads your last settings for the menu
 - **Adjust by DPI** Allows you to change scaling of the menu (Default: ON)
@@ -29,7 +29,7 @@
 - **Replace Streamer Mode Lobby Code** Changes the streamer mode hidden code from "******" to your custom text (Default: "SICKOS")
 - **RGB Lobby Code** Makes the lobby code RGB (Default: OFF)
 - **Unlock All Achievements** Unlocks all Achievements
-- **Unlock Cosmetics** Unlocks EVERY SINGLE cosmetic (hats, visors, etc.) (Default: OFF)
+- **Unlock Cosmetics** Unlocks every single cosmetic (hats, visors, etc.) (Default: OFF)
 - **Safe Mode** Disables certain features whenever there is an anticheat (Default: ON)
 - **Allow other mod users to see you're using ...** Allows other mod menu users to see that you are using either SickoMenu, AmongUsMenu, or KillNetwork. (Default: SickoMenu)
 ### Spoofing
@@ -69,7 +69,7 @@
 - **Show/Hide Radar** (Default: Insert)
 - **Show/Hide Replay** (Default: End)
 - **Show/Hide Chat** (Default: None)
-- **Read Ghost Messages** (Defaul: None)
+- **Read Ghost Messages** (Default: None)
 - **Panic (Disable SickoMenu)** (Default: PAUSE BREAK)
 - **Enable/Disable HUD** (Default: None)
 - **Freecam** (Default: None)
@@ -131,7 +131,7 @@ View the game options!
 - **Always show Chat Button** Always shows the chat button even in game (Default: OFF)
 - **Allow Copy/Paste in Chat** Allows you to copy, paste, or cut text into chat (Default: OFF)
 - **Read Messages by Ghosts** Allows you to read ghost messages (Default: OFF)
-- **Read and Send AUM Chat** (No longer works) Allows you to read AmongUsMenu chat and send via "/aum [message]" (Default: OFF)
+- **Read and Send Sicko Chat** Allows you to read SickoMenu chat and send via "/sc [message]" (Default: OFF)
 - **Custom Name** Customize your name with effects such as gradient, RGB, size, italics, underline and strikethrough (Default: OFF)
 - **Server-sided Custom Name** *(Only as host/Safe Mode disabled)* Shows your custom name for everyone (Default: OFF)
 - **Reveal Roles** Reveals a player's roles and tasks completed (Default: OFF)
@@ -307,6 +307,7 @@ A dedicated player menu for viewing and manipulating players
 
 - **Disable Sabotages** *(Only as Host)* Prevents players from sabotaging stuff
 - **Repair Sabotage** Repairs the ongoing sabotage
+- **Sabotage All** Sabotages everything 
 - **Auto repair Sabotage** Automatically repairs all sabotages (Default: OFF)
 - **Random Sabotage** Sabotages a random system
 - **Spam Sabotage** Repeatedly calls a sabotage
@@ -316,7 +317,7 @@ A dedicated player menu for viewing and manipulating players
 - **Infinite mushroom mixup** Activates mushroom mixup forever
 
 >[!NOTE]
->If you spam sabotages, there is a high chance you will be detected by anticheat.
+>If you spam "Sabotage All", there is a high chance your game will crash.
 >
 
 ## 🚪 Doors
@@ -349,7 +350,6 @@ A dedicated player menu for viewing and manipulating players
 - **Kill While Vanished** Allows you to kill while being vanished as a phantom (Default: OFF)
 - **Spam Moving Platform** Spam uses the platform on the Airship
 - **Show Lobby Timer** See when the server will close the lobby due to inactivity (Default: OFF)
-- **BASICALLY BE ABLE TO DO ANYTHING!**
 
 ## 🧑‍💻 Debug
 <img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/094a1abd-5a71-4e29-8f9c-452a10dd895e" />
@@ -359,4 +359,4 @@ A dedicated player menu for viewing and manipulating players
 - **Force Save Settings** Force save your settings
 - **Clear RPC Queues** Clears RPC queues when there are too many RPCs to handle
 - **Log Unity Debug Messages** Shows Unity debug stuff in the game log (Default: ON)
-- **April Fools' Mode** F*** Hudson and Mog Everyone (Sigma)
+- **April Fools' Mode** F*** Hudson
