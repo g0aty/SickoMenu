@@ -7,7 +7,7 @@ A powerful utility for Among Us designed to enrich your game experience with cus
 
 **Intended for educational and experimental use only.**
 
-Join our very own Discord server for support, bug reports, sneak peeks, lobby hosting, and chilling!  
+Join our very own Discord server for support, bug reports, sneak peeks, lobby hosting, and more!  
 ### Vanity Invite: https://discord.gg/sickos  
 ### Permanent invite: https://dsc.gg/sickos 
 ---
@@ -43,7 +43,7 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 2. **Never exploit features in public matches** or to harass others.
 3. **Respect Innersloth's Terms of Service** and the integrity of the game.
 4. **Immediately disable the mod** (`PAUSE BREAK` hotkey) if joining public lobbies accidentally.
-5. **Have common sense!**
+5. **Have common sense.**
 
 > 🚫 Misuse may result in punitive actions on your Among Us account, including permanent bans. **We do not condone cheating.**  
 > Report unethical usage of SickoMenu in our [Discord](https://discord.gg/sickos).
