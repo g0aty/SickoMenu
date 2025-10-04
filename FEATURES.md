@@ -22,7 +22,7 @@
 - **Menu Theme Color**: Change the accent color of the menu (Default: #801341)
 - **RGB Menu Theme** Have an RGB accent color (Default: OFF)
 - **Opacity** Change the opacity of the Menu (Default: 100%)
-- **Show Debug Tab** *(Only for Debug)* Shows the Debug tab below the Doors tab (Default: OFF)
+- **Show Debug Tab** *(Only for Debug)* Shows the Debug tab (Default: OFF)
 - **Set Name** Sets in-game name to the specified name provided that it's valid or you're a host/not in safe mode
 - **Set as Account Name** Sets your account name to the specified name provided that it's valid
 - **Automatically Set Name** If your name is not the same as the username, set the username automatically (Default: OFF)
