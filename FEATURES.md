@@ -28,7 +28,7 @@
 - **Unlock All Achievements** Unlocks all Achievements
 - **Unlock Cosmetics** Unlocks every cosmetic (hats, visors, etc.) (Default: OFF)
 - **Safe Mode** Disables certain features whenever there is an anticheat (Default: ON)
-- **Allow other SickoMenu users to see you're using SickoMenu** Allows SickoMenu users to see other SickoMenu users
+- **Allow other mod users to see you're using ...** Allows other mod menu users to see that you are using either SickoMenu, AmongUsMenu, or KillNetwork. (Default: SickoMenu)
 ### Spoofing
 <img width="400" height="300" alt="Screenshot 2025-09-12 160940" src="https://github.com/user-attachments/assets/db97a985-1527-45f1-ae33-c37551ce974f" />
 
@@ -36,6 +36,7 @@
 - **Use Custom Guest Friend Code** Changes your new friend code to whatever you want as long as it's valid (Default: OFF)
 - **Spoof Level** Spoofs your level in game (Default: OFF)
 - **Spoof Platform** Spoofs your platform to whatever you choose (Default: OFF)
+- **+25 Mode** Disables anticheat so other SickoMenu users in your lobby can disable safe mode without being kicked (Default: OFF)
 - **Spoof Game Version** Spoofs your game version to play with people on the latest version of Among Us (Default: ON: 16.0.5/16.1.0)
 ### Customization
 <img width="400" height="300" alt="Screenshot 2025-09-12 160946" src="https://github.com/user-attachments/assets/5e582be8-5ebc-4f2b-ace0-e399d8f8fb13" />
@@ -122,7 +123,7 @@ View the game options!
 - **Always show Chat Button** Always shows the chat button even in game (Default: OFF)
 - **Allow Copy/Paste in Chat** Allows you to copy, paste, or cut text into chat (Default: OFF)
 - **Read Messages by Ghosts** Allows you to read ghost messages (Default: OFF)
-- **Read and Send AUM Chat** Allows you to read AUM chat and send via "/aum [message]" (Default: OFF)
+- **Read and Send AUM Chat** (No longer works) Allows you to read AmongUsMenu chat and send via "/aum [message]" (Default: OFF)
 - **Custom Name** Customize your name with effects such as gradient, RGB, size, italics, underline and strikethrough (Default: OFF)
 - **Server-sided Custom Name** *(Only as host/Safe Mode disabled)* Shows your custom name for everyone (Default: OFF)
 - **Reveal Roles** Reveals a player's roles and tasks completed (Default: OFF)
@@ -217,6 +218,7 @@ Edit your own texts with features like colors , size and more! This allows you t
 - **Hide During Meetings** Hides ESP in meetings (Default: OFF)
 - **Show Boxes** Shows ESP boxes on players (Default: ON)
 - **Show Tracers** Shows tracers from yourself to players (Default: ON)
+- **Show Distances** Shows the distance between you and other players (Default: ON)
 - **Role-based** Instead of player colors, use role colors for ESP and toggle roles you want to see (Default: OFF)
 
 ## 🤹 Players:
@@ -300,6 +302,10 @@ A dedicated player menu for viewing and manipulating players
 - **Disable Lights and auto-move switches** Automatically moves lights switches so it's harder for players to fix
 - **Infinite mushroom mixup** Activates mushroom mixup forever
 
+>[!NOTE]
+>If you spam sabotages, there is a high chance you will be detected by anticheat.
+>
+
 ## 🚪 Doors
 <img width="400" height="300" alt="Screenshot 2025-09-12 161307" src="https://github.com/user-attachments/assets/4a19c64e-086c-4039-812a-b31b322228ea" />
 
@@ -330,6 +336,7 @@ A dedicated player menu for viewing and manipulating players
 - **Kill While Vanished** Allows you to kill while being vanished as a phantom (Default: OFF)
 - **Spam Moving Platform** Spam uses the platform on the Airship
 - **Show Lobby Timer** See when the server will close the lobby due to inactivity (Default: OFF)
+- **BASICALLY BE ABLE TO DO ANYTHING!**
 
 ## 🧑‍💻 Debug
 <img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/094a1abd-5a71-4e29-8f9c-452a10dd895e" />
@@ -339,3 +346,4 @@ A dedicated player menu for viewing and manipulating players
 - **Force Save Settings** Force save your settings
 - **Clear RPC Queues** Clears RPC queues when there are too many RPCs to handle
 - **Log Unity Debug Messages** Shows Unity debug stuff in the game log (Default: ON)
+- **April Fools' Mode** F*** Hudson and Mog Everyone (Sigma)
