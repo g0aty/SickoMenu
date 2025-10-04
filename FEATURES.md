@@ -14,7 +14,7 @@
 - **Allow Keybinds while Chatting** Allows you to use keybinds while chatting (Default: OFF)
 - **Always Show Menu on Startup** Shows the menu on startup (Default: ON)
 - **Panic** Disables the mod at will (Default: OFF)
-- **Extra Commands** Adds more commands to the menu (Default: OFF)
+- **Extra Commands** Adds more commands for chat (Default: OFF)
 - **Save Config** Saves the menu settings you have already
 - **Load Config** Loads your last settings for the menu
 - **Adjust by DPI** Allows you to change scaling of the menu (Default: ON)
