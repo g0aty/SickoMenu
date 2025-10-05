@@ -955,54 +955,61 @@ namespace GameTab {
             ImGui::Separator();
             ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-            /*if (ToggleButton("Enable Temp-Ban System", &State.EnableTempBan)) {
+            if (ToggleButton("Enable Temp-Ban System", &State.TempBanEnabled)) {
                 State.Save();
 			}
-            if (State.EnableTempBan && ImGui::CollapsingHeader("Temp-Ban System"))
-            {
-				static std::string friendCodeToTempBan;
-                static int banDays = 0;
-                static int banHours = 0;
-                static int banMinutes = 0;
-                static int banSeconds = 0;
-                ImGui::BeginGroup();
+            if (State.TempBanEnabled && ImGui::CollapsingHeader("Temp-Ban System")) {
+                static std::string friendCodeToTempBan;
+                static int banDays = 0, banHours = 0, banMinutes = 0, banSeconds = 0;
 
+                ImGui::BeginGroup();
                 ImGui::PushItemWidth(150);
                 InputString("Friend Code", &friendCodeToTempBan);
 
-                if (ImGui::InputInt("Days", &banDays) && banDays < 0) banDays = 0;
-                if (ImGui::InputInt("Hours", &banHours) && banHours < 0) banHours = std::clamp(banHours, 0, 23);
-                if (ImGui::InputInt("Minutes", &banMinutes) && banMinutes < 0) banMinutes = std::clamp(banMinutes, 0, 59);
-                if (ImGui::InputInt("Seconds", &banSeconds) && banSeconds < 0) banSeconds = std::clamp(banSeconds, 0, 59);
+                ImGui::InputInt("Days", &banDays);     banDays = std::max<int>(0, banDays);
+                ImGui::InputInt("Hours", &banHours);   banHours = std::clamp(banHours, 0, 23);
+                ImGui::InputInt("Minutes", &banMinutes); banMinutes = std::clamp(banMinutes, 0, 59);
+                ImGui::InputInt("Seconds", &banSeconds); banSeconds = std::clamp(banSeconds, 0, 59);
                 ImGui::PopItemWidth();
 
                 if (!friendCodeToTempBan.empty() && ImGui::Button("Submit Temp-Ban")) {
-                    int totalSeconds = 0;
-                    totalSeconds += SafeMax(0, banDays) * 86400;
-                    totalSeconds += SafeMax(0, banHours) * 3600;
-                    totalSeconds += SafeMax(0, banMinutes) * 60;
-                    totalSeconds += SafeMax(0, banSeconds);
+                    std::string selfFC;
+                    if (Game::pLocalPlayer && *Game::pLocalPlayer) {
+                        selfFC = convert_from_string((*Game::pLocalPlayer)->fields.FriendCode);
+                    }
 
-                    if (totalSeconds > 0) {
-                        auto now = std::chrono::system_clock::now();
-                        auto banEndTime = now + std::chrono::seconds(totalSeconds);
-						int banEndSaveTime = static_cast<int>(banEndTime.time_since_epoch().count());
-                        //State.TempBannedFriendCodes[State.TBanFC] = {banEndTime, std::to_string(now.time_since_epoch().count())};
-                        //State.TBanFC.clear();
-                        //State.BanDays = State.BanHours = State.BanMinutes = State.BanSeconds = 0;
-                        State.TempBannedFCs[friendCodeToTempBan] = banEndSaveTime;
-                        if (IsInGame() || IsInLobby()) {
-                            for (auto p : GetAllPlayerControl()) {
-                                if (convert_from_string(p->fields.FriendCode) != friendCodeToTempBan) continue;
-                                if (IsInGame()) {
-                                    State.rpcQueue.push(new PunishPlayer(p, false));
-                                }
-                                if (IsInLobby()) {
-                                    State.lobbyRpcQueue.push(new PunishPlayer(p, false));
+                    if (!selfFC.empty() && friendCodeToTempBan == selfFC) { }
+                    else {
+                        int64_t totalSeconds = 0;
+                        totalSeconds += static_cast<int64_t>(banDays) * 86400;
+                        totalSeconds += static_cast<int64_t>(banHours) * 3600;
+                        totalSeconds += static_cast<int64_t>(banMinutes) * 60;
+                        totalSeconds += static_cast<int64_t>(banSeconds);
+
+                        if (totalSeconds > State.MAX_BAN_SECONDS) {
+                            totalSeconds = State.MAX_BAN_SECONDS;
+                        }
+
+                        if (totalSeconds > 0) {
+                            auto now = std::chrono::system_clock::now();
+                            auto banEnd = now + std::chrono::seconds(totalSeconds);
+
+                            State.TempBannedFCs[friendCodeToTempBan] = banEnd;
+                            State.Save();
+
+                            if (IsInGame() || IsInLobby()) {
+                                for (auto p : GetAllPlayerControl()) {
+                                    if (!p) continue;
+                                    if (convert_from_string(p->fields.FriendCode) == friendCodeToTempBan) {
+                                        // Main & first ban (new temp-banned user):
+                                        if (IsInGame())
+                                            State.rpcQueue.push(new PunishPlayer(p, false));
+                                        if (IsInLobby())
+                                            State.lobbyRpcQueue.push(new PunishPlayer(p, false));
+                                    }
                                 }
                             }
                         }
-                        State.Save();
                     }
                 }
                 ImGui::EndGroup();
@@ -1012,31 +1019,21 @@ namespace GameTab {
                 ImGui::Text("Temp-Banned Players:");
 
                 auto now = std::chrono::system_clock::now();
-                for (auto it = State.TempBannedFCs.begin(); it != State.TempBannedFCs.end(); ) {
-                    if (now.time_since_epoch().count() >= it->second) {
-                        State.TempBannedFCs.erase(it);
-                    }
-                    else {
-						++it;
-                    }
-                }
-
                 if (State.TempBannedFCs.empty()) {
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No players are temporarily banned.");
+                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "No players are temporarily banned.");
                 }
                 else {
                     static int selectedTempBanIndex = 0;
-                    std::vector<std::string> displayList;
-                    std::vector<std::string> friendCodeList;
+                    std::vector<std::string> displayList, friendCodeList;
 
-                    for (const auto& [fc, banTime] : State.TempBannedFCs) {
-                        auto timeLeft = banTime - now.time_since_epoch().count();
+                    for (const auto& [fc, until] : State.TempBannedFCs) {
+                        auto timeLeft = std::chrono::duration_cast<std::chrono::seconds>(until - now).count();
                         if (timeLeft < 0) timeLeft = 0;
 
-                        int d = static_cast<int>(timeLeft / 86400);
-                        int h = static_cast<int>((timeLeft % 86400) / 3600);
-                        int m = static_cast<int>((timeLeft % 3600) / 60);
-                        int s = static_cast<int>(timeLeft % 60);
+                        int d = (int)(timeLeft / 86400);
+                        int h = (int)((timeLeft % 86400) / 3600);
+                        int m = (int)((timeLeft % 3600) / 60);
+                        int s = (int)(timeLeft % 60);
 
                         char buffer[128];
                         snprintf(buffer, sizeof(buffer), "%s | %02dd:%02dh:%02dm:%02ds", fc.c_str(), d, h, m, s);
@@ -1059,10 +1056,11 @@ namespace GameTab {
                         }
                     }
                 }
+
                 ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
-                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Note: Temporary Ban Features\nWorks for Host Only!");
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), "Note: Temporary Ban Features\nWorks as Host Only!");
                 ImGui::EndGroup();
-            }*/
+            }
         }
 
         if (openOptions) {

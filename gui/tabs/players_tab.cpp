@@ -1509,40 +1509,39 @@ namespace PlayersTab {
 
 				ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
 
-				/*if (State.EnableTempBan && IsHost() && !selectedPlayer.is_LocalPlayer()) {
+				if (State.TempBanEnabled && IsHost() && !selectedPlayer.is_LocalPlayer()) {
+					static int banDays = 0, banHours = 0, banMinutes = 0, banSeconds = 0;
+
 					ImGui::PushItemWidth(200);
-					static std::string friendCodeToTempBan;
-					static int banDays = 0;
-					static int banHours = 0;
-					static int banMinutes = 0;
-					static int banSeconds = 0;
-					if (ImGui::InputInt("Days", &banDays) && banDays < 0) banDays = 0;
-					if (ImGui::InputInt("Hours", &banHours) && banHours < 0) banHours = std::clamp(banHours, 0, 23);
-					if (ImGui::InputInt("Minutes", &banMinutes) && banMinutes < 0) banMinutes = std::clamp(banMinutes, 0, 59);
-					if (ImGui::InputInt("Seconds", &banSeconds) && banSeconds < 0) banSeconds = std::clamp(banSeconds, 0, 59);
+					ImGui::InputInt("Days", &banDays);     banDays = std::max<int>(0, banDays);
+					ImGui::InputInt("Hours", &banHours);   banHours = std::clamp(banHours, 0, 23);
+					ImGui::InputInt("Minutes", &banMinutes); banMinutes = std::clamp(banMinutes, 0, 59);
+					ImGui::InputInt("Seconds", &banSeconds); banSeconds = std::clamp(banSeconds, 0, 59);
 					ImGui::PopItemWidth();
 
 					if (ImGui::Button("Confirm TempBan")) {
-						std::string targetFriendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
-						if (!targetFriendCode.empty()) {
-							auto now = std::chrono::system_clock::now();
+						std::string targetFC = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+						std::string selfFC = convert_from_string((*Game::pLocalPlayer)->fields.FriendCode);
+						if (!targetFC.empty() && targetFC != selfFC) {
+							int64_t totalSeconds = 0;
+							totalSeconds += static_cast<int64_t>(banDays) * 86400;
+							totalSeconds += static_cast<int64_t>(banHours) * 3600;
+							totalSeconds += static_cast<int64_t>(banMinutes) * 60;
+							totalSeconds += static_cast<int64_t>(banSeconds);
 
-							int totalSeconds = 0;
-							totalSeconds += SafeMax(0, banDays) * 86400;
-							totalSeconds += SafeMax(0, banHours) * 3600;
-							totalSeconds += SafeMax(0, banMinutes) * 60;
-							totalSeconds += SafeMax(0, banSeconds);
+							if (totalSeconds > State.MAX_BAN_SECONDS) {
+								totalSeconds = State.MAX_BAN_SECONDS;
+							}
 
 							if (totalSeconds > 0) {
 								auto now = std::chrono::system_clock::now();
-								auto banEndTime = now + std::chrono::seconds(totalSeconds);
-								int banEndSaveTime = static_cast<int>(banEndTime.time_since_epoch().count());
-								//State.TempBannedFriendCodes[State.TBanFC] = {banEndTime, std::to_string(now.time_since_epoch().count())};
-								//State.TBanFC.clear();
-								//State.BanDays = State.BanHours = State.BanMinutes = State.BanSeconds = 0;
-								State.TempBannedFCs[friendCodeToTempBan] = banEndSaveTime;
+								auto banEnd = now + std::chrono::seconds(totalSeconds);
+
+								State.TempBannedFCs[targetFC] = banEnd;
 								State.Save();
+
 								auto p = selectedPlayer.get_PlayerControl();
+								// Main & first ban (new temp-banned user):
 								if (IsInGame()) {
 									State.rpcQueue.push(new PunishPlayer(p, false));
 								}
@@ -1550,10 +1549,9 @@ namespace PlayersTab {
 									State.lobbyRpcQueue.push(new PunishPlayer(p, false));
 								}
 							}
-							State.Save();
 						}
 					}
-				}*/
+				}
 
 				if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
 					ImGui::NewLine(); //force a new line

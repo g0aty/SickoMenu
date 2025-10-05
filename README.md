@@ -21,7 +21,7 @@ This project is **not affiliated with, endorsed, or supported by Innersloth LLC*
 By downloading, installing, or using this software, you acknowledge and agree that:
 
 - You are solely responsible for how you use it.
-- You will not use it to violate Innersloth’s [Terms of Service](https://www.innersloth.com/terms/) or disrupt public gameplay.
+- You will not use it to violate Innersloth’s [Terms of Service](https://www.innersloth.com/terms-of-use-for-the-games/) or disrupt public gameplay.
 - The developers, including **g0aty** and all contributors, **assume no responsibility or liability** for:
   - Any direct or indirect consequences of misuse,
   - Violations of third-party rules or terms,
@@ -31,7 +31,7 @@ By downloading, installing, or using this software, you acknowledge and agree th
 
 **Legal Notice:**  
 Portions of the game referenced or interacted with may be intellectual property of Innersloth LLC. © Innersloth LLC.  
-This project is designed to comply with their [Modding Policy](https://www.innersloth.com/policies/) for private and non-malicious experimentation.
+This project is designed to comply with their [Modding Policy](https://www.innersloth.com/among-us-mod-policy/) for private and non-malicious experimentation.
 
 > ⚠️ Use responsibly. This software is provided "as is", **without any warranties** or guarantees of safety, support, or fitness for purpose.
 
