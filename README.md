@@ -215,7 +215,7 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 
 # Contributing
 
-Thanks for wanting to help. Small documentation fixes and simple clarifications are highly welcome and usually merged quickly good for earning the **Contributor** role.
+Thanks for wanting to help. Small documentation fixes and simple clarifications are highly welcome.
 
 ## Quick rules
 - Make small, focused PRs (one change per PR).
