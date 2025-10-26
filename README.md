@@ -213,10 +213,9 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * [cddjr](https://github.com/cddjr) (Helped in updating to the Fungle map, saved a lot of my time)
 * Everyone else who contributed to the code and I couldn't list here. Thank you!
 
-# Contributing
+# 💁 Contributing
 Thanks for wanting to help. Small documentation fixes and simple clarifications are highly welcome.
 
-## 💁 Contributing
 1. Fork it [here](<https://github.com/g0aty/SickoMenu/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
