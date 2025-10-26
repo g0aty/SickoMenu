@@ -80,9 +80,10 @@ A huge amount of features!!
 - ❌ Switch/Xbox/Playstation (Not Supported)
 
 ## ⬇️ Download & Install
-### For Windows
-You can find the latest release [here](https://github.com/g0aty/SickoMenu/releases/latest).
-Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in your Among Us directory (the folder containing `Among Us.exe`).
+## Quick Start (Windows)
+1. Download latest release from Releases.
+2. Put `version.dll` into Among Us folder OR inject `SickoMenu.dll`.
+3. For normal users: press **DELETE** in-game to open the menu.
 
 ### For Proton (Version Proxy Only)
 First you will need [protontricks](https://github.com/Matoking/protontricks), you can install it with your packager of choice.
@@ -212,12 +213,23 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * [cddjr](https://github.com/cddjr) (Helped in updating to the Fungle map, saved a lot of my time)
 * Everyone else who contributed to the code and I couldn't list here. Thank you!
 
-## 💁 Contributing
-1. Fork it [here](<https://github.com/g0aty/SickoMenu/fork>)
-2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Commit your changes (`git commit -am 'Add some fooBar'`)
-4. Push to the branch (`git push origin feature/fooBar`)
-5. Create a new Pull Request
+# Contributing
+
+Thanks for wanting to help. Small documentation fixes and simple clarifications are highly welcome and usually merged quickly good for earning the **Contributor** role.
+
+## Quick rules
+- Make small, focused PRs (one change per PR).
+- Use clear English
+- Include a short description of what you changed and how to test it.
+
+## Branch & commit style
+- Branch: `docs/readme-<short-desc>` (example: `docs/readme-fix-typos`)
+- Commit message: `docs: fix README typos` or `docs: add contributing guide`
+
+## What to change
+- Fix typos/grammar.
+- Clarify build/install steps for Windows/Proton/macOS.
+- Add short troubleshooting tips or common errors.
 
 ## ✨ Inspiration
 * [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
