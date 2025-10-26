@@ -214,17 +214,14 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * Everyone else who contributed to the code and I couldn't list here. Thank you!
 
 # Contributing
-
 Thanks for wanting to help. Small documentation fixes and simple clarifications are highly welcome.
 
-## Quick rules
-- Make small, focused PRs (one change per PR).
-- Use clear English
-- Include a short description of what you changed and how to test it.
-
-## Branch & commit style
-- Branch: `docs/readme-<short-desc>` (example: `docs/readme-fix-typos`)
-- Commit message: `docs: fix README typos` or `docs: add contributing guide`
+## 💁 Contributing
+1. Fork it [here](<https://github.com/g0aty/SickoMenu/fork>)
+2. Create your feature branch (`git checkout -b feature/fooBar`)
+3. Commit your changes (`git commit -am 'Add some fooBar'`)
+4. Push to the branch (`git push origin feature/fooBar`)
+5. Create a new Pull Request
 
 ## What to change
 - Fix typos/grammar.
