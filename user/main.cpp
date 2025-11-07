@@ -59,23 +59,7 @@ bool GameVersionCheck() {
 #define ToString(s) stringify(s)
 #define stringify(s) #s
 
-#define GAME_STATIC_POINTER(f,c,m) \
-	do \
-	{ \
-		if (!cctor_finished(c##__TypeInfo->_0.klass)) { \
-			if (MessageBox(NULL, \
-				L"SickoMenu does not support Among Us versions past v16.0.5 as of now!\n\nMake sure you downgrade your Among Us instance to v16.0.0 / v16.0.2 and use SickoMenu. If you're wondering about playing with players on the latest version, your game's version will automatically be spoofed so you can play with them!\n\nClick OK to exit the game. Your browser will then open a downgrading guide.", \
-				L"SickoMenu", MB_ICONINFORMATION)) { \
-				OpenLink("https://textbin.net/rruqqrlgaw"); \
-				ExitProcess(0); \
-			} \
-		}; \
-		f = &(c##__TypeInfo->static_fields->m); \
-		std::ostringstream ss; \
-		ss << std::internal << std::setfill('0') << std::hex << std::setw(8) \
-		 << stringify(f) << " is 0x" << f << " -> 0x" << *f; \
-		LOG_DEBUG(ss.str()); \
-	} while (0);
+
 
 void Run(LPVOID lpParam) {
 #if _DEBUG
