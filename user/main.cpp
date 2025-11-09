@@ -13,7 +13,82 @@
 #include <fstream>
 #include <sstream>
 //#include "gitparams.h"
+// right here
+void Run(LPVOID lpParam) {
+#if _DEBUG
+    new_console();
+#endif
+    Log.Create();
+    if (!GameVersionCheck()) {
+        fclose(stdout);
+        FreeConsole();
+        FreeLibraryAndExitThread((HMODULE)lpParam, 0);
+        return;
+    }
 
+    hModule = (HMODULE)lpParam;
+    State.lol = getModulePath(hModule).filename().string();
+    init_il2cpp();
+    State.Load();
+    ScopedThreadAttacher managedThreadAttached;
+
+    std::ostringstream ss;
+    ss << "\n\tSickoMenu - " << __DATE__ << " - " << __TIME__ << std::endl;
+    ss << "\tVersion: " << State.SickoVersion << std::endl;
+    ss << "\tAmong Us Version: " << getGameVersion() << std::endl;
+    LOG_INFO(ss.str());
+
+#if _DEBUG
+    SetConsoleTitleA(std::format("Debug Console - SickoMenu {} (Among Us v{})", State.SickoVersion, getGameVersion()).c_str());
+#endif
+
+    hUnloadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+    // Initialize game pointers
+    GAME_STATIC_POINTER(Game::pAmongUsClient, app::AmongUsClient, Instance);
+    GAME_STATIC_POINTER(Game::pGameData, app::GameData, Instance);
+    GAME_STATIC_POINTER(Game::pAllPlayerControls, app::PlayerControl, AllPlayerControls);
+    GAME_STATIC_POINTER(Game::pLocalPlayer, app::PlayerControl, LocalPlayer);
+    GAME_STATIC_POINTER(Game::pShipStatus, app::ShipStatus, Instance);
+    GAME_STATIC_POINTER(Game::pLobbyBehaviour, app::LobbyBehaviour, Instance);
+    LOG_DEBUG(std::format("Game::RoleManager is {}", static_cast<void*>(Game::RoleManager.GetInstance())));
+    State.userName = GetPlayerName();
+
+    Game::scanGameFunctions();
+    DetourInitilization();
+
+    // --- Safe GameOptions deserialization ---
+    try {
+        // Attempt normal deserialization
+        GAME_STATIC_POINTER(Game::pNormalGameManager, app::NormalGameManager, Instance);
+        auto mode = "Normal";
+        int version = 10; // or dynamically detect if needed
+        try {
+            GameOptionsFactory::ReadIGameOptionsFromInternalMessage(mode, version);
+        } catch (...) {
+            LOG_WARNING("Unknown game options version " + std::to_string(version) + " - using default options");
+            GameOptionsManager::set_CurrentGameOptions(DefaultGameOptions());
+        }
+    } catch (...) {
+        LOG_WARNING("Failed to initialize NormalGameManager - continuing without crashing.");
+    }
+
+#if _DEBUG
+    managedThreadAttached.detach();
+    DWORD dwWaitResult = WaitForSingleObject(hUnloadEvent, INFINITE);
+    if (dwWaitResult != WAIT_OBJECT_0) {
+        STREAM_ERROR("Failed to watch unload signal! dwWaitResult = " << dwWaitResult << " Error " << GetLastError());
+        return;
+    }
+
+    DetourUninitialization();
+    fclose(stdout);
+    FreeConsole();
+    CloseHandle(hUnloadEvent);
+    FreeLibraryAndExitThread(hModule, 0);
+#endif
+}
+//remove this if it doesnt work
 // test autoRelease main ver increment
 
 HMODULE hModule;
