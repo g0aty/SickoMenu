@@ -13,7 +13,7 @@ void LogIfEnabled(const std::string& message) {
 bool ShouldDisableHostAnticheat() {
 	return State.DisableHostAnticheat && State.CurrentScene != "MatchMaking" && State.CurrentScene != "FindAGame" && !State.IsFreePlay;
 }
-
+// this is code
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
     LogIfEnabled("Hook dConstants_1_GetBroadcastVersion executed");
     if (State.CurrentScene == "" || State.CurrentScene == "SplashIntro" || State.CurrentScene == "MatchMaking" || State.CurrentScene == "Tutorial" ||
@@ -28,7 +28,7 @@ int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
 			baseVersion = 50614950;
 			break;
 		case 1: // AU v16.0.5 / v16.1.0
-			baseVersion = 50632950;
+			baseVersion = 50638350;
 			break;
         }
     }
