@@ -103,7 +103,12 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 
 > [!NOTE]
 > This method uses CrossOver. If you have ANY other ways to use this with other software, refer to the contributing section!
-> 
+
+> [!TIP]
+> The hotkey to triggerr SickoMenu depends on your Mac model. There are 2 possible triggers: Command+Backspace **OR** Function+Backspace.
+
+**Backspace corresponds to the ⌫ on your keyboard.**
+
 **Method 1:**
 
 1. Install a bottle of CrossOver, install Steam in it and install Among Us.
@@ -111,7 +116,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 3. Go to `Program Files (x86)/Steam/steamapps/common/Among Us/` and put the `version.dll` into it. Then reopen CrossOver.
 4. Go to the **Configure Wine** panel, go to **Libraries**, open the menu below **New Replacement for:** and search for `version`.
 5. Select it and click **Add**, then **Apply** and **OK**.
-6. Start Among Us and press **Command+⌦** to show SickoMenu.
+6. Start Among Us and press **Fn+Backspace or Command+Backspace, depending on your model** to show SickoMenu.
 
 **Method 2:**
 
@@ -130,7 +135,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
    - Place the `version.dll` file here.
 6.  In PlayOnMac, select your virtual drive > **Configure** > **Wine** > **Libraries**.
    - Add `version` to the overrides and set it to **Native (Windows)**.
-7.Run Among Us through Steam in PlayOnMac. Use the hotkey **Command + Delete** to toggle the mod menu.
+7.Run Among Us through Steam in PlayOnMac. Use the hotkey **Fn+Backspace or Command+Backspace** to toggle the mod menu, depending on your model.
 
 **Method 3: (recommended)**
 
@@ -168,7 +173,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
    - Click **Apply** > **OK**.
 9. Launch Steam from Terminal (as in Step 3.3).  
 - Start Among Us from your Steam library.  
-- Use **Command + Delete** to toggle SickoMenu in-game.
+- Use **Command + Backspace or Fn+Backspace** to toggle SickoMenu in-game, depending onn your Mac model.
 
 ---
 ### **Note:**
