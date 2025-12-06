@@ -2338,3 +2338,131 @@ void SaveGameOptions(const class GameOptions& gameOptions) {
 	State.mapHostChoice = gameOptions.GetMapId();
 	State.impostors_amount = gameOptions.GetNumImpostors();
 }
+
+static float lastCheckTime = 0.f;
+
+void TrackPlayers()
+{
+	if (!IsInGame() && !IsInLobby()) return;
+
+	float now = app::Time_get_time(NULL);
+	if (now - lastCheckTime < 0.5f) return;
+	lastCheckTime = now;
+
+	auto& hist = State.PlayerHistory;
+	bool needSave = false;
+
+	for (auto p : GetAllPlayerControl())
+	{
+		if (!p || p == *Game::pLocalPlayer) continue;
+		auto data = GetPlayerData(p);
+		if (!data || data->fields.Disconnected) continue;
+
+		std::string fc = convert_from_string(data->fields.FriendCode);
+		std::string name = strToLower(RemoveHtmlTags(convert_from_string(GetPlayerOutfit(data)->fields.PlayerName)));
+		std::string puid = convert_from_string(data->fields.Puid);
+		int level = data->fields.PlayerLevel + 1;
+
+		if (fc.empty() || name.empty() || level <= 0) continue;
+		if (State.RemovedPlayers.count(fc)) continue;
+
+		// exists? (n <= 100 so linear scan is OK)
+		bool exists = false;
+		for (auto& rp : hist) {
+			if (rp.FriendCode == fc) { exists = true; break; }
+		}
+		if (exists) continue;
+
+		std::string platform = "Unknown";
+		auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), p, NULL);
+		if (client && client->fields.PlatformData && p->fields._.OwnerId == client->fields.Id) {
+			switch (client->fields.PlatformData->fields.Platform) {
+			case Platforms__Enum::StandaloneEpicPC: platform = "Epic Games (PC)";
+				break;
+			case Platforms__Enum::StandaloneSteamPC: platform = "Steam (PC)";
+				break;
+			case Platforms__Enum::StandaloneMac: platform = "Mac";
+				break;
+			case Platforms__Enum::StandaloneWin10: platform = "Microsoft Store (PC)";
+				break;
+			case Platforms__Enum::StandaloneItch: platform = "itch.io (PC)";
+				break;
+			case Platforms__Enum::IPhone: platform = "iOS/iPadOS (Mobile)";
+				break;
+			case Platforms__Enum::Android: platform = "Android (Mobile)";
+				break;
+			case Platforms__Enum::Switch: platform = "Nintendo Switch (Console)";
+				break;
+			case Platforms__Enum::Xbox: platform = "Xbox (Console)";
+				break;
+			case Platforms__Enum::Playstation: platform = "Playstation (Console)";
+				break;
+			default: platform = "Unknown";
+				break;
+			}
+		}
+
+		std::string lcname = name;
+		std::transform(lcname.begin(), lcname.end(), lcname.begin(), ::tolower);
+		bool nameCheck = (std::find(State.LockedNames.begin(), State.LockedNames.end(), lcname) != State.LockedNames.end());
+
+		bool isCheater = false;
+		std::string cheatName = "";
+		int pid = data->fields.PlayerId;
+		auto modIt = State.modUsers.find(pid);
+		if (modIt != State.modUsers.end()) {
+			cheatName = RemoveHtmlTags(modIt->second);
+			isCheater = true;
+		}
+
+		hist.erase(std::remove_if(hist.begin(), hist.end(), [](const Settings::RememberedPlayer& rp) {
+			return rp.Nick.empty() || rp.Level <= 0;
+			}), hist.end());
+
+		if (hist.size() >= 100) hist.pop_front();
+
+		Settings::RememberedPlayer rp { name, fc, puid, level, platform, nameCheck, isCheater, cheatName };
+		hist.push_back(rp);
+		needSave = true;
+	}
+
+	if (needSave) State.Save();
+}
+
+void AddToWhitelist(const std::string& fc)
+{
+	if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) == State.WhitelistFriendCodes.end())
+	{
+		State.WhitelistFriendCodes.push_back(fc);
+		State.Save();
+	}
+}
+
+void AddToBlacklist(const std::string& fc)
+{
+	if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), fc) == State.BlacklistFriendCodes.end())
+	{
+		State.BlacklistFriendCodes.push_back(fc);
+		State.Save();
+	}
+}
+
+void RemoveFromWhitelist(const std::string& fc)
+{
+	auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
+	if (it != State.WhitelistFriendCodes.end())
+	{
+		State.WhitelistFriendCodes.erase(it);
+		State.Save();
+	}
+}
+
+void RemoveFromBlacklist(const std::string& fc)
+{
+	auto it = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), fc);
+	if (it != State.BlacklistFriendCodes.end())
+	{
+		State.BlacklistFriendCodes.erase(it);
+		State.Save();
+	}
+}
