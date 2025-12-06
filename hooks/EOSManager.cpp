@@ -168,6 +168,8 @@ static String* f2() {
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlatformSpecificData_Serialize executed");
 	if (State.SpoofPlatform) __this->fields.Platform = Platforms__Enum(State.FakePlatform + 1);
+	if (State.SpoofPsnId) __this->fields.PsnPlatformId = State.FakePsnId;
+	if (State.SpoofXboxId) __this->fields.XboxPlatformId = State.FakeXboxId;
 	PlatformSpecificData_Serialize(__this, writer, method);
 }
 
