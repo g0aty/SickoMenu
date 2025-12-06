@@ -191,11 +191,13 @@ namespace HostTab {
 					ImGui::EndChild();
 				}
 				if (IsInLobby()) ImGui::SameLine();
-				ImGui::BeginChild("host#actions", ImVec2(300, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
+				ImGui::BeginChild("host#actions", ImVec2((IsInGame() ? 500.0f : 300.0f), 0)* State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 
 				if (!State.DisableRoleManager && IsInLobby()) {
+					ImGui::PushItemWidth(200);
 					if (ToggleButton("Custom Impostor Amount", &State.CustomImpostorAmount))
 						State.Save();
+					ImGui::PopItemWidth();
 					State.ImpostorCount = std::clamp(State.ImpostorCount, 0, int(Game::MAX_PLAYERS));
 					if (State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
 						State.Save();
@@ -269,11 +271,12 @@ namespace HostTab {
 
 				if (ToggleButton("Modify Start Countdown", &State.ModifyStartCountdown))
 					State.Save();
-
+				ImGui::PushItemWidth(200);
 				if (State.ModifyStartCountdown && ImGui::InputInt("Countdown Time", &State.StartCountdown)) {
 					State.StartCountdown = std::clamp(State.StartCountdown, 1, 127);
 					State.Save();
 				}
+				ImGui::PopItemWidth();
 
 				if (ToggleButton("Disable Meetings", &State.DisableMeetings))
 					State.Save();
@@ -350,9 +353,24 @@ namespace HostTab {
 					State.rpcQueue.push(new RpcUsePlatform());
 				}
 
-				if ((State.mapType == Settings::MapType::Airship) && IsInGame()) {
+				if ((State.mapType == Settings::MapType::Airship) && IsInGame())
+				{
 					if (ToggleButton("Spam Moving Platform", &State.SpamMovingPlatform)) {
 						State.Save();
+					}
+
+					if (State.SpamMovingPlatform)
+					{
+						ImGui::SameLine();
+						ImGui::PushItemWidth(200);
+						if (ImGui::SliderInt("##SpamPlatformInterval", &State.SpamPlatformInterval, 1, 60))
+						{
+							State.Save();
+						}
+						ImGui::PopItemWidth();
+						ImGui::SameLine();
+						ImGui::Text("Interval", State.SpamPlatformInterval);
+						ImGui::Spacing();
 					}
 				}
 
@@ -386,9 +404,11 @@ namespace HostTab {
 				if (ToggleButton("Force Name for Everyone", &State.ForceNameForEveryone)) {
 					State.Save();
 				}
+				ImGui::PushItemWidth(200);
 				if (InputString("Username", &State.hostUserName)) {
 					State.Save();
 				}
+				ImGui::PopItemWidth();
 
 				/*if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && AnimatedButton("Revive Yourself"))
 				{
