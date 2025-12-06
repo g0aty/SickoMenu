@@ -6,6 +6,7 @@
 #include "gui-helpers.hpp"
 #include <future>
 #include <_hooks.h>
+#include <unordered_map>
 
 namespace PlayersTab {
 
@@ -20,7 +21,7 @@ namespace PlayersTab {
 		Info,
 	};
 
-	static bool openPlayer = true; //default to visual tab group
+	static bool openPlayer = true;
 	static bool openTrolling = false;
 	static bool openInfo = false;
 
@@ -40,30 +41,187 @@ namespace PlayersTab {
 	static int farmCount = 0;
 	static int farmDelay = 0;
 
+	struct CachedPlayerData {
+		std::string nameRaw;
+		std::string nameClean;
+		std::string friendCode;
+		std::string puid;
+		std::string platformName;
+		uint64_t psnId = 0;
+		uint64_t xboxId = 0;
+
+		std::string finalDisplayName;
+		ImVec4 finalColor;
+		std::string selectableId;
+		std::string colorButtonId;
+		int lastUpdateFrame = 0;
+		bool isCached = false;
+	};
+
+	static std::unordered_map<uint8_t, CachedPlayerData> g_PlayerCache;
+	static int g_FrameCounter = 0;
+
+	const int CACHE_UPDATE_FREQ_NORMAL = 60;
+	const int CACHE_UPDATE_FREQ_MEETING = 180;
+
+	void ClearCache() {
+		g_PlayerCache.clear();
+	}
+
+	std::string GetPlatformString(PlayerControl* playerCtrl, app::ClientData* client, uint64_t& outPsn, uint64_t& outXbox) {
+		if (client == NULL || client->fields.PlatformData == NULL || playerCtrl->fields._.OwnerId != client->fields.Id) {
+			return "Unknown";
+		}
+
+		outPsn = client->fields.PlatformData->fields.PsnPlatformId;
+		outXbox = client->fields.PlatformData->fields.XboxPlatformId;
+
+		switch (client->fields.PlatformData->fields.Platform) {
+		case Platforms__Enum::StandaloneEpicPC:
+			return "Epic Games (PC)";
+		case Platforms__Enum::StandaloneSteamPC:
+			return "Steam (PC)";
+		case Platforms__Enum::StandaloneMac:
+			return "Mac";
+		case Platforms__Enum::StandaloneWin10:
+			return "Microsoft Store (PC)";
+		case Platforms__Enum::StandaloneItch:
+			return "itch.io (PC)";
+		case Platforms__Enum::IPhone:
+			return "iOS/iPadOS (Mobile)";
+		case Platforms__Enum::Android:
+			return "Android (Mobile)";
+		case Platforms__Enum::Switch:
+			return "Nintendo Switch (Console)";
+		case Platforms__Enum::Xbox:
+			return "Xbox (Console)";
+		case Platforms__Enum::Playstation:
+			return "Playstation (Console)";
+		default:
+			return "Unknown";
+		}
+	}
+
 	void Render() {
+		g_FrameCounter++;
+
 		if ((IsInGame() || IsInLobby())) {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::BeginChild("players#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
+
 			if (!State.selectedPlayer.has_value() || State.selectedPlayer.validate().is_Disconnected()) {
 				State.selectedPlayer = {};
 			}
+
 			auto selectedPlayer = State.selectedPlayer.validate();
 			bool shouldEndListBox = ImGui::ListBoxHeader("###players#list", ImVec2(200, 230) * State.dpiScale);
 			auto localData = GetPlayerData(*Game::pLocalPlayer);
-			std::vector<PlayerSelection> selectedPlayers = {};
-			for (auto id : State.selectedPlayers) {
-				auto playerCtrl = GetPlayerControlById(id);
-				const auto& validPlayer = PlayerSelection(playerCtrl).validate();
-				if (!validPlayer.has_value() || validPlayer.is_Disconnected()) continue;
-				selectedPlayers.push_back(PlayerSelection(playerCtrl));
-			}
 
 			State.currentPlayers.clear();
-			for (auto playerCtrl : GetAllPlayerControl()) {
+			std::vector<uint8_t> activeIds;
+
+			auto allControllers = GetAllPlayerControl();
+			for (auto playerCtrl : allControllers) {
 				if (playerCtrl == NULL) continue;
 				auto playerData = GetPlayerData(playerCtrl);
 				if (playerData == NULL || playerData->fields.Disconnected) continue;
-				State.currentPlayers.insert(playerData->fields.PlayerId);
+
+				uint8_t pid = playerData->fields.PlayerId;
+				State.currentPlayers.insert(pid);
+				activeIds.push_back(pid);
+
+				CachedPlayerData& cache = g_PlayerCache[pid];
+
+				int updateFrequency = State.InMeeting ? CACHE_UPDATE_FREQ_MEETING : CACHE_UPDATE_FREQ_NORMAL;
+
+				bool needsUpdate = !cache.isCached || ((g_FrameCounter - cache.lastUpdateFrame) > updateFrequency);
+
+				if (needsUpdate) {
+					app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
+
+					if (outfit) {
+						cache.nameRaw = convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr));
+						cache.nameClean = RemoveHtmlTags(cache.nameRaw);
+						cache.friendCode = convert_from_string(playerData->fields.FriendCode);
+						cache.puid = convert_from_string(playerData->fields.Puid);
+
+						app::ClientData* client = (app::ClientData*)app::InnerNetClient_GetClientFromCharacter((app::InnerNetClient*)(*Game::pAmongUsClient), playerCtrl, NULL);
+						cache.platformName = GetPlatformString(playerCtrl, client, cache.psnId, cache.xboxId);
+
+						if (!cache.isCached) {
+							cache.selectableId = "##" + ToString(pid);
+							cache.isCached = true;
+						}
+
+						std::string tempName = cache.nameClean;
+						ImVec4 tempColor = State.LightMode ? AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Black) : AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
+
+						if (IsInMultiplayerGame() || IsInLobby()) {
+							bool isBlacklisted = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), cache.friendCode) != State.BlacklistFriendCodes.end();
+							bool isWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), cache.friendCode) != State.WhitelistFriendCodes.end();
+							bool isNameLocked = std::find(State.LockedNames.begin(), State.LockedNames.end(), tempName) != State.LockedNames.end();
+
+							if (isNameLocked && isBlacklisted) {
+								tempName = "[!] + [-] " + tempName;
+								tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+							}
+							else if (isNameLocked && isWhitelisted) {
+								tempName = "[!] + [+] " + tempName;
+								tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
+							}
+							else if (isBlacklisted) {
+								tempName = "[-] " + tempName;
+								tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+							}
+							else if (isWhitelisted) {
+								tempName = "[+] " + tempName;
+								tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
+							}
+							else if (isNameLocked) {
+								tempName = "[!] " + tempName;
+								tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
+							}
+							else if (localData && PlayerIsImpostor(localData) && PlayerIsImpostor(playerData))
+								tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
+							else if (playerCtrl == *Game::pLocalPlayer || State.modUsers.count(pid)) {
+								if (playerCtrl == *Game::pLocalPlayer) {}
+								else if (State.modUsers.at(pid) == "<#f00>KillNetwork</color>")
+									tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
+								else if (State.modUsers.at(pid) == "<#5f5>BetterAmongUs</color>")
+									tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LogSuccessColor);
+								else if (State.modUsers.at(pid) == "<#f55>AmongUsMenu</color>")
+									tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
+								else if (State.modUsers.at(pid) == "<#ADD8E6>HostGuard</color>")
+									tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LightBlue);
+								else if (State.modUsers.at(pid) == "<#ff006c>SickoMenu</color>")
+									tempColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
+							}
+						}
+
+						if (State.RevealRoles) {
+							std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
+							tempName = tempName + " (" + roleName + ")";
+							tempColor = AmongUsColorToImVec4(GetRoleColor(playerData->fields.Role, true));
+						}
+
+						if (playerData->fields.IsDead)
+							tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
+
+						cache.finalDisplayName = tempName;
+						cache.finalColor = tempColor;
+						cache.colorButtonId = "##" + tempName + "_ColorButton";
+						cache.lastUpdateFrame = g_FrameCounter;
+					}
+				}
+			}
+
+			for (auto it = g_PlayerCache.begin(); it != g_PlayerCache.end(); ) {
+				if (State.currentPlayers.find(it->first) == State.currentPlayers.end()) {
+					it = g_PlayerCache.erase(it);
+				}
+				else {
+					++it;
+				}
 			}
 
 			for (auto it = State.knownPlayers.begin(); it != State.knownPlayers.end(); ) {
@@ -86,158 +244,112 @@ namespace PlayersTab {
 				}
 			}
 
-			for (auto playerCtrl : GetAllPlayerControl()) {
+			for (auto playerCtrl : allControllers) {
 				if (playerCtrl == NULL) continue;
-				const auto& player = PlayerSelection(playerCtrl);
-				const auto& validPlayer = PlayerSelection(playerCtrl).validate();
-				if (!validPlayer.has_value())
-					continue;
+
+				auto player = PlayerSelection(playerCtrl);
+				if (!player.has_value()) continue;
+
 				auto playerData = GetPlayerData(playerCtrl);
-				if (playerData == NULL) continue;
-				if (playerData->fields.Disconnected)
-					continue;
+				if (playerData == NULL || playerData->fields.Disconnected) continue;
+
 				app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(playerData);
 				if (outfit == NULL) continue;
-				std::string playerName = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(playerData, nullptr)));
-				std::string playerFc = convert_from_string(playerData->fields.FriendCode);
+
+				uint8_t pid = playerData->fields.PlayerId;
+
+				auto it = g_PlayerCache.find(pid);
+				if (it == g_PlayerCache.end()) continue;
+				CachedPlayerData& cached = it->second;
+
+				const char* displayPlayerNameC = cached.finalDisplayName.c_str();
+				const char* selectableIdC = cached.selectableId.c_str();
+				const char* colorButtonIdC = cached.colorButtonId.c_str();
+
+				ImVec4 nameColor = cached.finalColor;
+
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0) * State.dpiScale);
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0) * State.dpiScale);
+
 				bool isSelected = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId()) != State.selectedPlayers.end();
-				if (ImGui::Selectable(std::string("##" + ToString(playerData->fields.PlayerId)).c_str(), isSelected)) { //fix selection problems with multiple ppl having same name
+
+				if (ImGui::Selectable(selectableIdC, isSelected)) {
 					bool isCtrl = ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3);
 					bool isShifted = ImGui::IsKeyDown(0x10);
 
 					if (isCtrl) {
 						if (isShifted) {
-							if (State.selectedPlayers.size() == GetAllPlayerControl().size()) {
+							if (State.selectedPlayers.size() == activeIds.size()) {
 								State.selectedPlayers.clear();
 								State.selectedPlayer = {};
 							}
 							else {
 								State.selectedPlayers.clear();
-								for (auto p : GetAllPlayerControl()) {
-									State.selectedPlayers.push_back(p->fields.PlayerId);
-									State.selectedPlayer = PlayerSelection(p);
+								for (auto p : allControllers) {
+									if (p) {
+										State.selectedPlayers.push_back(p->fields.PlayerId);
+										State.selectedPlayer = PlayerSelection(p);
+									}
 								}
 							}
 						}
 						else {
-							auto it = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId());
-							if (it != State.selectedPlayers.end()) {
-								State.selectedPlayers.erase(it);
+							auto it_sel = std::find(State.selectedPlayers.begin(), State.selectedPlayers.end(), player.get_PlayerId());
+							if (it_sel != State.selectedPlayers.end()) {
+								State.selectedPlayers.erase(it_sel);
 								if (State.selectedPlayers.empty()) {
 									State.selectedPlayer = {};
-									selectedPlayers.clear();
 									selectedPlayer = State.selectedPlayer.validate();
 									if (State.selectedPlayer.has_value()) {
-										auto outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
-										forcedName = convert_from_string(outfit->fields.PlayerName);
+										forcedName = cached.nameRaw;
 										forcedColor = outfit->fields.ColorId;
 									}
 								}
 							}
 							else {
 								State.selectedPlayers.push_back(player.get_PlayerId());
-								State.selectedPlayer = validPlayer;
-								selectedPlayer = validPlayer;
+								State.selectedPlayer = player.validate();
+								selectedPlayer = player.validate();
 								if (State.selectedPlayer.has_value()) {
-									auto outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
-									forcedName = convert_from_string(outfit->fields.PlayerName);
+									forcedName = cached.nameRaw;
 									forcedColor = outfit->fields.ColorId;
 								}
 							}
 						}
 					}
 					else {
-						State.selectedPlayer = validPlayer;
-						selectedPlayer = validPlayer;
+						State.selectedPlayer = player.validate();
+						selectedPlayer = player.validate();
 						State.selectedPlayers = { player.get_PlayerId() };
 						if (State.selectedPlayer.has_value()) {
-							auto outfit = GetPlayerOutfit(selectedPlayer.get_PlayerData());
-							forcedName = convert_from_string(outfit->fields.PlayerName);
+							forcedName = cached.nameRaw;
 							forcedColor = outfit->fields.ColorId;
 						}
 					}
 				}
+
 				ImGui::SameLine();
 				auto playerColor = AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId));
 				playerColor.w = State.MenuThemeColor.w;
-				ImGui::ColorButton(std::string("##" + playerName + "_ColorButton").c_str(), playerColor, ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoTooltip);
+				ImGui::ColorButton(colorButtonIdC, playerColor, ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoTooltip);
 				ImGui::SameLine();
 				ImGui::PopStyleVar(2);
 				ImGui::Dummy(ImVec2(0, 0) * State.dpiScale);
 				ImGui::SameLine();
 
-				ImVec4 nameColor = State.LightMode ? AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Black) : AmongUsColorToImVec4(Palette__TypeInfo->static_fields->White);
-				if (IsInMultiplayerGame() || IsInLobby()) {
-					bool isBlacklisted = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), playerFc) != State.BlacklistFriendCodes.end();
-					bool isWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), playerFc) != State.WhitelistFriendCodes.end();
-					bool isNameLocked = std::find(State.LockedNames.begin(), State.LockedNames.end(), playerName) != State.LockedNames.end();
+				if (displayPlayerNameC[0] != '\0') {
+					State.currentPlayers.insert(pid);
 
-					if (isNameLocked && isBlacklisted) {
-						playerName = "[!] + [-] " + playerName;
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
-					}
-					else if (isNameLocked && isWhitelisted) {
-						playerName = "[!] + [+] " + playerName;
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
-					}
-					else if (isBlacklisted) {
-						playerName = "[-] " + playerName;
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
-					}
-					else if (isWhitelisted) {
-						playerName = "[+] " + playerName;
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->CrewmateBlue);
-					}
-					else if (isNameLocked) {
-						playerName = "[!] " + playerName;
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
-					}
-					else if (PlayerIsImpostor(localData) && PlayerIsImpostor(playerData))
-						nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
-					else if (playerCtrl == *Game::pLocalPlayer || State.modUsers.find(playerData->fields.PlayerId) != State.modUsers.end()) {
-						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f00>KillNetwork</color>")
-							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
-
-						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#5f5>BetterAmongUs</color>")
-							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LogSuccessColor);
-
-						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#f55>AmongUsMenu</color>")
-							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
-
-						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#ADD8E6>HostGuard</color>")
-							nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LightBlue);
-
-						if (playerCtrl == *Game::pLocalPlayer || State.modUsers.at(playerData->fields.PlayerId) == "<#ff006c>SickoMenu</color>")
-							nameColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
-					}
-				}
-
-				if (State.RevealRoles)
-				{
-					std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
-					playerName = playerName + " (" + roleName + ")";
-					nameColor = AmongUsColorToImVec4(GetRoleColor(playerData->fields.Role, true));
-				}
-
-				if (playerData->fields.IsDead)
-					nameColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
-
-				if (!playerName.empty()) {
-					uint8_t playerId = player.get_PlayerId();
-					State.currentPlayers.insert(playerId);
-
-					if (State.knownPlayers.find(playerId) == State.knownPlayers.end() && State.finishedPlayers.find(playerId) == State.finishedPlayers.end()) {
-						State.knownPlayers.insert(playerId);
-						State.newPlayersAppear[playerId] = std::chrono::steady_clock::now();
+					if (State.knownPlayers.find(pid) == State.knownPlayers.end() && State.finishedPlayers.find(pid) == State.finishedPlayers.end()) {
+						State.knownPlayers.insert(pid);
+						State.newPlayersAppear[pid] = std::chrono::steady_clock::now();
 					}
 
 					float alpha = 1.0f;
-					auto it = State.newPlayersAppear.find(playerId);
-					if (it != State.newPlayersAppear.end()) {
+					auto it_appear = State.newPlayersAppear.find(pid);
+					if (it_appear != State.newPlayersAppear.end()) {
 						auto now = std::chrono::steady_clock::now();
-						float elapsed = std::chrono::duration<float>(now - it->second).count();
+						float elapsed = std::chrono::duration<float>(now - it_appear->second).count();
 
 						if (elapsed < State.appearDuration) {
 							float t = elapsed / State.appearDuration;
@@ -246,100 +358,75 @@ namespace PlayersTab {
 						}
 						else {
 							alpha = 1.0f;
-							State.newPlayersAppear.erase(playerId);
-							State.finishedPlayers.insert(playerId);
+							State.newPlayersAppear.erase(pid);
+							State.finishedPlayers.insert(pid);
 						}
 					}
 
 					nameColor.w *= alpha;
-					ImGui::TextColored(nameColor, playerName.c_str());
+					ImGui::TextColored(nameColor, displayPlayerNameC);
 				}
 			}
 			if (shouldEndListBox)
 				ImGui::ListBoxFooter();
 
-			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1) //Upon first startup no player is selected.  Also rare case where the playerdata is deleted before the next gui cycle
+			std::vector<PlayerSelection> selectedPlayers = {};
+			for (auto id : State.selectedPlayers) {
+				auto playerCtrl = GetPlayerControlById(id);
+				if (!playerCtrl) continue;
+				auto validPlayer = PlayerSelection(playerCtrl).validate();
+				if (!validPlayer.has_value() || validPlayer.is_Disconnected()) continue;
+				selectedPlayers.push_back(PlayerSelection(playerCtrl));
+			}
+
+			if (selectedPlayer.has_value() && !selectedPlayer.is_Disconnected() && selectedPlayers.size() == 1)
 			{
-				if (!selectedPlayer.get_PlayerControl()->fields.notRealPlayer && selectedPlayer.get_PlayerData() != NULL) {
-					bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.find(selectedPlayer.get_PlayerData()->fields.PlayerId) != State.modUsers.end();
-					ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
-					if (isUsingMod)
-						ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPlayer.get_PlayerData()->fields.PlayerId)).c_str());
-					std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
-					std::string playerIdText = std::format("Player ID: {}", playerId);
-					ImGui::Text(const_cast<char*>(playerIdText.c_str()));
-					std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
-					std::string friendCodeText = std::format("Friend Code: {}", (!IsStreamerMode()) ? friendCode : ((friendCode != "") ? friendCode.substr(0, 1) + "..." : ""));
-					if (friendCode != "") {
-						ImGui::Text(const_cast<char*>(friendCodeText.c_str()));
-					}
-					std::string puid = convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid);
-					std::string puidText = std::format("PUID:\n{}", (!IsStreamerMode()) ? puid : ((puid != "") ? puid.substr(0, 1) + "..." : ""));
-					if (puid != "") {
-						ImGui::Text(const_cast<char*>(puidText.c_str()));
-					}
-					uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
-					std::string levelText = std::format("Level: {}", playerLevel);
-					ImGui::Text(const_cast<char*>(levelText.c_str()));
-					std::string platform = "Unknown";
-					auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), selectedPlayer.get_PlayerControl(), NULL);
-					if (client != NULL && client->fields.PlatformData != NULL && selectedPlayer.get_PlayerControl()->fields._.OwnerId == client->fields.Id) {
-						switch (client->fields.PlatformData->fields.Platform) {
-						case Platforms__Enum::StandaloneEpicPC:
-							platform = "Epic Games (PC)";
-							break;
-						case Platforms__Enum::StandaloneSteamPC:
-							platform = "Steam (PC)";
-							break;
-						case Platforms__Enum::StandaloneMac:
-							platform = "Mac";
-							break;
-						case Platforms__Enum::StandaloneWin10:
-							platform = "Microsoft Store (PC)";
-							break;
-						case Platforms__Enum::StandaloneItch:
-							platform = "itch.io (PC)";
-							break;
-						case Platforms__Enum::IPhone:
-							platform = "iOS/iPadOS (Mobile)";
-							break;
-						case Platforms__Enum::Android:
-							platform = "Android (Mobile)";
-							break;
-						case Platforms__Enum::Switch:
-							platform = "Nintendo Switch (Console)";
-							break;
-						case Platforms__Enum::Xbox:
-							platform = "Xbox (Console)";
-							break;
-						case Platforms__Enum::Playstation:
-							platform = "Playstation (Console)";
-							break;
-						default:
-							platform = "Unknown";
-							break;
+				uint8_t selectedPid = selectedPlayer.get_PlayerData()->fields.PlayerId;
+
+				auto it = g_PlayerCache.find(selectedPid);
+				if (it != g_PlayerCache.end())
+				{
+					CachedPlayerData& cachedDetails = it->second;
+
+					if (!selectedPlayer.get_PlayerControl()->fields.notRealPlayer && selectedPlayer.get_PlayerData() != NULL) {
+						bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.count(selectedPid);
+						ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
+						if (isUsingMod) ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPid)).c_str());
+
+						ImGui::Text("Player ID: %d", selectedPid);
+
+						std::string friendCode = cachedDetails.friendCode;
+						std::string friendCodeText = std::format("Friend Code: {}", (!IsStreamerMode()) ? friendCode : ((friendCode != "") ? friendCode.substr(0, 1) + "..." : ""));
+						if (friendCode != "") {
+							ImGui::Text(const_cast<char*>(friendCodeText.c_str()));
 						}
+
+						std::string puid = cachedDetails.puid;
+						std::string puidText = std::format("PUID:\n{}", (!IsStreamerMode()) ? puid : ((puid != "") ? puid.substr(0, 1) + "..." : ""));
+						if (puid != "") {
+							ImGui::Text(const_cast<char*>(puidText.c_str()));
+						}
+
+						uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
+						ImGui::Text("Level: %d", playerLevel);
+
+						ImGui::Text("Platform: %s", cachedDetails.platformName.c_str());
+
+						if (cachedDetails.psnId != 0)
+							ImGui::Text("PSN Platform ID: %llu", cachedDetails.psnId);
+						if (cachedDetails.xboxId != 0)
+							ImGui::Text("Xbox Platform ID: %llu", cachedDetails.xboxId);
 					}
-					if (client != NULL && client->fields.PlatformData != NULL) {
-						std::string platformText = std::format("Platform: {}", platform);
-						ImGui::Text(platformText.c_str());
-						uint64_t psnId = client->fields.PlatformData->fields.PsnPlatformId;
-						std::string psnText = std::format("PSN Platform ID: {}", psnId);
-						if (psnId != 0) ImGui::Text(const_cast<char*>(psnText.c_str()));
-						uint64_t xboxId = client->fields.PlatformData->fields.XboxPlatformId;
-						std::string xboxText = std::format("Xbox Platform ID: {}", xboxId);
-						if (xboxId != 0) ImGui::Text(const_cast<char*>(xboxText.c_str()));
+					else {
+						ImGui::Text("Is using Modified Client: No");
+						ImGui::Text("Player ID: %d", selectedPid);
+						uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
+						ImGui::Text("Level: %d", playerLevel);
 					}
 				}
-				else {
-					ImGui::Text("Is using Modified Client: No");
-					std::uint8_t playerId = selectedPlayer.get_PlayerData()->fields.PlayerId;
-					std::string playerIdText = std::format("Player ID: {}", playerId);
-					ImGui::Text(const_cast<char*>(playerIdText.c_str()));
-					uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
-					std::string levelText = std::format("Level: {}", playerLevel);
-					ImGui::Text(const_cast<char*>(levelText.c_str()));
-				}
+			}
+			else {
+				if (!IsInGame() && !IsInLobby()) ClearCache();
 			}
 
 			ImGui::EndChild();
@@ -358,8 +445,7 @@ namespace PlayersTab {
 					CloseOtherGroups(Groups::Info);
 				}
 			}
-			if (State.DisableMeetings && IsHost())
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Meetings have been disabled.");
+			if (State.DisableMeetings && IsHost()) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Meetings have been disabled.");
 			GameOptions options;
 			if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings || !IsHost())) { //Player selection doesn't matter
 				if (!State.InMeeting) {
@@ -582,7 +668,7 @@ namespace PlayersTab {
 								State.Save();
 							}
 						}
-						ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+						ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
 						if (selectedPlayers.size() == 1 && nickname != "") {
 							std::transform(nickname.begin(), nickname.end(), nickname.begin(), ::tolower);
 							// Convert the name into lowercase
@@ -1500,14 +1586,14 @@ namespace PlayersTab {
 					if (IsInGame()) State.rpcQueue.push(new ReportPlayer(selectedPlayer.get_PlayerControl(), (ReportReasons__Enum)reportReason));
 					if (IsInLobby()) State.lobbyRpcQueue.push(new ReportPlayer(selectedPlayer.get_PlayerControl(), (ReportReasons__Enum)reportReason));
 				}
-				
+
 				ImGui::Text("Reason");
 
 				const std::vector<const char*> REPORTREASONS = { "Inappropriate Name", "Inappropriate Chat", "Cheating/Hacking", "Harassment/Misconduct" };
 
 				CustomListBoxInt("  ", &reportReason, REPORTREASONS);
 
-				ImGui::Dummy(ImVec2(10, 10)* State.dpiScale);
+				ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
 
 				if (State.TempBanEnabled && IsHost() && !selectedPlayer.is_LocalPlayer()) {
 					static int banDays = 0, banHours = 0, banMinutes = 0, banSeconds = 0;
