@@ -91,6 +91,10 @@ void Settings::Load() {
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
+		JSON_TRYGET("SpoofPsnId", this->SpoofPsnId);
+        JSON_TRYGET("FakePsnId", this->FakePsnId);
+        JSON_TRYGET("SpoofXboxId", this->SpoofXboxId);
+        JSON_TRYGET("FakeXboxId", this->FakeXboxId);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         JSON_TRYGET("SpoofAUVersion", this->SpoofAUVersion);
         JSON_TRYGET("FakeAUVersion", this->FakeAUVersion);
@@ -566,6 +570,10 @@ void Settings::Save() {
                 { "StealedPUID", this->StealedPUID },
                 { "SpoofPlatform", this->SpoofPlatform },
                 { "FakePlatform", this->FakePlatform },
+			    { "SpoofPsnId", this->SpoofPsnId },
+                { "FakePsnId", this->FakePsnId },
+                { "SpoofXboxId", this->SpoofXboxId },
+                { "FakeXboxId", this->FakeXboxId },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
                 { "SpoofAUVersion", this->SpoofAUVersion },
                 { "FakeAUVersion", this->FakeAUVersion },
