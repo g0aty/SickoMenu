@@ -339,6 +339,30 @@ namespace SettingsTab {
 					State.Save();
 			}
 
+			if (State.FakePlatform == 9) {
+				if (ToggleButton("Spoof PSN Platform ID", &State.SpoofPsnId)) {
+					State.Save();
+				}
+				if (State.SpoofPsnId)
+				{
+					ImGui::SameLine();
+					ImGui::SetNextItemWidth(150 * State.dpiScale);
+					ImGui::InputScalar("Fake PSN ID", ImGuiDataType_U64, &State.FakePsnId);
+				}
+			}
+
+			if (State.FakePlatform == 8) {
+				if (ToggleButton("Spoof Xbox Platform ID", &State.SpoofXboxId)) {
+					State.Save();
+				}
+				if (State.SpoofXboxId)
+				{
+					ImGui::SameLine();
+					ImGui::SetNextItemWidth(150 * State.dpiScale);
+					ImGui::InputScalar("Fake Xbox ID", ImGuiDataType_U64, &State.FakeXboxId);
+				}
+			}
+
 			if (ToggleButton("Disable Anticheat While Hosting (+25 Mode)", &State.DisableHostAnticheat)) {
 				if (!State.DisableHostAnticheat && State.BattleRoyale) {
 					State.BattleRoyale = false;
