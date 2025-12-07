@@ -70,7 +70,11 @@ public:
     std::string StealedFC = "";
     std::string StealedPUID = "";
     bool SpoofPlatform = false;
+    bool SpoofPsnId = false;
+    bool SpoofXboxId = false;
     int FakePlatform = 0;
+    uint64_t FakePsnId = 0;
+    uint64_t FakeXboxId = 0;
     bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
     bool SpoofAUVersion = true;
