@@ -348,6 +348,10 @@ namespace SettingsTab {
 					ImGui::SameLine();
 					ImGui::SetNextItemWidth(150 * State.dpiScale);
 					ImGui::InputScalar("Fake PSN ID", ImGuiDataType_U64, &State.FakePsnId);
+
+					if (AnimatedButton("Random PSN ID")) {
+						GeneratePlatformId();
+					}
 				}
 			}
 
@@ -360,6 +364,10 @@ namespace SettingsTab {
 					ImGui::SameLine();
 					ImGui::SetNextItemWidth(150 * State.dpiScale);
 					ImGui::InputScalar("Fake Xbox ID", ImGuiDataType_U64, &State.FakeXboxId);
+
+					if (AnimatedButton("Random Xbox ID")) {
+						GeneratePlatformId();
+					}
 				}
 			}
 
