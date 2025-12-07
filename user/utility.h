@@ -221,6 +221,7 @@ std::optional<Vector2> GetTargetPosition(NetworkedPlayerInfo* playerInfo);
 il2cpp::Array<Camera__Array> GetAllCameras();
 il2cpp::List<List_1_InnerNet_ClientData_> GetAllClients();
 Vector2 GetSpawnLocation(Game::PlayerId playerId, int numPlayer, bool initialSpawn);
+void GeneratePlatformId();
 bool IsAirshipSpawnLocation(const Vector2& vec);
 Vector2 Rotate(const Vector2& vec, float degrees);
 bool Equals(const Vector2& vec1, const Vector2& vec2);
