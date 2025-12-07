@@ -864,6 +864,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 				}
 			}
 		}
+		if (IsInLobby() || IsInMultiplayerGame()) {
+			TrackPlayers();
+		}
 	}
 	catch (...) {
 		//LOG_ERROR("Exception occurred in PlayerControl_FixedUpdate (PlayerControl)");

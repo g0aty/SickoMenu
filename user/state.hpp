@@ -693,6 +693,34 @@ public:
     int BanMinutes = 0;
     int BanSeconds = 0;*/
 
+    // Player History [Dependencies]
+    struct RememberedPlayer {
+        std::string Nick;
+        std::string FriendCode;
+        std::string Puid;
+        int Level = 0;
+        std::string Platform;
+        bool NameCheck = false;
+        bool IsModded = false;
+        std::string ModClient;
+    };
+
+    std::deque<RememberedPlayer> PlayerHistory;
+    std::unordered_set<std::string> RemovedPlayers;
+    std::map<std::string, bool> platformFilters = {
+    {"Epic Games (PC)", true},
+    {"Steam (PC)", true},
+    {"Mac", true},
+    {"Microsoft Store (PC)", true},
+    {"itch.io (PC)", true},
+    {"iOS/iPadOS (Mobile)", true},
+    {"Android (Mobile)", true},
+    {"Nintendo Switch (Console)", true},
+    {"Xbox (Console)", true},
+    {"Playstation (Console)", true},
+    {"Unknown", true}
+    };
+
     void Load();
     void Save();
     void SaveConfig();

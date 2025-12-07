@@ -472,6 +472,24 @@ void Settings::Load() {
                 }
             }
         }
+
+		if (j.contains("PlayerHistory") && j["PlayerHistory"].is_array()) {
+            this->PlayerHistory.clear();
+            for (auto& item : j["PlayerHistory"]) {
+                Settings::RememberedPlayer p;
+
+                if (item.contains("Nick"))        p.Nick = item["Nick"].get<std::string>();
+                if (item.contains("FriendCode"))  p.FriendCode = item["FriendCode"].get<std::string>();
+                if (item.contains("Puid"))        p.Puid = item["Puid"].get<std::string>();
+                if (item.contains("Level"))       p.Level = item["Level"].get<int>();
+                if (item.contains("Platform"))    p.Platform = item["Platform"].get<std::string>();
+                if (item.contains("NameCheck"))   p.NameCheck = item["NameCheck"].get<bool>();
+                if (item.contains("IsModded"))    p.IsModded = item["IsModded"].get<bool>();
+                if (item.contains("ModClient"))   p.ModClient = item["ModClient"].get<std::string>();
+
+                this->PlayerHistory.push_back(p);
+            }
+        }
     }
     catch (...) {
         Log.Info("Unable to load " + std::format("sicko-config/{}.json", this->selectedConfig));
@@ -943,6 +961,23 @@ void Settings::Save() {
                         };
                     }
                     return banList;
+                }() },
+
+			    { "PlayerHistory", [&]() {
+                    nlohmann::ordered_json arr = nlohmann::ordered_json::array();
+                    for (const auto& p : this->PlayerHistory) {
+                        arr.push_back({
+                            { "Nick",        p.Nick },
+                            { "FriendCode",  p.FriendCode },
+                            { "Puid",        p.Puid },
+                            { "Level",       p.Level },
+                            { "Platform",    p.Platform },
+                            { "NameCheck",   p.NameCheck },
+                            { "IsModded",    p.IsModded },
+                            { "ModClient",   p.ModClient }
+                        });
+                    }
+                    return arr;
                 }() }
             };
 

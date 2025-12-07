@@ -127,6 +127,7 @@ namespace GameTab {
         Chat,
         Anticheat,
         Utils,
+        History,
         Options
     };
 
@@ -134,6 +135,7 @@ namespace GameTab {
     static bool openChat = false;
     static bool openAnticheat = false;
     static bool openUtils = false;
+	static bool openHistory = false;
     static bool openOptions = false;
 
     void CloseOtherGroups(Groups group) {
@@ -141,6 +143,7 @@ namespace GameTab {
         openChat = group == Groups::Chat;
         openAnticheat = group == Groups::Anticheat;
         openUtils = group == Groups::Utils;
+		openHistory = group == Groups::History;
         openOptions = group == Groups::Options;
     }
 
@@ -161,6 +164,10 @@ namespace GameTab {
         ImGui::SameLine();
         if (TabGroup("Utils", openUtils)) {
             CloseOtherGroups(Groups::Utils);
+        }
+		ImGui::SameLine();
+        if (TabGroup("History", openHistory)) {
+            CloseOtherGroups(Groups::History);
         }
 
         if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
@@ -1060,6 +1067,257 @@ namespace GameTab {
                 ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
                 ImGui::TextColored(ImVec4(1, 0, 0, 1), "Note: Temporary Ban Features\nWorks as Host Only!");
                 ImGui::EndGroup();
+            }
+        }
+
+		if (openHistory) {
+            ImGui::Text("Last 100 players:");
+
+            static int selectedIndex = -1;
+
+            std::vector<std::string> decoratedStorage;
+            decoratedStorage.reserve(State.PlayerHistory.size());
+            std::vector<const char*> names;
+            std::vector<int> filteredIndices;
+
+            names.reserve(State.PlayerHistory.size());
+            filteredIndices.reserve(State.PlayerHistory.size());
+
+            for (int i = 0; i < (int)State.PlayerHistory.size(); ++i)
+            {
+                auto& p = State.PlayerHistory[i];
+                auto itf = State.platformFilters.find(p.Platform);
+                bool visible = (itf != State.platformFilters.end()) ? itf->second : true;
+                if (!visible) continue;
+
+                std::string decorated = p.Nick;
+
+                if (p.NameCheck) decorated += " [!]";
+                bool inWL = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), p.FriendCode) != State.WhitelistFriendCodes.end();
+                bool inBL = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), p.FriendCode) != State.BlacklistFriendCodes.end();
+                if (inWL) decorated += " [+]";
+                if (inBL) decorated += " [-]";
+
+                decoratedStorage.push_back(std::move(decorated));
+                names.push_back(decoratedStorage.back().c_str());
+                filteredIndices.push_back(i);
+            }
+
+            if (names.empty())
+            {
+                selectedIndex = -1;
+            }
+            else
+            {
+                if (selectedIndex >= (int)names.size()) selectedIndex = (int)names.size() - 1;
+
+                ImGui::PushItemWidth(200);
+                if (ImGui::ListBox("##PlayerList", &selectedIndex, names.data(), (int)names.size(), 10))
+                {
+                    if (selectedIndex < 0 || selectedIndex >= (int)filteredIndices.size()) selectedIndex = -1;
+                }
+                ImGui::PopItemWidth();
+
+                if (selectedIndex >= 0)
+                {
+                    int realIndex = filteredIndices[selectedIndex];
+                    auto& p = State.PlayerHistory[realIndex];
+
+                    ImGui::SameLine();
+                    ImGui::BeginGroup();
+
+                    ImGui::Text("Is using Modified Client: %s", p.IsModded ? "Yes" : "No");
+                    if (p.IsModded && !p.ModClient.empty()) ImGui::Text("Client Name: %s", p.ModClient.c_str());
+                    ImGui::NewLine();
+                    ImGui::Text("Friend Code: %s", p.FriendCode.c_str());
+                    ImGui::Text("PUID: %s", p.Puid.c_str());
+                    ImGui::Text("Level: %d", p.Level);
+                    ImGui::Text("Platform: %s", p.Platform.c_str());
+                    ImGui::Text("Name-Checker: %s", p.NameCheck ? "Yes" : "None");
+                    ImGui::NewLine();
+
+                    if (AnimatedButton("Clear Player"))
+                    {
+                        State.RemovedPlayers.insert(p.FriendCode);
+                        State.PlayerHistory.erase(State.PlayerHistory.begin() + realIndex);
+                        State.Save();
+                        selectedIndex = -1;
+                    }
+
+                    ImGui::EndGroup();
+                    ImGui::Spacing();
+
+                    bool inWL = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), p.FriendCode) != State.WhitelistFriendCodes.end();
+                    std::string wLabel = inWL ? "Remove from Whitelist" : "Add to Whitelist";
+
+                    if (AnimatedButton(wLabel.c_str()))
+                    {
+                        if (inWL)
+                            RemoveFromWhitelist(p.FriendCode);
+                        else
+                        {
+                            AddToWhitelist(p.FriendCode);
+                            RemoveFromBlacklist(p.FriendCode);
+                        }
+                        State.Save();
+                        p;
+                    }
+
+                    ImGui::SameLine();
+
+                    bool inBL = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), p.FriendCode) != State.BlacklistFriendCodes.end();
+                    std::string bLabel = inBL ? "Remove from Blacklist" : "Add to Blacklist";
+
+                    if (AnimatedButton(bLabel.c_str()))
+                    {
+                        if (inBL)
+                            RemoveFromBlacklist(p.FriendCode);
+                        else
+                        {
+                            AddToBlacklist(p.FriendCode);
+                            RemoveFromWhitelist(p.FriendCode);
+                        }
+                        State.Save();
+                    }
+
+                    ImGui::SameLine();
+
+                    std::string lowName = p.Nick;
+                    std::transform(lowName.begin(), lowName.end(), lowName.begin(), ::tolower);
+                    std::string ncLabel = p.NameCheck ? "Remove from Name-Checker" : "Add to Name-Checker";
+
+                    if (AnimatedButton(ncLabel.c_str()))
+                    {
+                        if (p.NameCheck)
+                        {
+                            State.LockedNames.erase(std::remove(State.LockedNames.begin(), State.LockedNames.end(), lowName), State.LockedNames.end());
+                            p.NameCheck = false;
+                        }
+                        else
+                        {
+                            State.LockedNames.push_back(lowName);
+                            p.NameCheck = true;
+                        }
+                        for (auto& rp : State.PlayerHistory) {
+                            std::string lc = rp.Nick;
+                            std::transform(lc.begin(), lc.end(), lc.begin(), ::tolower);
+                            rp.NameCheck = (std::find(State.LockedNames.begin(), State.LockedNames.end(), lc) != State.LockedNames.end());
+                        }
+                        State.Save();
+                    }
+                }
+            }
+
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+
+            if (ImGui::Button("Clear History"))
+            {
+                for (auto& pp : State.PlayerHistory) State.RemovedPlayers.insert(pp.FriendCode);
+                State.PlayerHistory.clear();
+                selectedIndex = -1;
+                State.Save();
+            }
+            ImGui::SameLine(0, 20);
+            if (ImGui::Button("Update Player History"))
+            {
+                bool changed = false;
+                for (auto pctrl : GetAllPlayerControl())
+                {
+                    if (!pctrl || pctrl == *Game::pLocalPlayer) continue;
+                    auto data = GetPlayerData(pctrl);
+                    if (!data || data->fields.Disconnected) continue;
+
+                    std::string fc = convert_from_string(data->fields.FriendCode);
+                    std::string name = strToLower(RemoveHtmlTags(convert_from_string(GetPlayerOutfit(data)->fields.PlayerName)));
+                    std::string puid = convert_from_string(data->fields.Puid);
+                    int level = data->fields.PlayerLevel + 1;
+
+                    if (fc.empty() || name.empty() || level <= 0) continue;
+                    if (State.RemovedPlayers.count(fc)) State.RemovedPlayers.erase(fc);
+
+                    bool exists = false;
+                    for (auto& rp : State.PlayerHistory) if (rp.FriendCode == fc) { exists = true; break; }
+                    if (exists) continue;
+
+                    std::string platform = "Unknown";
+                    auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), pctrl, NULL);
+                    if (client != nullptr && client->fields.PlatformData != nullptr && pctrl->fields._.OwnerId == client->fields.Id) {
+                        switch (client->fields.PlatformData->fields.Platform) {
+                        case Platforms__Enum::StandaloneEpicPC:
+                            platform = "Epic Games (PC)";
+                            break;
+                        case Platforms__Enum::StandaloneSteamPC:
+                            platform = "Steam (PC)";
+                            break;
+                        case Platforms__Enum::StandaloneMac:
+                            platform = "Mac";
+                            break;
+                        case Platforms__Enum::StandaloneWin10:
+                            platform = "Microsoft Store (PC)";
+                            break;
+                        case Platforms__Enum::StandaloneItch:
+                            platform = "itch.io (PC)";
+                            break;
+                        case Platforms__Enum::IPhone:
+                            platform = "iOS/iPadOS (Mobile)";
+                            break;
+                        case Platforms__Enum::Android:
+                            platform = "Android (Mobile)";
+                            break;
+                        case Platforms__Enum::Switch:
+                            platform = "Nintendo Switch (Console)";
+                            break;
+                        case Platforms__Enum::Xbox:
+                            platform = "Xbox (Console)";
+                            break;
+                        case Platforms__Enum::Playstation:
+                            platform = "Playstation (Console)";
+                            break;
+                        default:
+                            platform = "Unknown";
+                            break;
+                        }
+                    }
+
+                    std::string lcname = name;
+                    std::transform(lcname.begin(), lcname.end(), lcname.begin(), ::tolower);
+                    bool nameCheck = (std::find(State.LockedNames.begin(), State.LockedNames.end(), lcname) != State.LockedNames.end());
+
+                    bool isCheater = false;
+                    std::string cheatName = "";
+                    int pid = data->fields.PlayerId;
+                    auto modIt = State.modUsers.find(pid);
+                    if (modIt != State.modUsers.end()) {
+                        cheatName = RemoveHtmlTags(modIt->second);
+                        isCheater = true;
+                    }
+
+                    if (State.PlayerHistory.size() >= 100)
+                        State.PlayerHistory.pop_front();
+
+                    State.PlayerHistory.push_back({ name, fc, puid, level, platform, nameCheck, isCheater, cheatName });
+                    changed = true;
+                }
+                if (changed) State.Save();
+            }
+
+            ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+
+            if (ImGui::CollapsingHeader("Platform Filters"))
+            {
+                ImGui::Columns(2, NULL, false);
+
+                for (size_t i = 0; i < PLATFORM_FILTERS.size(); i++)
+                {
+                    ToggleButton(PLATFORM_FILTERS[i].c_str(), &State.platformFilters[PLATFORM_FILTERS[i]]);
+
+                    if (i == (PLATFORM_FILTERS.size() + 1) / 2 - 1)
+                        ImGui::NextColumn();
+                }
+
+                ImGui::Columns(1);
             }
         }
 
