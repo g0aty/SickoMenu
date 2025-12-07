@@ -459,6 +459,7 @@ public:
     float LobbyTimer = 600.f;
     bool ShowLobbyTimer = false;
     bool SpamMovingPlatform = false;
+    int SpamPlatformInterval = 10;
     bool JoinedAsHost = false;
     float ChatCooldown = 0.f;
     bool MessageSent = false;
