@@ -2466,3 +2466,33 @@ void RemoveFromBlacklist(const std::string& fc)
 		State.Save();
 	}
 }
+
+static uint64_t Random64(uint64_t di, uint64_t ddy) {
+	thread_local std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count() ^ ((uint64_t)std::random_device{}() << 1));
+	std::uniform_int_distribution<uint64_t> dist(di, ddy);
+	return dist(rng);
+}
+
+static uint64_t GeneratePsnId() {
+	return Random64(1000000000000000ULL, 9999999999999999ULL);
+}
+
+static uint64_t GenerateXboxId() { 
+	return Random64(0x10000000000ULL, 0xFFFFFFFFFFFFULL);
+}
+
+void GeneratePlatformId() {
+	if (State.FakePlatform == 8)
+	{
+		State.FakeXboxId = GenerateXboxId();
+		State.SpoofXboxId = true;
+		State.Save();
+	}
+
+	if (State.FakePlatform == 9)
+	{
+		State.FakePsnId = GeneratePsnId();
+		State.SpoofPsnId = true;
+		State.Save();
+	}
+}
