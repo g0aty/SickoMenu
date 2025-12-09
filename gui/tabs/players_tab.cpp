@@ -42,6 +42,7 @@ namespace PlayersTab {
 	static int farmDelay = 0;
 
 	struct CachedPlayerData {
+		PlayerControl* controlPtr = nullptr;
 		std::string nameRaw;
 		std::string nameClean;
 		std::string friendCode;
@@ -131,6 +132,12 @@ namespace PlayersTab {
 				activeIds.push_back(pid);
 
 				CachedPlayerData& cache = g_PlayerCache[pid];
+
+				if (cache.controlPtr != playerCtrl) {
+					cache = CachedPlayerData();
+					cache.controlPtr = playerCtrl;
+					cache.isCached = false;
+				}
 
 				int updateFrequency = State.InMeeting ? CACHE_UPDATE_FREQ_MEETING : CACHE_UPDATE_FREQ_NORMAL;
 
