@@ -175,6 +175,51 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 - Start Among Us from your Steam library.  
 - Use **Command + Backspace or Fn+Backspace** to toggle SickoMenu in-game, depending onn your Mac model.
 
+### Method 4: Whisky + Apple Game Porting Toolkit (Apple Silicon)
+
+> [!NOTE]
+> This method uses **Whisky** with **Apple’s Game Porting Toolkit**.
+> It is completely separate from CrossOver, PlayOnMac, and manual Wine prefixes.
+
+> [!TIP]
+> This method works best on **Apple Silicon (M1 / M2 / M3)** Macs running **macOS Ventura (13+)**.
+
+1. Download and install Whisky from:
+https://getwhisky.app
+Drag Whisky into your Applications folder and open it.
+2. Allow Whisky to install Wine and Apple Game Porting Toolkit when prompted.
+Create a new bottle in Whisky:
+Click + New Bottle.
+Name it something like Among Us GPTK.
+Set Windows Version to Windows 10.
+Leave architecture at default (64-bit).
+Create the bottle.
+3. Install Steam inside the bottle:
+Select your bottle and click Run Installer.
+Download the Steam installer from
+https://store.steampowered.com/about/
+Select SteamSetup.exe and complete the installation.
+Launch Steam from Whisky:
+Log in to your Steam account.
+Install Among Us normally through Steam.
+Close Steam once the installation finishes.
+4. Add SickoMenu’s version.dll:
+In Whisky, select your bottle and click Open Bottle in Finder.
+5. Navigate to:
+```drive_c/Program Files (x86)/Steam/steamapps/common/Among Us```
+Place the version.dll file into this folder.
+6. Configure the DLL override:
+With the bottle selected, open Bottle Settings.
+Click Wine Configuration.
+Go to the Libraries tab.
+Under New override for library, type version.
+Click Add, set it to Native (Windows).
+Click Apply and OK.
+7. Launch the game:
+Start Steam from Whisky.
+Launch Among Us from your Steam library.
+Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggle SickoMenu.
+
 ---
 ### **Note:**
 **For Method 2:**
