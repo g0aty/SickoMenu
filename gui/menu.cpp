@@ -41,7 +41,7 @@ namespace Menu {
 	static std::string searchQuery = (std::string)"";
 
 	std::map<std::string, std::vector<std::string>> categories = {
-		{"Settings", {"Show Keybinds", "Allow Activating Keybinds while Chatting", "Always Show Menu on Startup", "Panic (Disable SickoMenu)",
+		{"Settings", {"Show Keybinds", "Allow Activating Keybinds while Chatting", "Always Show Menu on Startup", "Panic Warning",
 					  "Config Name", "Load Config", "Save Config", "Adjust by DPI", "Menu Scale", "Menu Theme Color", "Gradient Theme", "Match Background with Theme",
 					  "RGB Menu Theme", "Reset Menu Theme", "Opacity", "Show Debug Tab", "Username", "Set as Account Name", "Automatically Set Name", "Custom Code",
 					  "Replace Streamer Mode Lobby Code", "RGB Lobby Code", "Unlock Cosmetics", "Safe Mode", "Allow other SickoMenu users to see you're using SickoMenu",
@@ -69,9 +69,10 @@ namespace Menu {
 		{"Doors", {"Close All Doors", "Close Room Door", "Pin All Doors", "Unpin All Doors", "Auto Open Doors"}},
 		{"Host", {"Custom Impostor Amount", "Impostor Count", "Force Start of Game", "Disable Meetings", "Disable Sabotages", "Disable Game Ending", "End Game", "Force Color for Everyone",
 				  "Force Name for Everyone", "Spam Moving Platform", "Unlock Kill Button", "Allow Killing in Lobbies", "Kill While Vanished", "Game Mode", "Show Lobby Timer", "Auto Start Game", "Spectator Mode"}},
+				  {"IRL update", {"BRAINWASH", "SEX", "FUCK", "get gud", "free knife", "PAINKILLER", "get doctor degree", "Become Diddy"}},
 #ifdef _DEBUG
 		{"Debug", {"Enable Occlusion Culling", "Force Load Settings", "Force Save Settings", "Clear RPC Queues", "Log Unity Debug Messages", "Log Hook Debug Messages", "Colors", "Profiler",
-				   "Experiments", "Enable Anticheat (SMAC)", "Point System (Only for Hosting)"}},
+				   "Experiments", "Enable Anticheat (SMAC)", "Point System (Only for Hosting)", "April fools mode", "Fuckson Mode", "FuckHudson Mode"}},
 #endif
 				   // Add more settings here as needed
 	};
