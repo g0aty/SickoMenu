@@ -171,7 +171,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 - Start Among Us from your Steam library.  
 - Use **Command + Backspace or Fn+Backspace** to toggle SickoMenu in-game, depending onn your Mac model.
 
-**Method4 : (Limited and Specific)**
+**Method 4 : (Limited and Specific)**
 
 1. Download and install Whisky from:
 https://getwhisky.app
