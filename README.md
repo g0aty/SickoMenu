@@ -175,7 +175,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 
 1. Download and install Whisky from:
 https://getwhisky.app
-2.Allow Whisky to install Wine and Apple Game Porting Toolkit when prompted. Create a new bottle in Whisky: Click + New Bottle. Name it something like Among Us GPTK. Set Windows Version to Windows 10. Leave architecture at default (64-bit). Create the bottle.
+2.Allow Whisky to install Wine and Apple Game Porting Toolkit when prompted.
 3.Create a new bottle in Whisky:
 Click + New Bottle.
 Name it something like Among Us GPTK.
