@@ -14,6 +14,9 @@
 - **Allow Keybinds while Chatting** Allows you to use keybinds while chatting (Default: OFF)
 - **Always Show Menu on Startup** Shows the menu on startup (Default: ON)
 - **Panic** Disables the mod at will (Default: OFF)
+- **Extra Commands** Adds more commands for chat (Default: OFF)
+- **Save Config** Saves the menu settings you have already
+- **Load Config** Loads your last settings for the menu
 - **Adjust by DPI** Allows you to change scaling of the menu (Default: ON)
 - **Menu Scale** Change the size of the menu (Default: 100%)
 - **Menu Theme Color**: Change the accent color of the menu (Default: #801341)
@@ -26,9 +29,9 @@
 - **Replace Streamer Mode Lobby Code** Changes the streamer mode hidden code from "******" to your custom text (Default: "SICKOS")
 - **RGB Lobby Code** Makes the lobby code RGB (Default: OFF)
 - **Unlock All Achievements** Unlocks all Achievements
-- **Unlock Cosmetics** Unlocks every cosmetic (hats, visors, etc.) (Default: OFF)
+- **Unlock Cosmetics** Unlocks every single cosmetic (hats, visors, etc.) (Default: OFF)
 - **Safe Mode** Disables certain features whenever there is an anticheat (Default: ON)
-- **Allow other SickoMenu users to see you're using SickoMenu** Allows SickoMenu users to see other SickoMenu users
+- **Allow other mod users to see you're using ...** Allows other mod menu users to see that you are using either SickoMenu, AmongUsMenu, or KillNetwork. (Default: SickoMenu)
 ### Spoofing
 <img width="400" height="300" alt="Screenshot 2025-09-12 160940" src="https://github.com/user-attachments/assets/db97a985-1527-45f1-ae33-c37551ce974f" />
 
@@ -36,6 +39,7 @@
 - **Use Custom Guest Friend Code** Changes your new friend code to whatever you want as long as it's valid (Default: OFF)
 - **Spoof Level** Spoofs your level in game (Default: OFF)
 - **Spoof Platform** Spoofs your platform to whatever you choose (Default: OFF)
+- **+25 Mode** Disables anticheat while hosting. NOTE: Lobbies created in this protocol are hidden from regular players (Default: OFF)
 - **Spoof Game Version** Spoofs your game version to play with people on the latest version of Among Us (Default: ON: 16.0.5/16.1.0)
 ### Customization
 <img width="400" height="300" alt="Screenshot 2025-09-12 160946" src="https://github.com/user-attachments/assets/5e582be8-5ebc-4f2b-ace0-e399d8f8fb13" />
@@ -46,6 +50,7 @@
 - **Gradient Theme** Changes the gradient theme of the menu
 - **Match Background With Theme** Makes it so that the background of the menu is matching with its theme
 - **RGB Menu Theme** Changes the theme of the menu to RGB
+- **Opacity** Changes the opacity of the menu on a scale of 1
 - **Dark Game Theme** Changes the game theme to Dark
 - **Custom Game Theme** Makes you choose your own custom game theme
 - **Change Chat Font** Changes the font of the chat
@@ -63,18 +68,21 @@
 - **Show/Hide Console** (Default: HOME)
 - **Show/Hide Radar** (Default: Insert)
 - **Show/Hide Replay** (Default: End)
+- **Show/Hide Chat** (Default: None)
+- **Read Ghost Messages** (Default: None)
 - **Panic (Disable SickoMenu)** (Default: PAUSE BREAK)
-- **Enable/Disable HUD** (Default: None)
 - **Enable/Disable HUD** (Default: None)
 - **Freecam** (Default: None)
 - **Zoom** (Default: None)
 - **NoClip** (Default: CTRL)
+- **Autokill** (Default: None)
 - **Reset Appearance** (Default: None)
 - **Confuse Now** (Default: None)
 - **Repair All Sabotages** (Default: PAGE DOWN)
 - **Close All Doors** (Default: None)
 - **Close Current Room Door** (Default: None)
 - **Complete All Tasks** (Default: None)
+- **Cancel Start Game** (Default: None)
 
 ## 🎮 Game
 ### General
@@ -84,6 +92,7 @@
 - **Modify Kill Distance** Modifies kill distance to the specified amount (Default: OFF)
 - **No Ability Cooldown** Removes ability cooldowns (kill cooldown, vent cooldown, etc.) (Default: OFF)
 - **Set Color** Sets your color to the specified color if it's available or you're host/not in safe mode
+- **Random Color** Sets your color to a random one
 - **Snipe Color** Snipes your color whenever it's available (Default: OFF)
 - **Send Chat** Sends a chat message to the game chat
 - **Send to AUM** Sends an AUM chat message that can be seen with AmongUsMenu or SickoMenu
@@ -122,7 +131,7 @@ View the game options!
 - **Always show Chat Button** Always shows the chat button even in game (Default: OFF)
 - **Allow Copy/Paste in Chat** Allows you to copy, paste, or cut text into chat (Default: OFF)
 - **Read Messages by Ghosts** Allows you to read ghost messages (Default: OFF)
-- **Read and Send AUM Chat** Allows you to read AUM chat and send via "/aum [message]" (Default: OFF)
+- **Read and Send Sicko Chat** Allows you to read SickoMenu chat and send via "/sc [message]" (Default: OFF)
 - **Custom Name** Customize your name with effects such as gradient, RGB, size, italics, underline and strikethrough (Default: OFF)
 - **Server-sided Custom Name** *(Only as host/Safe Mode disabled)* Shows your custom name for everyone (Default: OFF)
 - **Reveal Roles** Reveals a player's roles and tasks completed (Default: OFF)
@@ -153,14 +162,16 @@ View the game options!
 - **Shapeshift without Animation** Allows you to shapeshift without the animation (Default: OFF)
 - **Copy Lobby Code on Disconnect** Automatically copies the lobby code to your clipboard when you get disconnected unintentionally (Default: OFF)
 - **NoClip** Allows you to walk through walls (Default: OFF)
+- **No Seeker Animation** When playing Hide & Seek as a seeker, you won't appear as one (Default: OFF)
 - **Kill Other Impostors** *(Only with Safe Mode disabled)* Allows you to kill fellow impostors (Default: OFF)
 - **Unlock Kill Button** *(Only with Safe Mode disabled)* Allows you to use kill button at any time (Default: OFF)
 - **Allow Killing in Lobbies** *(Only with Safe Mode disabled)* Allows you to kill in lobbies (Default: OFF)
 - **Kill While Vanished** *(Only with Safe Mode disabled)* Allows you to kill while being vanished as a phantom (Default: OFF)
 - **Infinite Kill Range** Extends your kill reach (Default: OFF)
+- **Autokill** Instantly kills the closest player when the kill CD reaches 0 (Default: OFF)
 - **Bypass Guardian Angel Protections** Allows you to kill protected players (Default: OFF)
 - **Do Tasks as Impostor** Allows you to complete tasks as impostor (Default: OFF)
-- **Always Use Kill Exploit** Forces the kill exploit to always be used, thus bypassing Disable Kills (Default: OFF)
+- **Always Use Kill Exploit** *(Only with Safe Mode disabled)* Forces the kill exploit to always be used, thus bypassing Disable Kills (Default: OFF)
 - **Fake Alive** Appear to yourself as alive even if you're dead (Default: OFF)
 - **God Mode** Prevents you from dying (Default: OFF)
 - **(Shift + Right Click) to Teleport** Teleports you to wherever you clicked (Default: OFF)
@@ -179,6 +190,8 @@ View the game options!
 <img width="400" height="300" alt="Screenshot 2025-09-12 161044" src="https://github.com/user-attachments/assets/23434fa5-10bd-4126-8d41-12842813a73d" />
 
 - **Cycler** Constantly cycles your cosmetics that you choose (Default: OFF)
+- **Cycle During Meetings** Constantly cycles your cosmetics during meetings (Default: OFF)
+- **Cycle Between Players** Constantly cycles your avatar between other players' avatars (Default: OFF) 
 - **Cycle for Everyone** *(Only as host/Safe Mode disabled)* Constantly cycles everyone's name and color if chosen (Default: OFF)
 - **Confuser** Randomize your appearance at will or when certain conditions are met (Default: OFF)
 - **Randomize Everyone** *(Only with Safe Mode disabled)* Randomize everyone's appearances at will
@@ -207,7 +220,8 @@ Edit your own texts with features like colors , size and more! This allows you t
 - **Show Replay** Shows a replay of all game events (Default: OFF)
 - **Show only last x seconds** Only shows the last x seconds (Default: OFF)
 - **Clear after Meeting** Clears the replay after meeting (Default: OFF)
-- **Replay Map Color** Changes the replay map's color
+- **Draw Player Icons** Shows player icons on replay map (Default: OFF)
+- **Replay Map Color** Changes the replay map's color (Default: White)
 
 ## 🩻 ESP
 <img width="400" height="300" alt="Screenshot 2025-09-12 161203" src="https://github.com/user-attachments/assets/1d39098b-afe6-427c-ab67-fa708fdd13ac" />
@@ -217,6 +231,7 @@ Edit your own texts with features like colors , size and more! This allows you t
 - **Hide During Meetings** Hides ESP in meetings (Default: OFF)
 - **Show Boxes** Shows ESP boxes on players (Default: ON)
 - **Show Tracers** Shows tracers from yourself to players (Default: ON)
+- **Show Distances** Shows the distance between you and other players (Default: ON)
 - **Role-based** Instead of player colors, use role colors for ESP and toggle roles you want to see (Default: OFF)
 
 ## 🤹 Players:
@@ -292,6 +307,7 @@ A dedicated player menu for viewing and manipulating players
 
 - **Disable Sabotages** *(Only as Host)* Prevents players from sabotaging stuff
 - **Repair Sabotage** Repairs the ongoing sabotage
+- **Sabotage All** Sabotages everything 
 - **Auto repair Sabotage** Automatically repairs all sabotages (Default: OFF)
 - **Random Sabotage** Sabotages a random system
 - **Spam Sabotage** Repeatedly calls a sabotage
@@ -299,6 +315,10 @@ A dedicated player menu for viewing and manipulating players
 - **Disable Lights** Prevents lights from being fixed by regular means
 - **Disable Lights and auto-move switches** Automatically moves lights switches so it's harder for players to fix
 - **Infinite mushroom mixup** Activates mushroom mixup forever
+
+>[!NOTE]
+>If you spam "Sabotage All", there is a high chance your game will crash.
+>
 
 ## 🚪 Doors
 <img width="400" height="300" alt="Screenshot 2025-09-12 161307" src="https://github.com/user-attachments/assets/4a19c64e-086c-4039-812a-b31b322228ea" />
@@ -339,3 +359,4 @@ A dedicated player menu for viewing and manipulating players
 - **Force Save Settings** Force save your settings
 - **Clear RPC Queues** Clears RPC queues when there are too many RPCs to handle
 - **Log Unity Debug Messages** Shows Unity debug stuff in the game log (Default: ON)
+- **April Fools' Mode** F*** Hudson
