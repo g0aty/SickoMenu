@@ -319,6 +319,7 @@
     <ClCompile Include="hooks\PlayerBanData.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
+    <ClCompile Include="rpc\RpcBanPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="appdata\il2cpp-api-functions.h">
@@ -562,6 +563,7 @@
     <None Include="framework\version.def">
       <Filter>framework</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="appdata">

@@ -1,0 +1,7 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define DO_APP_FUNC(r, n, p, s) extern r (*n) p
+#define DO_APP_FUNC(r, n, p, s) r (*n) p
+#define DO_APP_FUNC(r, n, p, s) n = reinterpret_cast<decltype(n)>(get_method(s))
+#define DO_APP_FUNC(r, n, p, s) if(!n) LOG_ERROR("Unable to locate " #n)
