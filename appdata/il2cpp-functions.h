@@ -272,7 +272,7 @@ DO_APP_FUNC(void, PlayerControl_TurnOnProtection, (PlayerControl* __this, bool v
 DO_APP_FUNC(void, PlayerControl_RemoveProtection, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RemoveProtection()");
 
 DO_APP_FUNC(bool, Object_1_op_Implicit, (Object_1* exists, MethodInfo* method), "UnityEngine.CoreModule, System.Boolean UnityEngine.Object::op_Implicit(UnityEngine.Object)");
-DO_APP_FUNC(void, PlayerControl_ShowFailedMurder, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::ShowFailedMurder()");
+DO_APP_FUNC(void, PlayerControl_ShowFailedMurder, (PlayerControl* __this, MethodInfo* method), "Assembly-Csharp, System.Void PlayerControl::ShowFailedMurder()");
 
 DO_APP_FUNC(bool, PlayerControl_get_IsKillTimerEnabled, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean PlayerControl::get_IsKillTimerEnabled()");
 DO_APP_FUNC(void, ExileController_ReEnableGameplay, (ExileController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ExileController::ReEnableGameplay()");
@@ -287,7 +287,7 @@ DO_APP_FUNC(void, AccountManager_UpdateKidAccountDisplay, (AccountManager* __thi
 DO_APP_FUNC(String*, AccountManager_GetRandomName, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.String AccountManager::GetRandomName()");
 DO_APP_FUNC(void, PlayerStorageManager_OnReadPlayerPrefsComplete, (PlayerStorageManager* __this, void* data, MethodInfo* method), "Assembly-CSharp, System.Void PlayerStorageManager::OnReadPlayerPrefsComplete(Epic.OnlineServices.PlayerDataStorage.ReadFileCallbackInfo&)");
 
-DO_APP_FUNC(void, AchievementManager_1_UnlockAchievement, (AchievementManager_1* __this, String* key, MethodInfo* method), "Assembly-CSharp, System.Void AchievementManager::UnlockAchievement(System.String)");
+DO_APP_FUNC(void, AchievementManager_1_UnlockAchievement, (AchievementManager_1* __this, String* key, MethodInfo* method), "Assembly-CSharp, System.Void AchievementManager::UnlockAchievement(System.String)")
 
 // 2022.10.25s
 DO_APP_FUNC(PlayerData*, DataManager_get_Player, (MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Player.PlayerData AmongUs.Data.DataManager::get_Player()");
@@ -422,4 +422,4 @@ DO_APP_FUNC(void, MainMenuManager_LateUpdate, (MainMenuManager* __this, MethodIn
 DO_APP_FUNC(AudioSource*, SoundManager_PlaySound, (SoundManager* __this, AudioClip* clip, bool loop, float volume, AudioMixerGroup* audioMixer, MethodInfo* method), "Assembly-CSharp, UnityEngine.AudioSource SoundManager::PlaySound(UnityEngine.AudioClip, System.Boolean, System.Single, UnityEngine.Audio.AudioMixerGroup)");
 DO_APP_FUNC(void, AudioSource_set_pitch, (AudioSource* __this, float value, MethodInfo* method), "UnityEngine.AudioModule, System.Void UnityEngine.AudioSource::set_pitch(System.Single)");
 DO_APP_FUNC(void, PassiveButton_SetButtonEnableState, (PassiveButton* __this, bool enabled, MethodInfo* method), "Assembly-CSharp, System.Void PassiveButton::SetButtonEnableState(System.Boolean)");
-DO_APP_FUNC(void, PassiveButton_ChangeButtonText, (PassiveButton* __this, String* s, MethodInfo* method), "Assembly-CSharp, System.Void PassiveButton::ChangeButtonText(System.String)");
+DO_APP_FUNC(void, PassiveButton_ChangeButtonText, (PassiveButton * __this, String * s, MethodInfo * method), "Assembly-CSharp, System.Void PassiveButton::ChangeButtonText(System.String)");

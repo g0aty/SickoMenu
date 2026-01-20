@@ -1398,166 +1398,166 @@ namespace PlayersTab {
 						}
 					}
 				}
+			}
 
-				if (!selectedPlayer.is_LocalPlayer() && selectedPlayers.size() == 1) {
-					if (AnimatedButton("Teleport To")) {
+			if (!selectedPlayer.is_LocalPlayer() && selectedPlayers.size() == 1) {
+				if (AnimatedButton("Teleport To")) {
+					if (IsInGame())
+						State.rpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(selectedPlayer.get_PlayerControl())));
+					else if (IsInLobby())
+						State.lobbyRpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(selectedPlayer.get_PlayerControl())));
+				}
+			}
+			ImGui::SameLine();
+			if (!selectedPlayer.is_LocalPlayer() && !State.SafeMode) {
+				if (AnimatedButton("Teleport To You")) {
+					for (auto p : selectedPlayers) {
 						if (IsInGame())
-							State.rpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(selectedPlayer.get_PlayerControl())));
+							State.rpcQueue.push(new RpcForceSnapTo(p.validate().get_PlayerControl(), GetTrueAdjustedPosition(*Game::pLocalPlayer)));
 						else if (IsInLobby())
-							State.lobbyRpcQueue.push(new RpcSnapTo(GetTrueAdjustedPosition(selectedPlayer.get_PlayerControl())));
+							State.lobbyRpcQueue.push(new RpcForceSnapTo(p.validate().get_PlayerControl(), GetTrueAdjustedPosition(*Game::pLocalPlayer)));
+					}
+				}
+			}
+
+			if ((IsInGame() || IsInLobby()) && selectedPlayer.has_value() && selectedPlayers.size() == 1)
+			{
+				if (State.ActiveAttach && selectedPlayer.has_value() && (State.playerToAttach.equals(State.selectedPlayer) || selectedPlayer.is_LocalPlayer())) {
+					if (AnimatedButton(State.AprilFoolsMode ? "Stop Backshotting" : "Stop Attaching")) {
+						State.playerToAttach = {};
+						State.ActiveAttach = false;
+					}
+				}
+				else {
+					if (!selectedPlayer.is_LocalPlayer() && AnimatedButton(State.AprilFoolsMode ? "Backshot To" : "Attach To")) {
+						State.playerToAttach = State.selectedPlayer;
+						State.ActiveAttach = true;
+					}
+				}
+			}
+
+			if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1 && !selectedPlayer.get_PlayerData()->fields.IsDead) {
+				if (AnimatedButton("Turn into Ghost"))
+				{
+					if (PlayerIsImpostor(selectedPlayer.get_PlayerData())) {
+						if (IsInGame())
+							State.rpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum::ImpostorGhost));
+						else if (IsInLobby())
+							State.lobbyRpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum::ImpostorGhost));
+					}
+					else {
+						if (IsInGame())
+							State.rpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum::CrewmateGhost));
+						else if (IsInLobby())
+							State.lobbyRpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum::CrewmateGhost));
+					}
+				}
+			}
+
+			if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
+				if (!IsInMultiplayerGame() || !selectedPlayer.get_PlayerControl()->fields.roleAssigned)
+				{
+					if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale))
+						State.Save();
+					ImGui::SameLine();
+					if (AnimatedButton("Set Role"))
+					{
+						if (IsInGame())
+							State.rpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum(State.FakeRole)));
+						else if (IsInLobby())
+							State.lobbyRpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum(State.FakeRole)));
+					}
+				}
+				else {
+					static int ghostRole = 0;
+					if (CustomListBoxInt("Select Role", &ghostRole, GHOSTROLES, 100.0f * State.dpiScale))
+						State.Save();
+					ImGui::SameLine();
+					if (AnimatedButton("Set Role"))
+					{
+						auto roleType = RoleTypes__Enum::CrewmateGhost;
+						switch (ghostRole) {
+						case 0:
+							roleType = RoleTypes__Enum::GuardianAngel;
+							break;
+						case 1:
+							roleType = RoleTypes__Enum::CrewmateGhost;
+							break;
+						case 2:
+							roleType = RoleTypes__Enum::ImpostorGhost;
+							break;
+						}
+						if (IsInGame())
+							State.rpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), roleType));
+						else if (IsInLobby())
+							State.lobbyRpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), roleType));
+					}
+				}
+			}
+
+			if (GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) {
+				if (!State.SafeMode && AnimatedButton("Set Scanner")) {
+					for (auto p : selectedPlayers) {
+						if (IsInGame())
+							State.rpcQueue.push(new RpcForceScanner(p.validate().get_PlayerControl(), true));
+						else if (IsInLobby())
+							State.lobbyRpcQueue.push(new RpcForceScanner(p.validate().get_PlayerControl(), true));
 					}
 				}
 				ImGui::SameLine();
-				if (!selectedPlayer.is_LocalPlayer() && !State.SafeMode) {
-					if (AnimatedButton("Teleport To You")) {
-						for (auto p : selectedPlayers) {
-							if (IsInGame())
-								State.rpcQueue.push(new RpcForceSnapTo(p.validate().get_PlayerControl(), GetTrueAdjustedPosition(*Game::pLocalPlayer)));
-							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcForceSnapTo(p.validate().get_PlayerControl(), GetTrueAdjustedPosition(*Game::pLocalPlayer)));
-						}
+				if (!State.SafeMode && AnimatedButton("Stop Scanner")) {
+					for (auto p : selectedPlayers) {
+						if (IsInGame())
+							State.rpcQueue.push(new RpcForceScanner(p.validate().get_PlayerControl(), false));
+						else if (IsInLobby())
+							State.lobbyRpcQueue.push(new RpcForceScanner(p.validate().get_PlayerControl(), false));
 					}
 				}
+			}
+			ImGui::NewLine();
 
-				if ((IsInGame() || IsInLobby()) && selectedPlayer.has_value() && selectedPlayers.size() == 1)
+			if (State.selectedPlayers.size() == 1) {
+				if ((IsInGame() || IsInLobby()) && !selectedPlayer.is_Disconnected() && !selectedPlayer.is_LocalPlayer())
 				{
-					if (State.ActiveAttach && selectedPlayer.has_value() && (State.playerToAttach.equals(State.selectedPlayer) || selectedPlayer.is_LocalPlayer())) {
-						if (AnimatedButton(State.AprilFoolsMode ? "Stop Backshotting" : "Stop Attaching")) {
-							State.playerToAttach = {};
-							State.ActiveAttach = false;
+					if (State.playerToWhisper.equals(State.selectedPlayer) && State.activeWhisper) {
+						if (AnimatedButton("Stop Whispering To")) {
+							State.playerToWhisper = {};
+							State.activeWhisper = false;
 						}
 					}
 					else {
-						if (!selectedPlayer.is_LocalPlayer() && AnimatedButton(State.AprilFoolsMode ? "Backshot To" : "Attach To")) {
-							State.playerToAttach = State.selectedPlayer;
-							State.ActiveAttach = true;
+						if (AnimatedButton("Whisper To")) {
+							State.playerToWhisper = State.selectedPlayer;
+							State.activeWhisper = true;
 						}
 					}
 				}
-
-				if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1 && !selectedPlayer.get_PlayerData()->fields.IsDead) {
-					if (AnimatedButton("Turn into Ghost"))
-					{
-						if (PlayerIsImpostor(selectedPlayer.get_PlayerData())) {
-							if (IsInGame())
-								State.rpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum::ImpostorGhost));
-							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum::ImpostorGhost));
-						}
-						else {
-							if (IsInGame())
-								State.rpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum::CrewmateGhost));
-							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum::CrewmateGhost));
-						}
-					}
+				//we have to send these rpc messages as ourselves since anticheat only allows you to send rpcs with your own net id
+				if (AnimatedButton(!State.SafeMode ? "Force AUM Detection" : "Fake AUM Detection")) {
+					if (IsInGame()) State.rpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
+					if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
+				}
+				ImGui::SameLine();
+				static std::string aumMessage = "";
+				if (AnimatedButton(!State.SafeMode ? "Force SickoChat" : "Fake SickoChat")) {
+					if (IsInGame()) State.rpcQueue.push(new RpcForceSickoChat(selectedPlayer, aumMessage, !State.SafeMode));
+					if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceSickoChat(selectedPlayer, aumMessage, !State.SafeMode));
 				}
 
-				if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
-					if (!IsInMultiplayerGame() || !selectedPlayer.get_PlayerControl()->fields.roleAssigned)
-					{
-						if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale))
-							State.Save();
-						ImGui::SameLine();
-						if (AnimatedButton("Set Role"))
-						{
-							if (IsInGame())
-								State.rpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum(State.FakeRole)));
-							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), RoleTypes__Enum(State.FakeRole)));
+				InputString("AUM Message", &aumMessage);
+
+				if (!State.SafeMode && (IsInGame() || IsInLobby()) && !selectedPlayer.is_Disconnected() && !selectedPlayer.is_LocalPlayer())
+				{
+					if (State.playerToChatAs.equals(State.selectedPlayer) && State.activeChatSpoof) {
+						if (AnimatedButton("Stop Chatting As")) {
+							State.playerToChatAs = {};
+							State.activeChatSpoof = false;
 						}
 					}
 					else {
-						static int ghostRole = 0;
-						if (CustomListBoxInt("Select Role", &ghostRole, GHOSTROLES, 100.0f * State.dpiScale))
-							State.Save();
-						ImGui::SameLine();
-						if (AnimatedButton("Set Role"))
-						{
-							auto roleType = RoleTypes__Enum::CrewmateGhost;
-							switch (ghostRole) {
-							case 0:
-								roleType = RoleTypes__Enum::GuardianAngel;
-								break;
-							case 1:
-								roleType = RoleTypes__Enum::CrewmateGhost;
-								break;
-							case 2:
-								roleType = RoleTypes__Enum::ImpostorGhost;
-								break;
-							}
-							if (IsInGame())
-								State.rpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), roleType));
-							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcSetRole(selectedPlayer.get_PlayerControl(), roleType));
-						}
-					}
-				}
-
-				if (GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) {
-					if (!State.SafeMode && AnimatedButton("Set Scanner")) {
-						for (auto p : selectedPlayers) {
-							if (IsInGame())
-								State.rpcQueue.push(new RpcForceScanner(p.validate().get_PlayerControl(), true));
-							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcForceScanner(p.validate().get_PlayerControl(), true));
-						}
-					}
-					ImGui::SameLine();
-					if (!State.SafeMode && AnimatedButton("Stop Scanner")) {
-						for (auto p : selectedPlayers) {
-							if (IsInGame())
-								State.rpcQueue.push(new RpcForceScanner(p.validate().get_PlayerControl(), false));
-							else if (IsInLobby())
-								State.lobbyRpcQueue.push(new RpcForceScanner(p.validate().get_PlayerControl(), false));
-						}
-					}
-				}
-				ImGui::NewLine();
-
-				if (State.selectedPlayers.size() == 1) {
-					if ((IsInGame() || IsInLobby()) && !selectedPlayer.is_Disconnected() && !selectedPlayer.is_LocalPlayer())
-					{
-						if (State.playerToWhisper.equals(State.selectedPlayer) && State.activeWhisper) {
-							if (AnimatedButton("Stop Whispering To")) {
-								State.playerToWhisper = {};
-								State.activeWhisper = false;
-							}
-						}
-						else {
-							if (AnimatedButton("Whisper To")) {
-								State.playerToWhisper = State.selectedPlayer;
-								State.activeWhisper = true;
-							}
-						}
-					}
-					//we have to send these rpc messages as ourselves since anticheat only allows you to send rpcs with your own net id
-					if (AnimatedButton(!State.SafeMode ? "Force AUM Detection" : "Fake AUM Detection")) {
-						if (IsInGame()) State.rpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
-					}
-					ImGui::SameLine();
-					static std::string aumMessage = "";
-					if (AnimatedButton(!State.SafeMode ? "Force SickoChat" : "Fake SickoChat")) {
-						if (IsInGame()) State.rpcQueue.push(new RpcForceSickoChat(selectedPlayer, aumMessage, !State.SafeMode));
-						if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceSickoChat(selectedPlayer, aumMessage, !State.SafeMode));
-					}
-
-					InputString("AUM Message", &aumMessage);
-
-					if (!State.SafeMode && (IsInGame() || IsInLobby()) && !selectedPlayer.is_Disconnected() && !selectedPlayer.is_LocalPlayer())
-					{
-						if (State.playerToChatAs.equals(State.selectedPlayer) && State.activeChatSpoof) {
-							if (AnimatedButton("Stop Chatting As")) {
-								State.playerToChatAs = {};
-								State.activeChatSpoof = false;
-							}
-						}
-						else {
-							if (AnimatedButton("Chat As")) {
-								State.playerToChatAs = State.selectedPlayer;
-								State.activeChatSpoof = true;
-							}
+						if (AnimatedButton("Chat As")) {
+							State.playerToChatAs = State.selectedPlayer;
+							State.activeChatSpoof = true;
 						}
 					}
 				}
@@ -1592,6 +1592,11 @@ namespace PlayersTab {
 				if (AnimatedButton("Report Player")) {
 					if (IsInGame()) State.rpcQueue.push(new ReportPlayer(selectedPlayer.get_PlayerControl(), (ReportReasons__Enum)reportReason));
 					if (IsInLobby()) State.lobbyRpcQueue.push(new ReportPlayer(selectedPlayer.get_PlayerControl(), (ReportReasons__Enum)reportReason));
+				}
+				ImGui::SameLine();
+				if (AnimatedButton("Attempt to Mass Report")) {
+					if (IsInGame()) State.rpcQueue.push(new RpcBanPlayer(selectedPlayer.get_PlayerControl(), 367, (ReportReasons__Enum)reportReason));
+					if (IsInLobby()) State.lobbyRpcQueue.push(new RpcBanPlayer(selectedPlayer.get_PlayerControl(), 367, (ReportReasons__Enum)reportReason));
 				}
 
 				ImGui::Text("Reason");

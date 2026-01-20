@@ -495,3 +495,11 @@ public:
 	PunishPlayer(PlayerControl* Player, bool isBan);
 	virtual void Process() override;
 };
+class RpcBanPlayer : public RPCInterface {
+public:
+	PlayerControl* target;
+	int count;
+	ReportReasons__Enum reason;
+	RpcBanPlayer(PlayerControl* target, int count = 367, ReportReasons__Enum reason = static_cast<ReportReasons__Enum>(2));
+	virtual void Process() override;
+};
