@@ -202,6 +202,8 @@ namespace PlayersTab {
 									tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LightBlue);
 								else if (State.modUsers.at(pid) == "<#ad2225>ChocooMenu</color>")
 									tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Purple);
+								else if (State.modUsers.at(pid) == "<#030303>Unknown</color>")
+									tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
 								else if (State.modUsers.at(pid) == "<#ff006c>SickoMenu</color>")
 									tempColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
 							}
