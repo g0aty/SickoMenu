@@ -67,6 +67,16 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		}
 	}
 	break;
+	case (uint8_t)121:
+	{
+		uint8_t playerId = player->fields.PlayerId;
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, "<#ad2225>ChocooMenu</color>" });
+			STREAM_DEBUG("RPC Received for a ChocooMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			// Developer: unnikuttan1753
+		}
+	}
+	break;
 	case (uint8_t)101:
 	{
 		using namespace std::chrono;
