@@ -151,7 +151,10 @@ namespace TasksTab {
 			}
 
 			if (IsInMultiplayerGame() && IsInGame()) {
-				float taskPercentage = (float)(*Game::pGameData)->fields.CompletedTasks / (float)(*Game::pGameData)->fields.TotalTasks;
+				float taskPercentage = 0.0f;
+				if ((float)(*Game::pGameData)->fields.TotalTasks > 0.0f) {
+					taskPercentage = (float)(*Game::pGameData)->fields.CompletedTasks / (float)(*Game::pGameData)->fields.TotalTasks;
+				}
 				ImGui::TextColored(ImVec4(1.0f - taskPercentage, 1.0f, 1.0f - taskPercentage, 1.0f), "%.2f%% Total Tasks Completed", taskPercentage * 100);
 			}
 

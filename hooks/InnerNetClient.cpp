@@ -1184,6 +1184,19 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 }
             }
         }
+		static int SpamPlatformTimer = 0;
+        if (State.SpamMovingPlatform) {
+            if (SpamPlatformTimer <= 0) {
+                State.rpcQueue.push(new RpcUsePlatform());
+                SpamPlatformTimer = std::max<int>(1, State.SpamPlatformInterval);
+            }
+            else {
+                SpamPlatformTimer--;
+            }
+        }
+        else {
+            SpamPlatformTimer = 0;
+        }
     }
     catch (Exception* ex) {
         onGameEnd();
@@ -1196,19 +1209,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     }
     Application_set_targetFrameRate(State.GameFPS > 1 ? State.GameFPS : 60, NULL);
     InnerNetClient_Update(__this, method);
-
-    static int SpamPlatformDelay = 10;
-    if (SpamPlatformDelay <= 0) {
-        if (State.SpamMovingPlatform) {
-            State.rpcQueue.push(new RpcUsePlatform());
-            SpamPlatformDelay = 10;
-        }
-    }
-    else {
-        SpamPlatformDelay--;
-    }
-
-
+	
     static int AutoRepairSabotageDelay = 100;
     if (AutoRepairSabotageDelay <= 0) {
         if (State.AutoRepairSabotage) {
