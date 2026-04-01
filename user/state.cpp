@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v4.4";
+    this->SickoVersion = "v4.4.1.26";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";

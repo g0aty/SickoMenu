@@ -622,7 +622,7 @@ public:
     bool KickByLockedName = false;
     bool ShowPDataByNC = false;
 
-    bool AprilFoolsMode = false;
+    bool AprilFoolsMode = true;
     bool BrainrotEveryone = false;
     bool RizzUpEveryone = false;
     bool DiddyPartyMode = false;
