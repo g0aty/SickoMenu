@@ -706,7 +706,7 @@ namespace GameTab {
                     if (State.RizzUpEveryone) State.RizzUpEveryone = false;
                     State.Save();
                 }
-                if (State.DiddyPartyMode && ToggleButton("Rizz Up Everyone [Skibidi]", &State.RizzUpEveryone)) {
+                if (/*State.DiddyPartyMode && */ToggleButton("Rizz Up Everyone [Skibidi]", &State.RizzUpEveryone)) {
                     if (State.ChatSpam) State.ChatSpam = false;
                     if (State.BrainrotEveryone) State.BrainrotEveryone = false;
                     State.Save();

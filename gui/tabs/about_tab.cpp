@@ -97,13 +97,16 @@ namespace AboutTab {
             if (State.AprilFoolsMode) {
                 ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
                 auto DiddyCol = ImVec4(0.79f, 0.03f, 1.f, 1.f);
-                ImGui::TextColored(DiddyCol, std::format("You now have access to a brand new mode: {} Mode!", State.DiddyPartyMode ? "Diddy Party" :
+                /*ImGui::TextColored(DiddyCol, std::format("You now have access to a brand new mode: {} Mode!", State.DiddyPartyMode ? "Diddy Party" :
                 (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson")).c_str());
                 ImGui::TextColored(DiddyCol, "Find all the new features and enjoy!");
                 if (ToggleButton("Diddy Party Mode", &State.DiddyPartyMode)) {
                     if (State.RizzUpEveryone) State.RizzUpEveryone = false;
                     State.Save();
-                }
+                }*/
+                ImGui::TextColored(DiddyCol, "Happy April Fools'!");
+                ImGui::TextColored(DiddyCol, "This is NOT a real update as the official release is not yet ready.");
+                ImGui::TextColored(DiddyCol, "Please wait for the official release to support the latest versions of Among Us!");
             }
         }
 

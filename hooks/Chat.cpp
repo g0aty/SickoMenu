@@ -127,7 +127,7 @@ void SendPrivateWarnMessage(PlayerControl* toPlayer, const std::string& reason, 
 
 	if (!*Game::pLocalPlayer) return;
 
-	if (IsHost) /* <- In order not to look ridiculous where we are not host :sob: */ {
+	if (IsHost() && State.ChatCooldown >= 3.f) /* <- In order not to look ridiculous where we are not host :sob: */ {
 		std::string message = std::format("You were warned by Reason: {}\n\nTotal warns: {}", reason, totalWarns);
 		if (message.length() > 120) {
 			message = message.substr(0, 120);

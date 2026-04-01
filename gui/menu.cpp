@@ -154,25 +154,25 @@ namespace Menu {
 			titleCol.w = 1.f;
 			ImGui::TextColored(titleCol, modText.c_str());
 			ImVec4 DiddyCol = ImVec4(0.79f, 0.03f, 1.f, 1.f);
-			if (State.AprilFoolsMode) {
+			/*if (State.AprilFoolsMode) {
 				ImGui::SameLine(0.f, 0.f);
 				if (State.DiddyPartyMode) ImGui::TextColored(DiddyCol, " [Diddy Party Mode]");
 				else ImGui::TextColored(DiddyCol, IsChatCensored() || IsStreamerMode() ? " [F***son Mode]" : " [Fuckson Mode]");
-			}
+			}*/
 			ImGui::SameLine(ImGui::GetWindowWidth() - 19 * State.dpiScale);
 			if (AnimatedButton("-")) State.ShowMenu = false; //minimize button
 			//ImGui::BeginTabBar("AmongUs#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 			// Search field
 			ImGui::SetNextItemWidth(90 * State.dpiScale); // Adjust the width of the input box
-			if (InputStringWithHint("##Search", "Search...", &searchQuery) && State.AprilFoolsMode) {
-				if (ToLower(searchQuery) == StrRev("nosduh")) {
+			if (InputStringWithHint("##Search", "Search...", &searchQuery)/* && State.AprilFoolsMode*/) {
+				/*if (ToLower(searchQuery) == StrRev("nosduh")) {
 					State.AprilFoolsMode = !State.AprilFoolsMode;
 					if (!State.AprilFoolsMode) State.DiddyPartyMode = false;
 				}
 				if (ToLower(searchQuery) == StrRev("yddid")) {
 					State.DiddyPartyMode = !State.DiddyPartyMode;
-				}
+				}*/
 			}
 			if (ImGui::Selectable("About", openAbout)) {
 				CloseAllOtherTabs(Tabs::About);
@@ -221,15 +221,15 @@ namespace Menu {
 			ImVec4 GreenCol = ImVec4(0.f, 1.f, 0.f, 1.f);
 			if (!isPanicWarning) {
 				ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 90 * State.dpiScale, ImGui::GetWindowHeight() - 20 * State.dpiScale));
-				if (!State.AprilFoolsMode && ColoredButton(PanicCol, "Disable Menu")) {
+				if (/*!State.AprilFoolsMode && */ColoredButton(PanicCol, "Disable Menu")) {
 					isPanicWarning = State.PanicWarning;
 					if (!State.PanicWarning) State.PanicMode = true;
 				}
-				if (State.AprilFoolsMode && ColoredButton(DiddyCol,State.DiddyPartyMode ? "Rizz Up Diddy" : 
+				/*if (State.AprilFoolsMode && ColoredButton(DiddyCol,State.DiddyPartyMode ? "Rizz Up Diddy" : 
 						StrRev(std::format("nosduH {}F", IsChatCensored() || IsStreamerMode() ? "***" : "kcu")).c_str())) {
 					isPanicWarning = State.PanicWarning;
 					if (!State.PanicWarning) State.PanicMode = true;
-				}
+				}*/
 			}
 			else {
 				bool panicKeybind = State.KeyBinds.Toggle_Sicko != 0x00;

@@ -1114,37 +1114,37 @@ void ResetOriginalAppearance()
 	try {
 		LOG_DEBUG("Reset appearance values");
 		auto player = app::DataManager_get_Player(nullptr);
-		static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "customization");
+		static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
 		LOG_ASSERT(field != nullptr);
 		auto customization = il2cpp_field_get_value_object(field, player);
 		LOG_ASSERT(customization != nullptr);
 
-		/*static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "colorID");
+		/*static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->klass, "colorID");
 		auto colorId = il2cpp_field_get_value_object(field2, customization);
 		LOG_ASSERT(colorId != nullptr);
 		uint8_t originalColor = (uint8_t(colorId) / 16);*/
 
-		static FieldInfo* field3 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "hat");
+		static FieldInfo* field3 = il2cpp_class_get_field_from_name(customization->klass, "hat");
 		auto hat = il2cpp_field_get_value_object(field3, customization);
 		LOG_ASSERT(hat != nullptr);
 		auto originalHat = reinterpret_cast<String*>(hat);
 
-		static FieldInfo* field4 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "visor");
+		static FieldInfo* field4 = il2cpp_class_get_field_from_name(customization->klass, "visor");
 		auto visor = il2cpp_field_get_value_object(field4, customization);
 		LOG_ASSERT(visor != nullptr);
 		auto originalVisor = reinterpret_cast<String*>(visor);
 
-		static FieldInfo* field5 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "skin");
+		static FieldInfo* field5 = il2cpp_class_get_field_from_name(customization->klass, "skin");
 		auto skin = il2cpp_field_get_value_object(field5, customization);
 		LOG_ASSERT(skin != nullptr);
 		auto originalSkin = reinterpret_cast<String*>(skin);
 
-		static FieldInfo* field6 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "pet");
+		static FieldInfo* field6 = il2cpp_class_get_field_from_name(customization->klass, "pet");
 		auto pet = il2cpp_field_get_value_object(field6, customization);
 		LOG_ASSERT(pet != nullptr);
 		auto originalPet = reinterpret_cast<String*>(pet);
 
-		static FieldInfo* field7 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "namePlate");
+		static FieldInfo* field7 = il2cpp_class_get_field_from_name(customization->klass, "namePlate");
 		auto namePlate = il2cpp_field_get_value_object(field7, customization);
 		LOG_ASSERT(namePlate != nullptr);
 		auto originalNamePlate = reinterpret_cast<String*>(namePlate);
@@ -1455,11 +1455,11 @@ bool Object_1_IsNull(app::Object_1* obj)
 
 std::string GetPlayerName() {
 	auto player = app::DataManager_get_Player(nullptr);
-	static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "customization");
+	static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
 	LOG_ASSERT(field != nullptr);
 	auto customization = il2cpp_field_get_value_object(field, player);
 	LOG_ASSERT(customization != nullptr);
-	static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->Il2CppClass.klass, "name");
+	static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->klass, "name");
 	auto name = il2cpp_field_get_value_object(field2, customization);
 	LOG_ASSERT(name != nullptr);
 	return convert_from_string(reinterpret_cast<String*>(name));
@@ -1467,7 +1467,7 @@ std::string GetPlayerName() {
 
 void SetPlayerName(std::string_view name) {
 	auto player = app::DataManager_get_Player(nullptr);
-	static FieldInfo* field = il2cpp_class_get_field_from_name(player->Il2CppClass.klass, "customization");
+	static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
 	LOG_ASSERT(field != nullptr);
 	auto customization = il2cpp_field_get_value_object(field, player);
 	LOG_ASSERT(customization != nullptr);
@@ -2151,7 +2151,7 @@ bool IsDater(std::string username, int playerCount) {
 //TODO: Workaround
 #define GET_VIRTUAL_INVOKE(obj, method) \
 	((VirtualInvokeData*)(&obj->klass->vtable))[ \
-		(obj->klass->interfaceOffsets ? obj->klass->interfaceOffsets[0].offset : 0) \
+		(obj->klass->_0.interfaceOffsets ? obj->klass->_0.interfaceOffsets[0].offset : 0) \
 		+ offsetof(decltype(obj->klass->vtable), method) \
 		/ sizeof(VirtualInvokeData)]
 
