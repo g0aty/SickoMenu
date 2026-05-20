@@ -32,7 +32,7 @@ int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
 			break;
         }
     }
-    else int32_t baseVersion = Constants_1_GetBroadcastVersion(method);
+    else baseVersion = Constants_1_GetBroadcastVersion(method);
     // This is the broadcast version for v16.1.0
     return baseVersion + (ShouldDisableHostAnticheat() ? AnticheatPenalty : 0);
 }
