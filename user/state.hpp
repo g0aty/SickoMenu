@@ -77,7 +77,7 @@ public:
     uint64_t FakeXboxId = 0;
     bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
-    bool SpoofAUVersion = true;
+    bool SpoofAUVersion = false;
     int FakeAUVersion = 1;
     bool DisableAnimations = false;
     float AnimationSpeed = 1.f;
