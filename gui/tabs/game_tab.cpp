@@ -135,7 +135,7 @@ namespace GameTab {
     static bool openChat = false;
     static bool openAnticheat = false;
     static bool openUtils = false;
-	static bool openHistory = false;
+        static bool openHistory = false;
     static bool openOptions = false;
 
     void CloseOtherGroups(Groups group) {
@@ -143,7 +143,7 @@ namespace GameTab {
         openChat = group == Groups::Chat;
         openAnticheat = group == Groups::Anticheat;
         openUtils = group == Groups::Utils;
-		openHistory = group == Groups::History;
+                openHistory = group == Groups::History;
         openOptions = group == Groups::Options;
     }
 
@@ -165,7 +165,7 @@ namespace GameTab {
         if (TabGroup("Utils", openUtils)) {
             CloseOtherGroups(Groups::Utils);
         }
-		ImGui::SameLine();
+                ImGui::SameLine();
         if (TabGroup("History", openHistory)) {
             CloseOtherGroups(Groups::History);
         }
@@ -413,20 +413,20 @@ namespace GameTab {
             }
 
             if (IsInGame() || IsInLobby()) {
-                if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && AnimatedButton("Scan Everyone")) {
+                if (!State.SafeMode && false && AnimatedButton("Scan Everyone")) {
                     for (auto p : GetAllPlayerControl()) {
                         if (IsInGame()) State.rpcQueue.push(new RpcForceScanner(p, true));
                         else State.lobbyRpcQueue.push(new RpcForceScanner(p, true));
                     }
                 }
-                if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) ImGui::SameLine();
-                if (!State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks) && AnimatedButton("Stop Scanning Everyone")) {
+                if (!State.SafeMode && false) ImGui::SameLine();
+                if (!State.SafeMode && false && AnimatedButton("Stop Scanning Everyone")) {
                     for (auto p : GetAllPlayerControl()) {
                         if (IsInGame()) State.rpcQueue.push(new RpcForceScanner(p, false));
                         else State.lobbyRpcQueue.push(new RpcForceScanner(p, false));
                     }
                 }
-                if (IsInGame() && !State.InMeeting && !State.SafeMode && GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks)) ImGui::SameLine();
+                if (IsInGame() && !State.InMeeting && !State.SafeMode && false) ImGui::SameLine();
                 if (IsInGame() && !State.InMeeting && AnimatedButton("Kick Everyone From Vents")) {
                     State.rpcQueue.push(new RpcBootAllVents());
                 }
@@ -561,7 +561,7 @@ namespace GameTab {
                     ImGui::Text(" (%d Users Blacklisted)", State.BlacklistFriendCodes.size());
                 }
                 static std::string newBFriendCode = "";
-				bool isInBlacklistAlready = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), newBFriendCode) != State.BlacklistFriendCodes.end();
+                                bool isInBlacklistAlready = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), newBFriendCode) != State.BlacklistFriendCodes.end();
                 InputString("New Friend Code", &newBFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
                 if (isInBlacklistAlready)
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user is already blacklisted!");
@@ -597,7 +597,7 @@ namespace GameTab {
                 static bool isInWhitelistAlready = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), newWFriendCode) != State.WhitelistFriendCodes.end();
                 InputString("New Friend Code\n", &newWFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
                 if (isInWhitelistAlready)
-					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user is already whitelisted!");
+                                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user is already whitelisted!");
                 if (newWFriendCode != "" && !isInWhitelistAlready) ImGui::SameLine();
                 if (newWFriendCode != "" && !isInWhitelistAlready && AnimatedButton("Add\n")) {
                     State.WhitelistFriendCodes.push_back(newWFriendCode);
@@ -803,7 +803,7 @@ namespace GameTab {
                     InputString("New Nickname", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     if (newName != "") ImGui::SameLine();
                     if (newName != "" && AnimatedButton("Add")) {
-						newName = strToLower(newName);
+                                                newName = strToLower(newName);
                         State.LockedNames.push_back(newName);
                         State.Save();
                         newName = "";
@@ -964,7 +964,7 @@ namespace GameTab {
 
             if (ToggleButton("Enable Temp-Ban System", &State.TempBanEnabled)) {
                 State.Save();
-			}
+                        }
             if (State.TempBanEnabled && ImGui::CollapsingHeader("Temp-Ban System")) {
                 static std::string friendCodeToTempBan;
                 static int banDays = 0, banHours = 0, banMinutes = 0, banSeconds = 0;
@@ -1070,7 +1070,7 @@ namespace GameTab {
             }
         }
 
-		if (openHistory) {
+                if (openHistory) {
             ImGui::Text("Last 100 players:");
 
             static int selectedIndex = -1;

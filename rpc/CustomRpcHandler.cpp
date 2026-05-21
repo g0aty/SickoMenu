@@ -221,7 +221,7 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		break;
 	}
 	/*case (uint8_t)RpcCalls__Enum::StartMeeting: {
-		if (State.SMAC_CheckMeeting && (IsInLobby() || GameOptions().GetGameMode() == GameModes__Enum::HideNSeek)) {
+		if (State.SMAC_CheckMeeting && IsInLobby()) {
 			SMAC_OnCheatDetected(player, "Abnormal Meeting");
 			return;
 		}
@@ -234,7 +234,7 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 				SMAC_OnCheatDetected(player, "Abnormal Report Body");
 				return;
 			}
-			if (IsInGame() && ((bodyPlayer != NULL && !bodyPlayer->fields.IsDead) || GameOptions().GetGameMode() == GameModes__Enum::HideNSeek)) {
+			if (IsInGame() && (bodyPlayer != NULL && !bodyPlayer->fields.IsDead)) {
 				SMAC_OnCheatDetected(player, "Abnormal Report Body");
 				return;
 			}

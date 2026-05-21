@@ -1339,21 +1339,6 @@ typedef struct Il2CppClass_1 {
     uint8_t packingSize;
     uint8_t bitflags1;
     uint8_t bitflags2;
-    uint8_t initialized_and_no_error : 1;
-    uint8_t initialized : 1;
-    uint8_t enumtype : 1;
-    uint8_t nullabletype : 1;
-    uint8_t is_generic : 1;
-    uint8_t has_references : 1;
-    uint8_t init_pending : 1;
-    uint8_t size_init_pending : 1;
-    uint8_t size_inited : 1;
-    uint8_t has_finalize : 1;
-    uint8_t has_cctor : 1;
-    uint8_t is_blittable : 1;
-    uint8_t is_import_or_windows_runtime : 1;
-    uint8_t is_vtable_initialized : 1;
-    uint8_t is_byref_like : 1;
 } Il2CppClass_1;
 
 typedef struct __declspec(align(8)) Il2CppClass_Merged {

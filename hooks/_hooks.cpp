@@ -14,7 +14,7 @@ bool HookFunction(PVOID* ppPointer, PVOID pDetour, const char* functionName) {
 		STREAM_ERROR("Failed to hook " << functionName << ", error " << error);
 		if (error == 6) {
 			MessageBox(NULL,
-				L"SickoMenu failed to hook with error 6!\nThis may be caused by a version of Among Us not supported by SickoMenu.\n\nPlease don’t post \"Please update\" stuff in the Issues section of the GitHub repository or on our bug reports forum on Discord. That’s not an issue. It always gets updated, just be patient. Day of launch updates are a privilege, not an expectation.",
+				L"SickoMenu failed to hook with error 6!\nThis may be caused by a version of Among Us not supported by SickoMenu.\n\nPlease dont post \"Please update\" stuff in the Issues section of the GitHub repository or on our bug reports forum on Discord. Thats not an issue. It always gets updated, just be patient. Day of launch updates are a privilege, not an expectation.",
 				L"SickoMenu", MB_ICONERROR);
 		}
 		return false;
@@ -190,7 +190,6 @@ void DetourInitilization() {
 	HOOKFUNC(EOSManager_UpdatePermissionKeys);
 	HOOKFUNC(EOSManager_Update);
 	HOOKFUNC(EOSManager_get_ProductUserId);
-	HOOKFUNC(GameOptionsManager_set_CurrentGameOptions);
 	HOOKFUNC(ExileController_ReEnableGameplay);
 	//HOOKFUNC(ActivityManager_UpdateActivity);
 	HOOKFUNC(PingTracker_Update);
@@ -365,7 +364,6 @@ void DetourUninitialization()
 	UNHOOKFUNC(EOSManager_UpdatePermissionKeys);
 	UNHOOKFUNC(EOSManager_Update);
 	UNHOOKFUNC(EOSManager_get_ProductUserId);
-	UNHOOKFUNC(GameOptionsManager_set_CurrentGameOptions);
 	UNHOOKFUNC(ExileController_ReEnableGameplay);
 	//UNHOOKFUNC(ActivityManager_UpdateActivity);
 	UNHOOKFUNC(PingTracker_Update);

@@ -180,6 +180,12 @@
     <ClCompile Include="gui\theme.cpp" />
     <ClCompile Include="rpc\RpcCompleteTask.cpp" />
     <ClCompile Include="rpc\RpcCloseDoorsOfType.cpp" />
+    <ClCompile Include="framework\crash_handler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Version|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Version|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="framework\dllmain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Version|Win32'">NotUsing</PrecompiledHeader>
@@ -373,6 +379,7 @@
     <ClInclude Include="appdata\il2cpp-types.h" />
     <ClInclude Include="framework\il2cpp-helpers.h" />
     <ClInclude Include="framework\il2cpp-init.h" />
+    <ClInclude Include="framework\crash_handler.h" />
     <ClInclude Include="gui\menu.hpp" />
     <ClInclude Include="gui\radar.hpp" />
     <ClInclude Include="gui\theme.hpp" />
@@ -431,14 +438,14 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <!--<PlatformToolset>v142</PlatformToolset>-->
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Version|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
@@ -448,7 +455,7 @@
     <!--<PlatformToolset>v142</PlatformToolset>-->
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Version|Win32'" Label="Configuration">
@@ -456,7 +463,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -510,6 +517,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <BuildStlModules>false</BuildStlModules>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -526,16 +534,8 @@
       <Command>
       </Command>
     </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>echo | set /p dummyName=#define GIT_CUR_COMMIT &gt;  gitparams.h
-git rev-parse --verify HEAD &gt;&gt;  gitparams.h
-
-echo | set /p dummyName=#define GIT_BRANCH &gt;&gt;  gitparams.h
-git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
-    </PreBuildEvent>
-    <PreBuildEvent>
-      <Message>Create gitparams.h</Message>
-    </PreBuildEvent>
+    <PreBuildEvent><Command></Command></PreBuildEvent>
+    <PreBuildEvent><Command></Command></PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Version|Win32'">
     <ClCompile>
@@ -556,6 +556,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BuildStlModules>false</BuildStlModules>
       <ExceptionHandling>Sync</ExceptionHandling>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -573,16 +574,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
       <Command>
       </Command>
     </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>echo | set /p dummyName=#define GIT_CUR_COMMIT &gt;  gitparams.h
-git rev-parse --verify HEAD &gt;&gt;  gitparams.h
-
-echo | set /p dummyName=#define GIT_BRANCH &gt;&gt;  gitparams.h
-git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
-    </PreBuildEvent>
-    <PreBuildEvent>
-      <Message>Create gitparams.h</Message>
-    </PreBuildEvent>
+    <PreBuildEvent><Command></Command></PreBuildEvent>
+    <PreBuildEvent><Command></Command></PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -606,6 +599,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
       </DisableSpecificWarnings>
       <MinimalRebuild>false</MinimalRebuild>
       <BuildStlModules>false</BuildStlModules>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -622,16 +616,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
       <Command>
       </Command>
     </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>echo | set /p dummyName=#define GIT_CUR_COMMIT &gt;  gitparams.h
-git rev-parse --verify HEAD &gt;&gt;  gitparams.h
-
-echo | set /p dummyName=#define GIT_BRANCH &gt;&gt;  gitparams.h
-git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
-    </PreBuildEvent>
-    <PreBuildEvent>
-      <Message>Create gitparams.h</Message>
-    </PreBuildEvent>
+    <PreBuildEvent><Command></Command></PreBuildEvent>
+    <PreBuildEvent><Command></Command></PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Version|Win32'">
     <ClCompile>
@@ -655,6 +641,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
       </DisableSpecificWarnings>
       <MinimalRebuild>false</MinimalRebuild>
       <BuildStlModules>false</BuildStlModules>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -670,16 +657,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
       <Command>
       </Command>
     </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>echo | set /p dummyName=#define GIT_CUR_COMMIT &gt;  gitparams.h
-git rev-parse --verify HEAD &gt;&gt;  gitparams.h
-
-echo | set /p dummyName=#define GIT_BRANCH &gt;&gt;  gitparams.h
-git rev-parse --abbrev-ref HEAD &gt;&gt;  gitparams.h</Command>
-    </PreBuildEvent>
-    <PreBuildEvent>
-      <Message>Create gitparams.h</Message>
-    </PreBuildEvent>
+    <PreBuildEvent><Command></Command></PreBuildEvent>
+    <PreBuildEvent><Command></Command></PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

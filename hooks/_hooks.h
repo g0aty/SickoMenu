@@ -99,7 +99,6 @@ void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResul
 void dAccountManager_UpdateKidAccountDisplay(AccountManager* __this, MethodInfo* method);
 void dPlayerStorageManager_OnReadPlayerPrefsComplete(PlayerStorageManager* __this, void* data, MethodInfo* method);
 bool dPlayerPurchasesData_GetPurchase(PlayerPurchasesData* __this, String* itemKey, String* bundleKey, MethodInfo* method);
-void dGameOptionsManager_set_CurrentGameOptions(GameOptionsManager* __this, IGameOptions* value, MethodInfo* method);
 void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* method);
 //void dActivityManager_UpdateActivity(void* __this, Activity_1 activity, void* callback, MethodInfo* method);
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method);
