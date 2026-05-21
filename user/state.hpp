@@ -258,7 +258,7 @@ public:
     bool BetterChatNotifications = false;
     bool BetterLobbyCodeInput = false;
     bool BetterMessageSounds = false;
-	AudioClip* MessageSound = NULL;
+        AudioClip* MessageSound = NULL;
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
