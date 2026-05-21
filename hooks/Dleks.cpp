@@ -11,7 +11,7 @@ void LogIfEnabled(const std::string& message) {
 }
 
 bool ShouldDisableHostAnticheat() {
-	return State.DisableHostAnticheat && State.CurrentScene != "MatchMaking" && State.CurrentScene != "FindAGame" && !State.IsFreePlay;
+        return State.DisableHostAnticheat && State.CurrentScene != "MatchMaking" && State.CurrentScene != "FindAGame" && !State.IsFreePlay;
 }
 
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
@@ -20,20 +20,25 @@ int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
         (State.CurrentScene == "MainMenu" && State.ShouldIgnoreBroadcastVersionHook)) {
         // This should not lead to unexpected behavior with unexpected disconnections
         return Constants_1_GetBroadcastVersion(method);
-	}
-    int32_t baseVersion = 50632950;
+        }
+    int32_t baseVersion;
     if (State.SpoofAUVersion) {
         switch (State.FakeAUVersion) {
-		case 0: // AU v16.0.0 / v16.0.2
-			baseVersion = 50614950;
-			break;
-		case 1: // AU v16.0.5 / v16.1.0
-			baseVersion = 50632950;
-			break;
+                case 0: // AU v16.0.0 / v16.0.2
+                        baseVersion = 50614950;
+                        break;
+                case 1: // AU v16.0.5 / v16.1.0
+                default:
+                        baseVersion = 50632950;
+                        break;
         }
     }
-    else baseVersion = Constants_1_GetBroadcastVersion(method);
-    // This is the broadcast version for v16.1.0
+    else {
+        // Spoof is OFF: use the real game version so the server shows matching rooms.
+        // Bug was: "else int32_t baseVersion = ..." created a shadow variable that
+        // immediately went out of scope, leaving the outer baseVersion at 50632950.
+        baseVersion = Constants_1_GetBroadcastVersion(method);
+    }
     return baseVersion + (ShouldDisableHostAnticheat() ? AnticheatPenalty : 0);
 }
 
