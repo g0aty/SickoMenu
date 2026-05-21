@@ -268,7 +268,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (!IsInLobby() && !State.lobbyRpcQueue.empty()) State.lobbyRpcQueue = {};
             if (!IsInGame() && !IsInLobby() && !State.taskRpcQueue.empty()) State.taskRpcQueue = {};
 
-            if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::Normal) {
+            if ((IsInGame() || IsInLobby())) {
                 auto localData = GetPlayerData(*Game::pLocalPlayer);
                 app::RoleBehaviour* playerRole = localData->fields.Role;
                 app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
@@ -343,7 +343,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     }
                 }
             }
-            if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && State.NoAbilityCD) {
+            if (false && State.NoAbilityCD) {
                 auto localData = GetPlayerData(*Game::pLocalPlayer);
                 app::RoleBehaviour* playerRole = localData->fields.Role;
                 app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
@@ -355,36 +355,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
                     engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
                 }
-            }
-
-            if (!State.NoAbilityCD && (IsInGame() || IsInLobby()) && GameOptions().HasOptions()) {
-                auto localData = GetPlayerData(*Game::pLocalPlayer);
-                app::RoleBehaviour* playerRole = localData->fields.Role;
-                app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
-                GameOptions options;
-                if (role == RoleTypes__Enum::Engineer)
-                {
-                    app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
-                    float ventTime = options.GetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, 1.0F);;
-                    if (engineerRole->fields.inVentTimeRemaining > ventTime)
-                        engineerRole->fields.inVentTimeRemaining = ventTime;
-                }
-                if (role == RoleTypes__Enum::Scientist) {
-                    app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
-                    float charge = options.GetFloat(app::FloatOptionNames__Enum::ScientistBatteryCharge, 1.0F);
-                    if (scientistRole->fields.currentCharge > charge)
-                        scientistRole->fields.currentCharge = charge;
-                }
-                if (role == RoleTypes__Enum::Shapeshifter) {
-                    /*app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
-                    float shiftTime = options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F);
-                    if (shapeshifterRole->fields.durationSecondsRemaining > shiftTime)
-                        shapeshifterRole->fields.durationSecondsRemaining = shiftTime;*/
-                }
-
-                int emergencies = options.GetInt(app::Int32OptionNames__Enum::NumEmergencyMeetings, 1);
-                if (IsInGame() && (*Game::pLocalPlayer)->fields.RemainingEmergencies > emergencies)
-                    (*Game::pLocalPlayer)->fields.RemainingEmergencies = emergencies;
             }
 
             static int weaponsDelay = 0;
@@ -488,13 +458,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
             else {
                 nameChangeCycleDelay--;
-            }
-
-            if (!IsInGame() && !IsInLobby() && !IsHost() && GameOptions().HasOptions()) {
-                GameOptions options;
-                float speedMod = options.GetFloat(FloatOptionNames__Enum::PlayerSpeedMod, 1.f);
-                if (speedMod <= 0.f) options.SetFloat(FloatOptionNames__Enum::PlayerSpeedMod, 1.f);
-                if (speedMod > 3.f) options.SetFloat(FloatOptionNames__Enum::PlayerSpeedMod, 3.f);
             }
 
             static int nameCtr = 1;
@@ -893,7 +856,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     continue;
                 }
 
-				if (pd->fields.ClientId == (*Game::pAmongUsClient)->fields._.ClientId) continue; // Don't kick yourself
+                                if (pd->fields.ClientId == (*Game::pAmongUsClient)->fields._.ClientId) continue; // Don't kick yourself
 
                 State.CurrentForbiddenNames.insert(name);
 
@@ -1141,7 +1104,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
         }
 
-        if (IsInLobby() && IsHost() && GameOptions().HasOptions()) {
+        if (IsInLobby() && IsHost() && GameOptionsManager_get_HasOptions(GameOptionsManager_get_Instance(NULL), NULL)) {
             GameOptions options;
             if (State.AutoHostRole) {
                 auto allPlayers = GetAllPlayerData();
@@ -1165,7 +1128,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                 State.AutoHostRole = false;
                             }
                             else {
-                                if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Impostor;
+                                // if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Impostor;
                                 State.assignedRoles[index] = State.HostRoleToSet;
                             }
                         }
@@ -1175,7 +1138,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                 State.AutoHostRole = false;
                             }
                             else {
-                                if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Engineer;
+                                // if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Engineer;
                                 State.assignedRoles[index] = State.HostRoleToSet;
                             }
                         }
@@ -1303,7 +1266,7 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
     auto currentPosition = PlayerControl_GetTruePosition(player.get_PlayerControl(), NULL);
     auto distanceToTarget = (int32_t)Vector2_Distance(currentPosition, newPosition, NULL); //rounding off as the smallest kill distance is zero
     std::vector<float> killDistances = { 1.0f, 1.8f, 2.5f }; //proper kill distance check
-    auto killDistance = killDistances[std::clamp(GameOptions().GetInt(app::Int32OptionNames__Enum::KillDistance), 0, 2)];
+    auto killDistance = killDistances[1];
     auto initialSpawnLocation = GetSpawnLocation(player.get_PlayerControl()->fields.PlayerId, (int)il2cpp::List((*Game::pGameData)->fields.AllPlayers).size(), true);
     auto meetingSpawnLocation = GetSpawnLocation(player.get_PlayerControl()->fields.PlayerId, (int)il2cpp::List((*Game::pGameData)->fields.AllPlayers).size(), false);
     if (Equals(initialSpawnLocation, newPosition)) return false;
@@ -1443,8 +1406,8 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
 void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dInnerNetClient_EnqueueDisconnect executed");
     try {
-		std::string reasonStr = convert_from_string(stringReason);
-		if (reason == DisconnectReasons__Enum::Error &&
+                std::string reasonStr = convert_from_string(stringReason);
+                if (reason == DisconnectReasons__Enum::Error &&
             (reasonStr == "Timeout while waiting for player ID assignment" || reasonStr == "Timeout while waiting for player data containers"))
             return;
         State.FollowerCam = nullptr;
