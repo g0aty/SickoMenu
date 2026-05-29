@@ -73,8 +73,8 @@ A huge amount of features!!
 ## 👌 Supported Versions
 - ✅ Steam (Supported)
 - ✅ itch.io (Supported)
-- ✅ Epic Games (Supported - Experimental)
-- ✅ Microsoft Store/Xbox App (Windows) (Supported - Experimental)
+- 🟡 Epic Games (Supported - Experimental)
+- 🟡 Microsoft Store/Xbox App (Windows) (Supported - Experimental)
 - ❓ Cracked (works occasionally, I don't condone it)
 - ❌ iOS/iPadOS/Android (Not Supported)
 - ❌ Switch/Xbox/Playstation (Not Supported)
