@@ -40,8 +40,8 @@ std::unordered_map<ICON_TYPES, IconTexture> icons;
 
 typedef struct Cache
 {
-        ImGuiWindow* Window = nullptr;  //Window instance
-        ImVec2       Winsize; //Size of the window
+    ImGuiWindow* Window = nullptr;  //Window instance
+    ImVec2       Winsize; //Size of the window
 } cache_t;
 
 static cache_t s_Cache;
@@ -62,12 +62,12 @@ ImVec2 DirectX::GetWindowSize()
 
 static bool CanDrawEsp()
 {
-        return (!State.PanicMode && IsInGame() || IsInLobby()) && State.ShowEsp && (!State.InMeeting || !State.HideEsp_During_Meetings);
+    return (!State.PanicMode && IsInGame() || IsInLobby()) && State.ShowEsp && (!State.InMeeting || !State.HideEsp_During_Meetings);
 }
 
 static bool CanDrawRadar()
 {
-        return !State.PanicMode && IsInGame() && State.ShowRadar && (!State.InMeeting || !State.HideRadar_During_Meetings);
+    return !State.PanicMode && IsInGame() && State.ShowRadar && (!State.InMeeting || !State.HideRadar_During_Meetings);
 }
 
 static bool CanDrawReplay()
@@ -98,7 +98,9 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
     KeyBinds::WndProc(uMsg, wParam, lParam);
 
-    if (!State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/) {
+    bool shouldKeybindsActivate = !State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/;
+
+    if (shouldKeybindsActivate) {
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Menu)) State.ShowMenu = !State.ShowMenu;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Radar)) State.ShowRadar = !State.ShowRadar;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Console)) State.ShowConsole = !State.ShowConsole;
@@ -119,6 +121,13 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Reset_Appearance) && (IsInGame() || IsInLobby())) ControlAppearance(false);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Randomize_Appearance)) ControlAppearance(true);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Complete_Tasks) && IsInGame()) CompleteAllTasks();
+    }
+    if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) State.PanicMode = !State.PanicMode;
+
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+        return true;
+
+    if (shouldKeybindsActivate) {
         if (State.EnableZoom && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f)  State.CameraHeight += 0.1f;
             if (ImGui::GetIO().MouseWheel > 0.f) {
@@ -127,14 +136,13 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             }
         }
         if ((ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT)) && State.FreeCam && (IsInGame() || IsInLobby())) {
-            if (ImGui::GetIO().MouseWheel < 0.f ) State.FreeCamSpeed += 0.05f;
-            if (ImGui::GetIO().MouseWheel > 0.f && State.CameraHeight - 0.05f >= 0.05f) State.FreeCamSpeed -= 0.05f;
+            if (ImGui::GetIO().MouseWheel < 0.f) State.FreeCamSpeed += 0.1f;
+            if (ImGui::GetIO().MouseWheel > 0.f) {
+                State.FreeCamSpeed -= 0.1f;
+                if (State.FreeCamSpeed <= 0.f) State.FreeCamSpeed = 0.1f;
+            }
         }
     }
-    if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) State.PanicMode = !State.PanicMode;
-
-    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-        return true;
 
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
@@ -279,7 +287,7 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
             pDevice->GetImmediateContext(&pContext);
         }
     });
-        if (!State.ImGuiInitialized) {
+    if (!State.ImGuiInitialized) {
         if (ImGuiInitialization(__this)) {
             ImVec2 size = DirectX::GetWindowSize();
             State.ImGuiInitialized = true;
@@ -341,39 +349,38 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
         ImGuiRenderer::Submit([]() { ConsoleGui::Render(); });
     }
 
-    if (CanDrawEsp())
+    if (CanDrawEsp()) {
+        ImGuiRenderer::Submit([&]()
         {
-                ImGuiRenderer::Submit([&]()
-                {
-                        //Push ImGui flags
-                        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f * State.dpiScale);
-                        ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
+            //Push ImGui flags
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f * State.dpiScale);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
 
-                        //Setup BackBuffer
-                        ImGui::Begin("BackBuffer", reinterpret_cast<bool*>(true),
-                                ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoScrollbar);
+            //Setup BackBuffer
+            ImGui::Begin("BackBuffer", reinterpret_cast<bool*>(true),
+                    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoScrollbar);
 
-                        s_Cache.Winsize = DirectX::GetWindowSize();
-                        s_Cache.Window = ImGui::GetCurrentWindow();
+            s_Cache.Winsize = DirectX::GetWindowSize();
+            s_Cache.Window = ImGui::GetCurrentWindow();
 
-                        //Set window properties
-                        ImGui::SetWindowPos({ 0, 0 }, ImGuiCond_Always);
-                        ImGui::SetWindowSize(s_Cache.Winsize, ImGuiCond_Always);
+            //Set window properties
+            ImGui::SetWindowPos({ 0, 0 }, ImGuiCond_Always);
+            ImGui::SetWindowSize(s_Cache.Winsize, ImGuiCond_Always);
 
-                        Esp::Render();
+            Esp::Render();
 
-                        s_Cache.Window->DrawList->PushClipRectFullScreen();
+            s_Cache.Window->DrawList->PushClipRectFullScreen();
 
-                        ImGui::PopStyleColor();
-                        ImGui::PopStyleVar();
-                        ImGui::End();
-                });
-        }
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+        });
+    }
 
-        if (CanDrawRadar())
-        {
-                ImGuiRenderer::Submit([]() { Radar::Render(); });
-        }
+    if (CanDrawRadar())
+    {
+            ImGuiRenderer::Submit([]() { Radar::Render(); });
+    }
 
     if (CanDrawReplay())
     {
@@ -381,7 +388,7 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
     }
 
     // Render in a separate thread
-        std::async(std::launch::async, ImGuiRenderer::ExecuteQueue).wait();
+    std::async(std::launch::async, ImGuiRenderer::ExecuteQueue).wait();
 
     ImGui::EndFrame();
     ImGui::Render();

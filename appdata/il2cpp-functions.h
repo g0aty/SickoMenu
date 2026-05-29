@@ -60,6 +60,7 @@ DO_APP_FUNC(void, CustomNetworkTransform_RpcSnapTo, (CustomNetworkTransform* __t
 DO_APP_FUNC(void, CustomNetworkTransform_SnapTo, (CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method), "Assembly-CSharp, System.Void CustomNetworkTransform::SnapTo(UnityEngine.Vector2, System.UInt16)");
 
 DO_APP_FUNC(Vector2, DeadBody_get_TruePosition, (DeadBody* __this, MethodInfo* method), "Assembly-CSharp, UnityEngine.Vector2 DeadBody::get_TruePosition()");
+DO_APP_FUNC(void, ViperDeadBody_FixedUpdate, (ViperDeadBody* __this, MethodInfo* method), "Assembly-CSharp, System.Void ViperDeadBody::FixedUpdate()");
 
 DO_APP_FUNC(NetworkedPlayerInfo*, GameData_GetPlayerById, (GameData* __this, uint8_t id, MethodInfo* method), "Assembly-CSharp, NetworkedPlayerInfo GameData::GetPlayerById(System.Byte)");
 
@@ -168,6 +169,7 @@ DO_APP_FUNC(void, ChatController_AddChat, (ChatController* __this, PlayerControl
 DO_APP_FUNC(void, ChatController_AddChatWarning, (ChatController* __this, String* warningText, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::AddChatWarning(System.String)");
 DO_APP_FUNC(void, ChatController_SetVisible, (ChatController* __this, bool visible, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::SetVisible(System.Boolean)");
 DO_APP_FUNC(void, ChatController_Update, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::Update()");
+DO_APP_FUNC(void, ChatController_UpdateChatMode, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::UpdateChatMode()");
 DO_APP_FUNC(void, ChatBubble_SetName, (ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method), "Assembly-CSharp, System.Void ChatBubble::SetName(System.String, System.Boolean, System.Boolean, UnityEngine.Color)");
 
 DO_APP_FUNC(void, AmongUsClient_OnGameJoined, (AmongUsClient* __this, String* gameIdString, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnGameJoined(System.String)");
@@ -176,6 +178,7 @@ DO_APP_FUNC(bool, InnerNetClient_get_AmHost, (InnerNetClient* __this, MethodInfo
 DO_APP_FUNC(ClientData*, InnerNetClient_GetHost, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, InnerNet.ClientData InnerNet.InnerNetClient::GetHost()");
 DO_APP_FUNC(ClientData*, InnerNetClient_GetClientFromCharacter, (InnerNetClient* __this, PlayerControl* character, MethodInfo* method), "Assembly-CSharp, InnerNet.ClientData InnerNet.InnerNetClient::GetClientFromCharacter(PlayerControl)");
 DO_APP_FUNC(void, InnerNetClient_KickPlayer, (InnerNetClient* __this, int32_t clientId, bool ban, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::KickPlayer(System.Int32, System.Boolean)");
+DO_APP_FUNC(void, AmongUsClient_KickNotJoinedPlayers, (AmongUsClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::KickNotJoinedPlayers()");
 DO_APP_FUNC(void, InnerNetClient_SendStartGame, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::SendStartGame()");
 DO_APP_FUNC(void, InnerNetClient_Update, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::Update()");
 //DO_APP_FUNC(MessageWriter*, InnerNetClient_StartRpc, (InnerNetClient* __this, uint32_t targetNetId, uint8_t callId, SendOption__Enum option, MethodInfo* method), "Assembly-CSharp, Hazel.MessageWriter InnerNet.InnerNetClient::StartRpc(System.UInt32, System.Byte, Hazel.SendOption)");
@@ -245,6 +248,7 @@ DO_APP_FUNC(bool, EOSManager_IsFriendsListAllowed, (EOSManager* __this, MethodIn
 DO_APP_FUNC(String*, EOSManager_get_ProductUserId, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.String EOSManager::get_ProductUserId()");
 DO_APP_FUNC(void, EOSManager_StartTempAccountFlow, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::StartTempAccountFlow()");
 DO_APP_FUNC(void, EOSManager_CloseStartupWaitScreen, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::CloseStartupWaitScreen()");
+DO_APP_FUNC(void, EOSManager_EndMergeGuestAccountFlow, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::EndMergeGuestAccountFlow()");
 DO_APP_FUNC(void, PlayerAccountData_set_LoginStatus, (PlayerAccountData* __this, EOSManager_AccountLoginStatus__Enum value, MethodInfo* method), "Assembly-CSharp, System.Void AmongUs.Data.Player.PlayerAccountData::set_LoginStatus(EOSManager.AccountLoginStatus)");
 DO_APP_FUNC(void, EditAccountUsername_SaveUsername, (EditAccountUsername* __this, MethodInfo* method), "Assembly-CSharp, System.Void EditAccountUsername::SaveUsername()");
 
@@ -375,6 +379,8 @@ DO_APP_FUNC(void, PlayerControl_RpcAppear, (PlayerControl* __this, bool shouldAn
 DO_APP_FUNC(void, PlayerControl_SetRoleInvisibility, (PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetRoleInvisibility(System.Boolean, System.Boolean, System.Boolean)");
 DO_APP_FUNC(void, PlayerControl_RpcSendChatNote, (PlayerControl* __this, uint8_t srcPlayerId, ChatNoteTypes__Enum noteType, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSendChatNote(System.Byte, ChatNoteTypes)");
 DO_APP_FUNC(void, MeetingHud_RpcVotingComplete, (MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcVotingComplete(MeetingHud.VoterState[], NetworkedPlayerInfo, System.Boolean)");
+DO_APP_FUNC(void, MeetingHud_VotingComplete, (MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcVotingComplete(MeetingHud.VoterState[], NetworkedPlayerInfo, System.Boolean)");
+DO_APP_FUNC(void, MeetingHud_CheckForEndVoting, (MeetingHud* __this, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::CheckForEndVoting()");
 DO_APP_FUNC(bool, AccountManager_CanPlayOnline, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean AccountManager::CanPlayOnline()");
 DO_APP_FUNC(void, SoundManager_StopSound, (SoundManager* __this, AudioClip* clip, MethodInfo* method), "Assembly-CSharp, System.Void SoundManager::StopSound(UnityEngine.AudioClip)");
 DO_APP_FUNC(void, Application_set_targetFrameRate, (int32_t value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Application::set_targetFrameRate(System.Int32)");
@@ -431,3 +437,4 @@ DO_APP_FUNC(void, VoteBanSystem_Awake, (VoteBanSystem* __this, MethodInfo* metho
 DO_APP_FUNC(void, MeetingHud_OnDestroy, (MeetingHud* __this, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::OnDestroy()");
 DO_APP_FUNC(void, ShipStatus_Awake, (ShipStatus* __this, MethodInfo* method), "Assembly-CSharp, System.Void ShipStatus::Awake()");
 DO_APP_FUNC(SoundManager*, SoundManager_get_Instance, (MethodInfo* method), "Assembly-CSharp, SoundManager SoundManager::get_Instance()");
+DO_APP_FUNC(float, Input_GetAxis, (String* str, MethodInfo* method), "UnityEngine.InputLegacyModule, System.Single UnityEngine.Input::GetAxis(System.String)");

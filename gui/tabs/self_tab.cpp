@@ -266,7 +266,7 @@ namespace SelfTab {
             }
 
             ImGui::SameLine(130.f * State.dpiScale);
-            SteppedSliderFloat("Speed", &State.FreeCamSpeed, 0.f, 10.f, 0.05f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+            SteppedSliderFloat("Speed", &State.FreeCamSpeed, 0.f, 10.f, 0.1f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
             if (ToggleButton("Zoom", &State.EnableZoom)) {
                 State.Save();
@@ -305,8 +305,8 @@ namespace SelfTab {
             if (framesPassed == 0) State.RefreshChatButton = false;
             else framesPassed--;*/
 
-            if (!IsHost() && State.SafeMode) {
-                ImGui::Text("Custom names are purely CLIENT-SIDED without host/disabled safe mode!");
+            if (/*!IsHost() && */State.SafeMode) {
+                ImGui::Text("Custom names are purely CLIENT-SIDED!");
             }
             if (ToggleButton("Custom Name", &State.CustomName)) {
                 State.Save();
@@ -316,7 +316,7 @@ namespace SelfTab {
                 State.Save();
             }
 
-            if ((IsHost() || !State.SafeMode)) {
+            if (/*IsHost() || */!State.SafeMode) {
                 if (ToggleButton("Server-sided Custom Name", &State.ServerSideCustomName)) {
                     State.Save();
                 }
@@ -472,6 +472,11 @@ namespace SelfTab {
                 State.Save();
             }
 
+            if (ToggleButton("Hide Whitelisted Players' Info", &State.HideWhitelistedPlayerInfo))
+            {
+                State.Save();
+            }
+
             if (ToggleButton("Reveal Votes", &State.RevealVotes)) {
                 State.Save();
             }
@@ -599,7 +604,7 @@ namespace SelfTab {
             if (ToggleButton("Better Lobby Code Input", &State.BetterLobbyCodeInput)) {
                 State.Save();
             }
-            ImGui::SameLine();
+            
             if (ToggleButton("Better Message Sounds", &State.BetterMessageSounds)) {
                 State.Save();
             }
@@ -705,42 +710,48 @@ namespace SelfTab {
                 }
             }
 
-            if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale))
+            if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale)) {
+                // for some reason, detective is 12 (0x0c) instead of 11, and viper is 18 (0x12) instead of 12
+                if (State.FakeRole == 12) State.FakeRoleId = State.FakeRole + 6;
+                else if (State.FakeRole == 11) State.FakeRoleId = State.FakeRole + 1;
+                else State.FakeRoleId = State.FakeRole;
                 State.Save();
+            }
             ImGui::SameLine();
             if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && AnimatedButton("Set Role")) {
-                State.FakeRole = std::clamp(State.FakeRole, 0, 10);
+                // State.FakeRole = std::clamp(State.FakeRole, 0, 10);
                 if (IsInGame())
-                    State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum(State.FakeRole)));
+                    State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum(State.FakeRoleId)));
                 else if (IsInLobby())
-                    State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum(State.FakeRole)));
+                    State.lobbyRpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum(State.FakeRoleId)));
             }
             if (IsHost() || !State.SafeMode) ImGui::SameLine();
             if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && AnimatedButton("Set for Everyone")) {
-                State.FakeRole = std::clamp(State.FakeRole, 0, 10);
+                // State.FakeRole = std::clamp(State.FakeRole, 0, 10);
                 if (IsInGame()) {
                     for (auto player : GetAllPlayerControl())
-                        State.rpcQueue.push(new RpcSetRole(player, RoleTypes__Enum(State.FakeRole)));
+                        State.rpcQueue.push(new RpcSetRole(player, RoleTypes__Enum(State.FakeRoleId)));
                 }
                 else if (IsInLobby()) {
                     for (auto player : GetAllPlayerControl())
-                        State.lobbyRpcQueue.push(new RpcSetRole(player, RoleTypes__Enum(State.FakeRole)));
+                        State.lobbyRpcQueue.push(new RpcSetRole(player, RoleTypes__Enum(State.FakeRoleId)));
                 }
             }
             bool roleAllowed = false;
-            switch (State.FakeRole) {
+            switch (State.FakeRoleId) {
             case (int)RoleTypes__Enum::Crewmate:
             case (int)RoleTypes__Enum::Engineer:
             case (int)RoleTypes__Enum::Scientist:
             case (int)RoleTypes__Enum::Noisemaker:
             case (int)RoleTypes__Enum::Tracker:
+            case (int)RoleTypes__Enum::Detective:
             case (int)RoleTypes__Enum::CrewmateGhost:
             case (int)RoleTypes__Enum::ImpostorGhost:
             case (int)RoleTypes__Enum::GuardianAngel:
                 roleAllowed = true;
                 break;
             case (int)RoleTypes__Enum::Impostor:
-                if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Impostor || State.RealRole != RoleTypes__Enum::Shapeshifter || State.RealRole != RoleTypes__Enum::Phantom) {
+                if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Impostor || State.RealRole != RoleTypes__Enum::Shapeshifter || State.RealRole != RoleTypes__Enum::Phantom || State.RealRole != RoleTypes__Enum::Viper) {
                     roleAllowed = false;
                     break;
                 }
@@ -760,25 +771,32 @@ namespace SelfTab {
                 }
                 roleAllowed = true;
                 break;
+            case (int)RoleTypes__Enum::Viper:
+                if (State.RealRole != RoleTypes__Enum::Viper) {
+                    roleAllowed = false;
+                    break;
+                }
+                roleAllowed = true;
+                break;
             default:
                 roleAllowed = false;
                 break;
             }
             if ((IsInGame() || IsInLobby()) && (roleAllowed || (IsHost() || !State.SafeMode)) && AnimatedButton("Set Fake Role")) {
                 if (IsInGame())
-                    State.rpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRole)));
+                    State.rpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRoleId)));
                 else if (IsInLobby())
-                    State.lobbyRpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRole)));
+                    State.lobbyRpcQueue.push(new SetRole(RoleTypes__Enum(State.FakeRoleId)));
             }
             ImGui::SameLine();
             if (ToggleButton("Automatically Set Fake Role", &State.AutoFakeRole)) {
                 State.Save();
             }
-            if (IsInLobby() || IsInGame()) {
+            /*if (IsInLobby() || IsInGame()) {
                 ImGui::SameLine();
                 std::string roleText = FAKEROLES[int(State.RealRole)];
                 ImGui::Text(("Real Role: " + roleText).c_str());
-            }
+            }*/
 
             if (!State.SafeMode) {
                 if (ToggleButton("Unlock Kill Button", &State.UnlockKillButton)) {
@@ -814,17 +832,18 @@ namespace SelfTab {
 
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             if (ImGui::CollapsingHeader("Cycler Options")) {
-                if (ToggleButton("Cycle Name", &State.CycleName)) {
-                    State.Save();
+                if (!State.SafeMode) {
+                    if (ToggleButton("Cycle Name", &State.CycleName)) {
+                        State.Save();
+                    }
+
+                    ImGui::SameLine(120.0f * State.dpiScale);
                 }
-
-
-                ImGui::SameLine(120.0f * State.dpiScale);
                 if (ToggleButton("Cycle Color", &State.RandomColor)) {
                     State.Save();
                 }
 
-                ImGui::SameLine(240.0f * State.dpiScale);
+                ImGui::SameLine(!State.SafeMode ? (240.0f * State.dpiScale) : (120.0f * State.dpiScale));
                 if (ToggleButton("Cycle Hat", &State.RandomHat)) {
                     State.Save();
                 }
@@ -849,14 +868,14 @@ namespace SelfTab {
 
                 if (IsHost() || !State.SafeMode) {
                     ImGui::SameLine();
-                    if (ToggleButton(IsHost() ? "Cycle for Everyone (name & color only)" : "Cycle for Everyone", &State.CycleForEveryone)) {
+                    if (ToggleButton(IsHost() ? "Cycle for Everyone (Color ONLY)" : "Cycle for Everyone", &State.CycleForEveryone)) {
                         State.Save();
                     }
                 }
             }
 
 
-            if (ImGui::CollapsingHeader("Cycler Name Options")) {
+            if (!State.SafeMode && ImGui::CollapsingHeader("Cycler Name Options")) {
                 if (CustomListBoxInt("Cycler Name Generation", &State.cyclerNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
                     State.Save();
                 }
@@ -921,17 +940,17 @@ namespace SelfTab {
                             name = GenerateRandomString(true);
                         else if (State.confuserNameGeneration == 2) {
                             if (!State.cyclerUserNames.empty())
-                                name = State.cyclerUserNames[randi(0, State.cyclerUserNames.size() - 1)] + "<size=0>" + std::to_string(player->fields.PlayerId) + "</size>";
+                                name = State.cyclerUserNames[randi(0, (int)State.cyclerUserNames.size() - 1)] + "<size=0>" + std::to_string(player->fields.PlayerId) + "</size>";
                         }
                         else
                             name = GenerateRandomString();
                         queue->push(new RpcForceName(player, name));
                         queue->push(new RpcForceColor(player, randi(0, 17)));
-                        queue->push(new RpcForceHat(player, convert_to_string(availableHats[randi(0, availableHats.size() - 1)])));
-                        queue->push(new RpcForceSkin(player, convert_to_string(availableSkins[randi(0, availableSkins.size() - 1)])));
-                        queue->push(new RpcForceVisor(player, convert_to_string(availableVisors[randi(0, availableVisors.size() - 1)])));
-                        queue->push(new RpcForcePet(player, convert_to_string(availablePets[randi(0, availablePets.size() - 1)])));
-                        queue->push(new RpcForceNamePlate(player, convert_to_string(availableNamePlates[randi(0, availableNamePlates.size() - 1)])));
+                        queue->push(new RpcForceHat(player, convert_to_string(availableHats[randi(0, (int)availableHats.size() - 1)])));
+                        queue->push(new RpcForceSkin(player, convert_to_string(availableSkins[randi(0, (int)availableSkins.size() - 1)])));
+                        queue->push(new RpcForceVisor(player, convert_to_string(availableVisors[randi(0, (int)availableVisors.size() - 1)])));
+                        queue->push(new RpcForcePet(player, convert_to_string(availablePets[randi(0, (int)availablePets.size() - 1)])));
+                        queue->push(new RpcForceNamePlate(player, convert_to_string(availableNamePlates[randi(0, (int)availableNamePlates.size() - 1)])));
                     }
                 }
 
@@ -956,7 +975,7 @@ namespace SelfTab {
                     State.Save();
                 }
             }
-            if (ImGui::CollapsingHeader("Confuser Name Options")) {
+            if (!State.SafeMode && ImGui::CollapsingHeader("Confuser Name Options")) {
                 if (CustomListBoxInt("Confuser Name Generation", &State.confuserNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
                     State.Save();
                 }

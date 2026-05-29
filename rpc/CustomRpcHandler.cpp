@@ -57,7 +57,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		}
 	}
 	break;
-	case (uint8_t)666:
+	/*case (uint8_t)666:
 	{
 		uint8_t playerId = player->fields.PlayerId;
 		if (State.modUsers.find(playerId) == State.modUsers.end()) {
@@ -66,7 +66,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 			// A mod to destroy e-daters on Among Us
 		}
 	}
-	break;
+	break;*/ // Unused
 	case (uint8_t)121:
 	{
 		uint8_t playerId = player->fields.PlayerId;

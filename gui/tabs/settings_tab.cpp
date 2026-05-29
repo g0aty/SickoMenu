@@ -179,7 +179,7 @@ namespace SettingsTab {
 				State.Save();
 			}
 			ImGui::SameLine();
-			ImGui::PushItemWidth(80);
+			ImGui::PushItemWidth(80 * State.dpiScale);
 			ImGui::InputInt("Minimum FPS", &State.minFpsThreshold);
 			if (State.minFpsThreshold < 0)
 				State.minFpsThreshold = 0;
@@ -193,12 +193,12 @@ namespace SettingsTab {
 			}
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 #endif
-			if (!IsHost() && !State.SafeMode && !IsNameValid(State.userName)) {
+			/*if (!IsHost() && !State.SafeMode && !IsNameValid(State.userName)) {
 				ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.f, 0.f, State.MenuThemeColor.w));
 				if (InputString("Username", &State.userName)) State.Save();
 				ImGui::PopStyleColor();
 			}
-			else if (InputString("Username", &State.userName)) State.Save();
+			else */if (InputString("Username", &State.userName)) State.Save();
 
 			if (!IsNameValid(State.userName) && !IsHost() && State.SafeMode) {
 				if (State.userName == "")
@@ -211,7 +211,17 @@ namespace SettingsTab {
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username gets detected by anticheat. This name will be ignored.");
 			}
 
-			if (IsNameValid(State.userName) || IsHost() || !State.SafeMode) {
+			// you can only join a lobby if you have the same name as what your requested name is, when trying to join it
+			if (IsNameValid(State.userName) && (!State.SafeMode ||
+				State.CurrentScene == "MatchMaking" || State.CurrentScene == "MainMenu" || State.CurrentScene == "Tutorial")) {
+				if (AnimatedButton("Set as Account Name")) {
+					SetPlayerName(State.userName);
+					LOG_INFO("Successfully set account name to \"" + State.userName + "\"");
+				}
+			}
+
+			if (/*IsNameValid(State.userName) || IsHost() || */!State.SafeMode) {
+				if (IsInGame() || IsInLobby()) ImGui::SameLine();
 				if ((IsInGame() || IsInLobby()) && AnimatedButton("Set Name")) {
 					if (IsInGame())
 						State.rpcQueue.push(new RpcSetName(State.userName));
@@ -219,17 +229,10 @@ namespace SettingsTab {
 						State.lobbyRpcQueue.push(new RpcSetName(State.userName));
 					LOG_INFO("Successfully set in-game name to \"" + State.userName + "\"");
 				}
-				if (IsNameValid(State.userName)) {
-					if ((IsInGame() || IsInLobby())) ImGui::SameLine();
-					if (AnimatedButton("Set as Account Name")) {
-						SetPlayerName(State.userName);
-						LOG_INFO("Successfully set account name to \"" + State.userName + "\"");
-					}
+				if (IsInGame() || IsInLobby()) ImGui::SameLine();
+				if (ToggleButton("Automatically Set Name", &State.SetName)) {
+					State.Save();
 				}
-				ImGui::SameLine();
-			}
-			if (ToggleButton("Automatically Set Name", &State.SetName)) {
-				State.Save();
 			}
 
 			if (InputString("Custom Code", &State.customCode)) {
@@ -384,13 +387,13 @@ namespace SettingsTab {
 				BoldText("You may not find any public lobbies in the game listing due to this.");
 				BoldText("This is intended behaviour, do NOT report it as a bug.");
 			}*/
-			if (ToggleButton("Spoof Among Us Version", &State.SpoofAUVersion))
+			/*if (ToggleButton("Spoof Among Us Version", &State.SpoofAUVersion))
 				State.Save();
 			if (State.SpoofAUVersion) {
 				ImGui::SameLine();
 				if (CustomListBoxInt("Version", &State.FakeAUVersion, AUVERSIONS))
 					State.Save();
-			}
+			}*/
 		}
 
 		if (openCustomization) {
@@ -498,6 +501,10 @@ namespace SettingsTab {
 				ImGui::ColorEdit4("Tracker", (float*)&State.TrackerColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
 				ImGui::SameLine(150.f * State.dpiScale);
 				ImGui::ColorEdit4("Phantom", (float*)&State.PhantomColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+				ImGui::SameLine(300.f * State.dpiScale);
+				ImGui::ColorEdit4("Detective", (float*)&State.DetectiveColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
+
+				ImGui::ColorEdit4("Viper", (float*)&State.ViperColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
 
 				if (AnimatedButton("Reset Role Colors")) {
 					State.CrewmateGhostColor = ImVec4(1.f, 1.f, 1.f, 0.5f);
@@ -511,6 +518,8 @@ namespace SettingsTab {
 					State.NoisemakerColor = ImVec4(0.f, 1.f, 0.47f, 1.f);
 					State.TrackerColor = ImVec4(0.65f, 0.36f, 1.f, 1.f);
 					State.PhantomColor = ImVec4(0.53f, 0.f, 0.f, 1.f);
+					State.DetectiveColor = ImVec4(0.39f, 0.735f, 1.f, 1.f);
+					State.ViperColor = ImVec4(1.f, 1.f, 0.f, 1.f);
 					State.Save();
 				}
 			}

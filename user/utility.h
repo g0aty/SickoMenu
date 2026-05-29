@@ -37,9 +37,11 @@ enum class RoleType
 	Engineer = 3,
 	Noisemaker = 4,
 	Tracker = 5,
-	Impostor = 6,
-	Shapeshifter = 7,
-	Phantom = 8,
+	Detective = 6,
+	Impostor = 7,
+	Shapeshifter = 8,
+	Phantom = 9,
+	Viper = 10
 };
 
 class RoleRates {
@@ -49,6 +51,8 @@ public:
 	int ShapeshifterChance = 0;
 	int PhantomCount = 0;
 	int PhantomChance = 0;
+	int ViperCount = 0;
+	int ViperChance = 0;
 	int ScientistCount = 0;
 	int ScientistChance = 0;
 	int TrackerCount = 0;
@@ -57,6 +61,8 @@ public:
 	int NoisemakerChance = 0;
 	int EngineerCount = 0;
 	int EngineerChance = 0;
+	int DetectiveCount = 0;
+	int DetectiveChance = 0;
 	int GuardianAngelCount = 0;
 	int GuardianAngelChance = 0;
 	int MaxCrewmates = Game::MAX_PLAYERS;

@@ -6,12 +6,36 @@
 
 HMODULE version_dll;
 
+#ifdef _WIN64
+
+#pragma warning (disable: 4081)
+
+// reference: https://github.com/BitCrackers/version-proxy/blob/main/src/version.cpp
+// this file used to be a stripped down version of the previous version.cpp optimized for 32-bit with a few tweaks,
+// which only had minor changes since i forked sicko from AUM
+// fun fact: AUM and the version-proxy have the same BitCrackers team behind them, yay!
+
+#define STRINGIFY(name) #name
+#define EXPORT_FUNCTION comment(linker, "/EXPORT:" __FUNCTION__ "=" __FUNCDNAME__)
+#define WRAPPER_GENFUNC(name) \
+    FARPROC o##name; \
+    __declspec(dllexport) void WINAPI _##name() \
+    { \
+        __pragma(STRINGIFY(EXPORT_FUNCTION)); \
+        o##name(); \
+    }
+
+#else
+
 #define WRAPPER_GENFUNC(name) \
 	FARPROC o##name; \
 	__declspec(naked) void _##name() \
 	{ \
 		__asm jmp[o##name] \
 	}
+
+#endif
+
 
 WRAPPER_GENFUNC(GetFileVersionInfoA)
 WRAPPER_GENFUNC(GetFileVersionInfoByHandle)

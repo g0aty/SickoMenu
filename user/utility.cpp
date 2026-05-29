@@ -14,255 +14,273 @@ using namespace std::string_view_literals;
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
+std::vector<std::string> threeLetters = { "ace", "ado", "age", "air", "ant", "apt", "art", "awe", "axe", "bag", "bat", "bay", "bay", "bee", "big", "bin", "bow", "bud", "bug", "bus", "bye", "cab", "can", "car", "cat", "cod", "cos", "cow", "coy", "cub", "cud", "cue", "dam", "day", "den", "dew", "dim", "dot", "due", "due", "dun", "ebb", "egg", "elf", "far", "fax", "fee", "few", "fey", "fin", "fir", "fit", "fly", "fog", "fox", "fun", "fur", "gap", "gen", "gig", "gnu", "gun", "gym", "hay", "hen", "hod", "hue", "ice", "ink", "inn", "jam", "jar", "jet", "jib", "jog", "joy", "key", "key", "kin", "kit", "kop", "lap", "lea", "lid", "lip", "lot", "lug", "map", "mid", "mop", "mud", "net", "net", "new", "nib", "nil", "nth", "oak", "oar", "oil", "one", "one", "ore", "our", "own", "pad", "pan", "pea", "pen", "pie", "pin", "pip", "pit", "pod", "pug", "pun", "pup", "rag", "ray", "ria", "rib", "rug", "saw", "sea", "set", "set", "she", "shy", "spa", "spy", "sty", "sum", "sun", "sup", "tab", "tag", "tan", "tap", "tax", "tea", "tee", "ten", "tie", "tin", "tip", "toy", "tub", "use", "vac", "van", "vet", "wad", "wax", "web", "wig", "wit", "wok", "wry", "yea", "yen", "yon", "zoo" };
+std::vector<std::string> fourLetters = { "able", "aged", "agog", "aide", "airy", "ajar", "akin", "ammo", "apex", "arch", "arch", "arty", "ashy", "atom", "auto", "avid", "away", "awed", "baby", "band", "bank", "bark", "barn", "base", "base", "bass", "bass", "bath", "bead", "beam", "bean", "bear", "beef", "bend", "best", "bevy", "bike", "bill", "bine", "blog", "blot", "blue", "blur", "boar", "bold", "bold", "bolt", "book", "boot", "born", "boss", "both", "bowl", "boxy", "brag", "brim", "buff", "bulb", "bump", "bunk", "burr", "busy", "cafe", "cake", "calf", "calm", "cane", "cape", "card", "care", "carp", "cart", "case", "cash", "cask", "cave", "cell", "cent", "chic", "chin", "chip", "chop", "city", "clad", "claw", "clay", "clef", "clip", "clod", "clog", "club", "clue", "coal", "coat", "coda", "code", "coin", "colt", "comb", "cook", "cool", "copy", "cord", "core", "cork", "corn", "cosy", "crab", "crew", "crib", "crop", "crow", "cube", "cult", "curd", "curl", "dame", "damp", "dark", "dart", "dash", "dawn", "dear", "deep", "deer", "deft", "desk", "dhal", "dhow", "dial", "dice", "diet", "disc", "dish", "doer", "doll", "dome", "done", "door", "dove", "dray", "drop", "drum", "dual", "duck", "duct", "dusk", "each", "east", "east", "easy", "echo", "ecru", "edge", "edgy", "envy", "epic", "euro", "even", "ewer", "exam", "exit", "fain", "fair", "fair", "fall", "fare", "farm", "fast", "faun", "fawn", "feet", "fell", "fern", "fife", "file", "film", "fine", "fire", "firm", "fish", "five", "flag", "flat", "flax", "flea", "flex", "flit", "flue", "flux", "foal", "foam", "fond", "font", "food", "fore", "form", "foxy", "free", "fuse", "fuss", "gaff", "gala", "gale", "game", "game", "gamy", "gaol", "gate", "germ", "ghat", "gill", "gilt", "glad", "glue", "goal", "goat", "gold", "gold", "gone", "good", "gram", "grey", "grid", "grub", "gulf", "gull", "gust", "hair", "hale", "half", "half", "hall", "hare", "hazy", "heap", "heat", "herd", "hero", "hewn", "hill", "hind", "hive", "home", "home", "hood", "hoof", "hoop", "hour", "huge", "hunt", "iced", "idea", "inch", "inky", "iron", "item", "jail", "joke", "just", "kame", "keel", "keen", "keep", "kelp", "kerb", "king", "kite", "knee", "knot", "kohl", "lace", "lacy", "lamb", "lamp", "lane", "late", "lava", "lawn", "laze", "lead", "leaf", "lean", "left", "lens", "life", "like", "limb", "line", "link", "lino", "lion", "live", "load", "loaf", "loan", "loch", "loft", "logo", "lone", "long", "look", "loop", "lord", "lost", "loud", "luck", "lure", "lush", "mail", "mall", "mane", "many", "mast", "maze", "meal", "meet", "mega", "menu", "mere", "mews", "mice", "mike", "mild", "mill", "mime", "mind", "mine", "mine", "mini", "mint", "mint", "mire", "mitt", "mole", "mood", "moon", "moor", "more", "moss", "most", "much", "musk", "myth", "name", "nave", "navy", "neap", "near", "neat", "neck", "need", "nest", "news", "next", "nice", "nosh", "note", "noun", "nova", "nowt", "null", "numb", "oast", "odds", "ogee", "once", "only", "open", "open", "oval", "oval", "over", "pace", "page", "pail", "pair", "pall", "palm", "park", "part", "past", "past", "path", "pawl", "peak", "peak", "pear", "peel", "pile", "pill", "pink", "pins", "pith", "pity", "plan", "plot", "plum", "plus", "plus", "poem", "poet", "pony", "pool", "pore", "port", "posh", "pout", "pram", "prey", "prim", "prow", "puce", "pure", "purr", "quay", "quin", "quip", "quiz", "raft", "rail", "rain", "rake", "ramp", "rare", "reed", "rent", "rest", "rich", "rife", "ripe", "rise", "road", "roan", "roof", "rope", "rose", "rose", "rosy", "ruby", "ruff", "rule", "rung", "rust", "safe", "saga", "sage", "sail", "sake", "sale", "salt", "salt", "same", "sand", "sane", "save", "scar", "seal", "seam", "seer", "sett", "shed", "ship", "shoe", "shop", "shot", "show", "side", "sign", "silk", "sine", "sink", "site", "size", "skew", "skip", "slab", "sloe", "slow", "slub", "snap", "snow", "snub", "snug", "sock", "sofa", "soil", "sole", "sole", "solo", "some", "song", "soup", "spam", "span", "spar", "spot", "spry", "stag", "star", "stem", "such", "suet", "sure", "swan", "swap", "tale", "tall", "tame", "tank", "tape", "task", "taut", "taxi", "team", "tear", "teat", "tent", "term", "test", "text", "then", "thud", "tick", "tide", "tidy", "tile", "till", "time", "tiny", "toad", "tofu", "toga", "toil", "tomb", "tour", "town", "trad", "tram", "trap", "tray", "trio", "true", "trug", "tsar", "tube", "tuna", "tune", "turf", "turn", "tusk", "twee", "twig", "twin", "twin", "type", "tyre", "unit", "used", "vase", "vast", "veal", "veil", "very", "vest", "view", "vote", "wail", "wall", "wand", "ward", "warm", "wary", "wasp", "wave", "wavy", "waxy", "week", "weir", "well", "well", "west", "west", "whey", "whim", "whip", "wide", "wild", "wile", "will", "wily", "wind", "wing", "wipe", "wire", "wise", "wise", "wish", "wont", "wont", "wool", "worn", "wove", "wren", "yawl", "yawn", "year", "yoke", "yolk", "zany", "zany", "zing" };
+std::vector<std::string> fiveLetters = { "ackee", "actor", "acute", "adept", "afoot", "agile", "aglow", "alarm", "album", "alert", "alike", "alive", "alkyl", "alkyl", "alloy", "alone", "alpha", "alpha", "amber", "amber", "ample", "angle", "apple", "apron", "arena", "argon", "arrow", "aside", "astir", "atlas", "attic", "audio", "aunty", "avail", "awake", "award", "aware", "awash", "axial", "azure", "badge", "baggy", "balmy", "barge", "basal", "basic", "basin", "basis", "baths", "baton", "baulk", "beach", "beads", "beady", "beefy", "beery", "beige", "bench", "berry", "bhaji", "bidet", "bijou", "bitty", "blank", "blase", "blaze", "bling", "bliss", "bliss", "block", "bloke", "blond", "blues", "blurb", "board", "bonny", "bonus", "booth", "boric", "bound", "bower", "brake", "brass", "brass", "brave", "break", "bream", "bride", "brief", "briny", "brisk", "broad", "broom", "brown", "brown", "bugle", "built", "bulky", "bumpy", "bunch", "cabin", "cable", "cairn", "calyx", "canny", "canoe", "canto", "caret", "cargo", "chain", "chalk", "charm", "chart", "chary", "chess", "chest", "chewy", "chief", "chief", "chill", "chine", "chive", "choir", "chump", "cinch", "civic", "civil", "claim", "clank", "class", "clear", "clerk", "cliff", "cloak", "clock", "close", "cloth", "cloud", "clove", "clump", "coach", "coast", "cocoa", "combe", "comfy", "comic", "comic", "comma", "conic", "coomb", "copse", "coral", "coral", "corps", "court", "coven", "cover", "crane", "crate", "crisp", "crisp", "croak", "crony", "crowd", "crown", "crumb", "crust", "cubic", "curly", "curve", "daily", "dairy", "dairy", "daisy", "dance", "dazed", "delta", "demob", "denim", "diary", "digit", "diner", "dinky", "disco", "ditch", "diver", "divot", "dizzy", "dodge", "domed", "doubt", "dozen", "draft", "drain", "drama", "drawl", "drawn", "dream", "dress", "dried", "drier", "drill", "drink", "drive", "droll", "drone", "duple", "dusky", "dusty", "eager", "eagle", "early", "eater", "elder", "elect", "elfin", "elite", "email", "envoy", "epoch", "equal", "error", "ether", "ethic", "event", "every", "exact", "extra", "facet", "faint", "famed", "fancy", "farad", "fated", "feast", "fence", "ferny", "ferry", "fever", "fibre", "fiery", "filmy", "final", "finch", "fishy", "fizzy", "flash", "flash", "flask", "fleet", "fleet", "flick", "flies", "flock", "flood", "floor", "flour", "fluid", "fluid", "flush", "flute", "focal", "focus", "foggy", "force", "forge", "forty", "fount", "frame", "frank", "fresh", "front", "frost", "frown", "funny", "furry", "furze", "futon", "fuzzy", "gable", "gamma", "gamut", "gauzy", "gecko", "ghost", "giant", "giant", "giddy", "given", "glace", "glass", "glaze", "gleam", "globe", "glory", "glove", "gluey", "going", "goods", "goody", "gooey", "goose", "gorse", "gouge", "gourd", "grace", "grain", "grand", "grand", "grape", "graph", "grasp", "great", "green", "groat", "group", "grown", "guard", "guest", "guide", "guise", "gummy", "gusty", "hanky", "happy", "hardy", "hasty", "heads", "heaps", "heavy", "hedge", "hefty", "helix", "herby", "hertz", "hewer", "hilly", "hinge", "hobby", "holey", "homey", "honey", "hoppy", "hotel", "humid", "husky", "husky", "hutch", "hyena", "icing", "ideal", "image", "imago", "index", "inner", "ionic", "irons", "ivory", "jacks", "jaggy", "jammy", "jazzy", "jeans", "jelly", "jewel", "jokey", "jolly", "juice", "jumbo", "jumbo", "jumpy", "kazoo", "khaki", "kiosk", "knife", "knurl", "koala", "label", "laird", "large", "larky", "larva", "laser", "lasso", "latex", "lathe", "latte", "layer", "leafy", "leaky", "least", "ledge", "leech", "leggy", "lemon", "lento", "level", "level", "lever", "lilac", "limit", "linen", "liner", "litre", "loads", "loamy", "local", "lofty", "logic", "lolly", "loose", "lorry", "loser", "lotto", "lower", "lucid", "lucky", "lunar", "lunch", "lupin", "lyric", "lyric", "magic", "magic", "major", "malty", "mango", "marly", "marsh", "maser", "match", "matey", "maths", "mauve", "mayor", "mealy", "meaty", "medal", "media", "mercy", "merry", "metal", "metal", "meter", "metre", "micro", "miner", "minty", "misty", "mixed", "mixer", "modal", "model", "model", "molar", "month", "moral", "moral", "motel", "motet", "mothy", "motor", "motor", "motte", "mould", "mouse", "mousy", "mouth", "movie", "muddy", "mulch", "mural", "music", "musty", "muted", "natty", "naval", "navvy", "newel", "newsy", "nifty", "night", "ninja", "noble", "noise", "nomad", "north", "north", "notch", "noted", "novel", "novel", "oaken", "ocean", "olden", "olive", "onion", "onset", "orbit", "order", "other", "outer", "outer", "overt", "owing", "oxide", "ozone", "pacer", "pager", "paint", "pally", "palmy", "panda", "paper", "party", "pasty", "patch", "pause", "peace", "peach", "peaky", "pearl", "pearl", "peaty", "peeve", "pence", "penny", "perch", "perky", "petal", "phone", "photo", "piano", "pilot", "pitch", "pithy", "piton", "place", "plain", "plain", "plane", "plank", "plant", "plumy", "plush", "point", "polar", "polka", "porch", "posse", "pouch", "pound", "pouty", "power", "prank", "prawn", "price", "pride", "prime", "prime", "prior", "prism", "privy", "prize", "prize", "prone", "proof", "proof", "prose", "proud", "pulpy", "pupal", "pupil", "puppy", "puree", "purse", "quark", "quart", "query", "quest", "quick", "quiet", "quill", "quilt", "quirk", "quits", "radar", "radio", "radio", "rainy", "rally", "ranch", "range", "rapid", "raven", "razor", "ready", "recap", "redox", "reedy", "regal", "reign", "relay", "remit", "reply", "resit", "retro", "rhyme", "rider", "ridge", "rifle", "right", "rigid", "rimed", "risky", "river", "roast", "robin", "robot", "rocky", "rooms", "roomy", "roost", "round", "route", "royal", "royal", "ruler", "runic", "rural", "rusty", "sable", "salad", "salon", "sassy", "sated", "satin", "saute", "scale", "scaly", "scant", "scarf", "scent", "scoop", "scope", "scrub", "scuff", "sedge", "senna", "sense", "sepia", "seven", "shade", "shaky", "shale", "shame", "shank", "shape", "shark", "sharp", "sheer", "sheet", "shelf", "shell", "shiny", "shirt", "shoal", "shock", "shore", "short", "shrug", "shtum", "sieve", "sight", "silky", "silty", "sixer", "skate", "skill", "skirl", "slang", "slaty", "sleek", "sleet", "slice", "slide", "slime", "small", "smart", "smelt", "smoke", "smoky", "snack", "snail", "snake", "snare", "sniff", "snore", "snowy", "solar", "solid", "solid", "sonic", "soppy", "sorry", "sound", "sound", "soupy", "south", "south", "space", "spare", "spark", "spate", "spawn", "spear", "spent", "spicy", "spiel", "spike", "spire", "spite", "splay", "spoon", "sport", "spout", "spree", "squad", "stack", "staff", "stage", "staid", "stain", "stair", "stamp", "stand", "stare", "start", "state", "state", "steak", "steam", "steel", "steep", "stern", "stick", "still", "stock", "stock", "stoic", "stone", "stony", "stool", "store", "stork", "storm", "story", "stout", "strap", "straw", "stray", "stuck", "study", "style", "suave", "sugar", "sunny", "sunup", "super", "surge", "swarm", "sweet", "sweet", "swell", "swell", "swift", "swipe", "swish", "sword", "sworn", "syrup", "table", "tacit", "tamer", "tangy", "taper", "tarry", "taste", "tawny", "tenon", "tense", "tense", "tenth", "terms", "terse", "theme", "these", "thief", "third", "thorn", "those", "three", "tiara", "tidal", "tiger", "tight", "tilde", "tiled", "tined", "tinny", "tipsy", "tired", "title", "toast", "today", "token", "tonal", "tonic", "topic", "torch", "torte", "total", "total", "towel", "tower", "trail", "train", "treat", "trial", "tribe", "trice", "trike", "trill", "trout", "truce", "truck", "trunk", "trunk", "truss", "truth", "twain", "tweak", "twine", "twirl", "uncut", "undue", "union", "upper", "urban", "usual", "utter", "vague", "valid", "value", "vegan", "verse", "video", "visit", "vista", "vital", "vocal", "voice", "vowel", "wacky", "wagon", "waist", "washy", "watch", "water", "waxen", "weave", "weber", "weeny", "weird", "whale", "wheat", "whiff", "whole", "whorl", "widow", "width", "wince", "winch", "windy", "wiper", "wispy", "witty", "woody", "wordy", "world", "worth", "wound", "wreck", "wrist", "yacht", "yogic", "young", "youth", "yummy", "zebra", "zippy", "zonal" };
+std::vector<std::string> sixLetters = { "ablaze", "access", "acting", "action", "active", "actual", "acuity", "adagio", "adroit", "adverb", "advice", "aerial", "aflame", "afloat", "agency", "airway", "alight", "allied", "allure", "amazed", "amoeba", "amount", "anchor", "annual", "annual", "answer", "apeman", "apical", "arable", "arbour", "arcane", "ardent", "ardour", "armful", "armlet", "armour", "arrant", "artful", "artist", "asleep", "aspect", "asthma", "astral", "astute", "atomic", "august", "auntie", "autumn", "avatar", "badger", "ballet", "banner", "barber", "bardic", "barley", "barrel", "basics", "basket", "bathos", "batten", "battle", "beaded", "beaked", "beaker", "bedbug", "bedsit", "beetle", "belief", "benign", "better", "billow", "binary", "bionic", "biotic", "blazon", "blithe", "blotch", "blouse", "blower", "bluish", "blurry", "bonded", "bonnet", "bonsai", "border", "botany", "bottle", "bounds", "bovine", "breach", "breath", "breeze", "breezy", "brewer", "bridge", "bright", "bronze", "brooch", "bubbly", "bubbly", "bucket", "buckle", "budget", "bumper", "bumper", "bundle", "burger", "burrow", "button", "buzzer", "bygone", "byroad", "cachet", "cactus", "camera", "campus", "canape", "candid", "candle", "canine", "canned", "canopy", "canvas", "carbon", "career", "career", "carpet", "carrot", "carton", "castle", "casual", "catchy", "catnap", "cattle", "causal", "caveat", "caviar", "celery", "cellar", "cement", "centre", "centre", "cereal", "cerise", "chalky", "chance", "chancy", "change", "chatty", "cheery", "cheese", "chilly", "chirpy", "choice", "choice", "choral", "chorus", "chummy", "chunky", "cinder", "cinema", "circle", "circus", "classy", "claves", "clayey", "clever", "clinic", "cloche", "cobweb", "cocoon", "coeval", "coffee", "coffer", "cogent", "collar", "collie", "colour", "column", "comedy", "common", "conger", "conoid", "convex", "cookie", "cooler", "coping", "copper", "copper", "cordon", "corned", "corner", "cosmic", "county", "coupon", "course", "covert", "cowboy", "coyote", "cradle", "craggy", "crayon", "creaky", "credit", "crispy", "crumby", "crunch", "cuboid", "cupola", "curacy", "cursor", "curtsy", "custom", "cyclic", "dainty", "damper", "dapper", "daring", "dative", "dazzle", "debate", "debtor", "decent", "defect", "degree", "deluxe", "demure", "denary", "desert", "desire", "detail", "device", "dexter", "diatom", "dilute", "dimple", "dinghy", "direct", "divide", "divine", "docile", "doctor", "dogged", "doodle", "dotage", "doting", "dotted", "double", "doughy", "dragon", "drapes", "drawer", "dreamy", "dressy", "dulcet", "duplex", "earthy", "earwig", "echoey", "effect", "effort", "eighty", "either", "elated", "eldest", "elfish", "elixir", "embryo", "ending", "energy", "engine", "enough", "enough", "entire", "equine", "eraser", "ermine", "errant", "ersatz", "excise", "excuse", "exempt", "exotic", "expert", "expert", "expiry", "extant", "fabled", "facile", "factor", "fallow", "family", "famous", "farmer", "fecund", "feisty", "feline", "fellow", "fencer", "ferric", "fervid", "fierce", "figure", "filial", "fillip", "finish", "finite", "fiscal", "fitful", "fitted", "flambe", "flaxen", "fleece", "fleecy", "flight", "flinty", "floral", "florid", "flossy", "floury", "flower", "fluent", "fluffy", "fodder", "foible", "folder", "folksy", "forage", "forest", "formal", "former", "fridge", "frieze", "fright", "frilly", "frizzy", "frosty", "frothy", "frozen", "frugal", "funnel", "future", "future", "gabled", "gaffer", "gaiter", "galaxy", "gallon", "galore", "gaming", "gaoler", "garage", "garden", "garlic", "gentle", "gerbil", "gifted", "giggly", "ginger", "girder", "glassy", "glider", "glitzy", "global", "glossy", "glossy", "gloved", "golden", "gopher", "gowned", "grainy", "grassy", "grater", "gratis", "gravel", "grease", "greasy", "greeny", "grilse", "gritty", "groove", "grotto", "ground", "grubby", "grungy", "guitar", "gutter", "hairdo", "haloed", "hamlet", "hammer", "hanger", "hawser", "header", "health", "helper", "hempen", "herbal", "hermit", "heroic", "hiccup", "hinder", "hinged", "homely", "homing", "honest", "hoofed", "hooked", "horsey", "hostel", "hourly", "hubbub", "huddle", "humane", "humble", "humour", "hungry", "hunted", "hunter", "hurray", "hybrid", "hyphen", "iambic", "icicle", "iconic", "iguana", "immune", "inborn", "indoor", "inland", "inmost", "innate", "inrush", "insect", "inside", "inside", "instep", "intact", "intent", "intern", "invite", "inward", "iodine", "ironic", "island", "italic", "jacket", "jagged", "jailer", "jargon", "jaunty", "jingle", "jingly", "jockey", "jocose", "jocund", "jogger", "joggle", "jovial", "joyful", "joyous", "jumble", "jumper", "jungly", "junior", "kennel", "ketone", "kettle", "kilted", "kindly", "kingly", "kirsch", "kitbag", "kitten", "knight", "ladder", "landed", "laptop", "larder", "larval", "latest", "latter", "laurel", "lavish", "lawful", "lawyer", "layman", "leaded", "leaden", "league", "ledger", "legacy", "legend", "legion", "lemony", "lender", "length", "lepton", "lessee", "lesser", "lesson", "lethal", "letter", "liable", "lidded", "likely", "limber", "limpid", "lineal", "linear", "liquid", "lissom", "listed", "litter", "little", "lively", "livery", "living", "living", "lizard", "loaded", "loafer", "locker", "locust", "logger", "lordly", "lounge", "lovely", "loving", "lugger", "lupine", "lustre", "luxury", "madcap", "magnet", "maiden", "maiden", "malted", "mammal", "manful", "manned", "manner", "mantis", "manual", "marble", "margin", "marine", "marked", "market", "maroon", "marshy", "mascot", "massif", "matrix", "matted", "matter", "mature", "meadow", "medial", "median", "medium", "memory", "merest", "meteor", "method", "metric", "mickle", "mickle", "midday", "middle", "middle", "mighty", "milieu", "minded", "minute", "minute", "mirror", "missus", "moated", "mobile", "modern", "modest", "modish", "module", "mohair", "molten", "moment", "mosaic", "motion", "motive", "motive", "motley", "moving", "muckle", "mucous", "muddle", "mulish", "mulled", "mullet", "museum", "mutiny", "mutton", "mutual", "muzzle", "myopia", "myriad", "myriad", "mystic", "mythic", "nachos", "narrow", "nation", "native", "natter", "nature", "nearby", "nether", "nettle", "neuter", "newish", "nimble", "nobody", "normal", "notice", "nought", "number", "object", "oblate", "oblong", "oblong", "occult", "octane", "ocular", "oddity", "offcut", "office", "oldish", "oniony", "online", "onrush", "onside", "onward", "opaque", "opener", "orange", "orange", "origin", "ornate", "orphan", "osprey", "outfit", "owlish", "oxtail", "oxygen", "packed", "packet", "palace", "paltry", "papery", "parade", "parcel", "parody", "parrot", "patchy", "patent", "pathos", "pavane", "peachy", "peaked", "peanut", "pebble", "pebbly", "pedlar", "people", "pepper", "petite", "petrol", "phrase", "picker", "picket", "pickle", "picnic", "pigeon", "pillar", "pillow", "pimple", "pimply", "pincer", "pinion", "piping", "pitted", "placid", "planar", "planet", "plaque", "plenty", "pliant", "plucky", "plumed", "plummy", "plunge", "plural", "plural", "plushy", "pocked", "pocket", "pocket", "poetic", "poetry", "poised", "polite", "pollen", "porous", "postal", "poster", "potato", "potted", "pounce", "powder", "precis", "prefix", "pretty", "pricey", "primal", "profit", "prompt", "proper", "proven", "public", "puddle", "pulley", "pulsar", "punchy", "puppet", "purism", "purist", "purple", "purply", "puzzle", "quaint", "quango", "quasar", "quirky", "rabbit", "racing", "racket", "radial", "radius", "raffia", "raffle", "ragged", "raging", "raglan", "raglan", "ragtag", "raisin", "rammer", "ramrod", "random", "rapper", "raring", "rarity", "rasher", "rating", "ration", "rattle", "ravine", "raving", "reason", "rebate", "recent", "recess", "recipe", "record", "record", "redial", "reform", "regent", "region", "relief", "relish", "remark", "remiss", "remote", "rennet", "rennin", "repair", "report", "rested", "result", "retort", "revamp", "reward", "rhythm", "ribbon", "ridden", "riddle", "ridged", "ripple", "rising", "robust", "rocket", "rodent", "rotary", "rotund", "roving", "rubble", "ruched", "rudder", "rueful", "rugged", "rugger", "rumour", "rumpus", "runway", "russet", "rustic", "rustle", "rutted", "saddle", "saithe", "saline", "salmon", "sample", "sandal", "sateen", "satiny", "saucer", "saving", "sawfly", "scalar", "scalar", "scales", "scarab", "scarce", "scenic", "scheme", "school", "schtum", "scorer", "scrawl", "screen", "script", "scurfy", "season", "seated", "second", "secret", "secret", "secure", "sedate", "seemly", "select", "senior", "sensor", "septet", "serene", "serial", "series", "settee", "setter", "severe", "shaper", "sharer", "sheeny", "shield", "shiner", "shorts", "shovel", "shower", "shrewd", "shrill", "shrimp", "signal", "signal", "signet", "silage", "silent", "silken", "silver", "silver", "simian", "simile", "simper", "simple", "sinewy", "single", "sinter", "sister", "sketch", "slangy", "sledge", "sleepy", "sleety", "sleeve", "sleigh", "slight", "slinky", "slippy", "sluice", "slushy", "smooth", "smudge", "smudgy", "snaggy", "snazzy", "snoopy", "snoozy", "social", "socket", "sodium", "softie", "solemn", "solids", "sonnet", "source", "sparky", "speech", "speedy", "sphere", "sphinx", "spider", "spinet", "spiral", "spiral", "spooky", "sporty", "spotty", "sprain", "sprawl", "spring", "spruce", "sprung", "square", "square", "squash", "squish", "stable", "stagey", "stamen", "staple", "staple", "starch", "starry", "static", "statue", "steady", "steely", "stereo", "stereo", "stocks", "stocky", "stolid", "stormy", "streak", "stride", "string", "stripe", "stripy", "stroll", "strong", "stubby", "studio", "sturdy", "subtle", "suburb", "subway", "sudden", "suffix", "sugary", "sulpha", "summer", "sundry", "sunken", "sunlit", "sunset", "superb", "supine", "supper", "supply", "supply", "surfer", "surtax", "survey", "swampy", "swanky", "sweaty", "switch", "swivel", "sylvan", "symbol", "syntax", "syrupy", "tablet", "taking", "talent", "talker", "tangle", "tanker", "tannic", "target", "tartan", "taster", "tavern", "teacup", "teapot", "teasel", "temper", "tennis", "tester", "tether", "thesis", "thirty", "thrill", "throes", "throne", "ticker", "ticket", "tiddly", "tiered", "tights", "timber", "timely", "tinker", "tinned", "tinted", "tipped", "tipple", "tiptop", "tissue", "titchy", "titled", "tomato", "tracer", "trader", "treaty", "treble", "tremor", "trendy", "tricky", "triple", "troops", "trophy", "trough", "truant", "trusty", "tucker", "tufted", "tundra", "tunnel", "turbid", "turkey", "turtle", "tussle", "twirly", "twisty", "umlaut", "unable", "unborn", "undone", "uneven", "unique", "unlike", "unmade", "unpaid", "unread", "unreal", "unsaid", "unseen", "unsold", "untold", "unused", "unwary", "unworn", "upbeat", "uphill", "upland", "uproar", "uptake", "upward", "upwind", "urbane", "urchin", "urgent", "usable", "useful", "utmost", "valley", "vapour", "varied", "veggie", "veiled", "veined", "velour", "velvet", "verbal", "verity", "vernal", "versed", "vertex", "vessel", "viable", "vinous", "violet", "violin", "visage", "viscid", "visual", "volume", "voyage", "waders", "waggle", "waiter", "waiver", "waking", "wallet", "wallop", "walrus", "wanted", "warble", "warder", "wealth", "wearer", "webbed", "webcam", "wedded", "weevil", "wheezy", "whippy", "wicker", "wifely", "wilful", "window", "winged", "winger", "winner", "winter", "wintry", "witted", "wizard", "wobbly", "wonder", "wonted", "wooded", "woolly", "woolly", "worthy", "wreath", "wrench", "yarrow", "yearly", "yellow", "yonder", "zapper", "zenith", "zigzag", "zigzag", "zircon", "zither" };
+std::vector<std::string> sevenLetters = { "abiding", "ability", "abiotic", "absence", "account", "acidity", "acrobat", "acrylic", "actress", "actuary", "adamant", "addenda", "address", "advance", "aerated", "aerobic", "affable", "ageless", "airport", "alcopop", "alleged", "amazing", "ambient", "amenity", "amiable", "amusing", "anaemia", "ancient", "angelic", "angling", "angular", "animate", "animism", "aniseed", "annular", "annulus", "anodyne", "antacid", "anthill", "antique", "antique", "antonym", "aplenty", "apology", "apparel", "applied", "apropos", "aquatic", "aqueous", "arbiter", "archaic", "article", "ascetic", "aseptic", "assured", "athlete", "attache", "audible", "aureole", "autocue", "average", "avidity", "awesome", "bagpipe", "balcony", "balloon", "bandsaw", "banquet", "bargain", "baronet", "barrage", "bassist", "battery", "beeline", "belated", "beloved", "bemused", "bequest", "bespoke", "betters", "bicycle", "billion", "binding", "biology", "biscuit", "bismuth", "bivalve", "blanket", "blanket", "blatant", "blessed", "blister", "blogger", "blossom", "blowfly", "blurred", "bonfire", "bookish", "boracic", "boulder", "boxroom", "boycott", "boyhood", "bracket", "bravery", "breaded", "breadth", "breathy", "brimful", "brisket", "bristly", "brittle", "bromide", "brother", "buckram", "bucolic", "budding", "builder", "bulrush", "bulwark", "buoyant", "burning", "bursary", "butcher", "buzzard", "cabaret", "cadence", "cadenza", "caisson", "calends", "calorie", "candied", "cannery", "capable", "capital", "capital", "captain", "caption", "capture", "caravan", "caraway", "carbide", "careful", "carmine", "carnage", "cartoon", "carving", "cashier", "cavalry", "ceiling", "centaur", "central", "centric", "century", "ceramic", "certain", "cession", "chamber", "channel", "chapter", "charity", "charmer", "chatter", "checked", "checker", "chemist", "chevron", "chicane", "chicken", "chimney", "chirrup", "chortle", "chuffed", "civvies", "clarion", "classic", "classic", "clastic", "cleaver", "clement", "climate", "clinker", "cluster", "clutter", "coastal", "coating", "coaxial", "cobbled", "coequal", "cognate", "coldish", "collage", "college", "comical", "commune", "compact", "compact", "company", "compass", "complex", "concave", "concert", "concise", "conduit", "conical", "content", "contest", "control", "convert", "cooking", "coolant", "copious", "copycat", "cordial", "coronet", "correct", "council", "counter", "counter", "country", "courage", "courtly", "crackle", "crawler", "crested", "crimson", "crinkly", "croquet", "crucial", "crumbly", "crunchy", "cryptic", "crystal", "crystal", "culvert", "cunning", "cunning", "cupcake", "curator", "curious", "currant", "current", "curried", "cursive", "cursive", "cursory", "curtain", "cushion", "customs", "cutaway", "cutback", "cutlass", "cutlery", "cutting", "cutting", "cyclist", "dabbler", "dancing", "dappled", "darling", "dashing", "dawning", "deadpan", "decagon", "decided", "decimal", "decimal", "decoder", "defiant", "deltaic", "denizen", "dentist", "dervish", "desktop", "desktop", "dessert", "devoted", "devotee", "diagram", "diamond", "diamond", "dietary", "diffuse", "digital", "dignity", "dioxide", "diploid", "diploma", "display", "distant", "disused", "diurnal", "diverse", "divided", "dolphin", "donnish", "dormant", "doughty", "drachma", "drastic", "draught", "drawing", "dresser", "dribble", "driving", "drought", "drummer", "duality", "ductile", "dungeon", "duopoly", "durable", "dustbin", "dutiful", "dynamic", "dynasty", "earmark", "earnest", "earplug", "earring", "earshot", "earthen", "earthly", "eastern", "easting", "eclipse", "economy", "edaphic", "egghead", "elastic", "elastic", "elderly", "elegant", "elegiac", "ellipse", "elusive", "emerald", "emerald", "eminent", "emirate", "emotive", "empties", "endemic", "endless", "engaged", "enquiry", "ensuing", "epicure", "epigeal", "episode", "epitome", "equable", "equator", "equerry", "erosive", "erudite", "eternal", "ethical", "evasive", "evening", "evident", "exalted", "example", "excited", "exhaust", "exigent", "expanse", "express", "extreme", "factual", "fairing", "fancier", "fantasy", "faraway", "fashion", "feather", "feature", "federal", "feeling", "felspar", "ferrety", "ferrous", "ferrule", "fervent", "festive", "fibrous", "fiction", "fighter", "figment", "filings", "finicky", "fishnet", "fissile", "fission", "fitting", "fixated", "fixture", "flannel", "flavour", "flecked", "fledged", "flighty", "flouncy", "flowery", "fluency", "fluster", "fluvial", "foliage", "foliate", "footing", "footman", "forfeit", "fortune", "forward", "forward", "fragile", "freckly", "freebie", "freeman", "freesia", "freezer", "fretted", "friable", "frilled", "fringed", "frosted", "frowsty", "fulsome", "furcate", "furlong", "furrier", "further", "furtive", "fusible", "fusilli", "gainful", "gallant", "gallery", "gamelan", "garbled", "garnish", "gavotte", "gazette", "gearbox", "general", "genteel", "genuine", "germane", "getaway", "gherkin", "gibbous", "gingery", "giraffe", "girlish", "glaring", "gleeful", "glimmer", "glowing", "gnomish", "goggles", "gorilla", "gradual", "grammar", "grandam", "grandee", "graphic", "grating", "gravity", "greatly", "greyish", "greylag", "gristly", "grocery", "grommet", "grooved", "gryphon", "guarded", "guising", "gushing", "gymnast", "habitat", "hafnium", "halcyon", "halfway", "hallway", "halogen", "halting", "halyard", "handbag", "harbour", "harvest", "heading", "healthy", "hearing", "heating", "helical", "helpful", "helping", "herbage", "heroics", "hexagon", "history", "hitcher", "holdall", "holiday", "holmium", "hominid", "homonym", "honeyed", "hopeful", "horizon", "hotline", "hotness", "hulking", "hunched", "hundred", "hurdler", "hurried", "hydrous", "hygiene", "idyllic", "igneous", "immense", "imprint", "inbuilt", "inexact", "infuser", "ingrown", "initial", "initial", "inkling", "inshore", "instant", "instant", "intense", "interim", "interim", "invader", "inverse", "isohyet", "isthmus", "italics", "jackpot", "jasmine", "jocular", "journal", "journey", "jubilee", "justice", "kenning", "kestrel", "keynote", "kindred", "kindred", "kinetic", "kingdom", "kinsman", "kitchen", "knowing", "knuckle", "knurled", "laconic", "lacquer", "lactose", "lagging", "lambent", "lantern", "largish", "lasting", "lateral", "lattice", "lawsuit", "layette", "leading", "leaflet", "learned", "learner", "leather", "lectern", "legible", "leisure", "lengthy", "lenient", "leonine", "leopard", "lettuce", "lexical", "liberty", "library", "lilting", "lineage", "linkage", "linkman", "lioness", "literal", "lithium", "logging", "logical", "longish", "lottery", "louvred", "lovable", "lowland", "luggage", "lyrical", "machine", "maestro", "magenta", "magenta", "magical", "magnate", "majesty", "maltose", "mammoth", "mammoth", "manners", "mansard", "marbled", "marital", "marquee", "mascara", "massive", "matinee", "matting", "mattock", "maximal", "maximum", "mayoral", "meaning", "meaning", "medical", "meeting", "melodic", "mermaid", "message", "midland", "midweek", "million", "million", "mimetic", "mindful", "mineral", "mineral", "minimal", "minimum", "minster", "missile", "missing", "mission", "mistake", "mixture", "modular", "mollusc", "moneyed", "monitor", "monthly", "moonlit", "moorhen", "morello", "morning", "mottled", "mounted", "mourner", "movable", "muddler", "muffler", "mullion", "musical", "mustard", "mustard", "nankeen", "narwhal", "natural", "nebular", "needful", "neither", "netball", "netting", "network", "newness", "nightly", "nitrous", "nomadic", "nominal", "notable", "noughth", "nuclear", "nursery", "nursing", "nurture", "obesity", "oblique", "obscure", "obvious", "oceanic", "octagon", "octopus", "offbeat", "officer", "offline", "offside", "oilcake", "ominous", "onerous", "ongoing", "onshore", "opening", "opinion", "optimal", "optimum", "opulent", "orbital", "orchard", "ordered", "orderly", "ordinal", "ordinal", "organic", "osmosis", "osmotic", "outdoor", "outline", "outside", "outside", "outsize", "outward", "overall", "overarm", "overlay", "package", "padlock", "pageant", "painter", "paisley", "palaver", "palette", "palmate", "palmtop", "panicle", "paragon", "parking", "parlous", "partial", "passage", "passing", "passive", "pastime", "pasture", "patient", "patient", "pattern", "payable", "peacock", "peckish", "pelagic", "pelisse", "penalty", "pendent", "pending", "penguin", "pension", "peppery", "perfect", "perfume", "persona", "phantom", "philtre", "phonics", "picture", "piebald", "pillbox", "pinched", "pinkish", "piquant", "pitcher", "pitfall", "pivotal", "plaster", "plastic", "plastic", "platoon", "playful", "pleased", "pleated", "plenary", "pliable", "plumber", "plunger", "podcast", "poetess", "pointed", "polemic", "politic", "popcorn", "popular", "portion", "postage", "postbox", "postern", "postman", "potable", "pottage", "pottery", "powdery", "powered", "praline", "prattle", "precise", "prefect", "premier", "present", "present", "prickle", "primary", "process", "product", "profuse", "program", "project", "pronged", "pronoun", "propane", "protean", "protein", "proverb", "proviso", "prudent", "psychic", "puckish", "pumpkin", "purpose", "puzzler", "pyjamas", "pyramid", "pyrites", "quality", "quantum", "quarter", "quavery", "queenly", "quinine", "quorate", "rabbity", "rackety", "radiant", "radical", "raffish", "rafting", "railing", "railman", "railway", "rainbow", "rambler", "ramekin", "rampant", "rarebit", "ratable", "raucous", "rawhide", "readies", "recital", "recount", "recruit", "redhead", "redwing", "referee", "refined", "regards", "regatta", "regency", "regnant", "regular", "related", "relaxed", "reliant", "remorse", "removed", "replete", "reproof", "reptile", "reputed", "respect", "restful", "restive", "rethink", "retired", "retread", "revelry", "revenge", "reverse", "rhombus", "rickety", "rimless", "ringing", "riotous", "riviera", "roaring", "robotic", "rolling", "roseate", "rounded", "rounder", "routine", "routine", "ruffled", "ruinous", "runaway", "rundown", "running", "saddler", "sailing", "salient", "salvage", "sampler", "sapient", "sardine", "saurian", "sausage", "savings", "savoury", "scarlet", "scenery", "scented", "science", "scrappy", "scratch", "scrawny", "screech", "scribal", "sealant", "searing", "seasick", "seaside", "seaward", "seaweed", "section", "secular", "seedbed", "seeming", "segment", "seismic", "sensory", "sensual", "serious", "serried", "servant", "several", "shadowy", "shapely", "shelter", "sheriff", "shivery", "shocker", "showery", "showing", "shrubby", "shudder", "shutter", "sickbay", "sidecar", "sighted", "sightly", "signing", "silvery", "similar", "sincere", "sinless", "sinuous", "sixfold", "sketchy", "skilful", "skilled", "skimmed", "skyline", "skyward", "slatted", "sleeved", "slipper", "slotted", "slowish", "slurred", "sniffle", "sniffly", "snuffly", "snuggly", "society", "soldier", "soluble", "someone", "soprano", "sorghum", "soulful", "spangle", "spangly", "spaniel", "spanner", "sparing", "sparkly", "sparrow", "spartan", "spatial", "speaker", "special", "speckle", "spidery", "spindly", "splashy", "splotch", "spotted", "springy", "spurred", "squally", "squashy", "squidgy", "squiffy", "squishy", "stadium", "standby", "standby", "stapler", "starchy", "starlit", "stately", "station", "stature", "staunch", "stealth", "stellar", "sticker", "stilted", "stoical", "strange", "stratum", "streaky", "stretch", "striker", "strings", "stringy", "striped", "stubbly", "student", "studied", "stylish", "styptic", "subject", "subject", "sublime", "success", "suiting", "sultana", "summary", "summary", "summery", "sunburn", "sundial", "sundown", "sunfish", "sunless", "sunrise", "sunroof", "support", "supreme", "surface", "surface", "surfeit", "surgery", "surmise", "surname", "surplus", "surreal", "swarthy", "swearer", "sweater", "swollen", "synapse", "synonym", "tabular", "tactful", "tactile", "tadpole", "tallish", "tangram", "tantrum", "taxable", "teacher", "telling", "tenable", "tenfold", "tensile", "ternary", "terrace", "terrain", "terrine", "testate", "textile", "textual", "texture", "theatre", "thistle", "thought", "thrifty", "through", "thrower", "thunder", "tideway", "timpani", "titanic", "titular", "toaster", "toccata", "tombola", "tonight", "toothed", "topical", "topmost", "topsoil", "torment", "tornado", "touched", "tourism", "tourist", "tracing", "tracker", "tractor", "trailer", "trainer", "trapeze", "treacly", "tremolo", "triable", "triadic", "tribune", "trickle", "trochee", "trolley", "trophic", "tropism", "trouble", "trouper", "trumpet", "tsunami", "tubular", "tumbler", "tunable", "tuneful", "twelfth", "twiddly", "twilled", "twitchy", "twofold", "typical", "umpteen", "unaided", "unarmed", "unasked", "unaware", "unbound", "unbowed", "uncanny", "undying", "unequal", "unheard", "unicorn", "unifier", "uniform", "uniform", "unitary", "unladen", "unlined", "unmoved", "unnamed", "unpaved", "unready", "untried", "unusual", "unwaged", "upfront", "upright", "upriver", "upstage", "upstate", "upswept", "useable", "utility", "utility", "valiant", "vanilla", "variant", "variety", "various", "vaulted", "vehicle", "velvety", "venison", "verbena", "verbose", "verdant", "verdict", "verdure", "vernier", "version", "vesicle", "vibrant", "victory", "vinegar", "vintage", "vintner", "virtual", "visible", "visitor", "vitamin", "vlogger", "volcano", "voltaic", "voluble", "voucher", "vulpine", "waggish", "wagtail", "wakeful", "walkout", "wallaby", "wanting", "warmish", "warrant", "washing", "waverer", "waxwing", "waxwork", "wayward", "wealthy", "wearing", "weather", "weather", "webbing", "website", "weighty", "welcome", "welcome", "western", "wetsuit", "wheaten", "wheelie", "whisker", "widower", "wildcat", "willing", "willowy", "winning", "winsome", "wishful", "wistful", "witness", "woollen", "working", "working", "worldly", "worsted", "wriggly", "wrinkle", "writing", "wrought", "zealous", "zestful" };
+
+std::vector availableHats = { "hat_NoHat", "hat_AbominalHat", "hat_anchor", "hat_antenna", "hat_Antenna_Black", "hat_arrowhead", "hat_Astronaut-Blue", "hat_Astronaut-Cyan", "hat_Astronaut-Orange", "hat_astronaut", "hat_axe", "hat_babybean", "hat_Baguette", "hat_BananaGreen", "hat_BananaPurple", "hat_bandanaWBY", "hat_Bandana_Blue", "hat_Bandana_Green", "hat_Bandana_Pink", "hat_Bandana_Red", "hat_Bandana_White", "hat_Bandana_Yellow", "hat_baseball_Black", "hat_baseball_Green", "hat_baseball_Lightblue", "hat_baseball_LightGreen", "hat_baseball_Lilac", "hat_baseball_Orange", "hat_baseball_Pink", "hat_baseball_Purple", "hat_baseball_Red", "hat_baseball_White", "hat_baseball_Yellow", "hat_Basketball", "hat_bat_crewcolor", "hat_bat_green", "hat_bat_ice", "hat_beachball", "hat_Beanie_Black", "hat_Beanie_Blue", "hat_Beanie_Green", "hat_Beanie_Lightblue", "hat_Beanie_LightGreen", "hat_Beanie_LightPurple", "hat_Beanie_Pink", "hat_Beanie_Purple", "hat_Beanie_White", "hat_Beanie_Yellow", "hat_bearyCold", "hat_bone", "hat_Bowlingball", "hat_brainslug", "hat_BreadLoaf", "hat_bucket", "hat_bucketHat", "hat_bushhat", "hat_Butter", "hat_caiatl", "hat_caitlin", "hat_candycorn", "hat_captain", "hat_cashHat", "hat_cat_grey", "hat_cat_orange", "hat_cat_pink", "hat_cat_snow", "hat_chalice", "hat_cheeseBleu", "hat_cheeseMoldy", "hat_cheeseSwiss", "hat_ChefWhiteBlue", "hat_cherryOrange", "hat_cherryPink", "hat_Chocolate", "hat_chocolateCandy", "hat_chocolateMatcha", "hat_chocolateVanillaStrawb", "hat_clagger", "hat_clown_purple", "hat_comper", "hat_croissant", "hat_crownBean", "hat_crownDouble", "hat_crownTall", "hat_CuppaJoe", "hat_Deitied", "hat_devilhorns_black", "hat_devilhorns_crewcolor", "hat_devilhorns_green", "hat_devilhorns_murky", "hat_devilhorns_white", "hat_devilhorns_yellow", "hat_Doc_black", "hat_Doc_Orange", "hat_Doc_Purple", "hat_Doc_Red", "hat_Doc_White", "hat_Dodgeball", "hat_Dorag_Black", "hat_Dorag_Desert", "hat_Dorag_Jungle", "hat_Dorag_Purple", "hat_Dorag_Sky", "hat_Dorag_Snow", "hat_Dorag_Yellow", "hat_doubletophat", "hat_DrillMetal", "hat_DrillStone", "hat_DrillWood", "hat_EarmuffGreen", "hat_EarmuffsPink", "hat_EarmuffsYellow", "hat_EarnmuffBlue", "hat_eggGreen", "hat_eggYellow", "hat_enforcer", "hat_erisMorn", "hat_fairywings", "hat_fishCap", "hat_fishhed", "hat_fishingHat", "hat_flowerpot", "hat_frankenbolts", "hat_frankenbride", "hat_fungleFlower", "hat_geoff", "hat_glowstick", "hat_glowstickCyan", "hat_glowstickOrange", "hat_glowstickPink", "hat_glowstickPurple", "hat_glowstickYellow", "hat_goggles", "hat_Goggles_Black", "hat_Goggles_Chrome", "hat_GovtDesert", "hat_GovtHeadset", "hat_halospartan", "hat_hardhat", "hat_Hardhat_black", "hat_Hardhat_Blue", "hat_Hardhat_Green", "hat_Hardhat_Orange", "hat_Hardhat_Pink", "hat_Hardhat_Purple", "hat_Hardhat_Red", "hat_Hardhat_White", "hat_HardtopHat", "hat_headslug_Purple", "hat_headslug_Red", "hat_headslug_White", "hat_headslug_Yellow", "hat_Heart", "hat_heim", "hat_Herohood_Black", "hat_Herohood_Blue", "hat_Herohood_Pink", "hat_Herohood_Purple", "hat_Herohood_Red", "hat_Herohood_Yellow", "hat_hl_fubuki", "hat_hl_gura", "hat_hl_korone", "hat_hl_marine", "hat_hl_mio", "hat_hl_moona", "hat_hl_okayu", "hat_hl_pekora", "hat_hl_risu", "hat_hl_watson", "hat_hunter", "hat_IceCreamMatcha", "hat_IceCreamMint", "hat_IceCreamNeo", "hat_IceCreamStrawberry", "hat_IceCreamUbe", "hat_IceCreamVanilla", "hat_Igloo", "hat_Janitor", "hat_jayce", "hat_jinx", "hat_killerplant", "hat_lilShroom", "hat_maraSov", "hat_mareLwyd", "hat_military", "hat_MilitaryWinter", "hat_MinerBlack", "hat_MinerYellow", "hat_mira_bush", "hat_mira_case", "hat_mira_cloud", "hat_mira_flower", "hat_mira_flower_red", "hat_mira_gem", "hat_mira_headset_blue", "hat_mira_headset_pink", "hat_mira_headset_yellow", "hat_mira_leaf", "hat_mira_milk", "hat_mira_sign_blue", "hat_mohawk_bubblegum", "hat_mohawk_bumblebee", "hat_mohawk_purple_green", "hat_mohawk_rainbow", "hat_mummy", "hat_mushbuns", "hat_mushroomBeret", "hat_mysteryBones", "hat_NewYear2023", "hat_OrangeHat", "hat_osiris", "hat_pack01_Astronaut0001", "hat_pack02_Tengallon0001", "hat_pack02_Tengallon0002", "hat_pack03_Stickynote0004", "hat_pack04_Geoffmask0001", "hat_pack06holiday_candycane0001", "hat_PancakeStack", "hat_paperhat", "hat_Paperhat_Black", "hat_Paperhat_Blue", "hat_Paperhat_Cyan", "hat_Paperhat_Lightblue", "hat_Paperhat_Pink", "hat_Paperhat_Yellow", "hat_papermask", "hat_partyhat", "hat_pickaxe", "hat_Pineapple", "hat_PizzaSliceHat", "hat_pk01_BaseballCap", "hat_pk02_Crown", "hat_pk02_Eyebrows", "hat_pk02_HaloHat", "hat_pk02_HeroCap", "hat_pk02_PipCap", "hat_pk02_PlungerHat", "hat_pk02_ScubaHat", "hat_pk02_StickminHat", "hat_pk02_StrawHat", "hat_pk02_TenGallonHat", "hat_pk02_ThirdEyeHat", "hat_pk02_ToiletPaperHat", "hat_pk02_Toppat", "hat_pk03_Fedora", "hat_pk03_Goggles", "hat_pk03_Headphones", "hat_pk03_Security1", "hat_pk03_StrapHat", "hat_pk03_Traffic", "hat_pk04_Antenna", "hat_pk04_Archae", "hat_pk04_Balloon", "hat_pk04_Banana", "hat_pk04_Bandana", "hat_pk04_Beanie", "hat_pk04_Bear", "hat_pk04_BirdNest", "hat_pk04_CCC", "hat_pk04_Chef", "hat_pk04_DoRag", "hat_pk04_Fez", "hat_pk04_GeneralHat", "hat_pk04_HunterCap", "hat_pk04_JungleHat", "hat_pk04_MinerCap", "hat_pk04_MiniCrewmate", "hat_pk04_Pompadour", "hat_pk04_RamHorns", "hat_pk04_Slippery", "hat_pk04_Snowman", "hat_pk04_Vagabond", "hat_pk04_WinterHat", "hat_pk05_Burthat", "hat_pk05_Cheese", "hat_pk05_cheesetoppat", "hat_pk05_Cherry", "hat_pk05_davehat", "hat_pk05_Egg", "hat_pk05_Ellie", "hat_pk05_EllieToppat", "hat_pk05_Ellryhat", "hat_pk05_Fedora", "hat_pk05_Flamingo", "hat_pk05_FlowerPin", "hat_pk05_GeoffreyToppat", "hat_pk05_Helmet", "hat_pk05_HenryToppat", "hat_pk05_Macbethhat", "hat_pk05_Plant", "hat_pk05_RHM", "hat_pk05_Svenhat", "hat_pk05_Wizardhat", "hat_pk06_Candycanes", "hat_pk06_ElfHat", "hat_pk06_Lights", "hat_pk06_Present", "hat_pk06_Reindeer", "hat_pk06_Santa", "hat_pk06_Snowman", "hat_pk06_tree", "hat_pkHW01_BatWings", "hat_pkHW01_CatEyes", "hat_pkHW01_Horns", "hat_pkHW01_Machete", "hat_pkHW01_Mohawk", "hat_pkHW01_Pirate", "hat_pkHW01_PlagueHat", "hat_pkHW01_Pumpkin", "hat_pkHW01_ScaryBag", "hat_pkHW01_Witch", "hat_pkHW01_Wolf", "hat_Plunger_Blue", "hat_Plunger_Yellow", "hat_police", "hat_Ponytail", "hat_Pot", "hat_Present", "hat_Prototype", "hat_pusheenGreyHat", "hat_PusheenicornHat", "hat_pusheenMintHat", "hat_pusheenPinkHat", "hat_pusheenPurpleHat", "hat_pusheenSitHat", "hat_pusheenSleepHat", "hat_pyramid", "hat_rabbitEars", "hat_Ramhorn_Black", "hat_Ramhorn_Red", "hat_Ramhorn_White", "hat_ratchet", "hat_Records", "hat_RockIce", "hat_RockLava", "hat_Rubberglove", "hat_Rupert", "hat_russian", "hat_saint14", "hat_sausage", "hat_savathun", "hat_schnapp", "hat_screamghostface", "hat_Scrudge", "hat_sharkfin", "hat_shaxx", "hat_shovel", "hat_SlothHat", "hat_SnowbeanieGreen", "hat_SnowbeanieOrange", "hat_SnowBeaniePurple", "hat_SnowbeanieRed", "hat_Snowman", "hat_Soccer", "hat_Sorry", "hat_starBalloon", "hat_starhorse", "hat_Starless", "hat_StarTopper", "hat_stethescope", "hat_StrawberryLeavesHat", "hat_TenGallon_Black", "hat_TenGallon_White", "hat_ThomasC", "hat_tinFoil", "hat_titan", "hat_ToastButterHat", "hat_tombstone", "hat_tophat", "hat_ToppatHair", "hat_towelwizard", "hat_Traffic_Blue", "hat_traffic_purple", "hat_Traffic_Red", "hat_Traffic_Yellow", "hat_Unicorn", "hat_vi", "hat_viking", "hat_Visor", "hat_Voleyball", "hat_w21_candycane_blue", "hat_w21_candycane_bubble", "hat_w21_candycane_chocolate", "hat_w21_candycane_mint", "hat_w21_elf_pink", "hat_w21_elf_swe", "hat_w21_gingerbread", "hat_w21_holly", "hat_w21_krampus", "hat_w21_lights_white", "hat_w21_lights_yellow", "hat_w21_log", "hat_w21_mistletoe", "hat_w21_mittens", "hat_w21_nutcracker", "hat_w21_pinecone", "hat_w21_present_evil", "hat_w21_present_greenyellow", "hat_w21_present_redwhite", "hat_w21_present_whiteblue", "hat_w21_santa_evil", "hat_w21_santa_green", "hat_w21_santa_mint", "hat_w21_santa_pink", "hat_w21_santa_white", "hat_w21_santa_yellow", "hat_w21_snowflake", "hat_w21_snowman", "hat_w21_snowman_evil", "hat_w21_snowman_greenred", "hat_w21_snowman_redgreen", "hat_w21_snowman_swe", "hat_w21_winterpuff", "hat_wallcap", "hat_warlock", "hat_whitetophat", "hat_wigJudge", "hat_wigTall", "hat_WilfordIV", "hat_Winston", "hat_WinterGreen", "hat_WinterHelmet", "hat_WinterRed", "hat_WinterYellow", "hat_witch_green", "hat_witch_murky", "hat_witch_pink", "hat_witch_white", "hat_wolf_grey", "hat_wolf_murky", "hat_Zipper" };
+std::vector availableSkins = { "skin_None", "skin_Abominalskin", "skin_ApronGreen", "skin_Archae", "skin_Astro", "skin_Astronaut-Blueskin", "skin_Astronaut-Cyanskin", "skin_Astronaut-Orangeskin", "skin_Bananaskin", "skin_benoit", "skin_Bling", "skin_BlueApronskin", "skin_BlueSuspskin", "skin_Box1skin", "skin_BubbleWrapskin", "skin_Burlapskin", "skin_BushSign1skin", "skin_Bushskin", "skin_BusinessFem-Aquaskin", "skin_BusinessFem-Tanskin", "skin_BusinessFemskin", "skin_caitlin", "skin_Capt", "skin_CCC", "skin_ChefBlackskin", "skin_ChefBlue", "skin_ChefRed", "skin_clown", "skin_D2Cskin", "skin_D2Hunter", "skin_D2Osiris", "skin_D2Saint14", "skin_D2Shaxx", "skin_D2Titan", "skin_D2Warlock", "skin_enforcer", "skin_fairy", "skin_FishingSkinskin", "skin_fishmonger", "skin_FishSkinskin", "skin_General", "skin_greedygrampaskin", "skin_halospartan", "skin_Hazmat-Blackskin", "skin_Hazmat-Blueskin", "skin_Hazmat-Greenskin", "skin_Hazmat-Pinkskin", "skin_Hazmat-Redskin", "skin_Hazmat-Whiteskin", "skin_Hazmat", "skin_heim", "skin_hl_fubuki", "skin_hl_gura", "skin_hl_korone", "skin_hl_marine", "skin_hl_mio", "skin_hl_moona", "skin_hl_okayu", "skin_hl_pekora", "skin_hl_risu", "skin_hl_watson", "skin_Horse1skin", "skin_Hotdogskin", "skin_InnerTubeSkinskin", "skin_JacketGreenskin", "skin_JacketPurpleskin", "skin_JacketYellowskin", "skin_Janitorskin", "skin_jayce", "skin_jinx", "skin_LifeVestSkinskin", "skin_Mech", "skin_MechanicRed", "skin_Military", "skin_MilitaryDesert", "skin_MilitarySnowskin", "skin_Miner", "skin_MinerBlackskin", "skin_mummy", "skin_OrangeSuspskin", "skin_PinkApronskin", "skin_PinkSuspskin", "skin_Police", "skin_presentskin", "skin_prisoner", "skin_PrisonerBlue", "skin_PrisonerTanskin", "skin_pumpkin", "skin_PusheenGreyskin", "skin_Pusheenicornskin", "skin_PusheenMintskin", "skin_PusheenPinkskin", "skin_PusheenPurpleskin", "skin_ratchet", "skin_rhm", "skin_RockIceskin", "skin_RockLavaskin", "skin_Sack1skin", "skin_scarfskin", "skin_Science", "skin_Scientist-Blueskin", "skin_Scientist-Darkskin", "skin_screamghostface", "skin_Security", "skin_Skin_SuitRedskin", "skin_Slothskin", "skin_SportsBlueskin", "skin_SportsRedskin", "skin_SuitB", "skin_SuitW", "skin_SweaterBlueskin", "skin_SweaterPinkskin", "skin_Sweaterskin", "skin_SweaterYellowskin", "skin_Tarmac", "skin_ToppatSuitFem", "skin_ToppatVest", "skin_uglysweaterskin", "skin_vampire", "skin_vi", "skin_w21_deer", "skin_w21_elf", "skin_w21_msclaus", "skin_w21_nutcracker", "skin_w21_santa", "skin_w21_snowmate", "skin_w21_tree", "skin_Wall", "skin_Winter", "skin_witch", "skin_YellowApronskin", "skin_YellowSuspskin" };
+std::vector availableVisors = { "visor_EmptyVisor", "visor_anime", "visor_BaconVisor", "visor_BananaVisor", "visor_beautyMark", "visor_BillyG", "visor_Blush", "visor_Bomba", "visor_BubbleBumVisor", "visor_Candycane", "visor_Carrot", "visor_chimkin", "visor_clownnose", "visor_Crack", "visor_CucumberVisor", "visor_D2CGoggles", "visor_Dirty", "visor_Dotdot", "visor_doubleeyepatch", "visor_eliksni", "visor_erisBandage", "visor_eyeball", "visor_EyepatchL", "visor_EyepatchR", "visor_fishhook", "visor_Galeforce", "visor_heim", "visor_hl_ah", "visor_hl_bored", "visor_hl_hmph", "visor_hl_marine", "visor_hl_nothoughts", "visor_hl_nudge", "visor_hl_smug", "visor_hl_sweepy", "visor_hl_teehee", "visor_hl_wrong", "visor_IceBeard", "visor_IceCreamChocolateVisor", "visor_IceCreamMintVisor", "visor_IceCreamStrawberryVisor", "visor_IceCreamUbeVisor", "visor_is_beard", "visor_JanitorStache", "visor_jinx", "visor_Krieghaus", "visor_Lava", "visor_LolliBlue", "visor_LolliBrown", "visor_LolliOrange", "visor_lollipopCrew", "visor_lollipopLemon", "visor_lollipopLime", "visor_LolliRed", "visor_marshmallow", "visor_masque_blue", "visor_masque_green", "visor_masque_red", "visor_masque_white", "visor_mira_card_blue", "visor_mira_card_red", "visor_mira_glasses", "visor_mira_mask_black", "visor_mira_mask_blue", "visor_mira_mask_green", "visor_mira_mask_purple", "visor_mira_mask_red", "visor_mira_mask_white", "visor_Mouth", "visor_mummy", "visor_PiercingL", "visor_PiercingR", "visor_PizzaVisor", "visor_pk01_AngeryVisor", "visor_pk01_DumStickerVisor", "visor_pk01_FredVisor", "visor_pk01_HazmatVisor", "visor_pk01_MonoclesVisor", "visor_pk01_PaperMaskVisor", "visor_pk01_PlagueVisor", "visor_pk01_RHMVisor", "visor_pk01_Security1Visor", "visor_Plsno", "visor_polus_ice", "visor_pusheenGorgeousVisor", "visor_pusheenKissyVisor", "visor_pusheenKoolKatVisor", "visor_pusheenOmNomNomVisor", "visor_pusheenSmileVisor", "visor_pusheenYaaaaaayVisor", "visor_Reginald", "visor_Rudolph", "visor_savathun", "visor_Scar", "visor_SciGoggles", "visor_shopglasses", "visor_shuttershadesBlue", "visor_shuttershadesLime", "visor_shuttershadesPink", "visor_shuttershadesPurple", "visor_shuttershadesWhite", "visor_shuttershadesYellow", "visor_SkiGoggleBlack", "visor_SKiGogglesOrange", "visor_SkiGogglesWhite", "visor_SmallGlasses", "visor_SmallGlassesBlue", "visor_SmallGlassesRed", "visor_starfish", "visor_Stealthgoggles", "visor_Stickynote_Cyan", "visor_Stickynote_Green", "visor_Stickynote_Orange", "visor_Stickynote_Pink", "visor_Stickynote_Purple", "visor_Straw", "visor_sunscreenv", "visor_teary", "visor_ToastVisor", "visor_tvColorTest", "visor_vr_Vr-Black", "visor_vr_Vr-White", "visor_w21_carrot", "visor_w21_nutstache", "visor_w21_nye", "visor_w21_santabeard", "visor_wash", "visor_WinstonStache" };
+std::vector availablePets = { "pet_EmptyPet", "pet_Alien", "pet_Bedcrab", "pet_BredPet", "pet_Bush", "pet_Charles", "pet_Charles_Red", "pet_ChewiePet", "pet_clank", "pet_coaltonpet", "pet_Creb", "pet_Crewmate", "pet_Cube", "pet_D2GhostPet", "pet_D2PoukaPet", "pet_D2WormPet", "pet_Doggy", "pet_Ellie", "pet_frankendog", "pet_GuiltySpark", "pet_HamPet", "pet_Hamster", "pet_HolidayHamPet", "pet_Lava", "pet_nuggetPet", "pet_Pip", "pet_poro", "pet_Pusheen", "pet_Robot", "pet_Snow", "pet_Squig", "pet_Stickmin", "pet_Stormy", "pet_test", "pet_UFO", "pet_YuleGoatPet" };
+std::vector availableNamePlates = { "nameplate_NoPlate", "nameplate_airship_Toppat", "nameplate_airship_CCC", "nameplate_airship_Diamond", "nameplate_airship_Emerald", "nameplate_airship_Gems", "nameplate_airship_government", "nameplate_Airship_Hull", "nameplate_airship_Ruby", "nameplate_airship_Sky", "nameplate_Polus-Skyline", "nameplate_Polus-Snowmates", "nameplate_Polus_Colors", "nameplate_Polus_DVD", "nameplate_Polus_Ground", "nameplate_Polus_Lava", "nameplate_Polus_Planet", "nameplate_Polus_Snow", "nameplate_Polus_SpecimenBlue", "nameplate_Polus_SpecimenGreen", "nameplate_Polus_SpecimenPurple", "nameplate_is_yard", "nameplate_is_dig", "nameplate_is_game", "nameplate_is_ghost", "nameplate_is_green", "nameplate_is_sand", "nameplate_is_trees", "nameplate_Mira_Cafeteria", "nameplate_Mira_Glass", "nameplate_Mira_Tiles", "nameplate_Mira_Vines", "nameplate_Mira_Wood", "nameplate_hw_candy", "nameplate_hw_woods", "nameplate_hw_pumpkin", "nameplate_lanterns", "nameplate_flagAce", "nameplate_flagAgend", "nameplate_flagAro", "nameplate_flagBi", "nameplate_flagRainbow", "nameplate_flagGendQ", "nameplate_flagGendF", "nameplate_flagLesbian", "nameplate_flagMlm", "nameplate_flagNonbinary", "nameplate_flagPan", "nameplate_flagTrans", "nameplate_flagPride", "nameplate_torch", "nameplate_PizzaPlate", "nameplate_BlimeyPlate", "nameplate_BreadPlate", "nameplate_SnowmiesPlate", "nameplate_Croissant", "nameplate_EggPlate", "nameplate_beanDragon", "nameplate_Snowflake", "nameplate_Celeste", "nameplate_Clouds", "nameplate_Feathers", "nameplate_Battlefield", "nameplate_Topaz", "nameplate_Jaguarprint", "nameplate_WinterForestPlate", "nameplate_Plant", "nameplate_Scales", "nameplate_Tigerplant", "nameplate_Spacecat", "nameplate_Spacedog", "nameplate_Spaceship", "nameplate_Pusheen_01", "nameplate_Pusheen_02", "nameplate_Pusheen_03", "nameplate_Pusheen_04", "nameplate_Specimen", "nameplate_PlusOne", "nameplate_Cake", "nameplate_Dragonfish", "nameplate_Snowfall", "nameplate_Gems", "nameplate_Moon", "nameplate_CandyCanePlate", "nameplate_Fight", "nameplate_Tigerprint", "nameplate_PlusPlate", "nameplate_Price", "nameplate_Lightfall", "nameplate_Frosty", "nameplate_SpecimenGreen", "nameplate_Winter", "nameplate0001", "nameplate0002", "Nameplate_DeadSunset", "nameplate_w21_fireplace", "nameplate_cafeteria", "nameplate_flyingStrawberry", "nameplate_polus", "nameplate_candyCanePlate", "nameplate_reactor", "nameplate_dungeonFloor", "nameplates_pusheen_03", "nameplate_cupcake", "Nameplate_zipline", "nameplate_hackerman", "nameplate_ballPit", "nameplate_disco", "nameplate_binoculars", "nameplate_crewmatesRed", "nameplate_crewmatesBlue", "nameplate_fur", "nameplate_goldImpostor", "nameplate_goldCrewmate", "nameplate_grill", "nameplate_ninjas", "nameplate_honk", "nameplate_hunter", "nameplate_sandcastle", "nameplate_jaguarprint", "nameplate_cliffs", "nameplate_lilypad", "nameplate_redPackets", "nameplate_moons", "nameplate_PlatePlate", "nameplate_sotenbori", "nameplate_ejected", "nameplate_hourglass", "nameplate_flowers", "nameplate_Orange", "nameplate_horsemateField", "nameplate_knife", "nameplate_winterForestPlate", "nameplate_incense", "nameplates_pusheen_02", "nameplate_spacecat", "nameplate_spacedog", "nameplate_tea", "nameplate_WrappingPaperPlate", "nameplate_dragonTattoo", "nameplate_majimaTattoo", "nameplate_eyes", "nameplate_w21_tree", "nameplate_PinkPlate", "nameplate_titan", "nameplate_warlock", "nameplate_horseHeaven", "nameplate_kamurochogate", "nameplates_pusheen_04", "nameplate_flashlight", "nameplate_boar", "nameplate_cat", "nameplate_dog", "nameplate_dragon", "nameplate_goat", "nameplate_horse", "nameplate_monkey", "nameplate_ox", "nameplate_rabbit", "nameplate_rat", "nameplate_rooster", "nameplate_snake", "nameplates_tiger", "nameplate_yokohama", "nameplate_shadows", "nameplate_hominid" };
+
 int randi(int lo, int hi) {
-        srand(unsigned int(time(NULL) + (static_cast<long long>(rand()) * 1000)));
-        int n = hi - lo + 1;
-        int i = rand() % n;
-        if (i < 0) i = -i;
-        return lo + i;
+    srand(unsigned int(time(NULL) + (static_cast<long long>(rand()) * 1000)));
+    int n = hi - lo + 1;
+    int i = rand() % n;
+    if (i < 0) i = -i;
+    return lo + i;
 }
 
 RoleRates::RoleRates(const class GameOptions& gameOptions, int playerAmount) {
-        this->ImpostorCount = gameOptions.GetNumImpostors();
-        auto maxImpostors = GetMaxImpostorAmount(playerAmount);
-        if (State.CustomImpostorAmount)
-                this->ImpostorCount = maxImpostors;
-        else if (this->ImpostorCount > maxImpostors)
-                this->ImpostorCount = maxImpostors;
+    this->ImpostorCount = gameOptions.GetNumImpostors();
+    auto maxImpostors = GetMaxImpostorAmount(playerAmount);
+    if (State.CustomImpostorAmount)
+        this->ImpostorCount = maxImpostors;
+    else if (this->ImpostorCount > maxImpostors)
+        this->ImpostorCount = maxImpostors;
 
-        const auto& roleOptions = gameOptions.GetRoleOptions();
+    const auto& roleOptions = gameOptions.GetRoleOptions();
 #define GET_ROLE_RATE(type) \
-        this->type##Chance = roleOptions.GetChancePerGame(RoleTypes__Enum::##type); \
-        this->type##Count = roleOptions.GetNumPerGame(RoleTypes__Enum::##type);
+    this->type##Chance = roleOptions.GetChancePerGame(RoleTypes__Enum::##type); \
+    this->type##Count = roleOptions.GetNumPerGame(RoleTypes__Enum::##type);
 
-        GET_ROLE_RATE(Engineer);
-        GET_ROLE_RATE(Scientist);
-        GET_ROLE_RATE(Tracker);
-        GET_ROLE_RATE(Noisemaker);
-        GET_ROLE_RATE(Shapeshifter);
-        GET_ROLE_RATE(Phantom);
-        GET_ROLE_RATE(GuardianAngel);
+    GET_ROLE_RATE(Engineer);
+    GET_ROLE_RATE(Scientist);
+    GET_ROLE_RATE(Tracker);
+    GET_ROLE_RATE(Detective);
+    GET_ROLE_RATE(Noisemaker);
+    GET_ROLE_RATE(Shapeshifter);
+    GET_ROLE_RATE(Phantom);
+    GET_ROLE_RATE(Viper);
+    GET_ROLE_RATE(GuardianAngel);
 #undef GET_ROLE_RATE
 }
 
 int RoleRates::GetRoleCount(RoleTypes__Enum role) {
-        switch (role) {
-        case RoleTypes__Enum::Shapeshifter:
-                return this->ShapeshifterCount;
-        case RoleTypes__Enum::Phantom:
-                return this->PhantomCount;
-        case RoleTypes__Enum::Impostor:
-                return this->ImpostorCount;
-        case RoleTypes__Enum::Scientist:
-                return this->ScientistCount;
-        case RoleTypes__Enum::Engineer:
-                return this->EngineerCount;
-        case RoleTypes__Enum::Tracker:
-                return this->TrackerCount;
-        case RoleTypes__Enum::Noisemaker:
-                return this->NoisemakerCount;
-        case RoleTypes__Enum::GuardianAngel:
-                return this->GuardianAngelCount;
-        case RoleTypes__Enum::Crewmate:
-                return this->MaxCrewmates;
-        default:
-                /*#ifdef _DEBUG
-                                assert(false);
-                #endif*/
-                return 0;
-        }
+    switch (role) {
+    case RoleTypes__Enum::Shapeshifter:
+        return this->ShapeshifterCount;
+    case RoleTypes__Enum::Phantom:
+        return this->PhantomCount;
+    case RoleTypes__Enum::Viper:
+        return this->ViperCount;
+    case RoleTypes__Enum::Impostor:
+        return this->ImpostorCount;
+    case RoleTypes__Enum::Scientist:
+        return this->ScientistCount;
+    case RoleTypes__Enum::Engineer:
+        return this->EngineerCount;
+    case RoleTypes__Enum::Tracker:
+        return this->TrackerCount;
+    case RoleTypes__Enum::Noisemaker:
+        return this->NoisemakerCount;
+    case RoleTypes__Enum::Detective:
+        return this->DetectiveCount;
+    case RoleTypes__Enum::GuardianAngel:
+        return this->GuardianAngelCount;
+    case RoleTypes__Enum::Crewmate:
+        return this->MaxCrewmates;
+    default:
+        /*#ifdef _DEBUG
+                assert(false);
+        #endif*/
+        return 0;
+    }
 }
 
 void RoleRates::SubtractRole(RoleTypes__Enum role) {
-        if (role == RoleTypes__Enum::Shapeshifter)
-        {
-                if (this->ShapeshifterCount < 1)
-                        return;
-                this->ShapeshifterCount--;
-                this->ImpostorCount--;
-        }
-        else if (role == RoleTypes__Enum::Phantom)
-        {
-                if (this->PhantomCount < 1)
-                        return;
-                this->PhantomCount--;
-                this->ImpostorCount--;
-        }
-        else if (role == RoleTypes__Enum::Impostor)
-        {
-                if (this->ImpostorCount < 1)
-                        return;
-                this->ImpostorCount--;
-                this->ShapeshifterCount--;
-                this->PhantomCount--;
-        }
-        else if (role == RoleTypes__Enum::Scientist)
-        {
-                if (this->ScientistCount < 1)
-                        return;
-                this->ScientistCount--;
-        }
-        else if (role == RoleTypes__Enum::Engineer)
-        {
-                if (this->EngineerCount < 1)
-                        return;
-                this->EngineerCount--;
-        }
-        else if (role == RoleTypes__Enum::Tracker)
-        {
-                if (this->TrackerCount < 1)
-                        return;
-                this->TrackerCount--;
-        }
-        else if (role == RoleTypes__Enum::Noisemaker)
-        {
-                if (this->NoisemakerCount < 1)
-                        return;
-                this->NoisemakerCount--;
-        }
-        /*else if (role == RoleTypes__Enum::GuardianAngel)
-        {
-                if (this->GuardianAngelCount < 1)
-                        return;
-                this->GuardianAngelCount--;
-        }*/ //why does this even exist
+    if (role == RoleTypes__Enum::Shapeshifter)
+    {
+        if (this->ShapeshifterCount < 1)
+            return;
+        this->ShapeshifterCount--;
+        this->ImpostorCount--;
+    }
+    else if (role == RoleTypes__Enum::Phantom)
+    {
+        if (this->PhantomCount < 1)
+            return;
+        this->PhantomCount--;
+        this->ImpostorCount--;
+    }
+    else if (role == RoleTypes__Enum::Impostor)
+    {
+        if (this->ImpostorCount < 1)
+            return;
+        this->ImpostorCount--;
+        this->ShapeshifterCount--;
+        this->PhantomCount--;
+    }
+    else if (role == RoleTypes__Enum::Scientist)
+    {
+        if (this->ScientistCount < 1)
+            return;
+        this->ScientistCount--;
+    }
+    else if (role == RoleTypes__Enum::Engineer)
+    {
+        if (this->EngineerCount < 1)
+            return;
+        this->EngineerCount--;
+    }
+    else if (role == RoleTypes__Enum::Tracker)
+    {
+        if (this->TrackerCount < 1)
+            return;
+        this->TrackerCount--;
+    }
+    else if (role == RoleTypes__Enum::Noisemaker)
+    {
+        if (this->NoisemakerCount < 1)
+            return;
+        this->NoisemakerCount--;
+    }
+    /*else if (role == RoleTypes__Enum::GuardianAngel)
+    {
+        if (this->GuardianAngelCount < 1)
+            return;
+        this->GuardianAngelCount--;
+    }*/ //why does this even exist
 }
 
 int GetMaxImpostorAmount(int playerAmount)
 {
-        GameOptions options;
-        if (State.CustomImpostorAmount)
-                return State.ImpostorCount;
-        if (options.GetGameMode() == GameModes__Enum::HideNSeek)
-                return 1; //pointless to use min here
-        if (playerAmount >= 9)
-                return min(options.GetNumImpostors(), 3);
-        if (playerAmount >= 7)
-                return min(options.GetNumImpostors(), 2);
-        //fix issue #9
-        return 1;
+    GameOptions options;
+    if (State.CustomImpostorAmount)
+        return State.ImpostorCount;
+    if (options.GetGameMode() == GameModes__Enum::HideNSeek)
+        return 1; //pointless to use min here
+    if (playerAmount >= 9)
+        return min(options.GetNumImpostors(), 3);
+    if (playerAmount >= 7)
+        return min(options.GetNumImpostors(), 2);
+    //fix issue #9
+    return 1;
 }
 
 int GenerateRandomNumber(int min, int max)
 {
-        std::random_device dev;
-        std::mt19937 rng(dev());
-        std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
-        return dist(rng);
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
+    return dist(rng);
 }
 
 Vector2 GetTrueAdjustedPosition(PlayerControl* playerControl)
 {
-        Vector2 playerVector2 = PlayerControl_GetTruePosition(playerControl, NULL);
-        playerVector2.y += 0.3636f; //correct accuracy to 4 places
-        return playerVector2;
+    Vector2 playerVector2 = PlayerControl_GetTruePosition(playerControl, NULL);
+    playerVector2.y += 0.3636f; //correct accuracy to 4 places
+    return playerVector2;
 }
 
 #pragma region PlayerSelection
 PlayerSelection::PlayerSelection() noexcept
 {
-        this->reset();
+    this->reset();
 }
 
 PlayerSelection::PlayerSelection(const PlayerControl* playerControl) {
-        if (Object_1_IsNotNull((Object_1*)playerControl)) {
-                this->clientId = playerControl->fields._.OwnerId;
-                this->playerId = playerControl->fields.PlayerId;
-        }
-        else {
-                this->reset();
-        }
+    if (Object_1_IsNotNull((Object_1*)playerControl)) {
+        this->clientId = playerControl->fields._.OwnerId;
+        this->playerId = playerControl->fields.PlayerId;
+    }
+    else {
+        this->reset();
+    }
 }
 
 PlayerSelection::PlayerSelection(NetworkedPlayerInfo* playerData) {
-        new (this)PlayerSelection(playerData->fields._object);
+    new (this)PlayerSelection(playerData->fields._object);
 }
 
 PlayerSelection::PlayerSelection(const PlayerSelection::Result& result) {
-        new (this)PlayerSelection(result.has_value() ? result.get_PlayerControl() : nullptr);
+    new (this)PlayerSelection(result.has_value() ? result.get_PlayerControl() : nullptr);
 }
 
 PlayerSelection::Result PlayerSelection::validate() {
-        auto playerControl = this->get_PlayerControl();
-        if (playerControl) {
-                auto playerData = app::PlayerControl_get_Data((*playerControl), nullptr);
-                if (playerData) {
-                        return { (*playerControl), playerData };
-                }
+    auto playerControl = this->get_PlayerControl();
+    if (playerControl) {
+        auto playerData = app::PlayerControl_get_Data((*playerControl), nullptr);
+        if (playerData) {
+            return { (*playerControl), playerData };
         }
-        this->reset();
-        return {};
+    }
+    this->reset();
+    return {};
 }
 
 bool PlayerSelection::equals(const PlayerSelection& selectedPlayer) const
 {
-        if (this == &selectedPlayer) return true;
-        if (!this->has_value() || !selectedPlayer.has_value()) return false;
-        return std::tie(clientId, playerId) == std::tie(selectedPlayer.clientId, selectedPlayer.playerId);
+    if (this == &selectedPlayer) return true;
+    if (!this->has_value() || !selectedPlayer.has_value()) return false;
+    return std::tie(clientId, playerId) == std::tie(selectedPlayer.clientId, selectedPlayer.playerId);
 }
 
 bool PlayerSelection::equals(const PlayerSelection::Result& selectedPlayer) const {
-        if (!this->has_value() || !selectedPlayer.has_value()) return false;
-        if (clientId == Game::HostInherit) {
-                return playerId == selectedPlayer.get_PlayerControl()->fields.PlayerId;
-        }
-        return std::tie(clientId, playerId) ==
-                std::tie(selectedPlayer.get_PlayerControl()->fields._.OwnerId,
-                        selectedPlayer.get_PlayerControl()->fields.PlayerId);
+    if (!this->has_value() || !selectedPlayer.has_value()) return false;
+    if (clientId == Game::HostInherit) {
+        return playerId == selectedPlayer.get_PlayerControl()->fields.PlayerId;
+    }
+    return std::tie(clientId, playerId) ==
+        std::tie(selectedPlayer.get_PlayerControl()->fields._.OwnerId,
+            selectedPlayer.get_PlayerControl()->fields.PlayerId);
 }
 
 std::optional<PlayerControl*> PlayerSelection::get_PlayerControl() const {
-        if (!this->has_value())
-                return std::nullopt;
-
-        if (clientId == Game::HostInherit) {
-                auto playerControl = GetPlayerControlById(this->playerId);
-                if (Object_1_IsNotNull((Object_1*)playerControl))
-                        return playerControl;
-#if _DEBUG
-                if (playerControl) {
-                        // oops: game bug
-                        STREAM_ERROR(ToString(playerControl) << " playerControl is invalid");
-                }
-#endif
-        }
-
-        for (auto client : GetAllClients()) {
-                if (client->fields.Id == this->clientId) {
-                        if (auto playerControl = client->fields.Character;
-                                Object_1_IsNotNull((Object_1*)playerControl)) {
-                                return playerControl;
-                        }
-#if _DEBUG
-                        if (client->fields.Character) {
-                                // oops: game bug
-                                STREAM_ERROR(ToString(client->fields.Character) << " Character is invalid");
-                        }
-#endif
-                        return std::nullopt;
-                }
-        }
-
+    if (!this->has_value())
         return std::nullopt;
+
+    if (clientId == Game::HostInherit) {
+        auto playerControl = GetPlayerControlById(this->playerId);
+        if (Object_1_IsNotNull((Object_1*)playerControl))
+            return playerControl;
+#if _DEBUG
+        if (playerControl) {
+            // oops: game bug
+            STREAM_ERROR(ToString(playerControl) << " playerControl is invalid");
+        }
+#endif
+    }
+
+    for (auto client : GetAllClients()) {
+        if (client->fields.Id == this->clientId) {
+            if (auto playerControl = client->fields.Character;
+                Object_1_IsNotNull((Object_1*)playerControl)) {
+                return playerControl;
+            }
+#if _DEBUG
+            if (client->fields.Character) {
+                // oops: game bug
+                STREAM_ERROR(ToString(client->fields.Character) << " Character is invalid");
+            }
+#endif
+            return std::nullopt;
+        }
+    }
+
+    return std::nullopt;
 }
 
 std::optional<NetworkedPlayerInfo*> PlayerSelection::get_PlayerData() const
 {
-        if (auto data = GetPlayerData(this->get_PlayerControl().value_or(nullptr));
-                data != nullptr) {
-                return data;
-        }
-        return std::nullopt;
+    if (auto data = GetPlayerData(this->get_PlayerControl().value_or(nullptr));
+        data != nullptr) {
+        return data;
+    }
+    return std::nullopt;
 }
 #pragma endregion
 
 ImVec4 AmongUsColorToImVec4(const Color& color) {
-        return ImVec4(color.r, color.g, color.b, color.a);
+    return ImVec4(color.r, color.g, color.b, color.a);
 }
 
 ImVec4 AmongUsColorToImVec4(const Color32& color) {
-        static_assert(offsetof(Color32, a) + sizeof(Color32::a) == sizeof(Color32::rgba), "Color32 must be defined as union");
-        return ImVec4(color.r / 255.0F, color.g / 255.0F, color.b / 255.0F, color.a / 255.0F);
+    static_assert(offsetof(Color32, a) + sizeof(Color32::a) == sizeof(Color32::rgba), "Color32 must be defined as union");
+    return ImVec4(color.r / 255.0F, color.g / 255.0F, color.b / 255.0F, color.a / 255.0F);
 }
 
 #define LocalInGame (((*Game::pAmongUsClient)->fields._.NetworkMode == NetworkModes__Enum::LocalGame) && ((*Game::pAmongUsClient)->fields._.GameState == InnerNetClient_GameStates__Enum::Started))
@@ -272,536 +290,531 @@ ImVec4 AmongUsColorToImVec4(const Color32& color) {
 #define TutorialScene (!State.CurrentScene.compare("Tutorial"))
 
 bool IsInLobby() {
-        if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
-        if (!app::GameManager_get_Instance(nullptr)) return false;
-        return (LocalInLobby || OnlineInLobby) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
+    if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
+    if (!app::GameManager_get_Instance(nullptr)) return false;
+    return (LocalInLobby || OnlineInLobby) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
 }
 
 bool IsHost() {
-        if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
-        return app::InnerNetClient_get_AmHost((InnerNetClient*)(*Game::pAmongUsClient), NULL);
+    if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
+    return app::InnerNetClient_get_AmHost((InnerNetClient*)(*Game::pAmongUsClient), NULL);
 }
 
 bool IsModdedHost() {
-        return State.DisableHostAnticheat;
+    return State.DisableHostAnticheat;
 }
 
 bool IsInGame() {
-        if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
-        if (!app::GameManager_get_Instance(nullptr)) return false;
-        return (LocalInGame || OnlineInGame || TutorialScene) && (Object_1_IsNotNull((Object_1*)*Game::pShipStatus) || State.GameLoaded) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
+    if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
+    if (!app::GameManager_get_Instance(nullptr)) return false;
+    return (LocalInGame || OnlineInGame || TutorialScene) && (Object_1_IsNotNull((Object_1*)*Game::pShipStatus) || State.GameLoaded) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
 }
 
 bool IsInMultiplayerGame() {
-        if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
-        if (!app::GameManager_get_Instance(nullptr)) return false;
-        return (LocalInGame || OnlineInGame) && (Object_1_IsNotNull((Object_1*)*Game::pShipStatus) || State.GameLoaded) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
+    if (Object_1_IsNull((Object_1*)*Game::pAmongUsClient)) return false;
+    if (!app::GameManager_get_Instance(nullptr)) return false;
+    return (LocalInGame || OnlineInGame) && (Object_1_IsNotNull((Object_1*)*Game::pShipStatus) || State.GameLoaded) && Object_1_IsNotNull((Object_1*)*Game::pLocalPlayer);
 }
 
 bool IsColorBlindMode() {
-        if (auto settings = DataManager_get_Settings(nullptr)) {
-                if (auto accessibility = SettingsData_get_Accessibility(settings, nullptr)) {
-                        return AccessibilitySettingsData_get_ColorBlindMode(accessibility, nullptr);
-                }
+    if (auto settings = DataManager_get_Settings(nullptr)) {
+        if (auto accessibility = SettingsData_get_Accessibility(settings, nullptr)) {
+            return AccessibilitySettingsData_get_ColorBlindMode(accessibility, nullptr);
         }
-        return false;
+    }
+    return false;
 }
 
 bool IsStreamerMode() {
-        if (auto settings = DataManager_get_Settings(nullptr)) {
-                if (auto gameplay = SettingsData_get_Gameplay(settings, nullptr)) {
-                        return GameplaySettingsData_get_StreamerMode(gameplay, nullptr);
-                }
+    if (auto settings = DataManager_get_Settings(nullptr)) {
+        if (auto gameplay = SettingsData_get_Gameplay(settings, nullptr)) {
+            return GameplaySettingsData_get_StreamerMode(gameplay, nullptr);
         }
-        return false;
+    }
+    return false;
 }
 
 bool IsChatCensored() {
-        if (auto settings = DataManager_get_Settings(nullptr)) {
-                if (auto multiplayer = SettingsData_get_Multiplayer(settings, nullptr)) {
-                        return MultiplayerSettingsData_get_CensorChat(multiplayer, nullptr);
-                }
+    if (auto settings = DataManager_get_Settings(nullptr)) {
+        if (auto multiplayer = SettingsData_get_Multiplayer(settings, nullptr)) {
+            return MultiplayerSettingsData_get_CensorChat(multiplayer, nullptr);
         }
-        return false;
+    }
+    return false;
 }
 
 std::string GetHostUsername(bool colored) {
-        if (IsInGame() || IsInLobby() && !colored)
-                return convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.PlayerName);
-        if (IsInGame() || IsInLobby()) {
-                Color32 color = GetPlayerColor(GetPlayerOutfit(GetPlayerData(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Character))->fields.ColorId);
-                std::string username = convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.PlayerName);
-                return std::format("<#{:02x}{:02x}{:02x}>{}</color>", color.r, color.g, color.b, RemoveHtmlTags(username));
-        }
-        return "";
+    if (IsInGame() || IsInLobby() && !colored)
+        return convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.PlayerName);
+    if (IsInGame() || IsInLobby()) {
+        Color32 color = GetPlayerColor(GetPlayerOutfit(GetPlayerData(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Character))->fields.ColorId);
+        std::string username = convert_from_string(InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.PlayerName);
+        return std::format("<#{:02x}{:02x}{:02x}>{}</color>", color.r, color.g, color.b, RemoveHtmlTags(username));
+    }
+    return "";
 }
 
 std::string RemoveHtmlTags(std::string html_str) {
-        std::regex tags("<[^>]*>");
-        std::string remove{};
-        return std::regex_replace(html_str, tags, remove);
+    std::regex tags("<[^>]*>");
+    std::string remove{};
+    return std::regex_replace(html_str, tags, remove);
 }
 
 bool IsNameValid(std::string str) {
-        if (str == "") return false;
-        /*(std::vector<std::string> properChars = {}; //check properly for length
-        String* blank = convert_to_string("");
-        std::string last_char = "";
-        for (size_t i = 0; i < str.length(); i++) {
-                if (convert_to_string(last_char + str[i]) == blank) {
-                        last_char += str[i];
-                        continue;
-                }
-                properChars.push_back(last_char + str[i]);
-                last_char = "";
-        }*/
-        if (convert_to_string(str)->fields.m_stringLength > 12) return false;
-        if (str.find("<") != std::string::npos || str.find(">") != std::string::npos ||
-                str.find("=") != std::string::npos || str.find("-") != std::string::npos ||
-                str.find("\\") != std::string::npos || str.find(":") != std::string::npos ||
-                str.find("#") != std::string::npos || str.find("[") != std::string::npos ||
-                str.find("'") != std::string::npos) return false;
-        return true;
+    if (str == "") return false;
+    /*(std::vector<std::string> properChars = {}; //check properly for length
+    String* blank = convert_to_string("");
+    std::string last_char = "";
+    for (size_t i = 0; i < str.length(); i++) {
+        if (convert_to_string(last_char + str[i]) == blank) {
+            last_char += str[i];
+            continue;
+        }
+        properChars.push_back(last_char + str[i]);
+        last_char = "";
+    }*/
+    if (convert_to_string(str)->fields.m_stringLength > 10) return false;
+    if (str.find("<") != std::string::npos || str.find(">") != std::string::npos ||
+        str.find("=") != std::string::npos || str.find("-") != std::string::npos ||
+        str.find("\\") != std::string::npos || str.find(":") != std::string::npos ||
+        str.find("#") != std::string::npos || str.find("[") != std::string::npos ||
+        str.find("'") != std::string::npos) return false;
+    return true;
 }
 
 bool IsChatValid(std::string msg) {
-        if (!State.SafeMode) return true;
-        /*(std::vector<std::string> properChars = {}; //check properly for length
-        String* blank = convert_to_string("");
-        std::string last_char = "";
-        for (size_t i = 0; i < str.length(); i++) {
-                if (convert_to_string(last_char + str[i]) == blank) {
-                        last_char += str[i];
-                        continue;
-                }
-                properChars.push_back(last_char + str[i]);
-                last_char = "";
-        }*/
-        if (convert_to_string(msg)->fields.m_stringLength > 120) return false;
-        if (msg.find("<") != std::string::npos || msg.find(">") != std::string::npos || msg.find("[") != std::string::npos) return false;
-        return true;
+    if (!State.SafeMode) return true;
+    /*(std::vector<std::string> properChars = {}; //check properly for length
+    String* blank = convert_to_string("");
+    std::string last_char = "";
+    for (size_t i = 0; i < str.length(); i++) {
+        if (convert_to_string(last_char + str[i]) == blank) {
+            last_char += str[i];
+            continue;
+        }
+        properChars.push_back(last_char + str[i]);
+        last_char = "";
+    }*/
+    if (convert_to_string(msg)->fields.m_stringLength > 120) return false;
+    if (msg.find("<") != std::string::npos || msg.find(">") != std::string::npos || msg.find("[") != std::string::npos) return false;
+    return true;
 }
 
 NetworkedPlayerInfo* GetPlayerData(PlayerControl* player) {
-        if (player) return app::PlayerControl_get_Data(player, NULL);
-        return NULL;
+    if (player) return app::PlayerControl_get_Data(player, NULL);
+    return NULL;
 }
 
 NetworkedPlayerInfo* GetPlayerDataById(Game::PlayerId id) {
-        return app::GameData_GetPlayerById((*Game::pGameData), id, NULL);
+    return app::GameData_GetPlayerById((*Game::pGameData), id, NULL);
 }
 
 PlayerControl* GetPlayerControlById(Game::PlayerId id) {
-        for (auto player : GetAllPlayerControl()) {
-                if (player->fields.PlayerId == id) return player;
-        }
+    for (auto player : GetAllPlayerControl()) {
+        if (player->fields.PlayerId == id) return player;
+    }
 
-        return NULL;
+    return NULL;
 }
 
 bool IsColorAvailable(int colorId) {
-        for (auto player : GetAllPlayerData()) {
-                if (GetPlayerOutfit(player)->fields.ColorId == colorId) { //aw hell nah, i made a classic mistake: forgetting another =
-                        return false;
-                        break;
-                }
+    for (auto player : GetAllPlayerData()) {
+        if (GetPlayerOutfit(player)->fields.ColorId == colorId) { //aw hell nah, i made a classic mistake: forgetting another =
+            return false;
+            break;
         }
-        return true;
+    }
+    return true;
 }
 
 std::string GenerateRandomString(bool completelyRandom) {
-        if (completelyRandom) {
-                std::string allowedChars = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-                int outputLength = randi(0, 9) % 10 + 1;
+    if (completelyRandom) {
+        std::string allowedChars = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        int outputLength = randi(0, 9) % 10 + 1;
 
-                int randomIndex;
-                std::string outputString = "";
+        int randomIndex;
+        std::string outputString = "";
 
-                for (int i = 0; i < outputLength; ++i) {
-                        randomIndex = rand() % (allowedChars.length() - 1);
-                        outputString += allowedChars[randomIndex];
-                }
-                return outputString;
+        for (int i = 0; i < outputLength; ++i) {
+            randomIndex = rand() % (allowedChars.length() - 1);
+            outputString += allowedChars[randomIndex];
         }
-        else {
-                std::vector<std::string> threeLetters = { "ace", "ado", "age", "air", "ant", "apt", "art", "awe", "axe", "bag", "bat", "bay", "bay", "bee", "big", "bin", "bow", "bud", "bug", "bus", "bye", "cab", "can", "car", "cat", "cod", "cos", "cow", "coy", "cub", "cud", "cue", "dam", "day", "den", "dew", "dim", "dot", "due", "due", "dun", "ebb", "egg", "elf", "far", "fax", "fee", "few", "fey", "fin", "fir", "fit", "fly", "fog", "fox", "fun", "fur", "gap", "gen", "gig", "gnu", "gun", "gym", "hay", "hen", "hod", "hue", "ice", "ink", "inn", "jam", "jar", "jet", "jib", "jog", "joy", "key", "key", "kin", "kit", "kop", "lap", "lea", "lid", "lip", "lot", "lug", "map", "mid", "mop", "mud", "net", "net", "new", "nib", "nil", "nth", "oak", "oar", "oil", "one", "one", "ore", "our", "own", "pad", "pan", "pea", "pen", "pie", "pin", "pip", "pit", "pod", "pug", "pun", "pup", "rag", "ray", "ria", "rib", "rug", "saw", "sea", "set", "set", "she", "shy", "spa", "spy", "sty", "sum", "sun", "sup", "tab", "tag", "tan", "tap", "tax", "tea", "tee", "ten", "tie", "tin", "tip", "toy", "tub", "use", "vac", "van", "vet", "wad", "wax", "web", "wig", "wit", "wok", "wry", "yea", "yen", "yon", "zoo" };
-                std::vector<std::string> fourLetters = { "able", "aged", "agog", "aide", "airy", "ajar", "akin", "ammo", "apex", "arch", "arch", "arty", "ashy", "atom", "auto", "avid", "away", "awed", "baby", "band", "bank", "bark", "barn", "base", "base", "bass", "bass", "bath", "bead", "beam", "bean", "bear", "beef", "bend", "best", "bevy", "bike", "bill", "bine", "blog", "blot", "blue", "blur", "boar", "bold", "bold", "bolt", "book", "boot", "born", "boss", "both", "bowl", "boxy", "brag", "brim", "buff", "bulb", "bump", "bunk", "burr", "busy", "cafe", "cake", "calf", "calm", "cane", "cape", "card", "care", "carp", "cart", "case", "cash", "cask", "cave", "cell", "cent", "chic", "chin", "chip", "chop", "city", "clad", "claw", "clay", "clef", "clip", "clod", "clog", "club", "clue", "coal", "coat", "coda", "code", "coin", "colt", "comb", "cook", "cool", "copy", "cord", "core", "cork", "corn", "cosy", "crab", "crew", "crib", "crop", "crow", "cube", "cult", "curd", "curl", "dame", "damp", "dark", "dart", "dash", "dawn", "dear", "deep", "deer", "deft", "desk", "dhal", "dhow", "dial", "dice", "diet", "disc", "dish", "doer", "doll", "dome", "done", "door", "dove", "dray", "drop", "drum", "dual", "duck", "duct", "dusk", "each", "east", "east", "easy", "echo", "ecru", "edge", "edgy", "envy", "epic", "euro", "even", "ewer", "exam", "exit", "fain", "fair", "fair", "fall", "fare", "farm", "fast", "faun", "fawn", "feet", "fell", "fern", "fife", "file", "film", "fine", "fire", "firm", "fish", "five", "flag", "flat", "flax", "flea", "flex", "flit", "flue", "flux", "foal", "foam", "fond", "font", "food", "fore", "form", "foxy", "free", "fuse", "fuss", "gaff", "gala", "gale", "game", "game", "gamy", "gaol", "gate", "germ", "ghat", "gill", "gilt", "glad", "glue", "goal", "goat", "gold", "gold", "gone", "good", "gram", "grey", "grid", "grub", "gulf", "gull", "gust", "hair", "hale", "half", "half", "hall", "hare", "hazy", "heap", "heat", "herd", "hero", "hewn", "hill", "hind", "hive", "home", "home", "hood", "hoof", "hoop", "hour", "huge", "hunt", "iced", "idea", "inch", "inky", "iron", "item", "jail", "joke", "just", "kame", "keel", "keen", "keep", "kelp", "kerb", "king", "kite", "knee", "knot", "kohl", "lace", "lacy", "lamb", "lamp", "lane", "late", "lava", "lawn", "laze", "lead", "leaf", "lean", "left", "lens", "life", "like", "limb", "line", "link", "lino", "lion", "live", "load", "loaf", "loan", "loch", "loft", "logo", "lone", "long", "look", "loop", "lord", "lost", "loud", "luck", "lure", "lush", "mail", "mall", "mane", "many", "mast", "maze", "meal", "meet", "mega", "menu", "mere", "mews", "mice", "mike", "mild", "mill", "mime", "mind", "mine", "mine", "mini", "mint", "mint", "mire", "mitt", "mole", "mood", "moon", "moor", "more", "moss", "most", "much", "musk", "myth", "name", "nave", "navy", "neap", "near", "neat", "neck", "need", "nest", "news", "next", "nice", "nosh", "note", "noun", "nova", "nowt", "null", "numb", "oast", "odds", "ogee", "once", "only", "open", "open", "oval", "oval", "over", "pace", "page", "pail", "pair", "pall", "palm", "park", "part", "past", "past", "path", "pawl", "peak", "peak", "pear", "peel", "pile", "pill", "pink", "pins", "pith", "pity", "plan", "plot", "plum", "plus", "plus", "poem", "poet", "pony", "pool", "pore", "port", "posh", "pout", "pram", "prey", "prim", "prow", "puce", "pure", "purr", "quay", "quin", "quip", "quiz", "raft", "rail", "rain", "rake", "ramp", "rare", "reed", "rent", "rest", "rich", "rife", "ripe", "rise", "road", "roan", "roof", "rope", "rose", "rose", "rosy", "ruby", "ruff", "rule", "rung", "rust", "safe", "saga", "sage", "sail", "sake", "sale", "salt", "salt", "same", "sand", "sane", "save", "scar", "seal", "seam", "seer", "sett", "shed", "ship", "shoe", "shop", "shot", "show", "side", "sign", "silk", "sine", "sink", "site", "size", "skew", "skip", "slab", "sloe", "slow", "slub", "snap", "snow", "snub", "snug", "sock", "sofa", "soil", "sole", "sole", "solo", "some", "song", "soup", "spam", "span", "spar", "spot", "spry", "stag", "star", "stem", "such", "suet", "sure", "swan", "swap", "tale", "tall", "tame", "tank", "tape", "task", "taut", "taxi", "team", "tear", "teat", "tent", "term", "test", "text", "then", "thud", "tick", "tide", "tidy", "tile", "till", "time", "tiny", "toad", "tofu", "toga", "toil", "tomb", "tour", "town", "trad", "tram", "trap", "tray", "trio", "true", "trug", "tsar", "tube", "tuna", "tune", "turf", "turn", "tusk", "twee", "twig", "twin", "twin", "type", "tyre", "unit", "used", "vase", "vast", "veal", "veil", "very", "vest", "view", "vote", "wail", "wall", "wand", "ward", "warm", "wary", "wasp", "wave", "wavy", "waxy", "week", "weir", "well", "well", "west", "west", "whey", "whim", "whip", "wide", "wild", "wile", "will", "wily", "wind", "wing", "wipe", "wire", "wise", "wise", "wish", "wont", "wont", "wool", "worn", "wove", "wren", "yawl", "yawn", "year", "yoke", "yolk", "zany", "zany", "zing" };
-                std::vector<std::string> fiveLetters = { "ackee", "actor", "acute", "adept", "afoot", "agile", "aglow", "alarm", "album", "alert", "alike", "alive", "alkyl", "alkyl", "alloy", "alone", "alpha", "alpha", "amber", "amber", "ample", "angle", "apple", "apron", "arena", "argon", "arrow", "aside", "astir", "atlas", "attic", "audio", "aunty", "avail", "awake", "award", "aware", "awash", "axial", "azure", "badge", "baggy", "balmy", "barge", "basal", "basic", "basin", "basis", "baths", "baton", "baulk", "beach", "beads", "beady", "beefy", "beery", "beige", "bench", "berry", "bhaji", "bidet", "bijou", "bitty", "blank", "blase", "blaze", "bling", "bliss", "bliss", "block", "bloke", "blond", "blues", "blurb", "board", "bonny", "bonus", "booth", "boric", "bound", "bower", "brake", "brass", "brass", "brave", "break", "bream", "bride", "brief", "briny", "brisk", "broad", "broom", "brown", "brown", "bugle", "built", "bulky", "bumpy", "bunch", "cabin", "cable", "cairn", "calyx", "canny", "canoe", "canto", "caret", "cargo", "chain", "chalk", "charm", "chart", "chary", "chess", "chest", "chewy", "chief", "chief", "chill", "chine", "chive", "choir", "chump", "cinch", "civic", "civil", "claim", "clank", "class", "clear", "clerk", "cliff", "cloak", "clock", "close", "cloth", "cloud", "clove", "clump", "coach", "coast", "cocoa", "combe", "comfy", "comic", "comic", "comma", "conic", "coomb", "copse", "coral", "coral", "corps", "court", "coven", "cover", "crane", "crate", "crisp", "crisp", "croak", "crony", "crowd", "crown", "crumb", "crust", "cubic", "curly", "curve", "daily", "dairy", "dairy", "daisy", "dance", "dazed", "delta", "demob", "denim", "diary", "digit", "diner", "dinky", "disco", "ditch", "diver", "divot", "dizzy", "dodge", "domed", "doubt", "dozen", "draft", "drain", "drama", "drawl", "drawn", "dream", "dress", "dried", "drier", "drill", "drink", "drive", "droll", "drone", "duple", "dusky", "dusty", "eager", "eagle", "early", "eater", "elder", "elect", "elfin", "elite", "email", "envoy", "epoch", "equal", "error", "ether", "ethic", "event", "every", "exact", "extra", "facet", "faint", "famed", "fancy", "farad", "fated", "feast", "fence", "ferny", "ferry", "fever", "fibre", "fiery", "filmy", "final", "finch", "fishy", "fizzy", "flash", "flash", "flask", "fleet", "fleet", "flick", "flies", "flock", "flood", "floor", "flour", "fluid", "fluid", "flush", "flute", "focal", "focus", "foggy", "force", "forge", "forty", "fount", "frame", "frank", "fresh", "front", "frost", "frown", "funny", "furry", "furze", "futon", "fuzzy", "gable", "gamma", "gamut", "gauzy", "gecko", "ghost", "giant", "giant", "giddy", "given", "glace", "glass", "glaze", "gleam", "globe", "glory", "glove", "gluey", "going", "goods", "goody", "gooey", "goose", "gorse", "gouge", "gourd", "grace", "grain", "grand", "grand", "grape", "graph", "grasp", "great", "green", "groat", "group", "grown", "guard", "guest", "guide", "guise", "gummy", "gusty", "hanky", "happy", "hardy", "hasty", "heads", "heaps", "heavy", "hedge", "hefty", "helix", "herby", "hertz", "hewer", "hilly", "hinge", "hobby", "holey", "homey", "honey", "hoppy", "hotel", "humid", "husky", "husky", "hutch", "hyena", "icing", "ideal", "image", "imago", "index", "inner", "ionic", "irons", "ivory", "jacks", "jaggy", "jammy", "jazzy", "jeans", "jelly", "jewel", "jokey", "jolly", "juice", "jumbo", "jumbo", "jumpy", "kazoo", "khaki", "kiosk", "knife", "knurl", "koala", "label", "laird", "large", "larky", "larva", "laser", "lasso", "latex", "lathe", "latte", "layer", "leafy", "leaky", "least", "ledge", "leech", "leggy", "lemon", "lento", "level", "level", "lever", "lilac", "limit", "linen", "liner", "litre", "loads", "loamy", "local", "lofty", "logic", "lolly", "loose", "lorry", "loser", "lotto", "lower", "lucid", "lucky", "lunar", "lunch", "lupin", "lyric", "lyric", "magic", "magic", "major", "malty", "mango", "marly", "marsh", "maser", "match", "matey", "maths", "mauve", "mayor", "mealy", "meaty", "medal", "media", "mercy", "merry", "metal", "metal", "meter", "metre", "micro", "miner", "minty", "misty", "mixed", "mixer", "modal", "model", "model", "molar", "month", "moral", "moral", "motel", "motet", "mothy", "motor", "motor", "motte", "mould", "mouse", "mousy", "mouth", "movie", "muddy", "mulch", "mural", "music", "musty", "muted", "natty", "naval", "navvy", "newel", "newsy", "nifty", "night", "ninja", "noble", "noise", "nomad", "north", "north", "notch", "noted", "novel", "novel", "oaken", "ocean", "olden", "olive", "onion", "onset", "orbit", "order", "other", "outer", "outer", "overt", "owing", "oxide", "ozone", "pacer", "pager", "paint", "pally", "palmy", "panda", "paper", "party", "pasty", "patch", "pause", "peace", "peach", "peaky", "pearl", "pearl", "peaty", "peeve", "pence", "penny", "perch", "perky", "petal", "phone", "photo", "piano", "pilot", "pitch", "pithy", "piton", "place", "plain", "plain", "plane", "plank", "plant", "plumy", "plush", "point", "polar", "polka", "porch", "posse", "pouch", "pound", "pouty", "power", "prank", "prawn", "price", "pride", "prime", "prime", "prior", "prism", "privy", "prize", "prize", "prone", "proof", "proof", "prose", "proud", "pulpy", "pupal", "pupil", "puppy", "puree", "purse", "quark", "quart", "query", "quest", "quick", "quiet", "quill", "quilt", "quirk", "quits", "radar", "radio", "radio", "rainy", "rally", "ranch", "range", "rapid", "raven", "razor", "ready", "recap", "redox", "reedy", "regal", "reign", "relay", "remit", "reply", "resit", "retro", "rhyme", "rider", "ridge", "rifle", "right", "rigid", "rimed", "risky", "river", "roast", "robin", "robot", "rocky", "rooms", "roomy", "roost", "round", "route", "royal", "royal", "ruler", "runic", "rural", "rusty", "sable", "salad", "salon", "sassy", "sated", "satin", "saute", "scale", "scaly", "scant", "scarf", "scent", "scoop", "scope", "scrub", "scuff", "sedge", "senna", "sense", "sepia", "seven", "shade", "shaky", "shale", "shame", "shank", "shape", "shark", "sharp", "sheer", "sheet", "shelf", "shell", "shiny", "shirt", "shoal", "shock", "shore", "short", "shrug", "shtum", "sieve", "sight", "silky", "silty", "sixer", "skate", "skill", "skirl", "slang", "slaty", "sleek", "sleet", "slice", "slide", "slime", "small", "smart", "smelt", "smoke", "smoky", "snack", "snail", "snake", "snare", "sniff", "snore", "snowy", "solar", "solid", "solid", "sonic", "soppy", "sorry", "sound", "sound", "soupy", "south", "south", "space", "spare", "spark", "spate", "spawn", "spear", "spent", "spicy", "spiel", "spike", "spire", "spite", "splay", "spoon", "sport", "spout", "spree", "squad", "stack", "staff", "stage", "staid", "stain", "stair", "stamp", "stand", "stare", "start", "state", "state", "steak", "steam", "steel", "steep", "stern", "stick", "still", "stock", "stock", "stoic", "stone", "stony", "stool", "store", "stork", "storm", "story", "stout", "strap", "straw", "stray", "stuck", "study", "style", "suave", "sugar", "sunny", "sunup", "super", "surge", "swarm", "sweet", "sweet", "swell", "swell", "swift", "swipe", "swish", "sword", "sworn", "syrup", "table", "tacit", "tamer", "tangy", "taper", "tarry", "taste", "tawny", "tenon", "tense", "tense", "tenth", "terms", "terse", "theme", "these", "thief", "third", "thorn", "those", "three", "tiara", "tidal", "tiger", "tight", "tilde", "tiled", "tined", "tinny", "tipsy", "tired", "title", "toast", "today", "token", "tonal", "tonic", "topic", "torch", "torte", "total", "total", "towel", "tower", "trail", "train", "treat", "trial", "tribe", "trice", "trike", "trill", "trout", "truce", "truck", "trunk", "trunk", "truss", "truth", "twain", "tweak", "twine", "twirl", "uncut", "undue", "union", "upper", "urban", "usual", "utter", "vague", "valid", "value", "vegan", "verse", "video", "visit", "vista", "vital", "vocal", "voice", "vowel", "wacky", "wagon", "waist", "washy", "watch", "water", "waxen", "weave", "weber", "weeny", "weird", "whale", "wheat", "whiff", "whole", "whorl", "widow", "width", "wince", "winch", "windy", "wiper", "wispy", "witty", "woody", "wordy", "world", "worth", "wound", "wreck", "wrist", "yacht", "yogic", "young", "youth", "yummy", "zebra", "zippy", "zonal" };
-                std::vector<std::string> sixLetters = { "ablaze", "access", "acting", "action", "active", "actual", "acuity", "adagio", "adroit", "adverb", "advice", "aerial", "aflame", "afloat", "agency", "airway", "alight", "allied", "allure", "amazed", "amoeba", "amount", "anchor", "annual", "annual", "answer", "apeman", "apical", "arable", "arbour", "arcane", "ardent", "ardour", "armful", "armlet", "armour", "arrant", "artful", "artist", "asleep", "aspect", "asthma", "astral", "astute", "atomic", "august", "auntie", "autumn", "avatar", "badger", "ballet", "banner", "barber", "bardic", "barley", "barrel", "basics", "basket", "bathos", "batten", "battle", "beaded", "beaked", "beaker", "bedbug", "bedsit", "beetle", "belief", "benign", "better", "billow", "binary", "bionic", "biotic", "blazon", "blithe", "blotch", "blouse", "blower", "bluish", "blurry", "bonded", "bonnet", "bonsai", "border", "botany", "bottle", "bounds", "bovine", "breach", "breath", "breeze", "breezy", "brewer", "bridge", "bright", "bronze", "brooch", "bubbly", "bubbly", "bucket", "buckle", "budget", "bumper", "bumper", "bundle", "burger", "burrow", "button", "buzzer", "bygone", "byroad", "cachet", "cactus", "camera", "campus", "canape", "candid", "candle", "canine", "canned", "canopy", "canvas", "carbon", "career", "career", "carpet", "carrot", "carton", "castle", "casual", "catchy", "catnap", "cattle", "causal", "caveat", "caviar", "celery", "cellar", "cement", "centre", "centre", "cereal", "cerise", "chalky", "chance", "chancy", "change", "chatty", "cheery", "cheese", "chilly", "chirpy", "choice", "choice", "choral", "chorus", "chummy", "chunky", "cinder", "cinema", "circle", "circus", "classy", "claves", "clayey", "clever", "clinic", "cloche", "cobweb", "cocoon", "coeval", "coffee", "coffer", "cogent", "collar", "collie", "colour", "column", "comedy", "common", "conger", "conoid", "convex", "cookie", "cooler", "coping", "copper", "copper", "cordon", "corned", "corner", "cosmic", "county", "coupon", "course", "covert", "cowboy", "coyote", "cradle", "craggy", "crayon", "creaky", "credit", "crispy", "crumby", "crunch", "cuboid", "cupola", "curacy", "cursor", "curtsy", "custom", "cyclic", "dainty", "damper", "dapper", "daring", "dative", "dazzle", "debate", "debtor", "decent", "defect", "degree", "deluxe", "demure", "denary", "desert", "desire", "detail", "device", "dexter", "diatom", "dilute", "dimple", "dinghy", "direct", "divide", "divine", "docile", "doctor", "dogged", "doodle", "dotage", "doting", "dotted", "double", "doughy", "dragon", "drapes", "drawer", "dreamy", "dressy", "dulcet", "duplex", "earthy", "earwig", "echoey", "effect", "effort", "eighty", "either", "elated", "eldest", "elfish", "elixir", "embryo", "ending", "energy", "engine", "enough", "enough", "entire", "equine", "eraser", "ermine", "errant", "ersatz", "excise", "excuse", "exempt", "exotic", "expert", "expert", "expiry", "extant", "fabled", "facile", "factor", "fallow", "family", "famous", "farmer", "fecund", "feisty", "feline", "fellow", "fencer", "ferric", "fervid", "fierce", "figure", "filial", "fillip", "finish", "finite", "fiscal", "fitful", "fitted", "flambe", "flaxen", "fleece", "fleecy", "flight", "flinty", "floral", "florid", "flossy", "floury", "flower", "fluent", "fluffy", "fodder", "foible", "folder", "folksy", "forage", "forest", "formal", "former", "fridge", "frieze", "fright", "frilly", "frizzy", "frosty", "frothy", "frozen", "frugal", "funnel", "future", "future", "gabled", "gaffer", "gaiter", "galaxy", "gallon", "galore", "gaming", "gaoler", "garage", "garden", "garlic", "gentle", "gerbil", "gifted", "giggly", "ginger", "girder", "glassy", "glider", "glitzy", "global", "glossy", "glossy", "gloved", "golden", "gopher", "gowned", "grainy", "grassy", "grater", "gratis", "gravel", "grease", "greasy", "greeny", "grilse", "gritty", "groove", "grotto", "ground", "grubby", "grungy", "guitar", "gutter", "hairdo", "haloed", "hamlet", "hammer", "hanger", "hawser", "header", "health", "helper", "hempen", "herbal", "hermit", "heroic", "hiccup", "hinder", "hinged", "homely", "homing", "honest", "hoofed", "hooked", "horsey", "hostel", "hourly", "hubbub", "huddle", "humane", "humble", "humour", "hungry", "hunted", "hunter", "hurray", "hybrid", "hyphen", "iambic", "icicle", "iconic", "iguana", "immune", "inborn", "indoor", "inland", "inmost", "innate", "inrush", "insect", "inside", "inside", "instep", "intact", "intent", "intern", "invite", "inward", "iodine", "ironic", "island", "italic", "jacket", "jagged", "jailer", "jargon", "jaunty", "jingle", "jingly", "jockey", "jocose", "jocund", "jogger", "joggle", "jovial", "joyful", "joyous", "jumble", "jumper", "jungly", "junior", "kennel", "ketone", "kettle", "kilted", "kindly", "kingly", "kirsch", "kitbag", "kitten", "knight", "ladder", "landed", "laptop", "larder", "larval", "latest", "latter", "laurel", "lavish", "lawful", "lawyer", "layman", "leaded", "leaden", "league", "ledger", "legacy", "legend", "legion", "lemony", "lender", "length", "lepton", "lessee", "lesser", "lesson", "lethal", "letter", "liable", "lidded", "likely", "limber", "limpid", "lineal", "linear", "liquid", "lissom", "listed", "litter", "little", "lively", "livery", "living", "living", "lizard", "loaded", "loafer", "locker", "locust", "logger", "lordly", "lounge", "lovely", "loving", "lugger", "lupine", "lustre", "luxury", "madcap", "magnet", "maiden", "maiden", "malted", "mammal", "manful", "manned", "manner", "mantis", "manual", "marble", "margin", "marine", "marked", "market", "maroon", "marshy", "mascot", "massif", "matrix", "matted", "matter", "mature", "meadow", "medial", "median", "medium", "memory", "merest", "meteor", "method", "metric", "mickle", "mickle", "midday", "middle", "middle", "mighty", "milieu", "minded", "minute", "minute", "mirror", "missus", "moated", "mobile", "modern", "modest", "modish", "module", "mohair", "molten", "moment", "mosaic", "motion", "motive", "motive", "motley", "moving", "muckle", "mucous", "muddle", "mulish", "mulled", "mullet", "museum", "mutiny", "mutton", "mutual", "muzzle", "myopia", "myriad", "myriad", "mystic", "mythic", "nachos", "narrow", "nation", "native", "natter", "nature", "nearby", "nether", "nettle", "neuter", "newish", "nimble", "nobody", "normal", "notice", "nought", "number", "object", "oblate", "oblong", "oblong", "occult", "octane", "ocular", "oddity", "offcut", "office", "oldish", "oniony", "online", "onrush", "onside", "onward", "opaque", "opener", "orange", "orange", "origin", "ornate", "orphan", "osprey", "outfit", "owlish", "oxtail", "oxygen", "packed", "packet", "palace", "paltry", "papery", "parade", "parcel", "parody", "parrot", "patchy", "patent", "pathos", "pavane", "peachy", "peaked", "peanut", "pebble", "pebbly", "pedlar", "people", "pepper", "petite", "petrol", "phrase", "picker", "picket", "pickle", "picnic", "pigeon", "pillar", "pillow", "pimple", "pimply", "pincer", "pinion", "piping", "pitted", "placid", "planar", "planet", "plaque", "plenty", "pliant", "plucky", "plumed", "plummy", "plunge", "plural", "plural", "plushy", "pocked", "pocket", "pocket", "poetic", "poetry", "poised", "polite", "pollen", "porous", "postal", "poster", "potato", "potted", "pounce", "powder", "precis", "prefix", "pretty", "pricey", "primal", "profit", "prompt", "proper", "proven", "public", "puddle", "pulley", "pulsar", "punchy", "puppet", "purism", "purist", "purple", "purply", "puzzle", "quaint", "quango", "quasar", "quirky", "rabbit", "racing", "racket", "radial", "radius", "raffia", "raffle", "ragged", "raging", "raglan", "raglan", "ragtag", "raisin", "rammer", "ramrod", "random", "rapper", "raring", "rarity", "rasher", "rating", "ration", "rattle", "ravine", "raving", "reason", "rebate", "recent", "recess", "recipe", "record", "record", "redial", "reform", "regent", "region", "relief", "relish", "remark", "remiss", "remote", "rennet", "rennin", "repair", "report", "rested", "result", "retort", "revamp", "reward", "rhythm", "ribbon", "ridden", "riddle", "ridged", "ripple", "rising", "robust", "rocket", "rodent", "rotary", "rotund", "roving", "rubble", "ruched", "rudder", "rueful", "rugged", "rugger", "rumour", "rumpus", "runway", "russet", "rustic", "rustle", "rutted", "saddle", "saithe", "saline", "salmon", "sample", "sandal", "sateen", "satiny", "saucer", "saving", "sawfly", "scalar", "scalar", "scales", "scarab", "scarce", "scenic", "scheme", "school", "schtum", "scorer", "scrawl", "screen", "script", "scurfy", "season", "seated", "second", "secret", "secret", "secure", "sedate", "seemly", "select", "senior", "sensor", "septet", "serene", "serial", "series", "settee", "setter", "severe", "shaper", "sharer", "sheeny", "shield", "shiner", "shorts", "shovel", "shower", "shrewd", "shrill", "shrimp", "signal", "signal", "signet", "silage", "silent", "silken", "silver", "silver", "simian", "simile", "simper", "simple", "sinewy", "single", "sinter", "sister", "sketch", "slangy", "sledge", "sleepy", "sleety", "sleeve", "sleigh", "slight", "slinky", "slippy", "sluice", "slushy", "smooth", "smudge", "smudgy", "snaggy", "snazzy", "snoopy", "snoozy", "social", "socket", "sodium", "softie", "solemn", "solids", "sonnet", "source", "sparky", "speech", "speedy", "sphere", "sphinx", "spider", "spinet", "spiral", "spiral", "spooky", "sporty", "spotty", "sprain", "sprawl", "spring", "spruce", "sprung", "square", "square", "squash", "squish", "stable", "stagey", "stamen", "staple", "staple", "starch", "starry", "static", "statue", "steady", "steely", "stereo", "stereo", "stocks", "stocky", "stolid", "stormy", "streak", "stride", "string", "stripe", "stripy", "stroll", "strong", "stubby", "studio", "sturdy", "subtle", "suburb", "subway", "sudden", "suffix", "sugary", "sulpha", "summer", "sundry", "sunken", "sunlit", "sunset", "superb", "supine", "supper", "supply", "supply", "surfer", "surtax", "survey", "swampy", "swanky", "sweaty", "switch", "swivel", "sylvan", "symbol", "syntax", "syrupy", "tablet", "taking", "talent", "talker", "tangle", "tanker", "tannic", "target", "tartan", "taster", "tavern", "teacup", "teapot", "teasel", "temper", "tennis", "tester", "tether", "thesis", "thirty", "thrill", "throes", "throne", "ticker", "ticket", "tiddly", "tiered", "tights", "timber", "timely", "tinker", "tinned", "tinted", "tipped", "tipple", "tiptop", "tissue", "titchy", "titled", "tomato", "tracer", "trader", "treaty", "treble", "tremor", "trendy", "tricky", "triple", "troops", "trophy", "trough", "truant", "trusty", "tucker", "tufted", "tundra", "tunnel", "turbid", "turkey", "turtle", "tussle", "twirly", "twisty", "umlaut", "unable", "unborn", "undone", "uneven", "unique", "unlike", "unmade", "unpaid", "unread", "unreal", "unsaid", "unseen", "unsold", "untold", "unused", "unwary", "unworn", "upbeat", "uphill", "upland", "uproar", "uptake", "upward", "upwind", "urbane", "urchin", "urgent", "usable", "useful", "utmost", "valley", "vapour", "varied", "veggie", "veiled", "veined", "velour", "velvet", "verbal", "verity", "vernal", "versed", "vertex", "vessel", "viable", "vinous", "violet", "violin", "visage", "viscid", "visual", "volume", "voyage", "waders", "waggle", "waiter", "waiver", "waking", "wallet", "wallop", "walrus", "wanted", "warble", "warder", "wealth", "wearer", "webbed", "webcam", "wedded", "weevil", "wheezy", "whippy", "wicker", "wifely", "wilful", "window", "winged", "winger", "winner", "winter", "wintry", "witted", "wizard", "wobbly", "wonder", "wonted", "wooded", "woolly", "woolly", "worthy", "wreath", "wrench", "yarrow", "yearly", "yellow", "yonder", "zapper", "zenith", "zigzag", "zigzag", "zircon", "zither" };
-                std::vector<std::string> sevenLetters = { "abiding", "ability", "abiotic", "absence", "account", "acidity", "acrobat", "acrylic", "actress", "actuary", "adamant", "addenda", "address", "advance", "aerated", "aerobic", "affable", "ageless", "airport", "alcopop", "alleged", "amazing", "ambient", "amenity", "amiable", "amusing", "anaemia", "ancient", "angelic", "angling", "angular", "animate", "animism", "aniseed", "annular", "annulus", "anodyne", "antacid", "anthill", "antique", "antique", "antonym", "aplenty", "apology", "apparel", "applied", "apropos", "aquatic", "aqueous", "arbiter", "archaic", "article", "ascetic", "aseptic", "assured", "athlete", "attache", "audible", "aureole", "autocue", "average", "avidity", "awesome", "bagpipe", "balcony", "balloon", "bandsaw", "banquet", "bargain", "baronet", "barrage", "bassist", "battery", "beeline", "belated", "beloved", "bemused", "bequest", "bespoke", "betters", "bicycle", "billion", "binding", "biology", "biscuit", "bismuth", "bivalve", "blanket", "blanket", "blatant", "blessed", "blister", "blogger", "blossom", "blowfly", "blurred", "bonfire", "bookish", "boracic", "boulder", "boxroom", "boycott", "boyhood", "bracket", "bravery", "breaded", "breadth", "breathy", "brimful", "brisket", "bristly", "brittle", "bromide", "brother", "buckram", "bucolic", "budding", "builder", "bulrush", "bulwark", "buoyant", "burning", "bursary", "butcher", "buzzard", "cabaret", "cadence", "cadenza", "caisson", "calends", "calorie", "candied", "cannery", "capable", "capital", "capital", "captain", "caption", "capture", "caravan", "caraway", "carbide", "careful", "carmine", "carnage", "cartoon", "carving", "cashier", "cavalry", "ceiling", "centaur", "central", "centric", "century", "ceramic", "certain", "cession", "chamber", "channel", "chapter", "charity", "charmer", "chatter", "checked", "checker", "chemist", "chevron", "chicane", "chicken", "chimney", "chirrup", "chortle", "chuffed", "civvies", "clarion", "classic", "classic", "clastic", "cleaver", "clement", "climate", "clinker", "cluster", "clutter", "coastal", "coating", "coaxial", "cobbled", "coequal", "cognate", "coldish", "collage", "college", "comical", "commune", "compact", "compact", "company", "compass", "complex", "concave", "concert", "concise", "conduit", "conical", "content", "contest", "control", "convert", "cooking", "coolant", "copious", "copycat", "cordial", "coronet", "correct", "council", "counter", "counter", "country", "courage", "courtly", "crackle", "crawler", "crested", "crimson", "crinkly", "croquet", "crucial", "crumbly", "crunchy", "cryptic", "crystal", "crystal", "culvert", "cunning", "cunning", "cupcake", "curator", "curious", "currant", "current", "curried", "cursive", "cursive", "cursory", "curtain", "cushion", "customs", "cutaway", "cutback", "cutlass", "cutlery", "cutting", "cutting", "cyclist", "dabbler", "dancing", "dappled", "darling", "dashing", "dawning", "deadpan", "decagon", "decided", "decimal", "decimal", "decoder", "defiant", "deltaic", "denizen", "dentist", "dervish", "desktop", "desktop", "dessert", "devoted", "devotee", "diagram", "diamond", "diamond", "dietary", "diffuse", "digital", "dignity", "dioxide", "diploid", "diploma", "display", "distant", "disused", "diurnal", "diverse", "divided", "dolphin", "donnish", "dormant", "doughty", "drachma", "drastic", "draught", "drawing", "dresser", "dribble", "driving", "drought", "drummer", "duality", "ductile", "dungeon", "duopoly", "durable", "dustbin", "dutiful", "dynamic", "dynasty", "earmark", "earnest", "earplug", "earring", "earshot", "earthen", "earthly", "eastern", "easting", "eclipse", "economy", "edaphic", "egghead", "elastic", "elastic", "elderly", "elegant", "elegiac", "ellipse", "elusive", "emerald", "emerald", "eminent", "emirate", "emotive", "empties", "endemic", "endless", "engaged", "enquiry", "ensuing", "epicure", "epigeal", "episode", "epitome", "equable", "equator", "equerry", "erosive", "erudite", "eternal", "ethical", "evasive", "evening", "evident", "exalted", "example", "excited", "exhaust", "exigent", "expanse", "express", "extreme", "factual", "fairing", "fancier", "fantasy", "faraway", "fashion", "feather", "feature", "federal", "feeling", "felspar", "ferrety", "ferrous", "ferrule", "fervent", "festive", "fibrous", "fiction", "fighter", "figment", "filings", "finicky", "fishnet", "fissile", "fission", "fitting", "fixated", "fixture", "flannel", "flavour", "flecked", "fledged", "flighty", "flouncy", "flowery", "fluency", "fluster", "fluvial", "foliage", "foliate", "footing", "footman", "forfeit", "fortune", "forward", "forward", "fragile", "freckly", "freebie", "freeman", "freesia", "freezer", "fretted", "friable", "frilled", "fringed", "frosted", "frowsty", "fulsome", "furcate", "furlong", "furrier", "further", "furtive", "fusible", "fusilli", "gainful", "gallant", "gallery", "gamelan", "garbled", "garnish", "gavotte", "gazette", "gearbox", "general", "genteel", "genuine", "germane", "getaway", "gherkin", "gibbous", "gingery", "giraffe", "girlish", "glaring", "gleeful", "glimmer", "glowing", "gnomish", "goggles", "gorilla", "gradual", "grammar", "grandam", "grandee", "graphic", "grating", "gravity", "greatly", "greyish", "greylag", "gristly", "grocery", "grommet", "grooved", "gryphon", "guarded", "guising", "gushing", "gymnast", "habitat", "hafnium", "halcyon", "halfway", "hallway", "halogen", "halting", "halyard", "handbag", "harbour", "harvest", "heading", "healthy", "hearing", "heating", "helical", "helpful", "helping", "herbage", "heroics", "hexagon", "history", "hitcher", "holdall", "holiday", "holmium", "hominid", "homonym", "honeyed", "hopeful", "horizon", "hotline", "hotness", "hulking", "hunched", "hundred", "hurdler", "hurried", "hydrous", "hygiene", "idyllic", "igneous", "immense", "imprint", "inbuilt", "inexact", "infuser", "ingrown", "initial", "initial", "inkling", "inshore", "instant", "instant", "intense", "interim", "interim", "invader", "inverse", "isohyet", "isthmus", "italics", "jackpot", "jasmine", "jocular", "journal", "journey", "jubilee", "justice", "kenning", "kestrel", "keynote", "kindred", "kindred", "kinetic", "kingdom", "kinsman", "kitchen", "knowing", "knuckle", "knurled", "laconic", "lacquer", "lactose", "lagging", "lambent", "lantern", "largish", "lasting", "lateral", "lattice", "lawsuit", "layette", "leading", "leaflet", "learned", "learner", "leather", "lectern", "legible", "leisure", "lengthy", "lenient", "leonine", "leopard", "lettuce", "lexical", "liberty", "library", "lilting", "lineage", "linkage", "linkman", "lioness", "literal", "lithium", "logging", "logical", "longish", "lottery", "louvred", "lovable", "lowland", "luggage", "lyrical", "machine", "maestro", "magenta", "magenta", "magical", "magnate", "majesty", "maltose", "mammoth", "mammoth", "manners", "mansard", "marbled", "marital", "marquee", "mascara", "massive", "matinee", "matting", "mattock", "maximal", "maximum", "mayoral", "meaning", "meaning", "medical", "meeting", "melodic", "mermaid", "message", "midland", "midweek", "million", "million", "mimetic", "mindful", "mineral", "mineral", "minimal", "minimum", "minster", "missile", "missing", "mission", "mistake", "mixture", "modular", "mollusc", "moneyed", "monitor", "monthly", "moonlit", "moorhen", "morello", "morning", "mottled", "mounted", "mourner", "movable", "muddler", "muffler", "mullion", "musical", "mustard", "mustard", "nankeen", "narwhal", "natural", "nebular", "needful", "neither", "netball", "netting", "network", "newness", "nightly", "nitrous", "nomadic", "nominal", "notable", "noughth", "nuclear", "nursery", "nursing", "nurture", "obesity", "oblique", "obscure", "obvious", "oceanic", "octagon", "octopus", "offbeat", "officer", "offline", "offside", "oilcake", "ominous", "onerous", "ongoing", "onshore", "opening", "opinion", "optimal", "optimum", "opulent", "orbital", "orchard", "ordered", "orderly", "ordinal", "ordinal", "organic", "osmosis", "osmotic", "outdoor", "outline", "outside", "outside", "outsize", "outward", "overall", "overarm", "overlay", "package", "padlock", "pageant", "painter", "paisley", "palaver", "palette", "palmate", "palmtop", "panicle", "paragon", "parking", "parlous", "partial", "passage", "passing", "passive", "pastime", "pasture", "patient", "patient", "pattern", "payable", "peacock", "peckish", "pelagic", "pelisse", "penalty", "pendent", "pending", "penguin", "pension", "peppery", "perfect", "perfume", "persona", "phantom", "philtre", "phonics", "picture", "piebald", "pillbox", "pinched", "pinkish", "piquant", "pitcher", "pitfall", "pivotal", "plaster", "plastic", "plastic", "platoon", "playful", "pleased", "pleated", "plenary", "pliable", "plumber", "plunger", "podcast", "poetess", "pointed", "polemic", "politic", "popcorn", "popular", "portion", "postage", "postbox", "postern", "postman", "potable", "pottage", "pottery", "powdery", "powered", "praline", "prattle", "precise", "prefect", "premier", "present", "present", "prickle", "primary", "process", "product", "profuse", "program", "project", "pronged", "pronoun", "propane", "protean", "protein", "proverb", "proviso", "prudent", "psychic", "puckish", "pumpkin", "purpose", "puzzler", "pyjamas", "pyramid", "pyrites", "quality", "quantum", "quarter", "quavery", "queenly", "quinine", "quorate", "rabbity", "rackety", "radiant", "radical", "raffish", "rafting", "railing", "railman", "railway", "rainbow", "rambler", "ramekin", "rampant", "rarebit", "ratable", "raucous", "rawhide", "readies", "recital", "recount", "recruit", "redhead", "redwing", "referee", "refined", "regards", "regatta", "regency", "regnant", "regular", "related", "relaxed", "reliant", "remorse", "removed", "replete", "reproof", "reptile", "reputed", "respect", "restful", "restive", "rethink", "retired", "retread", "revelry", "revenge", "reverse", "rhombus", "rickety", "rimless", "ringing", "riotous", "riviera", "roaring", "robotic", "rolling", "roseate", "rounded", "rounder", "routine", "routine", "ruffled", "ruinous", "runaway", "rundown", "running", "saddler", "sailing", "salient", "salvage", "sampler", "sapient", "sardine", "saurian", "sausage", "savings", "savoury", "scarlet", "scenery", "scented", "science", "scrappy", "scratch", "scrawny", "screech", "scribal", "sealant", "searing", "seasick", "seaside", "seaward", "seaweed", "section", "secular", "seedbed", "seeming", "segment", "seismic", "sensory", "sensual", "serious", "serried", "servant", "several", "shadowy", "shapely", "shelter", "sheriff", "shivery", "shocker", "showery", "showing", "shrubby", "shudder", "shutter", "sickbay", "sidecar", "sighted", "sightly", "signing", "silvery", "similar", "sincere", "sinless", "sinuous", "sixfold", "sketchy", "skilful", "skilled", "skimmed", "skyline", "skyward", "slatted", "sleeved", "slipper", "slotted", "slowish", "slurred", "sniffle", "sniffly", "snuffly", "snuggly", "society", "soldier", "soluble", "someone", "soprano", "sorghum", "soulful", "spangle", "spangly", "spaniel", "spanner", "sparing", "sparkly", "sparrow", "spartan", "spatial", "speaker", "special", "speckle", "spidery", "spindly", "splashy", "splotch", "spotted", "springy", "spurred", "squally", "squashy", "squidgy", "squiffy", "squishy", "stadium", "standby", "standby", "stapler", "starchy", "starlit", "stately", "station", "stature", "staunch", "stealth", "stellar", "sticker", "stilted", "stoical", "strange", "stratum", "streaky", "stretch", "striker", "strings", "stringy", "striped", "stubbly", "student", "studied", "stylish", "styptic", "subject", "subject", "sublime", "success", "suiting", "sultana", "summary", "summary", "summery", "sunburn", "sundial", "sundown", "sunfish", "sunless", "sunrise", "sunroof", "support", "supreme", "surface", "surface", "surfeit", "surgery", "surmise", "surname", "surplus", "surreal", "swarthy", "swearer", "sweater", "swollen", "synapse", "synonym", "tabular", "tactful", "tactile", "tadpole", "tallish", "tangram", "tantrum", "taxable", "teacher", "telling", "tenable", "tenfold", "tensile", "ternary", "terrace", "terrain", "terrine", "testate", "textile", "textual", "texture", "theatre", "thistle", "thought", "thrifty", "through", "thrower", "thunder", "tideway", "timpani", "titanic", "titular", "toaster", "toccata", "tombola", "tonight", "toothed", "topical", "topmost", "topsoil", "torment", "tornado", "touched", "tourism", "tourist", "tracing", "tracker", "tractor", "trailer", "trainer", "trapeze", "treacly", "tremolo", "triable", "triadic", "tribune", "trickle", "trochee", "trolley", "trophic", "tropism", "trouble", "trouper", "trumpet", "tsunami", "tubular", "tumbler", "tunable", "tuneful", "twelfth", "twiddly", "twilled", "twitchy", "twofold", "typical", "umpteen", "unaided", "unarmed", "unasked", "unaware", "unbound", "unbowed", "uncanny", "undying", "unequal", "unheard", "unicorn", "unifier", "uniform", "uniform", "unitary", "unladen", "unlined", "unmoved", "unnamed", "unpaved", "unready", "untried", "unusual", "unwaged", "upfront", "upright", "upriver", "upstage", "upstate", "upswept", "useable", "utility", "utility", "valiant", "vanilla", "variant", "variety", "various", "vaulted", "vehicle", "velvety", "venison", "verbena", "verbose", "verdant", "verdict", "verdure", "vernier", "version", "vesicle", "vibrant", "victory", "vinegar", "vintage", "vintner", "virtual", "visible", "visitor", "vitamin", "vlogger", "volcano", "voltaic", "voluble", "voucher", "vulpine", "waggish", "wagtail", "wakeful", "walkout", "wallaby", "wanting", "warmish", "warrant", "washing", "waverer", "waxwing", "waxwork", "wayward", "wealthy", "wearing", "weather", "weather", "webbing", "website", "weighty", "welcome", "welcome", "western", "wetsuit", "wheaten", "wheelie", "whisker", "widower", "wildcat", "willing", "willowy", "winning", "winsome", "wishful", "wistful", "witness", "woollen", "working", "working", "worldly", "worsted", "wriggly", "wrinkle", "writing", "wrought", "zealous", "zestful" };
-
-                std::map<int, std::vector<std::string>> mapper;
-                mapper[3] = threeLetters; mapper[4] = fourLetters; mapper[5] = fiveLetters; mapper[6] = sixLetters; mapper[7] = sevenLetters;
-                int rand1 = randi(3, 7);
-                std::string st = mapper[rand1][randi(0, mapper[rand1].size() - 1)];
-                int rand2 = randi(3, 10 - (int)st.length());
-                st += mapper[rand2][randi(0, mapper[rand2].size() - 1)];
-                st[0] = std::toupper(st[0]);
-                return st;
-        }
+        return outputString;
+    }
+    else {
+        // moved to the top of this file
+        std::map<int, std::vector<std::string>> mapper;
+        mapper[3] = threeLetters; mapper[4] = fourLetters; mapper[5] = fiveLetters; mapper[6] = sixLetters; mapper[7] = sevenLetters;
+        int rand1 = randi(3, 7);
+        std::string st = mapper[rand1][randi(0, (int)mapper[rand1].size() - 1)];
+        int rand2 = randi(3, 10 - (int)st.length());
+        st += mapper[rand2][randi(0, (int)mapper[rand2].size() - 1)];
+        st[0] = std::toupper(st[0]);
+        return st;
+    }
 }
 
 int GetFps() {
-        return int(round(1.f / Time_get_deltaTime(NULL)));
+    return int(round(1.f / Time_get_deltaTime(NULL)));
 }
 
 void OpenLink(const char* path)
 {
 #ifdef _WIN32
-        // Note: executable path must use backslashes!
-        ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT);
+    // Note: executable path must use backslashes!
+    ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT);
 #else
 #if __APPLE__
-        const char* open_executable = "open";
+    const char* open_executable = "open";
 #else
-        const char* open_executable = "xdg-open";
+    const char* open_executable = "xdg-open";
 #endif
-        char command[256];
-        snprintf(command, 256, "%s \"%s\"", open_executable, path);
-        system(command);
+    char command[256];
+    snprintf(command, 256, "%s \"%s\"", open_executable, path);
+    system(command);
 #endif
 }
 
 PlainDoor* GetPlainDoorByRoom(SystemTypes__Enum room) {
-        for (auto door : il2cpp::Array((*Game::pShipStatus)->fields.AllDoors))
+    for (auto door : il2cpp::Array((*Game::pShipStatus)->fields.AllDoors))
+    {
+        if (door->fields.Room == room)
         {
-                if (door->fields.Room == room)
-                {
-                        return (PlainDoor*)door;
-                }
+            return (PlainDoor*)door;
         }
+    }
 
-        return nullptr;
+    return nullptr;
 }
 
 OpenableDoor* GetOpenableDoorByRoom(SystemTypes__Enum room) {
-        for (auto door : il2cpp::Array((*Game::pShipStatus)->fields.AllDoors))
+    for (auto door : il2cpp::Array((*Game::pShipStatus)->fields.AllDoors))
+    {
+        if (door->fields.Room == room)
         {
-                if (door->fields.Room == room)
-                {
-                        return (OpenableDoor*)door;
-                }
+            return (OpenableDoor*)door;
         }
+    }
 
-        return nullptr;
+    return nullptr;
 }
 
 il2cpp::Array<OpenableDoor__Array> GetAllOpenableDoors() {
-        return (*Game::pShipStatus)->fields.AllDoors;
+    return (*Game::pShipStatus)->fields.AllDoors;
 }
 
 il2cpp::List<List_1_PlayerControl_> GetAllPlayerControl(/*bool includeFriends*/) {
-        //if (includeFriends)
-        return *Game::pAllPlayerControls;
-        /*else {
-                if (State.InGameFriends.size() == 0) {
-                        return *Game::pAllPlayerControls;
-                }
+    //if (includeFriends)
+    return *Game::pAllPlayerControls;
+    /*else {
+        if (State.InGameFriends.size() == 0) {
+            return *Game::pAllPlayerControls;
+        }
 
-                il2cpp::List<List_1_PlayerControl_> ret = *Game::pAllPlayerControls;
-                size_t max = GetAllPlayerControl(true).size();
-                for (size_t i = 0; i < max; i++) {
-                        if (State.InGameFriends.contains(ret[i]->fields.PlayerId)) {
-                                ret.erase(i);
-                        }
-                }
-                return ret;
-        }*/
+        il2cpp::List<List_1_PlayerControl_> ret = *Game::pAllPlayerControls;
+        size_t max = GetAllPlayerControl(true).size();
+        for (size_t i = 0; i < max; i++) {
+            if (State.InGameFriends.contains(ret[i]->fields.PlayerId)) {
+                ret.erase(i);
+            }
+        }
+        return ret;
+    }*/
 }
 
 il2cpp::List<List_1_NetworkedPlayerInfo_> GetAllPlayerData() {
-        return (*Game::pGameData)->fields.AllPlayers;
+    return (*Game::pGameData)->fields.AllPlayers;
 }
 
 il2cpp::Array<DeadBody__Array> GetAllDeadBodies() {
-        static std::string deadBodyType = translate_type_name("DeadBody, Assembly-CSharp");
+    static std::string deadBodyType = translate_type_name("DeadBody, Assembly-CSharp");
 
-        Type* deadBody_Type = app::Type_GetType(convert_to_string(deadBodyType), NULL);
-        return (DeadBody__Array*)app::Object_1_FindObjectsOfType(deadBody_Type, NULL);
+    Type* deadBody_Type = app::Type_GetType(convert_to_string(deadBodyType), NULL);
+    return (DeadBody__Array*)app::Object_1_FindObjectsOfType(deadBody_Type, NULL);
 }
 
 std::optional<il2cpp::List<List_1_PlayerTask_> > GetPlayerTasks(PlayerControl* player) {
-        try {
-                return player->fields.myTasks;
-        }
-        catch (...) {
-                LOG_ERROR("Exception occured while fetching player tasks!");
-                return nullptr;
-        }
+    try {
+        return player->fields.myTasks;
+    }
+    catch (...) {
+        LOG_ERROR("Exception occured while fetching player tasks!");
+        return nullptr;
+    }
 }
 
 std::vector<NormalPlayerTask*> GetNormalPlayerTasks(PlayerControl* player) {
-        try {
-                static std::string normalPlayerTaskType = translate_type_name("NormalPlayerTask");
+    try {
+        static std::string normalPlayerTaskType = translate_type_name("NormalPlayerTask");
 
-                auto getPlayerTasksCall = GetPlayerTasks(player);
-                if (!getPlayerTasksCall.has_value()) return std::vector<NormalPlayerTask*>{};
-                il2cpp::List<List_1_PlayerTask_> playerTasks = getPlayerTasksCall.value();
+        auto getPlayerTasksCall = GetPlayerTasks(player);
+        if (!getPlayerTasksCall.has_value()) return std::vector<NormalPlayerTask*>{};
+        il2cpp::List<List_1_PlayerTask_> playerTasks = getPlayerTasksCall.value();
 
-                std::vector<NormalPlayerTask*> normalPlayerTasks;
-                normalPlayerTasks.reserve(playerTasks.size());
+        std::vector<NormalPlayerTask*> normalPlayerTasks;
+        normalPlayerTasks.reserve(playerTasks.size());
 
-                for (auto playerTask : playerTasks)
-                        if (normalPlayerTaskType == playerTask->klass->_0.name || normalPlayerTaskType == playerTask->klass->_0.parent->name)
-                                normalPlayerTasks.push_back((NormalPlayerTask*)playerTask);
+        for (auto playerTask : playerTasks)
+            if (normalPlayerTaskType == playerTask->klass->_0.name || normalPlayerTaskType == playerTask->klass->_0.parent->name)
+                normalPlayerTasks.push_back((NormalPlayerTask*)playerTask);
 
-                return normalPlayerTasks;
-        }
-        catch (...) {
-                LOG_ERROR("Exception occured while feching normal player tasks!");
-                return std::vector<NormalPlayerTask*>{};
-        }
+        return normalPlayerTasks;
+    }
+    catch (...) {
+        LOG_ERROR("Exception occured while feching normal player tasks!");
+        return std::vector<NormalPlayerTask*>{};
+    }
 }
 
 Object_1* GetSabotageTask(PlayerControl* player) {
-        static std::string sabotageTaskType = translate_type_name("SabotageTask");
+    static std::string sabotageTaskType = translate_type_name("SabotageTask");
 
-        auto getPlayerTasksCall = GetPlayerTasks(player);
-        if (!getPlayerTasksCall.has_value()) return nullptr;
-        auto playerTasks = getPlayerTasksCall.value();
+    auto getPlayerTasksCall = GetPlayerTasks(player);
+    if (!getPlayerTasksCall.has_value()) return nullptr;
+    auto playerTasks = getPlayerTasksCall.value();
 
-        for (auto playerTask : playerTasks)
-                if (sabotageTaskType == playerTask->klass->_0.name
-                        || sabotageTaskType == playerTask->klass->_0.parent->name
-                        || "MushroomMixupSabotageTask"sv == playerTask->klass->_0.name)
-                        return (Object_1*)playerTask;
+    for (auto playerTask : playerTasks)
+        if (sabotageTaskType == playerTask->klass->_0.name
+            || sabotageTaskType == playerTask->klass->_0.parent->name
+            || "MushroomMixupSabotageTask"sv == playerTask->klass->_0.name)
+            return (Object_1*)playerTask;
 
-        return NULL;
+    return NULL;
 }
 
 void RepairSabotage(PlayerControl* player) {
-        if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle)
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 16));
-        else if (State.mapType == Settings::MapType::Pb)
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 16));
-        else if (State.mapType == Settings::MapType::Airship) {
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 16));
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 17));
+    if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle)
+        State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 16));
+    else if (State.mapType == Settings::MapType::Pb)
+        State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 16));
+    else if (State.mapType == Settings::MapType::Airship) {
+        State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 16));
+        State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 17));
+    }
+
+    if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq)
+        State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 16));
+
+    State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 16));
+    if (State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle) State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 17));
+    /*else if ("MushroomMixupSabotageTask"sv == sabotageTask->klass->_0.name) {
+        State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 0));
+    }*/ //mushroom mixup cannot be repaired
+
+    static std::string electricTaskType = translate_type_name("ElectricTask");
+    /*static std::string hqHudOverrideTaskType = translate_type_name("HqHudOverrideTask");
+    static std::string hudOverrideTaskType = translate_type_name("HudOverrideTask");
+    static std::string noOxyTaskType = translate_type_name("NoOxyTask");
+    static std::string reactorTaskType = translate_type_name("ReactorTask");*/
+
+    if (State.mapType != Settings::MapType::Fungle) {
+        il2cpp::Dictionary<Dictionary_2_SystemTypes_ISystemType_> systems = (*Game::pShipStatus)->fields.Systems;
+
+        auto switchSystem = (SwitchSystem*)(systems[SystemTypes__Enum::Electrical]);
+        auto actualSwitches = switchSystem->fields.ActualSwitches;
+        auto expectedSwitches = switchSystem->fields.ExpectedSwitches;
+
+        if (actualSwitches != expectedSwitches) {
+            for (auto i = 0; i < 5; i++) {
+                auto switchMask = 1 << (i & 0x1F);
+
+                if ((actualSwitches & switchMask) != (expectedSwitches & switchMask))
+                    State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
+            }
         }
-
-        if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq)
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::LifeSupp, 16));
-
-        State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 16));
-        if (State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle) State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Comms, 17));
-        /*else if ("MushroomMixupSabotageTask"sv == sabotageTask->klass->_0.name) {
-                State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::MushroomMixupSabotage, 0));
-        }*/ //mushroom mixup cannot be repaired
-
-        static std::string electricTaskType = translate_type_name("ElectricTask");
-        /*static std::string hqHudOverrideTaskType = translate_type_name("HqHudOverrideTask");
-        static std::string hudOverrideTaskType = translate_type_name("HudOverrideTask");
-        static std::string noOxyTaskType = translate_type_name("NoOxyTask");
-        static std::string reactorTaskType = translate_type_name("ReactorTask");*/
-
-        if (State.mapType != Settings::MapType::Fungle) {
-                il2cpp::Dictionary<Dictionary_2_SystemTypes_ISystemType_> systems = (*Game::pShipStatus)->fields.Systems;
-
-                auto switchSystem = (SwitchSystem*)(systems[SystemTypes__Enum::Electrical]);
-                auto actualSwitches = switchSystem->fields.ActualSwitches;
-                auto expectedSwitches = switchSystem->fields.ExpectedSwitches;
-
-                if (actualSwitches != expectedSwitches) {
-                        for (auto i = 0; i < 5; i++) {
-                                auto switchMask = 1 << (i & 0x1F);
-
-                                if ((actualSwitches & switchMask) != (expectedSwitches & switchMask))
-                                        State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
-                        }
-                }
-        }
+    }
 }
 
 void CompleteTask(NormalPlayerTask* playerTask) {
-        if (playerTask->fields._._Owner_k__BackingField == (*Game::pLocalPlayer)) {
-                while (playerTask->fields.taskStep < playerTask->fields.MaxStep)
-                        app::NormalPlayerTask_NextStep(playerTask, NULL);
-        }
+    if (playerTask->fields._._Owner_k__BackingField == (*Game::pLocalPlayer)) {
+        while (playerTask->fields.taskStep < playerTask->fields.MaxStep)
+            app::NormalPlayerTask_NextStep(playerTask, NULL);
+    }
 }
 
 void CompleteAllTasks(PlayerControl* player) {
-        if (!IsInGame()) return;
-        if (player == NULL) {
-                player = *Game::pLocalPlayer;
-                if (*Game::pLocalPlayer == NULL) return;
+    if (!IsInGame()) return;
+    if (player == NULL) {
+        player = *Game::pLocalPlayer;
+        if (*Game::pLocalPlayer == NULL) return;
+    }
+    if (State.SafeMode && player != *Game::pLocalPlayer) return;
+    auto playerTasks = GetNormalPlayerTasks(player);
+    for (auto playerTask : playerTasks) {
+        if (playerTask->fields.taskStep < playerTask->fields.MaxStep) {
+            State.taskRpcQueue.push(new RpcForceCompleteTask(player, playerTask->fields._._Id_k__BackingField));
         }
-        if (State.SafeMode && player != *Game::pLocalPlayer) return;
-        auto playerTasks = GetNormalPlayerTasks(player);
-        for (auto playerTask : playerTasks) {
-                if (playerTask->fields.taskStep < playerTask->fields.MaxStep) {
-                        State.taskRpcQueue.push(new RpcForceCompleteTask(player, playerTask->fields._._Id_k__BackingField));
-                }
-        }
+    }
 }
 
 const char* TranslateTaskTypes(TaskTypes__Enum taskType) {
-        static constexpr std::array TASK_TRANSLATIONS = { "Submit Scan", "Prime Shields", "Fuel Engines", "Chart Course", "Start Reactor", "Swipe Card", "Clear Asteroids", "Upload Data",
-                "Inspect Sample", "Empty Chute", "Empty Garbage", "Align Engine Output", "Fix Wiring", "Calibrate Distributor", "Divert Power", "Unlock Manifolds", "Stop Reactor Meltdown",
-                "Fix Lights", "Clean O2 Filter", "Fix Communications", "Restore Oxygen", "Stabilize Steering", "Assemble Artifact", "Sort Samples", "Measure Weather", "Enter ID Code",
-                "Buy Beverage", "Process Data", "Run Diagnostics", "Water Plants", "Monitor Oxygen", "Store Artifacts", "Fill Canisters", "Activate Weather Nodes", "Insert Keys",
-                "Reset Seismic Stabilizers", "Scan Boarding Pass", "Open Waterways", "Replace Water Jug", "Repair Drill", "Align Telescope", "Record Temperature", "Reboot Wifi",
-                "Polish Ruby", "Reset Breakers", "Decontaminate", "Make Burger", "Unlock Safe", "Sort Records", "Put Away Pistols", "Fix Shower", "Clean Toilet", "Dress Mannequin",
-                "Pick Up Towels", "Rewind Tapes", "Start Fans", "Develop Photos", "Get Biggol Sword", "Put Away Rifles", "Stop Charles", "Clean Vent", "None", "Build Sandcastle",
-                "Cook Fish", "Collect Shells", "Lift Weights", "Roast Marshmallow", "Throw Frisbee", "Collect Samples", "Prep Vegetables", "Hoist Supplies", "Mine Ores", "Polish Gem", "Replace Parts", "Help Critter",
-                "Crank Generator", "Fix Antenna", "Find Signal", "Activate Mushroom Mixup", "Extract Fuel", "Monitor Mushroom", "Play Video Game" };
-        return TASK_TRANSLATIONS.at(static_cast<size_t>(taskType));
+    static constexpr std::array TASK_TRANSLATIONS = { "Submit Scan", "Prime Shields", "Fuel Engines", "Chart Course", "Start Reactor", "Swipe Card", "Clear Asteroids", "Upload Data",
+        "Inspect Sample", "Empty Chute", "Empty Garbage", "Align Engine Output", "Fix Wiring", "Calibrate Distributor", "Divert Power", "Unlock Manifolds", "Stop Reactor Meltdown",
+        "Fix Lights", "Clean O2 Filter", "Fix Communications", "Restore Oxygen", "Stabilize Steering", "Assemble Artifact", "Sort Samples", "Measure Weather", "Enter ID Code",
+        "Buy Beverage", "Process Data", "Run Diagnostics", "Water Plants", "Monitor Oxygen", "Store Artifacts", "Fill Canisters", "Activate Weather Nodes", "Insert Keys",
+        "Reset Seismic Stabilizers", "Scan Boarding Pass", "Open Waterways", "Replace Water Jug", "Repair Drill", "Align Telescope", "Record Temperature", "Reboot Wifi",
+        "Polish Ruby", "Reset Breakers", "Decontaminate", "Make Burger", "Unlock Safe", "Sort Records", "Put Away Pistols", "Fix Shower", "Clean Toilet", "Dress Mannequin",
+        "Pick Up Towels", "Rewind Tapes", "Start Fans", "Develop Photos", "Get Biggol Sword", "Put Away Rifles", "Stop Charles", "Clean Vent", "None", "Build Sandcastle",
+        "Cook Fish", "Collect Shells", "Lift Weights", "Roast Marshmallow", "Throw Frisbee", "Collect Samples", "Prep Vegetables", "Hoist Supplies", "Mine Ores", "Polish Gem", "Replace Parts", "Help Critter",
+        "Crank Generator", "Fix Antenna", "Find Signal", "Activate Mushroom Mixup", "Extract Fuel", "Monitor Mushroom", "Play Video Game" };
+    return TASK_TRANSLATIONS.at(static_cast<size_t>(taskType));
 }
 
 const char* TranslateSystemTypes(SystemTypes__Enum systemType) {
-        static constexpr std::array SYSTEM_TRANSLATIONS = { "Hallway", "Storage", "Cafeteria", "Reactor", "Upper Engine", "Navigation", "Admin", "Electrical", "Oxygen", "Shields",
-                "MedBay", "Security", "Weapons", "Lower Engine", "Communications", "Ship Tasks", "Doors", "Sabotage", "Decontamination", "Launchpad", "Locker Room", "Laboratory",
-                "Balcony", "Office", "Greenhouse", "Dropship", "Decontamination", "Outside", "Specimen Room", "Boiler Room", "Vault Room", "Cockpit", "Armory", "Kitchen", "Viewing Deck",
-                "Hall Of Portraits", "Cargo Bay", "Ventilation", "Showers", "Engine Room", "The Brig", "Meeting Room", "Records", "Lounge Room", "Gap Room", "Main Hall", "Medical",
-                "Decontamination", "Zipline", "Mining Pit", "Dock", "Splash Zone", "Lookout", "Beach", "Highlands", "Jungle", "The Dorm", "Activate Mushroom Mixup", "Heli Sabotage" };
-        return SYSTEM_TRANSLATIONS.at(static_cast<size_t>(systemType));
+    static constexpr std::array SYSTEM_TRANSLATIONS = { "Hallway", "Storage", "Cafeteria", "Reactor", "Upper Engine", "Navigation", "Admin", "Electrical", "Oxygen", "Shields",
+        "MedBay", "Security", "Weapons", "Lower Engine", "Communications", "Ship Tasks", "Doors", "Sabotage", "Decontamination", "Launchpad", "Locker Room", "Laboratory",
+        "Balcony", "Office", "Greenhouse", "Dropship", "Decontamination", "Outside", "Specimen Room", "Boiler Room", "Vault Room", "Cockpit", "Armory", "Kitchen", "Viewing Deck",
+        "Hall Of Portraits", "Cargo Bay", "Ventilation", "Showers", "Engine Room", "The Brig", "Meeting Room", "Records", "Lounge Room", "Gap Room", "Main Hall", "Medical",
+        "Decontamination", "Zipline", "Mining Pit", "Dock", "Splash Zone", "Lookout", "Beach", "Highlands", "Jungle", "The Dorm", "Activate Mushroom Mixup", "Heli Sabotage" };
+    return SYSTEM_TRANSLATIONS.at(static_cast<size_t>(systemType));
 }
 
 Color32 GetPlayerColor(Game::ColorId colorId) {
-        il2cpp::Array colorArray = app::Palette__TypeInfo->static_fields->PlayerColors;
-        if ((colorId < 0 || colorId > 17) || (size_t)colorId >= colorArray.size()) {
-                // oops: game bug
-                Color32 fortegreen = Color32();
-                fortegreen.r = (uint8_t)38;
-                fortegreen.g = (uint8_t)166;
-                fortegreen.b = (uint8_t)98;
-                fortegreen.a = (uint8_t)255;
-                return fortegreen;
-        }
-        return colorArray[colorId];
+    il2cpp::Array colorArray = app::Palette__TypeInfo->static_fields->PlayerColors;
+    if ((colorId < 0 || colorId > 17) || (size_t)colorId >= colorArray.size()) {
+        // oops: game bug
+        Color32 fortegreen = Color32();
+        fortegreen.r = (uint8_t)38;
+        fortegreen.g = (uint8_t)166;
+        fortegreen.b = (uint8_t)98;
+        fortegreen.a = (uint8_t)255;
+        return fortegreen;
+    }
+    return colorArray[colorId];
 }
 
 std::filesystem::path getModulePath(HMODULE hModule) {
-        TCHAR buff[MAX_PATH];
-        GetModuleFileName(hModule, buff, MAX_PATH);
-        return std::filesystem::path(buff);
+    TCHAR buff[MAX_PATH];
+    GetModuleFileName(hModule, buff, MAX_PATH);
+    return std::filesystem::path(buff);
 }
 
 std::string getGameVersion() {
-        if (app::Application_get_version != nullptr)
-                return convert_from_string(app::Application_get_version(NULL));
-        else
-                return "unavailable";
+    if (app::Application_get_version != nullptr)
+        return convert_from_string(app::Application_get_version(NULL));
+    else
+        return "unavailable";
 }
 
 SystemTypes__Enum GetSystemTypes(const Vector2& vector) {
-        if (*Game::pShipStatus) {
-                auto shipStatus = *Game::pShipStatus;
-                for (auto room : il2cpp::Array(shipStatus->fields._AllRooms_k__BackingField))
-                        if (room->fields.roomArea != nullptr && app::Collider2D_OverlapPoint(room->fields.roomArea, vector, NULL))
-                                return room->fields.RoomId;
-        }
-        return State.mapType == Settings::MapType::Fungle ? SystemTypes__Enum::Beach : SystemTypes__Enum::Outside;
+    if (*Game::pShipStatus) {
+        auto shipStatus = *Game::pShipStatus;
+        for (auto room : il2cpp::Array(shipStatus->fields._AllRooms_k__BackingField))
+            if (room->fields.roomArea != nullptr && app::Collider2D_OverlapPoint(room->fields.roomArea, vector, NULL))
+                return room->fields.RoomId;
+    }
+    return State.mapType == Settings::MapType::Fungle ? SystemTypes__Enum::Beach : SystemTypes__Enum::Outside;
 }
 
 std::optional<EVENT_PLAYER> GetEventPlayer(NetworkedPlayerInfo* playerInfo)
 {
-        if (!playerInfo) return std::nullopt;
-        return EVENT_PLAYER(playerInfo);
+    if (!playerInfo) return std::nullopt;
+    return EVENT_PLAYER(playerInfo);
 }
 
 std::optional<EVENT_PLAYER> GetEventPlayerControl(PlayerControl* player)
 {
-        NetworkedPlayerInfo* playerInfo = GetPlayerData(player);
+    NetworkedPlayerInfo* playerInfo = GetPlayerData(player);
 
-        if (!playerInfo) return std::nullopt;
-        return EVENT_PLAYER(playerInfo);
+    if (!playerInfo) return std::nullopt;
+    return EVENT_PLAYER(playerInfo);
 }
 
 std::optional<Vector2> GetTargetPosition(NetworkedPlayerInfo* playerInfo)
 {
-        if (!playerInfo) return std::nullopt;
-        auto object = playerInfo->fields._object;
-        if (!object) {
-                // Likely disconnected player.
-                if (playerInfo->fields.Disconnected != true)
-                        LOG_ERROR(ToString(object) + " _object is null");
-                return std::nullopt;
-        }
-        return PlayerControl_GetTruePosition(object, NULL);
+    if (!playerInfo) return std::nullopt;
+    auto object = playerInfo->fields._object;
+    if (!object) {
+        // Likely disconnected player.
+        if (playerInfo->fields.Disconnected != true)
+            LOG_ERROR(ToString(object) + " _object is null");
+        return std::nullopt;
+    }
+    return PlayerControl_GetTruePosition(object, NULL);
 }
 
 il2cpp::Array<Camera__Array> GetAllCameras() {
-        int32_t cameraCount = app::Camera_get_allCamerasCount(nullptr);
-        il2cpp::Array cameraArray = (Camera__Array*)il2cpp_array_new((Il2CppClass*)app::Camera__TypeInfo, cameraCount);
-        int32_t returnedCount = app::Camera_GetAllCameras(cameraArray.get(), nullptr);
-        assert(returnedCount == cameraCount);
-        return cameraArray;
+    int32_t cameraCount = app::Camera_get_allCamerasCount(nullptr);
+    il2cpp::Array cameraArray = (Camera__Array*)il2cpp_array_new((Il2CppClass*)app::Camera__TypeInfo, cameraCount);
+    int32_t returnedCount = app::Camera_GetAllCameras(cameraArray.get(), nullptr);
+    assert(returnedCount == cameraCount);
+    return cameraArray;
 }
 
 il2cpp::List<List_1_InnerNet_ClientData_> GetAllClients()
 {
-        return (*Game::pAmongUsClient)->fields._.allClients;
+    return (*Game::pAmongUsClient)->fields._.allClients;
 }
 
 Vector2 GetSpawnLocation(Game::PlayerId playerId, int32_t numPlayer, bool initialSpawn)
 {
-        if (State.mapType == Settings::MapType::Ship || State.mapType != Settings::MapType::Pb || initialSpawn)
-        {
-                Vector2 vector = { 0, 1 };
-                vector = Rotate(vector, (float)(playerId - 1) * (360.f / (float)numPlayer));
-                float radius = (*Game::pShipStatus)->fields.SpawnRadius;
-                vector = { vector.x * radius, vector.y * radius };
-                Vector2 spawncenter = (initialSpawn ? (*Game::pShipStatus)->fields.InitialSpawnCenter : (*Game::pShipStatus)->fields.MeetingSpawnCenter);
-                return { spawncenter.x + vector.x, spawncenter.y + vector.y + 0.3636f };
-        }
-        if (playerId < 5)
-        {
-                Vector2 spawncenter = (*Game::pShipStatus)->fields.MeetingSpawnCenter;
-                return { (spawncenter.x + 1) * (float)playerId, spawncenter.y * (float)playerId };
-        }
-        Vector2 spawncenter = (*Game::pShipStatus)->fields.MeetingSpawnCenter2;
-        return { (spawncenter.x + 1) * (float)(playerId - 5), spawncenter.y * (float)(playerId - 5) };
+    if (State.mapType == Settings::MapType::Ship || State.mapType != Settings::MapType::Pb || initialSpawn)
+    {
+        Vector2 vector = { 0, 1 };
+        vector = Rotate(vector, (float)(playerId - 1) * (360.f / (float)numPlayer));
+        float radius = (*Game::pShipStatus)->fields.SpawnRadius;
+        vector = { vector.x * radius, vector.y * radius };
+        Vector2 spawncenter = (initialSpawn ? (*Game::pShipStatus)->fields.InitialSpawnCenter : (*Game::pShipStatus)->fields.MeetingSpawnCenter);
+        return { spawncenter.x + vector.x, spawncenter.y + vector.y + 0.3636f };
+    }
+    if (playerId < 5)
+    {
+        Vector2 spawncenter = (*Game::pShipStatus)->fields.MeetingSpawnCenter;
+        return { (spawncenter.x + 1) * (float)playerId, spawncenter.y * (float)playerId };
+    }
+    Vector2 spawncenter = (*Game::pShipStatus)->fields.MeetingSpawnCenter2;
+    return { (spawncenter.x + 1) * (float)(playerId - 5), spawncenter.y * (float)(playerId - 5) };
 }
 
 bool IsAirshipSpawnLocation(const Vector2& vec)
 {
-        return (State.mapType == Settings::MapType::Airship);
+    return (State.mapType == Settings::MapType::Airship);
 }
 
 Vector2 Rotate(const Vector2& vec, float degrees)
 {
-        float f = 0.017453292f * degrees;
-        float num = cos(f);
-        float num2 = sin(f);
-        return { vec.x * num - num2 * vec.y, vec.x * num2 + num * vec.y };
+    float f = 0.017453292f * degrees;
+    float num = cos(f);
+    float num2 = sin(f);
+    return { vec.x * num - num2 * vec.y, vec.x * num2 + num * vec.y };
 }
 
 bool Equals(const Vector2& vec1, const Vector2& vec2) {
-        return vec1.x == vec2.x && vec1.y == vec2.y;
+    return vec1.x == vec2.x && vec1.y == vec2.y;
 }
 
 std::string ToString(Object* object) {
-        std::string type = convert_from_string(Object_ToString(object, NULL));
-        if (type == "System.String") {
-                return convert_from_string((String*)object);
-        }
-        return type;
+    std::string type = convert_from_string(Object_ToString(object, NULL));
+    if (type == "System.String") {
+        return convert_from_string((String*)object);
+    }
+    return type;
 }
 
 std::string ToString(Game::PlayerId id) {
-        if (auto data = GetPlayerDataById(id))
-                return ToString(data);
-        return std::format("<#{}>", +id);
+    if (auto data = GetPlayerDataById(id))
+        return ToString(data);
+    return std::format("<#{}>", +id);
 }
 
 std::string ToString(__maybenull PlayerControl* player) {
-        if (player) {
-                if (auto data = GetPlayerData(player))
-                        return ToString(data);
-                return std::format("<#{}>", +player->fields.PlayerId);
-        }
-        return "<Unknown>";
+    if (player) {
+        if (auto data = GetPlayerData(player))
+            return ToString(data);
+        return std::format("<#{}>", +player->fields.PlayerId);
+    }
+    return "<Unknown>";
 }
 
 std::string ToString(__maybenull NetworkedPlayerInfo* data) {
-        if (data) {
-                if (const auto outfit = GetPlayerOutfit(data)) {
-                        return std::format("<#{} {}> (Friend Code: {}, PUID: {})", +data->fields.PlayerId, convert_from_string(outfit->fields.PlayerName),
-                                convert_from_string(data->fields.FriendCode), convert_from_string(data->fields.Puid));
-                }
-                return std::format("<#{}>", +data->fields.PlayerId);
+    if (data) {
+        if (const auto outfit = GetPlayerOutfit(data)) {
+            return std::format("<#{} {}> (Friend Code: {}, PUID: {})", +data->fields.PlayerId, convert_from_string(outfit->fields.PlayerName),
+                convert_from_string(data->fields.FriendCode), convert_from_string(data->fields.Puid));
         }
-        return "<Unknown>";
+        return std::format("<#{}>", +data->fields.PlayerId);
+    }
+    return "<Unknown>";
 }
 
 #define ADD_QUOTES_HELPER(s) #s
@@ -810,1715 +823,1737 @@ std::string ToString(__maybenull NetworkedPlayerInfo* data) {
 std::string GetGitCommit()
 {
 #ifdef GIT_CUR_COMMIT
-        return ADD_QUOTES(GIT_CUR_COMMIT);
+    return ADD_QUOTES(GIT_CUR_COMMIT);
 #endif
-        return "unavailable";
+    return "unavailable";
 }
 
 std::string GetGitBranch()
 {
 #ifdef GIT_BRANCH
-        return ADD_QUOTES(GIT_BRANCH);
+    return ADD_QUOTES(GIT_BRANCH);
 #endif
-        return "unavailable";
+    return "unavailable";
 }*/
 
 std::string operator*(std::string const& in, size_t m) { //python style string multiplication
-        std::string ret;
+    std::string ret;
 
-        ret.reserve(in.size() * m + 1); // + 1 for null terminator
+    ret.reserve(in.size() * m + 1); // + 1 for null terminator
 
-        for (size_t i = 0; i < m; i++)
-                ret += in;
-        return ret;
+    for (size_t i = 0; i < m; i++)
+        ret += in;
+    return ret;
 }
 
 bool compareStrings(const std::string lhs, const std::string rhs) { //for sorting strings by length
-        return lhs.length() < rhs.length();
+    return lhs.length() < rhs.length();
 }
 
 void ImpersonateName(__maybenull NetworkedPlayerInfo* data)
 {
-        if (!data) return;
-        app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(data);
-        if (!(IsInGame() || IsInLobby() || outfit)) return;
-        const auto& playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(data, nullptr));
-        //prevent anticheat detection with aum impersonation
-        int fillers = 1;
+    if (!data) return;
+    app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(data);
+    if (!(IsInGame() || IsInLobby() || outfit)) return;
+    const auto& playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(data, nullptr));
+    //prevent anticheat detection with aum impersonation
+    int fillers = 1;
 
-        std::vector<std::string> allNames = {};
-        for (auto p : GetAllPlayerData()) allNames.push_back(convert_from_string(NetworkedPlayerInfo_get_PlayerName(p, nullptr)));
-        std::sort(allNames.begin(), allNames.end(), compareStrings);
-        for (std::string n : allNames) {
-                if (n == playerName + (std::string(" ") * size_t(fillers))) fillers++;
-        }
+    std::vector<std::string> allNames = {};
+    for (auto p : GetAllPlayerData()) allNames.push_back(convert_from_string(NetworkedPlayerInfo_get_PlayerName(p, nullptr)));
+    std::sort(allNames.begin(), allNames.end(), compareStrings);
+    for (std::string n : allNames) {
+        if (n == playerName + (std::string(" ") * size_t(fillers))) fillers++;
+    }
 
-        if (IsHost() || !State.SafeMode) {
-                if (IsInGame())
-                        State.rpcQueue.push(new RpcSetName(playerName + (std::string(" ") * size_t(fillers))));
-                else if (IsInLobby())
-                        State.lobbyRpcQueue.push(new RpcSetName(playerName + (std::string(" ") * size_t(fillers))));
-        }
-        else if (IsNameValid(playerName) && playerName.length() <= size_t(12 - fillers)) {
-                if (IsInGame())
-                        State.rpcQueue.push(new RpcSetName(playerName + " "));
-                else if (IsInLobby())
-                        State.lobbyRpcQueue.push(new RpcSetName(playerName + " "));
-        }
-        else {
-                if (IsInGame())
-                        State.rpcQueue.push(new RpcSetName(GenerateRandomString()));
-                else if (IsInLobby())
-                        State.lobbyRpcQueue.push(new RpcSetName(GenerateRandomString()));
-        }
+    if (IsHost() || !State.SafeMode) {
+        if (IsInGame())
+            State.rpcQueue.push(new RpcSetName(playerName + (std::string(" ") * size_t(fillers))));
+        else if (IsInLobby())
+            State.lobbyRpcQueue.push(new RpcSetName(playerName + (std::string(" ") * size_t(fillers))));
+    }
+    else if (IsNameValid(playerName) && playerName.length() <= size_t(10 - fillers)) {
+        if (IsInGame())
+            State.rpcQueue.push(new RpcSetName(playerName + " "));
+        else if (IsInLobby())
+            State.lobbyRpcQueue.push(new RpcSetName(playerName + " "));
+    }
+    else {
+        if (IsInGame())
+            State.rpcQueue.push(new RpcSetName(GenerateRandomString()));
+        else if (IsInLobby())
+            State.lobbyRpcQueue.push(new RpcSetName(GenerateRandomString()));
+    }
 }
 
 void ImpersonateOutfit(NetworkedPlayerInfo_PlayerOutfit* outfit)
 {
-        if (!(IsInGame() || IsInLobby() || outfit)) return;
+    if (!(IsInGame() || IsInLobby() || outfit)) return;
 
-        if (IsInGame()) {
-                State.rpcQueue.push(new RpcSetColor((IsHost() || !State.SafeMode) ? outfit->fields.ColorId : GetRandomColorId(), (IsHost() || !State.SafeMode)));
-                State.rpcQueue.push(new RpcSetHat(outfit->fields.HatId));
-                State.rpcQueue.push(new RpcSetVisor(outfit->fields.VisorId));
-                State.rpcQueue.push(new RpcSetSkin(outfit->fields.SkinId));
-                State.rpcQueue.push(new RpcSetPet(outfit->fields.PetId));
-                State.rpcQueue.push(new RpcSetNamePlate(outfit->fields.NamePlateId));
-        }
-        else if (IsInLobby()) {
-                State.lobbyRpcQueue.push(new RpcSetColor((IsHost() || !State.SafeMode) ? outfit->fields.ColorId : GetRandomColorId(), (IsHost() || !State.SafeMode)));
-                State.lobbyRpcQueue.push(new RpcSetHat(outfit->fields.HatId));
-                State.lobbyRpcQueue.push(new RpcSetVisor(outfit->fields.VisorId));
-                State.lobbyRpcQueue.push(new RpcSetSkin(outfit->fields.SkinId));
-                State.lobbyRpcQueue.push(new RpcSetPet(outfit->fields.PetId));
-                State.lobbyRpcQueue.push(new RpcSetNamePlate(outfit->fields.NamePlateId));
-        }
+    if (IsInGame()) {
+        State.rpcQueue.push(new RpcSetColor((IsHost() || !State.SafeMode) ? outfit->fields.ColorId : GetRandomColorId(), (IsHost() || !State.SafeMode)));
+        State.rpcQueue.push(new RpcSetHat(outfit->fields.HatId));
+        State.rpcQueue.push(new RpcSetVisor(outfit->fields.VisorId));
+        State.rpcQueue.push(new RpcSetSkin(outfit->fields.SkinId));
+        State.rpcQueue.push(new RpcSetPet(outfit->fields.PetId));
+        State.rpcQueue.push(new RpcSetNamePlate(outfit->fields.NamePlateId));
+    }
+    else if (IsInLobby()) {
+        State.lobbyRpcQueue.push(new RpcSetColor((IsHost() || !State.SafeMode) ? outfit->fields.ColorId : GetRandomColorId(), (IsHost() || !State.SafeMode)));
+        State.lobbyRpcQueue.push(new RpcSetHat(outfit->fields.HatId));
+        State.lobbyRpcQueue.push(new RpcSetVisor(outfit->fields.VisorId));
+        State.lobbyRpcQueue.push(new RpcSetSkin(outfit->fields.SkinId));
+        State.lobbyRpcQueue.push(new RpcSetPet(outfit->fields.PetId));
+        State.lobbyRpcQueue.push(new RpcSetNamePlate(outfit->fields.NamePlateId));
+    }
 }
 
 Game::ColorId GetRandomColorId()
 {
-        Game::ColorId colorId;
-        il2cpp::Array PlayerColors = app::Palette__TypeInfo->static_fields->PlayerColors;
-        assert(PlayerColors.size() > 0);
-        if (IsInGame() || IsInLobby())
+    Game::ColorId colorId;
+    il2cpp::Array PlayerColors = app::Palette__TypeInfo->static_fields->PlayerColors;
+    assert(PlayerColors.size() > 0);
+    if (IsInGame() || IsInLobby())
+    {
+        auto players = GetAllPlayerControl();
+        std::vector<Game::ColorId> availableColors = { };
+        for (size_t i = 0; i < PlayerColors.size(); i++)
         {
-                auto players = GetAllPlayerControl();
-                std::vector<Game::ColorId> availableColors = { };
-                for (size_t i = 0; i < PlayerColors.size(); i++)
+            bool colorAvailable = true;
+            for (PlayerControl* player : players)
+            {
+                app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
+                if (outfit == NULL) continue;
+                if (i == outfit->fields.ColorId)
                 {
-                        bool colorAvailable = true;
-                        for (PlayerControl* player : players)
-                        {
-                                app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(player));
-                                if (outfit == NULL) continue;
-                                if (i == outfit->fields.ColorId)
-                                {
-                                        colorAvailable = false;
-                                        break;
-                                }
-                        }
-
-                        if (colorAvailable)
-                                availableColors.push_back((Game::ColorId)i);
+                    colorAvailable = false;
+                    break;
                 }
-                if (availableColors.size() > 0)
-                        colorId = availableColors.at(randi(0, (int)availableColors.size() - 1));
-                else
-                        colorId = randi(0, (int)PlayerColors.size() - 1);
+            }
+
+            if (colorAvailable)
+                availableColors.push_back((Game::ColorId)i);
         }
+        if (availableColors.size() > 0)
+            colorId = availableColors.at(randi(0, (int)availableColors.size() - 1));
         else
-        {
-                colorId = randi(0, (int)PlayerColors.size() - 1);
-        }
-        return colorId;
+            colorId = randi(0, (int)PlayerColors.size() - 1);
+    }
+    else
+    {
+        colorId = randi(0, (int)PlayerColors.size() - 1);
+    }
+    return colorId;
 }
 
 // Convert sRGB [0..255] to linear [0..1]
 float srgbToLinear(float c) {
-        c /= 255.0f;
-        if (c <= 0.04045f)
-                return c / 12.92f;
-        return std::pow((c + 0.055f) / 1.055f, 2.4f);
+    c /= 255.0f;
+    if (c <= 0.04045f)
+        return c / 12.92f;
+    return std::pow((c + 0.055f) / 1.055f, 2.4f);
 }
 
 // Linear [0..1] to sRGB [0..255]
 int linearToSrgb(float c) {
-        float srgb;
-        if (c <= 0.0031308f)
-                srgb = c * 12.92f;
-        else
-                srgb = 1.055f * std::pow(c, 1.0f / 2.4f) - 0.055f;
-        return std::clamp(int(std::round(srgb * 255.0f)), 0, 255);
+    float srgb;
+    if (c <= 0.0031308f)
+        srgb = c * 12.92f;
+    else
+        srgb = 1.055f * std::pow(c, 1.0f / 2.4f) - 0.055f;
+    return std::clamp(int(std::round(srgb * 255.0f)), 0, 255);
 }
 
 OkLAB rgbToOkLab(float r, float g, float b) {
-        // M1
-        float l = 0.4122214708f * r + 0.5363325363f * g + 0.0514459929f * b;
-        float m = 0.2119034982f * r + 0.6806995451f * g + 0.1073969566f * b;
-        float s = 0.0883024619f * r + 0.2817188376f * g + 0.6299787005f * b;
+    // M1
+    float l = 0.4122214708f * r + 0.5363325363f * g + 0.0514459929f * b;
+    float m = 0.2119034982f * r + 0.6806995451f * g + 0.1073969566f * b;
+    float s = 0.0883024619f * r + 0.2817188376f * g + 0.6299787005f * b;
 
-        l = cbrtf(l);
-        m = cbrtf(m);
-        s = cbrtf(s);
+    l = cbrtf(l);
+    m = cbrtf(m);
+    s = cbrtf(s);
 
-        return {
-                0.2104542553f * l + 0.7936177850f * m - 0.0040720468f * s,
-                1.9779984951f * l - 2.4285922050f * m + 0.4505937099f * s,
-                0.0259040371f * l + 0.7827717662f * m - 0.8086757660f * s
-        };
+    return {
+        0.2104542553f * l + 0.7936177850f * m - 0.0040720468f * s,
+        1.9779984951f * l - 2.4285922050f * m + 0.4505937099f * s,
+        0.0259040371f * l + 0.7827717662f * m - 0.8086757660f * s
+    };
 }
 
 // Convert OkLAB back to linear RGB
 void okLabToRgb(const OkLAB& lab, float& r, float& g, float& b) {
-        float l = lab.L + 0.3963377774f * lab.a + 0.2158037573f * lab.b;
-        float m = lab.L - 0.1055613458f * lab.a - 0.0638541728f * lab.b;
-        float s = lab.L - 0.0894841775f * lab.a - 1.2914855480f * lab.b;
+    float l = lab.L + 0.3963377774f * lab.a + 0.2158037573f * lab.b;
+    float m = lab.L - 0.1055613458f * lab.a - 0.0638541728f * lab.b;
+    float s = lab.L - 0.0894841775f * lab.a - 1.2914855480f * lab.b;
 
-        l = l * l * l;
-        m = m * m * m;
-        s = s * s * s;
+    l = l * l * l;
+    m = m * m * m;
+    s = s * s * s;
 
-        r = +4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s;
-        g = -1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s;
-        b = -0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s;
+    r = +4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s;
+    g = -1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s;
+    b = -0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s;
 
-        // clamp linear RGB to [0,1]
-        r = std::clamp(r, 0.0f, 1.0f);
-        g = std::clamp(g, 0.0f, 1.0f);
-        b = std::clamp(b, 0.0f, 1.0f);
+    // clamp linear RGB to [0,1]
+    r = std::clamp(r, 0.0f, 1.0f);
+    g = std::clamp(g, 0.0f, 1.0f);
+    b = std::clamp(b, 0.0f, 1.0f);
 }
 
 // Interpolating function
 OkLAB lerpOkLab(const OkLAB& c1, const OkLAB& c2, float t) {
-        return {
-                c1.L + (c2.L - c1.L) * t,
-                c1.a + (c2.a - c1.a) * t,
-                c1.b + (c2.b - c1.b) * t
-        };
+    return {
+        c1.L + (c2.L - c1.L) * t,
+        c1.a + (c2.a - c1.a) * t,
+        c1.b + (c2.b - c1.b) * t
+    };
 }
 
 std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2, int offset) {
-        std::vector<int> hex1 = { int(color1.x * 255), int(color1.y * 255), int(color1.z * 255), int(color1.w * 255) };
-        std::vector<int> hex2 = { int(color2.x * 255), int(color2.y * 255), int(color2.z * 255), int(color2.w * 255) };
+    std::vector<int> hex1 = { int(color1.x * 255), int(color1.y * 255), int(color1.z * 255), int(color1.w * 255) };
+    std::vector<int> hex2 = { int(color2.x * 255), int(color2.y * 255), int(color2.z * 255), int(color2.w * 255) };
 
-        //names look ugly af with white strikethrough
-        std::string opener = "";
-        if (State.UnderlineName) opener += "<u>";
-        if (State.StrikethroughName) opener += "<s>";
+    //names look ugly af with white strikethrough
+    std::string opener = "";
+    if (State.UnderlineName) opener += "<u>";
+    if (State.StrikethroughName) opener += "<s>";
 
-        std::string closer = "";
-        if (State.UnderlineName) closer += "</s>";
-        if (State.StrikethroughName) closer += "</u>";
+    std::string closer = "";
+    if (State.UnderlineName) closer += "</s>";
+    if (State.StrikethroughName) closer += "</u>";
 
-        if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
-                return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
+    if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
+        return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
 
-        std::vector<std::string> properChars = {};
-        String* blank = convert_to_string("");
-        std::string last_char = "";
-        for (size_t i = 0; i < str.length(); i++) {
-                if (convert_to_string(last_char + str[i]) == blank) {
-                        last_char += str[i];
-                        continue;
-                }
-                properChars.push_back(last_char + str[i]);
-                last_char = "";
+    std::vector<std::string> properChars = {};
+    String* blank = convert_to_string("");
+    std::string last_char = "";
+    for (size_t i = 0; i < str.length(); i++) {
+        if (convert_to_string(last_char + str[i]) == blank) {
+            last_char += str[i];
+            continue;
         }
-        int nameLength = int(properChars.size());
-        if (nameLength > 1) { //fix division by zero
-                std::string gradientText = "";
-                int mx = 2 * nameLength - 2;
-                for (int i = 0; i < nameLength; i++)
-                {
-                        // Compute triangle-wave t with offset
-                        int cycle = (i + offset) % (2 * (nameLength - 1));
-                        float t = (cycle <= (nameLength - 1))
-                                ? float(cycle) / float(nameLength - 1)                         // forward
-                                : float(2 * (nameLength - 1) - cycle) / float(nameLength - 1); // backward
+        properChars.push_back(last_char + str[i]);
+        last_char = "";
+    }
+    int nameLength = int(properChars.size());
+    if (nameLength > 1) { //fix division by zero
+        std::string gradientText = "";
+        int mx = 2 * nameLength - 2;
+        for (int i = 0; i < nameLength; i++)
+        {
+            // Compute triangle-wave t with offset
+            int cycle = (i + offset) % (2 * (nameLength - 1));
+            float t = (cycle <= (nameLength - 1))
+                ? float(cycle) / float(nameLength - 1)             // forward
+                : float(2 * (nameLength - 1) - cycle) / float(nameLength - 1); // backward
 
-                        // Convert hex1/hex2 to linear RGB [0..1]
-                        float r1 = srgbToLinear(static_cast<float>(hex1[0]));
-                        float g1 = srgbToLinear(static_cast<float>(hex1[1]));
-                        float b1 = srgbToLinear(static_cast<float>(hex1[2]));
+            // Convert hex1/hex2 to linear RGB [0..1]
+            float r1 = srgbToLinear(static_cast<float>(hex1[0]));
+            float g1 = srgbToLinear(static_cast<float>(hex1[1]));
+            float b1 = srgbToLinear(static_cast<float>(hex1[2]));
 
-                        float r2 = srgbToLinear(static_cast<float>(hex2[0]));
-                        float g2 = srgbToLinear(static_cast<float>(hex2[1]));
-                        float b2 = srgbToLinear(static_cast<float>(hex2[2]));
+            float r2 = srgbToLinear(static_cast<float>(hex2[0]));
+            float g2 = srgbToLinear(static_cast<float>(hex2[1]));
+            float b2 = srgbToLinear(static_cast<float>(hex2[2]));
 
-                        // Convert to OkLAB
-                        OkLAB c1 = rgbToOkLab(r1, g1, b1);
-                        OkLAB c2 = rgbToOkLab(r2, g2, b2);
+            // Convert to OkLAB
+            OkLAB c1 = rgbToOkLab(r1, g1, b1);
+            OkLAB c2 = rgbToOkLab(r2, g2, b2);
 
-                        // Interpolate in OkLAB
-                        OkLAB c = lerpOkLab(c1, c2, t);
+            // Interpolate in OkLAB
+            OkLAB c = lerpOkLab(c1, c2, t);
 
-                        // Convert back to linear RGB
-                        float rl, gl, bl;
-                        okLabToRgb(c, rl, gl, bl);
+            // Convert back to linear RGB
+            float rl, gl, bl;
+            okLabToRgb(c, rl, gl, bl);
 
-                        // Convert to sRGB
-                        int r = linearToSrgb(rl);
-                        int g = linearToSrgb(gl);
-                        int b = linearToSrgb(bl);
+            // Convert to sRGB
+            int r = linearToSrgb(rl);
+            int g = linearToSrgb(gl);
+            int b = linearToSrgb(bl);
 
-                        // Interpolate alpha linearly in sync with t
-                        int a = int(hex1[3] + std::round((hex2[3] - hex1[3]) * t));
+            // Interpolate alpha linearly in sync with t
+            int a = int(hex1[3] + std::round((hex2[3] - hex1[3]) * t));
 
-                        // Build color tag and append character
-                        std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", r, g, b, a);
-                        gradientText += colorCode + opener + properChars[i] + closer + "</color>";
-                }
-
-                return gradientText;
+            // Build color tag and append character
+            std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", r, g, b, a);
+            gradientText += colorCode + opener + properChars[i] + closer + "</color>";
         }
-        else {
-                int r = int((hex1[0] + hex2[0]) / 2);
-                int g = int((hex1[1] + hex2[1]) / 2);
-                int b = int((hex1[2] + hex2[2]) / 2);
-                int a = int((hex1[3] + hex2[3]) / 2);
-                std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", r, g, b, a);
 
-                std::string gradientText = colorCode + opener + str + closer + "</color>";
-                return gradientText;
-        }
+        return gradientText;
+    }
+    else {
+        int r = int((hex1[0] + hex2[0]) / 2);
+        int g = int((hex1[1] + hex2[1]) / 2);
+        int b = int((hex1[2] + hex2[2]) / 2);
+        int a = int((hex1[3] + hex2[3]) / 2);
+        std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>", r, g, b, a);
+
+        std::string gradientText = colorCode + opener + str + closer + "</color>";
+        return gradientText;
+    }
 }
 
 void RefreshChat(bool alsoShow) {
-        /*if (!Game::HudManager.IsInstanceExists()) return;
-        try {
-                auto chat = Game::HudManager.GetInstance()->fields.Chat;
-                GameObject_SetActive(chat->fields.chatButton, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
-                ChatController_SetVisible(chat, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
-                //if (alsoShow) GameObject_SetActive(chat->fields.chatScreen, true, NULL);
-        }
-        catch (...) {}*/
+    /*if (!Game::HudManager.IsInstanceExists()) return;
+    try {
+        auto chat = Game::HudManager.GetInstance()->fields.Chat;
+        GameObject_SetActive(chat->fields.chatButton, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
+        ChatController_SetVisible(chat, ((!State.PanicMode && State.ChatAlwaysActive) || State.InMeeting || IsInLobby() || GetPlayerData(*Game::pLocalPlayer)->fields.IsDead), NULL);
+        //if (alsoShow) GameObject_SetActive(chat->fields.chatScreen, true, NULL);
+    }
+    catch (...) {}*/
 }
 
 void SaveOriginalAppearance()
 {
-        app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
-        if (outfit == NULL) return;
-        LOG_DEBUG("Set appearance values to current player");
-        State.originalName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), nullptr));
-        State.originalSkin = outfit->fields.SkinId;
-        State.originalHat = outfit->fields.HatId;
-        State.originalPet = outfit->fields.PetId;
-        State.originalColor = outfit->fields.ColorId;
-        State.activeImpersonation = false;
-        State.originalVisor = outfit->fields.VisorId;
-        State.originalNamePlate = outfit->fields.NamePlateId;
+    app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+    if (outfit == NULL) return;
+    LOG_DEBUG("Set appearance values to current player");
+    State.originalName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), nullptr));
+    State.originalSkin = outfit->fields.SkinId;
+    State.originalHat = outfit->fields.HatId;
+    State.originalPet = outfit->fields.PetId;
+    State.originalColor = outfit->fields.ColorId;
+    State.activeImpersonation = false;
+    State.originalVisor = outfit->fields.VisorId;
+    State.originalNamePlate = outfit->fields.NamePlateId;
 }
 
 void ResetOriginalAppearance()
 {
-        try {
-                LOG_DEBUG("Reset appearance values");
-                auto player = app::DataManager_get_Player(nullptr);
-                static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
-                LOG_ASSERT(field != nullptr);
-                auto customization = il2cpp_field_get_value_object(field, player);
-                LOG_ASSERT(customization != nullptr);
+    try {
+        LOG_DEBUG("Reset appearance values");
+        auto player = app::DataManager_get_Player(nullptr);
+        static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
+        LOG_ASSERT(field != nullptr);
+        auto customization = il2cpp_field_get_value_object(field, player);
+        LOG_ASSERT(customization != nullptr);
 
-                /*static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->klass, "colorID");
-                auto colorId = il2cpp_field_get_value_object(field2, customization);
-                LOG_ASSERT(colorId != nullptr);
-                uint8_t originalColor = (uint8_t(colorId) / 16);*/
+        /*static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->klass, "colorID");
+        auto colorId = il2cpp_field_get_value_object(field2, customization);
+        LOG_ASSERT(colorId != nullptr);
+        uint8_t originalColor = (uint8_t(colorId) / 16);*/
 
-                static FieldInfo* field3 = il2cpp_class_get_field_from_name(customization->klass, "hat");
-                auto hat = il2cpp_field_get_value_object(field3, customization);
-                LOG_ASSERT(hat != nullptr);
-                auto originalHat = reinterpret_cast<String*>(hat);
+        static FieldInfo* field3 = il2cpp_class_get_field_from_name(customization->klass, "hat");
+        auto hat = il2cpp_field_get_value_object(field3, customization);
+        LOG_ASSERT(hat != nullptr);
+        auto originalHat = reinterpret_cast<String*>(hat);
 
-                static FieldInfo* field4 = il2cpp_class_get_field_from_name(customization->klass, "visor");
-                auto visor = il2cpp_field_get_value_object(field4, customization);
-                LOG_ASSERT(visor != nullptr);
-                auto originalVisor = reinterpret_cast<String*>(visor);
+        static FieldInfo* field4 = il2cpp_class_get_field_from_name(customization->klass, "visor");
+        auto visor = il2cpp_field_get_value_object(field4, customization);
+        LOG_ASSERT(visor != nullptr);
+        auto originalVisor = reinterpret_cast<String*>(visor);
 
-                static FieldInfo* field5 = il2cpp_class_get_field_from_name(customization->klass, "skin");
-                auto skin = il2cpp_field_get_value_object(field5, customization);
-                LOG_ASSERT(skin != nullptr);
-                auto originalSkin = reinterpret_cast<String*>(skin);
+        static FieldInfo* field5 = il2cpp_class_get_field_from_name(customization->klass, "skin");
+        auto skin = il2cpp_field_get_value_object(field5, customization);
+        LOG_ASSERT(skin != nullptr);
+        auto originalSkin = reinterpret_cast<String*>(skin);
 
-                static FieldInfo* field6 = il2cpp_class_get_field_from_name(customization->klass, "pet");
-                auto pet = il2cpp_field_get_value_object(field6, customization);
-                LOG_ASSERT(pet != nullptr);
-                auto originalPet = reinterpret_cast<String*>(pet);
+        static FieldInfo* field6 = il2cpp_class_get_field_from_name(customization->klass, "pet");
+        auto pet = il2cpp_field_get_value_object(field6, customization);
+        LOG_ASSERT(pet != nullptr);
+        auto originalPet = reinterpret_cast<String*>(pet);
 
-                static FieldInfo* field7 = il2cpp_class_get_field_from_name(customization->klass, "namePlate");
-                auto namePlate = il2cpp_field_get_value_object(field7, customization);
-                LOG_ASSERT(namePlate != nullptr);
-                auto originalNamePlate = reinterpret_cast<String*>(namePlate);
+        static FieldInfo* field7 = il2cpp_class_get_field_from_name(customization->klass, "namePlate");
+        auto namePlate = il2cpp_field_get_value_object(field7, customization);
+        LOG_ASSERT(namePlate != nullptr);
+        auto originalNamePlate = reinterpret_cast<String*>(namePlate);
 
-                State.originalSkin = originalSkin;
-                State.originalHat = originalHat;
-                State.originalPet = originalPet;
-                State.originalColor = State.SelectedColorId;
-                State.originalVisor = originalVisor;
-                State.originalNamePlate = originalNamePlate;
-        }
-        catch (...) {
-                LOG_DEBUG("Failed to reset appearance due to exception");
-        }
+        State.originalSkin = originalSkin;
+        State.originalHat = originalHat;
+        State.originalPet = originalPet;
+        State.originalColor = State.SelectedColorId;
+        State.originalVisor = originalVisor;
+        State.originalNamePlate = originalNamePlate;
+    }
+    catch (...) {
+        LOG_DEBUG("Failed to reset appearance due to exception");
+    }
 }
 
 void ControlAppearance(bool randomize)
 {
-        try {
-                std::queue<RPCInterface*>* queue = nullptr;
-                if (IsInGame())
-                        queue = &State.rpcQueue;
-                else if (IsInLobby())
-                        queue = &State.lobbyRpcQueue;
-                if (randomize) {
-                        std::vector availableHats = { "hat_NoHat", "hat_AbominalHat", "hat_anchor", "hat_antenna", "hat_Antenna_Black", "hat_arrowhead", "hat_Astronaut-Blue", "hat_Astronaut-Cyan", "hat_Astronaut-Orange", "hat_astronaut", "hat_axe", "hat_babybean", "hat_Baguette", "hat_BananaGreen", "hat_BananaPurple", "hat_bandanaWBY", "hat_Bandana_Blue", "hat_Bandana_Green", "hat_Bandana_Pink", "hat_Bandana_Red", "hat_Bandana_White", "hat_Bandana_Yellow", "hat_baseball_Black", "hat_baseball_Green", "hat_baseball_Lightblue", "hat_baseball_LightGreen", "hat_baseball_Lilac", "hat_baseball_Orange", "hat_baseball_Pink", "hat_baseball_Purple", "hat_baseball_Red", "hat_baseball_White", "hat_baseball_Yellow", "hat_Basketball", "hat_bat_crewcolor", "hat_bat_green", "hat_bat_ice", "hat_beachball", "hat_Beanie_Black", "hat_Beanie_Blue", "hat_Beanie_Green", "hat_Beanie_Lightblue", "hat_Beanie_LightGreen", "hat_Beanie_LightPurple", "hat_Beanie_Pink", "hat_Beanie_Purple", "hat_Beanie_White", "hat_Beanie_Yellow", "hat_bearyCold", "hat_bone", "hat_Bowlingball", "hat_brainslug", "hat_BreadLoaf", "hat_bucket", "hat_bucketHat", "hat_bushhat", "hat_Butter", "hat_caiatl", "hat_caitlin", "hat_candycorn", "hat_captain", "hat_cashHat", "hat_cat_grey", "hat_cat_orange", "hat_cat_pink", "hat_cat_snow", "hat_chalice", "hat_cheeseBleu", "hat_cheeseMoldy", "hat_cheeseSwiss", "hat_ChefWhiteBlue", "hat_cherryOrange", "hat_cherryPink", "hat_Chocolate", "hat_chocolateCandy", "hat_chocolateMatcha", "hat_chocolateVanillaStrawb", "hat_clagger", "hat_clown_purple", "hat_comper", "hat_croissant", "hat_crownBean", "hat_crownDouble", "hat_crownTall", "hat_CuppaJoe", "hat_Deitied", "hat_devilhorns_black", "hat_devilhorns_crewcolor", "hat_devilhorns_green", "hat_devilhorns_murky", "hat_devilhorns_white", "hat_devilhorns_yellow", "hat_Doc_black", "hat_Doc_Orange", "hat_Doc_Purple", "hat_Doc_Red", "hat_Doc_White", "hat_Dodgeball", "hat_Dorag_Black", "hat_Dorag_Desert", "hat_Dorag_Jungle", "hat_Dorag_Purple", "hat_Dorag_Sky", "hat_Dorag_Snow", "hat_Dorag_Yellow", "hat_doubletophat", "hat_DrillMetal", "hat_DrillStone", "hat_DrillWood", "hat_EarmuffGreen", "hat_EarmuffsPink", "hat_EarmuffsYellow", "hat_EarnmuffBlue", "hat_eggGreen", "hat_eggYellow", "hat_enforcer", "hat_erisMorn", "hat_fairywings", "hat_fishCap", "hat_fishhed", "hat_fishingHat", "hat_flowerpot", "hat_frankenbolts", "hat_frankenbride", "hat_fungleFlower", "hat_geoff", "hat_glowstick", "hat_glowstickCyan", "hat_glowstickOrange", "hat_glowstickPink", "hat_glowstickPurple", "hat_glowstickYellow", "hat_goggles", "hat_Goggles_Black", "hat_Goggles_Chrome", "hat_GovtDesert", "hat_GovtHeadset", "hat_halospartan", "hat_hardhat", "hat_Hardhat_black", "hat_Hardhat_Blue", "hat_Hardhat_Green", "hat_Hardhat_Orange", "hat_Hardhat_Pink", "hat_Hardhat_Purple", "hat_Hardhat_Red", "hat_Hardhat_White", "hat_HardtopHat", "hat_headslug_Purple", "hat_headslug_Red", "hat_headslug_White", "hat_headslug_Yellow", "hat_Heart", "hat_heim", "hat_Herohood_Black", "hat_Herohood_Blue", "hat_Herohood_Pink", "hat_Herohood_Purple", "hat_Herohood_Red", "hat_Herohood_Yellow", "hat_hl_fubuki", "hat_hl_gura", "hat_hl_korone", "hat_hl_marine", "hat_hl_mio", "hat_hl_moona", "hat_hl_okayu", "hat_hl_pekora", "hat_hl_risu", "hat_hl_watson", "hat_hunter", "hat_IceCreamMatcha", "hat_IceCreamMint", "hat_IceCreamNeo", "hat_IceCreamStrawberry", "hat_IceCreamUbe", "hat_IceCreamVanilla", "hat_Igloo", "hat_Janitor", "hat_jayce", "hat_jinx", "hat_killerplant", "hat_lilShroom", "hat_maraSov", "hat_mareLwyd", "hat_military", "hat_MilitaryWinter", "hat_MinerBlack", "hat_MinerYellow", "hat_mira_bush", "hat_mira_case", "hat_mira_cloud", "hat_mira_flower", "hat_mira_flower_red", "hat_mira_gem", "hat_mira_headset_blue", "hat_mira_headset_pink", "hat_mira_headset_yellow", "hat_mira_leaf", "hat_mira_milk", "hat_mira_sign_blue", "hat_mohawk_bubblegum", "hat_mohawk_bumblebee", "hat_mohawk_purple_green", "hat_mohawk_rainbow", "hat_mummy", "hat_mushbuns", "hat_mushroomBeret", "hat_mysteryBones", "hat_NewYear2023", "hat_OrangeHat", "hat_osiris", "hat_pack01_Astronaut0001", "hat_pack02_Tengallon0001", "hat_pack02_Tengallon0002", "hat_pack03_Stickynote0004", "hat_pack04_Geoffmask0001", "hat_pack06holiday_candycane0001", "hat_PancakeStack", "hat_paperhat", "hat_Paperhat_Black", "hat_Paperhat_Blue", "hat_Paperhat_Cyan", "hat_Paperhat_Lightblue", "hat_Paperhat_Pink", "hat_Paperhat_Yellow", "hat_papermask", "hat_partyhat", "hat_pickaxe", "hat_Pineapple", "hat_PizzaSliceHat", "hat_pk01_BaseballCap", "hat_pk02_Crown", "hat_pk02_Eyebrows", "hat_pk02_HaloHat", "hat_pk02_HeroCap", "hat_pk02_PipCap", "hat_pk02_PlungerHat", "hat_pk02_ScubaHat", "hat_pk02_StickminHat", "hat_pk02_StrawHat", "hat_pk02_TenGallonHat", "hat_pk02_ThirdEyeHat", "hat_pk02_ToiletPaperHat", "hat_pk02_Toppat", "hat_pk03_Fedora", "hat_pk03_Goggles", "hat_pk03_Headphones", "hat_pk03_Security1", "hat_pk03_StrapHat", "hat_pk03_Traffic", "hat_pk04_Antenna", "hat_pk04_Archae", "hat_pk04_Balloon", "hat_pk04_Banana", "hat_pk04_Bandana", "hat_pk04_Beanie", "hat_pk04_Bear", "hat_pk04_BirdNest", "hat_pk04_CCC", "hat_pk04_Chef", "hat_pk04_DoRag", "hat_pk04_Fez", "hat_pk04_GeneralHat", "hat_pk04_HunterCap", "hat_pk04_JungleHat", "hat_pk04_MinerCap", "hat_pk04_MiniCrewmate", "hat_pk04_Pompadour", "hat_pk04_RamHorns", "hat_pk04_Slippery", "hat_pk04_Snowman", "hat_pk04_Vagabond", "hat_pk04_WinterHat", "hat_pk05_Burthat", "hat_pk05_Cheese", "hat_pk05_cheesetoppat", "hat_pk05_Cherry", "hat_pk05_davehat", "hat_pk05_Egg", "hat_pk05_Ellie", "hat_pk05_EllieToppat", "hat_pk05_Ellryhat", "hat_pk05_Fedora", "hat_pk05_Flamingo", "hat_pk05_FlowerPin", "hat_pk05_GeoffreyToppat", "hat_pk05_Helmet", "hat_pk05_HenryToppat", "hat_pk05_Macbethhat", "hat_pk05_Plant", "hat_pk05_RHM", "hat_pk05_Svenhat", "hat_pk05_Wizardhat", "hat_pk06_Candycanes", "hat_pk06_ElfHat", "hat_pk06_Lights", "hat_pk06_Present", "hat_pk06_Reindeer", "hat_pk06_Santa", "hat_pk06_Snowman", "hat_pk06_tree", "hat_pkHW01_BatWings", "hat_pkHW01_CatEyes", "hat_pkHW01_Horns", "hat_pkHW01_Machete", "hat_pkHW01_Mohawk", "hat_pkHW01_Pirate", "hat_pkHW01_PlagueHat", "hat_pkHW01_Pumpkin", "hat_pkHW01_ScaryBag", "hat_pkHW01_Witch", "hat_pkHW01_Wolf", "hat_Plunger_Blue", "hat_Plunger_Yellow", "hat_police", "hat_Ponytail", "hat_Pot", "hat_Present", "hat_Prototype", "hat_pusheenGreyHat", "hat_PusheenicornHat", "hat_pusheenMintHat", "hat_pusheenPinkHat", "hat_pusheenPurpleHat", "hat_pusheenSitHat", "hat_pusheenSleepHat", "hat_pyramid", "hat_rabbitEars", "hat_Ramhorn_Black", "hat_Ramhorn_Red", "hat_Ramhorn_White", "hat_ratchet", "hat_Records", "hat_RockIce", "hat_RockLava", "hat_Rubberglove", "hat_Rupert", "hat_russian", "hat_saint14", "hat_sausage", "hat_savathun", "hat_schnapp", "hat_screamghostface", "hat_Scrudge", "hat_sharkfin", "hat_shaxx", "hat_shovel", "hat_SlothHat", "hat_SnowbeanieGreen", "hat_SnowbeanieOrange", "hat_SnowBeaniePurple", "hat_SnowbeanieRed", "hat_Snowman", "hat_Soccer", "hat_Sorry", "hat_starBalloon", "hat_starhorse", "hat_Starless", "hat_StarTopper", "hat_stethescope", "hat_StrawberryLeavesHat", "hat_TenGallon_Black", "hat_TenGallon_White", "hat_ThomasC", "hat_tinFoil", "hat_titan", "hat_ToastButterHat", "hat_tombstone", "hat_tophat", "hat_ToppatHair", "hat_towelwizard", "hat_Traffic_Blue", "hat_traffic_purple", "hat_Traffic_Red", "hat_Traffic_Yellow", "hat_Unicorn", "hat_vi", "hat_viking", "hat_Visor", "hat_Voleyball", "hat_w21_candycane_blue", "hat_w21_candycane_bubble", "hat_w21_candycane_chocolate", "hat_w21_candycane_mint", "hat_w21_elf_pink", "hat_w21_elf_swe", "hat_w21_gingerbread", "hat_w21_holly", "hat_w21_krampus", "hat_w21_lights_white", "hat_w21_lights_yellow", "hat_w21_log", "hat_w21_mistletoe", "hat_w21_mittens", "hat_w21_nutcracker", "hat_w21_pinecone", "hat_w21_present_evil", "hat_w21_present_greenyellow", "hat_w21_present_redwhite", "hat_w21_present_whiteblue", "hat_w21_santa_evil", "hat_w21_santa_green", "hat_w21_santa_mint", "hat_w21_santa_pink", "hat_w21_santa_white", "hat_w21_santa_yellow", "hat_w21_snowflake", "hat_w21_snowman", "hat_w21_snowman_evil", "hat_w21_snowman_greenred", "hat_w21_snowman_redgreen", "hat_w21_snowman_swe", "hat_w21_winterpuff", "hat_wallcap", "hat_warlock", "hat_whitetophat", "hat_wigJudge", "hat_wigTall", "hat_WilfordIV", "hat_Winston", "hat_WinterGreen", "hat_WinterHelmet", "hat_WinterRed", "hat_WinterYellow", "hat_witch_green", "hat_witch_murky", "hat_witch_pink", "hat_witch_white", "hat_wolf_grey", "hat_wolf_murky", "hat_Zipper" };
-                        std::vector availableSkins = { "skin_None", "skin_Abominalskin", "skin_ApronGreen", "skin_Archae", "skin_Astro", "skin_Astronaut-Blueskin", "skin_Astronaut-Cyanskin", "skin_Astronaut-Orangeskin", "skin_Bananaskin", "skin_benoit", "skin_Bling", "skin_BlueApronskin", "skin_BlueSuspskin", "skin_Box1skin", "skin_BubbleWrapskin", "skin_Burlapskin", "skin_BushSign1skin", "skin_Bushskin", "skin_BusinessFem-Aquaskin", "skin_BusinessFem-Tanskin", "skin_BusinessFemskin", "skin_caitlin", "skin_Capt", "skin_CCC", "skin_ChefBlackskin", "skin_ChefBlue", "skin_ChefRed", "skin_clown", "skin_D2Cskin", "skin_D2Hunter", "skin_D2Osiris", "skin_D2Saint14", "skin_D2Shaxx", "skin_D2Titan", "skin_D2Warlock", "skin_enforcer", "skin_fairy", "skin_FishingSkinskin", "skin_fishmonger", "skin_FishSkinskin", "skin_General", "skin_greedygrampaskin", "skin_halospartan", "skin_Hazmat-Blackskin", "skin_Hazmat-Blueskin", "skin_Hazmat-Greenskin", "skin_Hazmat-Pinkskin", "skin_Hazmat-Redskin", "skin_Hazmat-Whiteskin", "skin_Hazmat", "skin_heim", "skin_hl_fubuki", "skin_hl_gura", "skin_hl_korone", "skin_hl_marine", "skin_hl_mio", "skin_hl_moona", "skin_hl_okayu", "skin_hl_pekora", "skin_hl_risu", "skin_hl_watson", "skin_Horse1skin", "skin_Hotdogskin", "skin_InnerTubeSkinskin", "skin_JacketGreenskin", "skin_JacketPurpleskin", "skin_JacketYellowskin", "skin_Janitorskin", "skin_jayce", "skin_jinx", "skin_LifeVestSkinskin", "skin_Mech", "skin_MechanicRed", "skin_Military", "skin_MilitaryDesert", "skin_MilitarySnowskin", "skin_Miner", "skin_MinerBlackskin", "skin_mummy", "skin_OrangeSuspskin", "skin_PinkApronskin", "skin_PinkSuspskin", "skin_Police", "skin_presentskin", "skin_prisoner", "skin_PrisonerBlue", "skin_PrisonerTanskin", "skin_pumpkin", "skin_PusheenGreyskin", "skin_Pusheenicornskin", "skin_PusheenMintskin", "skin_PusheenPinkskin", "skin_PusheenPurpleskin", "skin_ratchet", "skin_rhm", "skin_RockIceskin", "skin_RockLavaskin", "skin_Sack1skin", "skin_scarfskin", "skin_Science", "skin_Scientist-Blueskin", "skin_Scientist-Darkskin", "skin_screamghostface", "skin_Security", "skin_Skin_SuitRedskin", "skin_Slothskin", "skin_SportsBlueskin", "skin_SportsRedskin", "skin_SuitB", "skin_SuitW", "skin_SweaterBlueskin", "skin_SweaterPinkskin", "skin_Sweaterskin", "skin_SweaterYellowskin", "skin_Tarmac", "skin_ToppatSuitFem", "skin_ToppatVest", "skin_uglysweaterskin", "skin_vampire", "skin_vi", "skin_w21_deer", "skin_w21_elf", "skin_w21_msclaus", "skin_w21_nutcracker", "skin_w21_santa", "skin_w21_snowmate", "skin_w21_tree", "skin_Wall", "skin_Winter", "skin_witch", "skin_YellowApronskin", "skin_YellowSuspskin" };
-                        std::vector availableVisors = { "visor_EmptyVisor", "visor_anime", "visor_BaconVisor", "visor_BananaVisor", "visor_beautyMark", "visor_BillyG", "visor_Blush", "visor_Bomba", "visor_BubbleBumVisor", "visor_Candycane", "visor_Carrot", "visor_chimkin", "visor_clownnose", "visor_Crack", "visor_CucumberVisor", "visor_D2CGoggles", "visor_Dirty", "visor_Dotdot", "visor_doubleeyepatch", "visor_eliksni", "visor_erisBandage", "visor_eyeball", "visor_EyepatchL", "visor_EyepatchR", "visor_fishhook", "visor_Galeforce", "visor_heim", "visor_hl_ah", "visor_hl_bored", "visor_hl_hmph", "visor_hl_marine", "visor_hl_nothoughts", "visor_hl_nudge", "visor_hl_smug", "visor_hl_sweepy", "visor_hl_teehee", "visor_hl_wrong", "visor_IceBeard", "visor_IceCreamChocolateVisor", "visor_IceCreamMintVisor", "visor_IceCreamStrawberryVisor", "visor_IceCreamUbeVisor", "visor_is_beard", "visor_JanitorStache", "visor_jinx", "visor_Krieghaus", "visor_Lava", "visor_LolliBlue", "visor_LolliBrown", "visor_LolliOrange", "visor_lollipopCrew", "visor_lollipopLemon", "visor_lollipopLime", "visor_LolliRed", "visor_marshmallow", "visor_masque_blue", "visor_masque_green", "visor_masque_red", "visor_masque_white", "visor_mira_card_blue", "visor_mira_card_red", "visor_mira_glasses", "visor_mira_mask_black", "visor_mira_mask_blue", "visor_mira_mask_green", "visor_mira_mask_purple", "visor_mira_mask_red", "visor_mira_mask_white", "visor_Mouth", "visor_mummy", "visor_PiercingL", "visor_PiercingR", "visor_PizzaVisor", "visor_pk01_AngeryVisor", "visor_pk01_DumStickerVisor", "visor_pk01_FredVisor", "visor_pk01_HazmatVisor", "visor_pk01_MonoclesVisor", "visor_pk01_PaperMaskVisor", "visor_pk01_PlagueVisor", "visor_pk01_RHMVisor", "visor_pk01_Security1Visor", "visor_Plsno", "visor_polus_ice", "visor_pusheenGorgeousVisor", "visor_pusheenKissyVisor", "visor_pusheenKoolKatVisor", "visor_pusheenOmNomNomVisor", "visor_pusheenSmileVisor", "visor_pusheenYaaaaaayVisor", "visor_Reginald", "visor_Rudolph", "visor_savathun", "visor_Scar", "visor_SciGoggles", "visor_shopglasses", "visor_shuttershadesBlue", "visor_shuttershadesLime", "visor_shuttershadesPink", "visor_shuttershadesPurple", "visor_shuttershadesWhite", "visor_shuttershadesYellow", "visor_SkiGoggleBlack", "visor_SKiGogglesOrange", "visor_SkiGogglesWhite", "visor_SmallGlasses", "visor_SmallGlassesBlue", "visor_SmallGlassesRed", "visor_starfish", "visor_Stealthgoggles", "visor_Stickynote_Cyan", "visor_Stickynote_Green", "visor_Stickynote_Orange", "visor_Stickynote_Pink", "visor_Stickynote_Purple", "visor_Straw", "visor_sunscreenv", "visor_teary", "visor_ToastVisor", "visor_tvColorTest", "visor_vr_Vr-Black", "visor_vr_Vr-White", "visor_w21_carrot", "visor_w21_nutstache", "visor_w21_nye", "visor_w21_santabeard", "visor_wash", "visor_WinstonStache" };
-                        std::vector availablePets = { "pet_EmptyPet", "pet_Alien", "pet_Bedcrab", "pet_BredPet", "pet_Bush", "pet_Charles", "pet_Charles_Red", "pet_ChewiePet", "pet_clank", "pet_coaltonpet", "pet_Creb", "pet_Crewmate", "pet_Cube", "pet_D2GhostPet", "pet_D2PoukaPet", "pet_D2WormPet", "pet_Doggy", "pet_Ellie", "pet_frankendog", "pet_GuiltySpark", "pet_HamPet", "pet_Hamster", "pet_HolidayHamPet", "pet_Lava", "pet_nuggetPet", "pet_Pip", "pet_poro", "pet_Pusheen", "pet_Robot", "pet_Snow", "pet_Squig", "pet_Stickmin", "pet_Stormy", "pet_test", "pet_UFO", "pet_YuleGoatPet" };
-                        std::vector availableNamePlates = { "nameplate_NoPlate", "nameplate_airship_Toppat", "nameplate_airship_CCC", "nameplate_airship_Diamond", "nameplate_airship_Emerald", "nameplate_airship_Gems", "nameplate_airship_government", "nameplate_Airship_Hull", "nameplate_airship_Ruby", "nameplate_airship_Sky", "nameplate_Polus-Skyline", "nameplate_Polus-Snowmates", "nameplate_Polus_Colors", "nameplate_Polus_DVD", "nameplate_Polus_Ground", "nameplate_Polus_Lava", "nameplate_Polus_Planet", "nameplate_Polus_Snow", "nameplate_Polus_SpecimenBlue", "nameplate_Polus_SpecimenGreen", "nameplate_Polus_SpecimenPurple", "nameplate_is_yard", "nameplate_is_dig", "nameplate_is_game", "nameplate_is_ghost", "nameplate_is_green", "nameplate_is_sand", "nameplate_is_trees", "nameplate_Mira_Cafeteria", "nameplate_Mira_Glass", "nameplate_Mira_Tiles", "nameplate_Mira_Vines", "nameplate_Mira_Wood", "nameplate_hw_candy", "nameplate_hw_woods", "nameplate_hw_pumpkin", "nameplate_lanterns", "nameplate_flagAce", "nameplate_flagAgend", "nameplate_flagAro", "nameplate_flagBi", "nameplate_flagRainbow", "nameplate_flagGendQ", "nameplate_flagGendF", "nameplate_flagLesbian", "nameplate_flagMlm", "nameplate_flagNonbinary", "nameplate_flagPan", "nameplate_flagTrans", "nameplate_flagPride", "nameplate_torch", "nameplate_PizzaPlate", "nameplate_BlimeyPlate", "nameplate_BreadPlate", "nameplate_SnowmiesPlate", "nameplate_Croissant", "nameplate_EggPlate", "nameplate_beanDragon", "nameplate_Snowflake", "nameplate_Celeste", "nameplate_Clouds", "nameplate_Feathers", "nameplate_Battlefield", "nameplate_Topaz", "nameplate_Jaguarprint", "nameplate_WinterForestPlate", "nameplate_Plant", "nameplate_Scales", "nameplate_Tigerplant", "nameplate_Spacecat", "nameplate_Spacedog", "nameplate_Spaceship", "nameplate_Pusheen_01", "nameplate_Pusheen_02", "nameplate_Pusheen_03", "nameplate_Pusheen_04", "nameplate_Specimen", "nameplate_PlusOne", "nameplate_Cake", "nameplate_Dragonfish", "nameplate_Snowfall", "nameplate_Gems", "nameplate_Moon", "nameplate_CandyCanePlate", "nameplate_Fight", "nameplate_Tigerprint", "nameplate_PlusPlate", "nameplate_Price", "nameplate_Lightfall", "nameplate_Frosty", "nameplate_SpecimenGreen", "nameplate_Winter", "nameplate0001", "nameplate0002", "Nameplate_DeadSunset", "nameplate_w21_fireplace", "nameplate_cafeteria", "nameplate_flyingStrawberry", "nameplate_polus", "nameplate_candyCanePlate", "nameplate_reactor", "nameplate_dungeonFloor", "nameplates_pusheen_03", "nameplate_cupcake", "Nameplate_zipline", "nameplate_hackerman", "nameplate_ballPit", "nameplate_disco", "nameplate_binoculars", "nameplate_crewmatesRed", "nameplate_crewmatesBlue", "nameplate_fur", "nameplate_goldImpostor", "nameplate_goldCrewmate", "nameplate_grill", "nameplate_ninjas", "nameplate_honk", "nameplate_hunter", "nameplate_sandcastle", "nameplate_jaguarprint", "nameplate_cliffs", "nameplate_lilypad", "nameplate_redPackets", "nameplate_moons", "nameplate_PlatePlate", "nameplate_sotenbori", "nameplate_ejected", "nameplate_hourglass", "nameplate_flowers", "nameplate_Orange", "nameplate_horsemateField", "nameplate_knife", "nameplate_winterForestPlate", "nameplate_incense", "nameplates_pusheen_02", "nameplate_spacecat", "nameplate_spacedog", "nameplate_tea", "nameplate_WrappingPaperPlate", "nameplate_dragonTattoo", "nameplate_majimaTattoo", "nameplate_eyes", "nameplate_w21_tree", "nameplate_PinkPlate", "nameplate_titan", "nameplate_warlock", "nameplate_horseHeaven", "nameplate_kamurochogate", "nameplates_pusheen_04", "nameplate_flashlight", "nameplate_boar", "nameplate_cat", "nameplate_dog", "nameplate_dragon", "nameplate_goat", "nameplate_horse", "nameplate_monkey", "nameplate_ox", "nameplate_rabbit", "nameplate_rat", "nameplate_rooster", "nameplate_snake", "nameplates_tiger", "nameplate_yokohama", "nameplate_shadows", "nameplate_hominid" };
-                        std::string name = "";
-                        std::vector<std::string> validNames;
-                        for (std::string i : State.cyclerUserNames) {
-                                if (i.length() >= 13 || RemoveHtmlTags(i) != i)
-                                        continue;
-                                validNames.push_back(i);
-                        }
-                        if (State.confuserNameGeneration == 0 || (State.cyclerNameGeneration == 2 && ((IsHost() || !State.SafeMode) ? State.cyclerUserNames.empty() : validNames.empty())))
-                                name = GenerateRandomString();
-                        else if (State.confuserNameGeneration == 1)
-                                name = GenerateRandomString(true);
-                        else if (State.confuserNameGeneration == 2) {
-                                if ((IsHost() || !State.SafeMode) && !State.cyclerUserNames.empty())
-                                        name = State.cyclerUserNames[randi(0, State.cyclerUserNames.size() - 1)];
-                                else
-                                        name = validNames[randi(0, validNames.size() - 1)];
-                        }
-                        else
-                                name = GenerateRandomString();
+    try {
+        std::queue<RPCInterface*>* queue = nullptr;
+        if (IsInGame())
+            queue = &State.rpcQueue;
+        else if (IsInLobby())
+            queue = &State.lobbyRpcQueue;
+        if (randomize) {
+            // once again, moved to the top of this file
+            std::string name = "";
+            std::vector<std::string> validNames;
+            for (std::string i : State.cyclerUserNames) {
+                if (i.length() >= 13 || RemoveHtmlTags(i) != i)
+                    continue;
+                validNames.push_back(i);
+            }
+            if (State.confuserNameGeneration == 0 || (State.cyclerNameGeneration == 2 && ((IsHost() || !State.SafeMode) ? State.cyclerUserNames.empty() : validNames.empty())))
+                name = GenerateRandomString();
+            else if (State.confuserNameGeneration == 1)
+                name = GenerateRandomString(true);
+            else if (State.confuserNameGeneration == 2) {
+                if ((IsHost() || !State.SafeMode) && !State.cyclerUserNames.empty())
+                    name = State.cyclerUserNames[randi(0, (int)State.cyclerUserNames.size() - 1)];
+                else
+                    name = validNames[randi(0, (int)validNames.size() - 1)];
+            }
+            else
+                name = GenerateRandomString();
 
-                        int color = randi(0, 17);
-                        std::string hat = availableHats[randi(0, availableHats.size() - 1)];
-                        std::string visor = availableVisors[randi(0, availableVisors.size() - 1)];
-                        std::string skin = availableSkins[randi(0, availableSkins.size() - 1)];
-                        std::string pet = availablePets[randi(0, availablePets.size() - 1)];
-                        std::string nameplate = availableNamePlates[randi(0, availableNamePlates.size() - 1)];
-                        if (IsInGame() || IsInLobby()) {
-                                queue->push(new RpcSetName(name));
-                                queue->push(new RpcSetColor(color));
-                                queue->push(new RpcSetHat(convert_to_string(hat)));
-                                queue->push(new RpcSetSkin(convert_to_string(skin)));
-                                queue->push(new RpcSetVisor(convert_to_string(visor)));
-                                queue->push(new RpcSetPet(convert_to_string(pet)));
-                                queue->push(new RpcSetNamePlate(convert_to_string(nameplate)));
-                        }
-                }
-                else if (IsInGame() || IsInLobby()) {
-                        ResetOriginalAppearance();
-                        if (IsHost() || !State.SafeMode)
-                                queue->push(new RpcForceColor(*Game::pLocalPlayer, State.originalColor));
-                        else
-                                queue->push(new RpcSetColor(State.originalColor));
-                        queue->push(new RpcSetPet(State.originalPet));
-                        queue->push(new RpcSetSkin(State.originalSkin));
-                        queue->push(new RpcSetHat(State.originalHat));
-                        queue->push(new RpcSetVisor(State.originalVisor));
-                        queue->push(new RpcSetNamePlate(State.originalNamePlate));
-                        queue->push(new RpcSetName(GetPlayerName()));
+            int color = randi(0, 17);
+            std::string hat = availableHats[randi(0, (int)availableHats.size() - 1)];
+            std::string visor = availableVisors[randi(0, (int)availableVisors.size() - 1)];
+            std::string skin = availableSkins[randi(0, (int)availableSkins.size() - 1)];
+            std::string pet = availablePets[randi(0, (int)availablePets.size() - 1)];
+            std::string nameplate = availableNamePlates[randi(0, (int)availableNamePlates.size() - 1)];
+            if (IsInGame() || IsInLobby()) {
+                if (!State.SafeMode) queue->push(new RpcSetName(name));
+                queue->push(new RpcSetColor(color));
+                queue->push(new RpcSetHat(convert_to_string(hat)));
+                queue->push(new RpcSetSkin(convert_to_string(skin)));
+                queue->push(new RpcSetVisor(convert_to_string(visor)));
+                queue->push(new RpcSetPet(convert_to_string(pet)));
+                queue->push(new RpcSetNamePlate(convert_to_string(nameplate)));
+            }
+        }
+        else if (IsInGame() || IsInLobby()) {
+            ResetOriginalAppearance();
+            if (IsHost() || !State.SafeMode)
+                queue->push(new RpcForceColor(*Game::pLocalPlayer, State.originalColor));
+            else
+                queue->push(new RpcSetColor(State.originalColor));
+            queue->push(new RpcSetPet(State.originalPet));
+            queue->push(new RpcSetSkin(State.originalSkin));
+            queue->push(new RpcSetHat(State.originalHat));
+            queue->push(new RpcSetVisor(State.originalVisor));
+            queue->push(new RpcSetNamePlate(State.originalNamePlate));
+            if (!State.SafeMode) queue->push(new RpcSetName(GetPlayerName()));
 
-                        State.activeImpersonation = false;
-                }
+            State.activeImpersonation = false;
         }
-        catch (...) {
-                LOG_DEBUG("Failed to control appearance due to exception");
-        }
+    }
+    catch (...) {
+        LOG_DEBUG("Failed to control appearance due to exception");
+    }
 }
 
 NetworkedPlayerInfo_PlayerOutfit* GetPlayerOutfit(NetworkedPlayerInfo* player, bool includeShapeshifted /* = false */) {
-        if (!player) return nullptr;
-        const il2cpp::Dictionary dic(player->fields.Outfits);
-        if (includeShapeshifted) {
-                auto playerOutfit = dic[PlayerOutfitType__Enum::Shapeshifted];
-                if (playerOutfit && !convert_from_string(NetworkedPlayerInfo_get_PlayerName(player, nullptr)).empty()) {
-                        return playerOutfit;
-                }
+    if (!player) return nullptr;
+    const il2cpp::Dictionary dic(player->fields.Outfits);
+    if (includeShapeshifted) {
+        auto playerOutfit = dic[PlayerOutfitType__Enum::Shapeshifted];
+        if (playerOutfit && !convert_from_string(NetworkedPlayerInfo_get_PlayerName(player, nullptr)).empty()) {
+            return playerOutfit;
         }
-        return dic[PlayerOutfitType__Enum::Default];
+    }
+    return dic[PlayerOutfitType__Enum::Default];
 }
 
 bool PlayerIsImpostor(NetworkedPlayerInfo* player) {
 
-        if (player->fields.Role == nullptr) return false;
+    if (player->fields.Role == nullptr) return false;
 
-        RoleBehaviour* role = player->fields.Role;
-        return role->fields.TeamType == RoleTeamTypes__Enum::Impostor;
+    RoleBehaviour* role = player->fields.Role;
+    return role->fields.TeamType == RoleTeamTypes__Enum::Impostor;
 }
 
 Color GetColorFromImVec4(ImVec4 vec) {
-        return Color(vec.x, vec.y, vec.z, vec.w);
+    return Color(vec.x, vec.y, vec.z, vec.w);
 }
 
 Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
-        if (roleBehaviour == nullptr)
-                return State.LightMode && gui ? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
+    if (roleBehaviour == nullptr)
+        return State.LightMode && gui ? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
 
-        app::Color c;
-        switch (roleBehaviour->fields.Role) {
-        case RoleTypes__Enum::CrewmateGhost: {
-                c = GetColorFromImVec4(State.CrewmateGhostColor);
-                break;
-        }
-        case RoleTypes__Enum::Crewmate: {
-                c = GetColorFromImVec4(State.CrewmateColor);
-                break;
-        }
-        case RoleTypes__Enum::Engineer: {
-                c = GetColorFromImVec4(State.EngineerColor);
-                break;
-        }
-        case RoleTypes__Enum::GuardianAngel: {
-                c = GetColorFromImVec4(State.GuardianAngelColor);
-                break;
-        }
-        case RoleTypes__Enum::Scientist: {
-                c = GetColorFromImVec4(State.ScientistColor);
-                break;
-        }
-        case RoleTypes__Enum::Impostor: {
-                c = GetColorFromImVec4(State.ImpostorColor);
-                break;
-        }
-        case RoleTypes__Enum::Shapeshifter: {
-                c = GetColorFromImVec4(State.ShapeshifterColor);
-                break;
-        }
-        case RoleTypes__Enum::ImpostorGhost: {
-                c = GetColorFromImVec4(State.ImpostorGhostColor);
-                break;
-        }
-        case RoleTypes__Enum::Noisemaker: {
-                c = GetColorFromImVec4(State.NoisemakerColor);
-                break;
-        }
-        case RoleTypes__Enum::Tracker: {
-                c = GetColorFromImVec4(State.TrackerColor);
-                break;
-        }
-        case RoleTypes__Enum::Phantom: {
-                c = GetColorFromImVec4(State.PhantomColor);
-                break;
-        }
-        default: {
-                c = GetColorFromImVec4(State.CrewmateColor);;
-                break;
-        }
-        }
-        return c;
+    app::Color c;
+    switch (roleBehaviour->fields.Role) {
+    case RoleTypes__Enum::CrewmateGhost: {
+        c = GetColorFromImVec4(State.CrewmateGhostColor);
+        break;
+    }
+    case RoleTypes__Enum::Crewmate: {
+        c = GetColorFromImVec4(State.CrewmateColor);
+        break;
+    }
+    case RoleTypes__Enum::Engineer: {
+        c = GetColorFromImVec4(State.EngineerColor);
+        break;
+    }
+    case RoleTypes__Enum::GuardianAngel: {
+        c = GetColorFromImVec4(State.GuardianAngelColor);
+        break;
+    }
+    case RoleTypes__Enum::Scientist: {
+        c = GetColorFromImVec4(State.ScientistColor);
+        break;
+    }
+    case RoleTypes__Enum::Impostor: {
+        c = GetColorFromImVec4(State.ImpostorColor);
+        break;
+    }
+    case RoleTypes__Enum::Shapeshifter: {
+        c = GetColorFromImVec4(State.ShapeshifterColor);
+        break;
+    }
+    case RoleTypes__Enum::ImpostorGhost: {
+        c = GetColorFromImVec4(State.ImpostorGhostColor);
+        break;
+    }
+    case RoleTypes__Enum::Noisemaker: {
+        c = GetColorFromImVec4(State.NoisemakerColor);
+        break;
+    }
+    case (RoleTypes__Enum)10:
+    case RoleTypes__Enum::Tracker: {
+        c = GetColorFromImVec4(State.TrackerColor);
+        break;
+    }
+    case RoleTypes__Enum::Phantom: {
+        c = GetColorFromImVec4(State.PhantomColor);
+        break;
+    }
+    case RoleTypes__Enum::Detective: {
+        c = GetColorFromImVec4(State.DetectiveColor);
+        break;
+    }
+    case RoleTypes__Enum::Viper: {
+        c = GetColorFromImVec4(State.ViperColor);
+        break;
+    }
+    default: {
+        c = GetColorFromImVec4(State.CrewmateColor);;
+        break;
+    }
+    }
+    return c;
 }
 
 std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = false */)
 {
-        if (roleBehaviour == nullptr) return (abbreviated ? "Unk" : "Unknown");
+    if (roleBehaviour == nullptr) return (abbreviated ? "Unk" : "Unknown");
 
-        switch (roleBehaviour->fields.Role)
-        {
-        case RoleTypes__Enum::Engineer:
-                return (abbreviated ? "Eng" : "Engineer");
-        case RoleTypes__Enum::GuardianAngel:
-                return (abbreviated ? "GA" : "Guardian Angel");
-        case RoleTypes__Enum::Impostor:
-                return (abbreviated ? "Imp" : "Impostor");
-        case RoleTypes__Enum::Scientist:
-                return (abbreviated ? "Sci" : "Scientist");
-        case RoleTypes__Enum::Shapeshifter:
-                return (abbreviated ? "SS" : "Shapeshifter");
-        case RoleTypes__Enum::Crewmate:
-                return (abbreviated ? "Crew" : "Crewmate");
-        case RoleTypes__Enum::CrewmateGhost:
-                return (abbreviated ? "CG" : "Crewmate Ghost");
-        case RoleTypes__Enum::ImpostorGhost:
-                return (abbreviated ? "IG" : "Impostor Ghost");
-        case RoleTypes__Enum::Noisemaker:
-                return (abbreviated ? "NM" : "Noisemaker");
-        case RoleTypes__Enum::Tracker:
-                return (abbreviated ? "Tra" : "Tracker");
-        case RoleTypes__Enum::Phantom:
-                return (abbreviated ? "Ph" : "Phantom");
-        default:
-                return (abbreviated ? "Unk" : "Unknown");
-        }
+    switch (roleBehaviour->fields.Role)
+    {
+    case RoleTypes__Enum::Engineer:
+        return (abbreviated ? "Eng" : "Engineer");
+    case RoleTypes__Enum::GuardianAngel:
+        return (abbreviated ? "GA" : "Guardian Angel");
+    case RoleTypes__Enum::Impostor:
+        return (abbreviated ? "Imp" : "Impostor");
+    case RoleTypes__Enum::Scientist:
+        return (abbreviated ? "Sci" : "Scientist");
+    case RoleTypes__Enum::Shapeshifter:
+        return (abbreviated ? "SS" : "Shapeshifter");
+    case RoleTypes__Enum::Crewmate:
+        return (abbreviated ? "Crew" : "Crewmate");
+    case RoleTypes__Enum::CrewmateGhost:
+        return (abbreviated ? "CG" : "Crewmate Ghost");
+    case RoleTypes__Enum::ImpostorGhost:
+        return (abbreviated ? "IG" : "Impostor Ghost");
+    case RoleTypes__Enum::Noisemaker:
+        return (abbreviated ? "NM" : "Noisemaker");
+    case (RoleTypes__Enum)10:
+    case RoleTypes__Enum::Tracker:
+        return (abbreviated ? "Tra" : "Tracker");
+    case RoleTypes__Enum::Phantom:
+        return (abbreviated ? "Ph" : "Phantom");
+    case RoleTypes__Enum::Detective:
+        return (abbreviated ? "Det" : "Detective");
+    case RoleTypes__Enum::Viper:
+        return (abbreviated ? "Vip" : "Viper");
+    default:
+        return (abbreviated ? "Unk" : "Unknown");
+    }
 }
 
 RoleTypes__Enum GetRoleTypesEnum(RoleType role)
 {
-        if (role == RoleType::Shapeshifter) {
-                return RoleTypes__Enum::Shapeshifter;
-        }
-        else if (role == RoleType::Phantom) {
-                return RoleTypes__Enum::Phantom;
-        }
-        else if (role == RoleType::Impostor) {
-                return RoleTypes__Enum::Impostor;
-        }
-        else if (role == RoleType::Engineer) {
-                return RoleTypes__Enum::Engineer;
-        }
-        else if (role == RoleType::Scientist) {
-                return RoleTypes__Enum::Scientist;
-        }
-        else if (role == RoleType::Tracker) {
-                return RoleTypes__Enum::Tracker;
-        }
-        else if (role == RoleType::Noisemaker) {
-                return RoleTypes__Enum::Noisemaker;
-        }
-        return RoleTypes__Enum::Crewmate;
+    if (role == RoleType::Shapeshifter) {
+        return RoleTypes__Enum::Shapeshifter;
+    }
+    else if (role == RoleType::Phantom) {
+        return RoleTypes__Enum::Phantom;
+    }
+    else if (role == RoleType::Viper) {
+        return RoleTypes__Enum::Viper;
+    }
+    else if (role == RoleType::Impostor) {
+        return RoleTypes__Enum::Impostor;
+    }
+    else if (role == RoleType::Engineer) {
+        return RoleTypes__Enum::Engineer;
+    }
+    else if (role == RoleType::Scientist) {
+        return RoleTypes__Enum::Scientist;
+    }
+    else if (role == RoleType::Tracker) {
+        return RoleTypes__Enum::Tracker;
+    }
+    else if (role == RoleType::Noisemaker) {
+        return RoleTypes__Enum::Noisemaker;
+    }
+    else if (role == RoleType::Detective) {
+        return RoleTypes__Enum::Detective;
+    }
+    return RoleTypes__Enum::Crewmate;
 }
 
 float GetDistanceBetweenPoints_Unity(const Vector2& p1, const Vector2& p2)
 {
-        float dx = p1.x - p2.x, dy = p1.y - p2.y;
-        return sqrtf(dx * dx + dy * dy);
+    float dx = p1.x - p2.x, dy = p1.y - p2.y;
+    return sqrtf(dx * dx + dy * dy);
 }
 
 float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2)
 {
-        float dx = p1.x - p2.x, dy = p1.y - p2.y;
-        return sqrtf(dx * dx + dy * dy);
+    float dx = p1.x - p2.x, dy = p1.y - p2.y;
+    return sqrtf(dx * dx + dy * dy);
 }
 
 void ShowHudNotification(std::string text) {
-        return;
-        std::string notificationText = "</size><#fb0>[<#0f0>Sicko</color><#f00>Menu</color>]</color> " + text + "<size=0>";
-        if (IsInGame() || IsInLobby())
-                NotificationPopper_AddDisconnectMessage((NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier), convert_to_string(text), NULL);
+    return;
+    std::string notificationText = "</size><#fb0>[<#ff006c>SickoMenu</color>]</color> " + text + "<size=0>";
+    if (IsInGame() || IsInLobby())
+        NotificationPopper_AddDisconnectMessage((NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier), convert_to_string(text), NULL);
 }
 
 void DoPolylineSimplification(std::vector<ImVec2>& inPoints, std::vector<std::chrono::system_clock::time_point>& inTimeStamps, std::vector<ImVec2>& outPoints, std::vector<std::chrono::system_clock::time_point>& outTimeStamps, float sqDistanceThreshold, bool clearInputs)
 {
-        sqDistanceThreshold = sqDistanceThreshold - FLT_EPSILON;
-        size_t numPendingPoints = inPoints.size();
-        if (numPendingPoints < 2)
-                return;
+    sqDistanceThreshold = sqDistanceThreshold - FLT_EPSILON;
+    size_t numPendingPoints = inPoints.size();
+    if (numPendingPoints < 2)
+        return;
 
-        Profiler::BeginSample("PolylineSimplification");
-        ImVec2 prevPoint = inPoints[0], point = inPoints[0];
-        std::chrono::system_clock::time_point timestamp = inTimeStamps[0];
-        size_t numNewPointsAdded = 0;
+    Profiler::BeginSample("PolylineSimplification");
+    ImVec2 prevPoint = inPoints[0], point = inPoints[0];
+    std::chrono::system_clock::time_point timestamp = inTimeStamps[0];
+    size_t numNewPointsAdded = 0;
 
-        // always add the first point
+    // always add the first point
+    outPoints.push_back(point);
+    outTimeStamps.push_back(timestamp);
+    numNewPointsAdded++;
+    for (size_t index = 1; index < numPendingPoints; index++)
+    {
+        point = inPoints[index];
+        timestamp = inTimeStamps[index];
+        float diffX = point.x - prevPoint.x, diffY = point.y - prevPoint.y;
+        if ((diffX * diffX + diffY * diffY) >= sqDistanceThreshold)
+        {
+            prevPoint = point;
+            // add the point if it's beyond the distance threshold of prev point.
+            outPoints.push_back(point);
+            outTimeStamps.push_back(timestamp);
+            numNewPointsAdded++;
+        }
+    }
+    // add the last point if it's not also the first point nor has already been added as the last point
+    if ((point.x != prevPoint.x) || (point.y != prevPoint.y))
+    {
         outPoints.push_back(point);
         outTimeStamps.push_back(timestamp);
         numNewPointsAdded++;
-        for (size_t index = 1; index < numPendingPoints; index++)
-        {
-                point = inPoints[index];
-                timestamp = inTimeStamps[index];
-                float diffX = point.x - prevPoint.x, diffY = point.y - prevPoint.y;
-                if ((diffX * diffX + diffY * diffY) >= sqDistanceThreshold)
-                {
-                        prevPoint = point;
-                        // add the point if it's beyond the distance threshold of prev point.
-                        outPoints.push_back(point);
-                        outTimeStamps.push_back(timestamp);
-                        numNewPointsAdded++;
-                }
-        }
-        // add the last point if it's not also the first point nor has already been added as the last point
-        if ((point.x != prevPoint.x) || (point.y != prevPoint.y))
-        {
-                outPoints.push_back(point);
-                outTimeStamps.push_back(timestamp);
-                numNewPointsAdded++;
-        }
+    }
 
-        if (clearInputs)
-        {
-                inPoints.clear();
-                inTimeStamps.clear();
-        }
-        Profiler::EndSample("PolylineSimplification");
+    if (clearInputs)
+    {
+        inPoints.clear();
+        inTimeStamps.clear();
+    }
+    Profiler::EndSample("PolylineSimplification");
 }
 
 float getMapXOffsetSkeld(float x)
 {
-        return (State.FlipSkeld && GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) ? x - 50.0f : x;
+    return (State.FlipSkeld && GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) ? x - 50.0f : x;
 }
 
 bool Object_1_IsNotNull(app::Object_1* obj)
 {
-        return app::Object_1_op_Implicit(obj, nullptr);
+    return app::Object_1_op_Implicit(obj, nullptr);
 }
 
 bool Object_1_IsNull(app::Object_1* obj)
 {
-        return !Object_1_IsNotNull(obj);
+    return !Object_1_IsNotNull(obj);
 }
 
 std::string GetPlayerName() {
-        auto player = app::DataManager_get_Player(nullptr);
-        static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
-        LOG_ASSERT(field != nullptr);
-        auto customization = il2cpp_field_get_value_object(field, player);
-        LOG_ASSERT(customization != nullptr);
-        static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->klass, "name");
-        auto name = il2cpp_field_get_value_object(field2, customization);
-        LOG_ASSERT(name != nullptr);
-        return convert_from_string(reinterpret_cast<String*>(name));
+    auto player = app::DataManager_get_Player(nullptr);
+    static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
+    LOG_ASSERT(field != nullptr);
+    auto customization = il2cpp_field_get_value_object(field, player);
+    LOG_ASSERT(customization != nullptr);
+    static FieldInfo* field2 = il2cpp_class_get_field_from_name(customization->klass, "name");
+    auto name = il2cpp_field_get_value_object(field2, customization);
+    LOG_ASSERT(name != nullptr);
+    return convert_from_string(reinterpret_cast<String*>(name));
 }
 
 void SetPlayerName(std::string_view name) {
-        auto player = app::DataManager_get_Player(nullptr);
-        static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
-        LOG_ASSERT(field != nullptr);
-        auto customization = il2cpp_field_get_value_object(field, player);
-        LOG_ASSERT(customization != nullptr);
-        app::PlayerCustomizationData_set_Name(customization, convert_to_string(name), nullptr);
+    auto player = app::DataManager_get_Player(nullptr);
+    static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "customization");
+    LOG_ASSERT(field != nullptr);
+    auto customization = il2cpp_field_get_value_object(field, player);
+    LOG_ASSERT(customization != nullptr);
+    app::PlayerCustomizationData_set_Name(customization, convert_to_string(name), nullptr);
 }
 
 std::string GetCustomName(std::string name, bool forceUnique, uint8_t id, int offset) {
-        name = RemoveHtmlTags(name);
+    name = RemoveHtmlTags(name);
 
-        if (State.UsePrefixAndSuffix) {
-                if (State.NamePrefix != "") {
-                        auto prefix = RemoveHtmlTags(State.NamePrefix);
-                        if (name.starts_with(prefix)) name = name.substr(prefix.size());
-                }
-                if (State.NameSuffix != "") {
-                        auto suffix = RemoveHtmlTags(State.NameSuffix);
-                        if (name.ends_with(suffix)) name = name.substr(0, name.size() - suffix.size());
-                }
+    if (State.UsePrefixAndSuffix) {
+        if (State.NamePrefix != "") {
+            auto prefix = RemoveHtmlTags(State.NamePrefix);
+            if (name.starts_with(prefix)) name = name.substr(prefix.size());
         }
-
-        std::string opener = "", closer = "";
-        if (State.RgbName) {
-                if (State.RgbMethod == 0) {
-                        opener = State.rgbCode;
-                        closer = "</color>";
-                }
-                else {
-                        std::string newName = "";
-                        float rgbNameColor = 0.5f * offset;
-                        std::vector<std::string> properChars = {};
-                        String* blank = convert_to_string("");
-                        std::string last_char = "";
-                        for (size_t i = 0; i < name.length(); i++) {
-                                if (convert_to_string(last_char + name[i]) == blank) {
-                                        last_char += name[i];
-                                        continue;
-                                }
-                                rgbNameColor += 0.5f;
-                                constexpr auto tau = 2.f * 3.14159265358979323846f;
-                                while (rgbNameColor > tau) rgbNameColor -= tau;
-                                const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
-                                auto color_r = calculate(rgbNameColor + 0.f);
-                                auto color_g = calculate(rgbNameColor + 4.f);
-                                auto color_b = calculate(rgbNameColor + 2.f);
-                                std::string rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
-                                newName += rgbCode + last_char + name[i] + "</color>";
-                                last_char = "";
-                        }
-                        name = newName;
-                }
+        if (State.NameSuffix != "") {
+            auto suffix = RemoveHtmlTags(State.NameSuffix);
+            if (name.ends_with(suffix)) name = name.substr(0, name.size() - suffix.size());
         }
+    }
 
-        if (State.ColoredName && !State.RgbName) {
-                name = GetGradientUsername(name, State.NameColor1, State.NameColor2, State.ColorMethod == 0 ? 0 : offset);
+    std::string opener = "", closer = "";
+    if (State.RgbName) {
+        if (State.RgbMethod == 0) {
+            opener = State.rgbCode;
+            closer = "</color>";
         }
-
-        if (State.ItalicName) {
-                opener += "<i>";
-                closer += "</i>";
+        else {
+            std::string newName = "";
+            float rgbNameColor = 0.5f * offset;
+            std::vector<std::string> properChars = {};
+            String* blank = convert_to_string("");
+            std::string last_char = "";
+            for (size_t i = 0; i < name.length(); i++) {
+                if (convert_to_string(last_char + name[i]) == blank) {
+                    last_char += name[i];
+                    continue;
+                }
+                rgbNameColor += 0.5f;
+                constexpr auto tau = 2.f * 3.14159265358979323846f;
+                while (rgbNameColor > tau) rgbNameColor -= tau;
+                const auto calculate = [](float value) {return std::sin(value) * .5f + .5f; };
+                auto color_r = calculate(rgbNameColor + 0.f);
+                auto color_g = calculate(rgbNameColor + 4.f);
+                auto color_b = calculate(rgbNameColor + 2.f);
+                std::string rgbCode = std::format("<#{:02x}{:02x}{:02x}>", int(color_r * 255), int(color_g * 255), int(color_b * 255));
+                newName += rgbCode + last_char + name[i] + "</color>";
+                last_char = "";
+            }
+            name = newName;
         }
+    }
 
-        if (State.UnderlineName && (!State.ColoredName || State.RgbName)) {
-                opener += "<u>";
-                closer += "</u>";
+    if (State.ColoredName && !State.RgbName) {
+        name = GetGradientUsername(name, State.NameColor1, State.NameColor2, State.ColorMethod == 0 ? 0 : offset);
+    }
+
+    if (State.ItalicName) {
+        opener += "<i>";
+        closer += "</i>";
+    }
+
+    if (State.UnderlineName && (!State.ColoredName || State.RgbName)) {
+        opener += "<u>";
+        closer += "</u>";
+    }
+
+    if (State.StrikethroughName && (!State.ColoredName || State.RgbName)) {
+        opener += "<s>";
+        closer += "</s>";
+    }
+
+    if (State.BoldName) {
+        opener += "<b>";
+        closer += "</b>";
+    }
+
+    if (State.NobrName) {
+        opener += "<nobr>";
+        closer += "</nobr>";
+    }
+
+    if (State.Font) {
+        switch (State.FontType) {
+        case 0: {
+            opener += "<font=\"Barlow-Italic SDF\">";
+            break;
         }
-
-        if (State.StrikethroughName && (!State.ColoredName || State.RgbName)) {
-                opener += "<s>";
-                closer += "</s>";
+        case 1: {
+            opener += "<font=\"Barlow-Medium SDF\">";
+            break;
         }
-
-        if (State.BoldName) {
-                opener += "<b>";
-                closer += "</b>";
+        case 2: {
+            opener += "<font=\"Barlow-Bold SDF\">";
+            break;
         }
-
-        if (State.NobrName) {
-                opener += "<nobr>";
-                closer += "</nobr>";
+        case 3: {
+            opener += "<font=\"Barlow-SemiBold SDF\">";
+            break;
         }
-
-        if (State.Font) {
-                switch (State.FontType) {
-                case 0: {
-                        opener += "<font=\"Barlow-Italic SDF\">";
-                        break;
-                }
-                case 1: {
-                        opener += "<font=\"Barlow-Medium SDF\">";
-                        break;
-                }
-                case 2: {
-                        opener += "<font=\"Barlow-Bold SDF\">";
-                        break;
-                }
-                case 3: {
-                        opener += "<font=\"Barlow-SemiBold SDF\">";
-                        break;
-                }
-                case 4: {
-                        opener += "<font=\"Barlow-SemiBold Masked\">";
-                        break;
-                }
-                case 5: {
-                        opener += "<font=\"Barlow-ExtraBold SDF\">";
-                        break;
-                }
-                case 6: {
-                        opener += "<font=\"Barlow-BoldItalic SDF\">";
-                        break;
-                }
-                case 7: {
-                        opener += "<font=\"Barlow-BoldItalic Masked\">";
-                        break;
-                }
-                case 8: {
-                        opener += "<font=\"Barlow-Black SDF\">";
-                        break;
-                }
-                case 9: {
-                        opener += "<font=\"Barlow-Light SDF\">";
-                        break;
-                }
-                case 10: {
-                        opener += "<font=\"Barlow-Regular SDF\">";
-                        break;
-                }
-                case 11: {
-                        opener += "<font=\"Barlow-Regular Masked\">";
-                        break;
-                }
-                case 12: {
-                        opener += "<font=\"Barlow-Regular Outline\">";
-                        break;
-                }
-                case 13: {
-                        opener += "<font=\"Brook SDF\">";
-                        break;
-                }
-                case 14: {
-                        opener += "<font=\"LiberationSans SDF\">";
-                        break;
-                }
-                case 15: {
-                        opener += "<font=\"NotoSansJP-Regular SDF\">";
-                        break;
-                }
-                case 16: {
-                        opener += "<font=\"VCR SDF\">";
-                        break;
-                }
-                case 17: {
-                        opener += "<font=\"CONSOLA SDF\">";
-                        break;
-                }
-                case 18: {
-                        opener += "<font=\"digital-7 SDF\">";
-                        break;
-                }
-                case 19: {
-                        opener += "<font=\"OCRAEXT SDF\">";
-                        break;
-                }
-                case 20: {
-                        opener += "<font=\"DIN_Pro_Bold_700 SDF\">";
-                        break;
-                }
-                }
-                closer += "</font>";
+        case 4: {
+            opener += "<font=\"Barlow-SemiBold Masked\">";
+            break;
         }
-
-        /*if (State.Material) {
-                switch (State.MaterialType) {
-                case 0: {
-                        opener += "<material=\"Barlow-Italic SDF Outline\">";
-                        break;
-                }
-                case 1: {
-                        opener += "<material=\"Barlow-BoldItalic SDF Outline\">";
-                        break;
-                }
-                case 2: {
-                        opener += "<material=\"Barlow-SemiBold SDF Outline\">";
-                        break;
-                }
-                                closer += "</material>";
-                }
-        }*/
-
-        if (State.ResizeName) {
-                opener += std::format("<size={}%>", State.NameSize * 100);
-                closer += "</size>";
+        case 5: {
+            opener += "<font=\"Barlow-ExtraBold SDF\">";
+            break;
         }
-
-        if (State.IndentName) {
-                opener += std::format("<line-indent={}>", State.NameIndent * 1);
-                closer += "</line-indent>";
+        case 6: {
+            opener += "<font=\"Barlow-BoldItalic SDF\">";
+            break;
         }
-
-        if (State.CspaceName) {
-                opener += std::format("<cspace={}>", State.NameCspace * 1);
-                closer += "</cspace>";
+        case 7: {
+            opener += "<font=\"Barlow-BoldItalic Masked\">";
+            break;
         }
-
-        if (State.MspaceName) {
-                opener += std::format("<mspace={}>", State.NameMspace * 1);
-                closer += "</mspace>";
+        case 8: {
+            opener += "<font=\"Barlow-Black SDF\">";
+            break;
         }
-
-        if (State.VoffsetName) {
-                opener += std::format("<voffset={}>", State.NameVoffset * 1);
-                closer += "</voffset>";
+        case 9: {
+            opener += "<font=\"Barlow-Light SDF\">";
+            break;
         }
-
-        if (State.RotateName) {
-                opener += std::format("<rotate={}>", State.NameRotate * 1);
-                closer += "<rotate=0>";
+        case 10: {
+            opener += "<font=\"Barlow-Regular SDF\">";
+            break;
         }
-        if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
-
-        if (State.UsePrefixAndSuffix) {
-                if (State.NamePrefix != "") opener = State.NamePrefix + (State.PrefixAndSuffixNewLines ? "<br>" : "") + opener;
-                if (State.NameSuffix != "") closer = closer + (State.PrefixAndSuffixNewLines ? "<br>" : "") + State.NameSuffix;
+        case 11: {
+            opener += "<font=\"Barlow-Regular Masked\">";
+            break;
         }
+        case 12: {
+            opener += "<font=\"Barlow-Regular Outline\">";
+            break;
+        }
+        case 13: {
+            opener += "<font=\"Brook SDF\">";
+            break;
+        }
+        case 14: {
+            opener += "<font=\"LiberationSans SDF\">";
+            break;
+        }
+        case 15: {
+            opener += "<font=\"NotoSansJP-Regular SDF\">";
+            break;
+        }
+        case 16: {
+            opener += "<font=\"VCR SDF\">";
+            break;
+        }
+        case 17: {
+            opener += "<font=\"CONSOLA SDF\">";
+            break;
+        }
+        case 18: {
+            opener += "<font=\"digital-7 SDF\">";
+            break;
+        }
+        case 19: {
+            opener += "<font=\"OCRAEXT SDF\">";
+            break;
+        }
+        case 20: {
+            opener += "<font=\"DIN_Pro_Bold_700 SDF\">";
+            break;
+        }
+        }
+        closer += "</font>";
+    }
 
-        return opener + name + closer;
+    /*if (State.Material) {
+        switch (State.MaterialType) {
+        case 0: {
+            opener += "<material=\"Barlow-Italic SDF Outline\">";
+            break;
+        }
+        case 1: {
+            opener += "<material=\"Barlow-BoldItalic SDF Outline\">";
+            break;
+        }
+        case 2: {
+            opener += "<material=\"Barlow-SemiBold SDF Outline\">";
+            break;
+        }
+                closer += "</material>";
+        }
+    }*/
+
+    if (State.ResizeName) {
+        opener += std::format("<size={}%>", State.NameSize * 100);
+        closer += "</size>";
+    }
+
+    if (State.IndentName) {
+        opener += std::format("<line-indent={}>", State.NameIndent * 1);
+        closer += "</line-indent>";
+    }
+
+    if (State.CspaceName) {
+        opener += std::format("<cspace={}>", State.NameCspace * 1);
+        closer += "</cspace>";
+    }
+
+    if (State.MspaceName) {
+        opener += std::format("<mspace={}>", State.NameMspace * 1);
+        closer += "</mspace>";
+    }
+
+    if (State.VoffsetName) {
+        opener += std::format("<voffset={}>", State.NameVoffset * 1);
+        closer += "</voffset>";
+    }
+
+    if (State.RotateName) {
+        opener += std::format("<rotate={}>", State.NameRotate * 1);
+        closer += "<rotate=0>";
+    }
+    if (forceUnique) opener = std::format("<size=0><{}></size>", id) + opener;
+
+    if (State.UsePrefixAndSuffix) {
+        if (State.NamePrefix != "") opener = State.NamePrefix + (State.PrefixAndSuffixNewLines ? "<br>" : "") + opener;
+        if (State.NameSuffix != "") closer = closer + (State.PrefixAndSuffixNewLines ? "<br>" : "") + State.NameSuffix;
+    }
+
+    return opener + name + closer;
 }
 
 
 std::vector<std::string> GetAllConfigs() {
-        std::vector<std::string> files;
+    std::vector<std::string> files;
 
-        auto path = getModulePath(hModule);
-        auto configsPath = path.parent_path() / "sicko-config";
+    auto path = getModulePath(hModule);
+    auto configsPath = path.parent_path() / "sicko-config";
 
-        for (const auto& f : std::filesystem::directory_iterator(configsPath)) {
-                if (std::filesystem::is_regular_file(f) && f.path().extension() == ".json") {
-                        files.push_back(f.path().stem().string());
-                }
+    for (const auto& f : std::filesystem::directory_iterator(configsPath)) {
+        if (std::filesystem::is_regular_file(f) && f.path().extension() == ".json") {
+            files.push_back(f.path().stem().string());
         }
+    }
 
-        return files;
+    return files;
 }
 
 bool CheckConfigExists(std::string configName) {
-        auto path = getModulePath(hModule);
-        auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", State.selectedConfig);
-        return std::filesystem::exists(settingsPath);
+    auto path = getModulePath(hModule);
+    auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", State.selectedConfig);
+    return std::filesystem::exists(settingsPath);
 }
 
 void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
-        if (!State.TournamentMode) return;
-        std::string friendCode = convert_from_string(playerData->fields.FriendCode);
-        State.tournamentPoints[friendCode] += points;
+    if (!State.TournamentMode) return;
+    std::string friendCode = convert_from_string(playerData->fields.FriendCode);
+    State.tournamentPoints[friendCode] += points;
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
-        if (!State.Enable_SMAC) return;
-        if (reason == "Overloading" && !(IsHost() && State.SMAC_HostPunishment >= 2)) return; // Don't spam logs for overloading, that causes overload as well
-        if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; // Avoid detecting yourself and practice mode dummies
-        if (reason == "Bad Sabotage" && !IsHost()) return; // Without host, we cannot detect who sent UpdateSystem rpc properly
+    if (!State.Enable_SMAC) return;
+    if (reason == "Overloading" && !(IsHost() && State.SMAC_HostPunishment >= 2)) return; // Don't spam logs for overloading, that causes overload as well
+    if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; // Avoid detecting yourself and practice mode dummies
+    if (reason == "Bad Sabotage" && !IsHost()) return; // Without host, we cannot detect who sent UpdateSystem rpc properly
 
-        auto pData = GetPlayerData(pCtrl);
-        std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName));
-        if (name == "") name = convert_from_string(InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), pCtrl, NULL)->fields.PlayerName);
-        if (name == "") name = "<#b0f>[Unknown]</color>";
+    auto pData = GetPlayerData(pCtrl);
+    std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName));
+    if (name == "") name = convert_from_string(InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), pCtrl, NULL)->fields.PlayerName);
+    if (name == "") name = "<#b0f>[Unknown]</color>";
 
-        std::string fc = convert_from_string(pData->fields.FriendCode);
-        auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
-        if (fc != "" && State.SMAC_IgnoreWhitelist && it != State.WhitelistFriendCodes.end()) return;
-        if (fc != "" && State.SMAC_AddToBlacklist) {
-                if (it != State.WhitelistFriendCodes.end()) State.WhitelistFriendCodes.erase(it);
-                State.BlacklistFriendCodes.push_back(fc);
-                State.Save();
-        }
+    std::string fc = convert_from_string(pData->fields.FriendCode);
+    auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
+    if (fc != "" && State.SMAC_IgnoreWhitelist && it != State.WhitelistFriendCodes.end()) return;
+    if (fc != "" && State.SMAC_AddToBlacklist) {
+        if (it != State.WhitelistFriendCodes.end()) State.WhitelistFriendCodes.erase(it);
+        State.BlacklistFriendCodes.push_back(fc);
+        State.Save();
+    }
 
-        if (IsHost()) {
-                switch (State.SMAC_HostPunishment) {
-                case 0:
-                        LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
-                        break;
-                case 1: {
-                        auto realOutfit = GetPlayerOutfit(pData);
-                        Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
-                        const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
-                        std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
-                                int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
-                                State.DarkMode ? "<#fff>" : "<#000>";
-                        std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
-                                colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
-                                IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
-                                        " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
-                        //ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
-                        ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
-                        break;
-                }
-                case 2:
-                {
-                        String* newName = convert_to_string(name + " <#fff>has been kicked by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
-                        if (name.find(" by SickoMenu Anticheat! Reason: ") == std::string::npos)
-                                GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName = newName; // Set name for yourself as it doesn't show up fast enough for others
-                        InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
-                        break;
-                }
-                case 3:
-                {
-                        String* newName = convert_to_string(name + " <#fff>has been banned by <#0f0>Sicko</color><#f00>Menu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
-                        if (name.find(" by SickoMenu Anticheat! Reason: ") == std::string::npos)
-                                GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName = newName; // Set name for yourself as it doesn't show up fast enough for others
-                        InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
-                        break;
-                }
-                }
+    if (IsHost()) {
+        switch (State.SMAC_HostPunishment) {
+        case 0:
+            LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
+            break;
+        case 1: {
+            auto realOutfit = GetPlayerOutfit(pData);
+            Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
+            const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
+            std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
+                int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
+                State.DarkMode ? "<#fff>" : "<#000>";
+            std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
+                colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
+                IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
+                    " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
+            //ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+            ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
+            break;
         }
-        else {
-                switch (State.SMAC_Punishment) {
-                case 0:
-                        LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
-                        break;
-                case 1: {
-                        auto realOutfit = GetPlayerOutfit(pData);
-                        Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
-                        const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
-                        std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
-                                int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
-                                State.DarkMode ? "<#fff>" : "<#000>";
-                        std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
-                                colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
-                                IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
-                                        " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
-                        //ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
-                        ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
-                        break;
-                }
-                }
+        case 2:
+        {
+            String* newName = convert_to_string(name + " <#fff>has been kicked by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
+            if (name.find(" by SickoMenu Anticheat! Reason: ") == std::string::npos)
+                GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName = newName; // Set name for yourself as it doesn't show up fast enough for others
+            InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
+            break;
         }
+        case 3:
+        {
+            String* newName = convert_to_string(name + " <#fff>has been banned by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
+            if (name.find(" by SickoMenu Anticheat! Reason: ") == std::string::npos)
+                GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName = newName; // Set name for yourself as it doesn't show up fast enough for others
+            InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
+            break;
+        }
+        }
+    }
+    else {
+        switch (State.SMAC_Punishment) {
+        case 0:
+            LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
+            break;
+        case 1: {
+            auto realOutfit = GetPlayerOutfit(pData);
+            Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
+            const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
+            std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
+                int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
+                State.DarkMode ? "<#fff>" : "<#000>";
+            std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
+                colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
+                IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
+                    " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
+            //ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
+            ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
+            break;
+        }
+        }
+    }
 }
 
 static std::string strToLower(std::string str) {
-        std::string new_str = "";
-        for (auto i : str) {
-                new_str += char(std::tolower(i));
-        }
-        return new_str;
+    std::string new_str = "";
+    for (auto i : str) {
+        new_str += char(std::tolower(i));
+    }
+    return new_str;
 }
 
 bool IsRandomAUName(const std::string& name)
 {
-        if (name.length() < 3)
-                return false;
-
-        if (!std::isupper(static_cast<unsigned char>(name[0])))
-                return false;
-
-        if (name == "Needaunty" || name == "Snapaunty" || name == "Snapfun" || name == "Funsnap" || name == "Auntysnap") return true;
-        // who tf sets their random name like this
-
-        // All remaining letters should be lowercase
-        for (size_t i = 1; i < name.size(); ++i)
-        {
-                if (!std::islower(static_cast<unsigned char>(name[i])))
-                        return false;
-        }
-
-        // Convert to lowercase
-        std::string lowered = strToLower(name);
-
-        std::unordered_set<std::string> dictionary = { "ace", "ado", "age", "air", "ant", "apt", "art", "awe", "axe", "bag", "bat", "bay", "bay", "bee", "big", "bin", "bow", "bud", "bug", "bus", "bye", "cab", "can", "car", "cat", "cod", "cos", "cow", "coy", "cub", "cud", "cue", "dam", "day", "den", "dew", "dim", "dot", "due", "due", "dun", "ebb", "egg", "elf", "far", "fax", "fee", "few", "fey", "fin", "fir", "fit", "fly", "fog", "fox", "fun", "fur", "gap", "gen", "gig", "gnu", "gun", "gym", "hay", "hen", "hod", "hue", "ice", "ink", "inn", "jam", "jar", "jet", "jib", "jog", "joy", "key", "key", "kin", "kit", "kop", "lap", "lea", "lid", "lip", "lot", "lug", "map", "mid", "mop", "mud", "net", "net", "new", "nib", "nil", "nth", "oak", "oar", "oil", "one", "one", "ore", "our", "own", "pad", "pan", "pea", "pen", "pie", "pin", "pip", "pit", "pod", "pug", "pun", "pup", "rag", "ray", "ria", "rib", "rug", "saw", "sea", "set", "set", "she", "shy", "spa", "spy", "sty", "sum", "sun", "sup", "tab", "tag", "tan", "tap", "tax", "tea", "tee", "ten", "tie", "tin", "tip", "toy", "tub", "use", "vac", "van", "vet", "wad", "wax", "web", "wig", "wit", "wok", "wry", "yea", "yen", "yon", "zoo", "able", "aged", "agog", "aide", "airy", "ajar", "akin", "ammo", "apex", "arch", "arch", "arty", "ashy", "atom", "auto", "avid", "away", "awed", "baby", "band", "bank", "bark", "barn", "base", "base", "bass", "bass", "bath", "bead", "beam", "bean", "bear", "beef", "bend", "best", "bevy", "bike", "bill", "bine", "blog", "blot", "blue", "blur", "boar", "bold", "bold", "bolt", "book", "boot", "born", "boss", "both", "bowl", "boxy", "brag", "brim", "buff", "bulb", "bump", "bunk", "burr", "busy", "cafe", "cake", "calf", "calm", "cane", "cape", "card", "care", "carp", "cart", "case", "cash", "cask", "cave", "cell", "cent", "chic", "chin", "chip", "chop", "city", "clad", "claw", "clay", "clef", "clip", "clod", "clog", "club", "clue", "coal", "coat", "coda", "code", "coin", "colt", "comb", "cook", "cool", "copy", "cord", "core", "cork", "corn", "cosy", "crab", "crew", "crib", "crop", "crow", "cube", "cult", "curd", "curl", "dame", "damp", "dark", "dart", "dash", "dawn", "dear", "deep", "deer", "deft", "desk", "dhal", "dhow", "dial", "dice", "diet", "disc", "dish", "doer", "doll", "dome", "done", "door", "dove", "dray", "drop", "drum", "dual", "duck", "duct", "dusk", "each", "east", "east", "easy", "echo", "ecru", "edge", "edgy", "envy", "epic", "euro", "even", "ewer", "exam", "exit", "fain", "fair", "fair", "fall", "fare", "farm", "fast", "faun", "fawn", "feet", "fell", "fern", "fife", "file", "film", "fine", "fire", "firm", "fish", "five", "flag", "flat", "flax", "flea", "flex", "flit", "flue", "flux", "foal", "foam", "fond", "font", "food", "fore", "form", "foxy", "free", "fuse", "fuss", "gaff", "gala", "gale", "game", "game", "gamy", "gaol", "gate", "germ", "ghat", "gill", "gilt", "glad", "glue", "goal", "goat", "gold", "gold", "gone", "good", "gram", "grey", "grid", "grub", "gulf", "gull", "gust", "hair", "hale", "half", "half", "hall", "hare", "hazy", "heap", "heat", "herd", "hero", "hewn", "hill", "hind", "hive", "home", "home", "hood", "hoof", "hoop", "hour", "huge", "hunt", "iced", "idea", "inch", "inky", "iron", "item", "jail", "joke", "just", "kame", "keel", "keen", "keep", "kelp", "kerb", "king", "kite", "knee", "knot", "kohl", "lace", "lacy", "lamb", "lamp", "lane", "late", "lava", "lawn", "laze", "lead", "leaf", "lean", "left", "lens", "life", "like", "limb", "line", "link", "lino", "lion", "live", "load", "loaf", "loan", "loch", "loft", "logo", "lone", "long", "look", "loop", "lord", "lost", "loud", "luck", "lure", "lush", "mail", "mall", "mane", "many", "mast", "maze", "meal", "meet", "mega", "menu", "mere", "mews", "mice", "mike", "mild", "mill", "mime", "mind", "mine", "mine", "mini", "mint", "mint", "mire", "mitt", "mole", "mood", "moon", "moor", "more", "moss", "most", "much", "musk", "myth", "name", "nave", "navy", "neap", "near", "neat", "neck", "need", "nest", "news", "next", "nice", "nosh", "note", "noun", "nova", "nowt", "null", "numb", "oast", "odds", "ogee", "once", "only", "open", "open", "oval", "oval", "over", "pace", "page", "pail", "pair", "pall", "palm", "park", "part", "past", "past", "path", "pawl", "peak", "peak", "pear", "peel", "pile", "pill", "pink", "pins", "pith", "pity", "plan", "plot", "plum", "plus", "plus", "poem", "poet", "pony", "pool", "pore", "port", "posh", "pout", "pram", "prey", "prim", "prow", "puce", "pure", "purr", "quay", "quin", "quip", "quiz", "raft", "rail", "rain", "rake", "ramp", "rare", "reed", "rent", "rest", "rich", "rife", "ripe", "rise", "road", "roan", "roof", "rope", "rose", "rose", "rosy", "ruby", "ruff", "rule", "rung", "rust", "safe", "saga", "sage", "sail", "sake", "sale", "salt", "salt", "same", "sand", "sane", "save", "scar", "seal", "seam", "seer", "sett", "shed", "ship", "shoe", "shop", "shot", "show", "side", "sign", "silk", "sine", "sink", "site", "size", "skew", "skip", "slab", "sloe", "slow", "slub", "snap", "snow", "snub", "snug", "sock", "sofa", "soil", "sole", "sole", "solo", "some", "song", "soup", "spam", "span", "spar", "spot", "spry", "stag", "star", "stem", "such", "suet", "sure", "swan", "swap", "tale", "tall", "tame", "tank", "tape", "task", "taut", "taxi", "team", "tear", "teat", "tent", "term", "test", "text", "then", "thud", "tick", "tide", "tidy", "tile", "till", "time", "tiny", "toad", "tofu", "toga", "toil", "tomb", "tour", "town", "trad", "tram", "trap", "tray", "trio", "true", "trug", "tsar", "tube", "tuna", "tune", "turf", "turn", "tusk", "twee", "twig", "twin", "twin", "type", "tyre", "unit", "used", "vase", "vast", "veal", "veil", "very", "vest", "view", "vote", "wail", "wall", "wand", "ward", "warm", "wary", "wasp", "wave", "wavy", "waxy", "week", "weir", "well", "well", "west", "west", "whey", "whim", "whip", "wide", "wild", "wile", "will", "wily", "wind", "wing", "wipe", "wire", "wise", "wise", "wish", "wont", "wont", "wool", "worn", "wove", "wren", "yawl", "yawn", "year", "yoke", "yolk", "zany", "zany", "zing", "ackee", "actor", "acute", "adept", "afoot", "agile", "aglow", "alarm", "album", "alert", "alike", "alive", "alkyl", "alkyl", "alloy", "alone", "alpha", "alpha", "amber", "amber", "ample", "angle", "apple", "apron", "arena", "argon", "arrow", "aside", "astir", "atlas", "attic", "audio", "aunty", "avail", "awake", "award", "aware", "awash", "axial", "azure", "badge", "baggy", "balmy", "barge", "basal", "basic", "basin", "basis", "baths", "baton", "baulk", "beach", "beads", "beady", "beefy", "beery", "beige", "bench", "berry", "bhaji", "bidet", "bijou", "bitty", "blank", "blase", "blaze", "bling", "bliss", "bliss", "block", "bloke", "blond", "blues", "blurb", "board", "bonny", "bonus", "booth", "boric", "bound", "bower", "brake", "brass", "brass", "brave", "break", "bream", "bride", "brief", "briny", "brisk", "broad", "broom", "brown", "brown", "bugle", "built", "bulky", "bumpy", "bunch", "cabin", "cable", "cairn", "calyx", "canny", "canoe", "canto", "caret", "cargo", "chain", "chalk", "charm", "chart", "chary", "chess", "chest", "chewy", "chief", "chief", "chill", "chine", "chive", "choir", "chump", "cinch", "civic", "civil", "claim", "clank", "class", "clear", "clerk", "cliff", "cloak", "clock", "close", "cloth", "cloud", "clove", "clump", "coach", "coast", "cocoa", "combe", "comfy", "comic", "comic", "comma", "conic", "coomb", "copse", "coral", "coral", "corps", "court", "coven", "cover", "crane", "crate", "crisp", "crisp", "croak", "crony", "crowd", "crown", "crumb", "crust", "cubic", "curly", "curve", "daily", "dairy", "dairy", "daisy", "dance", "dazed", "delta", "demob", "denim", "diary", "digit", "diner", "dinky", "disco", "ditch", "diver", "divot", "dizzy", "dodge", "domed", "doubt", "dozen", "draft", "drain", "drama", "drawl", "drawn", "dream", "dress", "dried", "drier", "drill", "drink", "drive", "droll", "drone", "duple", "dusky", "dusty", "eager", "eagle", "early", "eater", "elder", "elect", "elfin", "elite", "email", "envoy", "epoch", "equal", "error", "ether", "ethic", "event", "every", "exact", "extra", "facet", "faint", "famed", "fancy", "farad", "fated", "feast", "fence", "ferny", "ferry", "fever", "fibre", "fiery", "filmy", "final", "finch", "fishy", "fizzy", "flash", "flash", "flask", "fleet", "fleet", "flick", "flies", "flock", "flood", "floor", "flour", "fluid", "fluid", "flush", "flute", "focal", "focus", "foggy", "force", "forge", "forty", "fount", "frame", "frank", "fresh", "front", "frost", "frown", "funny", "furry", "furze", "futon", "fuzzy", "gable", "gamma", "gamut", "gauzy", "gecko", "ghost", "giant", "giant", "giddy", "given", "glace", "glass", "glaze", "gleam", "globe", "glory", "glove", "gluey", "going", "goods", "goody", "gooey", "goose", "gorse", "gouge", "gourd", "grace", "grain", "grand", "grand", "grape", "graph", "grasp", "great", "green", "groat", "group", "grown", "guard", "guest", "guide", "guise", "gummy", "gusty", "hanky", "happy", "hardy", "hasty", "heads", "heaps", "heavy", "hedge", "hefty", "helix", "herby", "hertz", "hewer", "hilly", "hinge", "hobby", "holey", "homey", "honey", "hoppy", "hotel", "humid", "husky", "husky", "hutch", "hyena", "icing", "ideal", "image", "imago", "index", "inner", "ionic", "irons", "ivory", "jacks", "jaggy", "jammy", "jazzy", "jeans", "jelly", "jewel", "jokey", "jolly", "juice", "jumbo", "jumbo", "jumpy", "kazoo", "khaki", "kiosk", "knife", "knurl", "koala", "label", "laird", "large", "larky", "larva", "laser", "lasso", "latex", "lathe", "latte", "layer", "leafy", "leaky", "least", "ledge", "leech", "leggy", "lemon", "lento", "level", "level", "lever", "lilac", "limit", "linen", "liner", "litre", "loads", "loamy", "local", "lofty", "logic", "lolly", "loose", "lorry", "loser", "lotto", "lower", "lucid", "lucky", "lunar", "lunch", "lupin", "lyric", "lyric", "magic", "magic", "major", "malty", "mango", "marly", "marsh", "maser", "match", "matey", "maths", "mauve", "mayor", "mealy", "meaty", "medal", "media", "mercy", "merry", "metal", "metal", "meter", "metre", "micro", "miner", "minty", "misty", "mixed", "mixer", "modal", "model", "model", "molar", "month", "moral", "moral", "motel", "motet", "mothy", "motor", "motor", "motte", "mould", "mouse", "mousy", "mouth", "movie", "muddy", "mulch", "mural", "music", "musty", "muted", "natty", "naval", "navvy", "newel", "newsy", "nifty", "night", "ninja", "noble", "noise", "nomad", "north", "north", "notch", "noted", "novel", "novel", "oaken", "ocean", "olden", "olive", "onion", "onset", "orbit", "order", "other", "outer", "outer", "overt", "owing", "oxide", "ozone", "pacer", "pager", "paint", "pally", "palmy", "panda", "paper", "party", "pasty", "patch", "pause", "peace", "peach", "peaky", "pearl", "pearl", "peaty", "peeve", "pence", "penny", "perch", "perky", "petal", "phone", "photo", "piano", "pilot", "pitch", "pithy", "piton", "place", "plain", "plain", "plane", "plank", "plant", "plumy", "plush", "point", "polar", "polka", "porch", "posse", "pouch", "pound", "pouty", "power", "prank", "prawn", "price", "pride", "prime", "prime", "prior", "prism", "privy", "prize", "prize", "prone", "proof", "proof", "prose", "proud", "pulpy", "pupal", "pupil", "puppy", "puree", "purse", "quark", "quart", "query", "quest", "quick", "quiet", "quill", "quilt", "quirk", "quits", "radar", "radio", "radio", "rainy", "rally", "ranch", "range", "rapid", "raven", "razor", "ready", "recap", "redox", "reedy", "regal", "reign", "relay", "remit", "reply", "resit", "retro", "rhyme", "rider", "ridge", "rifle", "right", "rigid", "rimed", "risky", "river", "roast", "robin", "robot", "rocky", "rooms", "roomy", "roost", "round", "route", "royal", "royal", "ruler", "runic", "rural", "rusty", "sable", "salad", "salon", "sassy", "sated", "satin", "saute", "scale", "scaly", "scant", "scarf", "scent", "scoop", "scope", "scrub", "scuff", "sedge", "senna", "sense", "sepia", "seven", "shade", "shaky", "shale", "shame", "shank", "shape", "shark", "sharp", "sheer", "sheet", "shelf", "shell", "shiny", "shirt", "shoal", "shock", "shore", "short", "shrug", "shtum", "sieve", "sight", "silky", "silty", "sixer", "skate", "skill", "skirl", "slang", "slaty", "sleek", "sleet", "slice", "slide", "slime", "small", "smart", "smelt", "smoke", "smoky", "snack", "snail", "snake", "snare", "sniff", "snore", "snowy", "solar", "solid", "solid", "sonic", "soppy", "sorry", "sound", "sound", "soupy", "south", "south", "space", "spare", "spark", "spate", "spawn", "spear", "spent", "spicy", "spiel", "spike", "spire", "spite", "splay", "spoon", "sport", "spout", "spree", "squad", "stack", "staff", "stage", "staid", "stain", "stair", "stamp", "stand", "stare", "start", "state", "state", "steak", "steam", "steel", "steep", "stern", "stick", "still", "stock", "stock", "stoic", "stone", "stony", "stool", "store", "stork", "storm", "story", "stout", "strap", "straw", "stray", "stuck", "study", "style", "suave", "sugar", "sunny", "sunup", "super", "surge", "swarm", "sweet", "sweet", "swell", "swell", "swift", "swipe", "swish", "sword", "sworn", "syrup", "table", "tacit", "tamer", "tangy", "taper", "tarry", "taste", "tawny", "tenon", "tense", "tense", "tenth", "terms", "terse", "theme", "these", "thief", "third", "thorn", "those", "three", "tiara", "tidal", "tiger", "tight", "tilde", "tiled", "tined", "tinny", "tipsy", "tired", "title", "toast", "today", "token", "tonal", "tonic", "topic", "torch", "torte", "total", "total", "towel", "tower", "trail", "train", "treat", "trial", "tribe", "trice", "trike", "trill", "trout", "truce", "truck", "trunk", "trunk", "truss", "truth", "twain", "tweak", "twine", "twirl", "uncut", "undue", "union", "upper", "urban", "usual", "utter", "vague", "valid", "value", "vegan", "verse", "video", "visit", "vista", "vital", "vocal", "voice", "vowel", "wacky", "wagon", "waist", "washy", "watch", "water", "waxen", "weave", "weber", "weeny", "weird", "whale", "wheat", "whiff", "whole", "whorl", "widow", "width", "wince", "winch", "windy", "wiper", "wispy", "witty", "woody", "wordy", "world", "worth", "wound", "wreck", "wrist", "yacht", "yogic", "young", "youth", "yummy", "zebra", "zippy", "zonal", "ablaze", "access", "acting", "action", "active", "actual", "acuity", "adagio", "adroit", "adverb", "advice", "aerial", "aflame", "afloat", "agency", "airway", "alight", "allied", "allure", "amazed", "amoeba", "amount", "anchor", "annual", "annual", "answer", "apeman", "apical", "arable", "arbour", "arcane", "ardent", "ardour", "armful", "armlet", "armour", "arrant", "artful", "artist", "asleep", "aspect", "asthma", "astral", "astute", "atomic", "august", "auntie", "autumn", "avatar", "badger", "ballet", "banner", "barber", "bardic", "barley", "barrel", "basics", "basket", "bathos", "batten", "battle", "beaded", "beaked", "beaker", "bedbug", "bedsit", "beetle", "belief", "benign", "better", "billow", "binary", "bionic", "biotic", "blazon", "blithe", "blotch", "blouse", "blower", "bluish", "blurry", "bonded", "bonnet", "bonsai", "border", "botany", "bottle", "bounds", "bovine", "breach", "breath", "breeze", "breezy", "brewer", "bridge", "bright", "bronze", "brooch", "bubbly", "bubbly", "bucket", "buckle", "budget", "bumper", "bumper", "bundle", "burger", "burrow", "button", "buzzer", "bygone", "byroad", "cachet", "cactus", "camera", "campus", "canape", "candid", "candle", "canine", "canned", "canopy", "canvas", "carbon", "career", "career", "carpet", "carrot", "carton", "castle", "casual", "catchy", "catnap", "cattle", "causal", "caveat", "caviar", "celery", "cellar", "cement", "centre", "centre", "cereal", "cerise", "chalky", "chance", "chancy", "change", "chatty", "cheery", "cheese", "chilly", "chirpy", "choice", "choice", "choral", "chorus", "chummy", "chunky", "cinder", "cinema", "circle", "circus", "classy", "claves", "clayey", "clever", "clinic", "cloche", "cobweb", "cocoon", "coeval", "coffee", "coffer", "cogent", "collar", "collie", "colour", "column", "comedy", "common", "conger", "conoid", "convex", "cookie", "cooler", "coping", "copper", "copper", "cordon", "corned", "corner", "cosmic", "county", "coupon", "course", "covert", "cowboy", "coyote", "cradle", "craggy", "crayon", "creaky", "credit", "crispy", "crumby", "crunch", "cuboid", "cupola", "curacy", "cursor", "curtsy", "custom", "cyclic", "dainty", "damper", "dapper", "daring", "dative", "dazzle", "debate", "debtor", "decent", "defect", "degree", "deluxe", "demure", "denary", "desert", "desire", "detail", "device", "dexter", "diatom", "dilute", "dimple", "dinghy", "direct", "divide", "divine", "docile", "doctor", "dogged", "doodle", "dotage", "doting", "dotted", "double", "doughy", "dragon", "drapes", "drawer", "dreamy", "dressy", "dulcet", "duplex", "earthy", "earwig", "echoey", "effect", "effort", "eighty", "either", "elated", "eldest", "elfish", "elixir", "embryo", "ending", "energy", "engine", "enough", "enough", "entire", "equine", "eraser", "ermine", "errant", "ersatz", "excise", "excuse", "exempt", "exotic", "expert", "expert", "expiry", "extant", "fabled", "facile", "factor", "fallow", "family", "famous", "farmer", "fecund", "feisty", "feline", "fellow", "fencer", "ferric", "fervid", "fierce", "figure", "filial", "fillip", "finish", "finite", "fiscal", "fitful", "fitted", "flambe", "flaxen", "fleece", "fleecy", "flight", "flinty", "floral", "florid", "flossy", "floury", "flower", "fluent", "fluffy", "fodder", "foible", "folder", "folksy", "forage", "forest", "formal", "former", "fridge", "frieze", "fright", "frilly", "frizzy", "frosty", "frothy", "frozen", "frugal", "funnel", "future", "future", "gabled", "gaffer", "gaiter", "galaxy", "gallon", "galore", "gaming", "gaoler", "garage", "garden", "garlic", "gentle", "gerbil", "gifted", "giggly", "ginger", "girder", "glassy", "glider", "glitzy", "global", "glossy", "glossy", "gloved", "golden", "gopher", "gowned", "grainy", "grassy", "grater", "gratis", "gravel", "grease", "greasy", "greeny", "grilse", "gritty", "groove", "grotto", "ground", "grubby", "grungy", "guitar", "gutter", "hairdo", "haloed", "hamlet", "hammer", "hanger", "hawser", "header", "health", "helper", "hempen", "herbal", "hermit", "heroic", "hiccup", "hinder", "hinged", "homely", "homing", "honest", "hoofed", "hooked", "horsey", "hostel", "hourly", "hubbub", "huddle", "humane", "humble", "humour", "hungry", "hunted", "hunter", "hurray", "hybrid", "hyphen", "iambic", "icicle", "iconic", "iguana", "immune", "inborn", "indoor", "inland", "inmost", "innate", "inrush", "insect", "inside", "inside", "instep", "intact", "intent", "intern", "invite", "inward", "iodine", "ironic", "island", "italic", "jacket", "jagged", "jailer", "jargon", "jaunty", "jingle", "jingly", "jockey", "jocose", "jocund", "jogger", "joggle", "jovial", "joyful", "joyous", "jumble", "jumper", "jungly", "junior", "kennel", "ketone", "kettle", "kilted", "kindly", "kingly", "kirsch", "kitbag", "kitten", "knight", "ladder", "landed", "laptop", "larder", "larval", "latest", "latter", "laurel", "lavish", "lawful", "lawyer", "layman", "leaded", "leaden", "league", "ledger", "legacy", "legend", "legion", "lemony", "lender", "length", "lepton", "lessee", "lesser", "lesson", "lethal", "letter", "liable", "lidded", "likely", "limber", "limpid", "lineal", "linear", "liquid", "lissom", "listed", "litter", "little", "lively", "livery", "living", "living", "lizard", "loaded", "loafer", "locker", "locust", "logger", "lordly", "lounge", "lovely", "loving", "lugger", "lupine", "lustre", "luxury", "madcap", "magnet", "maiden", "maiden", "malted", "mammal", "manful", "manned", "manner", "mantis", "manual", "marble", "margin", "marine", "marked", "market", "maroon", "marshy", "mascot", "massif", "matrix", "matted", "matter", "mature", "meadow", "medial", "median", "medium", "memory", "merest", "meteor", "method", "metric", "mickle", "mickle", "midday", "middle", "middle", "mighty", "milieu", "minded", "minute", "minute", "mirror", "missus", "moated", "mobile", "modern", "modest", "modish", "module", "mohair", "molten", "moment", "mosaic", "motion", "motive", "motive", "motley", "moving", "muckle", "mucous", "muddle", "mulish", "mulled", "mullet", "museum", "mutiny", "mutton", "mutual", "muzzle", "myopia", "myriad", "myriad", "mystic", "mythic", "nachos", "narrow", "nation", "native", "natter", "nature", "nearby", "nether", "nettle", "neuter", "newish", "nimble", "nobody", "normal", "notice", "nought", "number", "object", "oblate", "oblong", "oblong", "occult", "octane", "ocular", "oddity", "offcut", "office", "oldish", "oniony", "online", "onrush", "onside", "onward", "opaque", "opener", "orange", "orange", "origin", "ornate", "orphan", "osprey", "outfit", "owlish", "oxtail", "oxygen", "packed", "packet", "palace", "paltry", "papery", "parade", "parcel", "parody", "parrot", "patchy", "patent", "pathos", "pavane", "peachy", "peaked", "peanut", "pebble", "pebbly", "pedlar", "people", "pepper", "petite", "petrol", "phrase", "picker", "picket", "pickle", "picnic", "pigeon", "pillar", "pillow", "pimple", "pimply", "pincer", "pinion", "piping", "pitted", "placid", "planar", "planet", "plaque", "plenty", "pliant", "plucky", "plumed", "plummy", "plunge", "plural", "plural", "plushy", "pocked", "pocket", "pocket", "poetic", "poetry", "poised", "polite", "pollen", "porous", "postal", "poster", "potato", "potted", "pounce", "powder", "precis", "prefix", "pretty", "pricey", "primal", "profit", "prompt", "proper", "proven", "public", "puddle", "pulley", "pulsar", "punchy", "puppet", "purism", "purist", "purple", "purply", "puzzle", "quaint", "quango", "quasar", "quirky", "rabbit", "racing", "racket", "radial", "radius", "raffia", "raffle", "ragged", "raging", "raglan", "raglan", "ragtag", "raisin", "rammer", "ramrod", "random", "rapper", "raring", "rarity", "rasher", "rating", "ration", "rattle", "ravine", "raving", "reason", "rebate", "recent", "recess", "recipe", "record", "record", "redial", "reform", "regent", "region", "relief", "relish", "remark", "remiss", "remote", "rennet", "rennin", "repair", "report", "rested", "result", "retort", "revamp", "reward", "rhythm", "ribbon", "ridden", "riddle", "ridged", "ripple", "rising", "robust", "rocket", "rodent", "rotary", "rotund", "roving", "rubble", "ruched", "rudder", "rueful", "rugged", "rugger", "rumour", "rumpus", "runway", "russet", "rustic", "rustle", "rutted", "saddle", "saithe", "saline", "salmon", "sample", "sandal", "sateen", "satiny", "saucer", "saving", "sawfly", "scalar", "scalar", "scales", "scarab", "scarce", "scenic", "scheme", "school", "schtum", "scorer", "scrawl", "screen", "script", "scurfy", "season", "seated", "second", "secret", "secret", "secure", "sedate", "seemly", "select", "senior", "sensor", "septet", "serene", "serial", "series", "settee", "setter", "severe", "shaper", "sharer", "sheeny", "shield", "shiner", "shorts", "shovel", "shower", "shrewd", "shrill", "shrimp", "signal", "signal", "signet", "silage", "silent", "silken", "silver", "silver", "simian", "simile", "simper", "simple", "sinewy", "single", "sinter", "sister", "sketch", "slangy", "sledge", "sleepy", "sleety", "sleeve", "sleigh", "slight", "slinky", "slippy", "sluice", "slushy", "smooth", "smudge", "smudgy", "snaggy", "snazzy", "snoopy", "snoozy", "social", "socket", "sodium", "softie", "solemn", "solids", "sonnet", "source", "sparky", "speech", "speedy", "sphere", "sphinx", "spider", "spinet", "spiral", "spiral", "spooky", "sporty", "spotty", "sprain", "sprawl", "spring", "spruce", "sprung", "square", "square", "squash", "squish", "stable", "stagey", "stamen", "staple", "staple", "starch", "starry", "static", "statue", "steady", "steely", "stereo", "stereo", "stocks", "stocky", "stolid", "stormy", "streak", "stride", "string", "stripe", "stripy", "stroll", "strong", "stubby", "studio", "sturdy", "subtle", "suburb", "subway", "sudden", "suffix", "sugary", "sulpha", "summer", "sundry", "sunken", "sunlit", "sunset", "superb", "supine", "supper", "supply", "supply", "surfer", "surtax", "survey", "swampy", "swanky", "sweaty", "switch", "swivel", "sylvan", "symbol", "syntax", "syrupy", "tablet", "taking", "talent", "talker", "tangle", "tanker", "tannic", "target", "tartan", "taster", "tavern", "teacup", "teapot", "teasel", "temper", "tennis", "tester", "tether", "thesis", "thirty", "thrill", "throes", "throne", "ticker", "ticket", "tiddly", "tiered", "tights", "timber", "timely", "tinker", "tinned", "tinted", "tipped", "tipple", "tiptop", "tissue", "titchy", "titled", "tomato", "tracer", "trader", "treaty", "treble", "tremor", "trendy", "tricky", "triple", "troops", "trophy", "trough", "truant", "trusty", "tucker", "tufted", "tundra", "tunnel", "turbid", "turkey", "turtle", "tussle", "twirly", "twisty", "umlaut", "unable", "unborn", "undone", "uneven", "unique", "unlike", "unmade", "unpaid", "unread", "unreal", "unsaid", "unseen", "unsold", "untold", "unused", "unwary", "unworn", "upbeat", "uphill", "upland", "uproar", "uptake", "upward", "upwind", "urbane", "urchin", "urgent", "usable", "useful", "utmost", "valley", "vapour", "varied", "veggie", "veiled", "veined", "velour", "velvet", "verbal", "verity", "vernal", "versed", "vertex", "vessel", "viable", "vinous", "violet", "violin", "visage", "viscid", "visual", "volume", "voyage", "waders", "waggle", "waiter", "waiver", "waking", "wallet", "wallop", "walrus", "wanted", "warble", "warder", "wealth", "wearer", "webbed", "webcam", "wedded", "weevil", "wheezy", "whippy", "wicker", "wifely", "wilful", "window", "winged", "winger", "winner", "winter", "wintry", "witted", "wizard", "wobbly", "wonder", "wonted", "wooded", "woolly", "woolly", "worthy", "wreath", "wrench", "yarrow", "yearly", "yellow", "yonder", "zapper", "zenith", "zigzag", "zigzag", "zircon", "zither", "abiding", "ability", "abiotic", "absence", "account", "acidity", "acrobat", "acrylic", "actress", "actuary", "adamant", "addenda", "address", "advance", "aerated", "aerobic", "affable", "ageless", "airport", "alcopop", "alleged", "amazing", "ambient", "amenity", "amiable", "amusing", "anaemia", "ancient", "angelic", "angling", "angular", "animate", "animism", "aniseed", "annular", "annulus", "anodyne", "antacid", "anthill", "antique", "antique", "antonym", "aplenty", "apology", "apparel", "applied", "apropos", "aquatic", "aqueous", "arbiter", "archaic", "article", "ascetic", "aseptic", "assured", "athlete", "attache", "audible", "aureole", "autocue", "average", "avidity", "awesome", "bagpipe", "balcony", "balloon", "bandsaw", "banquet", "bargain", "baronet", "barrage", "bassist", "battery", "beeline", "belated", "beloved", "bemused", "bequest", "bespoke", "betters", "bicycle", "billion", "binding", "biology", "biscuit", "bismuth", "bivalve", "blanket", "blanket", "blatant", "blessed", "blister", "blogger", "blossom", "blowfly", "blurred", "bonfire", "bookish", "boracic", "boulder", "boxroom", "boycott", "boyhood", "bracket", "bravery", "breaded", "breadth", "breathy", "brimful", "brisket", "bristly", "brittle", "bromide", "brother", "buckram", "bucolic", "budding", "builder", "bulrush", "bulwark", "buoyant", "burning", "bursary", "butcher", "buzzard", "cabaret", "cadence", "cadenza", "caisson", "calends", "calorie", "candied", "cannery", "capable", "capital", "capital", "captain", "caption", "capture", "caravan", "caraway", "carbide", "careful", "carmine", "carnage", "cartoon", "carving", "cashier", "cavalry", "ceiling", "centaur", "central", "centric", "century", "ceramic", "certain", "cession", "chamber", "channel", "chapter", "charity", "charmer", "chatter", "checked", "checker", "chemist", "chevron", "chicane", "chicken", "chimney", "chirrup", "chortle", "chuffed", "civvies", "clarion", "classic", "classic", "clastic", "cleaver", "clement", "climate", "clinker", "cluster", "clutter", "coastal", "coating", "coaxial", "cobbled", "coequal", "cognate", "coldish", "collage", "college", "comical", "commune", "compact", "compact", "company", "compass", "complex", "concave", "concert", "concise", "conduit", "conical", "content", "contest", "control", "convert", "cooking", "coolant", "copious", "copycat", "cordial", "coronet", "correct", "council", "counter", "counter", "country", "courage", "courtly", "crackle", "crawler", "crested", "crimson", "crinkly", "croquet", "crucial", "crumbly", "crunchy", "cryptic", "crystal", "crystal", "culvert", "cunning", "cunning", "cupcake", "curator", "curious", "currant", "current", "curried", "cursive", "cursive", "cursory", "curtain", "cushion", "customs", "cutaway", "cutback", "cutlass", "cutlery", "cutting", "cutting", "cyclist", "dabbler", "dancing", "dappled", "darling", "dashing", "dawning", "deadpan", "decagon", "decided", "decimal", "decimal", "decoder", "defiant", "deltaic", "denizen", "dentist", "dervish", "desktop", "desktop", "dessert", "devoted", "devotee", "diagram", "diamond", "diamond", "dietary", "diffuse", "digital", "dignity", "dioxide", "diploid", "diploma", "display", "distant", "disused", "diurnal", "diverse", "divided", "dolphin", "donnish", "dormant", "doughty", "drachma", "drastic", "draught", "drawing", "dresser", "dribble", "driving", "drought", "drummer", "duality", "ductile", "dungeon", "duopoly", "durable", "dustbin", "dutiful", "dynamic", "dynasty", "earmark", "earnest", "earplug", "earring", "earshot", "earthen", "earthly", "eastern", "easting", "eclipse", "economy", "edaphic", "egghead", "elastic", "elastic", "elderly", "elegant", "elegiac", "ellipse", "elusive", "emerald", "emerald", "eminent", "emirate", "emotive", "empties", "endemic", "endless", "engaged", "enquiry", "ensuing", "epicure", "epigeal", "episode", "epitome", "equable", "equator", "equerry", "erosive", "erudite", "eternal", "ethical", "evasive", "evening", "evident", "exalted", "example", "excited", "exhaust", "exigent", "expanse", "express", "extreme", "factual", "fairing", "fancier", "fantasy", "faraway", "fashion", "feather", "feature", "federal", "feeling", "felspar", "ferrety", "ferrous", "ferrule", "fervent", "festive", "fibrous", "fiction", "fighter", "figment", "filings", "finicky", "fishnet", "fissile", "fission", "fitting", "fixated", "fixture", "flannel", "flavour", "flecked", "fledged", "flighty", "flouncy", "flowery", "fluency", "fluster", "fluvial", "foliage", "foliate", "footing", "footman", "forfeit", "fortune", "forward", "forward", "fragile", "freckly", "freebie", "freeman", "freesia", "freezer", "fretted", "friable", "frilled", "fringed", "frosted", "frowsty", "fulsome", "furcate", "furlong", "furrier", "further", "furtive", "fusible", "fusilli", "gainful", "gallant", "gallery", "gamelan", "garbled", "garnish", "gavotte", "gazette", "gearbox", "general", "genteel", "genuine", "germane", "getaway", "gherkin", "gibbous", "gingery", "giraffe", "girlish", "glaring", "gleeful", "glimmer", "glowing", "gnomish", "goggles", "gorilla", "gradual", "grammar", "grandam", "grandee", "graphic", "grating", "gravity", "greatly", "greyish", "greylag", "gristly", "grocery", "grommet", "grooved", "gryphon", "guarded", "guising", "gushing", "gymnast", "habitat", "hafnium", "halcyon", "halfway", "hallway", "halogen", "halting", "halyard", "handbag", "harbour", "harvest", "heading", "healthy", "hearing", "heating", "helical", "helpful", "helping", "herbage", "heroics", "hexagon", "history", "hitcher", "holdall", "holiday", "holmium", "hominid", "homonym", "honeyed", "hopeful", "horizon", "hotline", "hotness", "hulking", "hunched", "hundred", "hurdler", "hurried", "hydrous", "hygiene", "idyllic", "igneous", "immense", "imprint", "inbuilt", "inexact", "infuser", "ingrown", "initial", "initial", "inkling", "inshore", "instant", "instant", "intense", "interim", "interim", "invader", "inverse", "isohyet", "isthmus", "italics", "jackpot", "jasmine", "jocular", "journal", "journey", "jubilee", "justice", "kenning", "kestrel", "keynote", "kindred", "kindred", "kinetic", "kingdom", "kinsman", "kitchen", "knowing", "knuckle", "knurled", "laconic", "lacquer", "lactose", "lagging", "lambent", "lantern", "largish", "lasting", "lateral", "lattice", "lawsuit", "layette", "leading", "leaflet", "learned", "learner", "leather", "lectern", "legible", "leisure", "lengthy", "lenient", "leonine", "leopard", "lettuce", "lexical", "liberty", "library", "lilting", "lineage", "linkage", "linkman", "lioness", "literal", "lithium", "logging", "logical", "longish", "lottery", "louvred", "lovable", "lowland", "luggage", "lyrical", "machine", "maestro", "magenta", "magenta", "magical", "magnate", "majesty", "maltose", "mammoth", "mammoth", "manners", "mansard", "marbled", "marital", "marquee", "mascara", "massive", "matinee", "matting", "mattock", "maximal", "maximum", "mayoral", "meaning", "meaning", "medical", "meeting", "melodic", "mermaid", "message", "midland", "midweek", "million", "million", "mimetic", "mindful", "mineral", "mineral", "minimal", "minimum", "minster", "missile", "missing", "mission", "mistake", "mixture", "modular", "mollusc", "moneyed", "monitor", "monthly", "moonlit", "moorhen", "morello", "morning", "mottled", "mounted", "mourner", "movable", "muddler", "muffler", "mullion", "musical", "mustard", "mustard", "nankeen", "narwhal", "natural", "nebular", "needful", "neither", "netball", "netting", "network", "newness", "nightly", "nitrous", "nomadic", "nominal", "notable", "noughth", "nuclear", "nursery", "nursing", "nurture", "obesity", "oblique", "obscure", "obvious", "oceanic", "octagon", "octopus", "offbeat", "officer", "offline", "offside", "oilcake", "ominous", "onerous", "ongoing", "onshore", "opening", "opinion", "optimal", "optimum", "opulent", "orbital", "orchard", "ordered", "orderly", "ordinal", "ordinal", "organic", "osmosis", "osmotic", "outdoor", "outline", "outside", "outside", "outsize", "outward", "overall", "overarm", "overlay", "package", "padlock", "pageant", "painter", "paisley", "palaver", "palette", "palmate", "palmtop", "panicle", "paragon", "parking", "parlous", "partial", "passage", "passing", "passive", "pastime", "pasture", "patient", "patient", "pattern", "payable", "peacock", "peckish", "pelagic", "pelisse", "penalty", "pendent", "pending", "penguin", "pension", "peppery", "perfect", "perfume", "persona", "phantom", "philtre", "phonics", "picture", "piebald", "pillbox", "pinched", "pinkish", "piquant", "pitcher", "pitfall", "pivotal", "plaster", "plastic", "plastic", "platoon", "playful", "pleased", "pleated", "plenary", "pliable", "plumber", "plunger", "podcast", "poetess", "pointed", "polemic", "politic", "popcorn", "popular", "portion", "postage", "postbox", "postern", "postman", "potable", "pottage", "pottery", "powdery", "powered", "praline", "prattle", "precise", "prefect", "premier", "present", "present", "prickle", "primary", "process", "product", "profuse", "program", "project", "pronged", "pronoun", "propane", "protean", "protein", "proverb", "proviso", "prudent", "psychic", "puckish", "pumpkin", "purpose", "puzzler", "pyjamas", "pyramid", "pyrites", "quality", "quantum", "quarter", "quavery", "queenly", "quinine", "quorate", "rabbity", "rackety", "radiant", "radical", "raffish", "rafting", "railing", "railman", "railway", "rainbow", "rambler", "ramekin", "rampant", "rarebit", "ratable", "raucous", "rawhide", "readies", "recital", "recount", "recruit", "redhead", "redwing", "referee", "refined", "regards", "regatta", "regency", "regnant", "regular", "related", "relaxed", "reliant", "remorse", "removed", "replete", "reproof", "reptile", "reputed", "respect", "restful", "restive", "rethink", "retired", "retread", "revelry", "revenge", "reverse", "rhombus", "rickety", "rimless", "ringing", "riotous", "riviera", "roaring", "robotic", "rolling", "roseate", "rounded", "rounder", "routine", "routine", "ruffled", "ruinous", "runaway", "rundown", "running", "saddler", "sailing", "salient", "salvage", "sampler", "sapient", "sardine", "saurian", "sausage", "savings", "savoury", "scarlet", "scenery", "scented", "science", "scrappy", "scratch", "scrawny", "screech", "scribal", "sealant", "searing", "seasick", "seaside", "seaward", "seaweed", "section", "secular", "seedbed", "seeming", "segment", "seismic", "sensory", "sensual", "serious", "serried", "servant", "several", "shadowy", "shapely", "shelter", "sheriff", "shivery", "shocker", "showery", "showing", "shrubby", "shudder", "shutter", "sickbay", "sidecar", "sighted", "sightly", "signing", "silvery", "similar", "sincere", "sinless", "sinuous", "sixfold", "sketchy", "skilful", "skilled", "skimmed", "skyline", "skyward", "slatted", "sleeved", "slipper", "slotted", "slowish", "slurred", "sniffle", "sniffly", "snuffly", "snuggly", "society", "soldier", "soluble", "someone", "soprano", "sorghum", "soulful", "spangle", "spangly", "spaniel", "spanner", "sparing", "sparkly", "sparrow", "spartan", "spatial", "speaker", "special", "speckle", "spidery", "spindly", "splashy", "splotch", "spotted", "springy", "spurred", "squally", "squashy", "squidgy", "squiffy", "squishy", "stadium", "standby", "standby", "stapler", "starchy", "starlit", "stately", "station", "stature", "staunch", "stealth", "stellar", "sticker", "stilted", "stoical", "strange", "stratum", "streaky", "stretch", "striker", "strings", "stringy", "striped", "stubbly", "student", "studied", "stylish", "styptic", "subject", "subject", "sublime", "success", "suiting", "sultana", "summary", "summary", "summery", "sunburn", "sundial", "sundown", "sunfish", "sunless", "sunrise", "sunroof", "support", "supreme", "surface", "surface", "surfeit", "surgery", "surmise", "surname", "surplus", "surreal", "swarthy", "swearer", "sweater", "swollen", "synapse", "synonym", "tabular", "tactful", "tactile", "tadpole", "tallish", "tangram", "tantrum", "taxable", "teacher", "telling", "tenable", "tenfold", "tensile", "ternary", "terrace", "terrain", "terrine", "testate", "textile", "textual", "texture", "theatre", "thistle", "thought", "thrifty", "through", "thrower", "thunder", "tideway", "timpani", "titanic", "titular", "toaster", "toccata", "tombola", "tonight", "toothed", "topical", "topmost", "topsoil", "torment", "tornado", "touched", "tourism", "tourist", "tracing", "tracker", "tractor", "trailer", "trainer", "trapeze", "treacly", "tremolo", "triable", "triadic", "tribune", "trickle", "trochee", "trolley", "trophic", "tropism", "trouble", "trouper", "trumpet", "tsunami", "tubular", "tumbler", "tunable", "tuneful", "twelfth", "twiddly", "twilled", "twitchy", "twofold", "typical", "umpteen", "unaided", "unarmed", "unasked", "unaware", "unbound", "unbowed", "uncanny", "undying", "unequal", "unheard", "unicorn", "unifier", "uniform", "uniform", "unitary", "unladen", "unlined", "unmoved", "unnamed", "unpaved", "unready", "untried", "unusual", "unwaged", "upfront", "upright", "upriver", "upstage", "upstate", "upswept", "useable", "utility", "utility", "valiant", "vanilla", "variant", "variety", "various", "vaulted", "vehicle", "velvety", "venison", "verbena", "verbose", "verdant", "verdict", "verdure", "vernier", "version", "vesicle", "vibrant", "victory", "vinegar", "vintage", "vintner", "virtual", "visible", "visitor", "vitamin", "vlogger", "volcano", "voltaic", "voluble", "voucher", "vulpine", "waggish", "wagtail", "wakeful", "walkout", "wallaby", "wanting", "warmish", "warrant", "washing", "waverer", "waxwing", "waxwork", "wayward", "wealthy", "wearing", "weather", "weather", "webbing", "website", "weighty", "welcome", "welcome", "western", "wetsuit", "wheaten", "wheelie", "whisker", "widower", "wildcat", "willing", "willowy", "winning", "winsome", "wishful", "wistful", "witness", "woollen", "working", "working", "worldly", "worsted", "wriggly", "wrinkle", "writing", "wrought", "zealous", "zestful" };
-
-        for (size_t i = 1; i < lowered.length(); ++i)
-        {
-                std::string first = lowered.substr(0, i);
-                std::string second = lowered.substr(i);
-
-                if (dictionary.count(first) && dictionary.count(second))
-                        return true;
-        }
-
+    if (name.length() < 3)
         return false;
+
+    if (!std::isupper(static_cast<unsigned char>(name[0])))
+        return false;
+
+    if (name == "Needaunty" || name == "Snapaunty" || name == "Snapfun" || name == "Funsnap" || name == "Auntysnap") return true;
+    // who tf sets their random name like this
+
+    // All remaining letters should be lowercase
+    for (size_t i = 1; i < name.size(); ++i)
+    {
+        if (!std::islower(static_cast<unsigned char>(name[i])))
+            return false;
+    }
+
+    // Convert to lowercase
+    std::string lowered = strToLower(name);
+
+    std::unordered_set<std::string> dictionary; // = threeLetters + fourLetters + fiveLetters + sixLetters + sevenLetters;
+    dictionary.reserve(threeLetters.size() + fourLetters.size() + fiveLetters.size() + sixLetters.size() + sevenLetters.size());
+    dictionary.insert(threeLetters.begin(), threeLetters.end());
+    dictionary.insert(fourLetters.begin(), fourLetters.end());
+    dictionary.insert(fiveLetters.begin(), fiveLetters.end());
+    dictionary.insert(sixLetters.begin(), sixLetters.end());
+    dictionary.insert(sevenLetters.begin(), sevenLetters.end());
+
+    for (size_t i = 1; i < lowered.length(); ++i)
+    {
+        std::string first = lowered.substr(0, i);
+        std::string second = lowered.substr(i);
+
+        if (dictionary.count(first) && dictionary.count(second))
+            return true;
+    }
+
+    return false;
 }
 
 bool HasExactlyOneTwoDigitNumber(const std::string& input)
 {
-        std::regex numberPattern(R"(\d+)");
-        std::sregex_iterator it(input.begin(), input.end(), numberPattern);
-        std::sregex_iterator end;
+    std::regex numberPattern(R"(\d+)");
+    std::sregex_iterator it(input.begin(), input.end(), numberPattern);
+    std::sregex_iterator end;
 
-        int matchCount = 0;
+    int matchCount = 0;
 
-        for (; it != end; ++it)
+    for (; it != end; ++it)
+    {
+        std::string matchStr = it->str();
+        if (matchStr.length() == 2)
         {
-                std::string matchStr = it->str();
-                if (matchStr.length() == 2)
-                {
-                        matchCount++;
-                }
-                else
-                {
-                        // Ignore numbers that aren't exactly two digits
-                        continue;
-                }
-
-                // If more than one 2-digit number found, exit early
-                if (matchCount > 1)
-                        return false;
+            matchCount++;
+        }
+        else
+        {
+            // Ignore numbers that aren't exactly two digits
+            continue;
         }
 
-        return matchCount == 1;
+        // If more than one 2-digit number found, exit early
+        if (matchCount > 1)
+            return false;
+    }
+
+    return matchCount == 1;
 }
 
 bool checkAgainstDict(const std::string& str, const std::string& substr, const std::vector<std::string>& dict)
 {
-        for (const std::string& falseDet : dict)
+    for (const std::string& falseDet : dict)
+    {
+        if (str.find(falseDet) != std::string::npos)
         {
-                if (str.find(falseDet) != std::string::npos)
-                {
-                        return false; // found a false flag word
-                }
+            return false; // found a false flag word
         }
+    }
 
-        // If no false flags and contains target substring
-        return str.find(substr) != std::string::npos;
+    // If no false flags and contains target substring
+    return str.find(substr) != std::string::npos;
 }
 
 std::string RemoveDiacritics(const std::string& input)
 {
-        static const std::unordered_map<std::string, std::string> diacriticMap = {
-                // This list of mappings is specifically handpicked to target Among Us's font support.
-                // If it looks like some diacritics or other homoglyphs may be missing from here, that's probably why.
-                // This list is not fully complete and may be subject to change in the future.
+    static const std::unordered_map<std::string, std::string> diacriticMap = {
+        // This list of mappings is specifically handpicked to target Among Us's font support.
+        // If it looks like some diacritics or other homoglyphs may be missing from here, that's probably why.
+        // This list is not fully complete and may be subject to change in the future.
 
-                {"ª","a"},{"à","a"},{"á","a"},{"â","a"},{"ã","a"},{"ä","a"},{"å","a"},{"ā","a"},{"ă","a"},{"ǎ","a"},{"ɑ","a"},{"α","a"},{"а","a"},{"д","a"},{"ạ","a"},{"ả","a"},{"ấ","a"},{"ầ","a"},{"ẩ","a"},{"ẫ","a"},{"ậ","a"},{"ắ","a"},{"ằ","a"},{"ẳ","a"},{"ẵ","a"},{"ặ","a"},{"⒜","a"},{"ⓐ","a"},{"ａ","a"},{"À","A"},{"Á","A"},{"Â","A"},{"Ã","A"},{"Ä","A"},{"Å","A"},{"Ā","A"},{"Ă","A"},{"Ǎ","A"},{"Α","A"},{"Δ","A"},{"Λ","A"},{"λ","A"},{"А","A"},{"Д","A"},{"Ạ","A"},{"Ả","A"},{"Ấ","A"},{"Ầ","A"},{"Ẩ","A"},{"Ẫ","A"},{"Ậ","A"},{"Ắ","A"},{"Ằ","A"},{"Ẳ","A"},{"Ẵ","A"},{"Ặ","A"},{"Å","A"},{"∆","A"},{"∧","A"},{"⊿","A"},{"⌆","A"},{"⏃","A"},{"⏄","A"},{"⏅","A"},{"Ⓐ","A"},{"▲","A"},{"△","A"},{"★","A"},{"☆","A"},{"⼈","A"},{"⼊","A"},{"⽕","A"},{"ㅅ","A"},{"Ａ","A"},{"♲","A"},{"♳","A"},{"♴","A"},{"♵","A"},{"♶","A"},{"♷","A"},{"♸","A"},{"♹","A"},{"♺","A"},{"♻","A"},{"⚠","A"},{"︽","A"},{"︿","A"},{"♠","A"},{"♣","A"},{"♤","A"},{"♧","A"},
-                {"æ","ae"},{"Æ","AE"},
-                {"Ъ","b"},{"Ь","b"},{"ъ","b"},{"ь","b"},{"⒝","b"},{"ⓑ","b"},{"♭","b"},{"ß","B"},{"Б","B"},{"В","B"},{"в","B"},{"Ⓑ","B"},
-                {"Ы","bl"},{"ы","bi"},
-                {"¢","c"},{"©","c"},{"ç","c"},{"с","c"},{"ς","c"},{"⊂","c"},{"⊄","c"},{"⊆","c"},{"⊊","c"},{"⒞","c"},{"ⓒ","c"},{"ㄷ","c"},{"ｃ","c"},{"ﾧ","c"},{"￠","c"},{"㈂","c"},{"㉢","c"},{"ㄸ","cc"},{"ﾨ","cc"},{"Ç","C"},{"С","C"},{"℃","C"},{"Ⓒ","C"},{"⼕","C"},{"⼖","C"},{"⿷","C"},{"【","C"},{"〖","C"},{"ㄈ","C"},{"Ｃ","C"},
-                {"đ","d"},{"ð","d"},{"δ","d"},{"₫","d"},{"∂","d"},{"⒟","d"},{"ⓓ","d"},{"ㆳ","d"},{"ｄ","d"},{"♩","d"},{"♪","d"},{"Ð","D"},{"Đ","D"},{"Ⓓ","D"},{"Ｄ","D"},
-                {"è","e"},{"é","e"},{"ê","e"},{"ë","e"},{"ē","e"},{"ě","e"},{"ε","e"},{"е","e"},{"ё","e"},{"ẹ","e"},{"ẻ","e"},{"ẽ","e"},{"ế","e"},{"ề","e"},{"ể","e"},{"ễ","e"},{"ệ","e"},{"℮","e"},{"⒠","e"},{"ⓔ","e"},{"⺋","e"},{"⺒","e"},{"ｅ","e"},{"£","E"},{"È","E"},{"É","E"},{"Ê","E"},{"Ë","E"},{"Ē","E"},{"Ě","E"},{"Ε","E"},{"Ξ","E"},{"Σ","E"},{"ξ","E"},{"Ё","E"},{"Е","E"},{"Ẹ","E"},{"Ẻ","E"},{"Ẽ","E"},{"Ế","E"},{"Ề","E"},{"Ể","E"},{"Ễ","E"},{"Ệ","E"},{"€","E"},{"∈","E"},{"∉","E"},{"∊","E"},{"∑","E"},{"Ⓔ","E"},{"モ","E"},{"ㅌ","E"},{"ㆯ","E"},{"㈋","E"},{"㉫","E"},{"Ｅ","E"},{"ミ","E"},
-                {"ƒ","f"},{"⒡","f"},{"ⓕ","f"},{"ｆ","f"},{"℉","F"},{"Ⓕ","F"},{"Ｆ","F"},
-                {"ﬀ","ff"},{"ﬁ","fi"},{"ﬂ","fl"},{"ﬃ","ffi"},{"ﬄ","ffl"},
-                {"ɡ","g"},{"ℊ","g"},{"⒢","g"},{"ⓖ","g"},{"ｇ","g"},{"Ⓖ","G"},{"⼛","G"},{"Ｇ","G"},
-                {"ℏ","h"},{"⒣","h"},{"ⓗ","h"},{"ん","h"},{"Η","H"},{"Н","H"},{"н","H"},{"Ⓗ","H"},{"⧺","H"},{"⧻","HH"},
-                {"¦","i"},{"¡","i"},{"ì","i"},{"í","i"},{"î","i"},{"ï","i"},{"ĩ","i"},{"ī","i"},{"ι","i"},{"ⅰ","i"},{"↑","i"},{"↕","i"},{"⇧","i"},{"Ⓘ","i"},{"┆","i"},{"┇","i"},{"┊","i"},{"┋","i"},{"╎","i"},{"╏","i"},{"⬆","i"},{"⬇","i"},{"〡","i"},{"㆐","i"},{"㇑","i"},{"︴","i"},{"ｉ","i"},{"￤","i"},{"Ì","I"},{"Í","I"},{"Î","I"},{"Ï","I"},{"Ĩ","I"},{"Ī","I"},{"Ι","I"},{"Ⅰ","I"},{"↓","I"},{"⇩","I"},{"∣","I"},{"⒤","I"},{"ⓘ","I"},{"⼁","I"},{"ㅣ","I"},{"︱","I"},{"︳","I"},{"ￜ","I"},{"Ｉ","I"},
-                {"Ⅳ","iv"},{"ⅳ","iv"},{"Ⅵ","vi"},{"ⅵ","vi"},{"Ⅶ","vii"},{"ⅶ","vii"},{"Ⅷ","viii"},{"ⅷ","viii"},{"ⅱ","ii"},{"〢","ii"},{"‼","ii"},{"Ⅱ","II"},{"‖","II"},{"ⅲ","iii"},{"〣","iii"},{"Ⅲ","III"},{"Ю","io"},{"ю","io"},
-                {"⒥","j"},{"ⓙ","j"},{"ｊ","j"},{"Ⓙ","J"},{"㆜","J"},{"Ｊ","J"},
-                {"⒦","k"},{"ⓚ","k"},{"ｋ","k"},{"Κ","K"},{"κ","K"},{"К","K"},{"к","K"},{"Ⓚ","K"},{"Ｋ","K"},{"㉿","K"},
-                {"⒧","l"},{"ⓛ","l"},{"ｌ","l"},{"│","l"},{"┃","l"},{"▎","l"},{"▏","l"},{"⎱","l"},{"Ⓛ","L"},{"Ｌ","L"},{"⎿","L"},{"ㆹ","L"},{"㇄","L"},{"㇏","L"},{"㇗","L"},{"㇙","L"},{"㇜","L"},{"㇟","L"},{"└","L"},{"┕","L"},{"┖","L"},{"┗","L"},{"⻌","L"},{"⻍","L"},{"⻎","L"},{"⿺","L"},{"し","L"},{"じ","L"},{"║","ll"},
-                {"ḿ","m"},{"ⓜ","m"},{"ｍ","m"},{"М","M"},{"м","M"},{"Ḿ","M"},{"Ⓜ","M"},{"𝖬","M"},{"Ｍ","M"},
-                {"ñ","n"},{"ń","n"},{"ň","n"},{"ǹ","n"},{"η","n"},{"Л","n"},{"П","n"},{"л","n"},{"п","n"},{"ⓝ","n"},{"ｎ","n"},{"⺆","n"},{"⺇","n"},{"⼌","n"},{"⼍","n"},{"⼑","n"},{"⾨","n"},{"⾾","n"},{"⿵","n"},{"れ","n"},{"ㄇ","n"},{"︵","n"},{"︷","n"},{"︹","n"},{"︻","n"},{"﹇","n"},{"Ñ","N"},{"Ń","N"},{"Ň","N"},{"Ǹ","N"},{"Ν","N"},{"И","N"},{"Й","N"},{"и","N"},{"й","N"},{"Ⓝ","N"},{"𝖭","N"},{"Ｎ","N"},{"ℵ","N"},
-                {"№","No"},
-                {"¤","o"},{"ò","o"},{"ó","o"},{"ô","o"},{"õ","o"},{"ö","o"},{"ø","o"},{"ō","o"},{"ŏ","o"},{"ơ","o"},{"ǒ","o"},{"ο","o"},{"σ","o"},{"φ","o"},{"о","o"},{"ọ","o"},{"ỏ","o"},{"ố","o"},{"ồ","o"},{"ổ","o"},{"ỗ","o"},{"ộ","o"},{"ớ","o"},{"ờ","o"},{"ở","o"},{"ỡ","o"},{"ợ","o"},{"∅","o"},{"⊕","o"},{"⊖","o"},{"⊗","o"},{"⊘","o"},{"⊙","o"},{"⏀","o"},{"⏁","o"},{"⏂","o"},{"⒪","o"},{"■","o"},{"□","o"},{"▢","o"},{"▣","o"},{"▤","o"},{"▥","o"},{"▦","o"},{"▧","o"},{"▨","o"},{"▩","o"},{"▪","o"},{"▫","o"},{"◆","o"},{"◇","o"},{"◈","o"},{"◉","o"},{"◊","o"},{"○","o"},{"◌","o"},{"◍","o"},{"◎","o"},{"●","o"},{"◐","o"},{"◑","o"},{"◒","o"},{"◓","o"},{"◦","o"},{"◯","o"},{"☉","o"},{"☯","o"},{"♡","o"},{"♢","o"},{"♥","o"},{"♦","o"},{"✿","o"},{"❀","o"},{"⦿","o"},{"㆕","o"},{"ㅁ","o"},{"ㅇ","o"},{"㇣","o"},{"ㇿ","o"},{"㈄","o"},{"㈇","o"},{"㉤","o"},{"㉧","o"},{"㋺","o"},{"ｏ","o"},{"ﾷ","o"},{"￮","o"},{"〼","o"},{"Ò","O"},{"Ó","O"},{"Ô","O"},{"Õ","O"},{"Ö","O"},{"Ø","O"},{"Ō","O"},{"Ŏ","O"},{"Ơ","O"},{"Ǒ","O"},{"Θ","O"},{"Ο","O"},{"Φ","O"},{"Ω","O"},{"θ","O"},{"О","O"},{"Ф","O"},{"ф","O"},{"Ọ","O"},{"Ỏ","O"},{"Ố","O"},{"Ồ","O"},{"Ổ","O"},{"Ỗ","O"},{"Ộ","O"},{"Ớ","O"},{"Ờ","O"},{"Ở","O"},{"Ỡ","O"},{"Ợ","O"},{"Ω","O"},{"Ⓞ","O"},{"▇","O"},{"█","O"},{"▉","O"},{"▊","O"},{"▋","O"},{"▱","O"},{"♼","O"},{"♽","O"},{"⚽","O"},{"⚾","O"},{"⼝","O"},{"⼞","O"},{"⿴","O"},{"〇","O"},{"〄","O"},{"Ｏ","O"},{"⓪","0"},{"⓿","0"},{"０","0"},{"ㄖ","0"},
-                {"œ","oe"},{"Œ","OE"},
-                {"ⓟ","p"},{"ｐ","p"},{"þ","p"},{"Þ","p"},{"ρ","p"},{"р","p"},{"Ⓟ","P"},{"𝖯","P"},{"Ｐ","P"},{"Ρ","P"},{"Р","P"},{"⼙","P"},{"⼫","P"},{"ㄕ","P"},{"ㄗ","P"},{"ㆡ","P"},
-                {"ⓠ","q"},{"ｑ","q"},{"Ⓠ","Q"},{"𝖰","Q"},{"Ｑ","Q"},
-                {"ⓡ","r"},{"ｒ","r"},{"Γ","r"},{"⎾","r"},{"┌","r"},{"┍","r"},{"┎","r"},{"┏","r"},{"╒","r"},{"╓","r"},{"╔","r"},{"╭","r"},{"⺁","r"},{"⼚","r"},{"⼴","r"},{"⽧","r"},{"⿸","r"},{"「","r"},{"『","r"},{"ㄏ","r"},{"ㄬ","r"},{"ㆷ","r"},{"Ⓡ","R"},{"𝖱","R"},{"Ｒ","R"},{"­","R"},{"®","R"},{"Я","R"},{"я","R"},
-                {"ⓢ","s"},{"ｓ","s"},{"$","S"},{"Ⓢ","S"},{"𝖲","S"},{"Ｓ","S"},{"⎰","S"},{"∫","S"},{"∮","S"},{"∾","S"},{"ㄎ","S"},{"ㆶ","S"},{"＄","S"},
-                {"∬","ss"},{"∭","sss"},
-                {"ⓣ","t"},{"ｔ","t"},{"⺊","t"},{"⼔","t"},{"⼗","t"},{"⼘","t"},{"〸","t"},{"ㆺ","t"},{"ㇶ","t"},{"㈦","t"},{"㈩","t"},{"Ⓣ","T"},{"𝖳","T"},{"Ｔ","T"},{"Τ","T"},{"τ","T"},{"Т","T"},{"т","T"},{"⏇","T"},{"⏉","T"},{"┬","T"},{"┭","T"},{"┮","T"},{"┯","T"},{"┰","T"},{"┱","T"},{"┲","T"},{"┳","T"},{"╤","T"},{"╥","T"},{"╦","T"},{"⺅","T"},{"ィ","T"},{"イ","T"},{"ㄒ","T"},{"ￓ","T"},
-                {"〹","tt"},
-                {"µ","u"},{"ũ","u"},{"ū","u"},{"ŭ","u"},{"ư","u"},{"ǔ","u"},{"ǖ","u"},{"ǘ","u"},{"ǚ","u"},{"ǜ","u"},{"ц","u"},{"ụ","u"},{"ủ","u"},{"ứ","u"},{"ừ","u"},{"ử","u"},{"ữ","u"},{"ự","u"},{"⒰","u"},{"ⓤ","u"},{"㇃","u"},{"ｕ","u"},{"︶","u"},{"︸","u"},{"︺","u"},{"︼","u"},{"﹈","u"},{"υ","u"},{"Ũ","U"},{"Ū","U"},{"Ŭ","U"},{"Ư","U"},{"Ǔ","U"},{"Ǖ","U"},{"Ǘ","U"},{"Ǚ","U"},{"Ǜ","U"},{"Ц","U"},{"Ụ","U"},{"Ủ","U"},{"Ứ","U"},{"Ừ","U"},{"Ử","U"},{"Ữ","U"},{"Ự","U"},{"∪","U"},{"℧","U"},{"Ⓤ","U"},{"⿶","U"},{"ひ","U"},{"び","U"},{"ぴ","U"},{"Ｕ","U"},
-                {"˅","v"},{"ⅴ","v"},{"∨","v"},{"⒱","v"},{"ⓥ","v"},{"▼","v"},{"▽","v"},{"✓","v"},{"㇢","v"},{"︾","v"},{"﹀","v"},{"ｖ","v"},{"Ⅴ","V"},{"∀","V"},{"Ⓥ","V"},{"Ｖ","V"},
-                {"ⓦ","w"},{"ｗ","w"},{"ω","w"},{"ш","w"},{"щ","w"},{"Ⓦ","W"},{"𝖶","W"},{"Ｗ","W"},{"Ш","W"},{"Щ","W"},{"₩","W"},{"￦","W"},
-                {"ⓧ","x"},{"ｘ","x"},{"χ","x"},{"х","x"},{"ⅹ","x"},{"〆","x"},{"〤","x"},{"Ⓧ","X"},{"𝖷","X"},{"Ｘ","X"},{"Χ","X"},{"Х","X"},{"Ⅹ","X"},{"╳","X"},{"ㄨ","X"},{"ㆫ","X"},
-                {"⽹","XX"},{"〷","XX"},{"ⓨ","y"},{"ｙ","y"},{"ý","y"},{"ÿ","y"},{"У","y"},{"у","y"},{"ỳ","y"},{"ỵ","y"},{"ỷ","y"},{"ỹ","y"},{"Ⓨ","Y"},{"𝖸","Y"},{"Ｙ","Y"},{"￥","Y"},{"¥","Y"},{"Ý","Y"},{"Υ","Y"},{"Ỳ","Y"},{"Ỵ","Y"},{"Ỷ","Y"},{"Ỹ","Y"},{"ㄚ","Y"},{"ㆩ","Y"},
-                {"ⓩ","z"},{"ｚ","z"},{"Ⓩ","Z"},{"𝖹","Z"},{"Ｚ","Z"},{"Ζ","Z"},{"ζ","Z"},{"⼄","Z"},{"㆚","Z"},{"㇠","Z"},
-                {"①","1"},{"⑴","1"},{"⒈","1"},{"⓵","1"},{"❶","1"},{"➀","1"},{"➊","1"},{"１","1"},
-                {"②","2"},{"⑵","2"},{"⒉","2"},{"⓶","2"},{"❷","2"},{"➁","2"},{"➋","2"},{"２","2"},
-                {"³","3"},{"З","3"},{"Э","3"},{"з","3"},{"э","3"},{"∃","3"},{"∋","3"},{"③","3"},{"⑶","3"},{"⒊","3"},{"⓷","3"},{"❸","3"},{"➂","3"},{"➌","3"},{"⺕","3"},{"⼹","3"},{"る","3"},{"ろ","3"},{"ョ","3"},{"ヨ","3"},{"ヺ","3"},{"ㄋ","3"},{"㇋","3"},{"㇌","3"},{"㇡","3"},{"３","3"},
-                {"④","4"},{"⑷","4"},{"⒋","4"},{"⓸","4"},{"❹","4"},{"➃","4"},{"➍","4"},{"４","4"},
-                {"⑤","5"},{"⑸","5"},{"⒌","5"},{"⓹","5"},{"❺","5"},{"➄","5"},{"➎","5"},{"５","5"},
-                {"⑥","6"},{"⑹","6"},{"⒍","6"},{"⓺","6"},{"❻","6"},{"➅","6"},{"➏","6"},{"６","6"},
-                {"⑦","7"},{"⑺","7"},{"⒎","7"},{"⓻","7"},{"❼","7"},{"➆","7"},{"➐","7"},{"７","7"},
-                {"⑧","8"},{"⑻","8"},{"⒏","8"},{"⓼","8"},{"❽","8"},{"➇","8"},{"➑","8"},{"８","8"},
-                {"⑨","9"},{"⑼","9"},{"⒐","9"},{"⓽","9"},{"❾","9"},{"➈","9"},{"➒","9"},{"９","9"},
-                {"＠","@"},{"﹫","@"},{"＾","^"},{"⌅","^"},{"㆟","^"},
-                {"℀","ac"},{"℅","co"},{"℡","TEL"},{"™","TM"},{"℻","FAX"},{"ⅸ","ix"},{"Ⅸ","IX"},{"ⅺ","xi"},{"Ⅺ","XI"},{"ⅻ","xii"},{"Ⅻ","XII"},{"㉐","PTE"},{"㋌","Hg"},{"㋍","erg"},{"㋎","eV"},{"㋏","LTD"},{"㍱","hPa"},{"㍲","da"},{"㍳","AU"},{"㍴","bar"},{"㍵","oV"},{"㍶","pc"},{"㍷","dm"},{"㍸","dm2"},{"㍹","dm3"},{"㍺","IU"},{"㎀","pA"},{"㎁","nA"},{"㎂","uA"},{"㎃","mA"},{"㎄","kA"},{"㎅","KB"},{"㎆","MB"},{"㎇","GB"},{"㎈","cal"},{"㎉","kcal"},{"㎊","pF"},{"㎋","nF"},{"㎌","uF"},{"㎍","ug"},{"㎎","mg"},{"㎏","kg"},{"㎐","Hz"},{"㎑","kHz"},{"㎒","MHz"},{"㎓","GHz"},{"㎔","Thz"},{"㎕","ul"},{"㎖","ml"},{"㎗","dl"},{"㎘","kl"},{"㎙","fm"},{"㎚","nm"},{"㎛","um"},{"㎜","mm"},{"㎝","cm"},{"㎞","km"},{"㎟","mm2"},{"㎠","cm2"},{"㎡","m2"},{"㎢","km2"},{"㎣","mm3"},{"㎤","cm3"},{"㎥","m3"},{"㎦","km3"},{"㎧","ms"},{"㎨","ms2"},{"㎩","Pa"},{"㎪","kPa"},{"㎫","MPa"},{"㎬","GPa"},{"㎭","rad"},{"㎮","rads"},{"㎯","rads2"},{"㎰","ps"},{"㎱","ns"},{"㎲","us"},{"㎳","ms"},{"㎴","pV"},{"㎵","nV"},{"㎶","uV"},{"㎷","mV"},{"㎸","kW"},{"㎹","MV"},{"㎺","pW"},{"㎻","nW"},{"㎼","uW"},{"㎽","mW"},{"㎾","kW"},{"㎿","MW"},{"㏀","kO"},{"㏁","MO"},{"㏂","am"},{"㏃","Bq"},{"㏄","cc"},{"㏅","cd"},{"㏆","Ckg"},{"㏇","Co"},{"㏈","dB"},{"㏉","Gy"},{"㏊","ha"},{"㏋","HP"},{"㏌","in"},{"㏍","KK"},{"㏎","KM"},{"㏏","kt"},{"㏐","lm"},{"㏑","ln"},{"㏒","log"},{"㏓","lx"},{"㏔","mb"},{"㏕","mil"},{"㏖","mol"},{"㏗","pH"},{"㏘","pm"},{"㏙","PPM"},{"㏚","PR"},{"㏛","sr"},{"㏜","Sv"},{"㏝","Wb"},{"㏞","Vm"},{"㏟","Am"},{"㏿","gal"},
-                {"⑩","10"},{"⑽","10"},{"⒑","10"},{"⓾","10"},{"❿","10"},{"➉","10"},{"➓","10"},{"㉈","10"},{"⑪","11"},{"⑾","11"},{"⒒","11"},{"⓫","11"},{"⑫","12"},{"⑿","12"},{"⒓","12"},{"⓬","12"},{"⑬","13"},{"⒀","13"},{"⒔","13"},{"⓭","13"},{"⑭","14"},{"⒁","14"},{"⒕","14"},{"⓮","14"},{"⑮","15"},{"⒂","15"},{"⒖","15"},{"⓯","15"},{"⑯","16"},{"⒃","16"},{"⒗","16"},{"⓰","16"},{"⑰","17"},{"⒄","17"},{"⒘","17"},{"⓱","17"},{"⑱","18"},{"⒅","18"},{"⒙","18"},{"⓲","18"},{"⑲","19"},{"⒆","19"},{"⒚","19"},{"⓳","19"},{"⑳","20"},{"⒇","20"},{"⒛","20"},{"⓴","20"},{"㉉","20"},{"㉑","21"},{"㉒","22"},{"㉓","23"},{"㉔","24"},{"㉕","25"},{"㉖","26"},{"㉗","27"},{"㉘","28"},{"㉙","29"},{"㉚","30"},{"㉊","30"},{"㉛","31"},{"㉜","32"},{"㉝","33"},{"㉞","34"},{"㉟","35"},{"㊱","36"},{"㊲","37"},{"㊳","38"},{"㊴","39"},{"㊵","40"},{"㉋","40"},{"㊶","41"},{"㊷","42"},{"㊸","43"},{"㊹","44"},{"㊺","45"},{"㊻","46"},{"㊼","47"},{"㊽","48"},{"㊾","49"},{"㊿","50"},{"㉌","50"},{"㉍","60"},{"㉎","70"},{"㉏","80"}
-        };
+        {"ª","a"},{"à","a"},{"á","a"},{"â","a"},{"ã","a"},{"ä","a"},{"å","a"},{"ā","a"},{"ă","a"},{"ǎ","a"},{"ɑ","a"},{"α","a"},{"а","a"},{"д","a"},{"ạ","a"},{"ả","a"},{"ấ","a"},{"ầ","a"},{"ẩ","a"},{"ẫ","a"},{"ậ","a"},{"ắ","a"},{"ằ","a"},{"ẳ","a"},{"ẵ","a"},{"ặ","a"},{"⒜","a"},{"ⓐ","a"},{"ａ","a"},{"À","A"},{"Á","A"},{"Â","A"},{"Ã","A"},{"Ä","A"},{"Å","A"},{"Ā","A"},{"Ă","A"},{"Ǎ","A"},{"Α","A"},{"Δ","A"},{"Λ","A"},{"λ","A"},{"А","A"},{"Д","A"},{"Ạ","A"},{"Ả","A"},{"Ấ","A"},{"Ầ","A"},{"Ẩ","A"},{"Ẫ","A"},{"Ậ","A"},{"Ắ","A"},{"Ằ","A"},{"Ẳ","A"},{"Ẵ","A"},{"Ặ","A"},{"Å","A"},{"∆","A"},{"∧","A"},{"⊿","A"},{"⌆","A"},{"⏃","A"},{"⏄","A"},{"⏅","A"},{"Ⓐ","A"},{"▲","A"},{"△","A"},{"★","A"},{"☆","A"},{"⼈","A"},{"⼊","A"},{"⽕","A"},{"ㅅ","A"},{"Ａ","A"},{"♲","A"},{"♳","A"},{"♴","A"},{"♵","A"},{"♶","A"},{"♷","A"},{"♸","A"},{"♹","A"},{"♺","A"},{"♻","A"},{"⚠","A"},{"︽","A"},{"︿","A"},{"♠","A"},{"♣","A"},{"♤","A"},{"♧","A"},
+        {"æ","ae"},{"Æ","AE"},
+        {"Ъ","b"},{"Ь","b"},{"ъ","b"},{"ь","b"},{"⒝","b"},{"ⓑ","b"},{"♭","b"},{"ß","B"},{"Б","B"},{"В","B"},{"в","B"},{"Ⓑ","B"},
+        {"Ы","bl"},{"ы","bi"},
+        {"¢","c"},{"©","c"},{"ç","c"},{"с","c"},{"ς","c"},{"⊂","c"},{"⊄","c"},{"⊆","c"},{"⊊","c"},{"⒞","c"},{"ⓒ","c"},{"ㄷ","c"},{"ｃ","c"},{"ﾧ","c"},{"￠","c"},{"㈂","c"},{"㉢","c"},{"ㄸ","cc"},{"ﾨ","cc"},{"Ç","C"},{"С","C"},{"℃","C"},{"Ⓒ","C"},{"⼕","C"},{"⼖","C"},{"⿷","C"},{"【","C"},{"〖","C"},{"ㄈ","C"},{"Ｃ","C"},
+        {"đ","d"},{"ð","d"},{"δ","d"},{"₫","d"},{"∂","d"},{"⒟","d"},{"ⓓ","d"},{"ㆳ","d"},{"ｄ","d"},{"♩","d"},{"♪","d"},{"Ð","D"},{"Đ","D"},{"Ⓓ","D"},{"Ｄ","D"},
+        {"è","e"},{"é","e"},{"ê","e"},{"ë","e"},{"ē","e"},{"ě","e"},{"ε","e"},{"е","e"},{"ё","e"},{"ẹ","e"},{"ẻ","e"},{"ẽ","e"},{"ế","e"},{"ề","e"},{"ể","e"},{"ễ","e"},{"ệ","e"},{"℮","e"},{"⒠","e"},{"ⓔ","e"},{"⺋","e"},{"⺒","e"},{"ｅ","e"},{"£","E"},{"È","E"},{"É","E"},{"Ê","E"},{"Ë","E"},{"Ē","E"},{"Ě","E"},{"Ε","E"},{"Ξ","E"},{"Σ","E"},{"ξ","E"},{"Ё","E"},{"Е","E"},{"Ẹ","E"},{"Ẻ","E"},{"Ẽ","E"},{"Ế","E"},{"Ề","E"},{"Ể","E"},{"Ễ","E"},{"Ệ","E"},{"€","E"},{"∈","E"},{"∉","E"},{"∊","E"},{"∑","E"},{"Ⓔ","E"},{"モ","E"},{"ㅌ","E"},{"ㆯ","E"},{"㈋","E"},{"㉫","E"},{"Ｅ","E"},{"ミ","E"},
+        {"ƒ","f"},{"⒡","f"},{"ⓕ","f"},{"ｆ","f"},{"℉","F"},{"Ⓕ","F"},{"Ｆ","F"},
+        {"ﬀ","ff"},{"ﬁ","fi"},{"ﬂ","fl"},{"ﬃ","ffi"},{"ﬄ","ffl"},
+        {"ɡ","g"},{"ℊ","g"},{"⒢","g"},{"ⓖ","g"},{"ｇ","g"},{"Ⓖ","G"},{"⼛","G"},{"Ｇ","G"},
+        {"ℏ","h"},{"⒣","h"},{"ⓗ","h"},{"ん","h"},{"Η","H"},{"Н","H"},{"н","H"},{"Ⓗ","H"},{"⧺","H"},{"⧻","HH"},
+        {"¦","i"},{"¡","i"},{"ì","i"},{"í","i"},{"î","i"},{"ï","i"},{"ĩ","i"},{"ī","i"},{"ι","i"},{"ⅰ","i"},{"↑","i"},{"↕","i"},{"⇧","i"},{"Ⓘ","i"},{"┆","i"},{"┇","i"},{"┊","i"},{"┋","i"},{"╎","i"},{"╏","i"},{"⬆","i"},{"⬇","i"},{"〡","i"},{"㆐","i"},{"㇑","i"},{"︴","i"},{"ｉ","i"},{"￤","i"},{"Ì","I"},{"Í","I"},{"Î","I"},{"Ï","I"},{"Ĩ","I"},{"Ī","I"},{"Ι","I"},{"Ⅰ","I"},{"↓","I"},{"⇩","I"},{"∣","I"},{"⒤","I"},{"ⓘ","I"},{"⼁","I"},{"ㅣ","I"},{"︱","I"},{"︳","I"},{"ￜ","I"},{"Ｉ","I"},
+        {"Ⅳ","iv"},{"ⅳ","iv"},{"Ⅵ","vi"},{"ⅵ","vi"},{"Ⅶ","vii"},{"ⅶ","vii"},{"Ⅷ","viii"},{"ⅷ","viii"},{"ⅱ","ii"},{"〢","ii"},{"‼","ii"},{"Ⅱ","II"},{"‖","II"},{"ⅲ","iii"},{"〣","iii"},{"Ⅲ","III"},{"Ю","io"},{"ю","io"},
+        {"⒥","j"},{"ⓙ","j"},{"ｊ","j"},{"Ⓙ","J"},{"㆜","J"},{"Ｊ","J"},
+        {"⒦","k"},{"ⓚ","k"},{"ｋ","k"},{"Κ","K"},{"κ","K"},{"К","K"},{"к","K"},{"Ⓚ","K"},{"Ｋ","K"},{"㉿","K"},
+        {"⒧","l"},{"ⓛ","l"},{"ｌ","l"},{"│","l"},{"┃","l"},{"▎","l"},{"▏","l"},{"⎱","l"},{"Ⓛ","L"},{"Ｌ","L"},{"⎿","L"},{"ㆹ","L"},{"㇄","L"},{"㇏","L"},{"㇗","L"},{"㇙","L"},{"㇜","L"},{"㇟","L"},{"└","L"},{"┕","L"},{"┖","L"},{"┗","L"},{"⻌","L"},{"⻍","L"},{"⻎","L"},{"⿺","L"},{"し","L"},{"じ","L"},{"║","ll"},
+        {"ḿ","m"},{"ⓜ","m"},{"ｍ","m"},{"М","M"},{"м","M"},{"Ḿ","M"},{"Ⓜ","M"},{"𝖬","M"},{"Ｍ","M"},
+        {"ñ","n"},{"ń","n"},{"ň","n"},{"ǹ","n"},{"η","n"},{"Л","n"},{"П","n"},{"л","n"},{"п","n"},{"ⓝ","n"},{"ｎ","n"},{"⺆","n"},{"⺇","n"},{"⼌","n"},{"⼍","n"},{"⼑","n"},{"⾨","n"},{"⾾","n"},{"⿵","n"},{"れ","n"},{"ㄇ","n"},{"︵","n"},{"︷","n"},{"︹","n"},{"︻","n"},{"﹇","n"},{"Ñ","N"},{"Ń","N"},{"Ň","N"},{"Ǹ","N"},{"Ν","N"},{"И","N"},{"Й","N"},{"и","N"},{"й","N"},{"Ⓝ","N"},{"𝖭","N"},{"Ｎ","N"},{"ℵ","N"},
+        {"№","No"},
+        {"¤","o"},{"ò","o"},{"ó","o"},{"ô","o"},{"õ","o"},{"ö","o"},{"ø","o"},{"ō","o"},{"ŏ","o"},{"ơ","o"},{"ǒ","o"},{"ο","o"},{"σ","o"},{"φ","o"},{"о","o"},{"ọ","o"},{"ỏ","o"},{"ố","o"},{"ồ","o"},{"ổ","o"},{"ỗ","o"},{"ộ","o"},{"ớ","o"},{"ờ","o"},{"ở","o"},{"ỡ","o"},{"ợ","o"},{"∅","o"},{"⊕","o"},{"⊖","o"},{"⊗","o"},{"⊘","o"},{"⊙","o"},{"⏀","o"},{"⏁","o"},{"⏂","o"},{"⒪","o"},{"■","o"},{"□","o"},{"▢","o"},{"▣","o"},{"▤","o"},{"▥","o"},{"▦","o"},{"▧","o"},{"▨","o"},{"▩","o"},{"▪","o"},{"▫","o"},{"◆","o"},{"◇","o"},{"◈","o"},{"◉","o"},{"◊","o"},{"○","o"},{"◌","o"},{"◍","o"},{"◎","o"},{"●","o"},{"◐","o"},{"◑","o"},{"◒","o"},{"◓","o"},{"◦","o"},{"◯","o"},{"☉","o"},{"☯","o"},{"♡","o"},{"♢","o"},{"♥","o"},{"♦","o"},{"✿","o"},{"❀","o"},{"⦿","o"},{"㆕","o"},{"ㅁ","o"},{"ㅇ","o"},{"㇣","o"},{"ㇿ","o"},{"㈄","o"},{"㈇","o"},{"㉤","o"},{"㉧","o"},{"㋺","o"},{"ｏ","o"},{"ﾷ","o"},{"￮","o"},{"〼","o"},{"Ò","O"},{"Ó","O"},{"Ô","O"},{"Õ","O"},{"Ö","O"},{"Ø","O"},{"Ō","O"},{"Ŏ","O"},{"Ơ","O"},{"Ǒ","O"},{"Θ","O"},{"Ο","O"},{"Φ","O"},{"Ω","O"},{"θ","O"},{"О","O"},{"Ф","O"},{"ф","O"},{"Ọ","O"},{"Ỏ","O"},{"Ố","O"},{"Ồ","O"},{"Ổ","O"},{"Ỗ","O"},{"Ộ","O"},{"Ớ","O"},{"Ờ","O"},{"Ở","O"},{"Ỡ","O"},{"Ợ","O"},{"Ω","O"},{"Ⓞ","O"},{"▇","O"},{"█","O"},{"▉","O"},{"▊","O"},{"▋","O"},{"▱","O"},{"♼","O"},{"♽","O"},{"⚽","O"},{"⚾","O"},{"⼝","O"},{"⼞","O"},{"⿴","O"},{"〇","O"},{"〄","O"},{"Ｏ","O"},{"⓪","0"},{"⓿","0"},{"０","0"},{"ㄖ","0"},
+        {"œ","oe"},{"Œ","OE"},
+        {"ⓟ","p"},{"ｐ","p"},{"þ","p"},{"Þ","p"},{"ρ","p"},{"р","p"},{"Ⓟ","P"},{"𝖯","P"},{"Ｐ","P"},{"Ρ","P"},{"Р","P"},{"⼙","P"},{"⼫","P"},{"ㄕ","P"},{"ㄗ","P"},{"ㆡ","P"},
+        {"ⓠ","q"},{"ｑ","q"},{"Ⓠ","Q"},{"𝖰","Q"},{"Ｑ","Q"},
+        {"ⓡ","r"},{"ｒ","r"},{"Γ","r"},{"⎾","r"},{"┌","r"},{"┍","r"},{"┎","r"},{"┏","r"},{"╒","r"},{"╓","r"},{"╔","r"},{"╭","r"},{"⺁","r"},{"⼚","r"},{"⼴","r"},{"⽧","r"},{"⿸","r"},{"「","r"},{"『","r"},{"ㄏ","r"},{"ㄬ","r"},{"ㆷ","r"},{"Ⓡ","R"},{"𝖱","R"},{"Ｒ","R"},{"­","R"},{"®","R"},{"Я","R"},{"я","R"},
+        {"ⓢ","s"},{"ｓ","s"},{"$","S"},{"Ⓢ","S"},{"𝖲","S"},{"Ｓ","S"},{"⎰","S"},{"∫","S"},{"∮","S"},{"∾","S"},{"ㄎ","S"},{"ㆶ","S"},{"＄","S"},
+        {"∬","ss"},{"∭","sss"},
+        {"ⓣ","t"},{"ｔ","t"},{"⺊","t"},{"⼔","t"},{"⼗","t"},{"⼘","t"},{"〸","t"},{"ㆺ","t"},{"ㇶ","t"},{"㈦","t"},{"㈩","t"},{"Ⓣ","T"},{"𝖳","T"},{"Ｔ","T"},{"Τ","T"},{"τ","T"},{"Т","T"},{"т","T"},{"⏇","T"},{"⏉","T"},{"┬","T"},{"┭","T"},{"┮","T"},{"┯","T"},{"┰","T"},{"┱","T"},{"┲","T"},{"┳","T"},{"╤","T"},{"╥","T"},{"╦","T"},{"⺅","T"},{"ィ","T"},{"イ","T"},{"ㄒ","T"},{"ￓ","T"},
+        {"〹","tt"},
+        {"µ","u"},{"ũ","u"},{"ū","u"},{"ŭ","u"},{"ư","u"},{"ǔ","u"},{"ǖ","u"},{"ǘ","u"},{"ǚ","u"},{"ǜ","u"},{"ц","u"},{"ụ","u"},{"ủ","u"},{"ứ","u"},{"ừ","u"},{"ử","u"},{"ữ","u"},{"ự","u"},{"⒰","u"},{"ⓤ","u"},{"㇃","u"},{"ｕ","u"},{"︶","u"},{"︸","u"},{"︺","u"},{"︼","u"},{"﹈","u"},{"υ","u"},{"Ũ","U"},{"Ū","U"},{"Ŭ","U"},{"Ư","U"},{"Ǔ","U"},{"Ǖ","U"},{"Ǘ","U"},{"Ǚ","U"},{"Ǜ","U"},{"Ц","U"},{"Ụ","U"},{"Ủ","U"},{"Ứ","U"},{"Ừ","U"},{"Ử","U"},{"Ữ","U"},{"Ự","U"},{"∪","U"},{"℧","U"},{"Ⓤ","U"},{"⿶","U"},{"ひ","U"},{"び","U"},{"ぴ","U"},{"Ｕ","U"},
+        {"˅","v"},{"ⅴ","v"},{"∨","v"},{"⒱","v"},{"ⓥ","v"},{"▼","v"},{"▽","v"},{"✓","v"},{"㇢","v"},{"︾","v"},{"﹀","v"},{"ｖ","v"},{"Ⅴ","V"},{"∀","V"},{"Ⓥ","V"},{"Ｖ","V"},
+        {"ⓦ","w"},{"ｗ","w"},{"ω","w"},{"ш","w"},{"щ","w"},{"Ⓦ","W"},{"𝖶","W"},{"Ｗ","W"},{"Ш","W"},{"Щ","W"},{"₩","W"},{"￦","W"},
+        {"ⓧ","x"},{"ｘ","x"},{"χ","x"},{"х","x"},{"ⅹ","x"},{"〆","x"},{"〤","x"},{"Ⓧ","X"},{"𝖷","X"},{"Ｘ","X"},{"Χ","X"},{"Х","X"},{"Ⅹ","X"},{"╳","X"},{"ㄨ","X"},{"ㆫ","X"},
+        {"⽹","XX"},{"〷","XX"},{"ⓨ","y"},{"ｙ","y"},{"ý","y"},{"ÿ","y"},{"У","y"},{"у","y"},{"ỳ","y"},{"ỵ","y"},{"ỷ","y"},{"ỹ","y"},{"Ⓨ","Y"},{"𝖸","Y"},{"Ｙ","Y"},{"￥","Y"},{"¥","Y"},{"Ý","Y"},{"Υ","Y"},{"Ỳ","Y"},{"Ỵ","Y"},{"Ỷ","Y"},{"Ỹ","Y"},{"ㄚ","Y"},{"ㆩ","Y"},
+        {"ⓩ","z"},{"ｚ","z"},{"Ⓩ","Z"},{"𝖹","Z"},{"Ｚ","Z"},{"Ζ","Z"},{"ζ","Z"},{"⼄","Z"},{"㆚","Z"},{"㇠","Z"},
+        {"①","1"},{"⑴","1"},{"⒈","1"},{"⓵","1"},{"❶","1"},{"➀","1"},{"➊","1"},{"１","1"},
+        {"②","2"},{"⑵","2"},{"⒉","2"},{"⓶","2"},{"❷","2"},{"➁","2"},{"➋","2"},{"２","2"},
+        {"³","3"},{"З","3"},{"Э","3"},{"з","3"},{"э","3"},{"∃","3"},{"∋","3"},{"③","3"},{"⑶","3"},{"⒊","3"},{"⓷","3"},{"❸","3"},{"➂","3"},{"➌","3"},{"⺕","3"},{"⼹","3"},{"る","3"},{"ろ","3"},{"ョ","3"},{"ヨ","3"},{"ヺ","3"},{"ㄋ","3"},{"㇋","3"},{"㇌","3"},{"㇡","3"},{"３","3"},
+        {"④","4"},{"⑷","4"},{"⒋","4"},{"⓸","4"},{"❹","4"},{"➃","4"},{"➍","4"},{"４","4"},
+        {"⑤","5"},{"⑸","5"},{"⒌","5"},{"⓹","5"},{"❺","5"},{"➄","5"},{"➎","5"},{"５","5"},
+        {"⑥","6"},{"⑹","6"},{"⒍","6"},{"⓺","6"},{"❻","6"},{"➅","6"},{"➏","6"},{"６","6"},
+        {"⑦","7"},{"⑺","7"},{"⒎","7"},{"⓻","7"},{"❼","7"},{"➆","7"},{"➐","7"},{"７","7"},
+        {"⑧","8"},{"⑻","8"},{"⒏","8"},{"⓼","8"},{"❽","8"},{"➇","8"},{"➑","8"},{"８","8"},
+        {"⑨","9"},{"⑼","9"},{"⒐","9"},{"⓽","9"},{"❾","9"},{"➈","9"},{"➒","9"},{"９","9"},
+        {"＠","@"},{"﹫","@"},{"＾","^"},{"⌅","^"},{"㆟","^"},
+        {"℀","ac"},{"℅","co"},{"℡","TEL"},{"™","TM"},{"℻","FAX"},{"ⅸ","ix"},{"Ⅸ","IX"},{"ⅺ","xi"},{"Ⅺ","XI"},{"ⅻ","xii"},{"Ⅻ","XII"},{"㉐","PTE"},{"㋌","Hg"},{"㋍","erg"},{"㋎","eV"},{"㋏","LTD"},{"㍱","hPa"},{"㍲","da"},{"㍳","AU"},{"㍴","bar"},{"㍵","oV"},{"㍶","pc"},{"㍷","dm"},{"㍸","dm2"},{"㍹","dm3"},{"㍺","IU"},{"㎀","pA"},{"㎁","nA"},{"㎂","uA"},{"㎃","mA"},{"㎄","kA"},{"㎅","KB"},{"㎆","MB"},{"㎇","GB"},{"㎈","cal"},{"㎉","kcal"},{"㎊","pF"},{"㎋","nF"},{"㎌","uF"},{"㎍","ug"},{"㎎","mg"},{"㎏","kg"},{"㎐","Hz"},{"㎑","kHz"},{"㎒","MHz"},{"㎓","GHz"},{"㎔","Thz"},{"㎕","ul"},{"㎖","ml"},{"㎗","dl"},{"㎘","kl"},{"㎙","fm"},{"㎚","nm"},{"㎛","um"},{"㎜","mm"},{"㎝","cm"},{"㎞","km"},{"㎟","mm2"},{"㎠","cm2"},{"㎡","m2"},{"㎢","km2"},{"㎣","mm3"},{"㎤","cm3"},{"㎥","m3"},{"㎦","km3"},{"㎧","ms"},{"㎨","ms2"},{"㎩","Pa"},{"㎪","kPa"},{"㎫","MPa"},{"㎬","GPa"},{"㎭","rad"},{"㎮","rads"},{"㎯","rads2"},{"㎰","ps"},{"㎱","ns"},{"㎲","us"},{"㎳","ms"},{"㎴","pV"},{"㎵","nV"},{"㎶","uV"},{"㎷","mV"},{"㎸","kW"},{"㎹","MV"},{"㎺","pW"},{"㎻","nW"},{"㎼","uW"},{"㎽","mW"},{"㎾","kW"},{"㎿","MW"},{"㏀","kO"},{"㏁","MO"},{"㏂","am"},{"㏃","Bq"},{"㏄","cc"},{"㏅","cd"},{"㏆","Ckg"},{"㏇","Co"},{"㏈","dB"},{"㏉","Gy"},{"㏊","ha"},{"㏋","HP"},{"㏌","in"},{"㏍","KK"},{"㏎","KM"},{"㏏","kt"},{"㏐","lm"},{"㏑","ln"},{"㏒","log"},{"㏓","lx"},{"㏔","mb"},{"㏕","mil"},{"㏖","mol"},{"㏗","pH"},{"㏘","pm"},{"㏙","PPM"},{"㏚","PR"},{"㏛","sr"},{"㏜","Sv"},{"㏝","Wb"},{"㏞","Vm"},{"㏟","Am"},{"㏿","gal"},
+        {"⑩","10"},{"⑽","10"},{"⒑","10"},{"⓾","10"},{"❿","10"},{"➉","10"},{"➓","10"},{"㉈","10"},{"⑪","11"},{"⑾","11"},{"⒒","11"},{"⓫","11"},{"⑫","12"},{"⑿","12"},{"⒓","12"},{"⓬","12"},{"⑬","13"},{"⒀","13"},{"⒔","13"},{"⓭","13"},{"⑭","14"},{"⒁","14"},{"⒕","14"},{"⓮","14"},{"⑮","15"},{"⒂","15"},{"⒖","15"},{"⓯","15"},{"⑯","16"},{"⒃","16"},{"⒗","16"},{"⓰","16"},{"⑰","17"},{"⒄","17"},{"⒘","17"},{"⓱","17"},{"⑱","18"},{"⒅","18"},{"⒙","18"},{"⓲","18"},{"⑲","19"},{"⒆","19"},{"⒚","19"},{"⓳","19"},{"⑳","20"},{"⒇","20"},{"⒛","20"},{"⓴","20"},{"㉉","20"},{"㉑","21"},{"㉒","22"},{"㉓","23"},{"㉔","24"},{"㉕","25"},{"㉖","26"},{"㉗","27"},{"㉘","28"},{"㉙","29"},{"㉚","30"},{"㉊","30"},{"㉛","31"},{"㉜","32"},{"㉝","33"},{"㉞","34"},{"㉟","35"},{"㊱","36"},{"㊲","37"},{"㊳","38"},{"㊴","39"},{"㊵","40"},{"㉋","40"},{"㊶","41"},{"㊷","42"},{"㊸","43"},{"㊹","44"},{"㊺","45"},{"㊻","46"},{"㊼","47"},{"㊽","48"},{"㊾","49"},{"㊿","50"},{"㉌","50"},{"㉍","60"},{"㉎","70"},{"㉏","80"}
+    };
 
-        std::string output;
-        for (size_t i = 0; i < input.size();) {
-                unsigned char c = static_cast<unsigned char>(input[i]);
-                size_t len = 1;
+    std::string output;
+    for (size_t i = 0; i < input.size();) {
+        unsigned char c = static_cast<unsigned char>(input[i]);
+        size_t len = 1;
 
-                // Detect UTF-8 sequence length
-                if ((c & 0x80) == 0x00) {
-                        len = 1; // ASCII (0xxxxxxx)
-                }
-                else if ((c & 0xE0) == 0xC0) {
-                        len = 2; // 110xxxxx
-                }
-                else if ((c & 0xF0) == 0xE0) {
-                        len = 3; // 1110xxxx
-                }
-                else if ((c & 0xF8) == 0xF0) {
-                        len = 4; // 11110xxx
-                }
-
-                // Extract full UTF-8 codepoint as substring
-                std::string key = input.substr(i, len);
-
-                // Replace if in map
-                auto it = diacriticMap.find(key);
-                if (it != diacriticMap.end()) {
-                        output += it->second;
-                }
-                else {
-                        output += key;
-                }
-
-                i += len;
+        // Detect UTF-8 sequence length
+        if ((c & 0x80) == 0x00) {
+            len = 1; // ASCII (0xxxxxxx)
         }
-        return output;
+        else if ((c & 0xE0) == 0xC0) {
+            len = 2; // 110xxxxx
+        }
+        else if ((c & 0xF0) == 0xE0) {
+            len = 3; // 1110xxxx
+        }
+        else if ((c & 0xF8) == 0xF0) {
+            len = 4; // 11110xxx
+        }
+
+        // Extract full UTF-8 codepoint as substring
+        std::string key = input.substr(i, len);
+
+        // Replace if in map
+        auto it = diacriticMap.find(key);
+        if (it != diacriticMap.end()) {
+            output += it->second;
+        }
+        else {
+            output += key;
+        }
+
+        i += len;
+    }
+    return output;
 }
 
 bool IsAllUppercase(const std::string& str)
 {
-        return !str.empty() &&
-                std::all_of(str.begin(), str.end(), [](unsigned char c) {
-                return !std::isalpha(c) || std::isupper(c);
-                        });
+    return !str.empty() &&
+        std::all_of(str.begin(), str.end(), [](unsigned char c) {
+        return !std::isalpha(c) || std::isupper(c);
+            });
 }
 
 bool IsDater(std::string username, int playerCount) {
-        if (IsRandomAUName(username)) return false;
+    if (IsRandomAUName(username)) return false;
 
-        username = RemoveDiacritics(username);
+    username = RemoveDiacritics(username);
 
-        if (IsAllUppercase(username)) username = strToLower(username); // Convert all-uppercase usernames to lowercase
+    if (IsAllUppercase(username)) username = strToLower(username); // Convert all-uppercase usernames to lowercase
 
-        // Convert to lowercase
-        std::string loweredName = strToLower(username);
+    // Convert to lowercase
+    std::string loweredName = strToLower(username);
 
-        if (playerCount > 0 && playerCount <= 7)
+    if (playerCount > 0 && playerCount <= 7)
+    {
+        if (checkAgainstDict(loweredName, "talk", { "stalk" })) return true;
+        if (checkAgainstDict(loweredName, "boy", { "cowboy", "boycott", "boyhood", "boyish" }) || loweredName == "cowboy") return true;
+        if (checkAgainstDict(loweredName, "girl", { "girlish" })) return true;
+        if (checkAgainstDict(loweredName, "boi", { "cuboid", "boil" })) return true;
+        std::string cleaned = loweredName;
+        cleaned.erase(std::remove(cleaned.begin(), cleaned.end(), ' '), cleaned.end()); // Remove spaces"
+        std::unordered_set<std::string> sussyDaterNames = { "bore", "bull", "bang", "mine", "yours", "wantfb", "fun", "chat", "pound",
+        "guy", "bxy", "dude", "man", "gurl", "gul", "grl", "yng", "pound" };
+        for (const std::string& word : sussyDaterNames)
         {
-                if (checkAgainstDict(loweredName, "talk", { "stalk" })) return true;
-                if (checkAgainstDict(loweredName, "boy", { "cowboy", "boycott", "boyhood", "boyish" }) || loweredName == "cowboy") return true;
-                if (checkAgainstDict(loweredName, "girl", { "girlish" })) return true;
-                if (checkAgainstDict(loweredName, "boi", { "cuboid", "boil" })) return true;
-                std::string cleaned = loweredName;
-                cleaned.erase(std::remove(cleaned.begin(), cleaned.end(), ' '), cleaned.end()); // Remove spaces"
-                std::unordered_set<std::string> sussyDaterNames = { "bore", "bull", "bang", "mine", "yours", "wantfb", "fun", "chat", "pound",
-                "guy", "bxy", "dude", "man", "gurl", "gul", "grl", "yng", "pound" };
-                for (const std::string& word : sussyDaterNames)
-                {
-                        if (cleaned.find(word) != std::string::npos)
-                                return true;
-                }
-                // Check for any 1–2 digit number in the cleaned string
-                if (HasExactlyOneTwoDigitNumber(cleaned)) return true;
-                // Detect shit like "Robbie 18"
+            if (cleaned.find(word) != std::string::npos)
+                return true;
         }
+        // Check for any 1–2 digit number in the cleaned string
+        if (HasExactlyOneTwoDigitNumber(cleaned)) return true;
+        // Detect shit like "Robbie 18"
+    }
 
-        // Direct equality checks
-        if (loweredName == "bi") return true;
-        std::unordered_set<std::string> mayFalsePositive = { "rp", "gf", "bf", "r p", "ass", "hny", "mha", "mina", "abs", "fwb", "ddy", "mmy", "bae", "hoe", "hrn",
-                        "psy", "fvvb", "urs", "fk", "sx", "af", "asf" };
+    // Direct equality checks
+    if (loweredName == "bi") return true;
+    std::unordered_set<std::string> mayFalsePositive = { "rp", "gf", "bf", "r p", "ass", "hny", "mha", "mina", "abs", "fwb", "ddy", "mmy", "bae", "hoe", "hrn",
+            "psy", "fvvb", "urs", "fk", "sx", "af", "asf" };
 
-        for (const auto& st : mayFalsePositive)
+    for (const auto& st : mayFalsePositive)
+    {
+        std::string lowerSt = st;
+        std::string upperSt = lowerSt;
+        std::transform(lowerSt.begin(), lowerSt.end(), lowerSt.begin(), ::tolower);
+        std::transform(upperSt.begin(), upperSt.end(), upperSt.begin(), ::toupper);
+
+        // Title-case version (first letter uppercase)
+        std::string titleCase = lowerSt;
+        if (!titleCase.empty())
+            titleCase[0] = std::toupper(titleCase[0]);
+
+        if (
+            loweredName == lowerSt ||
+            loweredName.find(lowerSt) == 0 || // starts with
+            username.find(titleCase) != std::string::npos ||
+            username.find(upperSt) != std::string::npos ||
+            loweredName.find(" " + lowerSt) != std::string::npos ||
+            loweredName.find("need" + lowerSt) != std::string::npos ||
+            loweredName.find("want" + lowerSt) != std::string::npos ||
+            loweredName.find("ned" + lowerSt) != std::string::npos ||
+            loweredName.find("wnt" + lowerSt) != std::string::npos ||
+            loweredName.find("needa" + lowerSt) != std::string::npos ||
+            loweredName.find("wanta" + lowerSt) != std::string::npos ||
+            loweredName.find("neda" + lowerSt) != std::string::npos ||
+            loweredName.find("wnta" + lowerSt) != std::string::npos ||
+            loweredName.find("my" + lowerSt) != std::string::npos ||
+            loweredName.find("ur" + lowerSt) != std::string::npos ||
+            loweredName.find("4" + lowerSt) != std::string::npos ||
+            loweredName.find("for" + lowerSt) != std::string::npos
+            )
         {
-                std::string lowerSt = st;
-                std::string upperSt = lowerSt;
-                std::transform(lowerSt.begin(), lowerSt.end(), lowerSt.begin(), ::tolower);
-                std::transform(upperSt.begin(), upperSt.end(), upperSt.begin(), ::toupper);
-
-                // Title-case version (first letter uppercase)
-                std::string titleCase = lowerSt;
-                if (!titleCase.empty())
-                        titleCase[0] = std::toupper(titleCase[0]);
-
-                if (
-                        loweredName == lowerSt ||
-                        loweredName.find(lowerSt) == 0 || // starts with
-                        username.find(titleCase) != std::string::npos ||
-                        username.find(upperSt) != std::string::npos ||
-                        loweredName.find(" " + lowerSt) != std::string::npos ||
-                        loweredName.find("need" + lowerSt) != std::string::npos ||
-                        loweredName.find("want" + lowerSt) != std::string::npos ||
-                        loweredName.find("ned" + lowerSt) != std::string::npos ||
-                        loweredName.find("wnt" + lowerSt) != std::string::npos ||
-                        loweredName.find("needa" + lowerSt) != std::string::npos ||
-                        loweredName.find("wanta" + lowerSt) != std::string::npos ||
-                        loweredName.find("neda" + lowerSt) != std::string::npos ||
-                        loweredName.find("wnta" + lowerSt) != std::string::npos ||
-                        loweredName.find("my" + lowerSt) != std::string::npos ||
-                        loweredName.find("ur" + lowerSt) != std::string::npos ||
-                        loweredName.find("4" + lowerSt) != std::string::npos ||
-                        loweredName.find("for" + lowerSt) != std::string::npos
-                        )
-                {
-                        return true;
-                }
+            return true;
         }
+    }
 
-        if (checkAgainstDict(loweredName, "hot", { "shot", "hotel", "photo", "earshot", "hotline", "hotness" })) return true;
-        if (checkAgainstDict(loweredName, "horn", { "thorn", "horns" })) return true;
-        if (checkAgainstDict(loweredName, "lick", { "flick", "slick" })) return true;
-        if (checkAgainstDict(loweredName, "wet", { "wetsuit" })) return true;
-        if (checkAgainstDict(loweredName, "hard", { "hardy", "orchard" })) return true;
-        if (checkAgainstDict(loweredName, "cock", { "peacock" })) return true;
-        if (checkAgainstDict(loweredName, "wank", { "swanky" })) return true;
-        if (checkAgainstDict(loweredName, "chut", { "chute" })) return true;
-        if (checkAgainstDict(loweredName, "trade", { "trader" })) return true;
-        if (checkAgainstDict(loweredName, "insta", { "instant" })) return true;
-        if (checkAgainstDict(loweredName, "dom", { "dome", "domed", "random", "kingdom" })) return true;
-        if (checkAgainstDict(loweredName, "rough", { "trough", "drought", "through", "wrought" })) return true;
-        if (checkAgainstDict(loweredName, "butt", { "button", "butter" })) return true;
-        if (checkAgainstDict(loweredName, "love", { "lovely", "beloved", "gloved", "glove", "clove" })) return true;
-        if (checkAgainstDict(loweredName, "nood", { "noodle" })) return true;
-        if (checkAgainstDict(loweredName, "chut", { "chutney" })) return true;
-        if (checkAgainstDict(loweredName, "hony", { "anthony" })) return true;
-        if (checkAgainstDict(loweredName, "bada", { "badal", "badapp" })) return true;
-        if (checkAgainstDict(loweredName, "sax", { "saxophone" })) return true;
-        if (checkAgainstDict(loweredName, "hron", { "throne" })) return true;
-        if (checkAgainstDict(loweredName, "gand", { "gandhi" })) return true;
-        if (checkAgainstDict(loweredName, "cok", { "coke" })) return true;
+    if (checkAgainstDict(loweredName, "hot", { "shot", "hotel", "photo", "earshot", "hotline", "hotness" })) return true;
+    if (checkAgainstDict(loweredName, "horn", { "thorn", "horns" })) return true;
+    if (checkAgainstDict(loweredName, "lick", { "flick", "slick" })) return true;
+    if (checkAgainstDict(loweredName, "wet", { "wetsuit" })) return true;
+    if (checkAgainstDict(loweredName, "hard", { "hardy", "orchard" })) return true;
+    if (checkAgainstDict(loweredName, "cock", { "peacock" })) return true;
+    if (checkAgainstDict(loweredName, "wank", { "swanky" })) return true;
+    if (checkAgainstDict(loweredName, "chut", { "chute" })) return true;
+    if (checkAgainstDict(loweredName, "trade", { "trader" })) return true;
+    if (checkAgainstDict(loweredName, "insta", { "instant" })) return true;
+    if (checkAgainstDict(loweredName, "dom", { "dome", "domed", "random", "kingdom" })) return true;
+    if (checkAgainstDict(loweredName, "rough", { "trough", "drought", "through", "wrought" })) return true;
+    if (checkAgainstDict(loweredName, "butt", { "button", "butter" })) return true;
+    if (checkAgainstDict(loweredName, "love", { "lovely", "beloved", "gloved", "glove", "clove" })) return true;
+    if (checkAgainstDict(loweredName, "nood", { "noodle" })) return true;
+    if (checkAgainstDict(loweredName, "chut", { "chutney" })) return true;
+    if (checkAgainstDict(loweredName, "hony", { "anthony" })) return true;
+    if (checkAgainstDict(loweredName, "bada", { "badal", "badapp" })) return true;
+    if (checkAgainstDict(loweredName, "sax", { "saxophone" })) return true;
+    if (checkAgainstDict(loweredName, "hron", { "throne" })) return true;
+    if (checkAgainstDict(loweredName, "gand", { "gandhi" })) return true;
+    if (checkAgainstDict(loweredName, "cok", { "coke" })) return true;
 
-        static const std::vector<std::string> hornyNames = { "snap" ,"aunty", "singl", "sxngl", "hxon", "hx0n", "fuvk", "kok",
-                "gay", "slt", "snp", "bbw", "bbc", "bwc", "sex", "s3x", "53x", "5ex", "igx", "sxy", "b0y", "fck", "pxxy",
-                "fcck", "pxrn", "cnm", "cum", "h0t", "hrne", "lulli", "rndi", "rxndi", "slave", "siave", "slxv", "sxlv", "sxav",
-                "slax", "freak", "slve", "hxrd", "f4k", "fem", "cxm", "dik", "hry", "hrny", "hxrn", "h0rn", "slvt", "sxlt",
-                "sivt", "lesb", "cxck", "puss", "s4np", "segs", "pusy", "pxss", "pxsy", "slut", "slxt", "snxp", "dady", "dxdy",
-                "dvdy", "fuck", "fxck", "pics", "perv", "sanp", "sn4p", "seggs", "futa", "momy", "mxm", "vrgn", "duro",
-                "dddy", "bxby", "hoxn", "hpny", "jerk", "wank", "jxrk", "jork", "ndue", "svlt", "deku", "baku", "nvde", "lund",
-                "siut", "knky", "nude", "tits", "txts", "bxtt", "nudx", "nxde", "bigd", "nips", "pssy", "0cm", "1cm", "2cm",
-                "3cm", "4cm", "5cm", "6cm", "7cm", "8cm", "9cm", "0in", "1in", "2in", "3in", "4in", "lust", "lusxt", "5in",
-                "6in", "7in", "8in", "9in", "0ln", "1ln", "2ln", "3ln", "4ln", "bitch", "btch", "bich", "gaand", "pawg",
-                "5ln", "6ln", "7ln", "8ln", "9ln", "domgf", "dom gf", "dombf", "dom bf", "subgf", "sub gf", "subbf", "sub bf",
-                "4orny", "0 cm", "1 cm", "2 cm", "3 cm", "4 cm", "5 cm", "6 cm", "7 cm", "8 cm", "9 cm", "0 in", "1 in", "2 in",
-                "3 in", "4 in", "5 in", "6 in", "7 in", "8 in", "9 in", "0 ln", "1 ln", "2 ln", "3 ln", "4 ln", "5 ln", "6 ln",
-                "7 ln", "8 ln", "9 ln", "nxds", "nuds", "goon", "sxck", "babe", "xude", "toes", "male", "xfun", "funx", "iund",
-                "booty", "chodu", "chxdu", "chdu", "slux", "papi", "fuxk", "nudz", "suck", "sxck", "suxk", "sucx", "spnk", "dxk",
-                "puzy", "pxzy", "3som", "3sum", "dabi", "s1ut", "momo", "gxrl", "grxl", "gixl", "guxl", "dick", "dxck",
-                "dixk", "dxxk", "hxny", "trde", "4rny", "trxad", "hxrx", "bobs", "b0bs", "bxbs", "pedo", "pxdo", "pdxo", "ped0",
-                "pxd0", "pdx0", "p3do", "p3d0", "hr b", "horxy", "horxi", "daxdy", "dxady", "dadxy", "dadd", "dxdd", "dvdd",
-                "trxde", "mxm", "stepx", "vrgon", "puszy", "flirt", "dicx", "tity", "raxdi", "hrnx", "ho1ny", "hprny", "domme",
-                "bxxb", "b00b", "boob", "kinky", "k1nky", "kxnky", "hrxny", "noods", "izuku", "dxrty", "hrne", "bussy", "bxssy",
-                "buxxy", "buxsy", "busxy", "randi", "puxxy", "puxsy", "ladka", "ladki", "big d", "sxut", "drty", "hnrxy", "niple",
-                "tamil", "mallu", "edgin", "puhsy", "dirty", "spank", "spxnk", "sxank", "dvvdy", "send d", "sendd", "hrxd",
-                "spaxk", "xlove", "showd", "puzzy", "pxzzy", "hoxrn", "bo0b", "b0ob", "boxbs", "bxob", "b0xb", "bx0b", "dxxdy",
-                "desi", "mytoy", "mytxy", "hor b", "femboy", "fetish", "vergon", "virgin", "horxny", "ho1rny", "hor1ny",
-                "nipple", "nxpple", "telugu", "blackd", "vagina", "hxorn", "h3orn", "h30rn", "show d", "hxorm", "me n u",
-                "mineta", "gir1", "g1rl", "g1r1", "meandu", "master", "my toy", "my txy", "dxxd", "daxx", "stepsis", "stepbro",
-                "stxpsis", "stxpbro", "gorny", "gorni", "g0rn", "jackoff", "jxckoff", "freeuse", "black d", "white d",
-                "naughty", "muthmar", "thresom", "thresum", "step sis", "step bro", "stxp sis", "stxp bro", "pleasure",
-                "free use", "bigblack", "bigwhite", "roleplay", "role play", "me and u", "me n you", "meandyou", "threesom",
-                "threesum", "jackmeoff", "jerkmeoff", "jxckmeoff", "jxrkmeoff", "kamasutra", "threeesom", "threeesum",
-                "masturbate", "masterbate", "mxsturbate", "mxsterbate", "jackmehoff", "jerkmehoff", "jxckmehoff",
-                "jxrkmehoff", "kama sutra", "me and you", "needg", "need g", "needb", "need b", "wantg", "want g", "wantb",
-                "want b", "packing d", "packingd", "bigbbs", "hugebbs", "smallbbs", "tinybbs", "bigpp", "hugepp", "tinypp",
-                "smallpp", "smolpp", "hx0rn", "hxxrn", "hxxn", "bigdk", "hugedk", "tinydk", "smalldk", "smoldk", "h0rx",
-                "40rny", "4xrny", "hr0n", "no0ds", "n0ods", "hnr0y", "hnry", "hx0rm", "h0rm", "horm", "hoorn", "hxoorn",
-                "hrooxn", "pucsy", "puscy", "pxcsy", "pxscy", "d4dd", "d3dd", "d5dd", "rideme", "ride me", "rideonme",
-                "ride on me", "sendmy", "sendyo", "sendur", "send my", "send yo", "send ur", "sndmy", "sndyo", "sndur",
-                "snd my", "snd yo", "snd ur", "fetsluck", "fets luck", "sit on"
-                "bricked", "brxcked", "brcked", "eatpus", "eatpxs", "eatpux", "banda", "creamy", "date", "dating", "datng",
-                "datin", "veiny", "hore", "hqrn", "hirn", "luvr", "lovr", "puccy", "txrade", "traxde", "tradx", "tits",
-                "tlts", "siton", "facesit", "sitface", "sit on", "face sit", "wannafk", "want2fk", "wanttofk",
-                "gonnafk", "goingtofk", "going2fk", "puhss", "puhsy", "stpsis", "stpbro", "stpxsis", "stpxbro", "stp sis",
-                "stp bro", "need bro", "need sis", "needbro", "needsis", "h0xrn", "hr0n", "hr0xn", "hrn0", "punish", "pnish",
-                "pxnish", "punixh", "pxnixh", "daxd", "dadx", "daad", "givehead", "gimmehead", "give head", "gimme head",
-                "digbick", "dig bick", "mom", "fkr", "fker", "submissive", "submisive", "sxbmissive", "sxbmisive",
-                "sxbmxssxve", "sxbmxsxve", "submxssxve", "submxsxve", "submissxve", "submisxve", "submxssive", "submxsive",
-                "slxut", "sxlut", "pussi", "pusi", "ned bro", "ned sis", "nedbro", "nedsis", "missher", "misshim", "misher",
-                "mishim", "miss her", "miss him", "mis her", "mis him", "missingher", "missinghim", "misingher", "misinghim",
-                "mising her", "mising him", "nxdx", "nuxe", "nuxd", "throbbin", "gujju", "cutie", "bangali", "hoxy", "hoxxy",
-                "hrxy", "hrxxy", "hxxxy", "howrn", "hworn", "horwn", "booy", "boooy", "booooy", "boooooy", "booooooy",
-                "boooooooy", "booooooooy", "bhabi", "babhi", "bhabhi", "naugty", "nughty", "handsum", "handsom", "beautiful",
-                "packind", "packin d", "myd", "my d", "bnft", "frnd", "needfriend", "lauda", "laude", "loda", "seduce",
-                "seduct", "bubs", "hzorn", "cxxk", "useme", "use me", "snnap", "snaap", "snnaap", "hxry", "puxssy", "urknees",
-                "ur knees", "ur knes", "urknes", "chhat", "chaat", "chhaat"
-        };
+    static const std::vector<std::string> hornyNames = { "snap" ,"aunty", "singl", "sxngl", "hxon", "hx0n", "fuvk", "kok",
+        "gay", "slt", "snp", "bbw", "bbc", "bwc", "sex", "s3x", "53x", "5ex", "igx", "sxy", "b0y", "fck", "pxxy",
+        "fcck", "pxrn", "cnm", "cum", "h0t", "hrne", "lulli", "rndi", "rxndi", "slave", "siave", "slxv", "sxlv", "sxav",
+        "slax", "freak", "slve", "hxrd", "f4k", "fem", "cxm", "dik", "hry", "hrny", "hxrn", "h0rn", "slvt", "sxlt",
+        "sivt", "lesb", "cxck", "puss", "s4np", "segs", "pusy", "pxss", "pxsy", "slut", "slxt", "snxp", "dady", "dxdy",
+        "dvdy", "fuck", "fxck", "pics", "perv", "sanp", "sn4p", "seggs", "futa", "momy", "mxm", "vrgn", "duro",
+        "dddy", "bxby", "hoxn", "hpny", "jerk", "wank", "jxrk", "jork", "ndue", "svlt", "deku", "baku", "nvde", "lund",
+        "siut", "knky", "nude", "tits", "txts", "bxtt", "nudx", "nxde", "bigd", "nips", "pssy", "0cm", "1cm", "2cm",
+        "3cm", "4cm", "5cm", "6cm", "7cm", "8cm", "9cm", "0in", "1in", "2in", "3in", "4in", "lust", "lusxt", "5in",
+        "6in", "7in", "8in", "9in", "0ln", "1ln", "2ln", "3ln", "4ln", "bitch", "btch", "bich", "gaand", "pawg",
+        "5ln", "6ln", "7ln", "8ln", "9ln", "domgf", "dom gf", "dombf", "dom bf", "subgf", "sub gf", "subbf", "sub bf",
+        "4orny", "0 cm", "1 cm", "2 cm", "3 cm", "4 cm", "5 cm", "6 cm", "7 cm", "8 cm", "9 cm", "0 in", "1 in", "2 in",
+        "3 in", "4 in", "5 in", "6 in", "7 in", "8 in", "9 in", "0 ln", "1 ln", "2 ln", "3 ln", "4 ln", "5 ln", "6 ln",
+        "7 ln", "8 ln", "9 ln", "nxds", "nuds", "goon", "sxck", "babe", "xude", "toes", "male", "xfun", "funx", "iund",
+        "booty", "chodu", "chxdu", "chdu", "slux", "papi", "fuxk", "nudz", "suck", "sxck", "suxk", "sucx", "spnk", "dxk",
+        "puzy", "pxzy", "3som", "3sum", "dabi", "s1ut", "momo", "gxrl", "grxl", "gixl", "guxl", "dick", "dxck",
+        "dixk", "dxxk", "hxny", "trde", "4rny", "trxad", "hxrx", "bobs", "b0bs", "bxbs", "pedo", "pxdo", "pdxo", "ped0",
+        "pxd0", "pdx0", "p3do", "p3d0", "hr b", "horxy", "horxi", "daxdy", "dxady", "dadxy", "dadd", "dxdd", "dvdd",
+        "trxde", "mxm", "stepx", "vrgon", "puszy", "flirt", "dicx", "tity", "raxdi", "hrnx", "ho1ny", "hprny", "domme",
+        "bxxb", "b00b", "boob", "kinky", "k1nky", "kxnky", "hrxny", "noods", "izuku", "dxrty", "hrne", "bussy", "bxssy",
+        "buxxy", "buxsy", "busxy", "randi", "puxxy", "puxsy", "ladka", "ladki", "big d", "sxut", "drty", "hnrxy", "niple",
+        "tamil", "mallu", "edgin", "puhsy", "dirty", "spank", "spxnk", "sxank", "dvvdy", "send d", "sendd", "hrxd",
+        "spaxk", "xlove", "showd", "puzzy", "pxzzy", "hoxrn", "bo0b", "b0ob", "boxbs", "bxob", "b0xb", "bx0b", "dxxdy",
+        "desi", "mytoy", "mytxy", "hor b", "femboy", "fetish", "vergon", "virgin", "horxny", "ho1rny", "hor1ny",
+        "nipple", "nxpple", "telugu", "blackd", "vagina", "hxorn", "h3orn", "h30rn", "show d", "hxorm", "me n u",
+        "mineta", "gir1", "g1rl", "g1r1", "meandu", "master", "my toy", "my txy", "dxxd", "daxx", "stepsis", "stepbro",
+        "stxpsis", "stxpbro", "gorny", "gorni", "g0rn", "jackoff", "jxckoff", "freeuse", "black d", "white d",
+        "naughty", "muthmar", "thresom", "thresum", "step sis", "step bro", "stxp sis", "stxp bro", "pleasure",
+        "free use", "bigblack", "bigwhite", "roleplay", "role play", "me and u", "me n you", "meandyou", "threesom",
+        "threesum", "jackmeoff", "jerkmeoff", "jxckmeoff", "jxrkmeoff", "kamasutra", "threeesom", "threeesum",
+        "masturbate", "masterbate", "mxsturbate", "mxsterbate", "jackmehoff", "jerkmehoff", "jxckmehoff",
+        "jxrkmehoff", "kama sutra", "me and you", "needg", "need g", "needb", "need b", "wantg", "want g", "wantb",
+        "want b", "packing d", "packingd", "bigbbs", "hugebbs", "smallbbs", "tinybbs", "bigpp", "hugepp", "tinypp",
+        "smallpp", "smolpp", "hx0rn", "hxxrn", "hxxn", "bigdk", "hugedk", "tinydk", "smalldk", "smoldk", "h0rx",
+        "40rny", "4xrny", "hr0n", "no0ds", "n0ods", "hnr0y", "hnry", "hx0rm", "h0rm", "horm", "hoorn", "hxoorn",
+        "hrooxn", "pucsy", "puscy", "pxcsy", "pxscy", "d4dd", "d3dd", "d5dd", "rideme", "ride me", "rideonme",
+        "ride on me", "sendmy", "sendyo", "sendur", "send my", "send yo", "send ur", "sndmy", "sndyo", "sndur",
+        "snd my", "snd yo", "snd ur", "fetsluck", "fets luck", "sit on"
+        "bricked", "brxcked", "brcked", "eatpus", "eatpxs", "eatpux", "banda", "creamy", "date", "dating", "datng",
+        "datin", "veiny", "hore", "hqrn", "hirn", "luvr", "lovr", "puccy", "txrade", "traxde", "tradx", "tits",
+        "tlts", "siton", "facesit", "sitface", "sit on", "face sit", "wannafk", "want2fk", "wanttofk",
+        "gonnafk", "goingtofk", "going2fk", "puhss", "puhsy", "stpsis", "stpbro", "stpxsis", "stpxbro", "stp sis",
+        "stp bro", "need bro", "need sis", "needbro", "needsis", "h0xrn", "hr0n", "hr0xn", "hrn0", "punish", "pnish",
+        "pxnish", "punixh", "pxnixh", "daxd", "dadx", "daad", "givehead", "gimmehead", "give head", "gimme head",
+        "digbick", "dig bick", "mom", "fkr", "fker", "submissive", "submisive", "sxbmissive", "sxbmisive",
+        "sxbmxssxve", "sxbmxsxve", "submxssxve", "submxsxve", "submissxve", "submisxve", "submxssive", "submxsive",
+        "slxut", "sxlut", "pussi", "pusi", "ned bro", "ned sis", "nedbro", "nedsis", "missher", "misshim", "misher",
+        "mishim", "miss her", "miss him", "mis her", "mis him", "missingher", "missinghim", "misingher", "misinghim",
+        "mising her", "mising him", "nxdx", "nuxe", "nuxd", "throbbin", "gujju", "cutie", "bangali", "hoxy", "hoxxy",
+        "hrxy", "hrxxy", "hxxxy", "howrn", "hworn", "horwn", "booy", "boooy", "booooy", "boooooy", "booooooy",
+        "boooooooy", "booooooooy", "bhabi", "babhi", "bhabhi", "naugty", "nughty", "handsum", "handsom", "beautiful",
+        "packind", "packin d", "myd", "my d", "bnft", "frnd", "needfriend", "lauda", "laude", "loda", "seduce",
+        "seduct", "bubs", "hzorn", "cxxk", "useme", "use me", "snnap", "snaap", "snnaap", "hxry", "puxssy", "urknees",
+        "ur knees", "ur knes", "urknes", "chhat", "chaat", "chhaat"
+    };
 
-        for (const std::string& name : hornyNames)
-        {
-                if (loweredName.find(name) != std::string::npos) return true;
-        }
-        return false;
+    for (const std::string& name : hornyNames)
+    {
+        if (loweredName.find(name) != std::string::npos) return true;
+    }
+    return false;
 }
 
 //TODO: Workaround
 #define GET_VIRTUAL_INVOKE(obj, method) \
-        ((VirtualInvokeData*)(&obj->klass->vtable))[ \
-                (obj->klass->_0.interfaceOffsets ? obj->klass->_0.interfaceOffsets[0].offset : 0) \
-                + offsetof(decltype(obj->klass->vtable), method) \
-                / sizeof(VirtualInvokeData)]
+    ((VirtualInvokeData*)(&obj->klass->vtable))[ \
+        (obj->klass->_0.interfaceOffsets ? obj->klass->_0.interfaceOffsets[0].offset : 0) \
+        + offsetof(decltype(obj->klass->vtable), method) \
+        / sizeof(VirtualInvokeData)]
 
 // Safe interface dispatch: hardcodes interface offset=4 (Object base slots: Equals/Finalize/GetHashCode/ToString).
 // Confirmed identical for IGameOptions and IRoleOptionsCollection on both Epic x64 and Steam Win32 via dump comparison.
 // Avoids reading obj->klass->_0.interfaceOffsets which may land on wrong memory if the Win32 il2cpp
 // class struct layout differs from the x64-generated Il2CppClass_0 definition.
 #define GET_VIRTUAL_INVOKE_IFACE(obj, method) \
-        ((VirtualInvokeData*)(&obj->klass->vtable))[ \
-                4 + offsetof(decltype(obj->klass->vtable), method) \
-                / sizeof(VirtualInvokeData)]
+    ((VirtualInvokeData*)(&obj->klass->vtable))[ \
+        4 + offsetof(decltype(obj->klass->vtable), method) \
+        / sizeof(VirtualInvokeData)]
 
 // Safe concrete-class dispatch: offset=0 (no interface, method lives directly in own vtable).
 // Used for LogicOptions which implements no interfaces.
 #define GET_VIRTUAL_INVOKE_CONCRETE(obj, method) \
-        ((VirtualInvokeData*)(&obj->klass->vtable))[ \
-                offsetof(decltype(obj->klass->vtable), method) \
-                / sizeof(VirtualInvokeData)]
+    ((VirtualInvokeData*)(&obj->klass->vtable))[ \
+        offsetof(decltype(obj->klass->vtable), method) \
+        / sizeof(VirtualInvokeData)]
 
 GameLogicOptions::GameLogicOptions() {
-        auto mgr = app::GameManager_get_Instance(nullptr);
-        if (mgr == nullptr)
-                return;
-        auto logic = app::GameManager_get_LogicOptions(mgr, nullptr);
-        LOG_ASSERT(logic != nullptr);
-        auto& func = GET_VIRTUAL_INVOKE_CONCRETE(logic, __unknown_4);
-        _options = ((app::IGameOptions * (*)(void*, const void*))(func.methodPtr))(logic, func.method);
-        LOG_ASSERT(_options != nullptr);
+    auto mgr = app::GameManager_get_Instance(nullptr);
+    if (mgr == nullptr)
+        return;
+    auto logic = app::GameManager_get_LogicOptions(mgr, nullptr);
+    LOG_ASSERT(logic != nullptr);
+    auto& func = GET_VIRTUAL_INVOKE_CONCRETE(logic, __unknown_4);
+    _options = ((app::IGameOptions * (*)(void*, const void*))(func.methodPtr))(logic, func.method);
+    LOG_ASSERT(_options != nullptr);
 }
 
 GameOptions::GameOptions() : _options(nullptr) {
-        auto mgr = app::GameOptionsManager_get_Instance(nullptr);
-        if (mgr == nullptr) // see issue 477.
-                return;
-        if (app::GameOptionsManager_get_HasOptions(mgr, nullptr)) {
-                _options = app::GameOptionsManager_get_CurrentGameOptions(mgr, nullptr);
-                LOG_ASSERT(_options != nullptr);
-        }
+    auto mgr = app::GameOptionsManager_get_Instance(nullptr);
+    if (mgr == nullptr) // see issue 477.
+        return;
+    if (app::GameOptionsManager_get_HasOptions(mgr, nullptr)) {
+        _options = app::GameOptionsManager_get_CurrentGameOptions(mgr, nullptr);
+        LOG_ASSERT(_options != nullptr);
+    }
 }
 
 GameOptions& GameOptions::SetByte(app::ByteOptionNames__Enum option, uint8_t value) {
-        if (!_options) return *this;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetByte);
-        ((void(*)(void*, app::ByteOptionNames__Enum, uint8_t, const void*))(func.methodPtr))
-                (_options, option, value, func.method);
-        return *this;
+    if (!_options) return *this;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetByte);
+    ((void(*)(void*, app::ByteOptionNames__Enum, uint8_t, const void*))(func.methodPtr))
+        (_options, option, value, func.method);
+    return *this;
 }
 
 GameOptions& GameOptions::SetFloat(app::FloatOptionNames__Enum option, float value) {
-        if (!_options) return *this;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetFloat);
-        ((void(*)(void*, app::FloatOptionNames__Enum, float, const void*))(func.methodPtr))
-                (_options, option, value, func.method);
-        return *this;
+    if (!_options) return *this;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetFloat);
+    ((void(*)(void*, app::FloatOptionNames__Enum, float, const void*))(func.methodPtr))
+        (_options, option, value, func.method);
+    return *this;
 }
 
 GameOptions& GameOptions::SetBool(app::BoolOptionNames__Enum option, bool value) {
-        if (!_options) return *this;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetBool);
-        ((void(*)(void*, app::BoolOptionNames__Enum, bool, const void*))(func.methodPtr))
-                (_options, option, value, func.method);
-        return *this;
+    if (!_options) return *this;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetBool);
+    ((void(*)(void*, app::BoolOptionNames__Enum, bool, const void*))(func.methodPtr))
+        (_options, option, value, func.method);
+    return *this;
 }
 
 GameOptions& GameOptions::SetInt(app::Int32OptionNames__Enum option, int32_t value) {
-        if (!_options) return *this;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetInt);
-        ((void(*)(void*, app::Int32OptionNames__Enum, int32_t, const void*))(func.methodPtr))
-                (_options, option, value, func.method);
-        return *this;
+    if (!_options) return *this;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetInt);
+    ((void(*)(void*, app::Int32OptionNames__Enum, int32_t, const void*))(func.methodPtr))
+        (_options, option, value, func.method);
+    return *this;
 }
 
 GameOptions& GameOptions::SetUInt(app::UInt32OptionNames__Enum option, uint32_t value) {
-        if (!_options) return *this;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetUInt);
-        ((void(*)(void*, app::UInt32OptionNames__Enum, uint32_t, const void*))(func.methodPtr))
-                (_options, option, value, func.method);
-        return *this;
+    if (!_options) return *this;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetUInt);
+    ((void(*)(void*, app::UInt32OptionNames__Enum, uint32_t, const void*))(func.methodPtr))
+        (_options, option, value, func.method);
+    return *this;
 }
 
 uint8_t GameOptions::GetByte(app::ByteOptionNames__Enum option, uint8_t defaultValue) const {
-        if (!_options) return defaultValue;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, TryGetByte);
-        uint8_t value;
-        bool succ = ((bool(*)(void*, app::ByteOptionNames__Enum, uint8_t*, const void*))(func.methodPtr))
-                (_options, option, &value, func.method);
-        if (!succ)
-                value = defaultValue;
-        return value;
+    if (!_options) return defaultValue;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, TryGetByte);
+    uint8_t value;
+    bool succ = ((bool(*)(void*, app::ByteOptionNames__Enum, uint8_t*, const void*))(func.methodPtr))
+        (_options, option, &value, func.method);
+    if (!succ)
+        value = defaultValue;
+    return value;
 }
 
 float GameOptions::GetFloat(app::FloatOptionNames__Enum option, float defaultValue) const {
-        if (!_options) return defaultValue;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, TryGetFloat);
-        float value;
-        bool succ = ((bool(*)(void*, app::FloatOptionNames__Enum, float*, const void*))(func.methodPtr))
-                (_options, option, &value, func.method);
-        if (!succ)
-                value = defaultValue;
-        return value;
+    if (!_options) return defaultValue;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, TryGetFloat);
+    float value;
+    bool succ = ((bool(*)(void*, app::FloatOptionNames__Enum, float*, const void*))(func.methodPtr))
+        (_options, option, &value, func.method);
+    if (!succ)
+        value = defaultValue;
+    return value;
 }
 
 bool GameOptions::GetBool(app::BoolOptionNames__Enum option, bool defaultValue) const {
-        if (!_options) return defaultValue;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, TryGetBool);
-        bool value;
-        bool succ = ((bool(*)(void*, app::BoolOptionNames__Enum, bool*, const void*))(func.methodPtr))
-                (_options, option, &value, func.method);
-        if (!succ)
-                value = defaultValue;
-        return value;
+    if (!_options) return defaultValue;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, TryGetBool);
+    bool value;
+    bool succ = ((bool(*)(void*, app::BoolOptionNames__Enum, bool*, const void*))(func.methodPtr))
+        (_options, option, &value, func.method);
+    if (!succ)
+        value = defaultValue;
+    return value;
 }
 
 int32_t GameOptions::GetInt(app::Int32OptionNames__Enum option, int32_t defaultValue) const {
-        if (!_options) return defaultValue;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, TryGetInt);
-        int32_t value;
-        bool succ = ((bool(*)(void*, app::Int32OptionNames__Enum, int32_t*, const void*))(func.methodPtr))
-                (_options, option, &value, func.method);
-        if (!succ)
-                value = defaultValue;
-        return value;
+    if (!_options) return defaultValue;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, TryGetInt);
+    int32_t value;
+    bool succ = ((bool(*)(void*, app::Int32OptionNames__Enum, int32_t*, const void*))(func.methodPtr))
+        (_options, option, &value, func.method);
+    if (!succ)
+        value = defaultValue;
+    return value;
 }
 
 app::GameModes__Enum GameOptions::GetGameMode() const {
-        if (!_options) return app::GameModes__Enum::None;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_GameMode);
-        return ((app::GameModes__Enum(*)(void*, const void*))(func.methodPtr))(_options, func.method);
+    if (!_options) return app::GameModes__Enum::None;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_GameMode);
+    return ((app::GameModes__Enum(*)(void*, const void*))(func.methodPtr))(_options, func.method);
 }
 
 int32_t GameOptions::GetMaxPlayers() const {
-        if (!_options) return 0;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_MaxPlayers);
-        return ((int32_t(*)(void*, const void*))(func.methodPtr))(_options, func.method);
+    if (!_options) return 0;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_MaxPlayers);
+    return ((int32_t(*)(void*, const void*))(func.methodPtr))(_options, func.method);
 }
 
 uint8_t GameOptions::GetMapId() const {
-        if (!_options) return 0;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_MapId);
-        return ((uint8_t(*)(void*, const void*))(func.methodPtr))(_options, func.method);
+    if (!_options) return 0;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_MapId);
+    return ((uint8_t(*)(void*, const void*))(func.methodPtr))(_options, func.method);
 }
 
 int32_t GameOptions::GetNumImpostors() const {
-        if (!_options) return 0;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_NumImpostors);
-        return ((int32_t(*)(void*, const void*))(func.methodPtr))(_options, func.method);
+    if (!_options) return 0;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_NumImpostors);
+    return ((int32_t(*)(void*, const void*))(func.methodPtr))(_options, func.method);
 }
 
 int32_t GameOptions::GetTotalTaskCount() const {
-        if (!_options) return 0;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_TotalTaskCount);
-        return ((int32_t(*)(void*, const void*))(func.methodPtr))(_options, func.method);
+    if (!_options) return 0;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_TotalTaskCount);
+    return ((int32_t(*)(void*, const void*))(func.methodPtr))(_options, func.method);
 }
 
 RoleOptions GameOptions::GetRoleOptions() const {
-        if (!_options) return RoleOptions(nullptr);
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_RoleOptions);
-        return RoleOptions(((app::IRoleOptionsCollection * (*)(void*, const void*))(func.methodPtr))(_options, func.method));
+    if (!_options) return RoleOptions(nullptr);
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, get_RoleOptions);
+    return RoleOptions(((app::IRoleOptionsCollection * (*)(void*, const void*))(func.methodPtr))(_options, func.method));
 }
 
 float GameOptions::GetPlayerSpeedMod() const {
-        return GetFloat(app::FloatOptionNames__Enum::PlayerSpeedMod, 1.0F);
+    return GetFloat(app::FloatOptionNames__Enum::PlayerSpeedMod, 1.0F);
 }
 
 float GameOptions::GetKillCooldown() const {
-        return GetFloat(app::FloatOptionNames__Enum::KillCooldown, 1.0F);
+    return GetFloat(app::FloatOptionNames__Enum::KillCooldown, 1.0F);
 }
 
 float GameOptions::GetGACooldown() const {
-        return GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F);
+    return GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F);
 }
 
 RoleOptions& RoleOptions::SetRoleRate(app::RoleTypes__Enum role, int32_t maxCount, int32_t chance) {
-        if (!_options) return *this;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetRoleRate);
-        ((void(*)(void*, app::RoleTypes__Enum, int32_t, int32_t, const void*))(func.methodPtr))
-                (_options, role, maxCount, chance, func.method);
-        return *this;
+    if (!_options) return *this;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetRoleRate);
+    ((void(*)(void*, app::RoleTypes__Enum, int32_t, int32_t, const void*))(func.methodPtr))
+        (_options, role, maxCount, chance, func.method);
+    return *this;
 }
 
 RoleOptions& RoleOptions::SetRoleRecommended(app::RoleTypes__Enum role) {
-        if (!_options) return *this;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetRoleRecommended);
-        ((void(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
-        return *this;
+    if (!_options) return *this;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetRoleRecommended);
+    ((void(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
+    return *this;
 }
 
 int32_t RoleOptions::GetNumPerGame(app::RoleTypes__Enum role) const {
-        if (!_options) return 0;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, GetNumPerGame);
-        return ((int32_t(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
+    if (!_options) return 0;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, GetNumPerGame);
+    return ((int32_t(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
 }
 
 int32_t RoleOptions::GetChancePerGame(app::RoleTypes__Enum role) const {
-        if (!_options) return 0;
-        auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, GetChancePerGame);
-        return ((int32_t(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
+    if (!_options) return 0;
+    auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, GetChancePerGame);
+    return ((int32_t(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
 }
 
 void SaveGameOptions() {
-        SaveGameOptions(GameOptions());
+    SaveGameOptions(GameOptions());
 }
 
 void SaveGameOptions(const class GameOptions& gameOptions) {
-        /*State.PlayerSpeed = State.PrevPlayerSpeed = gameOptions.GetPlayerSpeedMod();
-        State.GACooldown = State.PrevGACooldown = gameOptions.GetGACooldown();
-        State.KillDistance = State.PrevKillDistance = gameOptions.GetInt(app::Int32OptionNames__Enum::KillDistance);
-        State.TaskBarUpdates = State.PrevTaskBarUpdates = gameOptions.GetInt(app::Int32OptionNames__Enum::TaskBarMode);
-        State.VisualTasks = State.PrevVisualTasks = gameOptions.GetBool(app::BoolOptionNames__Enum::VisualTasks);*/
-        State.mapHostChoice = gameOptions.GetMapId();
-        State.impostors_amount = gameOptions.GetNumImpostors();
+    /*State.PlayerSpeed = State.PrevPlayerSpeed = gameOptions.GetPlayerSpeedMod();
+    State.GACooldown = State.PrevGACooldown = gameOptions.GetGACooldown();
+    State.KillDistance = State.PrevKillDistance = gameOptions.GetInt(app::Int32OptionNames__Enum::KillDistance);
+    State.TaskBarUpdates = State.PrevTaskBarUpdates = gameOptions.GetInt(app::Int32OptionNames__Enum::TaskBarMode);
+    State.VisualTasks = State.PrevVisualTasks = gameOptions.GetBool(app::BoolOptionNames__Enum::VisualTasks);*/
+    State.mapHostChoice = gameOptions.GetMapId();
+    State.impostors_amount = gameOptions.GetNumImpostors();
 }
 
 static float lastCheckTime = 0.f;
 
 void TrackPlayers()
 {
-        if (!IsInGame() && !IsInLobby()) return;
+    if (!IsInGame() && !IsInLobby()) return;
 
-        float now = app::Time_get_time(NULL);
-        if (now - lastCheckTime < 0.5f) return;
-        lastCheckTime = now;
+    float now = app::Time_get_time(NULL);
+    if (now - lastCheckTime < 0.5f) return;
+    lastCheckTime = now;
 
-        auto& hist = State.PlayerHistory;
-        bool needSave = false;
+    auto& hist = State.PlayerHistory;
+    bool needSave = false;
 
-        for (auto p : GetAllPlayerControl())
-        {
-                if (!p || p == *Game::pLocalPlayer) continue;
-                auto data = GetPlayerData(p);
-                if (!data || data->fields.Disconnected) continue;
+    for (auto p : GetAllPlayerControl())
+    {
+        if (!p || p == *Game::pLocalPlayer) continue;
+        auto data = GetPlayerData(p);
+        if (!data || data->fields.Disconnected) continue;
 
-                std::string fc = convert_from_string(data->fields.FriendCode);
-                std::string name = strToLower(RemoveHtmlTags(convert_from_string(GetPlayerOutfit(data)->fields.PlayerName)));
-                std::string puid = convert_from_string(data->fields.Puid);
-                int level = data->fields.PlayerLevel + 1;
+        std::string fc = convert_from_string(data->fields.FriendCode);
+        std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(data)->fields.PlayerName));
+        std::string puid = convert_from_string(data->fields.Puid);
+        int level = data->fields.PlayerLevel + 1;
 
-                if (fc.empty() || name.empty() || level <= 0) continue;
-                if (State.RemovedPlayers.count(fc)) continue;
+        if (fc.empty() || name.empty() || level <= 0) continue;
+        if (State.RemovedPlayers.count(fc)) continue;
 
-                // exists? (n <= 100 so linear scan is OK)
-                bool exists = false;
-                for (auto& rp : hist) {
-                        if (rp.FriendCode == fc) { exists = true; break; }
-                }
-                if (exists) continue;
+        // exists? (n <= 100 so linear scan is OK)
+        bool exists = false;
+        for (auto& rp : hist) {
+            if (rp.FriendCode == fc) { exists = true; break; }
+        }
+        if (exists) continue;
 
-                std::string platform = "Unknown";
-                auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), p, NULL);
-                if (client && client->fields.PlatformData && p->fields._.OwnerId == client->fields.Id) {
-                        switch (client->fields.PlatformData->fields.Platform) {
-                        case Platforms__Enum::StandaloneEpicPC: platform = "Epic Games (PC)";
-                                break;
-                        case Platforms__Enum::StandaloneSteamPC: platform = "Steam (PC)";
-                                break;
-                        case Platforms__Enum::StandaloneMac: platform = "Mac";
-                                break;
-                        case Platforms__Enum::StandaloneWin10: platform = "Microsoft Store (PC)";
-                                break;
-                        case Platforms__Enum::StandaloneItch: platform = "itch.io (PC)";
-                                break;
-                        case Platforms__Enum::IPhone: platform = "iOS/iPadOS (Mobile)";
-                                break;
-                        case Platforms__Enum::Android: platform = "Android (Mobile)";
-                                break;
-                        case Platforms__Enum::Switch: platform = "Nintendo Switch (Console)";
-                                break;
-                        case Platforms__Enum::Xbox: platform = "Xbox (Console)";
-                                break;
-                        case Platforms__Enum::Playstation: platform = "Playstation (Console)";
-                                break;
-                        default: platform = "Unknown";
-                                break;
-                        }
-                }
-
-                std::string lcname = name;
-                std::transform(lcname.begin(), lcname.end(), lcname.begin(), ::tolower);
-                bool nameCheck = (std::find(State.LockedNames.begin(), State.LockedNames.end(), lcname) != State.LockedNames.end());
-
-                bool isCheater = false;
-                std::string cheatName = "";
-                int pid = data->fields.PlayerId;
-                auto modIt = State.modUsers.find(pid);
-                if (modIt != State.modUsers.end()) {
-                        cheatName = RemoveHtmlTags(modIt->second);
-                        isCheater = true;
-                }
-
-                hist.erase(std::remove_if(hist.begin(), hist.end(), [](const Settings::RememberedPlayer& rp) {
-                        return rp.Nick.empty() || rp.Level <= 0;
-                        }), hist.end());
-
-                if (hist.size() >= 100) hist.pop_front();
-
-                Settings::RememberedPlayer rp { name, fc, puid, level, platform, nameCheck, isCheater, cheatName };
-                hist.push_back(rp);
-                needSave = true;
+        std::string platform = "Unknown";
+        auto client = app::InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), p, NULL);
+        if (client && client->fields.PlatformData && p->fields._.OwnerId == client->fields.Id) {
+            switch (client->fields.PlatformData->fields.Platform) {
+            case Platforms__Enum::StandaloneEpicPC: platform = "Epic Games (PC)";
+                break;
+            case Platforms__Enum::StandaloneSteamPC: platform = "Steam (PC)";
+                break;
+            case Platforms__Enum::StandaloneMac: platform = "Mac";
+                break;
+            case Platforms__Enum::StandaloneWin10: platform = "Microsoft Store (PC)";
+                break;
+            case Platforms__Enum::StandaloneItch: platform = "itch.io (PC)";
+                break;
+            case Platforms__Enum::IPhone: platform = "iOS/iPadOS (Mobile)";
+                break;
+            case Platforms__Enum::Android: platform = "Android (Mobile)";
+                break;
+            case Platforms__Enum::Switch: platform = "Nintendo Switch (Console)";
+                break;
+            case Platforms__Enum::Xbox: platform = "Xbox (Console)";
+                break;
+            case Platforms__Enum::Playstation: platform = "Playstation (Console)";
+                break;
+            default: platform = "Unknown";
+                break;
+            }
         }
 
-        if (needSave) State.Save();
+        std::string lcname = name;
+        std::transform(lcname.begin(), lcname.end(), lcname.begin(), ::tolower);
+        bool nameCheck = (std::find(State.LockedNames.begin(), State.LockedNames.end(), lcname) != State.LockedNames.end());
+
+        bool isCheater = false;
+        std::string cheatName = "";
+        int pid = data->fields.PlayerId;
+        auto modIt = State.modUsers.find(pid);
+        if (modIt != State.modUsers.end()) {
+            cheatName = RemoveHtmlTags(modIt->second);
+            isCheater = true;
+        }
+
+        hist.erase(std::remove_if(hist.begin(), hist.end(), [](const Settings::RememberedPlayer& rp) {
+            return rp.Nick.empty() || rp.Level <= 0;
+            }), hist.end());
+
+        if (hist.size() >= 100) hist.pop_front();
+
+        Settings::RememberedPlayer rp { name, fc, puid, level, platform, nameCheck, isCheater, cheatName };
+        hist.push_back(rp);
+        needSave = true;
+    }
+
+    if (needSave) State.Save();
 }
 
 void AddToWhitelist(const std::string& fc)
 {
-        if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) == State.WhitelistFriendCodes.end())
-        {
-                State.WhitelistFriendCodes.push_back(fc);
-                State.Save();
-        }
+    if (std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) == State.WhitelistFriendCodes.end())
+    {
+        State.WhitelistFriendCodes.push_back(fc);
+        State.Save();
+    }
 }
 
 void AddToBlacklist(const std::string& fc)
 {
-        if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), fc) == State.BlacklistFriendCodes.end())
-        {
-                State.BlacklistFriendCodes.push_back(fc);
-                State.Save();
-        }
+    if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), fc) == State.BlacklistFriendCodes.end())
+    {
+        State.BlacklistFriendCodes.push_back(fc);
+        State.Save();
+    }
 }
 
 void RemoveFromWhitelist(const std::string& fc)
 {
-        auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
-        if (it != State.WhitelistFriendCodes.end())
-        {
-                State.WhitelistFriendCodes.erase(it);
-                State.Save();
-        }
+    auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
+    if (it != State.WhitelistFriendCodes.end())
+    {
+        State.WhitelistFriendCodes.erase(it);
+        State.Save();
+    }
 }
 
 void RemoveFromBlacklist(const std::string& fc)
 {
-        auto it = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), fc);
-        if (it != State.BlacklistFriendCodes.end())
-        {
-                State.BlacklistFriendCodes.erase(it);
-                State.Save();
-        }
+    auto it = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), fc);
+    if (it != State.BlacklistFriendCodes.end())
+    {
+        State.BlacklistFriendCodes.erase(it);
+        State.Save();
+    }
 }
 
 static uint64_t Random64(uint64_t di, uint64_t ddy) {
-        thread_local std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count() ^ ((uint64_t)std::random_device{}() << 1));
-        std::uniform_int_distribution<uint64_t> dist(di, ddy);
-        return dist(rng);
+    thread_local std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count() ^ ((uint64_t)std::random_device{}() << 1));
+    std::uniform_int_distribution<uint64_t> dist(di, ddy);
+    return dist(rng);
 }
 
 static uint64_t GeneratePsnId() {
-        return Random64(1000000000000000ULL, 9999999999999999ULL);
+    return Random64(1000000000000000ULL, 9999999999999999ULL);
 }
 
 static uint64_t GenerateXboxId() { 
-        return Random64(0x10000000000ULL, 0xFFFFFFFFFFFFULL);
+    return Random64(0x10000000000ULL, 0xFFFFFFFFFFFFULL);
 }
 
 void GeneratePlatformId() {
-        if (State.FakePlatform == 8)
-        {
-                State.FakeXboxId = GenerateXboxId();
-                State.SpoofXboxId = true;
-                State.Save();
-        }
+    if (State.FakePlatform == 8)
+    {
+        State.FakeXboxId = GenerateXboxId();
+        State.SpoofXboxId = true;
+        State.Save();
+    }
 
-        if (State.FakePlatform == 9)
-        {
-                State.FakePsnId = GeneratePsnId();
-                State.SpoofPsnId = true;
-                State.Save();
-        }
+    if (State.FakePlatform == 9)
+    {
+        State.FakePsnId = GeneratePsnId();
+        State.SpoofPsnId = true;
+        State.Save();
+    }
 }

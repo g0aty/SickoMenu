@@ -52,7 +52,7 @@
 - **Menu Scale** Changes the scale of the menu
 - **Enable/Disable Animations** Enables/Disables animations
 - **Animation Speed** Changes the speep of the animation
-- **Rounding Radious Multiplier** Changes the rounding radious multiplier
+- **Rounding Radius Multiplier** Changes the rounding radius multiplier
 - **Role colors** Changes the color shown for a certain role
 - **Other Colors** Changes other colors
 
@@ -109,6 +109,9 @@
 
 ### Settings
 View the game options!
+
+### History
+View and copy the info of the last 100 players you have encountered!
 
 ## 🤵 Self
 ### Visuals

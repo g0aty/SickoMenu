@@ -26,7 +26,7 @@ void RpcForceSnapTo::Process()
 	for (auto p : GetAllPlayerControl()) {
 		if (p == *Game::pLocalPlayer) continue;
 		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields.NetTransform->fields._.NetId,
-			uint8_t(RpcCalls__Enum::SnapTo), SendOption__Enum::None, p->fields._.OwnerId, NULL);
+			uint8_t(RpcCalls__Enum::SnapTo), SendOption__Enum::Reliable, p->fields._.OwnerId, NULL);
 		NetHelpers_WriteVector2(targetVector, writer, NULL);
 		MessageWriter_WriteUShort(writer, Player->fields.NetTransform->fields.lastSequenceId + 100, NULL);
 		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);

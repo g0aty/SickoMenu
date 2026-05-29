@@ -65,7 +65,7 @@ bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodIn
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dVent_TryMoveToVent executed");
 	if (!State.PanicMode && *Game::pLocalPlayer != NULL) {
 		bool wasVisible = PlayerControl_get_Visible(*Game::pLocalPlayer, NULL) && !(*Game::pLocalPlayer)->fields.walkingToVent && State.ShowPlayersInVents && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead;
-		if (wasVisible) {
+		if (wasVisible && (*Game::pLocalPlayer)->fields.inVent) {
 			PlayerControl_set_Visible(*Game::pLocalPlayer, false, NULL);
 		}
 		return Vent_TryMoveToVent(__this, otherVent, error, method);

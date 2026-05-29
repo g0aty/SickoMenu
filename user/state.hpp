@@ -106,6 +106,7 @@ public:
     bool ShowPhantoms = false;
     bool ShowPlayersInVents = false;
     int FakeRole = 0;
+    int FakeRoleId = 0;
     bool AutoFakeRole = false;
     bool DisableVents = false;
     bool SpamReport = false;
@@ -148,6 +149,7 @@ public:
     bool AbbreviatedRoleNames = false;
     bool PlayerColoredDots = false;
     bool ShowPlayerInfo = false;
+    bool HideWhitelistedPlayerInfo = true;
     bool ShowLobbyInfo = false;
     float PrevKillDistance = 0.f;
     float KillDistance = 0.f;
@@ -258,7 +260,7 @@ public:
     bool BetterChatNotifications = false;
     bool BetterLobbyCodeInput = false;
     bool BetterMessageSounds = false;
-        AudioClip* MessageSound = NULL;
+    AudioClip* MessageSound = NULL;
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
@@ -343,20 +345,24 @@ public:
     //std::vector<Game::PlayerId> aumUsers;
     //std::vector<Game::PlayerId> sickoUsers;
     std::vector<Game::PlayerId> vanishedPlayers;
+    std::vector<Game::PlayerId> validDeadBodyIds;
     std::map<Game::PlayerId, std::string> modUsers;
     int32_t rpcCooldown = 15;
     int32_t playerKilledId = 0;
+    std::string searchQuery = "";
 
     std::array<PlayerControl*, Game::MAX_PLAYERS> assignedRolesPlayer = {};
     std::array<RoleType, Game::MAX_PLAYERS> assignedRoles = {};
-    int mapHostChoice = -1;
+    int mapHostChoice = 0;
     int impostors_amount = 0;
     int shapeshifters_amount = 0;
     int phantoms_amount = 0;
+    int vipers_amount = 0;
     int engineers_amount = 0;
     int scientists_amount = 0;
     int trackers_amount = 0;
     int noisemakers_amount = 0;
+    int detectives_amount = 0;
     int crewmates_amount = 0;
 
     bool Wallhack = false;
@@ -402,6 +408,8 @@ public:
     ImVec4 NoisemakerColor = ImVec4(0.f, 1.f, 0.47f, 1.f);
     ImVec4 TrackerColor = ImVec4(0.65f, 0.36f, 1.f, 1.f);
     ImVec4 PhantomColor = ImVec4(0.53f, 0.f, 0.f, 1.f);
+    ImVec4 DetectiveColor = ImVec4(0.39f, 0.735f, 1.f, 1.f);
+    ImVec4 ViperColor = ImVec4(1.f, 1.f, 0.f, 1.f);
 
     ImVec4 HostColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
     ImVec4 PlayerIdColor = ImVec4(1.f, 0.f, 0.f, 1.f);
@@ -492,7 +500,7 @@ public:
     bool IsStartCountdownActive = false;
     bool AlwaysAllowStart = false;
     bool ModifyStartCountdown = false;
-    int StartCountdown = 10;
+    int StartCountdown = 3;
 
     std::unordered_set<std::string> Friends;
     std::unordered_set<Game::PlayerId> InGameFriends;
@@ -537,6 +545,9 @@ public:
 
     bool CanChangeOutfit = false;
     bool MainMenuLoaded = false;
+    bool EndLoginFlowFlag = false;
+    QuickChatModes__Enum CurrentChatMode = QuickChatModes__Enum::FreeChatOrQuickChat;
+    bool WasPreviousMessageCommand = false;
     uint8_t OutfitCooldown = 50;
     RoleTypes__Enum RealRole = RoleTypes__Enum::Crewmate;
     DisconnectReasons__Enum LastDisconnectReason = DisconnectReasons__Enum::Unknown;
@@ -552,6 +563,16 @@ public:
     bool AutoOpenDoors = false;
     bool AutoHostRole = false;
     RoleType HostRoleToSet = RoleType::Impostor;
+
+    bool murderLoop = false;
+    bool suicideLoop = false;
+    bool farmLoop = false;
+    int murderCount = 0;
+    int murderDelay = 0;
+    int suicideCount = 0;
+    int suicideDelay = 0;
+    int farmCount = 0;
+    int farmDelay = 0;
 
     Settings()
     {
@@ -622,7 +643,7 @@ public:
     bool KickByLockedName = false;
     bool ShowPDataByNC = false;
 
-    bool AprilFoolsMode = true;
+    bool AprilFoolsMode = false;
     bool BrainrotEveryone = false;
     bool RizzUpEveryone = false;
     bool DiddyPartyMode = false;

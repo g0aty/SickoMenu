@@ -9,7 +9,7 @@ on:
     #branches: [ "main" ]
   
 jobs:
-  Build_Release:
+  Build_Release_x86:
     runs-on: windows-2022
     steps:
       - name: Checkout
@@ -17,26 +17,53 @@ jobs:
       
       - name: Build Release
         shell: bash
-        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Release -property:PlatformToolset=v143'
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Release -property:PlatformToolset=v143 -property:Platform=x86'
         
       - name: Build Release_Version
         shell: bash
-        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Release_Version -property:PlatformToolset=v143'
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Release_Version -property:PlatformToolset=v143 -property:Platform=x86'
         
       - name: Package Release Builds
         shell: cmd
         run: |
           move /y Release\SickoMenu.dll SickoMenu.dll
           move /y Release_Version\version.dll version.dll
-          tar -caf Release.zip SickoMenu.dll version.dll LICENSE
+          tar -caf Release_x86_SteamItch.zip SickoMenu.dll version.dll LICENSE
         
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4.2.0
         with:
-          name: Release
-          path: Release.zip
+          name: Release_x86_SteamItch
+          path: Release_x86_SteamItch.zip
           
-  Build_Debug:
+  Build_Release_x64:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      
+      - name: Build Release
+        shell: bash
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Release -property:PlatformToolset=v143 -property:Platform=x64'
+        
+      - name: Build Release_Version
+        shell: bash
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Release_Version -property:PlatformToolset=v143 -property:Platform=x64'
+        
+      - name: Package Release Builds
+        shell: cmd
+        run: |
+          move /y x64\Release\SickoMenu.dll SickoMenu.dll
+          move /y x64\Release_Version\version.dll version.dll
+          tar -caf Release_x64_EpicXboxMS.zip SickoMenu.dll version.dll LICENSE
+        
+      - name: Upload Release Artifact
+        uses: actions/upload-artifact@v4.2.0
+        with:
+          name: Release_x64_EpicXboxMS
+          path: Release_x64_EpicXboxMS.zip
+          
+  Build_Debug_x86:
     runs-on: windows-2022
     steps:
       - name: Checkout
@@ -44,28 +71,55 @@ jobs:
       
       - name: Build Debug
         shell: bash
-        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Debug -property:PlatformToolset=v143'
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Debug -property:PlatformToolset=v143 -property:Platform=x86'
         
       - name: Build Debug_Version
         shell: bash
-        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Debug_Version -property:PlatformToolset=v143'
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Debug_Version -property:PlatformToolset=v143 -property:Platform=x86'
         
       - name: Package Debug Builds
         shell: cmd
         run: |
           move /y Debug\SickoMenu.dll SickoMenu.dll
           move /y Debug_Version\version.dll version.dll
-          tar -caf Debug.zip SickoMenu.dll version.dll LICENSE
+          tar -caf Debug_x86_SteamItch.zip SickoMenu.dll version.dll LICENSE
         
       - name: Upload Debug Artifact
         uses: actions/upload-artifact@v4.2.0
         with:
-          name: Debug
-          path: Debug.zip
+          name: Debug_x86_SteamItch
+          path: Debug_x86_SteamItch.zip
+          
+  Build_Debug_x64:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      
+      - name: Build Debug
+        shell: bash
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Debug -property:PlatformToolset=v143 -property:Platform=x64'
+        
+      - name: Build Debug_Version
+        shell: bash
+        run: '"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Msbuild/Current/Bin/MSBuild.exe" -property:Configuration=Debug_Version -property:PlatformToolset=v143 -property:Platform=x64'
+        
+      - name: Package Debug Builds
+        shell: cmd
+        run: |
+          move /y x64\Debug\SickoMenu.dll SickoMenu.dll
+          move /y x64\Debug_Version\version.dll version.dll
+          tar -caf Debug_x64_EpicXboxMS.zip SickoMenu.dll version.dll LICENSE
+        
+      - name: Upload Debug Artifact
+        uses: actions/upload-artifact@v4.2.0
+        with:
+          name: Debug_x64_EpicXboxMS
+          path: Debug_x64_EpicXboxMS.zip
           
   AutoRelease:
     runs-on: windows-2022
-    needs: [Build_Release, Build_Debug]
+    needs: [Build_Release_x86, Build_Release_x64, Build_Debug_x86, Build_Debug_x64]
     steps:
 #      - name: Parse tag semver
 #        uses: booxmedialtd/ws-action-parse-semver@3576f3a20a39f8752fe0d8195f5ed384090285dc
@@ -85,15 +139,25 @@ jobs:
 #            echo 'full: ${{ steps.semver_parser.outputs.fullversion }}'
 #            echo 'is pre-release: ${{ steps.semver_parser.outputs.prerelease != 0 }}'
       
-      - name: Download Release Artifact
+      - name: Download Release Artifact (x86)
         uses: actions/download-artifact@v4.1.7
         with:
-          name: Release
+          name: Release_x86_SteamItch
       
-      - name: Download Debug Artifact
+      - name: Download Release Artifact (x64)
         uses: actions/download-artifact@v4.1.7
         with:
-          name: Debug
+          name: Release_x64_EpicXboxMS
+      
+      - name: Download Debug Artifact (x86)
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: Debug_x86_SteamItch
+      
+      - name: Download Debug Artifact (x64)
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: Debug_x64_EpicXboxMS
       
       - name: Automatic Releases
         uses: marvinpinto/action-automatic-releases@latest #maybe this fixed auto release versioning?
@@ -103,5 +167,7 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: false
           files: |
-            Release.zip
-            Debug.zip
+            Release_x86_SteamItch.zip
+            Release_x64_EpicXboxMS.zip
+            Debug_x86_SteamItch.zip
+            Debug_x64_EpicXboxMS.zip

@@ -22,8 +22,10 @@ void fakeSuccessfulLogin(EOSManager* eosManager)
 
 void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_StartInitialLoginFlow executed");
+	EOSManager_DeleteDeviceID(__this, NULL, NULL);
 	if (!State.SpoofGuestAccount) {
 		EOSManager_StartInitialLoginFlow(__this, method);
+		EOSManager_EndMergeGuestAccountFlow(__this, method);
 		return;
 	}
 	EOSManager_StartTempAccountFlow(__this, method);
@@ -57,8 +59,9 @@ bool dEOSManager_IsFreechatAllowed(EOSManager* __this, MethodInfo* method)
 }
 
 QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method) {
-	if (IsInGame() || IsInLobby()) return QuickChatModes__Enum::FreeChatOrQuickChat;
-	return !isGuestAccount || IsInGame() || IsInLobby() ? MultiplayerSettingsData_get_ChatMode(__this, value, method) : QuickChatModes__Enum::QuickChatOnly;
+	bool commandsAllowed = (State.ReadAndSendSickoChat || State.ExtraCommands) && (IsInGame() || IsInLobby());
+	State.CurrentChatMode = MultiplayerSettingsData_get_ChatMode(__this, value, method);
+	return commandsAllowed ? QuickChatModes__Enum::FreeChatOrQuickChat : State.CurrentChatMode;
 }
 
 bool dEOSManager_IsFriendsListAllowed(EOSManager* __this, MethodInfo* method)
@@ -136,6 +139,11 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		stats->fields.level = fakeLevel - 1;
 		AbstractSaveData_Save((AbstractSaveData*)player, NULL);
 	}
+
+	/*if (State.EndLoginFlowFlag && State.CurrentScene == "MainMenu") { // wait until main menu to end login flow so we don't get null references
+		EOSManager_EndMergeGuestAccountFlow(__this, method);
+		State.EndLoginFlowFlag = false;
+	}*/
 }
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {

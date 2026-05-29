@@ -141,7 +141,11 @@ namespace Radar {
 
 		if (State.ShowRadar_DeadBodies) {
 			for (auto deadBody : GetAllDeadBodies()) {
-				auto playerData = GetPlayerDataById(deadBody->fields.ParentId);
+				auto playerId = deadBody->fields.ParentId;
+				auto playerData = GetPlayerDataById(playerId);
+
+				if (std::find(State.validDeadBodyIds.begin(), State.validDeadBodyIds.end(), playerId) == State.validDeadBodyIds.end())
+					continue; // the dead body has been fully dissolved or invalid in this case, don't render it
 
 				if (State.RadarDrawIcons)
 					drawDeadPlayerIcon(deadBody, winpos, GetRadarPlayerColor(playerData));

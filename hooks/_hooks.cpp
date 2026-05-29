@@ -14,7 +14,7 @@ bool HookFunction(PVOID* ppPointer, PVOID pDetour, const char* functionName) {
 		STREAM_ERROR("Failed to hook " << functionName << ", error " << error);
 		if (error == 6) {
 			MessageBox(NULL,
-				L"SickoMenu failed to hook with error 6!\nThis may be caused by a version of Among Us not supported by SickoMenu.\n\nPlease dont post \"Please update\" stuff in the Issues section of the GitHub repository or on our bug reports forum on Discord. Thats not an issue. It always gets updated, just be patient. Day of launch updates are a privilege, not an expectation.",
+				L"SickoMenu failed to hook with error 6!\nThis may be caused by a version of Among Us not supported by SickoMenu.\n\nPlease don\'t post \"Please update\" stuff in the Issues section of the GitHub repository or on our bug reports forum on Discord. That\'s not an issue. It always gets updated, just be patient. Day of launch updates are a privilege, not an expectation.",
 				L"SickoMenu", MB_ICONERROR);
 		}
 		return false;
@@ -224,7 +224,8 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerControl_SetRoleInvisibility);
 	HOOKFUNC(ShipStatus_UpdateSystem);
 	HOOKFUNC(PlayerControl_CmdCheckProtect);
-	HOOKFUNC(MeetingHud_RpcVotingComplete);
+	//HOOKFUNC(MeetingHud_RpcVotingComplete);
+	HOOKFUNC(MeetingHud_CheckForEndVoting);
 	HOOKFUNC(AccountManager_CanPlayOnline);
 	HOOKFUNC(LogicOptions_GetAnonymousVotes);
 	//HOOKFUNC(AssetReference_InstantiateAsync_1);
@@ -260,6 +261,7 @@ void DetourInitilization() {
 	HOOKFUNC(MainMenuManager_LateUpdate);
 	HOOKFUNC(SoundManager_PlaySound);
 	HOOKFUNC(GameStartManager_ReallyBegin);
+	HOOKFUNC(ViperDeadBody_FixedUpdate);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -398,7 +400,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerControl_SetRoleInvisibility);
 	UNHOOKFUNC(ShipStatus_UpdateSystem);
 	UNHOOKFUNC(PlayerControl_CmdCheckProtect);
-	UNHOOKFUNC(MeetingHud_RpcVotingComplete);
+	//UNHOOKFUNC(MeetingHud_RpcVotingComplete);
+	UNHOOKFUNC(MeetingHud_CheckForEndVoting);
 	UNHOOKFUNC(AccountManager_CanPlayOnline);
 	UNHOOKFUNC(LogicOptions_GetAnonymousVotes);
 	//UNHOOKFUNC(AssetReference_InstantiateAsync_1);
@@ -434,6 +437,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(MainMenuManager_LateUpdate);
 	UNHOOKFUNC(SoundManager_PlaySound);
 	UNHOOKFUNC(GameStartManager_ReallyBegin);
+	UNHOOKFUNC(ViperDeadBody_FixedUpdate);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

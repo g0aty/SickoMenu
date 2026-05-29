@@ -39,7 +39,7 @@ namespace SabotageTab {
 
             if (AnimatedButton("Sabotage All")) {
                 if (State.mapType != Settings::MapType::Fungle) {
-                    for (size_t i = 0; i < 5; i++)
+                    for (uint32_t i = 0; i < 5; i++)
                         State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
                 }
 
@@ -67,7 +67,7 @@ namespace SabotageTab {
                     switch (randIndex) {
                     case 1:
                     {
-                        for (size_t i = 0; i < 5; i++)
+                        for (uint32_t i = 0; i < 5; i++)
                             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
                     } break;
                     case 2: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Laboratory, 128)); break;
@@ -81,7 +81,7 @@ namespace SabotageTab {
                     switch (randIndex) {
                     case 1:
                     {
-                        for (size_t i = 0; i < 5; i++)
+                        for (uint32_t i = 0; i < 5; i++)
                             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
                     } break;
                     case 2: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::HeliSabotage, 128)); break;
@@ -105,7 +105,7 @@ namespace SabotageTab {
                     switch (randIndex) {
                     case 1:
                     {
-                        for (size_t i = 0; i < 5; i++)
+                        for (uint32_t i = 0; i < 5; i++)
                             State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
                     } break;
                     case 2: State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Reactor, 128)); break;
@@ -118,7 +118,7 @@ namespace SabotageTab {
             }
 
             if (State.mapType != Settings::MapType::Fungle && AnimatedButton("Sabotage Lights")) {
-                for (size_t i = 0; i < 5; i++)
+                for (uint32_t i = 0; i < 5; i++)
                     State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Electrical, i));
             }
             if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle) {

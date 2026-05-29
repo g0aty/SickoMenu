@@ -20,10 +20,12 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 	EvenOutImpostorRoleCounts(roleRates);
 	AssignRoles(roleRates, roleRates.ShapeshifterChance, RoleTypes__Enum::Shapeshifter, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.PhantomChance, RoleTypes__Enum::Phantom, allPlayers, assignedPlayers); //don't be sleep-deprived and mix-up phantom with tracker
+	AssignRoles(roleRates, roleRates.ViperChance, RoleTypes__Enum::Viper, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, 100, RoleTypes__Enum::Impostor, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.ScientistChance, RoleTypes__Enum::Scientist, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.TrackerChance, RoleTypes__Enum::Tracker, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.NoisemakerChance, RoleTypes__Enum::Noisemaker, allPlayers, assignedPlayers);
+	AssignRoles(roleRates, roleRates.DetectiveChance, RoleTypes__Enum::Detective, allPlayers, assignedPlayers);
 	if (options.GetGameMode() == GameModes__Enum::HideNSeek) {
 		AssignRoles(roleRates, 100, RoleTypes__Enum::Engineer, allPlayers, assignedPlayers);
 	}
@@ -53,7 +55,7 @@ void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPl
 		roleRates.SubtractRole(trueRole);
 
 		PlayerControl_RpcSetRole(player, trueRole, false, NULL);
-		if (trueRole == RoleTypes__Enum::Impostor || trueRole == RoleTypes__Enum::Shapeshifter || trueRole == RoleTypes__Enum::Phantom)
+		if (trueRole == RoleTypes__Enum::Impostor || trueRole == RoleTypes__Enum::Shapeshifter || trueRole == RoleTypes__Enum::Phantom || trueRole == RoleTypes__Enum::Viper)
 			preChosenImpCount++;
 		if (State.TournamentMode) {
 			auto friendCode = convert_from_string(GetPlayerData(player)->fields.FriendCode);
@@ -65,7 +67,7 @@ void AssignPreChosenRoles(RoleRates& roleRates, std::vector<uint8_t>& assignedPl
 				State.tournamentEarlyDeathPoints[friendCode] = 0.f;
 				State.tournamentKillCaps[friendCode] = 0.f;
 			}
-			if (trueRole == RoleTypes__Enum::Impostor || trueRole == RoleTypes__Enum::Shapeshifter || trueRole == RoleTypes__Enum::Phantom) {
+			if (trueRole == RoleTypes__Enum::Impostor || trueRole == RoleTypes__Enum::Shapeshifter || trueRole == RoleTypes__Enum::Phantom || trueRole == RoleTypes__Enum::Viper) {
 				State.tournamentAssignedImpostors.push_back(friendCode);
 				State.tournamentAliveImpostors.push_back(friendCode);
 			}
@@ -80,7 +82,7 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		for (auto sender : GetAllPlayerControl()) {
 			for (auto receiver : GetAllPlayerControl()) {
 				auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), sender->fields._.NetId,
-					uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::None, receiver->fields._.OwnerId, NULL);
+					uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::Reliable, receiver->fields._.OwnerId, NULL);
 				MessageWriter_WriteUShort(writer, uint16_t((sender == receiver || receiver == *Game::pLocalPlayer) ?
 					RoleTypes__Enum::Impostor : RoleTypes__Enum::Crewmate), NULL);
 				MessageWriter_WriteBoolean(writer, false, NULL);
@@ -92,7 +94,7 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		for (auto sender : GetAllPlayerControl()) {
 			for (auto receiver : GetAllPlayerControl()) {
 				auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), sender->fields._.NetId,
-					uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::None, receiver->fields._.OwnerId, NULL);
+					uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::Reliable, receiver->fields._.OwnerId, NULL);
 				MessageWriter_WriteUShort(writer, uint16_t(RoleTypes__Enum::Crewmate), NULL);
 				MessageWriter_WriteBoolean(writer, false, NULL);
 				InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
@@ -111,7 +113,7 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		//}
 
 		if (options.GetGameMode() == GameModes__Enum::HideNSeek && role == RoleTypes__Enum::Engineer)
-			roleCount = allPlayers.size() - 1;
+			roleCount = (int)allPlayers.size() - 1;
 
 		//int ssCount = roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter), phCount = roleRates.GetRoleCount(RoleTypes__Enum::Phantom), splImpCount = ssCount + phCount;
 
@@ -152,7 +154,7 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 							State.tournamentEarlyDeathPoints[friendCode] = 0.f;
 							State.tournamentKillCaps[friendCode] = 0.f;
 						}
-						if (role == RoleTypes__Enum::Impostor || role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Phantom) {
+						if (role == RoleTypes__Enum::Impostor || role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Phantom || role == RoleTypes__Enum::Viper) {
 							State.tournamentAssignedImpostors.push_back(friendCode);
 							State.tournamentAliveImpostors.push_back(friendCode);
 						}
@@ -185,9 +187,9 @@ bool CanPlayerBeAssignedToRole(app::PlayerControl* player, std::vector<uint8_t>&
 
 void EvenOutImpostorRoleCounts(RoleRates& roleRates) {
 	for (int i = 0; i < 60; ++i) { // My sanity is lost after this code
-		int MoreThanImpostorCountOfImpostorRoles = preChosenImpCount + roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter) + roleRates.GetRoleCount(RoleTypes__Enum::Phantom);
+		int MoreThanImpostorCountOfImpostorRoles = preChosenImpCount + roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter) + roleRates.GetRoleCount(RoleTypes__Enum::Phantom) + roleRates.GetRoleCount(RoleTypes__Enum::Viper);
 		if (roleRates.ImpostorCount < MoreThanImpostorCountOfImpostorRoles) {
-			uint8_t numImpRoles = 2; // Add support for more roles as they are added
+			uint8_t numImpRoles = 3; // Add support for more roles as they are added
 			switch (randi(1, numImpRoles)) {
 			case 1:
 				if (roleRates.ShapeshifterCount > 0)
@@ -196,6 +198,10 @@ void EvenOutImpostorRoleCounts(RoleRates& roleRates) {
 			case 2:
 				if (roleRates.PhantomCount > 0)
 					roleRates.PhantomCount--;
+				break;
+			case 3:
+				if (roleRates.ViperCount > 0)
+					roleRates.ViperCount--;
 				break;
 			}
 		}

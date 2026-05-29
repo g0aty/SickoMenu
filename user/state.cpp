@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v4.4.1.26";
+    this->SickoVersion = "v4.5";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -96,8 +96,8 @@ void Settings::Load() {
         JSON_TRYGET("SpoofXboxId", this->SpoofXboxId);
         JSON_TRYGET("FakeXboxId", this->FakeXboxId);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
-        JSON_TRYGET("SpoofAUVersion", this->SpoofAUVersion);
-        JSON_TRYGET("FakeAUVersion", this->FakeAUVersion);
+        // JSON_TRYGET("SpoofAUVersion_", this->SpoofAUVersion); // putting an underscore to reset version spoofing, remove to reset again
+        // JSON_TRYGET("FakeAUVersion_", this->FakeAUVersion);
         JSON_TRYGET("PanicWarning", this->PanicWarning);
         JSON_TRYGET("DisableAnimations", this->DisableAnimations);
         JSON_TRYGET("AnimationSpeed", this->AnimationSpeed);
@@ -144,6 +144,7 @@ void Settings::Load() {
         JSON_TRYGET("ShowPhantoms", this->ShowPhantoms);
         JSON_TRYGET("ShowPlayersInVents", this->ShowPlayersInVents);
         JSON_TRYGET("FakeRole", this->FakeRole);
+        JSON_TRYGET("FakeRoleId", this->FakeRoleId);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
 
         JSON_TRYGET("NoGameEnd", this->NoGameEnd);
@@ -198,12 +199,14 @@ void Settings::Load() {
         JSON_TRYGET("AbbreviatedRoleNames", this->AbbreviatedRoleNames);
         JSON_TRYGET("PlayerColoredDots", this->PlayerColoredDots);
         JSON_TRYGET("ShowPlayerInfo", this->ShowPlayerInfo);
+        JSON_TRYGET("HideWhitelistedPlayerInfo", this->HideWhitelistedPlayerInfo);
         JSON_TRYGET("ShowLobbyInfo", this->ShowLobbyInfo);
         JSON_TRYGET("ChatAlwaysActive", this->ChatAlwaysActive);
         JSON_TRYGET("ReadGhostMessages", this->ReadGhostMessages);
         JSON_TRYGET("ReadAndSendSickoChat", this->ReadAndSendSickoChat);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
+        JSON_TRYGET("RgbMethod", this->RgbMethod);
         JSON_TRYGET("UsePrefixAndSuffix", this->UsePrefixAndSuffix);
         JSON_TRYGET("PrefixAndSuffixNewLines", this->PrefixAndSuffixNewLines);
         JSON_TRYGET("NamePrefix", this->NamePrefix);
@@ -229,6 +232,7 @@ void Settings::Load() {
         JSON_TRYGET("BoldName", this->BoldName);
         JSON_TRYGET("NobrName", this->BoldName);
         JSON_TRYGET("ColoredName", this->ColoredName);
+        JSON_TRYGET("ColorMethod", this->ColorMethod);
         JSON_TRYGET("NameColor1_R", this->NameColor1.x);
         JSON_TRYGET("NameColor1_G", this->NameColor1.y);
         JSON_TRYGET("NameColor1_B", this->NameColor1.z);
@@ -411,6 +415,14 @@ void Settings::Load() {
         JSON_TRYGET("PhantomColor_G", this->PhantomColor.y);
         JSON_TRYGET("PhantomColor_B", this->PhantomColor.z);
         JSON_TRYGET("PhantomColor_A", this->PhantomColor.w);
+        JSON_TRYGET("DetectiveColor_R", this->DetectiveColor.x);
+        JSON_TRYGET("DetectiveColor_G", this->DetectiveColor.y);
+        JSON_TRYGET("DetectiveColor_B", this->DetectiveColor.z);
+        JSON_TRYGET("DetectiveColor_A", this->DetectiveColor.w);
+        JSON_TRYGET("ViperColor_R", this->ViperColor.x);
+        JSON_TRYGET("ViperColor_G", this->ViperColor.y);
+        JSON_TRYGET("ViperColor_B", this->ViperColor.z);
+        JSON_TRYGET("ViperColor_A", this->ViperColor.w);
 
         JSON_TRYGET("HostColor_R", this->HostColor.x);
         JSON_TRYGET("HostColor_G", this->HostColor.y);
@@ -593,8 +605,8 @@ void Settings::Save() {
                 { "SpoofXboxId", this->SpoofXboxId },
                 { "FakeXboxId", this->FakeXboxId },
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
-                { "SpoofAUVersion", this->SpoofAUVersion },
-                { "FakeAUVersion", this->FakeAUVersion },
+                // { "SpoofAUVersion_", this->SpoofAUVersion }, // putting an underscore to reset version spoofing, remove to reset again
+                // { "FakeAUVersion_", this->FakeAUVersion },
                 { "PanicWarning", this->PanicWarning },
                 { "DisableAnimations", this->DisableAnimations },
                 { "AnimationSpeed", this->AnimationSpeed },
@@ -641,6 +653,7 @@ void Settings::Save() {
                 { "ShowPhantoms", this->ShowPhantoms },
                 { "ShowPlayersInVents", this->ShowPlayersInVents },
                 { "FakeRole", this->FakeRole },
+                { "FakeRoleId", this->FakeRoleId },
                 { "AutoFakeRole", this->AutoFakeRole },
 
                 { "NoGameEnd", this->NoGameEnd },
@@ -695,12 +708,14 @@ void Settings::Save() {
                 { "AbbreviatedRoleNames", this->AbbreviatedRoleNames },
                 { "PlayerColoredDots", this->PlayerColoredDots },
                 { "ShowPlayerInfo", this->ShowPlayerInfo },
+                { "HideWhitelistedPlayerInfo", this->HideWhitelistedPlayerInfo },
                 { "ShowLobbyInfo", this->ShowLobbyInfo },
                 { "ChatAlwaysActive", this->ChatAlwaysActive },
                 { "ReadGhostMessages", this->ReadGhostMessages },
                 { "ReadAndSendSickoChat", this->ReadAndSendSickoChat },
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
+                { "RgbMethod", this->RgbMethod },
                 { "UsePrefixAndSuffix", this->UsePrefixAndSuffix },
                 { "PrefixAndSuffixNewLines", this->PrefixAndSuffixNewLines },
                 { "NamePrefix", this->NamePrefix },
@@ -729,6 +744,7 @@ void Settings::Save() {
                 { "BoldName", this->BoldName },
                 { "NobrName", this->NobrName },
                 { "ColoredName", this->ColoredName },
+                { "ColorMethod", this->ColorMethod },
                 { "NameColor1_R", this->NameColor1.x },
                 { "NameColor1_G", this->NameColor1.y },
                 { "NameColor1_B", this->NameColor1.z },
@@ -803,8 +819,6 @@ void Settings::Save() {
                 { "RgbLobbyCode", this->RgbLobbyCode },
 
                 { "ShowLobbyTimer", this->ShowLobbyTimer },
-                { "AutoStartGame", this->AutoStartGame },
-                { "AutoStartTimer", this->AutoStartTimer },
                 { "ModDetection", this->ModDetection },
                 { "BroadcastedMod", this->BroadcastedMod },
                 { "DisableHostAnticheat", this->DisableHostAnticheat },
@@ -910,6 +924,14 @@ void Settings::Save() {
                 { "PhantomColor_G", this->PhantomColor.y },
                 { "PhantomColor_B", this->PhantomColor.z },
                 { "PhantomColor_A", this->PhantomColor.w },
+                { "DetectiveColor_R", this->DetectiveColor.x },
+                { "DetectiveColor_G", this->DetectiveColor.y },
+                { "DetectiveColor_B", this->DetectiveColor.z },
+                { "DetectiveColor_A", this->DetectiveColor.w },
+                { "ViperColor_R", this->ViperColor.x },
+                { "ViperColor_G", this->ViperColor.y },
+                { "ViperColor_B", this->ViperColor.z },
+                { "ViperColor_A", this->ViperColor.w },
                 { "HostColor_R", this->HostColor.x },
                 { "HostColor_G", this->HostColor.y },
                 { "HostColor_B", this->HostColor.z },

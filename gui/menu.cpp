@@ -38,7 +38,7 @@ namespace Menu {
 #ifdef _DEBUG
 	static bool openDebug = false;
 #endif
-	static std::string searchQuery = (std::string)"";
+	// static std::string searchQuery = (std::string)"";
 
 	std::map<std::string, std::vector<std::string>> categories = {
 		{"Settings", {"Show Keybinds", "Allow Activating Keybinds while Chatting", "Always Show Menu on Startup", "Panic (Disable SickoMenu)",
@@ -116,9 +116,9 @@ namespace Menu {
 	}
 
 	void RenderSearchResults() {
-		if (searchQuery.size() == 0) return;
+		if (State.searchQuery.size() == 0) return;
 
-		std::string lowerQuery = ToLower(searchQuery);
+		std::string lowerQuery = ToLower(State.searchQuery);
 
 		std::vector<std::string> searchResults = {};
 
@@ -165,7 +165,7 @@ namespace Menu {
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 			// Search field
 			ImGui::SetNextItemWidth(90 * State.dpiScale); // Adjust the width of the input box
-			if (InputStringWithHint("##Search", "Search...", &searchQuery)/* && State.AprilFoolsMode*/) {
+			if (InputStringWithHint("##Search", "Search...", &State.searchQuery)/* && State.AprilFoolsMode*/) {
 				/*if (ToLower(searchQuery) == StrRev("nosduh")) {
 					State.AprilFoolsMode = !State.AprilFoolsMode;
 					if (!State.AprilFoolsMode) State.DiddyPartyMode = false;

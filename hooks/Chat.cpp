@@ -274,7 +274,7 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 						playerName = convert_to_string(dot + " " + convert_from_string(playerName));
 				}
 				if (State.IsProcessingSickoChat) {
-					std::string prefix = "<size=90%><#fb0>[<#0f0>Sicko</color><#f00>Chat</color>]</color> ";
+					std::string prefix = "<size=90%><#fb0>[<#ff006c>SickoChat</color>]</color> ";
 					playerName = convert_to_string(prefix + convert_from_string(playerName) + "</size>");
 				}
 			}
@@ -301,7 +301,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 		ObjectPoolBehavior_ReclaimOldest(pool, NULL);
 	}
 	
-	if (__this->fields.state != ChatControllerState__Enum::Closed) {
+	if (__this->fields.state != ChatControllerState__Enum::Closed && !State.PanicMode) {
 		freeChatField->fields.textArea->fields.characterLimit = State.SafeMode ? (State.ExtendChatLimit ? 120 : 100) : 2147483647;
 		freeChatField->fields.textArea->fields.allowAllCharacters = true;
 		freeChatField->fields.textArea->fields.AllowEmail = true;
@@ -310,16 +310,26 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 		freeChatField->fields.charCountText->fields._.m_enableWordWrapping = false;
 		int charLimit = freeChatField->fields.textArea->fields.characterLimit;
 		std::string chatCooldownText = "";
-		if (State.ShowChatTimer)
+		
+		bool commandsAllowed = State.ReadAndSendSickoChat || State.ExtraCommands;
+
+		if (State.ShowChatTimer && !(State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly && commandsAllowed))
 			chatCooldownText = State.ChatCooldown >= 3.f ? (length == 0 ? "" : "<#0f0>You can chat now!</color> ") : std::format("<#f00>Wait for {:.1f} seconds!</color> ", 3 - State.ChatCooldown);
 		if (copyNotificationTimer > 0.f) chatCooldownText = std::format("<#0f0>{} text to clipboard!</color> ", isTextCut ? "Cut" : "Copied", copyNotificationTimer);
 		std::string charCountColor = std::format("<#{}{}0>", length >= 0.75 * charLimit ? "f" : "0", length != charLimit && length >= 0.75 * charLimit ? "f" : "0");
-		std::string updatedText = std::format("{}{}{}/{}</color>", chatCooldownText, charCountColor, length, charLimit);
+
+		std::string quickChatInfo = State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly && commandsAllowed ? "<#f00>(Quick Chat Mode, only commands are allowed)</color> " : "";
+
+		std::string updatedText = std::format("{}{}{}{}/{}</color>", quickChatInfo, chatCooldownText, charCountColor, length, charLimit);
 		TMP_Text_set_text((TMP_Text*)freeChatField->fields.charCountText, convert_to_string(updatedText), NULL);
+
+		if (State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly) ChatController_UpdateChatMode(__this, NULL);
 	}
 
-	if (!State.SafeMode)
+	if (!State.SafeMode || State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly || State.WasPreviousMessageCommand) {
 		__this->fields.timeSinceLastMessage = 420.69f; //we can set this to anything more than or equal to 3 and it'll work
+		if (State.WasPreviousMessageCommand) State.WasPreviousMessageCommand = false;
+	}
 
 	if ((!State.PanicMode || State.TempPanicMode) && (State.CustomGameTheme || State.DarkMode)) {
 		if (State.CustomGameTheme) {
@@ -332,15 +342,15 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 			if (__this->fields.freeChatField != NULL) {
 				auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
 				TMP_Text_set_color((app::TMP_Text*)outputText, textCol, NULL);
-				auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
+				auto col = SpriteRenderer_get_color(__this->fields.freeChatField->fields._.background, NULL);
 				bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
 				if (!isHighlighted)
 					SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, bg, NULL);
-				else if (State.DarkMode) {
+				else {
 					auto green32 = Color32();
 					green32.r = 34; green32.g = 100; green32.b = 34; green32.a = 255;
 					auto green = Color32_op_Implicit_1(green32, NULL);
-					SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, green, NULL);
+					SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, green, NULL);
 				}
 			}
 			if (__this->fields.quickChatField != NULL) {
@@ -352,7 +362,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 				bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
 				if (!isHighlighted)
 					SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, bg, NULL);
-				else if (State.DarkMode) {
+				else {
 					auto green32 = Color32();
 					green32.r = 34; green32.g = 100; green32.b = 34; green32.a = 255;
 					auto green = Color32_op_Implicit_1(green32, NULL);
@@ -381,7 +391,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 				TMP_Text_set_color((app::TMP_Text*)placeholderText, Palette__TypeInfo->static_fields->White, NULL);
 				auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
 				bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
-				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, isHighlighted ? green : gray, NULL);
+				SpriteRenderer_set_color(__this->fields.quickChatField->fields._.background, isHighlighted ? green : gray, NULL);
 			}
 		}
 	}
@@ -389,7 +399,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 		if (__this->fields.freeChatField != NULL) {
 			auto outputText = __this->fields.freeChatField->fields.textArea->fields.outputText;
 			TMP_Text_set_color((app::TMP_Text*)outputText, Palette__TypeInfo->static_fields->Black, NULL);
-			auto col = SpriteRenderer_get_color(__this->fields.quickChatField->fields._.background, NULL);
+			auto col = SpriteRenderer_get_color(__this->fields.freeChatField->fields._.background, NULL);
 			bool isHighlighted = col.r == 0.f && col.g == 1.f && col.b == 0.f && col.a == 1.f;
 			if (!isHighlighted)
 				SpriteRenderer_set_color(__this->fields.freeChatField->fields._.background, Palette__TypeInfo->static_fields->White, NULL);
@@ -458,7 +468,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 			"I know I'm a SIGMA but that doesnt mean I can't have a GYATT too", "Just put the fries in the bag bro", "Stay on the sigma grindset",
 			"Sigma Sigma on the wall, who is the skibidiest of them all?", "Duke Dennis did you pray today?", "What kinda bomboclat dawg are ya" };
 		auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-		PlayerControl_RpcSendChat(player, convert_to_string(brainrotList[randi(0, brainrotList.size() - 1)]), NULL);
+		PlayerControl_RpcSendChat(player, convert_to_string(brainrotList[randi(0, (int)brainrotList.size() - 1)]), NULL);
 		State.MessageSent = true;
 	}
 
@@ -469,7 +479,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 			"Am I Baby Gronk? Because you can be my Livvy Dunne", "Sup shawty, are you skibidi, because I could use that to my sigma", "Hey shawty, are you skibidi rizz in ohio?",
 			"Yer a rizzard Harry", "Remind me what a work of skibidi rizz looks like" };
 		auto player = !State.SafeMode && State.playerToChatAs.has_value() ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-		PlayerControl_RpcSendChat(player, convert_to_string(rizzLinesList[randi(0, rizzLinesList.size() - 1)]), NULL);
+		PlayerControl_RpcSendChat(player, convert_to_string(rizzLinesList[randi(0, (int)rizzLinesList.size() - 1)]), NULL);
 		State.MessageSent = true;
 	}
 
@@ -696,8 +706,9 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 	if (chatText == "") return;
 	std::string chatTextLower = strToLower(chatText);
 	if (!State.PanicMode) {
+		State.WasPreviousMessageCommand = true;
 		auto playerToChatAs = (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) ? State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-		if (State.ReadAndSendSickoChat && chatTextLower.substr(0, 4) == "/sc ") {
+		if (State.ReadAndSendSickoChat && chatTextLower.substr(0, 4) == "/sc " && chatText.substr(4) != "") {
 			if (IsInGame()) State.rpcQueue.push(new RpcForceSickoChat(PlayerSelection(playerToChatAs), chatText.substr(4), true));
 			if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceSickoChat(PlayerSelection(playerToChatAs), chatText.substr(4), true));
 			return; //we don't want the chat to know we're using "aum"
@@ -927,10 +938,18 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 
 			// without temp-ban command due to runtime error + uncomfortable use :despair:
 		}
+
+		if (State.WasPreviousMessageCommand) State.WasPreviousMessageCommand = false;
+		// this was done to avoid repeating (State.WasPreviousMessageCommand = true) before every return statement
+
+		if (State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly) {
+			ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string("Free chat is not allowed!"), NULL);
+			return;
+		}
 		
 		if (State.activeWhisper && State.playerToWhisper.has_value()) {
 			MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
-				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None,
+				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::Reliable,
 				State.playerToWhisper.get_PlayerControl().value_or(nullptr)->fields._.OwnerId, NULL);
 			std::string whisperMsg = std::format("{} whispers to you:\n{}",
 				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
@@ -947,20 +966,21 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 		}
 		else if (!State.SafeMode && State.activeChatSpoof && State.playerToChatAs.has_value()) {
 			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(State.playerToChatAs.get_PlayerId())->fields._.NetId,
-				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::Reliable, -1, NULL);
 			MessageWriter_WriteString(writer, convert_to_string(chatText), NULL);
 			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, GetPlayerControlById(State.playerToChatAs.get_PlayerId()), convert_to_string(chatText), false, NULL);
 		}
 		else {
 			auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
-				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::None, -1, NULL);
+				uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::Reliable, -1, NULL);
 			MessageWriter_WriteString(writer, convert_to_string(chatText), NULL);
 			InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 			dChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, *Game::pLocalPlayer, convert_to_string(chatText), false, NULL);
 		}
 	}
 	else {
+		if (State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly) return;
 		PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(chatText), NULL);
 	}
 }
@@ -975,7 +995,7 @@ void dFreeChatInputField_UpdateCharCount(FreeChatInputField* __this, MethodInfo*
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dFreeChatInputField_UpdateCharCount executed");
 	FreeChatInputField_UpdateCharCount(__this, method);
 	__this->fields.charCountText->fields._.m_enableWordWrapping = false;
-	int length = __this->fields.textArea->fields.text->fields.m_stringLength;
+	/*int length = __this->fields.textArea->fields.text->fields.m_stringLength;
 	int charLimit = __this->fields.textArea->fields.characterLimit;
 	std::string chatCooldownText = "";
 	if (State.ShowChatTimer)
@@ -983,7 +1003,7 @@ void dFreeChatInputField_UpdateCharCount(FreeChatInputField* __this, MethodInfo*
 	if (copyNotificationTimer > 0.f) chatCooldownText = std::format("<#0f0>{} text to clipboard!</color> ", isTextCut ? "Cut" : "Copied", copyNotificationTimer);
 	std::string charCountColor = std::format("<#{}{}0>", length >= 0.75 * charLimit ? "f" : "0", length != charLimit && length >= 0.75 * charLimit ? "f" : "0");
 	std::string updatedText = std::format("{}{}{}/{}</color>", chatCooldownText, charCountColor, length, charLimit);
-	TMP_Text_set_text((TMP_Text*)__this->fields.charCountText, convert_to_string(updatedText), NULL);
+	TMP_Text_set_text((TMP_Text*)__this->fields.charCountText, convert_to_string(updatedText), NULL);*/
 }
 
 void dObjectPoolBehavior_InitPool(ObjectPoolBehavior* __this, PoolableBehavior* prefab, MethodInfo* method) {

@@ -60,7 +60,7 @@ void RpcSpamMeeting::Process()
 	for (int i = 0; i < 200; ++i) {
 		if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) break;
 		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerData(target)->fields._.NetId,
-			uint8_t(RpcCalls__Enum::ReportDeadBody), SendOption__Enum::None, GetPlayerData(target)->fields._.OwnerId, NULL);
+			uint8_t(RpcCalls__Enum::ReportDeadBody), SendOption__Enum::Reliable, GetPlayerData(target)->fields._.OwnerId, NULL);
 		MessageWriter_WriteByte(writer, 255, NULL);
 		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
 	}

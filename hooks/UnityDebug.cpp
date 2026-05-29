@@ -26,4 +26,8 @@ void dDebug_LogWarning(Object* message, MethodInfo* method) {
 	if (State.ShowUnityLogs)
 		Log.Info("UNITY", ToString(message));
 	Debug_LogWarning(message, method);
+	/*if (ToString(message).find("player prefs") != std::string::npos) {
+		// check for the warning so we can finalize the login flow
+		State.EndLoginFlowFlag = true;
+	}*/
 }

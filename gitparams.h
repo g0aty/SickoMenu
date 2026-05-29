@@ -1,2 +1,2 @@
-#define GIT_CUR_COMMIT unknown
-#define GIT_BRANCH unknown
+#define GIT_CUR_COMMIT b26f75359c4c72285dd749afc086495195263fc0
+#define GIT_BRANCH main

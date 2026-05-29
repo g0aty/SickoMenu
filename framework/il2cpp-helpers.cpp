@@ -47,7 +47,7 @@ std::string convert_from_string(app::String* input) {
 }
 
 app::String* convert_to_string(std::string_view input) {
-	return (app::String*)il2cpp_string_new_len(input.data(), input.length());
+	return (app::String*)il2cpp_string_new_len(input.data(), (uint32_t)input.length());
 }
 
 KLASS translate_klass(KLASS klass_input) {

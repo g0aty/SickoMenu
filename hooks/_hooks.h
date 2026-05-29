@@ -134,6 +134,7 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
 void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method);
 void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method);
 void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method);
+void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method);
 bool dAccountManager_CanPlayOnline(AccountManager* __this, MethodInfo* method);
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method);
 //AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_1(AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method);
@@ -170,3 +171,4 @@ void dShipStatus_AddTasksFromList(ShipStatus* __this, int32_t* start, int32_t co
 void* dPlayerControl_Start(PlayerControl* __this, MethodInfo* method);
 void dMainMenuManager_LateUpdate(MainMenuManager* __this, MethodInfo* method);
 AudioSource* dSoundManager_PlaySound(SoundManager* __this, AudioClip* clip, bool loop, float volume, AudioMixerGroup* audioMixer, MethodInfo* method);
+void dViperDeadBody_FixedUpdate(ViperDeadBody* __this, MethodInfo* method);

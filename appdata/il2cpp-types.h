@@ -4434,7 +4434,6 @@ namespace app {
 #pragma region EOSManager
     //sicko
     struct EOSManager__Fields {
-        void* _;
         struct String* productName;
         struct String* productVersion;
         struct String* productId;
@@ -4452,36 +4451,36 @@ namespace app {
         struct GameObject* TimeOutPopup;
         float TimeOutTime;
         bool FinishedAssets;
-        struct PlatformInterface* platformInterface;
-        struct ProductUserId* userId;
-        struct ProductUserId* deviceIDuserID;
+        void* platformInterface;
+        void* userId;
+        void* deviceIDuserID;
         bool announcementsVisible;
         bool attemptAuthAgain;
         uint32_t numLinkedAccounts;
-        struct List_1_Epic_OnlineServices_Connect_ExternalAccountInfo_* linkedExternalAccounts;
+        void* linkedExternalAccounts;
         struct EditAccountUsername* editAccountUsername;
         struct AskToMergeGuest* askToMergeAccount;
         struct String* freeChatKey;
         struct String* customNameKey;
         struct String* friendsListKey;
         struct String* accountLinkKey;
-        struct List_1_TMPro_TextMeshProUGUI_* watermark;
+        void* watermark;
         struct GameObject* watermarkCanvas;
         struct Logger* logger;
         int32_t ageOfConsent;
         struct String* kwsUserId;
         bool isKWSMinor;
-        struct ContinuanceToken* continuanceToken;
+        void* continuanceToken;
         struct String* exchangeToken;
         struct String* platformAuthToken;
         void* serverTimeOnLaunch;
         bool authExpiredCallbackTriggered;
         bool silentLoginFailed;
-        struct CompletionToken_1_PurchaseStates_* validateOldDLC;
+        void* validateOldDLC;
         bool isRedeemingDLC;
-        struct PlatformInterface* s_eosPlatformInterface;
-        struct CallResult_1_EncryptedAppTicketResponse_t_* OnEncryptedAppTicketResponseCallResult;
-        struct OnLoginCallback* successCallback;
+        void* s_eosPlatformInterface;
+        void* OnEncryptedAppTicketResponseCallResult;
+        void* successCallback;
         struct Action* onLoginFailedCallback;
     };
 
@@ -5210,7 +5209,7 @@ namespace app {
         ImpostorGhost = 0x0007,
         Noisemaker = 0x0008,
         Phantom = 0x0009,
-        Tracker = 0x000a,
+        Tracker = 0x000b,
         Detective = 0x000c,
         Viper = 0x0012,
     };
@@ -5227,7 +5226,7 @@ namespace app {
         RoleTypes__Enum_ImpostorGhost = 0x0007,
         RoleTypes__Enum_Noisemaker = 0x0008,
         RoleTypes__Enum_Phantom = 0x0009,
-        RoleTypes__Enum_Tracker = 0x000a,
+        RoleTypes__Enum_Tracker = 0x000b,
         RoleTypes__Enum_Detective = 0x000c,
         RoleTypes__Enum_Viper = 0x0012,
     };
@@ -7799,6 +7798,48 @@ namespace app {
     };
 #pragma endregion
 
+#pragma region ViperDeadBody
+    struct ViperDeadBody__Fields {
+        struct DeadBody__Fields _;
+        struct AnimationClip__Array* dissolveAnims;
+        struct SpriteRenderer* acidRenderer;
+        struct SpriteRenderer* splashRenderer;
+        struct SpriteAnim* spriteAnim;
+        struct AudioClip* acidSplashSFX;
+        float dissolveCurrentTime;
+        float maxDissolveTime;
+        bool victimDissolving;
+        int32_t dissolveStage;
+        struct PlayerControl* myKiller;
+        struct PlayerControl* myController;
+    };
+
+    struct ViperDeadBody {
+        struct ViperDeadBody__Class* klass;
+        MonitorData* monitor;
+        struct ViperDeadBody__Fields fields;
+    };
+
+    struct ViperDeadBody__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct ViperDeadBody__StaticFields {
+    };
+
+    struct ViperDeadBody__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct ViperDeadBody__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ViperDeadBody__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region DeadBody__Array
     WRAPPER_IL2CPP_ARRAY(DeadBody, struct DeadBody*);
 #pragma endregion
@@ -9908,31 +9949,7 @@ namespace app {
 #pragma endregion
 
 #pragma region MeetingHud_VoterState__Array
-    struct MeetingHud_VoterState__Array {
-        struct MeetingHud_VoterState__Array__Class* klass;
-        MonitorData* monitor;
-        Il2CppArrayBounds* bounds;
-        il2cpp_array_size_t max_length;
-        struct MeetingHud_VoterState vector[32];
-    };
-
-    struct MeetingHud_VoterState__VTable {
-        VirtualInvokeData Equals;
-        VirtualInvokeData Finalize;
-        VirtualInvokeData GetHashCode;
-        VirtualInvokeData ToString;
-    };
-
-    struct MeetingHud_VoterState__StaticFields {
-    };
-
-    struct MeetingHud_VoterState__Class {
-        Il2CppClass_0 _0;
-        struct MeetingHud_VoterState__StaticFields* static_fields;
-        const Il2CppRGCTXData* rgctx_data;
-        Il2CppClass_1 _1;
-        struct MeetingHud_VoterState__VTable vtable;
-    };
+    WRAPPER_IL2CPP_ARRAY(MeetingHud_VoterState, struct MeetingHud_VoterState*);
 #pragma endregion
 
 #pragma region EditAccountUsername
