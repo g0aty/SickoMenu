@@ -41,3 +41,11 @@ void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 		LOG_ERROR("Exception occurred in FungleShipStatus_OnEnable (FungleShipStatus)");
 	}
 }
+
+void dZiplineConsole_Update(ZiplineConsole* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) LOG_DEBUG("Hook dZiplineConsole_Update executed");
+
+	if (!State.PanicMode && State.NoAbilityCD) __this->fields._CoolDown_k__BackingField = 0.f;
+
+	return ZiplineConsole_Update(__this, method);
+}

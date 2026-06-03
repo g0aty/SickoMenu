@@ -106,6 +106,13 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
         this->PhantomCount--;
         this->ImpostorCount--;
     }
+    else if (role == RoleTypes__Enum::Viper)
+    {
+        if (this->ViperCount < 1)
+            return;
+        this->ViperCount--;
+        this->ImpostorCount--;
+    }
     else if (role == RoleTypes__Enum::Impostor)
     {
         if (this->ImpostorCount < 1)
@@ -113,6 +120,7 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
         this->ImpostorCount--;
         this->ShapeshifterCount--;
         this->PhantomCount--;
+        this->ViperCount--;
     }
     else if (role == RoleTypes__Enum::Scientist)
     {
@@ -137,6 +145,12 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
         if (this->NoisemakerCount < 1)
             return;
         this->NoisemakerCount--;
+    }
+    else if (role == RoleTypes__Enum::Detective)
+    {
+        if (this->DetectiveCount < 1)
+            return;
+        this->DetectiveCount--;
     }
     /*else if (role == RoleTypes__Enum::GuardianAngel)
     {
@@ -852,7 +866,7 @@ bool compareStrings(const std::string lhs, const std::string rhs) { //for sortin
 
 void ImpersonateName(__maybenull NetworkedPlayerInfo* data)
 {
-    if (!data) return;
+    if (!data || State.SafeMode) return;
     app::NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(data);
     if (!(IsInGame() || IsInLobby() || outfit)) return;
     const auto& playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(data, nullptr));

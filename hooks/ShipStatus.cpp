@@ -11,7 +11,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
     if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_CalculateLightRadius executed");
     if (IsHost() && State.TaskSpeedrun && State.GameLoaded && State.mapType != Settings::MapType::Airship)
         State.SpeedrunTimer += Time_get_deltaTime(NULL);
-    CosmeticsCache_PopulateFromPlayers(__this->fields._CosmeticsCache_k__BackingField, NULL);
+    CosmeticsCache_PopulateFromPlayers((CosmeticsCache*)__this->fields._CosmeticsCache_k__BackingField, NULL);
     switch (__this->fields.Type) {
     case ShipStatus_MapType__Enum::Ship:
         if (State.mapType != Settings::MapType::Airship) State.mapType = Settings::MapType::Ship;

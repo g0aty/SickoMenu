@@ -5,6 +5,9 @@
 #include "state.hpp"
 #include <regex>
 
+static float copyNotificationTimer = 0.f;
+static bool isTextCut = false;
+
 std::string trim(const std::string& str) {
 	const auto start = str.find_first_not_of(" \t\n\r");
 	if (start == std::string::npos) return "";
@@ -137,6 +140,25 @@ void SendPrivateWarnMessage(PlayerControl* toPlayer, const std::string& reason, 
 		MessageWriter_WriteString(writer, convert_to_string(message), nullptr);
 		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, nullptr);
 	}
+}
+
+void updateCharCounterText(FreeChatInputField* freeChatField) {
+
+	int charLimit = freeChatField->fields.textArea->fields.characterLimit;
+	int length = freeChatField->fields.textArea->fields.text->fields.m_stringLength;
+	std::string chatCooldownText = "";
+
+	bool commandsAllowed = State.ReadAndSendSickoChat || State.ExtraCommands;
+
+	if (!State.PanicMode && State.ShowChatTimer && !(State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly && commandsAllowed))
+		chatCooldownText = State.ChatCooldown >= 3.f ? (length == 0 ? "" : "<#0f0>You can chat now!</color> ") : std::format("<#f00>Wait for {:.1f} seconds!</color> ", 3 - State.ChatCooldown);
+	if (!State.PanicMode && copyNotificationTimer > 0.f) chatCooldownText = std::format("<#0f0>{} text to clipboard!</color> ", isTextCut ? "Cut" : "Copied", copyNotificationTimer);
+	std::string charCountColor = std::format("<#{}{}0>", length >= 0.75 * charLimit ? "f" : "0", length < charLimit && length >= 0.75 * charLimit ? "f" : "0");
+
+	std::string quickChatInfo = !State.PanicMode && State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly && commandsAllowed ? "<#f00>(Quick Chat Mode, only commands are allowed)</color> " : "";
+
+	std::string updatedText = std::format("{}{}{}{}/{}</color>", quickChatInfo, chatCooldownText, charCountColor, length, charLimit);
+	TMP_Text_set_text((TMP_Text*)freeChatField->fields.charCountText, convert_to_string(updatedText), NULL);
 }
 
 void ChangeChatNotificationBackground(ChatNotification* chatNotif, PlayerControl* sender) {
@@ -283,9 +305,6 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 	ChatBubble_SetName(__this, playerName, isDead, voted, color, method);
 }
 
-static float copyNotificationTimer = 0.f;
-static bool isTextCut = false;
-
 void dChatController_Update(ChatController* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_Update executed");
 	auto freeChatField = __this->fields.freeChatField;
@@ -301,29 +320,19 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 		ObjectPoolBehavior_ReclaimOldest(pool, NULL);
 	}
 	
-	if (__this->fields.state != ChatControllerState__Enum::Closed && !State.PanicMode) {
-		freeChatField->fields.textArea->fields.characterLimit = State.SafeMode ? (State.ExtendChatLimit ? 120 : 100) : 2147483647;
-		freeChatField->fields.textArea->fields.allowAllCharacters = true;
-		freeChatField->fields.textArea->fields.AllowEmail = true;
-		freeChatField->fields.textArea->fields.AllowSymbols = true;
+	if (__this->fields.state != ChatControllerState__Enum::Closed) {
+		if (State.PanicMode) freeChatField->fields.textArea->fields.characterLimit = 100;
+		else freeChatField->fields.textArea->fields.characterLimit = State.SafeMode ? (State.ExtendChatLimit ? 120 : 100) : 2147483647;
 
-		freeChatField->fields.charCountText->fields._.m_enableWordWrapping = false;
-		int charLimit = freeChatField->fields.textArea->fields.characterLimit;
-		std::string chatCooldownText = "";
-		
-		bool commandsAllowed = State.ReadAndSendSickoChat || State.ExtraCommands;
+		freeChatField->fields.textArea->fields.allowAllCharacters = !State.PanicMode;
+		freeChatField->fields.textArea->fields.AllowEmail = !State.PanicMode;
+		freeChatField->fields.textArea->fields.AllowSymbols = !State.PanicMode;
 
-		if (State.ShowChatTimer && !(State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly && commandsAllowed))
-			chatCooldownText = State.ChatCooldown >= 3.f ? (length == 0 ? "" : "<#0f0>You can chat now!</color> ") : std::format("<#f00>Wait for {:.1f} seconds!</color> ", 3 - State.ChatCooldown);
-		if (copyNotificationTimer > 0.f) chatCooldownText = std::format("<#0f0>{} text to clipboard!</color> ", isTextCut ? "Cut" : "Copied", copyNotificationTimer);
-		std::string charCountColor = std::format("<#{}{}0>", length >= 0.75 * charLimit ? "f" : "0", length != charLimit && length >= 0.75 * charLimit ? "f" : "0");
+		freeChatField->fields.charCountText->fields._.m_enableWordWrapping = State.PanicMode;
 
-		std::string quickChatInfo = State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly && commandsAllowed ? "<#f00>(Quick Chat Mode, only commands are allowed)</color> " : "";
-
-		std::string updatedText = std::format("{}{}{}{}/{}</color>", quickChatInfo, chatCooldownText, charCountColor, length, charLimit);
-		TMP_Text_set_text((TMP_Text*)freeChatField->fields.charCountText, convert_to_string(updatedText), NULL);
-
+		updateCharCounterText(freeChatField);
 		if (State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly) ChatController_UpdateChatMode(__this, NULL);
+		// Always update quick chat chatting mode
 	}
 
 	if (!State.SafeMode || State.CurrentChatMode == QuickChatModes__Enum::QuickChatOnly || State.WasPreviousMessageCommand) {
@@ -995,6 +1004,8 @@ void dFreeChatInputField_UpdateCharCount(FreeChatInputField* __this, MethodInfo*
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dFreeChatInputField_UpdateCharCount executed");
 	FreeChatInputField_UpdateCharCount(__this, method);
 	__this->fields.charCountText->fields._.m_enableWordWrapping = false;
+
+	updateCharCounterText(__this);
 	/*int length = __this->fields.textArea->fields.text->fields.m_stringLength;
 	int charLimit = __this->fields.textArea->fields.characterLimit;
 	std::string chatCooldownText = "";

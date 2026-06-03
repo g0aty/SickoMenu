@@ -110,7 +110,7 @@ void dMushroomDoorSabotageMinigame_Begin(MushroomDoorSabotageMinigame* __this, P
 //void* dAmongUsClient_CoStartGameHost(AmongUsClient* __this, MethodInfo* method);
 float dConsole_CanUse(Console* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method);
 void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method);
-void dZiplineConsole_SetDestinationCooldown(ZiplineConsole* __this, MethodInfo* method);
+void dZiplineConsole_Update(ZiplineConsole* __this, MethodInfo* method);
 void dMushroomWallDoor_SetDoorway(MushroomWallDoor* __this, bool open, MethodInfo* method);
 void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method);
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method);

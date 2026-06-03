@@ -205,8 +205,9 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 		}
 		break;
 	case (uint8_t)RpcCalls__Enum::SetScanner:
-		if (State.SMAC_CheckScanner && (IsInLobby() || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle)
-			&& !MessageReader_ReadBoolean(reader, NULL)) {
+		if (State.SMAC_CheckScanner && (IsInLobby() ||
+			((State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle)
+			&& MessageReader_ReadBoolean(reader, NULL))) ) {
 			SMAC_OnCheatDetected(player, "Abnormal MedBay Scan");
 			return;
 		}

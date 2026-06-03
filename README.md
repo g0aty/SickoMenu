@@ -2,7 +2,7 @@
    <img src="SickoBanner.png">
   </p>
 
-<h1 align="center">👺 SickoMenu v4.5</h1>
+<h1 align="center">👺 SickoMenu v4.5.1</h1>
 A powerful utility for Among Us designed to enrich your game experience with custom features!
 
 **Intended for educational and experimental use only.**
@@ -11,6 +11,19 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 ### Vanity Invite: https://discord.gg/sickos  
 ### Permanent invite: https://dsc.gg/sickos 
 ---
+
+## 📋 Table of Contents
+- [⚠️ Disclaimer](https://github.com/g0aty/SickoMenu#%EF%B8%8F-disclaimer)
+- [🛑 Ethical Use Protocol](https://github.com/g0aty/SickoMenu#-ethical-use-protocol)
+- [⚙️ Features](https://github.com/g0aty/SickoMenu#%EF%B8%8F-features)
+- [📸 Screenshot](https://github.com/g0aty/SickoMenu#-screenshot)
+- [👌 Supported Versions](https://github.com/g0aty/SickoMenu#-supported-versions)
+- [⬇️ Download & Install](https://github.com/g0aty/SickoMenu#%EF%B8%8F-download--install)
+- [⌨️ Default Hotkeys](https://github.com/g0aty/SickoMenu#%EF%B8%8F-default-hotkeys)
+- [⚒️ Building / Compilation](https://github.com/g0aty/SickoMenu#%EF%B8%8F-building--compilation)
+- [💁 Contributing](https://github.com/g0aty/SickoMenu#-contributing)
+- [✨ Inspiration](https://github.com/g0aty/SickoMenu#-inspiration)
+- [🙏 Special Thanks](https://github.com/g0aty/SickoMenu#-special-thanks)
 
 ## ⚠️ Disclaimer
 This project is maintained by **g0aty**, with contributions from other developers.  
@@ -50,7 +63,7 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 ---
 
 ## ⚙️ Features
-A huge amount of features!!
+A huge amount of features!
 - NoClip (`CTRL`)  
 - Ghost Visibility  
 - Confuser (May disrupt gameplay)  
@@ -73,8 +86,8 @@ A huge amount of features!!
 ## 👌 Supported Versions
 - ✅ Steam (Supported)
 - ✅ itch.io (Supported)
-- ✅ Epic Games (Supported - Experimental)
-- ✅ Microsoft Store/Xbox App (Windows) (Supported - Experimental)
+- 🟡 Epic Games (Supported - Experimental)
+- 🟡 Microsoft Store/Xbox App (Windows) (Supported - Experimental)
 - ❓ Cracked (works occasionally, I don't condone it)
 - ❌ iOS/iPadOS/Android (Not Supported)
 - ❌ Switch/Xbox/Playstation (Not Supported)
@@ -83,6 +96,14 @@ A huge amount of features!!
 ### For Windows
 You can find the latest release [here](https://github.com/g0aty/SickoMenu/releases/latest).
 Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in your Among Us directory (the folder containing `Among Us.exe`). Make sure to use the correct DLL for your Among Us platform!
+
+**Accessing the Among Us directory for supported platforms:**
+- **🚂 Steam** Right-click **Among Us** in your Library → Click **Manage** → Click **Browse local files**.
+- **🛖 itch.io** Go to wherever you normally execute **Among Us.exe**.
+- **🛍️ Epic Games** Right-click **Among Us** in your Library → Click **Manage** → Click the folder icon in the **Installation** box.
+- **🪟 Microsoft Store** Go to `C:\Program Files\WindowsApps\` and search for **Among Us.exe**, the location of it is the required folder.
+- **❎ XBOX App** Right-click Among Us in your Library → Click **Manage** → Open the **FILES** tab → Click **BROWSE...** → Open the **Among Us** folder → Open the **Content** folder.
+- **❌ Other Platforms** Unsupported!
 
 ### For Proton (Version Proxy Only)
 First you will need [protontricks](https://github.com/Matoking/protontricks), you can install it with your packager of choice.
@@ -240,7 +261,7 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - NoClip - CTRL
 - Panic / Disable SickoMenu - PAUSE BREAK (Break)
 
-## ⚒️ Compile (Configurations)
+## ⚒️ Building / Compilation
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
 
 ### Normal (SickoMenu.dll)
@@ -255,13 +276,6 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 - Debug_Version (With Debug Information and can be attached to process)
 - Release_Version (Optimized with all information stripped)
 
-## 🙏 Special Thanks
-* The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
-* [KulaGGin](https://github.com/KulaGGin) (Helped with some ImGui code for replay system)
-* [tomsa000](https://github.com/tomsa000) (Helped with fixing memory leaks and smart pointers)
-* [cddjr](https://github.com/cddjr) (Helped in updating to the Fungle map, saved a lot of my time)
-* Everyone else who contributed to the code and I couldn't list here. Thank you!
-
 ## 💁 Contributing
 1. Fork it [here](<https://github.com/g0aty/SickoMenu/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
@@ -274,3 +288,10 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 * [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
 * [BetterAmongUs](https://github.com/D1GQ/BetterAmongUs) by [D1GQ](https://github.com/D1GQ/)
 * [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
+
+## 🙏 Special Thanks
+* The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
+* [KulaGGin](https://github.com/KulaGGin) (Helped with some ImGui code for replay system)
+* [tomsa000](https://github.com/tomsa000) (Helped with fixing memory leaks and smart pointers)
+* [cddjr](https://github.com/cddjr) (Helped in updating to the Fungle map, saved a lot of my time)
+* Everyone else who contributed to the code and I couldn't list here. Thank you!

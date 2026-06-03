@@ -1049,19 +1049,18 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
         if (!State.PanicMode && IsHost() && (State.DisableMeetings || (State.BattleRoyale || State.TaskSpeedrun))) {
             return;
         }
-        else {
-            if (State.Enable_SMAC && State.SMAC_CheckReport) {
-                if (IsInLobby()) {
-                    SMAC_OnCheatDetected(__this, "Abnormal Meeting");
-                }
-                if (IsInGame() && ((target != NULL && !target->fields.IsDead) || GameOptions().GetGameMode() == GameModes__Enum::HideNSeek)) {
-                    SMAC_OnCheatDetected(__this, "Abnormal Meeting");
-                }
+
+        if (State.Enable_SMAC && State.SMAC_CheckReport) {
+            if (IsInLobby()) {
+                SMAC_OnCheatDetected(__this, "Abnormal Meeting");
             }
-            synchronized(Replay::replayEventMutex) {
-                State.liveReplayEvents.emplace_back(std::make_unique<ReportDeadBodyEvent>(GetEventPlayerControl(__this).value(), GetEventPlayer(target), PlayerControl_GetTruePosition(__this, NULL), GetTargetPosition(target)));
-                State.liveConsoleEvents.emplace_back(std::make_unique<ReportDeadBodyEvent>(GetEventPlayerControl(__this).value(), GetEventPlayer(target), PlayerControl_GetTruePosition(__this, NULL), GetTargetPosition(target)));
+            if (IsInGame() && ((target != NULL && !target->fields.IsDead) || GameOptions().GetGameMode() == GameModes__Enum::HideNSeek)) {
+                SMAC_OnCheatDetected(__this, "Abnormal Meeting");
             }
+        }
+        synchronized(Replay::replayEventMutex) {
+            State.liveReplayEvents.emplace_back(std::make_unique<ReportDeadBodyEvent>(GetEventPlayerControl(__this).value(), GetEventPlayer(target), PlayerControl_GetTruePosition(__this, NULL), GetTargetPosition(target)));
+            State.liveConsoleEvents.emplace_back(std::make_unique<ReportDeadBodyEvent>(GetEventPlayerControl(__this).value(), GetEventPlayer(target), PlayerControl_GetTruePosition(__this, NULL), GetTargetPosition(target)));
         }
     }
     catch (...) {
@@ -1436,7 +1435,7 @@ void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool 
         roleAllowed = true;
         break;
     case (int)RoleTypes__Enum::Impostor:
-        if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Impostor || State.RealRole != RoleTypes__Enum::Shapeshifter || State.RealRole != RoleTypes__Enum::Phantom) {
+        if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Impostor || State.RealRole != RoleTypes__Enum::Shapeshifter || State.RealRole != RoleTypes__Enum::Phantom || State.RealRole != RoleTypes__Enum::Viper) {
             roleAllowed = false;
             break;
         }

@@ -15,6 +15,7 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
         State.voteMonitor.clear();
         State.validDeadBodyIds.clear(); // since dead bodies are cleared every meeting
         State.InMeeting = true;
+        Camera_set_orthographicSize(State.FollowerCam, 3.f, NULL); // reset camera height to show the meeting caller/dead body
         static std::string strVoteSpreaderType = translate_type_name("VoteSpreader, Assembly-CSharp");
         voteSpreaderType = app::Type_GetType(convert_to_string(strVoteSpreaderType), nullptr);
         if (State.confuser && State.confuseOnMeeting && !State.PanicMode)

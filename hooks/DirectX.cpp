@@ -127,15 +127,20 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
 
-    if (shouldKeybindsActivate) {
-        if (State.EnableZoom && (IsInGame() || IsInLobby())) {
-            if (ImGui::GetIO().MouseWheel < 0.f)  State.CameraHeight += 0.1f;
+    if ((IsInGame() || IsInLobby()) && Game::HudManager.GetInstance()->fields.Chat != NULL && shouldKeybindsActivate) {
+        auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
+        bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
+        bool isScrollModifierAllowed = !chatOpen && !State.InMeeting;
+
+        if (isScrollModifierAllowed && State.EnableZoom && (IsInGame() || IsInLobby())) {
+            if (ImGui::GetIO().MouseWheel < 0.f)  State.CameraHeight += 0.5f;
             if (ImGui::GetIO().MouseWheel > 0.f) {
-                State.CameraHeight -= 0.1f;
+                State.CameraHeight -= 0.5f;
                 if (State.CameraHeight < 1.f) State.CameraHeight = 1.f;
             }
         }
-        if ((ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT)) && State.FreeCam && (IsInGame() || IsInLobby())) {
+        if ((ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT)) &&
+            isScrollModifierAllowed && State.FreeCam && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f) State.FreeCamSpeed += 0.1f;
             if (ImGui::GetIO().MouseWheel > 0.f) {
                 State.FreeCamSpeed -= 0.1f;

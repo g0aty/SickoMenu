@@ -201,7 +201,7 @@ void DetourInitilization() {
 	//HOOKFUNC(AmongUsClient_CoStartGameHost);
 	HOOKFUNC(Console_CanUse);
 	HOOKFUNC(Ladder_SetDestinationCooldown);
-	HOOKFUNC(ZiplineConsole_SetDestinationCooldown);
+	HOOKFUNC(ZiplineConsole_Update);
 	HOOKFUNC(MushroomWallDoor_SetDoorway);
 	HOOKFUNC(VoteBanSystem_AddVote);
 	HOOKFUNC(PlatformSpecificData_Serialize);
@@ -377,7 +377,7 @@ void DetourUninitialization()
 	//UNHOOKFUNC(AmongUsClient_CoStartGameHost);
 	UNHOOKFUNC(Console_CanUse);
 	UNHOOKFUNC(Ladder_SetDestinationCooldown);
-	UNHOOKFUNC(ZiplineConsole_SetDestinationCooldown);
+	UNHOOKFUNC(ZiplineConsole_Update);
 	UNHOOKFUNC(MushroomWallDoor_SetDoorway);
 	UNHOOKFUNC(VoteBanSystem_AddVote);
 	UNHOOKFUNC(PlatformSpecificData_Serialize);

@@ -1408,15 +1408,6 @@ namespace GameTab {
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Shapeshifters: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Shapeshifter));
-                    ImGui::Text("Shapeshifter Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Shapeshifter));
-                    ImGui::Text("Shapeshifter Shift Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 1.0F));
-                    ImGui::Text("Shapeshifter Shift Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F));
-
-                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
-                    ImGui::Separator();
-                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
-
                     ImGui::Text("Max Noisemakers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Noisemaker));
                     ImGui::Text("Noisemaker Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Noisemaker));
                     ImGui::Text("Noisemaker Alert Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::NoisemakerAlertDuration, 1.0F));
@@ -1435,10 +1426,35 @@ namespace GameTab {
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
+                    ImGui::Text("Max Detectives: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Detective));
+                    ImGui::Text("Detective Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Detective));
+                    ImGui::Text("Detective Suspect Limit: %.2f", options.GetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+
+                    ImGui::Text("Max Shapeshifters: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Shapeshifter));
+                    ImGui::Text("Shapeshifter Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Shapeshifter));
+                    ImGui::Text("Shapeshifter Shift Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 1.0F));
+                    ImGui::Text("Shapeshifter Shift Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+
                     ImGui::Text("Max Phantoms: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Phantom));
                     ImGui::Text("Phantom Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Phantom));
                     ImGui::Text("Phantom Vanish Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 1.0F));
                     ImGui::Text("Phantom Vanish Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::PhantomDuration, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
+
+                    ImGui::Text("Max Vipers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Viper));
+                    ImGui::Text("Viper Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Viper));
+                    ImGui::Text("Viper Dissolve Time: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ViperDissolveTime, 1.0F));
                 }
                 else if (options.GetGameMode() == GameModes__Enum::HideNSeek) {
 
@@ -1451,12 +1467,13 @@ namespace GameTab {
                         ImGui::Text(const_cast<char*>(ImpostorName.c_str()));
                     }
                     ImGui::Text("Flashlight Mode: %s", (options.GetBool(app::BoolOptionNames__Enum::UseFlashlight) ? "On" : "Off"));
+                    ImGui::Text("Show Names: %s", (options.GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) ? "On" : "Off"));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Vent Uses: %d", options.GetInt(app::Int32OptionNames__Enum::CrewmateVentUses));
+                    ImGui::Text("Max Vent Uses: %d", options.GetInt(app::Int32OptionNames__Enum::CrewmateVentUses));
                     ImGui::Text("Duration in Vent: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::CrewmateTimeInVent, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
@@ -1465,7 +1482,17 @@ namespace GameTab {
 
                     ImGui::Text("Hiding Time: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::EscapeTime, 1.0F));
                     ImGui::Text("Final Hiding Time: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::FinalEscapeTime, 1.0F));
-                    ImGui::Text("Final Impostor Speed: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::SeekerFinalSpeed, 1.0F));
+                    ImGui::Text("Final Seeker Speed: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::SeekerFinalSpeed, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+
+                    ImGui::Text("Hider Flashlight Size: % .2fx", options.GetFloat(app::FloatOptionNames__Enum::CrewmateFlashlightSize, 1.0F));
+                    ImGui::Text("Seeker Flashlight Size: % .2fx", options.GetFloat(app::FloatOptionNames__Enum::ImpostorFlashlightSize, 1.0F));
+                    ImGui::Text("Final Hide Seeker Map: %s", (options.GetBool(app::BoolOptionNames__Enum::SeekerFinalMap) ? "On" : "Off"));
+                    ImGui::Text("Final Hide Pings: %s", (options.GetBool(app::BoolOptionNames__Enum::SeekerPings) ? "On" : "Off"));
+                    ImGui::Text("Ping Interval: % .2f s", options.GetFloat(app::FloatOptionNames__Enum::MaxPingTime, 1.0F));
                 }
             }
             else CloseOtherGroups(Groups::General);

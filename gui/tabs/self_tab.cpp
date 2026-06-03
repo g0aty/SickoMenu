@@ -274,7 +274,7 @@ namespace SelfTab {
             }
 
             ImGui::SameLine(130.f * State.dpiScale);
-            SteppedSliderFloat("Scale", &State.CameraHeight, 0.5f, 10.0f, 0.1f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+            SteppedSliderFloat("Scale", &State.CameraHeight, 0.5f, 10.0f, 0.5f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
             ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
             ImGui::Separator();
@@ -821,7 +821,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            if (ToggleButton("Cycle Between Players", &State.CycleBetweenPlayers)) {
+            if (ToggleButton(State.SafeMode ? "Cycle Between Players' Outfits" : "Cycle Between Players", &State.CycleBetweenPlayers)) {
                 State.Save();
             }
 

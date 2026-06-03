@@ -117,15 +117,19 @@ namespace HostTab {
                                         State.assignedRoles[index] = RoleType::Random;
                                     else if (State.assignedRoles[index] == RoleType::Phantom)
                                         State.assignedRoles[index] = RoleType::Random;
+                                    else if (State.assignedRoles[index] == RoleType::Viper)
+                                        State.assignedRoles[index] = RoleType::Random;
                                     State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
+                                    State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
+                                    State.vipers_amount = (int)GetRoleCount(RoleType::Viper);
                                     State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
                                     State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
                                 }
 
                                 if (State.assignedRoles[index] == RoleType::Engineer || State.assignedRoles[index] == RoleType::Scientist ||
                                     State.assignedRoles[index] == RoleType::Tracker || State.assignedRoles[index] == RoleType::Noisemaker ||
-                                    State.assignedRoles[index] == RoleType::Crewmate) {
-                                    if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.crewmates_amount >= (int)playerAmount)
+                                    State.assignedRoles[index] == RoleType::Detective || State.assignedRoles[index] == RoleType::Crewmate) {
+                                    if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.crewmates_amount >= (int)playerAmount)
                                         State.assignedRoles[index] = RoleType::Random;
                                 } //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps.
 
@@ -229,7 +233,7 @@ namespace HostTab {
                     ImGui::SameLine();
                     int hostRoleInt = (int)State.HostRoleToSet;
                     if (CustomListBoxInt("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "")) {
-                        if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom) {
+                        if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
                             if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount + 1 > GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
                                 State.AutoHostRole = false;
                             }
@@ -504,8 +508,10 @@ namespace HostTab {
                     // MakeFloat("Player Speed", playerSpeed, FloatOptionNames__Enum::PlayerSpeedMod);
                     // player speed can be between 0 (not included) and 3 (included) in classic mode due to the anticheat, so we separate this float input
                     if (ImGui::InputFloat("Player Speed", &playerSpeed)) {
-                        if (playerSpeed <= 0.f) playerSpeed = 0.000001f;
-                        if (playerSpeed > 3.f) playerSpeed = 3.f;
+                        if (State.SafeMode) {
+                            if (playerSpeed <= 0.f) playerSpeed = 0.000001f;
+                            if (playerSpeed > 3.f) playerSpeed = 3.f;
+                        }
                         options.SetFloat(FloatOptionNames__Enum::PlayerSpeedMod, playerSpeed);
                         SyncAllSettings();
                     }
@@ -549,7 +555,15 @@ namespace HostTab {
                             break;
                         }
                     }
-                    MakeInt(("Kill Distance" + killDistInfo).c_str(), killDistance, Int32OptionNames__Enum::KillDistance);
+
+                    if (ImGui::InputInt(("Kill Distance" + killDistInfo).c_str(), &killDistance)) {
+                        if (State.SafeMode) killDistance = std::clamp(killDistance, 0, 2);
+                        options.SetInt(Int32OptionNames__Enum::KillDistance, killDistance);
+                        SyncAllSettings();
+                    }
+                    else killDistance = options.GetInt(Int32OptionNames__Enum::KillDistance);
+
+                    // MakeInt(("Kill Distance" + killDistInfo).c_str(), killDistance, Int32OptionNames__Enum::KillDistance);
                     MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
                     MakeInt("# Common Tasks", commonTasks, Int32OptionNames__Enum::NumCommonTasks);
                     MakeInt("# Long Tasks", longTasks, Int32OptionNames__Enum::NumLongTasks);
@@ -630,10 +644,26 @@ namespace HostTab {
 
                     static bool flashlight = false, seekMap = false, hidePings = false, showNames = false;
 
-                    MakeFloat("Crewmate Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
-                    MakeFloat("Impostor Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
+                    MakeFloat("Hider Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
+                    MakeFloat("Seeker Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
                     MakeFloat("Kill Cooldown", killCooldown, FloatOptionNames__Enum::KillCooldown);
-                    MakeInt("Kill Distance", killDistance, Int32OptionNames__Enum::KillDistance);
+
+                    std::string killDistInfo = "";
+                    if (killDistance >= 0 && killDistance <= 2) {
+                        switch (killDistance) {
+                        case 0:
+                            killDistInfo = " (Short)";
+                            break;
+                        case 1:
+                            killDistInfo = " (Medium)";
+                            break;
+                        case 2:
+                            killDistInfo = " (Long)";
+                            break;
+                        }
+                    }
+
+                    MakeInt(("Kill Distance" + killDistInfo).c_str(), killDistance, Int32OptionNames__Enum::KillDistance);
                     MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
                     MakeInt("# Common Tasks", commonTasks, Int32OptionNames__Enum::NumCommonTasks);
                     MakeInt("# Long Tasks", longTasks, Int32OptionNames__Enum::NumLongTasks);
@@ -643,10 +673,10 @@ namespace HostTab {
                     MakeInt("Max Vent Uses", maxVents, Int32OptionNames__Enum::CrewmateVentUses);
                     MakeFloat("Max Time In Vent", ventTime, FloatOptionNames__Enum::CrewmateTimeInVent);
                     MakeBool("Flashlight Mode", flashlight, BoolOptionNames__Enum::UseFlashlight);
-                    MakeFloat("Crewmate Flashlight Size", crewLight, FloatOptionNames__Enum::CrewmateFlashlightSize);
-                    MakeFloat("Impostor Flashlight Size", impLight, FloatOptionNames__Enum::ImpostorFlashlightSize);
-                    MakeFloat("Final Hide Impostor Speed", finalImpSpeed, FloatOptionNames__Enum::SeekerFinalSpeed);
-                    MakeBool("Final Hide Seek Map", seekMap, BoolOptionNames__Enum::SeekerFinalMap);
+                    MakeFloat("Hider Flashlight Size", crewLight, FloatOptionNames__Enum::CrewmateFlashlightSize);
+                    MakeFloat("Seeker Flashlight Size", impLight, FloatOptionNames__Enum::ImpostorFlashlightSize);
+                    MakeFloat("Final Hide Seeker Speed", finalImpSpeed, FloatOptionNames__Enum::SeekerFinalSpeed);
+                    MakeBool("Final Hide Seeker Map", seekMap, BoolOptionNames__Enum::SeekerFinalMap);
                     MakeBool("Final Hide Pings", hidePings, BoolOptionNames__Enum::SeekerPings);
                     MakeFloat("Ping Interval", pingInterval, FloatOptionNames__Enum::MaxPingTime);
                     MakeBool("Show Names", showNames, BoolOptionNames__Enum::ShowCrewmateNames);

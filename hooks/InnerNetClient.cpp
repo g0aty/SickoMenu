@@ -661,7 +661,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     else if (IsInGame() || IsInLobby()) {
                         int rand = randi(0, (int)players.size() - 1);
                         NetworkedPlayerInfo_PlayerOutfit* outfit = GetPlayerOutfit(GetPlayerData(players[rand]));
-                        ImpersonateName(GetPlayerData(players[rand]));
+                        if (!State.SafeMode) ImpersonateName(GetPlayerData(players[rand]));
                         ImpersonateOutfit(outfit);
                         State.rpcQueue.push(new RpcSetLevel(*Game::pLocalPlayer, GetPlayerData(players[rand])->fields.PlayerLevel));
                         playerCycleDelay = State.CycleDuration;
@@ -1636,20 +1636,6 @@ void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
         Log.Debug("Exception occurred in Ladder_SetDestinationCooldown (InnerNetClient)");
     }
     return Ladder_SetDestinationCooldown(__this, method);
-}
-
-void dZiplineConsole_SetDestinationCooldown(ZiplineConsole* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dZiplineConsole_SetDestinationCooldown executed");
-    try {
-        if (!State.PanicMode && State.NoAbilityCD) {
-            __this->fields._CoolDown_k__BackingField = 0.f;
-            return;
-        }
-    }
-    catch (...) {
-        Log.Debug("Exception occurred in ZiplineConsole_SetDestinationCooldown (InnerNetClient)");
-    }
-    return ZiplineConsole_SetDestinationCooldown(__this, method);
 }
 
 void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method) {
