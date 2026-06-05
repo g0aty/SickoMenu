@@ -9,9 +9,15 @@ CastVoteEvent::CastVoteEvent(const EVENT_PLAYER& source, const std::optional<EVE
 void CastVoteEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
 	ImGui::SameLine();
+	ImGui::Text("(%s)", GetColorName(source.colorId).c_str());
+	ImGui::SameLine();
 	ImGui::Text(">");
 	ImGui::SameLine();
-	if (target.has_value()) ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(target->colorId)), target->playerName.c_str());
+	if (target.has_value()) {
+		ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(target->colorId)), target->playerName.c_str());
+		ImGui::SameLine();
+		ImGui::Text("(%s)", GetColorName(target->colorId).c_str());
+	}
 	else ImGui::Text("Skipped");
 	ImGui::SameLine();
 	ImGui::Text("[%s ago]", std::format("{:%OM:%OS}", (std::chrono::system_clock::now() - this->timestamp)).c_str());
