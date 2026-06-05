@@ -697,6 +697,13 @@ Color32 GetPlayerColor(Game::ColorId colorId) {
     return colorArray[colorId];
 }
 
+std::string GetColorName(Game::ColorId colorId) {
+    static const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
+    if (colorId >= 0 && colorId < (int32_t)COLORS.size())
+        return COLORS[colorId];
+    return "Fortegreen";
+}
+
 std::filesystem::path getModulePath(HMODULE hModule) {
     TCHAR buff[MAX_PATH];
     GetModuleFileName(hModule, buff, MAX_PATH);
