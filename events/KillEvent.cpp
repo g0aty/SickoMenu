@@ -12,9 +12,13 @@ KillEvent::KillEvent(const EVENT_PLAYER& source, const EVENT_PLAYER& target, con
 void KillEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
 	ImGui::SameLine();
+	ImGui::Text("(%s)", GetColorName(source.colorId).c_str());
+	ImGui::SameLine();
 	ImGui::Text(">");
 	ImGui::SameLine();
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(target.colorId)), target.playerName.c_str());
+	ImGui::SameLine();
+	ImGui::Text("(%s)", GetColorName(target.colorId).c_str());
 	ImGui::SameLine();
 	ImGui::Text("(%s)", TranslateSystemTypes(systemType));
 	if (target.isProtected) {
