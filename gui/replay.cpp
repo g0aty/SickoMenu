@@ -205,11 +205,29 @@ namespace Replay
 			if ((isUsingEventFilter == true) && (Replay::event_filter[(int)EVENT_TYPES::EVENT_WALK].second == false))
 				continue;
 
+			// hide ghosts: clip the trail at the player's moment of death so post-death ghost movement isn't shown
+			bool effIsUsingMaxTimeFilter = isUsingMaxTimeFilter;
+			std::chrono::system_clock::time_point effMaxTimeFilter = maxTimeFilter;
+			if (State.Replay_HideGhosts) {
+				auto ghostInfo = GetPlayerDataById(plrLineData.playerId);
+				bool isGhost = (ghostInfo != NULL) &&
+					((ghostInfo->fields.IsDead) ||
+						((ghostInfo->fields.Role != NULL) &&
+							(ghostInfo->fields.Role->fields.Role == RoleTypes__Enum::GuardianAngel)));
+				if (isGhost) {
+					auto deathTime = State.replayDeathTimePerPlayer[plrLineData.playerId];
+					if (!effIsUsingMaxTimeFilter || deathTime < effMaxTimeFilter) {
+						effMaxTimeFilter = deathTime;
+						effIsUsingMaxTimeFilter = true;
+					}
+				}
+			}
+
 			if (plrLineData.simplifiedPoints.size() > 0)
-				RenderPolyline(drawList, cursorPosX, cursorPosY, plrLineData.simplifiedPoints, plrLineData.simplifiedTimeStamps, plrLineData.colorId, isUsingMinTimeFilter, minTimeFilter, isUsingMaxTimeFilter, maxTimeFilter);
+				RenderPolyline(drawList, cursorPosX, cursorPosY, plrLineData.simplifiedPoints, plrLineData.simplifiedTimeStamps, plrLineData.colorId, isUsingMinTimeFilter, minTimeFilter, effIsUsingMaxTimeFilter, effMaxTimeFilter);
 			// pendingPoints picks up where simplifiedPoints leaves off. there should only ever be 100 or less pendingPoints at any one time, so this is fine.
 			if (plrLineData.pendingPoints.size() > 0)
-				RenderPolyline(drawList, cursorPosX, cursorPosY, plrLineData.pendingPoints, plrLineData.pendingTimeStamps, plrLineData.colorId, isUsingMinTimeFilter, minTimeFilter, isUsingMaxTimeFilter, maxTimeFilter);
+				RenderPolyline(drawList, cursorPosX, cursorPosY, plrLineData.pendingPoints, plrLineData.pendingTimeStamps, plrLineData.colorId, isUsingMinTimeFilter, minTimeFilter, effIsUsingMaxTimeFilter, effMaxTimeFilter);
 		}
 		Profiler::EndSample("ReplayPolyline");
 	}
@@ -239,6 +257,18 @@ namespace Replay
 					(Replay::player_filter[plrIdx].second == false) ||
 					(Replay::player_filter[plrIdx].first.has_value() == false)))
 				continue;
+
+			// hide ghosts: once the player has died by the current playback time, stop rendering them
+			if (State.Replay_HideGhosts) {
+				auto ghostInfo = GetPlayerDataById(plrLineData.playerId);
+				bool isGhost = (ghostInfo != NULL) &&
+					((ghostInfo->fields.IsDead) ||
+						((ghostInfo->fields.Role != NULL) &&
+							(ghostInfo->fields.Role->fields.Role == RoleTypes__Enum::GuardianAngel)));
+				if (isGhost &&
+					(!isUsingMaxTimeFilter || maxTimeFilter >= State.replayDeathTimePerPlayer[plrLineData.playerId]))
+					continue;
+			}
 
 			// we get the player's position from the line data which is constructed from WalkEvents
 			// pendingPoints will have the absolute freshest data, while simplifiedPoints will be behind by ~100 points or so (depends on how often we run the simplification)
