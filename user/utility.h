@@ -216,6 +216,7 @@ void CompleteAllTasks(PlayerControl* player = NULL);
 const char* TranslateTaskTypes(TaskTypes__Enum taskType);
 const char* TranslateSystemTypes(SystemTypes__Enum systemType);
 Color32 GetPlayerColor(Game::ColorId colorId);
+std::string GetColorName(Game::ColorId colorId);
 std::filesystem::path getModulePath(HMODULE hModule);
 std::string getGameVersion();
 SystemTypes__Enum GetSystemTypes(const Vector2& vector);
