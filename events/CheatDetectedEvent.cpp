@@ -9,6 +9,8 @@ CheatDetectedEvent::CheatDetectedEvent(const EVENT_PLAYER& source, CHEAT_ACTIONS
 void CheatDetectedEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
 	ImGui::SameLine();
+	ImGui::Text("(%s)", GetColorName(source.colorId).c_str());
+	ImGui::SameLine();
 	ImGui::Text(">");
 	ImGui::SameLine();
 	ImGui::Text("Cheat detected: %s", CHEAT_ACTION_NAMES[(int)this->action]);
