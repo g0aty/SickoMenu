@@ -325,6 +325,7 @@ public:
     int Replay_LastSecondsValue = 1;
     bool Replay_ClearAfterMeeting = false;
     bool Replay_DrawIcons = true;
+    bool Replay_HideGhosts = true;
     std::chrono::system_clock::time_point MatchStart;
     std::chrono::system_clock::time_point MatchCurrent;
     std::chrono::system_clock::time_point MatchEnd;
