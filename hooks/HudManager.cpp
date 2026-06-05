@@ -211,8 +211,8 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
     }
     std::string disableHostAnticheatText = State.CurrentScene == "FindAGame" && State.DisableHostAnticheat ? " • <#f00>+25 Mode is ON</color>" : "";
     std::string watermarkOffset = State.CurrentScene == "MMOnline" ? "<#0000>00000</color>" : "";
-    std::string sickoText = "<#ff006c>NotserpMenu</color>";
-    std::string goatText = "<#ef0143>g0aty & notserpishere</color>";
+    std::string sickoText = "<#ff006c>SickoMenu</color>";
+    std::string goatText = "<#ef0143>g0aty</color>";
     /*if (!State.HideWatermark) {
         sickoText = GetGradientUsername("SickoMenu", ImVec4(1.f, 0.f, 0.424f, 1.f), ImVec4(0.502f, 0.075f, 0.256f, 1.f));
         goatText = GetGradientUsername("g0aty", ImVec4(0.937f, 0.004f, 0.263f, 1.f), ImVec4(0.529f, 0.008f, 0.157f, 1.f));
