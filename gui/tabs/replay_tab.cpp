@@ -32,6 +32,11 @@ namespace ReplayTab {
 			State.Save();
 		}
 
+		if (ToggleButton("Hide Ghosts", &State.Replay_HideGhosts))
+		{
+			State.Save();
+		}
+
 		if (ImGui::ColorEdit4("Replay Map Color",
 			(float*)&State.SelectedReplayMapColor,
 			ImGuiColorEditFlags__OptionsDefault
