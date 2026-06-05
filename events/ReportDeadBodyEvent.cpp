@@ -13,10 +13,14 @@ ReportDeadBodyEvent::ReportDeadBodyEvent(const EVENT_PLAYER& source, const std::
 void ReportDeadBodyEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
 	ImGui::SameLine();
+	ImGui::Text("(%s)", GetColorName(source.colorId).c_str());
+	ImGui::SameLine();
 	if (target.has_value()) {
 		ImGui::Text(">");
 		ImGui::SameLine();
 		ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(target->colorId)), target->playerName.c_str());
+		ImGui::SameLine();
+		ImGui::Text("(%s)", GetColorName(target->colorId).c_str());
 		ImGui::SameLine();
 	}
 	ImGui::Text("(%s)", TranslateSystemTypes(systemType));
