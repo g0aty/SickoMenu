@@ -13,6 +13,8 @@ void VentEvent::Output()
 {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
 	ImGui::SameLine();
+	ImGui::Text("(%s)", GetColorName(source.colorId).c_str());
+	ImGui::SameLine();
 	ImGui::Text("(%s)", TranslateSystemTypes(systemType));
 	ImGui::SameLine();
 	ImGui::Text("[%s ago]", std::format("{:%OM:%OS}", (std::chrono::system_clock::now() - this->timestamp)).c_str());
@@ -40,6 +42,8 @@ SabotageEvent::SabotageEvent(const EVENT_PLAYER& source, SystemTypes__Enum syste
 void SabotageEvent::Output()
 {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
+	ImGui::SameLine();
+	ImGui::Text("(%s)", GetColorName(source.colorId).c_str());
 	ImGui::SameLine();
 	ImGui::Text("(%s)", TranslateSystemTypes(systemType));
 	ImGui::SameLine();
