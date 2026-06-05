@@ -1,4 +1,4 @@
-﻿#include "pch-il2cpp.h"
+#include "pch-il2cpp.h"
 #include "utility.h"
 #include "state.hpp"
 #include "game.h"
@@ -1802,14 +1802,12 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
         case 1: {
             auto realOutfit = GetPlayerOutfit(pData);
             Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
-            const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
             std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
                 int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
                 State.DarkMode ? "<#fff>" : "<#000>";
             std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
                 colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
-                IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
-                    " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
+                IsColorBlindMode() ? " (" + GetColorName(realOutfit->fields.ColorId) + ")" : "", reason);
             //ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
             ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
             break;
@@ -1840,14 +1838,12 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
         case 1: {
             auto realOutfit = GetPlayerOutfit(pData);
             Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
-            const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
             std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
                 int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
                 State.DarkMode ? "<#fff>" : "<#000>";
             std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
                 colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
-                IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
-                    " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
+                IsColorBlindMode() ? " (" + GetColorName(realOutfit->fields.ColorId) + ")" : "", reason);
             //ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
             ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
             break;
