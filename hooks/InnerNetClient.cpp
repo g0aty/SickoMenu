@@ -463,16 +463,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 reportDelay--;
             }
 
-            static int reportDelays = 0;
-            if (reportDelays <= 0 && State.CrashSpamReport && IsInGame() && !State.GameLoaded) {
-                for (auto p : GetAllPlayerControl()) {
-                    State.rpcQueue.push(new RpcReportBody(PlayerSelection(p)));
-                    return;
-                }
-                reportDelays = 0;
-            }
-            else {
-                reportDelays--;
+            if (State.CrashSpamReport && IsInGame() && !State.GameLoaded) {
+                State.rpcQueue.push(new RpcReportBody({}));
             }
 
             static int nameChangeCycleDelay = 0; //If we spam too many name changes, we're banned
@@ -741,12 +733,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     }
                 }
 
-                /*if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer && !autoStartedGame) {
+                if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer && !autoStartedGame) {
                     autoStartedGame = true;
                     InnerNetClient_SendStartGame(__this, NULL);
                 }
 
-                if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount && !autoStartedGame) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
+                /*if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount && !autoStartedGame) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
                     int playerCount = 0;
                     for (auto p : GetAllPlayerControl()) {
                         if (!p->fields.isNew) playerCount++;

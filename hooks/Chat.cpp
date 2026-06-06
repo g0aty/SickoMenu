@@ -174,12 +174,18 @@ void ChangeChatNotificationBackground(ChatNotification* chatNotif, PlayerControl
 			SpriteRenderer_set_color(chatNotif->fields.background, bg, NULL);
 			auto textArea = chatNotif->fields.chatText;
 			TMP_Text_set_color((app::TMP_Text*)textArea, textCol, NULL);
+			/*auto chatText = convert_from_string(TMP_Text_get_text((app::TMP_Text*)textArea, NULL));
+			chatText = std::format("<#{:02x}{:02x}{:02x}>", text32.r, text32.g, text32.b) + chatText + "</color>";
+			TMP_Text_set_text((app::TMP_Text*)textArea, convert_to_string(chatText), NULL);*/
 		}
 		else if (State.DarkMode && sender != NULL) {
 			auto black = Color(0.133f, 0.133f, 0.133f, 1.f);
 			SpriteRenderer_set_color(chatNotif->fields.background, black, NULL);
 			auto textArea = chatNotif->fields.chatText;
 			TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
+			/*auto chatText = convert_from_string(TMP_Text_get_text((app::TMP_Text*)textArea, NULL));
+			chatText = "<#fff>" + chatText + "</color>";
+			TMP_Text_set_text((app::TMP_Text*)textArea, convert_to_string(chatText), NULL);*/
 		}
 	}
 }
@@ -190,8 +196,8 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 	if (!State.PanicMode) {
 		auto player = GetPlayerData(sourcePlayer);
 		auto local = GetPlayerData(*Game::pLocalPlayer);
-		std::string message = RemoveHtmlTags(convert_from_string(chatText));
-		std::string newChatText = RemoveHtmlTags(convert_from_string(chatText));
+		std::string message = convert_from_string(chatText);
+		std::string newChatText = message;
 		if (State.BetterChatNotifications && __this->fields.state == ChatControllerState__Enum::Closed && !GetPlayerData(sourcePlayer)->fields.IsDead) {
 			auto chatNotif = __this->fields.chatNotification;
 			ChatNotification_SetUp(chatNotif, sourcePlayer, chatText, NULL);
@@ -579,6 +585,8 @@ void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodI
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method) {
 	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatBubble_SetText executed");
 	if ((!State.PanicMode || State.TempPanicMode)) {
+		// std::string colorOpener = "", colorCloser = "";
+
 		if (State.CustomGameTheme) {
 			auto bg32 = Color32();
 			bg32.r = int(State.GameBgColor.x * 255); bg32.g = int(State.GameBgColor.y * 255); bg32.b = int(State.GameBgColor.z * 255); bg32.a = 255;
@@ -592,6 +600,8 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 			if (!isChatWarning) {
 				auto textArea = __this->fields.TextArea;
 				TMP_Text_set_color((app::TMP_Text*)textArea, textCol, NULL);
+				// colorOpener = std::format("<#{:02x}{:02x}{:02x}>", text32.r, text32.g, text32.b);
+				// colorCloser = "</color>";
 			}
 		}
 		else if (State.DarkMode) {
@@ -602,6 +612,8 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 			if (!isChatWarning) {
 				auto textArea = __this->fields.TextArea;
 				TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
+				// colorOpener = "<#fff>";
+				// colorCloser = "</color>";
 			}
 		}
 
@@ -611,98 +623,99 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 			SpriteRenderer_set_color(__this->fields.Background, darkGold, NULL);
 		}
 
+		std::string fontOpener = "", fontCloser = "";
 		if (State.ChatFont) {
-			std::string opener = "";
-
 			switch (State.ChatFontType) {
 			case 0: {
-				opener = "<font=\"Barlow-Italic SDF\">";
+				fontOpener = "<font=\"Barlow-Italic SDF\">";
 				break;
 			}
 			case 1: {
-				opener = "<font=\"Barlow-Medium SDF\">";
+				fontOpener = "<font=\"Barlow-Medium SDF\">";
 				break;
 			}
 			case 2: {
-				opener = "<font=\"Barlow-Bold SDF\">";
+				fontOpener = "<font=\"Barlow-Bold SDF\">";
 				break;
 			}
 			case 3: {
-				opener = "<font=\"Barlow-SemiBold SDF\">";
+				fontOpener = "<font=\"Barlow-SemiBold SDF\">";
 				break;
 			}
 			case 4: {
-				opener = "<font=\"Barlow-SemiBold Masked\">";
+				fontOpener = "<font=\"Barlow-SemiBold Masked\">";
 				break;
 			}
 			case 5: {
-				opener = "<font=\"Barlow-ExtraBold SDF\">";
+				fontOpener = "<font=\"Barlow-ExtraBold SDF\">";
 				break;
 			}
 			case 6: {
-				opener = "<font=\"Barlow-BoldItalic SDF\">";
+				fontOpener = "<font=\"Barlow-BoldItalic SDF\">";
 				break;
 			}
 			case 7: {
-				opener = "<font=\"Barlow-BoldItalic Masked\">";
+				fontOpener = "<font=\"Barlow-BoldItalic Masked\">";
 				break;
 			}
 			case 8: {
-				opener = "<font=\"Barlow-Black SDF\">";
+				fontOpener = "<font=\"Barlow-Black SDF\">";
 				break;
 			}
 			case 9: {
-				opener = "<font=\"Barlow-Light SDF\">";
+				fontOpener = "<font=\"Barlow-Light SDF\">";
 				break;
 			}
 			case 10: {
-				opener = "<font=\"Barlow-Regular SDF\">";
+				fontOpener = "<font=\"Barlow-Regular SDF\">";
 				break;
 			}
 			case 11: {
-				opener = "<font=\"Barlow-Regular Masked\">";
+				fontOpener = "<font=\"Barlow-Regular Masked\">";
 				break;
 			}
 			case 12: {
-				opener = "<font=\"Barlow-Regular Outline\">";
+				fontOpener = "<font=\"Barlow-Regular Outline\">";
 				break;
 			}
 			case 13: {
-				opener = "<font=\"Brook SDF\">";
+				fontOpener = "<font=\"Brook SDF\">";
 				break;
 			}
 			case 14: {
-				opener = "<font=\"LiberationSans SDF\">";
+				fontOpener = "<font=\"LiberationSans SDF\">";
 				break;
 			}
 			case 15: {
-				opener = "<font=\"NotoSansJP-Regular SDF\">";
+				fontOpener = "<font=\"NotoSansJP-Regular SDF\">";
 				break;
 			}
 			case 16: {
-				opener = "<font=\"VCR SDF\">";
+				fontOpener = "<font=\"VCR SDF\">";
 				break;
 			}
 			case 17: {
-				opener = "<font=\"CONSOLA SDF\">";
+				fontOpener = "<font=\"CONSOLA SDF\">";
 				break;
 			}
 			case 18: {
-				opener = "<font=\"digital-7 SDF\">";
+				fontOpener = "<font=\"digital-7 SDF\">";
 				break;
 			}
 			case 19: {
-				opener = "<font=\"OCRAEXT SDF\">";
+				fontOpener = "<font=\"OCRAEXT SDF\">";
 				break;
 			}
 			case 20: {
-				opener = "<font=\"DIN_Pro_Bold_700 SDF\">";
+				fontOpener = "<font=\"DIN_Pro_Bold_700 SDF\">";
 				break;
 			}
 			}
 
-			chatText = convert_to_string(opener + convert_from_string(chatText) + "</font>");
+			fontCloser = "</font>";
 		}
+
+		chatText = convert_to_string(fontOpener + /*colorOpener + */convert_from_string(chatText) + /*colorCloser + */fontCloser);
 	}
 	ChatBubble_SetText(__this, chatText, method);
 }
@@ -921,28 +934,28 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 				return;
 			}
 
+			if (IsHost()) {
+				if (chatTextLower == "/kick all") {
+					bool isBan = false;
+					if (IsInGame()) {
+						State.rpcQueue.push(new PunishEveryone(isBan));
+					}
+					else if (IsInLobby()) {
+						State.lobbyRpcQueue.push(new PunishEveryone(isBan));
+					}
+					return;
+				}
 
-
-			if (chatTextLower == "/kick all") {
-				bool isBan = false;
-				if (IsInGame()) {
-					State.rpcQueue.push(new PunishEveryone(isBan));
+				if (chatTextLower == "/ban all") {
+					bool isBan = true;
+					if (IsInGame()) {
+						State.rpcQueue.push(new PunishEveryone(isBan));
+					}
+					else if (IsInLobby()) {
+						State.lobbyRpcQueue.push(new PunishEveryone(isBan));
+					}
+					return;
 				}
-				else if (IsInLobby()) {
-					State.lobbyRpcQueue.push(new PunishEveryone(isBan));
-				}
-				return;
-			}
-
-			if (chatTextLower == "/ban all") {
-				bool isBan = true;
-				if (IsInGame()) {
-					State.rpcQueue.push(new PunishEveryone(isBan));
-				}
-				else if (IsInLobby()) {
-					State.lobbyRpcQueue.push(new PunishEveryone(isBan));
-				}
-				return;
 			}
 
 			// without temp-ban command due to runtime error + uncomfortable use :despair:
@@ -1006,15 +1019,6 @@ void dFreeChatInputField_UpdateCharCount(FreeChatInputField* __this, MethodInfo*
 	__this->fields.charCountText->fields._.m_enableWordWrapping = false;
 
 	updateCharCounterText(__this);
-	/*int length = __this->fields.textArea->fields.text->fields.m_stringLength;
-	int charLimit = __this->fields.textArea->fields.characterLimit;
-	std::string chatCooldownText = "";
-	if (State.ShowChatTimer)
-		chatCooldownText = State.ChatCooldown >= 3.f ? (length == 0 ? "" : "<#0f0>You can chat now!</color> ") : std::format("<#f00>Wait for {:.1f} seconds!</color> ", 3 - State.ChatCooldown);
-	if (copyNotificationTimer > 0.f) chatCooldownText = std::format("<#0f0>{} text to clipboard!</color> ", isTextCut ? "Cut" : "Copied", copyNotificationTimer);
-	std::string charCountColor = std::format("<#{}{}0>", length >= 0.75 * charLimit ? "f" : "0", length != charLimit && length >= 0.75 * charLimit ? "f" : "0");
-	std::string updatedText = std::format("{}{}{}/{}</color>", chatCooldownText, charCountColor, length, charLimit);
-	TMP_Text_set_text((TMP_Text*)__this->fields.charCountText, convert_to_string(updatedText), NULL);*/
 }
 
 void dObjectPoolBehavior_InitPool(ObjectPoolBehavior* __this, PoolableBehavior* prefab, MethodInfo* method) {

@@ -12,9 +12,9 @@ using namespace Game;
 bool HookFunction(PVOID* ppPointer, PVOID pDetour, const char* functionName) {
 	if (const auto error = DetourAttach(ppPointer, pDetour); error != NO_ERROR) {
 		STREAM_ERROR("Failed to hook " << functionName << ", error " << error);
-		if (error == 6) {
+		if (error == ERROR_INVALID_HANDLE) {
 			MessageBox(NULL,
-				L"SickoMenu failed to hook with error 6!\nThis may be caused by a version of Among Us not supported by SickoMenu.\n\nPlease don\'t post \"Please update\" stuff in the Issues section of the GitHub repository or on our bug reports forum on Discord. That\'s not an issue. It always gets updated, just be patient. Day of launch updates are a privilege, not an expectation.",
+				L"SickoMenu failed to hook a function with an invalid handle!\nThis may be caused by a version of Among Us not supported by SickoMenu.\n\nPlease don\'t post \"Please update\" stuff in the Issues section of the GitHub repository or on our bug reports forum on Discord. That\'s not an issue. It always gets updated, just be patient. Day of launch updates are a privilege, not an expectation.",
 				L"SickoMenu", MB_ICONERROR);
 		}
 		return false;

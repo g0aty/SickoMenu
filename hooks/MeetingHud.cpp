@@ -353,7 +353,10 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
         il2cpp::Array playerStates2(__this->fields.playerStates);
         for (auto voteArea : playerStates2) {
             std::string namePlate = convert_from_string(GetPlayerOutfit(GetPlayerDataById(voteArea->fields.TargetPlayerId))->fields.NamePlateId);
-            std::unordered_set<std::string> noPlateSet = { "", "nameplate_NoPlate", "nameplate_Transparent", "nameplate_bsb2_notes", "nameplate_bsb2_breach", "nameplate_bsb2_frame", "nameplate_bsb2_error", "nameplate_racing_beanCar" };
+            std::unordered_set<std::string> noPlateSet = { "", "nameplate_NoPlate", "nameplate_Transparent"/*, "nameplate_bsb2_notes", "nameplate_bsb2_breach", "nameplate_bsb2_frame", "nameplate_bsb2_error", "nameplate_racing_beanCar"*/ };
+            // the reason additional nameplates were included was to set their theme,
+            // and unknown nameplates show up as blank ones
+            // the commented out nameplates were not in v16.0.0 & v16.0.2, but in v16.0.5 & v16.1.0
             if (!noPlateSet.contains(namePlate)) continue;
             if (!State.PanicMode && State.CustomGameTheme) {
                 auto bg = Color(State.GameBgColor.x, State.GameBgColor.y, State.GameBgColor.z, State.GameBgColor.w);

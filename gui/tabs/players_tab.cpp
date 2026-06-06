@@ -1613,17 +1613,20 @@ namespace PlayersTab {
                     }
                 }
 
-                if ((/*IsHost() || */!State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
+                if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
                     ImGui::NewLine(); //force a new line
-                    if (InputString("Username", &forcedName)) {
-                        State.Save();
-                    }
-                    if (AnimatedButton("Force Name"))
-                    {
-                        if (IsInGame())
-                            State.rpcQueue.push(new RpcForceName(selectedPlayer.get_PlayerControl(), forcedName));
-                        else if (IsInLobby())
-                            State.lobbyRpcQueue.push(new RpcForceName(selectedPlayer.get_PlayerControl(), forcedName));
+
+                    if (!State.SafeMode) {
+                        if (InputString("Username", &forcedName)) {
+                            State.Save();
+                        }
+                        if (AnimatedButton("Force Name"))
+                        {
+                            if (IsInGame())
+                                State.rpcQueue.push(new RpcForceName(selectedPlayer.get_PlayerControl(), forcedName));
+                            else if (IsInLobby())
+                                State.lobbyRpcQueue.push(new RpcForceName(selectedPlayer.get_PlayerControl(), forcedName));
+                        }
                     }
 
                     CustomListBoxInt(" ", &forcedColor, COLORS, 85.0f * State.dpiScale);

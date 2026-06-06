@@ -2376,6 +2376,7 @@ float GameOptions::GetGACooldown() const {
 RoleOptions& RoleOptions::SetRoleRate(app::RoleTypes__Enum role, int32_t maxCount, int32_t chance) {
     if (!_options) return *this;
     auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetRoleRate);
+    if (role == (RoleTypes__Enum::Tracker)) role = (RoleTypes__Enum)10;
     ((void(*)(void*, app::RoleTypes__Enum, int32_t, int32_t, const void*))(func.methodPtr))
         (_options, role, maxCount, chance, func.method);
     return *this;
@@ -2384,6 +2385,7 @@ RoleOptions& RoleOptions::SetRoleRate(app::RoleTypes__Enum role, int32_t maxCoun
 RoleOptions& RoleOptions::SetRoleRecommended(app::RoleTypes__Enum role) {
     if (!_options) return *this;
     auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetRoleRecommended);
+    if (role == (RoleTypes__Enum::Tracker)) role = (RoleTypes__Enum)10;
     ((void(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
     return *this;
 }
@@ -2391,12 +2393,14 @@ RoleOptions& RoleOptions::SetRoleRecommended(app::RoleTypes__Enum role) {
 int32_t RoleOptions::GetNumPerGame(app::RoleTypes__Enum role) const {
     if (!_options) return 0;
     auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, GetNumPerGame);
+    if (role == (RoleTypes__Enum::Tracker)) role = (RoleTypes__Enum)10;
     return ((int32_t(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
 }
 
 int32_t RoleOptions::GetChancePerGame(app::RoleTypes__Enum role) const {
     if (!_options) return 0;
     auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, GetChancePerGame);
+    if (role == (RoleTypes__Enum::Tracker)) role = (RoleTypes__Enum)10;
     return ((int32_t(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
 }
 

@@ -515,6 +515,8 @@ namespace HostTab {
                         options.SetFloat(FloatOptionNames__Enum::PlayerSpeedMod, playerSpeed);
                         SyncAllSettings();
                     }
+                    else playerSpeed = options.GetFloat(FloatOptionNames__Enum::PlayerSpeedMod);
+
                     std::string taskBarInfo = "";
                     if (taskBarMode >= 0 && taskBarMode <= 2) {
                         switch (taskBarMode) {
