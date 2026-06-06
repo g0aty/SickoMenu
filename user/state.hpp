@@ -378,6 +378,7 @@ public:
     std::string versionShowerDefaultText = "";
 
     bool DisableHud = false;
+    bool AntiOverload = true;
     bool GodMode = false;
 
     bool ActiveAttach = false;

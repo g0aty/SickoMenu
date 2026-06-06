@@ -8,6 +8,7 @@
 #include "game.h"
 
 using namespace Game;
+using namespace app;
 
 bool HookFunction(PVOID* ppPointer, PVOID pDetour, const char* functionName) {
 	if (const auto error = DetourAttach(ppPointer, pDetour); error != NO_ERROR) {
@@ -140,6 +141,8 @@ void DetourInitilization() {
 	//HOOKFUNC(RoleManager_AssignRolesForTeam);
 	//HOOKFUNC(RoleManager_AssignRolesFromList);
 	HOOKFUNC(PlayerControl_HandleRpc);
+	HOOKFUNC(PlayerPhysics_HandleRpc);
+	HOOKFUNC(InnerNetClient_HandleGameData);
 	HOOKFUNC(PlayerControl_RpcStartMeeting);
 	HOOKFUNC(PlayerControl_CmdReportDeadBody);
 	HOOKFUNC(PlayerControl_RpcSendChat);
@@ -319,6 +322,8 @@ void DetourUninitialization()
 	//UNHOOKFUNC(RoleManager_AssignRolesForTeam);
 	//UNHOOKFUNC(RoleManager_AssignRolesFromList);
 	UNHOOKFUNC(PlayerControl_HandleRpc);
+	UNHOOKFUNC(PlayerPhysics_HandleRpc);
+	UNHOOKFUNC(InnerNetClient_HandleGameData);
 	UNHOOKFUNC(PlayerControl_RpcStartMeeting);
 	UNHOOKFUNC(PlayerControl_CmdReportDeadBody);
 	UNHOOKFUNC(PlayerControl_RpcSendChat);

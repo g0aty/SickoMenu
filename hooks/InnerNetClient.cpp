@@ -1385,6 +1385,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
             uint8_t playerId = data->fields.Character->fields.PlayerId;
+            AntiOverload_OnPlayerLeave(playerId);
 
             if (State.modUsers.find(playerId) != State.modUsers.end())
                 State.modUsers.erase(playerId);
@@ -1410,6 +1411,8 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
 void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dAmongUsClient_OnPlayerJoined executed");
     State.BlinkPlayersTab = true;
+    if (data->fields.Character)
+        AntiOverload_OnPlayerJoin(data->fields.Character->fields.PlayerId);
     AmongUsClient_OnPlayerJoined(__this, data, method);
 }
 

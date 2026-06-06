@@ -1071,6 +1071,9 @@ void dPlayerControl_StartMeeting(PlayerControl* __this, NetworkedPlayerInfo* tar
 
 void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_HandleRpc executed");
+    if (State.AntiOverload && __this)                                    
+        if (!(Game::pLocalPlayer && __this == *Game::pLocalPlayer))     
+            if (!RpcCheck(__this, callId, 1)) return;
     int32_t pos = reader->fields._position, head = reader->fields.readHead;
     try {
         if (State.IgnoreRPCs && callId != (uint8_t)RpcCalls__Enum::CheckName && callId != (uint8_t)RpcCalls__Enum::CheckColor && callId != (uint8_t)RpcCalls__Enum::SendChat)

@@ -181,6 +181,7 @@ DO_APP_FUNC(void, InnerNetClient_KickPlayer, (InnerNetClient* __this, int32_t cl
 DO_APP_FUNC(void, AmongUsClient_KickNotJoinedPlayers, (AmongUsClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::KickNotJoinedPlayers()");
 DO_APP_FUNC(void, InnerNetClient_SendStartGame, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::SendStartGame()");
 DO_APP_FUNC(void, InnerNetClient_Update, (InnerNetClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::Update()");
+DO_APP_FUNC(void, InnerNetClient_HandleGameData, (InnerNetClient* __this, MessageReader* parentReader, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::HandleGameData(Hazel.MessageReader)");
 //DO_APP_FUNC(MessageWriter*, InnerNetClient_StartRpc, (InnerNetClient* __this, uint32_t targetNetId, uint8_t callId, SendOption__Enum option, MethodInfo* method), "Assembly-CSharp, Hazel.MessageWriter InnerNet.InnerNetClient::StartRpc(System.UInt32, System.Byte, Hazel.SendOption)");
 DO_APP_FUNC(MessageWriter*, InnerNetClient_StartRpcImmediately, (InnerNetClient* __this, uint32_t targetNetId, uint8_t callId, SendOption__Enum option, int32_t targetClientId, MethodInfo* method), "Assembly-CSharp, Hazel.MessageWriter InnerNet.InnerNetClient::StartRpcImmediately(System.UInt32, System.Byte, Hazel.SendOption, System.Int32)");
 DO_APP_FUNC(void, InnerNetClient_FinishRpcImmediately, (InnerNetClient* __this, MessageWriter* msg, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::FinishRpcImmediately(Hazel.MessageWriter)");
@@ -271,6 +272,7 @@ DO_APP_FUNC(void, PlayerPhysics_FixedUpdate, (PlayerPhysics* __this, MethodInfo*
 DO_APP_FUNC(void, PlayerPhysics_RpcEnterVent, (PlayerPhysics* __this, int32_t id, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcEnterVent(System.Int32)");
 DO_APP_FUNC(void, PlayerPhysics_RpcExitVent, (PlayerPhysics* __this, int32_t id, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcExitVent(System.Int32)");
 DO_APP_FUNC(void, PlayerPhysics_RpcBootFromVent, (PlayerPhysics* __this, int32_t ventId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcBootFromVent(System.Int32)");
+DO_APP_FUNC(void, PlayerPhysics_HandleRpc, (PlayerPhysics* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::HandleRpc(System.Byte, Hazel.MessageReader)");
 
 DO_APP_FUNC(void, PlayerControl_TurnOnProtection, (PlayerControl* __this, bool visible, int32_t colorId, int32_t guardianPlayerId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::TurnOnProtection(System.Boolean, System.Int32, System.Int32)");
 DO_APP_FUNC(void, PlayerControl_RemoveProtection, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RemoveProtection()");

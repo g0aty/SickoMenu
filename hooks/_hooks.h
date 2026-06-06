@@ -21,7 +21,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo* method);
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method);
 void dGameStartManager_ReallyBegin(GameStartManager* __this, bool neverShow, MethodInfo* method);
-void dHudManager_Update(HudManager* __this, MethodInfo* method);
+void dHudManager_Update(app::HudManager* __this, MethodInfo* method);
 Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo* method);
 void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method);
 void dScreenJoystick_FixedUpdate(ScreenJoystick* __this, MethodInfo* method);
@@ -88,7 +88,7 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
 float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method);
 //TaskBarMode__Enum dLogicOptions_GetTaskBarMode(LogicOptions* __this, MethodInfo* method);
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method);
-void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method);
+void dRoleManager_SelectRoles(app::RoleManager* __this, MethodInfo* method);
 //void dRoleManager_AssignRolesForTeam(List_1_GameData_PlayerInfo_* players, RoleOptionsData* opts, RoleTeamTypes__Enum team, int32_t teamMax, Nullable_1_RoleTypes_ defaultRole, MethodInfo* method);
 //void dRoleManager_AssignRolesFromList(List_1_GameData_PlayerInfo_* players, int32_t teamMax, List_1_RoleTypes_* roleList, int32_t* rolesAssigned, MethodInfo* method);
 void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method);
@@ -96,7 +96,7 @@ bool dSaveManager_GetPurchase(String* itemKey, String* bundleKey, MethodInfo* me
 void dPlayerControl_TurnOnProtection(PlayerControl* __this, bool visible, int32_t colorId, int32_t guardianPlayerId, MethodInfo* method);
 void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method);
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResult, MethodInfo* method);
-void dAccountManager_UpdateKidAccountDisplay(AccountManager* __this, MethodInfo* method);
+void dAccountManager_UpdateKidAccountDisplay(app::AccountManager* __this, MethodInfo* method);
 void dPlayerStorageManager_OnReadPlayerPrefsComplete(PlayerStorageManager* __this, void* data, MethodInfo* method);
 bool dPlayerPurchasesData_GetPurchase(PlayerPurchasesData* __this, String* itemKey, String* bundleKey, MethodInfo* method);
 void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* method);
@@ -135,7 +135,7 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
 void dPlayerControl_CmdCheckProtect(PlayerControl* __this, PlayerControl* target, MethodInfo* method);
 void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method);
 void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method);
-bool dAccountManager_CanPlayOnline(AccountManager* __this, MethodInfo* method);
+bool dAccountManager_CanPlayOnline(app::AccountManager* __this, MethodInfo* method);
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method);
 //AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_1(AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method);
 bool dAprilFoolsMode_ShouldFlipSkeld(MethodInfo* method);
@@ -172,3 +172,8 @@ void* dPlayerControl_Start(PlayerControl* __this, MethodInfo* method);
 void dMainMenuManager_LateUpdate(MainMenuManager* __this, MethodInfo* method);
 AudioSource* dSoundManager_PlaySound(SoundManager* __this, AudioClip* clip, bool loop, float volume, AudioMixerGroup* audioMixer, MethodInfo* method);
 void dViperDeadBody_FixedUpdate(ViperDeadBody* __this, MethodInfo* method);
+void AntiOverload_OnPlayerJoin(uint8_t playerId);
+void AntiOverload_OnPlayerLeave(uint8_t playerId);
+void dPlayerPhysics_HandleRpc(PlayerPhysics* __this, uint8_t callId, MessageReader* reader, MethodInfo* method);
+void dInnerNetClient_HandleGameData(InnerNetClient* __this, MessageReader* parentReader, MethodInfo* method);
+bool RpcCheck(PlayerControl* player, uint8_t callId, int numData);
