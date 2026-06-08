@@ -291,6 +291,8 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - NoClip - CTRL
 - Panic / Disable SickoMenu - PAUSE BREAK (Break)
 
+The Default Hotkeys can be customized in-game through the menu Settings → Keybinds.
+
 ## ⚒️ Building / Compilation
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
 
