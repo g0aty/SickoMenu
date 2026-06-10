@@ -19,6 +19,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 - [📸 Screenshot](https://github.com/g0aty/SickoMenu#-screenshot)
 - [👌 Supported Versions](https://github.com/g0aty/SickoMenu#-supported-versions)
 - [⬇️ Download & Install](https://github.com/g0aty/SickoMenu#%EF%B8%8F-download--install)
+- [🛠️ Troubleshooting](https://github.com/g0aty/SickoMenu#-troubleshooting)
 - [⌨️ Default Hotkeys](https://github.com/g0aty/SickoMenu#%EF%B8%8F-default-hotkeys)
 - [⚒️ Building / Compilation](https://github.com/g0aty/SickoMenu#%EF%B8%8F-building--compilation)
 - [💁 Contributing](https://github.com/g0aty/SickoMenu#-contributing)
@@ -68,9 +69,10 @@ A huge amount of features!
 - Ghost Visibility  
 - Confuser (May disrupt gameplay)  
 
-**Cosmetic/UI Enhancements:**
-- Zoom Out  
-- SickoMenu Chat (`/sc [message]`)  
+**Miscellaneous Features:**
+- Zoom Out
+- Disable Kill Animation
+- SickoMenu Chat (`/sc [message]`)
 
 **Full Feature List:** [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
 
@@ -250,6 +252,34 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
   ```
   **For Method 3:**
 - The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
+---
+## 🛠️ Troubleshooting
+
+**Game crashes on launch**
+- Ensure you are using a supported Among Us version.
+- Verify you downloaded the correct DLL for your platform.
+- Remove other mods that may conflict with SickoMenu.
+
+**Menu does not appear**
+- Confirm the DLL was loaded successfully.
+- Verify you are using the correct installation method (Version Proxy or Injection).
+- Try restarting the game.
+
+**Antivirus removes files**
+- Some antivirus programs may flag game modifications and remove them automatically.
+- Check your antivirus quarantine if files disappear after installation.
+
+**Wrong DLL version**
+- Make sure you are using the DLL intended for your platform.
+- Download the latest release if you are unsure.
+
+**Injection issues**
+- Verify that the injected DLL matches your game version.
+- Ensure your injector is running with sufficient permissions.
+- If issues persists, try a different injection method or injector.
+
+**Other issues**
+- If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
 
 ---
 ## ⌨️ Default Hotkeys
@@ -260,6 +290,8 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - Repair Sabotage - PAGE DOWN (PgDn)
 - NoClip - CTRL
 - Panic / Disable SickoMenu - PAUSE BREAK (Break)
+
+The Default Hotkeys can be customized in-game through the menu Settings → Keybinds.
 
 ## ⚒️ Building / Compilation
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
