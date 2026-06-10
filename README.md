@@ -19,7 +19,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 - [📸 Screenshot](https://github.com/g0aty/SickoMenu#-screenshot)
 - [👌 Supported Versions](https://github.com/g0aty/SickoMenu#-supported-versions)
 - [⬇️ Download & Install](https://github.com/g0aty/SickoMenu#%EF%B8%8F-download--install)
-- [🛠️ Troubleshooting](https://github.com/g0aty/SickoMenu#-troubleshooting)
+- [🛠️ Troubleshooting](https://github.com/g0aty/SickoMenu#%EF%B8%8F-troubleshooting)
 - [⌨️ Default Hotkeys](https://github.com/g0aty/SickoMenu#%EF%B8%8F-default-hotkeys)
 - [⚒️ Building / Compilation](https://github.com/g0aty/SickoMenu#%EF%B8%8F-building--compilation)
 - [💁 Contributing](https://github.com/g0aty/SickoMenu#-contributing)
