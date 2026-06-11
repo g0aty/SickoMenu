@@ -1074,9 +1074,9 @@ namespace GameTab {
        if (openHistory) {
             ImGui::Text("Last 100 players:");
 
-            static char historySearchBuf[128] = "";
-            ImGui::SetNextItemWidth(200);
-            ImGui::InputText("##HistorySearch", historySearchBuf, IM_ARRAYSIZE(historySearchBuf));
+            static std::string historySearchBuf = "";
+ImGui::SetNextItemWidth(200);
+InputString("##HistorySearch", &historySearchBuf);
             ImGui::SameLine();
             ImGui::TextDisabled("Search");
             if (ImGui::IsItemHovered())
@@ -1092,7 +1092,7 @@ namespace GameTab {
             names.reserve(State.PlayerHistory.size());
             filteredIndices.reserve(State.PlayerHistory.size());
 
-            std::string searchQuery(historySearchBuf);
+            std::string searchQuery = historySearchBuf;
             std::transform(searchQuery.begin(), searchQuery.end(), searchQuery.begin(), ::tolower);
 
             for (int i = 0; i < (int)State.PlayerHistory.size(); ++i)
