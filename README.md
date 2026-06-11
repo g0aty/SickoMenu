@@ -72,7 +72,7 @@ A huge amount of features!
 **Miscellaneous Features:**
 - Zoom Out
 - Disable Kill Animation
-- SickoMenu Chat (`/sc [message]`)
+- SickoChat (`/sc [message]`)
 
 **Full Feature List:** [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
 
