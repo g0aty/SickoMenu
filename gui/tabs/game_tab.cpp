@@ -1071,8 +1071,16 @@ namespace GameTab {
             }
         }
 
-        if (openHistory) {
+       if (openHistory) {
             ImGui::Text("Last 100 players:");
+
+            static char historySearchBuf[128] = "";
+            ImGui::SetNextItemWidth(200);
+            ImGui::InputText("##HistorySearch", historySearchBuf, IM_ARRAYSIZE(historySearchBuf));
+            ImGui::SameLine();
+            ImGui::TextDisabled("Search");
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Filter by name, friend code, or PUID");
 
             static int selectedIndex = -1;
 
@@ -1084,6 +1092,9 @@ namespace GameTab {
             names.reserve(State.PlayerHistory.size());
             filteredIndices.reserve(State.PlayerHistory.size());
 
+            std::string searchQuery(historySearchBuf);
+            std::transform(searchQuery.begin(), searchQuery.end(), searchQuery.begin(), ::tolower);
+
             for (int i = 0; i < (int)State.PlayerHistory.size(); ++i)
             {
                 auto& p = State.PlayerHistory[i];
@@ -1091,6 +1102,19 @@ namespace GameTab {
                 bool visible = (itf != State.platformFilters.end()) ? itf->second : true;
                 if (!visible) continue;
 
+                if (!searchQuery.empty()) {
+                    std::string lnick = p.Nick;
+                    std::transform(lnick.begin(), lnick.end(), lnick.begin(), ::tolower);
+                    std::string lfc = p.FriendCode;
+                    std::transform(lfc.begin(), lfc.end(), lfc.begin(), ::tolower);
+                    std::string lpuid = p.Puid;
+                    std::transform(lpuid.begin(), lpuid.end(), lpuid.begin(), ::tolower);
+
+                    if (lnick.find(searchQuery) == std::string::npos &&
+                        lfc.find(searchQuery) == std::string::npos &&
+                        lpuid.find(searchQuery) == std::string::npos)
+                        continue;
+                }
                 std::string decorated = p.Nick;
 
                 if (p.NameCheck) decorated = "[!] " + decorated;
