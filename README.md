@@ -1,10 +1,5 @@
 <h1 align="center">StickoMenu v69</h1>
-## 💁 Contributing
-1. Fork it [here](<https://github.com/g0aty/SickoMenu/fork>)
-2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Commit your changes (`git commit -am 'Add some fooBar'`)
-4. Push to the branch (`git push origin feature/fooBar`)
-5. Create a new Pull Request
+# This is a ModMenu based in SickoMenu
   
 ## 🙏 Special Thanks
 * The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
