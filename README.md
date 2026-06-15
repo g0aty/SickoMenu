@@ -1,5 +1,5 @@
 <h1 align="center">StickoMenu v69</h1>
-# This is a ModMenu based in SickoMenu
+This is a ModMenu based in SickoMenu
   
 ## 🙏 Special Thanks
 * The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
