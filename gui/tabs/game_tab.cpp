@@ -1081,14 +1081,14 @@ InputString("##HistorySearch", &historySearchBuf);
             ImGui::TextDisabled("Search");
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Filter by name, friend code, or PUID");
+           
+           static int selectedIndex = -1;
 
            static std::string lastSearchQuery = "";
 if (historySearchBuf != lastSearchQuery) {
     lastSearchQuery = historySearchBuf;
     selectedIndex = -1;
 }
-
-            static int selectedIndex = -1;
 
             std::vector<std::string> decoratedStorage;
             decoratedStorage.reserve(State.PlayerHistory.size());
