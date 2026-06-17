@@ -1,7 +1,7 @@
 <h1 align="center">StickoMenu v69</h1>
 This is a ModMenu based in StickoMenu
   
-## ðŸ™ Special Thanks
+## Special Thanks
 * The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
 * [KulaGGin](https://github.com/KulaGGin) (Helped with some ImGui code for replay system)
 * [tomsa000](https://github.com/tomsa000) (Helped with fixing memory leaks and smart pointers)
