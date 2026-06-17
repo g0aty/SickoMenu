@@ -41,13 +41,13 @@ bool GameVersionCheck() {
 
     /*if (!IsWindows10OrGreater()) {
         Log.Error("Version of windows not supported exiting!");
-        MessageBox(NULL, L"This version of Windows is not supported!", L"SickoMenu", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        MessageBox(NULL, L"This version of Windows is not supported!", L"StickoMenu", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
         return false;
     }*/
 
     if (!std::filesystem::exists(gameAssembly)) {
         Log.Error("GameAssembly.dll was not found");
-        MessageBox(NULL, L"Unable to locate GameAssembly.dll", L"SickoMenu", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        MessageBox(NULL, L"Unable to locate GameAssembly.dll", L"StickoMenu", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
         return false;
     }
 
@@ -64,8 +64,8 @@ bool GameVersionCheck() {
     { \
         if (!cctor_finished(c##__TypeInfo->_0.klass)) { \
             if (MessageBox(NULL, \
-                L"SickoMenu does not support Among Us versions past v16.0.5 as of now!\n\nMake sure you downgrade your Among Us instance to v16.0.0 / v16.0.2 and use SickoMenu. If you're wondering about playing with players on the latest version, your game's version will automatically be spoofed so you can play with them!\n\nClick OK to exit the game. Your browser will then open a downgrading guide.", \
-                L"SickoMenu", MB_ICONINFORMATION)) { \
+                L"StickoMenu does not support Among Us versions past v16.0.5 as of now!\n\nMake sure you downgrade your Among Us instance to v16.0.0 / v16.0.2 and use StickoMenu. If you're wondering about playing with players on the latest version, your game's version will automatically be spoofed so you can play with them!\n\nClick OK to exit the game. Your browser will then open a downgrading guide.", \
+                L"StickoMenu", MB_ICONINFORMATION)) { \
                 OpenLink("https://textbin.net/rruqqrlgaw"); \
                 ExitProcess(0); \
             } \
@@ -95,14 +95,14 @@ void Run(LPVOID lpParam) {
     ScopedThreadAttacher managedThreadAttached;
     {
         std::ostringstream ss;
-        ss << "\n\tSickoMenu - " << __DATE__ << " - " << __TIME__ << std::endl; // Log SickoMenu info
+        ss << "\n\tStickoMenu - " << __DATE__ << " - " << __TIME__ << std::endl; // Log StickoMenu info
         /*ss << "\tBuild: " << _CONFIGURATION_NAME << std::endl;
         ss << "\tCommit: " << GetGitCommit() << " - " << GetGitBranch() << std::endl; // Log git info*/
         ss << "\tVersion: " << State.SickoVersion << std::endl;
         ss << "\tAmong Us Version: " << getGameVersion() << std::endl; // Log among us info
         LOG_INFO(ss.str());
 #if _DEBUG
-        SetConsoleTitleA(std::format("Debug Console - SickoMenu {} (Among Us v{})", State.SickoVersion, getGameVersion()).c_str());
+        SetConsoleTitleA(std::format("Debug Console - StickoMenu {} (Among Us v{})", State.SickoVersion, getGameVersion()).c_str());
 #endif
     }
 #if _DEBUG

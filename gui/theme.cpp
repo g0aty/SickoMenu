@@ -112,17 +112,17 @@ void ApplyTheme()
 	}
 
 	style.WindowPadding = ImVec2(6, 4);
-	style.WindowRounding = 8.0f * State.RoundingRadiusMultiplier;
+	style.WindowRounding = 0.0f; // Minimalist flat look
 	style.FramePadding = ImVec2(5, 2);
-	style.FrameRounding = 6.0f * State.RoundingRadiusMultiplier;
+	style.FrameRounding = 0.0f; // Minimalist flat look
 	style.ItemSpacing = ImVec2(7, 1);
 	style.ItemInnerSpacing = ImVec2(1, 1);
 	style.TouchExtraPadding = ImVec2(0, 0);
 	style.IndentSpacing = 6.0f;
 	style.ScrollbarSize = 12.0f;
-	style.ScrollbarRounding = 16.0f * State.RoundingRadiusMultiplier;
+	style.ScrollbarRounding = 0.0f; // Flat scrollbar
 	style.GrabMinSize = 20.0f;
-	style.GrabRounding = 2.0f * State.RoundingRadiusMultiplier;
+	style.GrabRounding = 0.0f; // Flat sliders
 
 	style.WindowTitleAlign.x = 0.50f;
 

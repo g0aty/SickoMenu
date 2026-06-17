@@ -230,8 +230,7 @@ namespace SelfTab {
     }
 
     void Render() {
-        ImGui::SameLine(100 * State.dpiScale);
-        ImGui::BeginChild("###Self", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+        ImGui::BeginChild("###Self", ImVec2(0, 0), true, ImGuiWindowFlags_NoBackground);
         if (TabGroup("Visuals", openVisuals)) {
             CloseOtherGroups(Groups::Visuals);
         }

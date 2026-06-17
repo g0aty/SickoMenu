@@ -41,10 +41,10 @@ namespace Menu {
 	// static std::string searchQuery = (std::string)"";
 
 	std::map<std::string, std::vector<std::string>> categories = {
-		{"Settings", {"Show Keybinds", "Allow Activating Keybinds while Chatting", "Always Show Menu on Startup", "Panic (Disable SickoMenu)",
+		{"Settings", {"Show Keybinds", "Allow Activating Keybinds while Chatting", "Always Show Menu on Startup", "Panic (Disable StickoMenu)",
 					  "Config Name", "Load Config", "Save Config", "Adjust by DPI", "Menu Scale", "Menu Theme Color", "Gradient Theme", "Match Background with Theme",
 					  "RGB Menu Theme", "Reset Menu Theme", "Opacity", "Show Debug Tab", "Username", "Set as Account Name", "Automatically Set Name", "Custom Code",
-					  "Replace Streamer Mode Lobby Code", "RGB Lobby Code", "Unlock Cosmetics", "Safe Mode", "Allow other SickoMenu users to see you're using SickoMenu",
+					  "Replace Streamer Mode Lobby Code", "RGB Lobby Code", "Unlock Cosmetics", "Safe Mode", "Allow other StickoMenu users to see you're using StickoMenu",
 					  "Spoof Guest Account", "Use Custom Guest Friend Code", "Spoof Level", "Spoof Platform", "Disable Host Anticheat (+25 Mode)", "FPS"}},
 		{"Game", {"Player Speed Multiplier", "Kill Distance", "No Ability Cooldown", "Multiply Speed", "Modify Kill Distance", "Random Color", "Set Color", "Snipe Color", "Console",
 				  "Reset Appearance", "Kill Everyone", "Protect Everyone", "Disable Venting", "Spam Report", "Kill All Crewmates", "Kill All Impostors", "Kick Everyone From Vents",
@@ -95,7 +95,7 @@ namespace Menu {
 	}
 
 	void Init() {
-		ImGui::SetNextWindowSize(ImVec2(600, 450) * State.dpiScale, ImGuiCond_None);
+		ImGui::SetNextWindowSize(ImVec2(800, 480) * State.dpiScale, ImGuiCond_None);
 		ImGui::SetNextWindowBgAlpha(State.MenuThemeColor.w);
 	}
 
@@ -144,8 +144,8 @@ namespace Menu {
 		try {
 			if (!init)
 				Menu::Init();
-			std::string modText = std::format("SickoMenu {}", State.SickoVersion);
-			ImGui::Begin("SickoMenu", &State.ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse);
+			std::string modText = std::format("StickoMenu {}", State.SickoVersion);
+			ImGui::Begin("StickoMenu", &State.ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse);
 			static ImVec4 titleCol = State.MenuThemeColor;
 			if (State.RgbMenuTheme)
 				titleCol = State.RgbColor;
@@ -161,89 +161,65 @@ namespace Menu {
 			}*/
 			ImGui::SameLine(ImGui::GetWindowWidth() - 19 * State.dpiScale);
 			if (AnimatedButton("-")) State.ShowMenu = false; //minimize button
-			//ImGui::BeginTabBar("AmongUs#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
-			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
-			// Search field
-			ImGui::SetNextItemWidth(90 * State.dpiScale); // Adjust the width of the input box
-			if (InputStringWithHint("##Search", "Search...", &State.searchQuery)/* && State.AprilFoolsMode*/) {
-				/*if (ToLower(searchQuery) == StrRev("nosduh")) {
-					State.AprilFoolsMode = !State.AprilFoolsMode;
-					if (!State.AprilFoolsMode) State.DiddyPartyMode = false;
+			if (ImGui::BeginTabBar("StickoMenuTabs", ImGuiTabBarFlags_NoTooltip)) {
+				if (ImGui::TabItemButton("About")) CloseAllOtherTabs(Tabs::About);
+				if (ImGui::TabItemButton("Settings")) CloseAllOtherTabs(Tabs::Settings);
+				if (ImGui::TabItemButton("Game")) CloseAllOtherTabs(Tabs::Game);
+				if (ImGui::TabItemButton("Self")) CloseAllOtherTabs(Tabs::Self);
+				if (ImGui::TabItemButton("Radar")) CloseAllOtherTabs(Tabs::Radar);
+				if (ImGui::TabItemButton("Replay")) CloseAllOtherTabs(Tabs::Replay);
+				if (ImGui::TabItemButton("ESP")) CloseAllOtherTabs(Tabs::Esp);
+				
+				if (IsInGame() || IsInLobby()) {
+					if (ImGui::TabItemButton("Players")) CloseAllOtherTabs(Tabs::Players);
 				}
-				if (ToLower(searchQuery) == StrRev("yddid")) {
-					State.DiddyPartyMode = !State.DiddyPartyMode;
-				}*/
-			}
-			if (ImGui::Selectable("About", openAbout)) {
-				CloseAllOtherTabs(Tabs::About);
-			}
-			if (ImGui::Selectable("Settings", openSettings)) {
-				CloseAllOtherTabs(Tabs::Settings);
-			}
-			if (ImGui::Selectable("Game", openGame)) {
-				CloseAllOtherTabs(Tabs::Game);
-			}
-			if (ImGui::Selectable("Self", openSelf)) {
-				CloseAllOtherTabs(Tabs::Self);
-			}
-			if (ImGui::Selectable("Radar", openRadar)) {
-				CloseAllOtherTabs(Tabs::Radar);
-			}
-			if (ImGui::Selectable("Replay", openReplay)) {
-				CloseAllOtherTabs(Tabs::Replay);
-			}
-			if (ImGui::Selectable("ESP", openEsp)) {
-				CloseAllOtherTabs(Tabs::Esp);
-			}
-			if ((IsInGame() || IsInLobby()) && ImGui::Selectable("Players", openPlayers)) {
-				CloseAllOtherTabs(Tabs::Players);
-			}
-			if ((IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) && ImGui::Selectable("Tasks", openTasks)) {
-				CloseAllOtherTabs(Tabs::Tasks);
-			}
-			if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance != NULL && ImGui::Selectable("Sabotage", openSabotage)) {
-				CloseAllOtherTabs(Tabs::Sabotage);
-			}
-			if ((IsInGame() && !State.mapDoors.empty()) && ImGui::Selectable("Doors", openDoors)) {
-				CloseAllOtherTabs(Tabs::Doors);
-			}
-			if (IsHost() && ImGui::Selectable("Host", openHost)) {
-				CloseAllOtherTabs(Tabs::Host);
-			}
+				if (IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) {
+					if (ImGui::TabItemButton("Tasks")) CloseAllOtherTabs(Tabs::Tasks);
+				}
+				if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance != NULL) {
+					if (ImGui::TabItemButton("Sabotage")) CloseAllOtherTabs(Tabs::Sabotage);
+				}
+				if (IsInGame() && !State.mapDoors.empty()) {
+					if (ImGui::TabItemButton("Doors")) CloseAllOtherTabs(Tabs::Doors);
+				}
+				if (IsHost()) {
+					if (ImGui::TabItemButton("Host")) CloseAllOtherTabs(Tabs::Host);
+				}
 #ifdef _DEBUG
-			if (State.showDebugTab && ImGui::Selectable("Debug", openDebug)) {
-				CloseAllOtherTabs(Tabs::Debug);
-			}
+				if (State.showDebugTab) {
+					if (ImGui::TabItemButton("Debug")) CloseAllOtherTabs(Tabs::Debug);
+				}
 #endif
+				ImGui::EndTabBar();
+			}
+			ImGui::Separator();
+
+			ImGui::SetNextItemWidth(150 * State.dpiScale);
+			InputStringWithHint("##Search", "Search StickoMenu...", &State.searchQuery);
+			ImGui::SameLine();
+
 			RenderSearchResults();
+			ImGui::SameLine();
 
 			ImVec4 PanicCol = ImVec4(1.f, 0.f, 0.f, 1.f);
 			ImVec4 GreenCol = ImVec4(0.f, 1.f, 0.f, 1.f);
 			if (!isPanicWarning) {
-				ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 90 * State.dpiScale, ImGui::GetWindowHeight() - 20 * State.dpiScale));
-				if (/*!State.AprilFoolsMode && */ColoredButton(PanicCol, "Disable Menu")) {
+				if (ColoredButton(PanicCol, "Disable Menu")) {
 					isPanicWarning = State.PanicWarning;
 					if (!State.PanicWarning) State.PanicMode = true;
 				}
-				/*if (State.AprilFoolsMode && ColoredButton(DiddyCol,State.DiddyPartyMode ? "Rizz Up Diddy" : 
-						StrRev(std::format("nosduH {}F", IsChatCensored() || IsStreamerMode() ? "***" : "kcu")).c_str())) {
-					isPanicWarning = State.PanicWarning;
-					if (!State.PanicWarning) State.PanicMode = true;
-				}*/
 			}
 			else {
 				bool panicKeybind = State.KeyBinds.Toggle_Sicko != 0x00;
-				ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 90 * State.dpiScale,
-					ImGui::GetWindowHeight() - 65 * State.dpiScale));
 				if (!panicKeybind) {
-					ImGui::TextColored(PanicCol, "No Panic");
-					ImGui::TextColored(PanicCol, "Keybind!");
+					ImGui::TextColored(PanicCol, "No Panic Keybind!");
 				}
 				else {
-					ImGui::TextColored(PanicCol, ("Press " + (std::string)KeyBinds::ToString(State.KeyBinds.Toggle_Sicko)).c_str());
-					ImGui::TextColored(PanicCol, ("to re-enable!"));
+					ImGui::TextColored(PanicCol, ("Press " + (std::string)KeyBinds::ToString(State.KeyBinds.Toggle_Sicko) + " to re-enable!").c_str());
 				}
+				ImGui::SameLine();
 				ImGui::TextColored(PanicCol, "Continue?");
+				ImGui::SameLine();
 				if (ColoredButton(PanicCol, "Yes")) {
 					isPanicWarning = false;
 					State.PanicMode = true;
@@ -253,13 +229,12 @@ namespace Menu {
 					isPanicWarning = false;
 				}
 			}
+			ImGui::Separator();
 
 			if (firstRender) {
 				firstRender = false;
 				CloseAllOtherTabs(Tabs::About); //welcome the user on startup
 			}
-			//ImGui::EndTabBar();
-			ImGui::EndChild();
 
 			//open respective tabs
 			if (openAbout) AboutTab::Render();

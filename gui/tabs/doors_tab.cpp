@@ -12,7 +12,6 @@ using namespace std::string_view_literals;
 namespace DoorsTab {
 	void Render() {
 		if (IsInGame() && !State.mapDoors.empty()) {
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::BeginChild("doors#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 			bool shouldEndListBox = ImGui::ListBoxHeader("###doors#list", ImVec2(200, 150) * State.dpiScale);
 			for (auto systemType : State.mapDoors) {

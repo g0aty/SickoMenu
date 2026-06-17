@@ -621,7 +621,7 @@
     <!--<VCProjectVersion>16.0</VCProjectVersion>-->
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{AA556AC8-55E7-46C4-B59E-A7A781A4710A}</ProjectGuid>
-    <RootNamespace>SickoMenu</RootNamespace>
+    <RootNamespace>StickoMenu</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <!--<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>-->
   </PropertyGroup>

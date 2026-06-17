@@ -6,8 +6,7 @@
 
 namespace ReplayTab {
 	void Render() {
-		ImGui::SameLine(100 * State.dpiScale);
-		ImGui::BeginChild("###Replay", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+		ImGui::BeginChild("###Replay", ImVec2(0, 0), true, ImGuiWindowFlags_NoBackground);
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 		if (ToggleButton("Show Replay", &State.ShowReplay)) {
 			State.Save();

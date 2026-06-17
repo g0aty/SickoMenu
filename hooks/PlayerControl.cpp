@@ -90,7 +90,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                     break;
                 }
                 if (State.rpcCooldown <= 0) {
-                    //SickoMenu users can detect this rpc
+                    //StickoMenu users can detect this rpc
                     MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, rpcCall, (SendOption__Enum)1, -1, NULL);
                     MessageWriter_EndMessage(writer, NULL);
                     State.rpcCooldown = int(0.5 * GetFps());
@@ -165,11 +165,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
             {
                 auto realOutfit = GetPlayerOutfit(playerData);
                 Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
-                std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}> ●</color>",
+                std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}> â—</color>",
                     nameColor.r, nameColor.g, nameColor.b,
                     nameColor.a);
 
-                playerName = "<#0000>● </color>" + playerName + dot;
+                playerName = "<#0000>â— </color>" + playerName + dot;
             }
 
             if (IsInLobby() && State.RevealRoles) {
@@ -235,7 +235,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                         break;
                     }
                 }
-                std::string localPlayerMod = State.modUsers.find((*Game::pLocalPlayer)->fields.PlayerId) == State.modUsers.end() ? "<#ff006c>SickoMenu</color>" : State.modUsers.at((*Game::pLocalPlayer)->fields.PlayerId);
+                std::string localPlayerMod = State.modUsers.find((*Game::pLocalPlayer)->fields.PlayerId) == State.modUsers.end() ? "<#ff006c>StickoMenu</color>" : State.modUsers.at((*Game::pLocalPlayer)->fields.PlayerId);
                 if (State.ModDetection) {
                     switch (State.BroadcastedMod) {
                     case 1:
@@ -412,6 +412,19 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                     State.lobbyRpcQueue.push(new RpcForceSnapTo(player, ScreenToWorld(target)));
             }
             if (!State.PanicMode) {
+                if (State.SpinBot && __this == *Game::pLocalPlayer && (IsInGame() || IsInLobby())) {
+                    static float velo = -4.f;
+                    
+                    static auto get_vel = reinterpret_cast<app::Vector2(*)(app::Rigidbody2D*, MethodInfo*)>(il2cpp_resolve_icall("UnityEngine.Rigidbody2D::get_velocity()"));
+                    static auto set_vel = reinterpret_cast<void(*)(app::Rigidbody2D*, app::Vector2, MethodInfo*)>(il2cpp_resolve_icall("UnityEngine.Rigidbody2D::set_velocity(UnityEngine.Vector2)"));
+
+                    if (get_vel && set_vel && __this->fields.MyPhysics && __this->fields.MyPhysics->fields.body) {
+                        app::Vector2 currentVel = get_vel(__this->fields.MyPhysics->fields.body, NULL);
+                        currentVel.x += velo;
+                        set_vel(__this->fields.MyPhysics->fields.body, currentVel, NULL);
+                    }
+                    velo = -velo;
+                }
                 if (State.RotateEveryone) {
                     static float f = 0.f;
                     static float rotateDelay = 0;
@@ -1497,7 +1510,7 @@ void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader
             }
             case 2:
             {
-                String* newName = convert_to_string(name + " has been kicked by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
+                String* newName = convert_to_string(name + " has been kicked by <#ff006c>StickoMenu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
                 if (IsHost()) {
                     PlayerControl_CmdCheckName(GetPlayerControlById(id), newName, NULL);
                     InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(id)->fields._.OwnerId, false, NULL);
@@ -1506,7 +1519,7 @@ void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader
             }
             case 3:
             {
-                String* newName = convert_to_string(name + " has been banned by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
+                String* newName = convert_to_string(name + " has been banned by <#ff006c>StickoMenu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
                 if (IsHost()) {
                     PlayerControl_CmdCheckName(GetPlayerControlById(id), newName, NULL);
                     InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(id)->fields._.OwnerId, true, NULL);

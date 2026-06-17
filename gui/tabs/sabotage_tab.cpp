@@ -16,8 +16,7 @@ namespace SabotageTab {
 
     void Render() {
         if (IsInGame()) {
-            ImGui::SameLine(100 * State.dpiScale);
-            ImGui::BeginChild("###Sabotage", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+            ImGui::BeginChild("###Sabotage", ImVec2(0, 0), true, ImGuiWindowFlags_NoBackground);
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             if (IsHost() && ToggleButton("Disable Sabotages", &State.DisableSabotages)) {
                 ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);

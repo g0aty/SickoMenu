@@ -98,7 +98,6 @@ namespace PlayersTab {
         g_FrameCounter++;
 
         if ((IsInGame() || IsInLobby())) {
-            ImGui::SameLine(100 * State.dpiScale);
             ImGui::BeginChild("players#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 
             if (!State.selectedPlayer.has_value() || State.selectedPlayer.validate().is_Disconnected()) {
@@ -195,7 +194,7 @@ namespace PlayersTab {
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Purple);
                                 else if (State.modUsers.at(pid) == "<#030303>Unknown</color>")
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
-                                else if (State.modUsers.at(pid) == "<#ff006c>SickoMenu</color>")
+                                else if (State.modUsers.at(pid) == "<#ff006c>StickoMenu</color>")
                                     tempColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
                             }
                         }
@@ -395,7 +394,7 @@ namespace PlayersTab {
                     if (!selectedPlayer.get_PlayerControl()->fields.notRealPlayer && selectedPlayer.get_PlayerData() != NULL) {
                         bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.count(selectedPid);
                         ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
-                        if (isUsingMod) ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPid)).c_str());
+                        if (isUsingMod) ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "StickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPid)).c_str());
 
                         ImGui::Text("Player ID: %d", selectedPid);
 
@@ -790,8 +789,8 @@ namespace PlayersTab {
                         }
                         if (State.DiddyPartyMode && AnimatedButton("Rizz Up Player [Skibidi]")) {
                             std::vector<std::string> rizzLinesList = { "Do you have some Ohio rizz? Because you just turned my brain into pure jelly!",
-                                "If beauty were a Skibidi Toilet, you'd be the one everyone’s trying to get next to!", "Is your name Ohio? Because you’re making my heart do the Skibidi!",
-                                "Is your aura made of coffee? Because you’re brewing up some strong feelings in me!", "I see dat gyatt and I wanna fanum tax some of dat",
+                                "If beauty were a Skibidi Toilet, you'd be the one everyoneÃ¢â‚¬â„¢s trying to get next to!", "Is your name Ohio? Because youÃ¢â‚¬â„¢re making my heart do the Skibidi!",
+                                "Is your aura made of coffee? Because youÃ¢â‚¬â„¢re brewing up some strong feelings in me!", "I see dat gyatt and I wanna fanum tax some of dat",
                                 "Am I Baby Gronk? Because you can be my Livvy Dunne", "Sup shawty, are you skibidi, because I could use that to my sigma", "Hey shawty, are you skibidi rizz in ohio?",
                                 "Yer a rizzard Harry", "Remind me what a work of skibidi rizz looks like" };
                             if (IsInGame()) State.rpcQueue.push(new RpcSendChat(*Game::pLocalPlayer, rizzLinesList[randi(0, (int)rizzLinesList.size() - 1)], selectedPlayer.get_PlayerControl()));

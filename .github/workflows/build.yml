@@ -26,9 +26,9 @@ jobs:
       - name: Package Release Builds
         shell: cmd
         run: |
-          move /y Release\SickoMenu.dll SickoMenu.dll
+          move /y Release\StickoMenu.dll StickoMenu.dll
           move /y Release_Version\version.dll version.dll
-          tar -caf Release_x86_SteamItch.zip SickoMenu.dll version.dll LICENSE
+          tar -caf Release_x86_SteamItch.zip StickoMenu.dll version.dll LICENSE
         
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4.2.0
@@ -53,9 +53,9 @@ jobs:
       - name: Package Release Builds
         shell: cmd
         run: |
-          move /y x64\Release\SickoMenu.dll SickoMenu.dll
+          move /y x64\Release\StickoMenu.dll StickoMenu.dll
           move /y x64\Release_Version\version.dll version.dll
-          tar -caf Release_x64_EpicXboxMS.zip SickoMenu.dll version.dll LICENSE
+          tar -caf Release_x64_EpicXboxMS.zip StickoMenu.dll version.dll LICENSE
         
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4.2.0
@@ -80,9 +80,9 @@ jobs:
       - name: Package Debug Builds
         shell: cmd
         run: |
-          move /y Debug\SickoMenu.dll SickoMenu.dll
+          move /y Debug\StickoMenu.dll StickoMenu.dll
           move /y Debug_Version\version.dll version.dll
-          tar -caf Debug_x86_SteamItch.zip SickoMenu.dll version.dll LICENSE
+          tar -caf Debug_x86_SteamItch.zip StickoMenu.dll version.dll LICENSE
         
       - name: Upload Debug Artifact
         uses: actions/upload-artifact@v4.2.0
@@ -107,9 +107,9 @@ jobs:
       - name: Package Debug Builds
         shell: cmd
         run: |
-          move /y x64\Debug\SickoMenu.dll SickoMenu.dll
+          move /y x64\Debug\StickoMenu.dll StickoMenu.dll
           move /y x64\Debug_Version\version.dll version.dll
-          tar -caf Debug_x64_EpicXboxMS.zip SickoMenu.dll version.dll LICENSE
+          tar -caf Debug_x64_EpicXboxMS.zip StickoMenu.dll version.dll LICENSE
         
       - name: Upload Debug Artifact
         uses: actions/upload-artifact@v4.2.0

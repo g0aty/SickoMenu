@@ -128,7 +128,8 @@ namespace GameTab {
         Anticheat,
         Utils,
         History,
-        Options
+        Options,
+        Miscellaneous
     };
 
     static bool openGeneral = true;
@@ -137,6 +138,7 @@ namespace GameTab {
     static bool openUtils = false;
         static bool openHistory = false;
     static bool openOptions = false;
+    static bool openMiscellaneous = false;
 
     void CloseOtherGroups(Groups group) {
         openGeneral = group == Groups::General;
@@ -145,11 +147,11 @@ namespace GameTab {
         openUtils = group == Groups::Utils;
         openHistory = group == Groups::History;
         openOptions = group == Groups::Options;
+        openMiscellaneous = group == Groups::Miscellaneous;
     }
 
     void Render() {
-        ImGui::SameLine(100 * State.dpiScale);
-        ImGui::BeginChild("###Game", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+        ImGui::BeginChild("###Game", ImVec2(0, 0), true, ImGuiWindowFlags_NoBackground);
         if (TabGroup("General", openGeneral)) {
             CloseOtherGroups(Groups::General);
         }
@@ -168,6 +170,10 @@ namespace GameTab {
         ImGui::SameLine();
         if (TabGroup("History", openHistory)) {
             CloseOtherGroups(Groups::History);
+        }
+        ImGui::SameLine();
+        if (TabGroup("Miscellaneous", openMiscellaneous)) {
+            CloseOtherGroups(Groups::Miscellaneous);
         }
 
         if (GameOptions().HasOptions() && (IsInGame() || IsInLobby())) {
@@ -464,7 +470,7 @@ namespace GameTab {
                         State.Save();
                     }
 
-                    if (CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale)) State.Save();
+                    if (CustomListBoxInt(" Ã‚Â­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale)) State.Save();
                 }
             }
         }
@@ -622,7 +628,7 @@ namespace GameTab {
             ImGui::Text("Detect Actions:");
             if (ToggleButton("AUM/KillNetwork Usage", &State.SMAC_CheckAUM)) State.Save();
             ImGui::SameLine();
-            if (ToggleButton("SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
+            if (ToggleButton("StickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Abnormal Names", &State.SMAC_CheckBadNames)) State.Save();
 
@@ -1497,6 +1503,64 @@ namespace GameTab {
             }
             else CloseOtherGroups(Groups::General);
         }
+
+        if (openMiscellaneous) {
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
+            if (ToggleButton("Spin Bot", &State.SpinBot)) {
+                State.Save();
+            }
+            if (!IsHost()) {
+                static std::string renameAllText = "Hacker";
+                InputString("Name", &renameAllText);
+                static bool isSpammingRpcs = false;
+                static int spamByte1 = 0;
+                static int spamByte2 = 0;
+                
+                if (!isSpammingRpcs) {
+                    if (AnimatedButton("Fuzz Tag 67")) {
+                        if (Game::pAmongUsClient && *Game::pAmongUsClient) {
+                            isSpammingRpcs = true;
+                            spamByte1 = 0;
+                            spamByte2 = 0;
+                        }
+                    }
+                } else {
+                    ImGui::Text("Fuzzing Bytes... %d/255, %d/255", spamByte1, spamByte2);
+                    if (AnimatedButton("Stop Fuzzing")) {
+                        isSpammingRpcs = false;
+                    }
+                    
+                    if (Game::pAmongUsClient && *Game::pAmongUsClient) {
+                        static double lastRpcTime = 0.0;
+                        if (ImGui::GetTime() - lastRpcTime >= 0.1) {
+                            MessageWriter* writer = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+                            if (writer) {
+                                MessageWriter_StartMessage(writer, 67, NULL); // Undocumented Server Tag
+                                MessageWriter_WriteByte(writer, (uint8_t)spamByte1, NULL); // Magic byte 1
+                                MessageWriter_WriteByte(writer, (uint8_t)spamByte2, NULL); // Magic byte 2
+                                MessageWriter_WriteString(writer, convert_to_string(renameAllText), NULL);
+                                MessageWriter_EndMessage(writer, NULL);
+                                
+                                InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                            }
+                            
+                            spamByte2++;
+                            if (spamByte2 > 255) {
+                                spamByte2 = 0;
+                                spamByte1++;
+                                if (spamByte1 > 255) {
+                                    isSpammingRpcs = false;
+                                }
+                            }
+                            lastRpcTime = ImGui::GetTime();
+                        }
+                    } else {
+                        isSpammingRpcs = false;
+                    }
+                }
+            }
+        }
+
         ImGui::EndChild();
     }
 }

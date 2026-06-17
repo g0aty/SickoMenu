@@ -13,7 +13,6 @@
 namespace DebugTab {
 
 	void Render() {
-		ImGui::SameLine(100 * State.dpiScale);
 		ImGui::BeginChild("###Debug", ImVec2(500, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 #ifndef _VERSION
