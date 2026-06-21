@@ -392,6 +392,9 @@ DO_APP_FUNC(void, ModManager_LateUpdate, (ModManager* __this, MethodInfo* method
 DO_APP_FUNC(void, ModManager_ShowModStamp, (ModManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void ModManager::ShowModStamp()");
 DO_APP_FUNC(void, EndGameNavigation_ShowDefaultNavigation, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Void EndGameNavigation::ShowDefaultNavigation()");
 //DO_APP_FUNC(void*, EndGameNavigation_CoJoinGame, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator EndGameNavigation::CoJoinGame()");
+DO_APP_FUNC(void*, AmongUsClient_CoJoinOnlineGameFromCode, (AmongUsClient* __this, int32_t gameId, bool fromEnterCode, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoJoinOnlineGameFromCode(System.Int32, System.Boolean)");
+DO_APP_FUNC(void*, AmongUsClient_CoFindGameInfoFromCodeAndJoin, (AmongUsClient* __this, int32_t gameId, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator AmongUsClient::CoFindGameInfoFromCodeAndJoin(System.Int32)");
+DO_APP_FUNC(void*, MonoBehaviour_StartCoroutine, (MonoBehaviour* __this, void* routine, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Coroutine UnityEngine.MonoBehaviour::StartCoroutine(System.Collections.IEnumerator)");
 DO_APP_FUNC(PlayerBodyTypes__Enum, HideAndSeekManager_GetBodyType, (HideAndSeekManager* __this, PlayerControl* player, MethodInfo* method), "Assembly-CSharp, PlayerBodyTypes HideAndSeekManager::GetBodyType(PlayerControl)");
 DO_APP_FUNC(PlayerBodyTypes__Enum, NormalGameManager_GetBodyType, (NormalGameManager* __this, PlayerControl* player, MethodInfo* method), "Assembly-CSharp, PlayerBodyTypes NormalGameManager::GetBodyType(PlayerControl)");
 DO_APP_FUNC(void, PlayerControl_SetInvisibility, (PlayerControl* __this, bool isActive, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetInvisibility(System.Boolean)");

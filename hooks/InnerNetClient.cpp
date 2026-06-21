@@ -438,16 +438,16 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.Save();
             }
 
-            /*static int joinDelay = 500; //should be 10s
-            if (joinDelay <= 0 && State.AutoJoinLobby) {
-                AmongUsClient_CoJoinOnlineGameFromCode(*Game::pAmongUsClient,
+            static int joinDelay = 0;
+            if (joinDelay > 0) joinDelay--;
+            if (State.AutoJoinLobby && joinDelay <= 0) {
+                void* routine = AmongUsClient_CoFindGameInfoFromCodeAndJoin(*Game::pAmongUsClient,
                     GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
                     NULL);
-                joinDelay = 500; //Should be approximately 10s
+                MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
+                State.AutoJoinLobby = false;
+                joinDelay = 100;
             }
-            else {
-                joinDelay--;
-            }*/
 
             static int reportDelay = 0;
             if (reportDelay <= 0 && State.SpamReport && (IsHost() || !State.SafeMode) && IsInGame()) {
@@ -1352,6 +1352,35 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
         if (!State.PanicMode) {
             Log.Debug("Joined lobby " + convert_from_string(gameIdString));
             State.LastLobbyJoined = convert_from_string(gameIdString);
+
+            std::string code = convert_from_string(InnerNet_GameCode_IntToGameName(
+                __this->fields._.GameId, NULL));
+            if (!code.empty() && code != "LWQQQQ" && code != "QQQQQQ") {
+                std::string existingHost = "";
+                bool found = false;
+                for (auto it = State.LobbyHistory.begin(); it != State.LobbyHistory.end(); ++it) {
+                    if (it->Code == code) {
+                        existingHost = it->HostName;
+                        State.LobbyHistory.erase(it);
+                        found = true;
+                        break;
+                    }
+                }
+
+                auto cacheIt = State.LobbyHostCache.find(code);
+                std::string hostName = (cacheIt != State.LobbyHostCache.end())
+                    ? cacheIt->second
+                    : existingHost;
+
+                decltype(State.LobbyHistory)::value_type lobby;
+                lobby.Code = code;
+                lobby.HostName = hostName;
+                State.LobbyHistory.push_front(lobby);
+                while ((int)State.LobbyHistory.size() > State.LobbyHistoryMaxStored)
+                    State.LobbyHistory.pop_back();
+            }
+            State.LobbyHostCache.clear();
+
             /*if (!State.PanicMode) {
                 State.PanicMode = true;
                 State.TempPanicMode = true;

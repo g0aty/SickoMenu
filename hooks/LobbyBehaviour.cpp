@@ -109,6 +109,16 @@ void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gam
 
 void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dGameContainer_SetupGameInfo executed");
+
+    // Cache code- host mapping for all visible lobbies
+    {
+        auto& gl = __this->fields.gameListing;
+        std::string code = convert_from_string(InnerNet_GameCode_IntToGameName(gl.GameId, NULL));
+        std::string host = convert_from_string(gl.TrueHostName);
+        if (!code.empty() && !host.empty())
+            State.LobbyHostCache[code] = host;
+    }
+
     if (State.PanicMode || !State.ShowLobbyInfo) return GameContainer_SetupGameInfo(__this, method);
     GameContainer_SetupGameInfo(__this, method);
     auto gameListing = __this->fields.gameListing;
