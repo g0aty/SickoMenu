@@ -1071,24 +1071,24 @@ namespace GameTab {
             }
         }
 
-       if (openHistory) {
+        if (openHistory) {
             ImGui::Text("Last 100 players:");
 
             static std::string historySearchBuf = "";
-ImGui::SetNextItemWidth(200);
-InputString("##HistorySearch", &historySearchBuf);
+            ImGui::SetNextItemWidth(200);
+            InputString("##HistorySearch", &historySearchBuf);
             ImGui::SameLine();
             ImGui::TextDisabled("Search");
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Filter by name, friend code, or PUID");
-           
-           static int selectedIndex = -1;
 
-           static std::string lastSearchQuery = "";
-if (historySearchBuf != lastSearchQuery) {
-    lastSearchQuery = historySearchBuf;
-    selectedIndex = -1;
-}
+            static int selectedIndex = -1;
+
+            static std::string lastSearchQuery = "";
+            if (historySearchBuf != lastSearchQuery) {
+                lastSearchQuery = historySearchBuf;
+                selectedIndex = -1;
+            }
 
             std::vector<std::string> decoratedStorage;
             decoratedStorage.reserve(State.PlayerHistory.size());
@@ -1347,7 +1347,7 @@ if (historySearchBuf != lastSearchQuery) {
                 if (changed) State.Save();
             }
 
-            ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+            ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
 
             if (ImGui::CollapsingHeader("Platform Filters"))
             {
@@ -1362,6 +1362,58 @@ if (historySearchBuf != lastSearchQuery) {
                 }
 
                 ImGui::Columns(1);
+            }
+
+            ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+
+            if (ImGui::CollapsingHeader("Lobby History")) {
+                if (State.LobbyHistory.empty()) {
+                    ImGui::TextDisabled("No lobbies visited yet.");
+                }
+                else {
+                    if (SliderIntV2("Lobbies to Show", &State.LobbyHistoryLimit, 1, 50, "%d", ImGuiSliderFlags_NoInput))
+                        State.Save();
+                    int displayCount = (int)State.LobbyHistory.size() < State.LobbyHistoryLimit ? (int)State.LobbyHistory.size() : State.LobbyHistoryLimit;
+                    ImGui::Text("Last %d/%d lobbies:", displayCount, State.LobbyHistoryLimit);
+                    ImGui::Columns(3, "lobbyHistoryCols", false);
+                    ImGui::SetColumnWidth(0, 80 * State.dpiScale);
+                    ImGui::SetColumnWidth(1, 120 * State.dpiScale);
+                    ImGui::SetColumnWidth(2, 160 * State.dpiScale);
+
+                    ImGui::TextDisabled("Code"); ImGui::NextColumn();
+                    ImGui::TextDisabled("Host"); ImGui::NextColumn();
+                    ImGui::NextColumn();
+                    ImGui::Separator();
+
+                    int lobbyCount = 0;
+                    for (auto& lobby : State.LobbyHistory) {
+                        if (lobbyCount >= State.LobbyHistoryLimit) break;
+                        lobbyCount++;
+                        ImGui::Text("%s", lobby.Code.c_str());
+                        ImGui::NextColumn();
+                        ImGui::Text("%s", lobby.HostName.empty() ? "Unknown" : lobby.HostName.c_str());
+                        ImGui::NextColumn();
+                        if (AnimatedButton(("Copy##" + lobby.Code).c_str()))
+                            ImGui::SetClipboardText(lobby.Code.c_str());
+                        ImGui::SameLine();
+                        if (AnimatedButton(("Join##" + lobby.Code).c_str())) {
+                            State.AutoJoinLobbyCode = lobby.Code;
+                            State.AutoJoinLobby = true;
+                        }
+                        ImGui::SameLine();
+                        if (AnimatedButton(("Clear##" + lobby.Code).c_str())) {
+                            State.LobbyHistory.erase(std::remove_if(State.LobbyHistory.begin(), State.LobbyHistory.end(),
+                                [&lobby](const auto& l) { return l.Code == lobby.Code; }), State.LobbyHistory.end());
+                            break;
+                        }
+                        ImGui::NextColumn();
+                    }
+                    ImGui::Columns(1);
+
+                    ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+                    if (AnimatedButton("Clear History##lobby"))
+                        State.LobbyHistory.clear();
+                }
             }
         }
 
