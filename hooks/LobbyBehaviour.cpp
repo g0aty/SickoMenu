@@ -109,6 +109,55 @@ void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gam
 
 void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dGameContainer_SetupGameInfo executed");
+
+    // Cache code->host mapping and populate games list
+    {
+        GameListing gl = __this->fields.gameListing;
+        std::string code = convert_from_string(InnerNet_GameCode_IntToGameName(gl.GameId, NULL));
+        std::string host = convert_from_string(gl.TrueHostName);
+        if (!code.empty()) {
+            if (!host.empty())
+                State.LobbyHostCache[code] = host;
+
+            std::string platform = "Unknown";
+            switch ((int)gl.Platform) {
+            case (int)app::Platforms__Enum::StandaloneEpicPC: platform = "Epic"; break;
+            case (int)app::Platforms__Enum::StandaloneSteamPC: platform = "Steam"; break;
+            case (int)app::Platforms__Enum::StandaloneMac: platform = "Mac"; break;
+            case (int)app::Platforms__Enum::StandaloneWin10: platform = "MS Store"; break;
+            case (int)app::Platforms__Enum::StandaloneItch: platform = "itch.io"; break;
+            case (int)app::Platforms__Enum::IPhone: platform = "iOS"; break;
+            case (int)app::Platforms__Enum::Android: platform = "Android"; break;
+            case (int)app::Platforms__Enum::Switch: platform = "Switch"; break;
+            case (int)app::Platforms__Enum::Xbox: platform = "Xbox"; break;
+            case (int)app::Platforms__Enum::Playstation: platform = "PS"; break;
+            default: platform = "Unknown"; break;
+            }
+
+            bool found = false;
+            for (auto& entry : State.GamesList) {
+                if (entry.Code == code) {
+                    entry.HostName = host;
+                    entry.PlayerCount = (int)gl.PlayerCount;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                Settings::BrowsedLobby entry;
+                entry.Code = code;
+                entry.HostName = host;
+                entry.PlayerCount = (int)gl.PlayerCount;
+                entry.MaxPlayers = gl.MaxPlayers;
+                entry.MapId = gl.MapId;
+                entry.Platform = platform;
+                entry.Impostors = gl.NumImpostors;
+                entry.Age = gl.Age;
+                State.GamesList.push_back(entry);
+            }
+        }
+    }
+
     if (State.PanicMode || !State.ShowLobbyInfo) return GameContainer_SetupGameInfo(__this, method);
     GameContainer_SetupGameInfo(__this, method);
     auto gameListing = __this->fields.gameListing;

@@ -129,6 +129,9 @@ public:
     int CrashChatSpamMode = 1;
     bool AutoJoinLobby = false;
     std::string AutoJoinLobbyCode = "";
+    std::unordered_map<std::string, std::string> LobbyHostCache;
+    int LobbyHistoryLimit = 20;
+    static const int LobbyHistoryMaxStored = 50;
     bool IgnoreRPCs = false;
 
     bool ShowProtections = false;
@@ -731,6 +734,30 @@ public:
     };
 
     std::deque<RememberedPlayer> PlayerHistory;
+
+    struct RememberedLobby {
+        std::string Code;
+        std::string HostName;
+    };
+    std::deque<RememberedLobby> LobbyHistory;
+
+    struct BrowsedLobby {
+        std::string Code;
+        std::string HostName;
+        int PlayerCount;
+        int MaxPlayers;
+        uint8_t MapId;
+        std::string Platform;
+        int Impostors;
+        int Age;
+    };
+    std::vector<BrowsedLobby> GamesList;
+    std::string GamesListSearchBuf = "";
+    int GamesListMapFilter = 0;
+    int GamesListMinPlayers = 1;
+    int GamesListMaxPlayers = 15;
+    bool GamesListHideFull = false;
+
     std::unordered_set<std::string> RemovedPlayers;
     std::map<std::string, bool> platformFilters = {
     {"Epic Games (PC)", true},
