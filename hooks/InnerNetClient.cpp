@@ -103,6 +103,17 @@ static void onGameEnd() {
 void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 {
     if (State.ShowHookLogs) LOG_DEBUG("Hook dInnerNetClient_Update executed");
+
+    if (!State.pinnedDoors.empty()) {
+        auto now = std::chrono::steady_clock::now();
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - State.lastPinnedDoorCloseCheck).count() >= 5000) {
+            State.lastPinnedDoorCloseCheck = now;
+            for (auto pinnedType : State.pinnedDoors) {
+                app::ShipStatus_RpcCloseDoorsOfType(*Game::pShipStatus, pinnedType, NULL);
+            }
+        }
+    }
+
     try {
         if (!State.PanicMode) {
             static bool onStart = true;
