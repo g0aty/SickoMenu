@@ -320,6 +320,8 @@ public:
     SystemTypes__Enum selectedDoor = SystemTypes__Enum::Hallway;
     std::vector<SystemTypes__Enum> mapDoors;
     std::vector<SystemTypes__Enum> pinnedDoors;
+    std::chrono::steady_clock::time_point lastPinnedDoorCloseCheck = std::chrono::steady_clock::now();
+    std::vector<SystemTypes__Enum> pinnedDoors;
     bool CloseAllDoors = false;
 
     bool ShowConsole = false;
