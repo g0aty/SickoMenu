@@ -438,6 +438,13 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.Save();
             }
 
+            // Resolve missing host name when joining through a code / invite using GetHostUsername which is known to work
+            if (!State.LobbyHistory.empty() && State.LobbyHistory.front().HostName.empty() && IsInLobby()) {
+                std::string host = GetHostUsername();
+                if (!host.empty())
+                    State.LobbyHistory.front().HostName = RemoveHtmlTags(host);
+            }
+
             static int joinDelay = 0;
             if (joinDelay > 0) joinDelay--;
             if (State.AutoJoinLobby && joinDelay <= 0) {
