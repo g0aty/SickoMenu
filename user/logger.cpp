@@ -46,27 +46,27 @@ void SickoLogger::Debug(std::string_view source, std::string_view message, bool 
 	Write("DEBUG", source, message, write);
 }
 
-void SickoLogger::Error(std::string_view source, std::string_view message)
+void SickoLogger::Error(std::string_view source, std::string_view message, bool write)
 {
-	Write("ERROR", source, message);
+	Write("ERROR", source, message, write);
 }
 
-void SickoLogger::Info(std::string_view source, std::string_view message)
+void SickoLogger::Info(std::string_view source, std::string_view message, bool write)
 {
-	Write("INFO", source, message);
+	Write("INFO", source, message, write);
 }
 
-void SickoLogger::Debug(std::string_view message)
+void SickoLogger::Debug(std::string_view message, bool write)
 {
-	Debug("SICKO", message);
+	Debug("SICKO", message, write);
 }
 
-void SickoLogger::Error(std::string_view message)
+void SickoLogger::Error(std::string_view message, bool write)
 {
-	Error("SICKO", message);
+	Error("SICKO", message, write);
 }
 
-void SickoLogger::Info(std::string_view message)
+void SickoLogger::Info(std::string_view message, bool write)
 {
-	Info("SICKO", message);
+	Info("SICKO", message, write);
 }

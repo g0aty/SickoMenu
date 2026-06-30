@@ -6,7 +6,7 @@
 
 void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) Log.Debug("Hook dFungleShipStatus_OnEnable executed", false;
+	if (State.ShowHookLogs) Log.Debug("Hook dFungleShipStatus_OnEnable executed", false);
 	FungleShipStatus_OnEnable(__this, method);
 
 	try {
