@@ -7,7 +7,7 @@
 NetworkedPlayerInfo* exiledInfo = NULL;
 
 void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dExileController_ReEnableGameplay executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dExileController_ReEnableGameplay executed", false);
     app::ExileController_ReEnableGameplay(__this, method);
 
     try {// ESP: Reset Kill Cooldown
@@ -31,7 +31,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
 }
 
 void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dExileController_BeginForGameplay executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dExileController_BeginForGameplay executed", false);
     State.VoteOffPlayerId = Game::HasNotVoted;
     ExileController_BeginForGameplay(__this, exiled, voteTie, method);
     exiledInfo = exiled;

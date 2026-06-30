@@ -8,7 +8,7 @@
 #include "game.h"
 
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_CalculateLightRadius executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_CalculateLightRadius executed", false);
     if (IsHost() && State.TaskSpeedrun && State.GameLoaded && State.mapType != Settings::MapType::Airship)
         State.SpeedrunTimer += Time_get_deltaTime(NULL);
     CosmeticsCache_PopulateFromPlayers((CosmeticsCache*)__this->fields._CosmeticsCache_k__BackingField, NULL);
@@ -34,7 +34,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 }
 
 void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_OnEnable executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_OnEnable executed", false);
     try {
         State.BlinkPlayersTab = false;
 
@@ -91,18 +91,18 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
 }
 
 void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, int32_t amount, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_RpcUpdateSystem executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_RpcUpdateSystem executed", false);
 
     ShipStatus_RpcUpdateSystem(__this, systemType, amount, method);
 }
 
 void dShipStatus_RpcCloseDoorsOfType(ShipStatus* __this, SystemTypes__Enum type, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_RpcCloseDoorsOfType executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_RpcCloseDoorsOfType executed", false);
     ShipStatus_RpcCloseDoorsOfType(__this, type, method);
 }
 
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_HandleRpc executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_HandleRpc executed", false);
     if (callId != 27 && callId != 35) return;
     int32_t pos = reader->fields._position, head = reader->fields.readHead;
     auto systemType = (SystemTypes__Enum)MessageReader_ReadByte(reader, NULL);
@@ -167,7 +167,7 @@ bool DetectCheatSabotage(SystemTypes__Enum systemType, PlayerControl* player, ui
 }
 
 void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dShipStatus_UpdateSystem executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_UpdateSystem executed", false);
     LOG_DEBUG(std::format("SystemType {} updated with amount {}", (std::string)TranslateSystemTypes(systemType), amount).c_str());
     if (systemType == SystemTypes__Enum::Ventilation ||
         systemType == SystemTypes__Enum::Security ||

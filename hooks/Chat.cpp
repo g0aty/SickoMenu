@@ -191,7 +191,7 @@ void ChangeChatNotificationBackground(ChatNotification* chatNotif, PlayerControl
 }
 
 void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_AddChat executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dChatController_AddChat executed", false);
 	censor = IsChatCensored(); // Fix chat not being censored
 	if (!State.PanicMode) {
 		auto player = GetPlayerData(sourcePlayer);
@@ -263,7 +263,7 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 }
 
 void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_SetVisible executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dChatController_SetVisible executed", false);
 	if (State.ChatAlwaysActive && !State.PanicMode)
 		ChatController_SetVisible(__this, true, method);
 	else
@@ -274,7 +274,7 @@ void dChatController_SetVisible(ChatController* __this, bool visible, MethodInfo
 }
 
 void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatBubble_SetName executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dChatBubble_SetName executed", false);
 	if (!State.PanicMode && (IsInGame() || IsInLobby())) {
 		for (auto playerData : GetAllPlayerData()) {
 			auto outfit = GetPlayerOutfit(playerData);
@@ -312,7 +312,7 @@ void dChatBubble_SetName(ChatBubble* __this, String* playerName, bool isDead, bo
 }
 
 void dChatController_Update(ChatController* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_Update executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dChatController_Update executed", false);
 	auto freeChatField = __this->fields.freeChatField;
 	int length = freeChatField->fields.textArea->fields.text->fields.m_stringLength;
 
@@ -508,7 +508,7 @@ void dChatController_Update(ChatController* __this, MethodInfo* method) {
 
 bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dTextBoxTMP_IsCharAllowed executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dTextBoxTMP_IsCharAllowed executed", false);
 	if (__this->fields.ForceUppercase) return TextBoxTMP_IsCharAllowed(__this, unicode_char, method);
 	// Patch lobby codes
 
@@ -520,7 +520,7 @@ bool dTextBoxTMP_IsCharAllowed(TextBoxTMP* __this, uint16_t unicode_char, Method
 
 void dTextBoxTMP_SetText(TextBoxTMP* __this, String* input, String* inputCompo, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dTextBoxTMP_SetText executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dTextBoxTMP_SetText executed", false);
 	if (__this->fields.ForceUppercase) {
 		__this->fields.SendOnFullChars = State.PanicMode || !State.BetterLobbyCodeInput;
 		__this->fields.ClearOnFocus = State.PanicMode || !State.BetterLobbyCodeInput;
@@ -578,12 +578,12 @@ std::string UncensorLink(std::string text, std::string dotReplacer = ",") {
 
 void dPlayerControl_RpcSendChat(PlayerControl* __this, String* chatText, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerControl_RpcSendChat executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dPlayerControl_RpcSendChat executed", false);
 	PlayerControl_RpcSendChat(__this, chatText, NULL); // This hook should be useless since dChatController_SendFreeChat sends rpc directly
 }
 
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatBubble_SetText executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dChatBubble_SetText executed", false);
 	if ((!State.PanicMode || State.TempPanicMode)) {
 		// std::string colorOpener = "", colorCloser = "";
 
@@ -721,7 +721,7 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 }
 
 void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dChatController_SendFreeChat executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dChatController_SendFreeChat executed", false);
 	auto chatText = convert_from_string(__this->fields.freeChatField->fields.textArea->fields.text);
 	if (convert_to_string(UncensorLink(chatText, ".­"))->fields.m_stringLength > 120) chatText = UncensorLink(chatText);
 	else chatText = UncensorLink(chatText, ".­");
@@ -1014,7 +1014,7 @@ void dChatNotification_SetUp(ChatNotification* __this, PlayerControl* sender, St
 }
 
 void dFreeChatInputField_UpdateCharCount(FreeChatInputField* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dFreeChatInputField_UpdateCharCount executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dFreeChatInputField_UpdateCharCount executed", false);
 	FreeChatInputField_UpdateCharCount(__this, method);
 	__this->fields.charCountText->fields._.m_enableWordWrapping = false;
 
@@ -1026,7 +1026,7 @@ void dObjectPoolBehavior_InitPool(ObjectPoolBehavior* __this, PoolableBehavior* 
 }
 
 AudioSource* dSoundManager_PlaySound(SoundManager* __this, AudioClip* clip, bool loop, float volume, AudioMixerGroup* audioMixer, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dSoundManager_PlaySound executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dSoundManager_PlaySound executed", false);
 	if (State.BetterMessageSounds && State.MessageSound != NULL && clip == State.MessageSound) volume = 0.f;
 	return SoundManager_PlaySound(__this, clip, loop, volume, audioMixer, method);
 }

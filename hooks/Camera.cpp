@@ -9,7 +9,7 @@ static bool refreshChat = true;
 
 Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dCamera_ScreenToWorldPoint executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dCamera_ScreenToWorldPoint executed", false);
 	try {
 		if (!State.PanicMode && (State.GameLoaded || IsInLobby()))
 		{
@@ -29,7 +29,7 @@ Vector3 dCamera_ScreenToWorldPoint(Camera* __this, Vector3 position, MethodInfo*
 }
 
 void dFollowerCamera_Update(FollowerCamera* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dFollowerCamera_Update executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dFollowerCamera_Update executed", false);
 	try {
 		if (!State.PanicMode) {
 			if (auto playerToFollow = State.playerToFollow.validate(); playerToFollow.has_value())

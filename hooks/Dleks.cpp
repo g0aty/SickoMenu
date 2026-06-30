@@ -15,7 +15,7 @@ bool ShouldDisableHostAnticheat() {
 }
 
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
-    LogIfEnabled("Hook dConstants_1_GetBroadcastVersion executed");
+    LogIfEnabled("Hook dConstants_1_GetBroadcastVersion executed", false);
     if (State.CurrentScene == "" || State.CurrentScene == "SplashIntro" || State.CurrentScene == "MatchMaking" || State.CurrentScene == "Tutorial" ||
         (State.CurrentScene == "MainMenu" && State.ShouldIgnoreBroadcastVersionHook)) {
         // This should not lead to unexpected behavior with unexpected disconnections
@@ -38,12 +38,12 @@ int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
 }
 
 bool dConstants_1_IsVersionModded(MethodInfo* method) {
-    LogIfEnabled("Hook dConstants_1_IsVersionModded executed");
+    LogIfEnabled("Hook dConstants_1_IsVersionModded executed", false);
     return ShouldDisableHostAnticheat() || Constants_1_IsVersionModded(method);
 }
 
 /*AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_1(AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method) {
-    LogIfEnabled("Hook dAssetReference_InstantiateAsync_1 executed");
+    LogIfEnabled("Hook dAssetReference_InstantiateAsync_1 executed", false);
     LOG_DEBUG(std::format("AssetReference_InstantiateAsync executed with scene {}", State.CurrentScene).c_str());
     return AssetReference_InstantiateAsync_1(__this, parent, instantiateInWorldSpace, method);
 }*/
@@ -56,7 +56,7 @@ bool dAprilFoolsMode_ShouldFlipSkeld(MethodInfo* method) {
 }
 
 void dMainMenuManager_LateUpdate(MainMenuManager* __this, MethodInfo* method) {
-    LogIfEnabled("Hook dMainMenuManager_OpenOnlineMenu executed");
+    LogIfEnabled("Hook dMainMenuManager_OpenOnlineMenu executed", false);
     MainMenuManager_LateUpdate(__this, method);
     State.ShouldIgnoreBroadcastVersionHook = GameObject_GetActive(__this->fields.gameModeButtons, NULL);
 }

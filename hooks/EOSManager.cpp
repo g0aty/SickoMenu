@@ -21,7 +21,7 @@ void fakeSuccessfulLogin(EOSManager* eosManager)
 }
 
 void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_StartInitialLoginFlow executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEOSManager_StartInitialLoginFlow executed", false);
 	EOSManager_DeleteDeviceID(__this, NULL, NULL);
 	if (!State.SpoofGuestAccount) {
 		EOSManager_StartInitialLoginFlow(__this, method);
@@ -35,7 +35,7 @@ void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
 
 void dEOSManager_LoginFromAccountTab(EOSManager* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_LoginFromAccountTab executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEOSManager_LoginFromAccountTab executed", false);
 	EOSManager_LoginFromAccountTab(__this, method);
 	if (State.SpoofGuestAccount) {
 		LOG_DEBUG("Faking login");
@@ -45,7 +45,7 @@ void dEOSManager_LoginFromAccountTab(EOSManager* __this, MethodInfo* method)
 
 void dEOSManager_InitializePlatformInterface(EOSManager* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_InitializePlatformInterface executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEOSManager_InitializePlatformInterface executed", false);
 	EOSManager_InitializePlatformInterface(__this, method);
 	//LOG_DEBUG("Skipping device identification");
 	//__this->fields.platformInitialized = true;
@@ -54,7 +54,7 @@ void dEOSManager_InitializePlatformInterface(EOSManager* __this, MethodInfo* met
 bool dEOSManager_IsFreechatAllowed(EOSManager* __this, MethodInfo* method)
 {
 	bool ret = !isGuestAccount || IsInGame() || IsInLobby();
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_IsFreechatAllowed executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEOSManager_IsFreechatAllowed executed", false);
 	return ret;
 }
 
@@ -66,12 +66,12 @@ QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsDa
 
 bool dEOSManager_IsFriendsListAllowed(EOSManager* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_IsFriendsListAllowed executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEOSManager_IsFriendsListAllowed executed", false);
 	return app::EOSManager_IsFriendsListAllowed(__this, method);
 }
 
 void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_UpdatePermissionKeys executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEOSManager_UpdatePermissionKeys executed", false);
 	/*Il2CppClass* klass = get_class("Assembly-CSharp, EOSManager");
 	LOG_ASSERT(klass);
 	FieldInfo* field = il2cpp_class_get_field_from_name(klass, "isKWSMinor");
@@ -83,7 +83,7 @@ void dEOSManager_UpdatePermissionKeys(EOSManager* __this, void* callback, Method
 }
 
 void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_Update executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEOSManager_Update executed", false);
 	static bool hasDeletedDeviceId = false;
 	//__this->fields.ageOfConsent = 0; //why tf does amogus have an age of consent lmao
 	//if (State.SpoofFriendCode) __this->fields.friendCode = convert_to_string(State.FakeFriendCode);
@@ -147,7 +147,7 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 }
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEOSManager_get_ProductUserId executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEOSManager_get_ProductUserId executed", false);
 	auto puid = EOSManager_get_ProductUserId(__this, method);
 	if (State.UseGuestPuid && State.GuestPuid != "")
 		return convert_to_string(State.FakePuid);
@@ -174,7 +174,7 @@ static String* f2() {
 }*/
 
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlatformSpecificData_Serialize executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dPlatformSpecificData_Serialize executed", false);
 	if (State.SpoofPlatform) __this->fields.Platform = Platforms__Enum(State.FakePlatform + 1);
 	if (State.FakePlatform == 8) __this->fields.XboxPlatformId = State.FakeXboxId;
 	if (State.FakePlatform == 9) __this->fields.PsnPlatformId = State.FakePsnId;
@@ -182,7 +182,7 @@ void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter
 }
 
 void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dEditAccountUsername_SaveUsername executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dEditAccountUsername_SaveUsername executed", false);
 	if (State.UseNewFriendCode && State.NewFriendCode != "") {
 		std::string newFriendCode = "";
 		for (auto i : State.NewFriendCode) {

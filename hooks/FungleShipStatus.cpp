@@ -6,7 +6,7 @@
 
 void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dFungleShipStatus_OnEnable executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dFungleShipStatus_OnEnable executed", false;
 	FungleShipStatus_OnEnable(__this, method);
 
 	try {
@@ -43,7 +43,7 @@ void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 }
 
 void dZiplineConsole_Update(ZiplineConsole* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dZiplineConsole_Update executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dZiplineConsole_Update executed", false);
 
 	if (!State.PanicMode && State.NoAbilityCD) __this->fields._CoolDown_k__BackingField = 0.f;
 

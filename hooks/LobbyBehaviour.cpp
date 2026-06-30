@@ -15,7 +15,7 @@ static std::string getHexCodeFromImVec4(ImVec4 vec) {
 
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dLobbyBehaviour_Start executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dLobbyBehaviour_Start executed", false);
     State.LobbyTimer = 600;
     LobbyBehaviour_Start(__this, method);
     if (IsHost()) State.JoinedAsHost = true;
@@ -23,39 +23,39 @@ void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 
 void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
 {
-        static bool hasStarted = true;
-        if (State.ShowHookLogs) LOG_DEBUG("Hook dLobbyBehaviour_Update executed");
-        LobbyBehaviour_Update(__this, method);
-        if (State.DisableLobbyMusic) {
-            hasStarted = false;
-            SoundManager_StopSound(SoundManager__TypeInfo->static_fields->instance, (AudioClip*)__this->fields.MapTheme, NULL);
-        }
-        else if (!hasStarted) {
-            hasStarted = true;
-            LobbyBehaviour_Start(__this, method); //restart lobby music
-        }
-        /*if (GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) {
-            GameOptions().SetByte(app::ByteOptionNames__Enum::MapId, 0);
-            if (GameOptionsManager_get_Instance && GameOptionsManager_get_CurrentGameOptions && GameOptionsManager_set_GameHostOptions
-                && GameManager_get_Instance && GameManager_get_LogicOptions && LogicOptions_SyncOptions) {
-                auto gameOptionsManager = GameOptionsManager_get_Instance(NULL);
-                GameManager* gameManager = GameManager_get_Instance(NULL);
-                if (gameOptionsManager != nullptr) {
-                    auto currentOptions = GameOptionsManager_get_CurrentGameOptions(gameOptionsManager, NULL);
-                    if (currentOptions != nullptr)
-                        GameOptionsManager_set_GameHostOptions(gameOptionsManager, currentOptions, NULL);
-                }
-                if (gameManager != nullptr) {
-                    auto logicOptions = GameManager_get_LogicOptions(gameManager, NULL);
-                    if (logicOptions != nullptr)
-                        LogicOptions_SyncOptions(logicOptions, NULL);
-                }
+    static bool hasStarted = true;
+    if (State.ShowHookLogs) Log.Debug("Hook dLobbyBehaviour_Update executed", false);
+    LobbyBehaviour_Update(__this, method);
+    if (State.DisableLobbyMusic) {
+        hasStarted = false;
+        SoundManager_StopSound(SoundManager__TypeInfo->static_fields->instance, (AudioClip*)__this->fields.MapTheme, NULL);
+    }
+    else if (!hasStarted) {
+        hasStarted = true;
+        LobbyBehaviour_Start(__this, method); //restart lobby music
+    }
+    /*if (GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) {
+        GameOptions().SetByte(app::ByteOptionNames__Enum::MapId, 0);
+        if (GameOptionsManager_get_Instance && GameOptionsManager_get_CurrentGameOptions && GameOptionsManager_set_GameHostOptions
+            && GameManager_get_Instance && GameManager_get_LogicOptions && LogicOptions_SyncOptions) {
+            auto gameOptionsManager = GameOptionsManager_get_Instance(NULL);
+            GameManager* gameManager = GameManager_get_Instance(NULL);
+            if (gameOptionsManager != nullptr) {
+                auto currentOptions = GameOptionsManager_get_CurrentGameOptions(gameOptionsManager, NULL);
+                if (currentOptions != nullptr)
+                    GameOptionsManager_set_GameHostOptions(gameOptionsManager, currentOptions, NULL);
             }
-        }*/
+            if (gameManager != nullptr) {
+                auto logicOptions = GameManager_get_LogicOptions(gameManager, NULL);
+                if (logicOptions != nullptr)
+                    LogicOptions_SyncOptions(logicOptions, NULL);
+            }
+        }
+    }*/
 }
 
 void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMatchMakerGameButton_SetGame executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMatchMakerGameButton_SetGame executed", false);
     /*if (State.PanicMode || !State.ShowLobbyInfo) return MatchMakerGameButton_SetGame(__this, gameListing, method);
     MatchMakerGameButton_SetGame(__this, gameListing, method);
     auto platform = gameListing.Platform;
@@ -108,7 +108,7 @@ void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gam
 }
 
 void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dGameContainer_SetupGameInfo executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dGameContainer_SetupGameInfo executed", false);
 
     // Cache code- host mapping for all visible lobbies
     {
@@ -187,7 +187,7 @@ void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
 }
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dGameStartManager_Update executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dGameStartManager_Update executed", false);
     try {
         if (*Game::pLobbyBehaviour != NULL)
             State.LobbyTimer -= Time_get_deltaTime(NULL);
