@@ -5578,6 +5578,96 @@ namespace app {
     };
 #pragma endregion
 
+#pragma region VitalsPanel
+    struct VitalsPanel__Fields {
+        struct MonoBehaviour__Fields _;
+        struct NetworkedPlayerInfo* _PlayerInfo_k__BackingField;
+        struct PoolablePlayer* PlayerIcon;
+        struct SpriteRenderer* MaskingArea;
+        struct SpriteRenderer* Background;
+        struct VertLineBehaviour* Cardio;
+        struct Sprite* VitalBgDead;
+        struct Sprite* VitalBgDiscon;
+        struct IntRange* BeatRange;
+        bool IsDead;
+        bool IsDiscon;
+        struct TextMeshPro* ColorBlindName;
+    };
+
+    struct VitalsPanel {
+        struct VitalsPanel__Class* klass;
+        MonitorData* monitor;
+        struct VitalsPanel__Fields fields;
+    };
+
+    struct VitalsPanel__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct VitalsPanel__StaticFields {
+    };
+
+    struct VitalsPanel__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct VitalsPanel__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct VitalsPanel__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region VitalsPanel__Array
+    WRAPPER_IL2CPP_ARRAY(VitalsPanel, struct VitalsPanel*);
+#pragma endregion
+
+#pragma region VitalsMinigame
+    struct VitalsMinigame__Fields {
+        struct Minigame__Fields _;
+        struct TextMeshPro* BatteryText;
+        struct VitalsPanel* PanelPrefab;
+        struct TextMeshPro* SabText;
+        float XStart;
+        float YStart;
+        float XOffset;
+        float YOffset;
+        struct VitalsPanel__Array* vitals;
+    };
+
+    struct VitalsMinigame {
+        struct VitalsMinigame__Class* klass;
+        MonitorData* monitor;
+        struct VitalsMinigame__Fields fields;
+    };
+
+    struct VitalsMinigame__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_SkipMultistageOverlayMenuSetup;
+        VirtualInvokeData Begin;
+        VirtualInvokeData Close;
+        VirtualInvokeData CoAnimateOpen;
+        VirtualInvokeData CoDestroySelf;
+    };
+
+    struct VitalsMinigame__StaticFields {
+    };
+
+    struct VitalsMinigame__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct VitalsMinigame__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct VitalsMinigame__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region DoorCardSwipeGame
 
 #if defined(_CPLUSPLUS_)

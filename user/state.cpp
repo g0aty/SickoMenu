@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v4.5.2";
+    this->SickoVersion = "v5.0_pr1";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -266,6 +266,7 @@ void Settings::Load() {
         JSON_TRYGET("FreeCamSpeed", this->FreeCamSpeed);
         JSON_TRYGET("ZoomLevel", this->CameraHeight);
         JSON_TRYGET("UnlockVents", this->UnlockVents);
+        JSON_TRYGET("RolesBypassCommsSabotage", this->RolesBypassCommsSabotage);
         JSON_TRYGET("UnlockKillButton", this->UnlockKillButton);
         JSON_TRYGET("ChatPaste", this->ChatPaste);
         JSON_TRYGET("RevealRoles", this->RevealRoles);
@@ -867,6 +868,7 @@ void Settings::Save() {
                 { "FreeCamSpeed", this->FreeCamSpeed },
                 { "ZoomLevel", this->CameraHeight },
                 { "UnlockVents", this->UnlockVents },
+                { "RolesBypassCommsSabotage", this->RolesBypassCommsSabotage },
                 { "UnlockKillButton", this->UnlockKillButton },
                 { "ChatPaste", this->ChatPaste },
                 { "RevealRoles", this->RevealRoles },

@@ -283,7 +283,10 @@ std::vector<std::string> GetAllConfigs();
 bool CheckConfigExists(std::string configName);
 void UpdatePoints(NetworkedPlayerInfo* playerData, float points);
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason);
+std::string strToLower(std::string str);
+bool IsRandomAUName(const std::string& name);
 bool IsDater(std::string username, int playerCount = 4);
+void SendKillImmuneToggle(bool enabled);
 
 /// <summary>
 /// Simplifies a list of points by ensuring the distance between consecutive points is greater than the squared distance threshold; all other points are discarded.

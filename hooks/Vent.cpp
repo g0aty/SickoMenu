@@ -78,11 +78,3 @@ bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodIn
 	if (State.FlipSkeld && IsHost() && op == VentilationSystem_Operation__Enum::Exit && *Game::pLocalPlayer != NULL)
 		(*Game::pLocalPlayer)->fields.inVent = false; // Fix venting on Dleks
 }*/
-
-void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* method) {
-	if (State.ShowHookLogs) Log.Debug("Hook dPlayerPhysics_RpcExitVent executed", false);
-	PlayerPhysics_RpcExitVent(__this, id, method);
-	/*if (State.FlipSkeld && IsHost() && *Game::pLocalPlayer != NULL && __this->fields.myPlayer != NULL && __this->fields.myPlayer == *Game::pLocalPlayer)
-		(*Game::pLocalPlayer)->fields.inVent = false; // Fix venting on Dleks*/
-	// Not necessary with v16.0.0 :Cool:
-}

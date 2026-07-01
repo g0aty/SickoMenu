@@ -18,9 +18,7 @@
 #endif
 #include "state.hpp"
 #include "gui-helpers.hpp"
-#include <map>
-#include <vector>
-#include <string>
+#include "utility.h"
 
 namespace Menu {
 	static bool openAbout = false;
@@ -162,12 +160,6 @@ namespace Menu {
 	bool firstRender = true;
 	bool isPanicWarning = false;
 
-	std::string ToLower(const std::string& str) {
-		std::string lowerStr = str;
-		std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
-		return lowerStr;
-	}
-
 	static std::string StrRev(std::string str) {
 		std::string new_str = str;
 		std::reverse(new_str.begin(), new_str.end());
@@ -203,15 +195,15 @@ namespace Menu {
 	void RenderSearchResults() {
 		if (State.searchQuery.size() == 0) return;
 
-		std::string lowerQuery = ToLower(State.searchQuery);
+		std::string lowerQuery = strToLower(State.searchQuery);
 
 		// category name -> first matching sub-group found for it
 		std::vector<std::pair<std::string, std::string>> searchResults = {};
 
 		for (const auto& category : categories) {
-			for (const auto& entry : category.second) {
-				if (ToLower(entry.Name).find(lowerQuery) != std::string::npos) {
-					searchResults.push_back({ category.first, entry.SubGroup });
+			for (const auto& setting : category.second) {
+				if (strToLower(setting).find(lowerQuery) != std::string::npos) {
+					searchResults.push_back(category.first);
 					break;
 				}
 			}
@@ -354,8 +346,8 @@ namespace Menu {
 
 			//open respective tabs
 			if (openAbout) AboutTab::Render();
-			else {
-				if (!State.HasOpenedMenuBefore) State.HasOpenedMenuBefore = true;
+			else if (!State.HasOpenedMenuBefore) {
+				State.HasOpenedMenuBefore = true;
 			}
 			if (openSettings) SettingsTab::Render();
 			if (openGame) GameTab::Render();

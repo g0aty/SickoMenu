@@ -583,6 +583,15 @@ namespace SelfTab {
                 State.Save();
             }
 
+            if (ToggleButton("Kill Immunity", &State.KillImmunity)) {
+                SendKillImmuneToggle(State.KillImmunity);
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Make Role Abilities Bypass Comms Sabotages", &State.RolesBypassCommsSabotage)) {
+                State.Save();
+            }
+
             if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) {
                 State.Save();
             }

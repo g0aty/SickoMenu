@@ -77,6 +77,16 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		}
 	}
 	break;
+	case (uint8_t)201:
+	case (uint8_t)202:
+	{
+		uint8_t playerId = player->fields.PlayerId;
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, "<#8f0>SlopMenuCrew</color>" });
+			STREAM_DEBUG("RPC Received for a SlopMenuCrew user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+		}
+	}
+	break;
 	case (uint8_t)103:
 	{
 		uint8_t playerId = player->fields.PlayerId;

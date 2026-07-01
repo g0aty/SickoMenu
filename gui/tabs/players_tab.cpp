@@ -717,14 +717,20 @@ namespace PlayersTab {
                 app::RoleBehaviour* playerRole = localData->fields.Role;
                 app::RoleTypes__Enum role = playerRole != nullptr ? playerRole->fields.Role : app::RoleTypes__Enum::Crewmate;
 
-                if (!State.SafeMode)
+                if ((IsHost() && IsInGame()) || !State.SafeMode)
                 {
                     if (selectedPlayers.size() == 1 && AnimatedButton("Shift"))
                     {
+                        std::queue<RPCInterface*>* queue = nullptr;
                         if (IsInGame())
-                            State.rpcQueue.push(new RpcShapeshift(*Game::pLocalPlayer, State.selectedPlayer, !State.AnimationlessShapeshift));
+                            queue = &State.rpcQueue;
                         else if (IsInLobby())
-                            State.lobbyRpcQueue.push(new RpcShapeshift(*Game::pLocalPlayer, State.selectedPlayer, !State.AnimationlessShapeshift));
+                            queue = &State.lobbyRpcQueue;
+
+                        if (IsHost() && IsInGame())
+                            queue->push(new RpcShapeshiftAsHost(*Game::pLocalPlayer, State.selectedPlayer, !State.AnimationlessShapeshift));
+                        else
+                            queue->push(new RpcShapeshift(*Game::pLocalPlayer, State.selectedPlayer, !State.AnimationlessShapeshift));
                     }
                 }
                 else if (State.RealRole == RoleTypes__Enum::Shapeshifter && role == RoleTypes__Enum::Shapeshifter) {
@@ -1338,33 +1344,44 @@ namespace PlayersTab {
                     }
                 }
 
-                if (!State.SafeMode)
+                if ((IsHost() && IsInGame()) || !State.SafeMode)
                 {
                     if (selectedPlayers.size() == 1 && AnimatedButton("Shift Everyone To"))
                     {
+                        std::queue<RPCInterface*>* queue = nullptr;
+                        if (IsInGame())
+                            queue = &State.rpcQueue;
+                        else if (IsInLobby())
+                            queue = &State.lobbyRpcQueue;
+
                         for (auto player : GetAllPlayerControl()) {
-                            if (player == selectedPlayer.get_PlayerControl()) continue; //skip the player itself
-                            if (IsInGame()) {
-                                State.rpcQueue.push(new RpcShapeshift(player, State.selectedPlayer, !State.AnimationlessShapeshift));
+                            if (IsHost() && IsInGame()) {
+                                queue->push(new RpcShapeshiftAsHost(player, State.selectedPlayer, !State.AnimationlessShapeshift));
                             }
-                            else if (IsInLobby()) {
-                                State.lobbyRpcQueue.push(new RpcShapeshift(player, State.selectedPlayer, !State.AnimationlessShapeshift));
+                            else {
+                                queue->push(new RpcShapeshift(player, State.selectedPlayer, !State.AnimationlessShapeshift));
                             }
                         }
                     }
                     ImGui::SameLine();
                     if (AnimatedButton("Unshift Everyone"))
                     {
+                        std::queue<RPCInterface*>* queue = nullptr;
+                        if (IsInGame())
+                            queue = &State.rpcQueue;
+                        else if (IsInLobby())
+                            queue = &State.lobbyRpcQueue;
+
                         for (auto player : GetAllPlayerControl()) {
-                            if (IsInGame()) {
-                                State.rpcQueue.push(new RpcShapeshift(player, PlayerSelection(player), !State.AnimationlessShapeshift));
+                            if (IsHost() && IsInGame()) {
+                                queue->push(new RpcShapeshiftAsHost(player, PlayerSelection(player), !State.AnimationlessShapeshift));
                             }
-                            else if (IsInLobby()) {
-                                State.lobbyRpcQueue.push(new RpcShapeshift(player, PlayerSelection(player), !State.AnimationlessShapeshift));
+                            else {
+                                queue->push(new RpcShapeshift(player, PlayerSelection(player), !State.AnimationlessShapeshift));
                             }
                         }
                     }
-                    if (selectedPlayers.size() == 1 && selectedPlayer.has_value()) {
+                    if (!State.SafeMode && selectedPlayers.size() == 1 && selectedPlayer.has_value()) {
                         auto roleType = selectedPlayer.get_PlayerData()->fields.RoleType;
                         if (roleType == RoleTypes__Enum::Phantom) {
                             if (AnimatedButton("Force Vanish"))

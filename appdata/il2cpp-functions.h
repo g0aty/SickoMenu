@@ -441,3 +441,5 @@ DO_APP_FUNC(void, MeetingHud_OnDestroy, (MeetingHud* __this, MethodInfo* method)
 DO_APP_FUNC(void, ShipStatus_Awake, (ShipStatus* __this, MethodInfo* method), "Assembly-CSharp, System.Void ShipStatus::Awake()");
 DO_APP_FUNC(SoundManager*, SoundManager_get_Instance, (MethodInfo* method), "Assembly-CSharp, SoundManager SoundManager::get_Instance()");
 DO_APP_FUNC(float, Input_GetAxis, (String* str, MethodInfo* method), "UnityEngine.InputLegacyModule, System.Single UnityEngine.Input::GetAxis(System.String)");
+DO_APP_FUNC(bool, RoleBehaviour_get_CommsSabotaged, (RoleBehaviour* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean RoleBehaviour::get_CommsSabotaged()");
+DO_APP_FUNC(void, VitalsMinigame_Update, (VitalsMinigame* __this, MethodInfo* method), "Assembly-CSharp, System.Void VitalsMinigame::Update()");

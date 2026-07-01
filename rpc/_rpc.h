@@ -248,6 +248,15 @@ public:
 	virtual void Process() override;
 };
 
+class RpcShapeshiftAsHost : public RPCInterface {
+	PlayerControl* Player;
+	PlayerSelection target;
+	bool animate;
+public:
+	RpcShapeshiftAsHost(PlayerControl* Player, const PlayerSelection& target, bool animate);
+	virtual void Process() override;
+};
+
 class RpcVanish : public RPCInterface {
 	PlayerControl* Player;
 	bool appear;

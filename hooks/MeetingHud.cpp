@@ -43,6 +43,8 @@ void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
             State.MatchStart = std::chrono::system_clock::now();
             State.MatchCurrent = State.MatchStart;
         }
+
+        if (!State.PanicMode && State.KillImmunity) SendKillImmuneToggle(true);
     }
     catch (...) {
         LOG_ERROR("Exception occurred in MeetingHud_Close (MeetingHud)");

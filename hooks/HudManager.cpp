@@ -213,13 +213,17 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
     std::string watermarkOffset = State.CurrentScene == "MMOnline" ? "<#0000>00000</color>" : "";
     std::string sickoText = "<#ff006c>SickoMenu</color>";
     std::string goatText = "<#ef0143>g0aty</color>";
+    std::string sickoVersionText = "<#fb0>" + State.SickoVersion + "</color>";
+    if (State.SickoVersion.find("pr") != std::string::npos || State.SickoVersion.find("rc") != std::string::npos) {
+        sickoVersionText = "<#a700ff>" + State.SickoVersion + "</color>";
+    }
     /*if (!State.HideWatermark) {
         sickoText = GetGradientUsername("SickoMenu", ImVec4(1.f, 0.f, 0.424f, 1.f), ImVec4(0.502f, 0.075f, 0.256f, 1.f));
         goatText = GetGradientUsername("g0aty", ImVec4(0.937f, 0.004f, 0.263f, 1.f), ImVec4(0.529f, 0.008f, 0.157f, 1.f));
     }*/
     std::string watermarkText = /*State.AprilFoolsMode ? std::format(" • {} <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by {}", sickoText,
         State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson"), goatText) :*/
-        std::format(" • {} <#fb0>{}</color> by {}", sickoText, State.SickoVersion, goatText);
+        std::format(" • {} <#fb0>{}</color> by {}", sickoText, sickoVersionText, goatText);
     const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}{}{}</color></size></font>",
         watermarkSize, State.DarkMode ? "<#666>" : "<#fff>", State.versionShowerDefaultText, spoofVersionText,
         State.HideWatermark ? "" : watermarkText, disableHostAnticheatText, watermarkOffset);
@@ -232,7 +236,7 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
     bool isFreeplay = ((InnerNetClient*)(*Game::pAmongUsClient))->fields.NetworkMode == NetworkModes__Enum::FreePlay;
     app::PingTracker_Update(__this, method);
     float initialYdist = IsInGame() ? __this->fields.gamePos.y : __this->fields.lobbyPos.y;
-    float camHeight = Camera_get_orthographicSize(State.FollowerCam, NULL);
+    float camHeight = State.FollowerCam == NULL ? 3.f : Camera_get_orthographicSize(State.FollowerCam, NULL);
     if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y = initialYdist + 3 * (camHeight - 1);
     app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
     if (isFreeplay) {
@@ -288,11 +292,18 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
                 (IsHost() ? (sep + "You are Host") : std::format("{}Host: {}", sep, GetHostUsername(true))) : "";
             std::string voteKicksText = (State.ShowVoteKicks && State.VoteKicks > 0) ? std::format("{}Vote Kicks: {}", sep, State.VoteKicks) : "";
             std::string sickoText = "";
+            std::string versionText = "";
             std::string goatText = "";
             if (!State.HideWatermark) {
                 static uint8_t gradientOffset = 0;
                 static int gradientDelay = 0;
                 sickoText = GetGradientUsername("SickoMenu", ImVec4(1.f, 0.f, 0.424f, 1.f), ImVec4(0.502f, 0.075f, 0.256f, 1.f), gradientOffset);
+
+                if (State.SickoVersion.find("pr") != std::string::npos || State.SickoVersion.find("rc") != std::string::npos) {
+                    versionText = GetGradientUsername(State.SickoVersion, ImVec4(0.656f, 0.f, 1.f, 1.f), ImVec4(0.334f, 0.f, 0.624f, 1.f), gradientOffset);
+                }
+                else versionText = "<#fb0>" + State.SickoVersion + "</color>";
+
                 goatText = GetGradientUsername("g0aty", ImVec4(0.937f, 0.004f, 0.263f, 1.f), ImVec4(0.529f, 0.008f, 0.157f, 1.f), gradientOffset);
                 if (gradientDelay <= 0) {
                     gradientOffset++;
@@ -300,12 +311,17 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
                 }
                 else gradientDelay--;
             }
+
+            int overflowTimer = (int)std::ceilf(State.OverflowTimer);
+            std::string overflowText = IsInLobby() && State.Overflow ? std::format("\n<#f00>Overflow Countdown: 00:{}{}</color>",
+                overflowTimer < 10 ? "0" : "", overflowTimer) : "";
+
             std::string watermarkText = /*State.AprilFoolsMode ? std::format("<size={}%>{} <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by {}{}",
                 IsInGame() ? pingSize : 100, sickoText, State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson"), goatText, sep) :*/
-                std::format("<size={}%>{} <#fb0>{}</color> by {}{}", IsInGame() ? pingSize : 100, sickoText, State.SickoVersion, goatText, sep);
+                std::format("<size={}%>{} {} by {}{}", IsInGame() ? pingSize : 100, sickoText, versionText, goatText, sep);
             std::string pingText = (isFreeplay && !State.OldStylePingText ? "<size=150%><#0000>0</color></size>\n" : "") +
-                std::format("{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
-                    State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating);
+                std::format("{}{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
+                    State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating, overflowText);
             app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, State.OldStylePingText ? 
                 app::TextAlignmentOptions__Enum::TopRight : app::TextAlignmentOptions__Enum::Top, nullptr);
             app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);

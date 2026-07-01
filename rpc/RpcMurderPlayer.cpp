@@ -144,6 +144,68 @@ void CmdCheckShapeshift::Process()
     PlayerControl_CmdCheckShapeshift(Player, target.get_PlayerControl().value_or(nullptr), animate, NULL);
 }
 
+RpcShapeshiftAsHost::RpcShapeshiftAsHost(PlayerControl* Player, const PlayerSelection& target, bool animate)
+{
+    this->Player = Player;
+    this->target = target;
+    this->animate = animate;
+}
+
+void RpcShapeshiftAsHost::Process()
+{
+    if (!PlayerSelection(Player).has_value() || !target.has_value() ||
+        !GetPlayerData(Player) || !Game::RoleManager.IsInstanceExists()) return;
+
+    // original code references:
+    // https://github.com/MrDiamond64/Hydra/blob/main/src/Utilities.cs#L192
+    // https://github.com/MrDiamond64/Hydra/blob/main/src/Network.cs#L81
+
+    auto prevRole = GetPlayerData(Player)->fields.Role->fields.Role;
+    uint8_t gameDataTag = 5, rpcFlag = 2;
+    auto targetPc = target.get_PlayerControl().value_or(nullptr);
+
+    auto writer = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+    MessageWriter_StartMessage(writer, gameDataTag, NULL);
+    MessageWriter_WriteInt32(writer, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+
+    if (prevRole != RoleTypes__Enum::Shapeshifter) {
+        // set the player's role temporarily to shapeshifter to get around the vanilla anticheat
+        RoleManager_SetRole(Game::RoleManager.GetInstance(), Player, RoleTypes__Enum::Shapeshifter, NULL);
+        MessageWriter_StartMessage(writer, rpcFlag, NULL);
+        MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
+        MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::SetRole, NULL);
+        MessageWriter_WriteUShort(writer, (uint16_t)RoleTypes__Enum::Shapeshifter, NULL);
+        MessageWriter_WriteBoolean(writer, true, NULL); // the role should be able to be overridden
+        MessageWriter_EndMessage(writer, NULL);
+    }
+
+    // actually shapeshift the player
+    PlayerControl_Shapeshift(Player, targetPc, animate, NULL);
+    MessageWriter_StartMessage(writer, rpcFlag, NULL);
+    MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
+    MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::Shapeshift, NULL);
+    MessageExtensions_WriteNetObject(writer, (InnerNetObject*)targetPc, NULL);
+    MessageWriter_WriteBoolean(writer, animate, NULL);
+    MessageWriter_EndMessage(writer, NULL);
+
+    if (prevRole != RoleTypes__Enum::Shapeshifter) {
+        // set the player's role back to their previous role
+        RoleManager_SetRole(Game::RoleManager.GetInstance(), Player, prevRole, NULL);
+        MessageWriter_StartMessage(writer, rpcFlag, NULL);
+        MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
+        MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::SetRole, NULL);
+        MessageWriter_WriteUShort(writer, (uint16_t)prevRole, NULL);
+        MessageWriter_WriteBoolean(writer, true, NULL); // the role should be able to be overridden
+        MessageWriter_EndMessage(writer, NULL);
+    }
+
+    MessageWriter_EndMessage(writer, NULL);
+    InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+    MessageWriter_Recycle(writer, NULL);
+
+    // PlayerControl_CmdCheckShapeshift(Player, target.get_PlayerControl().value_or(nullptr), animate, NULL);
+}
+
 RpcVanish::RpcVanish(PlayerControl* Player, bool appear)
 {
     this->Player = Player;

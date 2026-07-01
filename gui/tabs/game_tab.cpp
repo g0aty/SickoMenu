@@ -747,10 +747,21 @@ namespace GameTab {
             if (ToggleButton("Ignore Whitelisted Players [Ban/Kick]", &State.Ban_IgnoreWhitelist)) {
                 State.Save();
             }
+
             if (IsInLobby() && ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {
                 State.Save();
             }
+
             if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
+
+            if (!IsInGame() && !IsInLobby()) {
+                if (ToggleButton("Overflow", &State.Overflow)) {
+                    State.Save();
+                }
+
+                if (State.Overflow) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Players who joined a lobby before you are disconnected after 30 seconds"));
+            }
+
             if (State.AprilFoolsMode) {
                 ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? "Diddy Party Mode" : (IsChatCensored() || IsStreamerMode() ? "F***son Mode" : "Fuckson Mode"));
                 if (ToggleButton("Mog Everyone [Sigma]", &State.BrainrotEveryone)) {
@@ -1451,8 +1462,8 @@ namespace GameTab {
                             ImGui::SetClipboardText(lobby.Code.c_str());
                         ImGui::SameLine();
                         if (AnimatedButton(("Join##" + lobby.Code).c_str())) {
-                            State.AutoJoinLobbyCode = lobby.Code;
-                            State.AutoJoinLobby = true;
+                            State.JoinLobbyCode = lobby.Code;
+                            State.JoinLobby = true;
                         }
                         ImGui::SameLine();
                         if (AnimatedButton(("Clear##" + lobby.Code).c_str())) {

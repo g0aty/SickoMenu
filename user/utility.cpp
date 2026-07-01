@@ -1943,12 +1943,10 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     }
 }
 
-static std::string strToLower(std::string str) {
-    std::string new_str = "";
-    for (auto i : str) {
-        new_str += char(std::tolower(i));
-    }
-    return new_str;
+std::string strToLower(std::string str) {
+    std::string lowerStr = str;
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    return lowerStr;
 }
 
 bool IsRandomAUName(const std::string& name)
@@ -2289,6 +2287,23 @@ bool IsDater(std::string username, int playerCount) {
         if (loweredName.find(name) != std::string::npos) return true;
     }
     return false;
+}
+
+void SendKillImmuneToggle(bool enabled) {
+    // original code: https://github.com/MrDiamond64/Hydra/blob/main/src/features/Immortality.cs
+    // if the server thinks we're in a vent, all CheckMurder RPCs fail
+    // this doesn't prevent direct MurderPlayer RPCs though,
+    // which are sent by default as host using SickoMenu
+    // we use a custom vent id that isn't on any map
+    // (67 in this case, 50 is used on Hydra) for this exploit
+
+    if (!IsInGame()) return;
+    if (*Game::pLocalPlayer == NULL || (*Game::pLocalPlayer)->fields.MyPhysics == NULL) return;
+
+    auto ventOp = enabled ? VentilationSystem_Operation__Enum::Enter : VentilationSystem_Operation__Enum::Exit;
+    int32_t customVentId = 67;
+
+    VentilationSystem_Update(ventOp, customVentId, NULL);
 }
 
 //TODO: Workaround

@@ -71,8 +71,7 @@ static void onGameEnd() {
         State.RealRole = RoleTypes__Enum::Crewmate;
         State.mapType = Settings::MapType::Ship;
         State.SpeedrunTimer = 0.f;
-        State.GameModeDurationTimer = 0.f;
-        State.GameModeDurationOver = false;
+        State.ChatFocused = false;
         autoStartedGame = false;
 
         State.VoteOffPlayerId = Game::HasNotVoted;
@@ -387,7 +386,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 if (role == RoleTypes__Enum::Engineer)
                 {
                     app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
-                    float ventTime = options.GetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, 1.0F);;
+                    float ventTime = options.GetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, 1.0F);
+                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) {
+                        ventTime = options.GetFloat(app::FloatOptionNames__Enum::CrewmateTimeInVent, 1.0F);
+                    }
                     if (engineerRole->fields.inVentTimeRemaining > ventTime)
                         engineerRole->fields.inVentTimeRemaining = ventTime;
                 }
@@ -1417,6 +1419,11 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         }
 
         Transform_set_position(cameraTransform, { State.camPos.x, State.camPos.y }, NULL);
+    }
+
+    if (State.OverflowTimer > 0.f) {
+        State.OverflowTimer -= Time_get_deltaTime(NULL);
+        if (State.OverflowTimer < 0.f) State.OverflowTimer = 0.f;
     }
 }
 

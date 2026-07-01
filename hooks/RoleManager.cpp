@@ -208,3 +208,39 @@ void EvenOutImpostorRoleCounts(RoleRates& roleRates) {
 		else break;
 	}
 }
+
+bool dRoleBehaviour_get_CommsSabotaged(RoleBehaviour* __this, MethodInfo* method) {
+	bool ret = RoleBehaviour_get_CommsSabotaged(__this, method);
+
+	if (State.PanicMode) return ret;
+
+	if ((__this->fields.Role == RoleTypes__Enum::Engineer && State.UnlockVents) ||
+		State.RolesBypassCommsSabotage) return false;
+
+	return ret;
+}
+
+void dVitalsMinigame_Update(VitalsMinigame* __this, MethodInfo* method) {
+	VitalsMinigame_Update(__this, method);
+
+	if (State.PanicMode || !State.RolesBypassCommsSabotage) return;
+	
+	auto sabTextGameObject = Component_get_gameObject((Component_1*)(__this->fields.SabText), NULL);
+
+	if (sabTextGameObject == NULL) return;
+
+	// the sabotage text activates during the sabotage, so we deactivate it
+	// as the GameObject activation is done in the function already,
+	// we don't need to check if it's been modified already
+	if (GameObject_GetActive(sabTextGameObject, NULL)) {
+		GameObject_SetActive(sabTextGameObject, false, NULL);
+
+		il2cpp::Array vitalsArr = __this->fields.vitals;
+
+		for (auto vital : vitalsArr) {
+			auto vitalGameObject = Component_get_gameObject((Component_1*)vital, NULL);
+			if (vitalGameObject == NULL) continue;
+			GameObject_SetActive(vitalGameObject, true, NULL);
+		}
+	}
+}

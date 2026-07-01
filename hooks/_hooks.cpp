@@ -262,6 +262,9 @@ void DetourInitilization() {
 	HOOKFUNC(SoundManager_PlaySound);
 	HOOKFUNC(GameStartManager_ReallyBegin);
 	HOOKFUNC(ViperDeadBody_FixedUpdate);
+	HOOKFUNC(PlayerControl_RpcSetNamePlate);
+	HOOKFUNC(RoleBehaviour_get_CommsSabotaged);
+	HOOKFUNC(VitalsMinigame_Update);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -438,6 +441,9 @@ void DetourUninitialization()
 	UNHOOKFUNC(SoundManager_PlaySound);
 	UNHOOKFUNC(GameStartManager_ReallyBegin);
 	UNHOOKFUNC(ViperDeadBody_FixedUpdate);
+	UNHOOKFUNC(PlayerControl_RpcSetNamePlate);
+	UNHOOKFUNC(RoleBehaviour_get_CommsSabotaged);
+	UNHOOKFUNC(VitalsMinigame_Update);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

@@ -177,3 +177,6 @@ void* dPlayerControl_Start(PlayerControl* __this, MethodInfo* method);
 void dMainMenuManager_LateUpdate(MainMenuManager* __this, MethodInfo* method);
 AudioSource* dSoundManager_PlaySound(SoundManager* __this, AudioClip* clip, bool loop, float volume, AudioMixerGroup* audioMixer, MethodInfo* method);
 void dViperDeadBody_FixedUpdate(ViperDeadBody* __this, MethodInfo* method);
+void dPlayerControl_RpcSetNamePlate(PlayerControl* __this, String* namePlateId, MethodInfo* method);
+bool dRoleBehaviour_get_CommsSabotaged(RoleBehaviour* __this, MethodInfo* method);
+void dVitalsMinigame_Update(VitalsMinigame* __this, MethodInfo* method);

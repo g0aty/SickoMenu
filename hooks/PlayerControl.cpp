@@ -854,6 +854,16 @@ void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dPlayerControl_OnGameStart executed", false);
     try {
         State.GameLoaded = true;
+
+        if (State.Overflow && __this == *Game::pLocalPlayer &&
+            convert_from_string(GetPlayerOutfit(GetPlayerData(__this))->fields.NamePlateId) == "missing") {
+            PlayerControl_RpcSetNamePlate(__this, convert_to_string(State.OverflowCachedNamePlate), NULL);
+        }
+
+        if (__this == *Game::pLocalPlayer && !State.PanicMode && State.KillImmunity) {
+            SendKillImmuneToggle(true);
+        }
+
         if (IsHost() && State.BattleRoyale) {
             for (auto p : GetAllPlayerControl()) {
                 if (p != *Game::pLocalPlayer) RoleManager_SetRole(Game::RoleManager.GetInstance(), p, RoleTypes__Enum::Crewmate, NULL);
@@ -879,6 +889,27 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
         // the reason is that the game tries to stop the medbay scan
         if (static_cast<int32_t>(resultFlags) & static_cast<int32_t>(MurderResultFlags__Enum::FailedError)) {
             app::PlayerControl_MurderPlayer(__this, target, resultFlags, method);
+
+            if (!State.PanicMode && State.KillImmunity && target == *Game::pLocalPlayer) {
+                std::string killNotif = std::format("<#f00>{} tried to kill you, but failed!</color>",
+                    convert_from_string(GetPlayerOutfit(GetPlayerData(__this))->fields.PlayerName));
+
+                auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
+                if (notifier) {
+                    Sprite spriteBackup = *notifier->fields.playerDisconnectSprite;
+                    Color colorBackup = notifier->fields.disconnectColor;
+
+                    notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+                    notifier->fields.disconnectColor = Color(1.f, 0.f, 0.f, 1.f);
+
+                    NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(killNotif), nullptr);
+
+                    notifier->fields.playerDisconnectSprite = &spriteBackup;
+                    notifier->fields.disconnectColor = colorBackup;
+                }
+
+                PlayerControl_ShowFailedMurder(*Game::pLocalPlayer, NULL);
+            }
             return;
         }
 
@@ -1739,4 +1770,16 @@ void dViperDeadBody_FixedUpdate(ViperDeadBody* __this, MethodInfo* method) {
         if (it != State.validDeadBodyIds.end())
             State.validDeadBodyIds.erase(it);
     }
+}
+
+void dPlayerControl_RpcSetNamePlate(PlayerControl* __this, String* namePlateId, MethodInfo* method) {
+    // if a nameplate isn't set by us, previously joined clients think that our data hasn't fully loaded in
+    // reference: PlayerControl.Start
+    // this leads to the 30 second timeout triggering, kicking all previously joined players for a "network error"
+    if (!State.PanicMode && State.Overflow) {
+        State.OverflowTimer = 30.f;
+        State.OverflowCachedNamePlate = convert_from_string(namePlateId);
+        return;
+    }
+    PlayerControl_RpcSetNamePlate(__this, namePlateId, method);
 }

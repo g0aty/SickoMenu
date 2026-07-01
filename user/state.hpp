@@ -102,6 +102,8 @@ public:
     float PrevCycleTimer = 0.5f;
     float CycleDuration = CycleTimer * 50;
     bool UnlockVents = false;
+    bool RolesBypassCommsSabotage = false;
+    bool KillImmunity = false;
     bool UnlockKillButton = false;
     bool ShowGhosts = false;
     bool ShowPhantoms = false;
@@ -113,6 +115,7 @@ public:
     bool PauseVentBlockingWhileVenting = false;
     bool SpamReport = false;
     bool CrashSpamReport = false;
+    bool Overflow = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
     bool DisableAllVotekicks = false;
@@ -134,6 +137,8 @@ public:
     int CrashChatSpamMode = 1;
     bool AutoJoinLobby = false;
     std::string AutoJoinLobbyCode = "";
+    bool JoinLobby = false;
+    std::string JoinLobbyCode = "";
     std::unordered_map<std::string, std::string> LobbyHostCache;
     int LobbyHistoryLimit = 20;
     static const int LobbyHistoryMaxStored = 50;
@@ -632,6 +637,8 @@ public:
     };
 
     bool CanChangeOutfit = false;
+    float OverflowTimer = 0.f;
+    std::string OverflowCachedNamePlate = "";
     bool MainMenuLoaded = false;
     bool EndLoginFlowFlag = false;
     QuickChatModes__Enum CurrentChatMode = QuickChatModes__Enum::FreeChatOrQuickChat;
