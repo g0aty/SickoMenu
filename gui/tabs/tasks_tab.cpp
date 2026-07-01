@@ -8,8 +8,7 @@
 namespace TasksTab {
 	void Render() {
 		if (IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) {
-			ImGui::SameLine(100 * State.dpiScale);
-			ImGui::BeginChild("###Tasks", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+			ImGui::BeginChild("###Tasks", ImVec2(0, 0), true, ImGuiWindowFlags_NoBackground);
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 			//if (!PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))) {
 			auto tasks = GetNormalPlayerTasks(*Game::pLocalPlayer);

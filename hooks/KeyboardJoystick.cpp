@@ -1,6 +1,7 @@
 #include "pch-il2cpp.h"
 #include "_hooks.h"
 #include "state.hpp"
+#include "game.h"
 
 void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dKeyboardJoystick_Update executed", false);
@@ -23,5 +24,4 @@ void dScreenJoystick_FixedUpdate(ScreenJoystick* __this, MethodInfo* method)
         app::ScreenJoystick_FixedUpdate(__this, method);
         countdown--;
     }
-    
 }

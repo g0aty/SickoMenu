@@ -467,14 +467,28 @@ RpcSpawnDummy::RpcSpawnDummy(uint8_t colorId, std::string_view name) {
 
 void RpcSpawnDummy::Process()
 {
-    return; // Disable temporarily
     PlayerControl* dummyPc = (PlayerControl*)Object_1_Instantiate((Object*)(*Game::pAmongUsClient)->fields.PlayerPrefab, NULL);
     if (dummyPc != NULL) {
         try {
+            uint8_t newPlayerId = 0;
+            while (GetPlayerDataById(newPlayerId) != NULL && newPlayerId < 15) {
+                newPlayerId++;
+            }
+            dummyPc->fields.PlayerId = newPlayerId;
+
             GameData_AddDummy(*Game::pGameData, dummyPc, NULL);
-            InnerNetClient_Spawn((InnerNetClient*)(*Game::pAmongUsClient), (InnerNetObject*)dummyPc, -2, SpawnFlags__Enum::None, NULL);
-            if (colorId != -1) PlayerControl_RpcSetColor(dummyPc, colorId, NULL);
-            if (name != "") PlayerControl_RpcSetName(dummyPc, convert_to_string(name), NULL);
+            InnerNetClient_Spawn((InnerNetClient*)(*Game::pAmongUsClient), (InnerNetObject*)dummyPc, -2, (SpawnFlags__Enum)1, NULL);
+            if (colorId != 255) PlayerControl_RpcSetColor(dummyPc, colorId, NULL);
+            if (name != "") {
+                PlayerControl_RpcSetName(dummyPc, convert_to_string(name), NULL);
+            }
+            
+            PlayerControl_RpcSetHat(dummyPc, convert_to_string(""), NULL);
+            PlayerControl_RpcSetSkin(dummyPc, convert_to_string(""), NULL);
+            PlayerControl_RpcSetPet(dummyPc, convert_to_string(""), NULL);
+            PlayerControl_RpcSetVisor(dummyPc, convert_to_string(""), NULL);
+            PlayerControl_RpcSetNamePlate(dummyPc, convert_to_string(""), NULL);
+            PlayerControl_RpcSetLevel(dummyPc, 0, NULL);
         }
         catch (...) {
             LOG_DEBUG("Something wrong happened when spawning dummy");

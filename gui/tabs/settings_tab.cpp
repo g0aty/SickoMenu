@@ -34,8 +34,7 @@ namespace SettingsTab {
 	}
 
 	void Render() {
-		ImGui::SameLine(100 * State.dpiScale);
-		ImGui::BeginChild("###Settings", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+		ImGui::BeginChild("###Settings", ImVec2(0, 0), true, ImGuiWindowFlags_NoBackground);
 		if (TabGroup("General", openGeneral)) {
 			CloseOtherGroups(Groups::General);
 		}
@@ -565,115 +564,96 @@ namespace SettingsTab {
 			State.KeybindsBeingEdited = false; // This should not stay on permanently
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Menu));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Menu");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Console));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Console");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Radar));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Radar");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Replay));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Replay");
 
 			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_ChatAlwaysActive));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Show/Hide Chat");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_ReadGhostMessages));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Read Ghost Messages");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Sicko));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Panic Mode");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Hud));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Enable/Disable HUD");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Freecam));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Freecam");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Zoom));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Zoom");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Noclip));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("NoClip");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Autokill));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Autokill");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Reset_Appearance));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Reset Appearance");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Randomize_Appearance));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Confuse Now");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Repair_Sabotage));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Repair All Sabotages");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Close_All_Doors));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Close All Doors");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Close_Current_Room_Door));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Close Current Room Door");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Complete_Tasks));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Complete All Tasks");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Cancel_Start));
-			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Cancel Start Game");
 		}
 		ImGui::EndChild();

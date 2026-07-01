@@ -209,17 +209,17 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
             break;
         }
     }
-    std::string disableHostAnticheatText = State.CurrentScene == "FindAGame" && State.DisableHostAnticheat ? " • <#f00>+25 Mode is ON</color>" : "";
+    std::string disableHostAnticheatText = State.CurrentScene == "FindAGame" && State.DisableHostAnticheat ? " â€¢ <#f00>+25 Mode is ON</color>" : "";
     std::string watermarkOffset = State.CurrentScene == "MMOnline" ? "<#0000>00000</color>" : "";
-    std::string sickoText = "<#ff006c>SickoMenu</color>";
-    std::string goatText = "<#ef0143>g0aty</color>";
+    std::string sickoText = "<#ff006c>StickoMenu</color>";
+    std::string goatText = "<#ef0143>h4unt</color>";
     /*if (!State.HideWatermark) {
-        sickoText = GetGradientUsername("SickoMenu", ImVec4(1.f, 0.f, 0.424f, 1.f), ImVec4(0.502f, 0.075f, 0.256f, 1.f));
-        goatText = GetGradientUsername("g0aty", ImVec4(0.937f, 0.004f, 0.263f, 1.f), ImVec4(0.529f, 0.008f, 0.157f, 1.f));
+        sickoText = GetGradientUsername("StickoMenu", ImVec4(1.f, 0.f, 0.424f, 1.f), ImVec4(0.502f, 0.075f, 0.256f, 1.f));
+        goatText = GetGradientUsername("h4unt", ImVec4(0.937f, 0.004f, 0.263f, 1.f), ImVec4(0.529f, 0.008f, 0.157f, 1.f));
     }*/
-    std::string watermarkText = /*State.AprilFoolsMode ? std::format(" • {} <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by {}", sickoText,
+    std::string watermarkText = /*State.AprilFoolsMode ? std::format(" â€¢ {} <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by {}", sickoText,
         State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson"), goatText) :*/
-        std::format(" • {} <#fb0>{}</color> by {}", sickoText, State.SickoVersion, goatText);
+        std::format(" â€¢ {} <#fb0>{}</color> by {}", sickoText, State.SickoVersion, goatText);
     const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}{}{}</color></size></font>",
         watermarkSize, State.DarkMode ? "<#666>" : "<#fff>", State.versionShowerDefaultText, spoofVersionText,
         State.HideWatermark ? "" : watermarkText, disableHostAnticheatText, watermarkOffset);
@@ -251,7 +251,7 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
                 if (!State.PanicMode && State.EnableZoom) oldDistFromEdge.y = initialYdist + 3 * (camHeight - 1);
                 __this->fields.aspectPosition->fields.DistanceFromEdge = oldDistFromEdge;
             }
-            std::string sep = State.OldStylePingText ? "\n" : " • ";
+            std::string sep = State.OldStylePingText ? "\n" : " â€¢ ";
             std::string ping = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
             static int fps = GetFps();
             static int fpsDelay = 0;
@@ -292,8 +292,8 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
             if (!State.HideWatermark) {
                 static uint8_t gradientOffset = 0;
                 static int gradientDelay = 0;
-                sickoText = GetGradientUsername("SickoMenu", ImVec4(1.f, 0.f, 0.424f, 1.f), ImVec4(0.502f, 0.075f, 0.256f, 1.f), gradientOffset);
-                goatText = GetGradientUsername("g0aty", ImVec4(0.937f, 0.004f, 0.263f, 1.f), ImVec4(0.529f, 0.008f, 0.157f, 1.f), gradientOffset);
+                sickoText = GetGradientUsername("StickoMenu", ImVec4(1.f, 0.f, 0.424f, 1.f), ImVec4(0.502f, 0.075f, 0.256f, 1.f), gradientOffset);
+                goatText = GetGradientUsername("h4unt", ImVec4(0.937f, 0.004f, 0.263f, 1.f), ImVec4(0.529f, 0.008f, 0.157f, 1.f), gradientOffset);
                 if (gradientDelay <= 0) {
                     gradientOffset++;
                     gradientDelay = (int)(0.1 * fps);

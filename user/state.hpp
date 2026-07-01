@@ -34,7 +34,7 @@ public:
         0x00, //reset appearance
         0x00, //save appearance
         0x00, //complete tasks
-        VK_PAUSE, //toggle SickoMenu
+        VK_PAUSE, //toggle StickoMenu
         0x00 //cancel start
     };
 
@@ -237,6 +237,7 @@ public:
 
     bool MoveInVentAndShapeshift = false;
     bool AlwaysMove = false;
+    bool SpinBot = false;
     bool AnimationlessShapeshift = false;
     bool DisableKillAnimation = false;
     bool KillImpostors = false;

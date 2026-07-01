@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v4.5.2";
+    this->SickoVersion = "v0.0.0.0.69";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -244,6 +244,7 @@ void Settings::Load() {
         JSON_TRYGET("AutoOpenDoors", this->AutoOpenDoors);
         JSON_TRYGET("MoveInVentAndShapeshift", this->MoveInVentAndShapeshift);
         JSON_TRYGET("AlwaysMove", this->AlwaysMove);
+        JSON_TRYGET("SpinBot", this->SpinBot);
         JSON_TRYGET("AnimationlessShapeshift", this->AnimationlessShapeshift);
         JSON_TRYGET("DisableKillAnimation", this->DisableKillAnimation);
         JSON_TRYGET("KillImpostors", this->KillImpostors);
@@ -756,6 +757,7 @@ void Settings::Save() {
                 { "AutoOpenDoors", this->AutoOpenDoors },
                 { "MoveInVentAndShapeshift", this->MoveInVentAndShapeshift },
                 { "AlwaysMove", this->AlwaysMove },
+                { "SpinBot", this->SpinBot },
                 { "AnimationlessShapeshift", this->AnimationlessShapeshift },
                 { "DisableKillAnimation", this->DisableKillAnimation },
                 { "KillImpostors", this->KillImpostors },

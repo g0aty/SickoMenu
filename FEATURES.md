@@ -1,11 +1,11 @@
-# Features of SickoMenu
+# Features of StickoMenu
 > [!NOTE]
 > Pro Tip: Use `Ctrl + F` to search for specific features!
-## 📕 About
+## ðŸ“• About
 <img width="400" height="300" alt="Screenshot 2025-09-12 160917" src="https://github.com/user-attachments/assets/cb5de8fd-2a2e-4125-b1f6-04f54f08cbed" /> <img width="400" height="300" alt="Screenshot 2025-09-12 160925" src="https://github.com/user-attachments/assets/7177f02b-5f40-4a65-bc30-f237e875e646" />
 
 
-## ⚙️ Settings
+## âš™ï¸ Settings
 ### General
 <img width="400" height="300" alt="Screenshot 2025-09-12 160933" src="https://github.com/user-attachments/assets/de4445f1-6fc0-4b5c-8b6c-0878cf147150" />
 
@@ -28,7 +28,7 @@
 - **Unlock All Achievements** Unlocks all Achievements
 - **Unlock Cosmetics** Unlocks every cosmetic (hats, visors, etc.) (Default: OFF)
 - **Safe Mode** Disables certain features whenever there is an anticheat (Default: ON)
-- **Allow other SickoMenu users to see you're using SickoMenu** Allows SickoMenu users to see other SickoMenu users
+- **Allow other StickoMenu users to see you're using StickoMenu** Allows StickoMenu users to see other StickoMenu users
 ### Spoofing
 <img width="400" height="300" alt="Screenshot 2025-09-12 160940" src="https://github.com/user-attachments/assets/db97a985-1527-45f1-ae33-c37551ce974f" />
 
@@ -62,7 +62,7 @@
 - **Show/Hide Console** (Default: HOME)
 - **Show/Hide Radar** (Default: Insert)
 - **Show/Hide Replay** (Default: End)
-- **Panic (Disable SickoMenu)** (Default: PAUSE BREAK)
+- **Panic (Disable StickoMenu)** (Default: PAUSE BREAK)
 - **Enable/Disable HUD** (Default: None)
 - **Enable/Disable HUD** (Default: None)
 - **Freecam** (Default: None)
@@ -75,7 +75,7 @@
 - **Close Current Room Door** (Default: None)
 - **Complete All Tasks** (Default: None)
 
-## 🎮 Game
+## ðŸŽ® Game
 ### General
 <img width="400" height="300" alt="Screenshot 2025-09-12 161000" src="https://github.com/user-attachments/assets/c15b2af8-8d0d-4a65-89fb-ccbd0806919a" />
 
@@ -85,7 +85,7 @@
 - **Set Color** Sets your color to the specified color if it's available or you're host/not in safe mode
 - **Snipe Color** Snipes your color whenever it's available (Default: OFF)
 - **Send Chat** Sends a chat message to the game chat
-- **Send to AUM** Sends an AUM chat message that can be seen with AmongUsMenu or SickoMenu
+- **Send to AUM** Sends an AUM chat message that can be seen with AmongUsMenu or StickoMenu
 - **Spam** Spams chat with your desired message
 - **Spell Check** Highlights misspelled words
 - **Spam by Everyone** *(Only with Safe Mode disabled)* Spams the chat as all players with your desired message (Default: OFF)
@@ -112,7 +112,7 @@ View the game options!
 ### History
 View and copy the info of the last 100 players you have encountered!
 
-## 🤵 Self
+## ðŸ¤µ Self
 ### Visuals
 <img width="400" height="300" alt="Screenshot 2025-09-12 161033" src="https://github.com/user-attachments/assets/6d8ad959-f1e9-4a04-8262-2ab1e0fb7415" />
 
@@ -189,7 +189,7 @@ View and copy the info of the last 100 players you have encountered!
 
 Edit your own texts with features like colors , size and more! This allows you to set your name or bigger projects
 
-## 🗺️ Radar
+## ðŸ—ºï¸ Radar
 <img width="400" height="300" alt="Screenshot 2025-09-12 161150" src="https://github.com/user-attachments/assets/3bbd0e24-65cf-4460-8210-fa4ff646dcb1" />
 
 - **Show Radar** Shows a radar of the current map with players (Default: OFF)
@@ -203,7 +203,7 @@ Edit your own texts with features like colors , size and more! This allows you t
 - **Radar Color** Changes the radar's color
 - **Extra Width/Height** Extends the radar to whatever width and height you choose
 
-## ▶️ Replay
+## â–¶ï¸ Replay
 <img width="400" height="300" alt="Screenshot 2025-09-12 161157" src="https://github.com/user-attachments/assets/5053389e-2ad3-46c1-b2e4-6681b4c4623d" />
 
 - **Show Replay** Shows a replay of all game events (Default: OFF)
@@ -211,7 +211,7 @@ Edit your own texts with features like colors , size and more! This allows you t
 - **Clear after Meeting** Clears the replay after meeting (Default: OFF)
 - **Replay Map Color** Changes the replay map's color
 
-## 🩻 ESP
+## ðŸ©» ESP
 <img width="400" height="300" alt="Screenshot 2025-09-12 161203" src="https://github.com/user-attachments/assets/1d39098b-afe6-427c-ab67-fa708fdd13ac" />
 
 - **Enable** Enables ESP (Default: OFF)
@@ -221,7 +221,7 @@ Edit your own texts with features like colors , size and more! This allows you t
 - **Show Tracers** Shows tracers from yourself to players (Default: ON)
 - **Role-based** Instead of player colors, use role colors for ESP and toggle roles you want to see (Default: OFF)
 
-## 🤹 Players:
+## ðŸ¤¹ Players:
 <img width="400" height="300" alt="Screenshot 2025-09-12 161227" src="https://github.com/user-attachments/assets/7783108c-9bd8-470a-aec7-845695afbd03" />
 
 A dedicated player menu for viewing and manipulating players
@@ -278,7 +278,7 @@ A dedicated player menu for viewing and manipulating players
 - **Fake AUM Chat** Makes AUM users falsely receive an AUM chat message from the selected player
 - **Chat As** *(Only with Safe Mode disabled)* Spoofs your chat messages from the selected player
 
-## ✅ Tasks
+## âœ… Tasks
 <img width="400" height="300" alt="Screenshot 2025-09-12 161253" src="https://github.com/user-attachments/assets/f4f6f3d4-848c-4d35-8ce0-1fd4efeb6111" />
 
 - **Complete All Tasks** Completes your tasks
@@ -287,9 +287,9 @@ A dedicated player menu for viewing and manipulating players
 - **Play Animations** Plays the map-specific animations specified
 - **Play Medbay Scan Animation** Plays a medbay scan animation on yourself
 - **Fake Cameras in Use** Fakes the cameras being used when there's no one using them
-- **Bypass Visual Tasks Being Off** Others can still see your task visuals regardless of the game’s visual task settings.
+- **Bypass Visual Tasks Being Off** Others can still see your task visuals regardless of the gameâ€™s visual task settings.
 
-## 🚨 Sabotage
+## ðŸš¨ Sabotage
 <img width="400" height="300" alt="Screenshot 2025-09-12 161300" src="https://github.com/user-attachments/assets/ec857216-c61b-430a-836a-830e76f4f0ba" />
 
 - **Disable Sabotages** *(Only as Host)* Prevents players from sabotaging stuff
@@ -302,7 +302,7 @@ A dedicated player menu for viewing and manipulating players
 - **Disable Lights and auto-move switches** Automatically moves lights switches so it's harder for players to fix
 - **Infinite mushroom mixup** Activates mushroom mixup forever
 
-## 🚪 Doors
+## ðŸšª Doors
 <img width="400" height="300" alt="Screenshot 2025-09-12 161307" src="https://github.com/user-attachments/assets/4a19c64e-086c-4039-812a-b31b322228ea" />
 
 - *All doors can be closed, pinned, or unpinned*
@@ -311,7 +311,7 @@ A dedicated player menu for viewing and manipulating players
 - **Unpin All Doors** All doors will be unpinned
 - **Auto Open Doors** Automatically opens doors for you without going through a minigame
 
-## 🫅 Host
+## ðŸ«… Host
 <img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/29761a1b-b017-449d-8bbe-989ca3868094" />
 
 - **Choose Roles** Select everyone's roles!
@@ -333,7 +333,7 @@ A dedicated player menu for viewing and manipulating players
 - **Spam Moving Platform** Spam uses the platform on the Airship
 - **Show Lobby Timer** See when the server will close the lobby due to inactivity (Default: OFF)
 
-## 🧑‍💻 Debug
+## ðŸ§‘â€ðŸ’» Debug
 <img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/094a1abd-5a71-4e29-8f9c-452a10dd895e" />
 
 - **Enable Occlusion Culling** Allows culling of objects not in your field of view (Default: OFF)

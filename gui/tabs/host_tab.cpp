@@ -4,6 +4,7 @@
 #include "game.h"
 #include "state.hpp"
 #include "gui-helpers.hpp"
+#include "_rpc.h"
 
 bool editingAutoStartPlayerCount = false;
 
@@ -59,8 +60,7 @@ namespace HostTab {
 
     void Render() {
         if (IsHost()) {
-            ImGui::SameLine(100 * State.dpiScale);
-            ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+            ImGui::BeginChild("###Host", ImVec2(0, 0), true, ImGuiWindowFlags_NoBackground);
             if (TabGroup("Utils", openUtils)) {
                 CloseOtherGroups(Groups::Utils);
             }
@@ -277,6 +277,10 @@ namespace HostTab {
                     State.CancelingStartGame = true;
                 }
 
+                if (IsInLobby() && AnimatedButton("Add Dummy")) {
+                    State.lobbyRpcQueue.push(new RpcSpawnDummy((uint8_t)(rand() % 18), "Dummy"));
+                }
+
                 if (ToggleButton("Always Allow Start Button", &State.AlwaysAllowStart))
                     State.Save();
 
@@ -390,7 +394,7 @@ namespace HostTab {
                     }
                 }
 
-                CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
+                CustomListBoxInt(" Â­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
 
                 if (ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
                     State.Save();

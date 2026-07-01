@@ -6,8 +6,7 @@
 
 namespace RadarTab {
 	void Render() {
-		ImGui::SameLine(100 * State.dpiScale);
-		ImGui::BeginChild("###Radar", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+		ImGui::BeginChild("###Radar", ImVec2(0, 0), true, ImGuiWindowFlags_NoBackground);
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 		if (ToggleButton("Show Radar", &State.ShowRadar)) {
 			State.Save();
