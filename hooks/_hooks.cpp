@@ -228,7 +228,7 @@ void DetourInitilization() {
 	HOOKFUNC(MeetingHud_CheckForEndVoting);
 	HOOKFUNC(AccountManager_CanPlayOnline);
 	HOOKFUNC(LogicOptions_GetAnonymousVotes);
-	//HOOKFUNC(AssetReference_InstantiateAsync_1);
+	HOOKFUNC(AssetReference_InstantiateAsync_1);
 	HOOKFUNC(AprilFoolsMode_ShouldFlipSkeld);
 	HOOKFUNC(MatchMakerGameButton_SetGame);
 	HOOKFUNC(ModManager_LateUpdate);
@@ -407,7 +407,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(MeetingHud_CheckForEndVoting);
 	UNHOOKFUNC(AccountManager_CanPlayOnline);
 	UNHOOKFUNC(LogicOptions_GetAnonymousVotes);
-	//UNHOOKFUNC(AssetReference_InstantiateAsync_1);
+	UNHOOKFUNC(AssetReference_InstantiateAsync_1);
 	UNHOOKFUNC(AprilFoolsMode_ShouldFlipSkeld);
 	UNHOOKFUNC(MatchMakerGameButton_SetGame);
 	UNHOOKFUNC(ModManager_LateUpdate);

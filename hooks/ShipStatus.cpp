@@ -63,6 +63,18 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
             if (!State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
         }
 
+        auto transform = Component_get_transform((Component_1*)__this, NULL);
+        auto localScale = transform == NULL ? Vector3(0.f, 0.f, 0.f) : Transform_get_localScale(transform, NULL);
+
+        if (State.mapType == Settings::MapType::Ship) {
+            State.FlipSkeld = localScale.x < 0;
+            // By default, the x coordinate of the local scale of the Skeld is 1.2,
+            // whereas it is -1.2 for Dleks.
+            // This allows us to flip stuff such as the radar,
+            // even when we aren't hosting and the host plays with Dleks.
+        }
+        else State.FlipSkeld = false;
+
         //if (!State.mapDoors.empty() && Constants_1_ShouldFlipSkeld(NULL))
             //State.FlipSkeld = true; fix later
 

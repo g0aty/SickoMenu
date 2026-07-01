@@ -1570,7 +1570,7 @@ void DoPolylineSimplification(std::vector<ImVec2>& inPoints, std::vector<std::ch
 
 float getMapXOffsetSkeld(float x)
 {
-    return (State.FlipSkeld && GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) ? x - 50.0f : x;
+    return State.FlipSkeld ? x - 50.0f : x;
 }
 
 bool Object_1_IsNotNull(app::Object_1* obj)

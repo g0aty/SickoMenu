@@ -589,17 +589,15 @@ namespace HostTab {
                 }
                 ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
                 // AU v2022.8.24 has been able to change maps in lobby.
-                // State.mapHostChoice = State.FlipSkeld ? 3 : options.GetByte(app::ByteOptionNames__Enum::MapId);
+                // AU v2022.8.24 has been able to change maps in lobby.
+                State.mapHostChoice = State.FlipSkeld ? 3 : options.GetByte(app::ByteOptionNames__Enum::MapId);
                 /*if (State.mapHostChoice > 3)
                     State.mapHostChoice--;*/
-                    // State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
-                int mapId = options.GetByte(app::ByteOptionNames__Enum::MapId);
-                if (mapId == 3) mapId = 0; // Dleks is the map with ID 3, and we are disabling it for now
-                State.mapHostChoice = mapId > 3 ? (mapId - 1) : mapId;
+                State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
                 if (IsInLobby() && CustomListBoxInt("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale)) {
                     //if (!IsInGame()) {
                         // disable flip
-                    /*if (State.mapHostChoice == 3) {
+                    if (State.mapHostChoice == 3) {
                         options.SetByte(app::ByteOptionNames__Enum::MapId, 0);
                         State.FlipSkeld = true;
                         SyncAllSettings();
@@ -608,11 +606,11 @@ namespace HostTab {
                         options.SetByte(app::ByteOptionNames__Enum::MapId, State.mapHostChoice);
                         State.FlipSkeld = false;
                         SyncAllSettings();
-                    }*/
-                    auto id = State.mapHostChoice;
+                    }
+                    /*auto id = State.mapHostChoice;
                     if (id >= 3) id++;
                     options.SetByte(app::ByteOptionNames__Enum::MapId, id);
-                    SyncAllSettings();
+                    SyncAllSettings();*/
                     //}
                 }
                 auto gamemode = options.GetGameMode();
@@ -756,8 +754,10 @@ namespace HostTab {
 #pragma region Noisemaker
                     ImGui::Text("Noisemaker");
                     static float alertDuration = 1.f;
+                    static bool alertImps = false;
 
                     MakeFloat("Alert Duration", alertDuration, FloatOptionNames__Enum::NoisemakerAlertDuration);
+                    MakeBool("Noisemakers Alert Impostors", alertImps, BoolOptionNames__Enum::NoisemakerImpostorAlert);
 #pragma endregion
 #pragma region Tracker
                     ImGui::Text("Tracker");
@@ -799,7 +799,12 @@ namespace HostTab {
 
                     MakeFloat("Hider Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
                     MakeFloat("Seeker Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
-                    MakeFloat("Kill Cooldown", killCooldown, FloatOptionNames__Enum::KillCooldown);
+                    if (ImGui::InputFloat("Kill Cooldown", &killCooldown)) {
+                        if (killCooldown <= 0.f) killCooldown = 0.000001f;
+                        options.SetFloat(FloatOptionNames__Enum::KillCooldown, killCooldown);
+                        SyncAllSettings();
+                    }
+                    else killCooldown = options.GetFloat(FloatOptionNames__Enum::KillCooldown);
 
                     std::string killDistInfo = "";
                     if (killDistance >= 0 && killDistance <= 2) {
@@ -824,7 +829,7 @@ namespace HostTab {
                     MakeFloat("Hiding Time", hidingTime, FloatOptionNames__Enum::EscapeTime);
                     MakeFloat("Final Hide Time", finalHideTime, FloatOptionNames__Enum::FinalEscapeTime);
                     MakeInt("Max Vent Uses", maxVents, Int32OptionNames__Enum::CrewmateVentUses);
-                    MakeFloat("Max Time In Vent", ventTime, FloatOptionNames__Enum::CrewmateTimeInVent);
+                    MakeFloat("Max Time in Vent", ventTime, FloatOptionNames__Enum::CrewmateTimeInVent);
                     MakeBool("Flashlight Mode", flashlight, BoolOptionNames__Enum::UseFlashlight);
                     MakeFloat("Hider Flashlight Size", crewLight, FloatOptionNames__Enum::CrewmateFlashlightSize);
                     MakeFloat("Seeker Flashlight Size", impLight, FloatOptionNames__Enum::ImpostorFlashlightSize);
