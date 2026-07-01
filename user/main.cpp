@@ -95,10 +95,10 @@ void Run(LPVOID lpParam) {
     ScopedThreadAttacher managedThreadAttached;
     {
         std::ostringstream ss;
-        ss << "\n\tSickoMenu - " << __DATE__ << " - " << __TIME__ << std::endl; // Log SickoMenu info
+        ss << "\n\tSickoMenu - Version: " << State.SickoVersion << std::endl; // Log SickoMenu info
         /*ss << "\tBuild: " << _CONFIGURATION_NAME << std::endl;
-        ss << "\tCommit: " << GetGitCommit() << " - " << GetGitBranch() << std::endl; // Log git info*/
-        ss << "\tVersion: " << State.SickoVersion << std::endl;
+        ss << "\tCommit: " << GetGitCommit() << " - " << GetGitBranch() << std::endl; // Log git info
+        ss << "\tVersion: " << State.SickoVersion << std::endl;*/
         ss << "\tAmong Us Version: " << getGameVersion() << std::endl; // Log among us info
         LOG_INFO(ss.str());
 #if _DEBUG
