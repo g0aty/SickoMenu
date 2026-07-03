@@ -20,7 +20,7 @@ static bool OpenDoor(OpenableDoor* door) {
 }
 
 void dDoorBreakerGame_Start(DoorBreakerGame* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dDoorBreakerGame_Start executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dDoorBreakerGame_Start executed", false);
     if (!State.PanicMode && State.AutoOpenDoors) {
         if (OpenDoor(__this->fields.MyDoor)) {
             Minigame_Close((Minigame*)__this, {});
@@ -31,7 +31,7 @@ void dDoorBreakerGame_Start(DoorBreakerGame* __this, MethodInfo* method) {
 }
 
 void dDoorCardSwipeGame_Begin(DoorCardSwipeGame* __this, PlayerTask* playerTask, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dDoorCardSwipeGame_Begin executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dDoorCardSwipeGame_Begin executed", false);
     if (!State.PanicMode && State.AutoOpenDoors) {
         if (OpenDoor(__this->fields.MyDoor)) {
             Minigame_Close((Minigame*)__this, {});
@@ -42,7 +42,7 @@ void dDoorCardSwipeGame_Begin(DoorCardSwipeGame* __this, PlayerTask* playerTask,
 }
 
 void dMushroomDoorSabotageMinigame_Begin(MushroomDoorSabotageMinigame* __this, PlayerTask* task, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMushroomDoorSabotageMinigame_Begin executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMushroomDoorSabotageMinigame_Begin executed", false);
     if (!State.PanicMode) {
         if (State.AutoOpenDoors) {
             if (OpenDoor(__this->fields.myDoor)) {

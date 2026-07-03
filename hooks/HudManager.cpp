@@ -19,7 +19,7 @@ static std::string strRev(std::string str) {
 }
 
 void dHudManager_Update(HudManager* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dHudManager_Update executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dHudManager_Update executed", false);
     try {
         static bool bChatAlwaysActivePrevious = false;
         if (bChatAlwaysActivePrevious != State.ChatAlwaysActive)
@@ -166,7 +166,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 }
 
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dVersionShower_Start executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dVersionShower_Start executed", false);
     State.versionShower = __this;
     VersionShower_Start(__this, method);
     State.versionShowerDefaultText = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
@@ -227,7 +227,7 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 }
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dPingTracker_Update executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dPingTracker_Update executed", false);
     __this->fields.gamePos.x = 0.f, __this->fields.lobbyPos.x = -0.09f; // Make the PingTracker actually look centered
     bool isFreeplay = ((InnerNetClient*)(*Game::pAmongUsClient))->fields.NetworkMode == NetworkModes__Enum::FreePlay;
     app::PingTracker_Update(__this, method);
@@ -323,42 +323,42 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 }
 
 bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicGameFlowNormal_IsGameOverDueToDeath executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dLogicGameFlowNormal_IsGameOverDueToDeath executed", false);
     return false; //fix black screen when you set fake role
 }
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicGameFlowHnS_IsGameOverDueToDeath executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dLogicGameFlowHnS_IsGameOverDueToDeath executed", false);
     return false; //fix black screen when you set fake role
 }
 
 void dModManager_LateUpdate(ModManager* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dModManager_LateUpdate executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dModManager_LateUpdate executed", false);
     ModManager_LateUpdate(__this, method);
 }
 
 void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dEndGameNavigation_ShowDefaultNavigation executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dEndGameNavigation_ShowDefaultNavigation executed", false);
     EndGameNavigation_ShowDefaultNavigation(__this, method);
 }
 
 void dFriendsListUI_UpdateFriendCodeUI(FriendsListUI* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dFriendsListUI_UpdateFriendCodeUI executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dFriendsListUI_UpdateFriendCodeUI executed", false);
     FriendsListUI_UpdateFriendCodeUI(__this, method);
 }
 
 void dMapCountOverlay_OnEnable(MapCountOverlay* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMapCountOverlay_OnEnable executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMapCountOverlay_OnEnable executed", false);
     State.IsAdminMapOpen = true;
     MapCountOverlay_OnEnable(__this, method);
 }
 
 void dMapCountOverlay_OnDisable(MapCountOverlay* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMapCountOverlay_OnDisable executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMapCountOverlay_OnDisable executed", false);
     State.IsAdminMapOpen = false;
     MapCountOverlay_OnDisable(__this, method);
 }
 
 void* dIntroCutscene_ShowTeam(IntroCutscene* __this, List_1_PlayerControl_* teamToShow, float duration, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dIntroCutscene_ShowTeam executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dIntroCutscene_ShowTeam executed", false);
     return IntroCutscene_ShowTeam(__this, teamToShow, duration, method);
 }

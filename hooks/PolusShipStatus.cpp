@@ -8,7 +8,7 @@
 
 void dPolusShipStatus_OnEnable(PolusShipStatus* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dPolusShipStatus_OnEnable executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dPolusShipStatus_OnEnable executed", false);
 	try {
 		State.BlinkPlayersTab = false;
 

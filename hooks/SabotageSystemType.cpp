@@ -5,7 +5,7 @@
 #include "state.hpp"
 
 void dSabotageSystemType_SetInitialSabotageCooldown(SabotageSystemType* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dSabotageSystemType_SetInitialSabotageCooldown executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dSabotageSystemType_SetInitialSabotageCooldown executed", false);
 	app::SabotageSystemType_SetInitialSabotageCooldown(__this, method);
 
 	// ESP: Initialize Kill Cooldown

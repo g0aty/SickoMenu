@@ -11,11 +11,11 @@ public:
 	void Write(std::string_view verbosity, std::string_view source, std::string_view message, bool write = true);
 
 	void Debug(std::string_view source, std::string_view message, bool write = true);
-	void Error(std::string_view source, std::string_view message);
-	void Info(std::string_view source, std::string_view message);
-	void Debug(std::string_view message);
-	void Error(std::string_view message);
-	void Info(std::string_view message);
+	void Error(std::string_view source, std::string_view message, bool write = true);
+	void Info(std::string_view source, std::string_view message, bool write = true);
+	void Debug(std::string_view message, bool write = true);
+	void Error(std::string_view message, bool write = true);
+	void Info(std::string_view message, bool write = true);
 private:
 	std::filesystem::path filePath;
 	std::string currentVerbosity;

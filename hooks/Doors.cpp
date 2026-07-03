@@ -4,7 +4,7 @@
 #include "_rpc.h"
 
 void dPlainDoor_SetDoorway(PlainDoor* __this, bool open, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlainDoor_SetDoorway executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dPlainDoor_SetDoorway executed", false);
 	if (open && (std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), __this->fields._.Room) != State.pinnedDoors.end())) {
 		ShipStatus_RpcCloseDoorsOfType(*Game::pShipStatus, __this->fields._.Room, NULL);
 	}
@@ -12,7 +12,7 @@ void dPlainDoor_SetDoorway(PlainDoor* __this, bool open, MethodInfo* method) {
 }
 
 void dMushroomWallDoor_SetDoorway(MushroomWallDoor* __this, bool open, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dMushroomWallDoor_SetDoorway executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dMushroomWallDoor_SetDoorway executed", false);
 	if (open && (std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), __this->fields._.Room) != State.pinnedDoors.end())) {
 		ShipStatus_RpcCloseDoorsOfType(*Game::pShipStatus, __this->fields._.Room, NULL);
 	}
@@ -20,7 +20,7 @@ void dMushroomWallDoor_SetDoorway(MushroomWallDoor* __this, bool open, MethodInf
 }
 
 bool dAutoOpenDoor_DoUpdate(AutoOpenDoor* __this, float dt, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dAutoOpenDoor_DoUpdate executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dAutoOpenDoor_DoUpdate executed", false);
 	/*if (__this->fields._.Open && (std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), __this->fields._._.Room) != State.pinnedDoors.end()) && __this->fields.ClosedTimer < 1.5f &&
 		__this->fields._._.Room != SystemTypes__Enum::Decontamination && __this->fields._._.Room != SystemTypes__Enum::Decontamination2
 		&& __this->fields._._.Room != SystemTypes__Enum::Decontamination3) {
