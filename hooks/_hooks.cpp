@@ -265,6 +265,12 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerControl_RpcSetNamePlate);
 	HOOKFUNC(RoleBehaviour_get_CommsSabotaged);
 	HOOKFUNC(VitalsMinigame_Update);
+	HOOKFUNC(EndGameManager_ShowButtons);
+	HOOKFUNC(ShhhBehaviour_PlayAnimation);
+	// HOOKFUNC(RoleBehaviour_get_NiceName);
+	HOOKFUNC(RoleBehaviour_get_Blurb);
+	HOOKFUNC(IntroCutscene_CoBegin);
+	HOOKFUNC(RoleBehaviour_AppendTaskHint);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -444,6 +450,12 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerControl_RpcSetNamePlate);
 	UNHOOKFUNC(RoleBehaviour_get_CommsSabotaged);
 	UNHOOKFUNC(VitalsMinigame_Update);
+	UNHOOKFUNC(EndGameManager_ShowButtons);
+	UNHOOKFUNC(ShhhBehaviour_PlayAnimation);
+	// UNHOOKFUNC(RoleBehaviour_get_NiceName);
+	UNHOOKFUNC(RoleBehaviour_get_Blurb);
+	UNHOOKFUNC(IntroCutscene_CoBegin);
+	UNHOOKFUNC(RoleBehaviour_AppendTaskHint);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

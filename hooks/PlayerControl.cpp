@@ -309,7 +309,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
             if (IsInGame() && ((State.RevealRoles && shouldSeeName) || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && !State.PanicMode)
             {
-                std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
+                std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames, State.LocalizeRoleNames);
                 int completedTasks = 0;
                 int totalTasks = 0;
                 auto tasks = GetNormalPlayerTasks(__this);
@@ -1005,8 +1005,30 @@ void dPlayerControl_CmdCheckMurder(PlayerControl* __this, PlayerControl* target,
         if (State.DisableKills || (IsHost() && State.GodMode && target == *Game::pLocalPlayer)) return;
 
         if (IsHost() || !State.SafeMode) {
-            PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, target->fields.protectedByGuardianId < 0 || State.BypassAngelProt, NULL);
-            //yay no more complicated checks, enough of me yapping here
+            if (target->fields.protectedByGuardianId >= 0 && State.BypassAngelProt) {
+                // use a batched message for guaranteed killing
+
+                uint8_t gameDataTag = 5, rpcFlag = 2;
+
+                auto writer = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+                MessageWriter_StartMessage(writer, gameDataTag, NULL);
+                MessageWriter_WriteInt32(writer, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+
+                MessageWriter_StartMessage(writer, rpcFlag, NULL);
+                MessageWriter_WritePacked(writer, (*Game::pLocalPlayer)->fields._.NetId, NULL);
+                MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::MurderPlayer, NULL);
+                MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+                MessageWriter_WriteInt32(writer, (int32_t)MurderResultFlags__Enum::Succeeded, NULL);
+                MessageWriter_EndMessage(writer, NULL);
+
+                MessageWriter_EndMessage(writer, NULL);
+                InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                MessageWriter_Recycle(writer, NULL);
+
+                PlayerControl_MurderPlayer(*Game::pLocalPlayer, target, MurderResultFlags__Enum::Succeeded, NULL);
+            }
+            else
+                PlayerControl_RpcMurderPlayer(*Game::pLocalPlayer, target, true, NULL);
         }
         else {
             PlayerControl_CmdCheckMurder(__this, target, NULL);
@@ -1725,7 +1747,7 @@ void dBanMenu_Select(BanMenu* __this, int32_t clientId, MethodInfo* method) {
 void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method) {
     if (State.BypassVisualTasks) {
         PlayerControl_PlayAnimation(__this, animType, NULL);
-        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::PlayAnimation), SendOption__Enum::Reliable, -1, NULL);
+        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::PlayAnimation), SendOption__Enum::None, -1, NULL);
         MessageWriter_WriteByte(writer, animType, NULL);
         MessageWriter_EndMessage(writer, NULL);
         return;
@@ -1736,7 +1758,7 @@ void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, Me
 void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method) {
     if (State.BypassVisualTasks) {
         PlayerControl_SetScanner(__this, value, __this->fields.scannerCount + 1);
-        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::Reliable, -1, NULL);
+        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId, uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::None, -1, NULL);
         MessageWriter_WriteBoolean(writer, value, NULL);
         MessageWriter_WriteByte(writer, __this->fields.scannerCount + 1, NULL);
         MessageWriter_EndMessage(writer, NULL);

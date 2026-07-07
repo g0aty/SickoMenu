@@ -251,7 +251,11 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
     try {
         if (!State.PanicMode || State.TempPanicMode) {
             if (State.OldStylePingText) {
-                Vector3 oldDistFromEdge = Vector3(2.3f, 5.9f, 0.f);
+                // these calculations are based on 16:9 (2.5) and 4:3 (1.2) aspect ratios
+                float aspectRatio = (float)Screen_get_width(NULL) / (float)Screen_get_height(NULL);
+                float xOffset = aspectRatio * 2.925f - 2.7f;
+
+                Vector3 oldDistFromEdge = Vector3(xOffset, 5.9f, 0.f);
                 if (!State.PanicMode && State.EnableZoom) oldDistFromEdge.y = initialYdist + 3 * (camHeight - 1);
                 __this->fields.aspectPosition->fields.DistanceFromEdge = oldDistFromEdge;
             }
@@ -377,4 +381,23 @@ void dMapCountOverlay_OnDisable(MapCountOverlay* __this, MethodInfo* method) {
 void* dIntroCutscene_ShowTeam(IntroCutscene* __this, List_1_PlayerControl_* teamToShow, float duration, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dIntroCutscene_ShowTeam executed", false);
     return IntroCutscene_ShowTeam(__this, teamToShow, duration, method);
+}
+
+void dEndGameManager_ShowButtons(EndGameManager* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.Debug("Hook dEndGameManager_ShowButtons executed", false);
+    EndGameManager_ShowButtons(__this, method);
+    if (!State.PanicMode && State.AutoRejoin)
+        EndGameNavigation_NextGame(__this->fields.Navigation, NULL);
+}
+
+void* dShhhBehaviour_PlayAnimation(ShhhBehaviour* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.Debug("Hook dShhhBehaviour_Update executed", false);
+    if (!State.PanicMode && State.DisableShushAnimation) {
+        auto shhhEmblemObject = app::Component_get_gameObject((Component_1*)Game::HudManager.GetInstance()->fields.shhhEmblem, NULL);
+        if (shhhEmblemObject != NULL) {
+            GameObject_SetActive(shhhEmblemObject, false, NULL);
+        }
+        return nullptr;
+    }
+    return ShhhBehaviour_PlayAnimation(__this, NULL);
 }

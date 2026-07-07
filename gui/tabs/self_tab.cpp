@@ -459,12 +459,18 @@ namespace SelfTab {
             if (ToggleButton("Reveal Roles", &State.RevealRoles)) {
                 State.Save();
             }
-            ImGui::SameLine(120.0f * State.dpiScale);
-            if (ToggleButton("Abbrv. Role", &State.AbbreviatedRoleNames))
+            ImGui::SameLine();
+            if (ToggleButton("Localize Role Names", &State.LocalizeRoleNames))
+            {
+                if (State.LocalizeRoleNames) State.AbbreviatedRoleNames = false;
+                State.Save();
+            }
+            if (!State.LocalizeRoleNames) ImGui::SameLine();
+            if (!State.LocalizeRoleNames && ToggleButton("Abbreviate Role Names", &State.AbbreviatedRoleNames))
             {
                 State.Save();
             }
-            ImGui::SameLine(240.0f * State.dpiScale);
+
             if (ToggleButton("Player Colored Dots Next To Names", &State.PlayerColoredDots))
             {
                 State.Save();
@@ -626,10 +632,14 @@ namespace SelfTab {
                 State.Save();
             }
 
-            /*if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
+            if (ToggleButton("Auto Rejoin After Game Ending", &State.AutoRejoin)) {
                 State.Save();
             }
-            ImGui::SameLine();*/
+            ImGui::SameLine();
+            if (ToggleButton("Disable Shush Animation", &State.DisableShushAnimation)) {
+                State.Save();
+            }
+
             if (ToggleButton("Autokill", &State.AutoKill)) {
                 State.Save();
             }
@@ -823,9 +833,9 @@ namespace SelfTab {
                 if (ToggleButton("Kill While Vanished", &State.KillInVanish)) {
                     State.Save();
                 }
-                /*if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
+                if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
                     State.Save();
-                }*/
+                }
             }
         }
 

@@ -273,7 +273,7 @@ int GetFriendCodeMaxRank(const std::string& friendCode);
 int GetPlayerMaxRank(PlayerControl* pc);
 NetworkedPlayerInfo_PlayerOutfit* GetPlayerOutfit(NetworkedPlayerInfo* player, bool includeShapeshifted = false);
 Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui = false);
-std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated = false);
+std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated = false, bool localized = false);
 RoleTypes__Enum GetRoleTypesEnum(RoleType role);
 float GetDistanceBetweenPoints_Unity(const Vector2& p1, const Vector2& p2);
 float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2);

@@ -69,11 +69,4 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 
 void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* method) {
 	PlayerPhysics_RpcExitVent(__this, id, method);
-
-	if (*Game::pLocalPlayer == NULL || (*Game::pLocalPlayer)->fields.MyPhysics == NULL) return;
-
-	auto myPhysics = (*Game::pLocalPlayer)->fields.MyPhysics;
-	if (__this == myPhysics) return;
-
-	if (!State.PanicMode && State.KillImmunity) SendKillImmuneToggle(true);
 }

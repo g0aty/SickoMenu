@@ -9,7 +9,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v5.0_pr1";
+    this->SickoVersion = "v5.0_pr2";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -271,6 +271,7 @@ void Settings::Load() {
         JSON_TRYGET("ChatPaste", this->ChatPaste);
         JSON_TRYGET("RevealRoles", this->RevealRoles);
         JSON_TRYGET("AbbreviatedRoleNames", this->AbbreviatedRoleNames);
+        JSON_TRYGET("LocalizeRoleNames", this->LocalizeRoleNames);
         JSON_TRYGET("PlayerColoredDots", this->PlayerColoredDots);
         JSON_TRYGET("ShowPlayerInfo", this->ShowPlayerInfo);
         JSON_TRYGET("HideWhitelistedPlayerInfo", this->HideWhitelistedPlayerInfo);
@@ -339,6 +340,8 @@ void Settings::Load() {
         JSON_TRYGET("DisableLobbyMusic", this->DisableLobbyMusic);
         JSON_TRYGET("ReportOnMurder", this->ReportOnMurder);
         JSON_TRYGET("PreventSelfReport", this->PreventSelfReport);
+        JSON_TRYGET("AutoRejoin", this->AutoRejoin);
+        JSON_TRYGET("DisableShushAnimation", this->DisableShushAnimation);
         JSON_TRYGET("OldStylePingText", this->OldStylePingText);
         JSON_TRYGET("NoSeekerAnim", this->NoSeekerAnim);
         JSON_TRYGET("BetterChatNotifications", this->BetterChatNotifications);
@@ -872,7 +875,7 @@ void Settings::Save() {
                 { "UnlockKillButton", this->UnlockKillButton },
                 { "ChatPaste", this->ChatPaste },
                 { "RevealRoles", this->RevealRoles },
-                { "AbbreviatedRoleNames", this->AbbreviatedRoleNames },
+                { "LocalizeRoleNames", this->LocalizeRoleNames },
                 { "PlayerColoredDots", this->PlayerColoredDots },
                 { "ShowPlayerInfo", this->ShowPlayerInfo },
                 { "HideWhitelistedPlayerInfo", this->HideWhitelistedPlayerInfo },
@@ -940,10 +943,8 @@ void Settings::Save() {
                 { "DisableLobbyMusic", this->DisableLobbyMusic },
                 { "ReportOnMurder", this->ReportOnMurder },
                 { "PreventSelfReport", this->PreventSelfReport },
-                { "AutoKickSlackers", this->AutoKickSlackers },
-                { "AutoKickSlackersIgnoreWhitelist", this->AutoKickSlackersIgnoreWhitelist },
-                { "AutoKickSlackersThreshold", this->AutoKickSlackersThreshold },
-                { "AutoKickSlackersGrace", this->AutoKickSlackersGrace },
+                { "AutoRejoin", this->AutoRejoin },
+                { "DisableShushAnimation", this->DisableShushAnimation },
                 { "OldStylePingText", this->OldStylePingText },
                 { "NoSeekerAnim", this->NoSeekerAnim },
                 { "BetterChatNotifications", this->BetterChatNotifications },

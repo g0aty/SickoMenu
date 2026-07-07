@@ -459,22 +459,16 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 State.Save();
             }
 
-            // Resolve missing host name when joining through a code / invite using GetHostUsername which is known to work
-            if (!State.LobbyHistory.empty() && State.LobbyHistory.front().HostName.empty() && IsInLobby()) {
-                std::string host = GetHostUsername();
-                if (!host.empty())
-                    State.LobbyHistory.front().HostName = RemoveHtmlTags(host);
-            }
-
-            static int joinDelay = 0;
-            if (joinDelay > 0) joinDelay--;
-            if (State.AutoJoinLobby && joinDelay <= 0) {
+            // static int joinDelay = 0;
+            // if (joinDelay > 0) joinDelay--;
+            if (State.JoinLobby/* && joinDelay <= 0*/) {
+                AmongUsClient_ExitGame(*Game::pAmongUsClient, DisconnectReasons__Enum::ExitGame, NULL);
                 void* routine = AmongUsClient_CoFindGameInfoFromCodeAndJoin(*Game::pAmongUsClient,
-                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
+                    GameCode_GameNameToInt(convert_to_string(State.JoinLobbyCode), NULL),
                     NULL);
                 MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
-                State.AutoJoinLobby = false;
-                joinDelay = 100;
+                State.JoinLobby = false;
+                // joinDelay = 100;
             }
 
             static int reportDelay = 0;
@@ -1265,7 +1259,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     else if (IsInLobby()) {
                         State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 1, false));
                     }
-                    State.murderDelay = 5;
+                    State.murderDelay = GetFps() / 12;
                     State.murderCount--;
                 }
                 else {
@@ -1276,39 +1270,53 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             else State.murderDelay--;
         }
 
-        /*if (State.farmLoop) {
-            auto selectedPlayer = State.selectedPlayer.validate();
-            if (State.farmDelay <= 0) {
-                if (State.farmCount > 0 && selectedPlayer.has_value() && !selectedPlayer.get_PlayerData()->fields.Disconnected) {
-                    LOG_DEBUG("Executing RpcMurderLoop for level farm");
-                    State.taskRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 2, false));
-                    State.farmDelay = 2;
+        if (State.farmLoop) {
+            if (State.farmDelay <= 0 && *Game::pLocalPlayer != NULL) {
+                if (State.farmCount > 0) {                    
+                    uint8_t gameDataTag = 5, rpcFlag = 2;
+
+                    auto writer = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+                    MessageWriter_StartMessage(writer, gameDataTag, NULL);
+                    MessageWriter_WriteInt32(writer, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+
+                    for (int i = 0; i < 10; ++i) {
+                        MessageWriter_StartMessage(writer, rpcFlag, NULL);
+                        MessageWriter_WritePacked(writer, (*Game::pLocalPlayer)->fields._.NetId, NULL);
+                        MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::MurderPlayer, NULL);
+                        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)(*Game::pLocalPlayer), NULL);
+                        MessageWriter_WriteInt32(writer, (int32_t)MurderResultFlags__Enum::Succeeded, NULL);
+                        MessageWriter_EndMessage(writer, NULL);
+                    }
+
+                    MessageWriter_EndMessage(writer, NULL);
+                    InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                    MessageWriter_Recycle(writer, NULL);
+
+                    State.farmDelay = GetFps() / 60;
                     State.farmCount--;
                 }
                 else {
-                    LOG_DEBUG("Stopped level farm");
                     State.farmLoop = false;
                     State.farmCount = 0;
-                    State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
-                    State.rpcQueue.push(new SetRole(RoleTypes__Enum::Impostor));
+                    PlayerControl_RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor, true, NULL);
+                    RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
+                    GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorsByKill, false, NULL);
                 }
             }
             else State.farmDelay--;
-        }*/
+        }
 
         if (State.suicideLoop) {
             auto selectedPlayer = State.selectedPlayer.validate();
             if (State.suicideDelay <= 0) {
                 if (State.suicideCount > 0 && selectedPlayer.has_value() && !selectedPlayer.get_PlayerData()->fields.Disconnected) {
                     if (IsInGame()) {
-                        State.rpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl(),
-                            selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+                        State.rpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl()));
                     }
                     else if (IsInLobby()) {
-                        State.lobbyRpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl(),
-                            selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+                        State.lobbyRpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl()));
                     }
-                    State.suicideDelay = 15;
+                    State.suicideDelay = GetFps() / 12;
                     State.suicideCount--;
                 }
                 else {

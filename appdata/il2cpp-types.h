@@ -6697,6 +6697,7 @@ namespace app {
 
     typedef Il2CppObject KillOverlay;
     typedef Il2CppObject IntroCutscene;
+    typedef Il2CppObject ShhhBehaviour;
 
     struct HudManager__Fields {
         struct DestroyableSingleton_1_HudManager___Fields _;
@@ -11097,6 +11098,83 @@ namespace app {
     };
 #pragma endregion
 
+#pragma region EndGameManager
+    struct EndGameManager__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* WinText;
+        struct MeshRenderer* BackgroundBar;
+        struct MeshRenderer* Foreground;
+        struct FloatRange* ForegroundRadius;
+        struct SpriteRenderer* FrontMost;
+        struct PoolablePlayer* PlayerPrefab;
+        struct Sprite* GhostSprite;
+        struct AudioClip* DisconnectStinger;
+        struct AudioClip* CrewStinger;
+        struct AudioClip* ImpostorStinger;
+        struct EndGameNavigation* Navigation;
+        float stingerTime;
+    };
+
+    struct EndGameManager {
+        struct EndGameManager__Class* klass;
+        MonitorData* monitor;
+        struct EndGameManager__Fields fields;
+    };
+
+    struct EndGameManager__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct EndGameManager__StaticFields {
+    };
+
+    struct EndGameManager__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct EndGameManager__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct EndGameManager__VTable vtable;
+    };
+
+    struct EndGameNavigation__Fields {
+        struct MonoBehaviour__Fields _;
+        struct ProgressionScreen* ProgressionScreen;
+        struct EndGameManager* EndGameManager;
+        struct GameObject* ContinueButton;
+        struct SpriteRenderer* PlayAgainButton;
+        struct SpriteRenderer* ExitButton;
+    };
+
+    struct EndGameNavigation {
+        struct EndGameNavigation__Class* klass;
+        MonitorData* monitor;
+        struct EndGameNavigation__Fields fields;
+    };
+
+    struct EndGameNavigation__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct EndGameNavigation__StaticFields {
+    };
+
+    struct EndGameNavigation__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct EndGameNavigation__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct EndGameNavigation__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ImpostorRole;
@@ -11117,7 +11195,6 @@ namespace app {
     typedef Il2CppObject AbstractSaveData;
     typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
     typedef Il2CppObject MatchMakerGameButton;
-    typedef Il2CppObject EndGameNavigation;
     typedef Il2CppObject HideAndSeekManager;
     typedef Il2CppObject NormalGameManager;
     typedef Il2CppObject QuickChatPhraseBuilderResult;

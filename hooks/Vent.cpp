@@ -58,7 +58,10 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 			State.liveConsoleEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_EXIT));
 		}
 	}
-	return Vent_ExitVent(__this, pc, method);
+
+	auto ret = Vent_ExitVent(__this, pc, method);
+	if (!State.PanicMode && State.KillImmunity) SendKillImmuneToggle(true);
+	return ret;
 }
 
 bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodInfo* method) {
@@ -73,8 +76,9 @@ bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodIn
 	else return Vent_TryMoveToVent(__this, otherVent, error, method);
 }
 
-/*void dVentilationSystem_Update(VentilationSystem_Operation__Enum op, int32_t ventId, MethodInfo* method) {
+void dVentilationSystem_Update(VentilationSystem_Operation__Enum op, int32_t ventId, MethodInfo* method) {
+	if (!State.PanicMode && State.KillImmunity && op == VentilationSystem_Operation__Enum::Exit) return;
 	VentilationSystem_Update(op, ventId, method);
-	if (State.FlipSkeld && IsHost() && op == VentilationSystem_Operation__Enum::Exit && *Game::pLocalPlayer != NULL)
-		(*Game::pLocalPlayer)->fields.inVent = false; // Fix venting on Dleks
-}*/
+	/*if (State.FlipSkeld && IsHost() && op == VentilationSystem_Operation__Enum::Exit && *Game::pLocalPlayer != NULL)
+		(*Game::pLocalPlayer)->fields.inVent = false;*/ // Fix venting on Dleks
+}

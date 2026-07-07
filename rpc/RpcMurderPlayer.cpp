@@ -16,28 +16,43 @@ RpcMurderPlayer::RpcMurderPlayer(PlayerControl* Player, PlayerControl* target, b
 void RpcMurderPlayer::Process()
 {
     if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) return;
-    if (IsInGame() && !IsInMultiplayerGame()) PlayerControl_RpcMurderPlayer(Player, target, success, NULL);
-    else if (target != *Game::pLocalPlayer || IsInGame()) {
+    if (IsInGame() && !IsInMultiplayerGame()) {
         PlayerControl_RpcMurderPlayer(Player, target, success, NULL);
-        /*for (auto p : GetAllPlayerControl()) {
-            auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
-                uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::Reliable, p->fields._.OwnerId, NULL);
-            MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
-            MessageWriter_WriteInt32(writer, int32_t(MurderResultFlags__Enum::Succeeded), NULL);
-            InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-        }*/
+        return;
+    }
+
+    if (target->fields.protectedByGuardianId >= 0 && success) {
+        // use a batched message for guaranteed killing
+
+        uint8_t gameDataTag = 5, rpcFlag = 2;
+
+        auto writer = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+        MessageWriter_StartMessage(writer, gameDataTag, NULL);
+        MessageWriter_WriteInt32(writer, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+
+        MessageWriter_StartMessage(writer, rpcFlag, NULL);
+        MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
+        MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::MurderPlayer, NULL);
+        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+        MessageWriter_WriteInt32(writer, (int32_t)MurderResultFlags__Enum::Succeeded, NULL);
+        MessageWriter_EndMessage(writer, NULL);
+
+        MessageWriter_EndMessage(writer, NULL);
+        InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+        MessageWriter_Recycle(writer, NULL);
+
+        PlayerControl_MurderPlayer(*Game::pLocalPlayer, target, MurderResultFlags__Enum::Succeeded, NULL);
+    }
+    else if (IsInGame()) {
+        PlayerControl_RpcMurderPlayer(Player, target, success, NULL);
     }
     else {
-        for (auto p : GetAllPlayerControl()) {
-            if (p != *Game::pLocalPlayer) {
-                auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
-                    uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::Reliable, p->fields._.OwnerId, NULL);
-                MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
-                MessageWriter_WriteInt32(writer, int32_t(success ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
-                InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-            }
-            if (success) GetPlayerData(target)->fields.IsDead = true;
-        }
+        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
+            uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::Reliable, -1, NULL);
+        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+        MessageWriter_WriteInt32(writer, int32_t(success ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
+        InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+        if (success) GetPlayerData(target)->fields.IsDead = true;
     }
 }
 
@@ -556,6 +571,23 @@ void RpcBootFromVent::Process()
     if (!PlayerSelection(Player).has_value()) return;
 
     PlayerPhysics_RpcBootFromVent(Player->fields.MyPhysics, ventId, NULL);
+}
+
+SendKillImmunity::SendKillImmunity(bool enabled, int ventId)
+{
+    this->enabled = enabled;
+    this->ventId = ventId;
+}
+
+void SendKillImmunity::Process()
+{
+    if (!IsInGame() || !PlayerSelection(*Game::pLocalPlayer).has_value()) return;
+    auto myPhysics = (*Game::pLocalPlayer)->fields.MyPhysics;
+    if (myPhysics == NULL) return;
+
+    auto ventOp = enabled ? VentilationSystem_Operation__Enum::Enter : VentilationSystem_Operation__Enum::Exit;
+
+    VentilationSystem_Update(ventOp, ventId, NULL);
 }
 
 PunishEveryone::PunishEveryone(bool isBan)

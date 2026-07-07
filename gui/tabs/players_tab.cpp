@@ -197,11 +197,13 @@ namespace PlayersTab {
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
                                 else if (State.modUsers.at(pid) == "<#ff006c>SickoMenu</color>")
                                     tempColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
+                                else if (State.modUsers.at(pid) == "<#7c0>SlopMenuCrew</color>")
+                                    tempColor = ImVec4(0.744f, 0.855f, 0.1227f, 1.f);
                             }
                         }
 
                         if (State.RevealRoles) {
-                            std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames);
+                            std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames, State.LocalizeRoleNames);
                             tempName = tempName + " (" + roleName + ")";
                             tempColor = AmongUsColorToImVec4(GetRoleColor(playerData->fields.Role, true));
                         }
@@ -213,6 +215,8 @@ namespace PlayersTab {
                         cache.finalColor = tempColor;
                         cache.colorButtonId = "##" + tempName + "_ColorButton";
                         cache.lastUpdateFrame = g_FrameCounter;
+
+                        tempColor.w *= State.MenuThemeColor.w;
                     }
                 }
             }
@@ -523,7 +527,10 @@ namespace PlayersTab {
                 {
                     if (AnimatedButton("Kill"))
                     {
-                        State.rpcQueue.push(new CmdCheckMurder(State.selectedPlayer));
+                        if (IsHost() || !State.SafeMode)
+                            State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, State.selectedPlayer.validate().get_PlayerControl()));
+                        else
+                            State.rpcQueue.push(new CmdCheckMurder(State.selectedPlayer));
                     }
                 }
                 else if (IsHost() || !State.SafeMode) {
@@ -532,12 +539,10 @@ namespace PlayersTab {
                         for (PlayerSelection p : selectedPlayers) {
                             auto validPlayer = p.validate();
                             if (IsInGame()) {
-                                State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, validPlayer.get_PlayerControl(),
-                                    validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+                                State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, validPlayer.get_PlayerControl()));
                             }
                             else if (IsInLobby()) {
-                                State.lobbyRpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), validPlayer.get_PlayerControl(),
-                                    validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+                                State.lobbyRpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), validPlayer.get_PlayerControl()));
                             }
                         }
                     }
@@ -550,8 +555,13 @@ namespace PlayersTab {
                     if (AnimatedButton("Telekill"))
                     {
                         previousPlayerPosition = GetTrueAdjustedPosition(*Game::pLocalPlayer);
-                        for (auto p : selectedPlayers)
-                            State.rpcQueue.push(new CmdCheckMurder(p));
+                        for (auto p : selectedPlayers) {
+                            auto validPlayer = p.validate();
+                            if (IsHost() || !State.SafeMode)
+                                State.rpcQueue.push(new RpcMurderPlayer(*Game::pLocalPlayer, validPlayer.get_PlayerControl()));
+                            else
+                                State.rpcQueue.push(new CmdCheckMurder(p));
+                        }
                         framesPassed = 40;
                     }
                 }
@@ -563,12 +573,10 @@ namespace PlayersTab {
                         for (auto p : selectedPlayers) {
                             auto validPlayer = p.validate();
                             if (IsInGame()) {
-                                State.rpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), validPlayer.get_PlayerControl(),
-                                    validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+                                State.rpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), validPlayer.get_PlayerControl()));
                             }
                             else if (IsInLobby()) {
-                                State.lobbyRpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), validPlayer.get_PlayerControl(),
-                                    validPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+                                State.lobbyRpcQueue.push(new RpcMurderPlayer((*Game::pLocalPlayer), validPlayer.get_PlayerControl()));
                             }
                         }
                         framesPassed = 40;
@@ -1259,22 +1267,6 @@ namespace PlayersTab {
                         ImGui::SameLine();
                         ImGui::Text(std::format("({})", 200 - State.murderCount).c_str());
                     }
-
-                    /*if (GetAllPlayerControl().size() == 1) {
-                        if (IsInGame()) {
-                            if (!State.farmLoop && AnimatedButton("Level Farm")) {
-                                State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::ImpostorGhost));
-                                State.farmCount = 5000; //controls how many times the player is to be murdered
-                                State.farmLoop = true;
-                            }
-                            if (State.farmLoop && AnimatedButton("Stop Level Farm")) {
-                                State.farmCount = 0;
-                                State.farmLoop = false;
-                            }
-                            ImGui::SameLine();
-                            ImGui::Text(std::format("({})", 10000 - 2 * State.farmCount).c_str());
-                        }
-                    }*/
                 }
 
                 if (!State.SafeMode && IsInGame() && selectedPlayers.size() == 1) {

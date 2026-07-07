@@ -226,6 +226,7 @@ public:
     bool ChatPaste = false;
     bool RevealRoles = false;
     bool AbbreviatedRoleNames = false;
+    bool LocalizeRoleNames = false;
     bool PlayerColoredDots = false;
     bool ShowPlayerInfo = false;
     bool HideWhitelistedPlayerInfo = true;
@@ -336,6 +337,7 @@ public:
     bool ReportOnMurder = false;
     bool PreventSelfReport = true;
     bool AutoRejoin = false;
+    bool DisableShushAnimation = false;
     bool OldStylePingText = false;
     bool NoSeekerAnim = false;
     bool BetterChatNotifications = false;

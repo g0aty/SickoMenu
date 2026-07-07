@@ -444,3 +444,10 @@ DO_APP_FUNC(SoundManager*, SoundManager_get_Instance, (MethodInfo* method), "Ass
 DO_APP_FUNC(float, Input_GetAxis, (String* str, MethodInfo* method), "UnityEngine.InputLegacyModule, System.Single UnityEngine.Input::GetAxis(System.String)");
 DO_APP_FUNC(bool, RoleBehaviour_get_CommsSabotaged, (RoleBehaviour* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean RoleBehaviour::get_CommsSabotaged()");
 DO_APP_FUNC(void, VitalsMinigame_Update, (VitalsMinigame* __this, MethodInfo* method), "Assembly-CSharp, System.Void VitalsMinigame::Update()");
+DO_APP_FUNC(void, EndGameManager_ShowButtons, (EndGameManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EndGameManager::ShowButtons()");
+DO_APP_FUNC(void, EndGameNavigation_NextGame, (EndGameNavigation* __this, MethodInfo* method), "Assembly-CSharp, System.Void EndGameNavigation::NextGame()");
+DO_APP_FUNC(void*, ShhhBehaviour_PlayAnimation, (ShhhBehaviour* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator ShhhBehaviour::PlayAnimation()");
+DO_APP_FUNC(String*, RoleBehaviour_get_NiceName, (RoleBehaviour* __this, MethodInfo* method), "Assembly-CSharp, System.String RoleBehaviour::get_NiceName()");
+DO_APP_FUNC(String*, RoleBehaviour_get_Blurb, (RoleBehaviour* __this, MethodInfo* method), "Assembly-CSharp, System.String RoleBehaviour::get_Blurb()");
+DO_APP_FUNC(void*, IntroCutscene_CoBegin, (IntroCutscene* __this, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator IntroCutscene::CoBegin()");
+DO_APP_FUNC(void, RoleBehaviour_AppendTaskHint, (RoleBehaviour* role, void* taskStringBuilder, MethodInfo* method), "Assembly-CSharp, System.Void RoleBehaviour::AppendTaskHint(RoleBehaviour, System.Text.StringBuilder)");

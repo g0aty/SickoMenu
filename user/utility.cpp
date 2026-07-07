@@ -1370,6 +1370,8 @@ Color GetColorFromImVec4(ImVec4 vec) {
     return Color(vec.x, vec.y, vec.z, vec.w);
 }
 
+// for some reason, the tracker's role ID is 55050 instead of 10
+
 Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
     if (roleBehaviour == nullptr)
         return State.LightMode && gui ? Palette__TypeInfo->static_fields->Black : Palette__TypeInfo->static_fields->White;
@@ -1412,7 +1414,8 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
         c = GetColorFromImVec4(State.NoisemakerColor);
         break;
     }
-    case RoleTypes__Enum::Tracker: {
+    case RoleTypes__Enum::Tracker:
+    case (RoleTypes__Enum)55050: {
         c = GetColorFromImVec4(State.TrackerColor);
         break;
     }
@@ -1436,38 +1439,48 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
     return c;
 }
 
-std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = false */)
+std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = false */, bool localized /* = false */)
 {
     if (roleBehaviour == nullptr) return (abbreviated ? "Unk" : "Unknown");
+
+    if ((roleBehaviour->fields.Role == RoleTypes__Enum::Tracker || roleBehaviour->fields.Role == (RoleTypes__Enum)55050) &&
+        roleBehaviour->fields.StringName != (StringNames__Enum)1681) {
+        roleBehaviour->fields.StringName = (StringNames__Enum)1681;
+    }
+
+    std::string fullRoleName = convert_from_string(app::RoleBehaviour_get_NiceName(roleBehaviour, NULL));
+
+    // crewmate and impostor ghosts don't have default role names in the game
 
     switch (roleBehaviour->fields.Role)
     {
     case RoleTypes__Enum::Engineer:
-        return (abbreviated ? "Eng" : "Engineer");
+        return (abbreviated ? "Eng" : (localized ? fullRoleName : "Engineer"));
     case RoleTypes__Enum::GuardianAngel:
-        return (abbreviated ? "GA" : "Guardian Angel");
+        return (abbreviated ? "GA" : (localized ? fullRoleName : "Guardian Angel"));
     case RoleTypes__Enum::Impostor:
-        return (abbreviated ? "Imp" : "Impostor");
+        return (abbreviated ? "Imp" : (localized ? fullRoleName : "Impostor"));
     case RoleTypes__Enum::Scientist:
-        return (abbreviated ? "Sci" : "Scientist");
+        return (abbreviated ? "Sci" : (localized ? fullRoleName : "Scientist"));
     case RoleTypes__Enum::Shapeshifter:
-        return (abbreviated ? "SS" : "Shapeshifter");
+        return (abbreviated ? "SS" : (localized ? fullRoleName : "Shapeshifter"));
     case RoleTypes__Enum::Crewmate:
-        return (abbreviated ? "Crew" : "Crewmate");
+        return (abbreviated ? "Crew" : (localized ? fullRoleName : "Crewmate"));
     case RoleTypes__Enum::CrewmateGhost:
         return (abbreviated ? "CG" : "Crewmate Ghost");
     case RoleTypes__Enum::ImpostorGhost:
         return (abbreviated ? "IG" : "Impostor Ghost");
     case RoleTypes__Enum::Noisemaker:
-        return (abbreviated ? "NM" : "Noisemaker");
+        return (abbreviated ? "NM" : (localized ? fullRoleName : "Noisemaker"));
     case RoleTypes__Enum::Tracker:
-        return (abbreviated ? "Tra" : "Tracker");
+    case (RoleTypes__Enum)55055:
+        return (abbreviated ? "Tra" : (localized ? fullRoleName : "Tracker"));
     case RoleTypes__Enum::Phantom:
-        return (abbreviated ? "Ph" : "Phantom");
+        return (abbreviated ? "Ph" : (localized ? fullRoleName : "Phantom"));
     case RoleTypes__Enum::Detective:
-        return (abbreviated ? "Det" : "Detective");
+        return (abbreviated ? "Det" : (localized ? fullRoleName : "Detective"));
     case RoleTypes__Enum::Viper:
-        return (abbreviated ? "Vip" : "Viper");
+        return (abbreviated ? "Vip" : (localized ? fullRoleName : "Viper"));
     default:
         return (abbreviated ? "Unk" : "Unknown");
     }
@@ -2300,10 +2313,7 @@ void SendKillImmuneToggle(bool enabled) {
     if (!IsInGame()) return;
     if (*Game::pLocalPlayer == NULL || (*Game::pLocalPlayer)->fields.MyPhysics == NULL) return;
 
-    auto ventOp = enabled ? VentilationSystem_Operation__Enum::Enter : VentilationSystem_Operation__Enum::Exit;
-    int32_t customVentId = 67;
-
-    VentilationSystem_Update(ventOp, customVentId, NULL);
+    State.rpcQueue.push(new SendKillImmunity(enabled, 67));
 }
 
 //TODO: Workaround
@@ -2485,7 +2495,6 @@ float GameOptions::GetGACooldown() const {
 RoleOptions& RoleOptions::SetRoleRate(app::RoleTypes__Enum role, int32_t maxCount, int32_t chance) {
     if (!_options) return *this;
     auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetRoleRate);
-    if (role == (RoleTypes__Enum::Tracker)) role = (RoleTypes__Enum)10;
     ((void(*)(void*, app::RoleTypes__Enum, int32_t, int32_t, const void*))(func.methodPtr))
         (_options, role, maxCount, chance, func.method);
     return *this;
@@ -2494,7 +2503,6 @@ RoleOptions& RoleOptions::SetRoleRate(app::RoleTypes__Enum role, int32_t maxCoun
 RoleOptions& RoleOptions::SetRoleRecommended(app::RoleTypes__Enum role) {
     if (!_options) return *this;
     auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, SetRoleRecommended);
-    if (role == (RoleTypes__Enum::Tracker)) role = (RoleTypes__Enum)10;
     ((void(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
     return *this;
 }
@@ -2502,14 +2510,12 @@ RoleOptions& RoleOptions::SetRoleRecommended(app::RoleTypes__Enum role) {
 int32_t RoleOptions::GetNumPerGame(app::RoleTypes__Enum role) const {
     if (!_options) return 0;
     auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, GetNumPerGame);
-    if (role == (RoleTypes__Enum::Tracker)) role = (RoleTypes__Enum)10;
     return ((int32_t(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
 }
 
 int32_t RoleOptions::GetChancePerGame(app::RoleTypes__Enum role) const {
     if (!_options) return 0;
     auto& func = GET_VIRTUAL_INVOKE_IFACE(_options, GetChancePerGame);
-    if (role == (RoleTypes__Enum::Tracker)) role = (RoleTypes__Enum)10;
     return ((int32_t(*)(void*, app::RoleTypes__Enum, const void*))(func.methodPtr))(_options, role, func.method);
 }
 

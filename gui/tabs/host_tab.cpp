@@ -521,9 +521,25 @@ namespace HostTab {
                     State.Save();
                 }
 
-                /*if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
+                if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
                     State.Save();
-                }*/
+                }
+
+                if (GetAllPlayerControl().size() == 1 && IsInGame()) {\
+                    if (!State.farmLoop && AnimatedButton("Level Farm (50000 Kills)")) {
+                        State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::ImpostorGhost));
+                        State.farmCount = 5000; //controls how many times the player is to be murdered
+                        State.farmLoop = true;
+                    }
+                    if (State.farmLoop && AnimatedButton("Stop Level Farm (End Game by Impostor Kill Win)")) {
+                        State.farmLoop = false;
+                        State.farmCount = 0;
+                        State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
+                        State.rpcQueue.push(new SetRole(RoleTypes__Enum::Impostor));
+                        State.rpcQueue.push(new RpcEndGame(GameOverReason__Enum::ImpostorsByKill));
+                    }
+                    if (State.farmLoop) ImGui::Text(std::format("({} Kills)", 50000 - 10 * State.farmCount).c_str());
+                }
 
                 ImGui::EndChild();
             }

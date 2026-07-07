@@ -490,6 +490,14 @@ public:
 	virtual void Process() override;
 };
 
+class SendKillImmunity : public RPCInterface {
+	bool enabled;
+	int ventId;
+public:
+	SendKillImmunity(bool enabled, int ventId);
+	virtual void Process() override;
+};
+
 class PunishEveryone : public RPCInterface {
 public:
 	bool isBan;

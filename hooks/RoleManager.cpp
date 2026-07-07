@@ -244,3 +244,43 @@ void dVitalsMinigame_Update(VitalsMinigame* __this, MethodInfo* method) {
 		}
 	}
 }
+
+// fix the tracker role info showing up as STRMISS
+
+/*String* dRoleBehaviour_get_NiceName(RoleBehaviour* __this, MethodInfo* method) {
+	if (__this->fields.Role == RoleTypes__Enum::Tracker || __this->fields.Role == (RoleTypes__Enum)55050) {
+		int trackerRoleStringId = 1681;
+		__this->fields.StringName = (StringNames__Enum)trackerRoleStringId;
+	}
+	return RoleBehaviour_get_NiceName(__this, method);
+}*/
+
+static int trackerRoleStringId = 1681;
+static int trackerRoleId = 55050;
+
+String* dRoleBehaviour_get_Blurb(RoleBehaviour* __this, MethodInfo* method) {
+	if (__this->fields.Role == RoleTypes__Enum::Tracker || __this->fields.Role == (RoleTypes__Enum)trackerRoleId) {
+		int trackerBlurbStringId = 1682;
+		__this->fields.BlurbName = (StringNames__Enum)trackerBlurbStringId;
+	}
+	return RoleBehaviour_get_Blurb(__this, method);
+}
+
+void* dIntroCutscene_CoBegin(IntroCutscene* __this, MethodInfo* method) {
+	auto roleBehaviour = GetPlayerData(*Game::pLocalPlayer)->fields.Role;
+	if (roleBehaviour != nullptr &&
+		(roleBehaviour->fields.Role == RoleTypes__Enum::Tracker ||
+		roleBehaviour->fields.Role == (RoleTypes__Enum)trackerRoleId)) {
+		roleBehaviour->fields.StringName = (StringNames__Enum)trackerRoleStringId;
+	}
+	return IntroCutscene_CoBegin(__this, method);
+}
+
+void dRoleBehaviour_AppendTaskHint(RoleBehaviour* role, void* taskStringBuilder, MethodInfo* method) {
+	if (role != nullptr &&
+		(role->fields.Role == RoleTypes__Enum::Tracker ||
+		role->fields.Role == (RoleTypes__Enum)trackerRoleId)) {
+		role->fields.StringName = (StringNames__Enum)trackerRoleStringId;
+	}
+	RoleBehaviour_AppendTaskHint(role, taskStringBuilder, method);
+}
