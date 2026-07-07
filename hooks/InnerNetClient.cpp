@@ -448,12 +448,14 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             static int joinDelay = 0;
             if (joinDelay > 0) joinDelay--;
             if (State.AutoJoinLobby && joinDelay <= 0) {
-                void* routine = AmongUsClient_CoFindGameInfoFromCodeAndJoin(*Game::pAmongUsClient,
-                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
-                    NULL);
-                MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
                 State.AutoJoinLobby = false;
-                joinDelay = 100;
+                if (!State.AutoJoinLobbyCode.empty()) {
+                    void* routine = AmongUsClient_CoFindGameInfoFromCodeAndJoin(*Game::pAmongUsClient,
+                        GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
+                        NULL);
+                    if (routine)
+                        MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
+                }
             }
 
             static int reportDelay = 0;
@@ -743,6 +745,47 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer && !autoStartedGame) {
                     autoStartedGame = true;
                     InnerNetClient_SendStartGame(__this, NULL);
+                }
+
+                if (IsHost() && IsInGame() && State.AutoKickSlackers) {
+                    static float slackerTimer = 0.f;
+                    slackerTimer += Time_get_deltaTime(NULL);
+                    if (slackerTimer >= (float)State.AutoKickSlackersGrace) {
+                        for (auto pc : GetAllPlayerControl()) {
+                            if (pc == nullptr || pc == *Game::pLocalPlayer) continue;
+                            auto pd = GetPlayerData(pc);
+                            if (pd == nullptr || pd->fields.Disconnected || pd->fields.IsDead) continue;
+                            auto tasks = GetNormalPlayerTasks(pc);
+                            if (tasks.empty()) continue;
+                            int total = (int)tasks.size();
+                            int completed = 0;
+                            for (auto task : tasks) {
+                                if (task != nullptr && NormalPlayerTask_get_IsComplete(task, NULL))
+                                    completed++;
+                            }
+                            int pct = (total > 0) ? (completed * 100 / total) : 100;
+                            if (pct < State.AutoKickSlackersThreshold) {
+                                std::string fc = convert_from_string(pd->fields.FriendCode);
+                                bool whitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc) != State.WhitelistFriendCodes.end();
+                                if (!whitelisted || !State.AutoKickSlackersIgnoreWhitelist) {
+                                    std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(pd, NULL));
+                                    LOG_DEBUG("Task Enforcer: kicking " + playerName + " (" + std::to_string(pct) + "% tasks)");
+                                    InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
+                                    if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
+                                        auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
+                                        Color colorBackup = notifier->fields.disconnectColor;
+                                        notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+                                        notifier->fields.disconnectColor = Color(1.0f, 0.5f, 0.0f, 1.0f);
+                                        std::string msg = std::format("<#FFF><b>{}</b></color> was kicked by Task Enforcer ({}/{}% tasks)", playerName, pct, State.AutoKickSlackersThreshold);
+                                        NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(msg), NULL);
+                                        notifier->fields.playerDisconnectSprite = spriteBackup;
+                                        notifier->fields.disconnectColor = colorBackup;
+                                    }
+                                }
+                            }
+                        }
+                        slackerTimer = 0.f;
+                    }
                 }
 
                 /*if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount && !autoStartedGame) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
@@ -1385,6 +1428,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
                 State.LobbyHistory.push_front(lobby);
                 while ((int)State.LobbyHistory.size() > State.LobbyHistoryMaxStored)
                     State.LobbyHistory.pop_back();
+                State.Save();
             }
             State.LobbyHostCache.clear();
 
@@ -1588,7 +1632,7 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
         if (__this->fields.GameState == InnerNetClient_GameStates__Enum::Started
             || __this->fields.GameState == InnerNetClient_GameStates__Enum::Joined
             || __this->fields.NetworkMode == NetworkModes__Enum::FreePlay) {
-            onGameEnd();
+            if (!State.AutoJoinLobby) onGameEnd();
             State.LastDisconnectReason = reason;
             if (reason == DisconnectReasons__Enum::Banned || reason == DisconnectReasons__Enum::ConnectionLimit || reason == DisconnectReasons__Enum::GameNotFound || reason == DisconnectReasons__Enum::ServerError)
                 State.AutoJoinLobby = false;
@@ -1608,7 +1652,7 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
             (reasonStr == "Timeout while waiting for player ID assignment" || reasonStr == "Timeout while waiting for player data containers"))
             return;
         State.FollowerCam = nullptr;
-        onGameEnd(); //removed antiban cuz it glitches the game
+        if (!(State.AutoJoinLobby && reason == DisconnectReasons__Enum::NewConnection)) onGameEnd(); //removed antiban cuz it glitches the game
     }
     catch (...) {
         LOG_ERROR("Exception occurred in InnerNetClient_EnqueueDisconnect (InnerNetClient)");

@@ -1072,7 +1072,9 @@ namespace GameTab {
         }
 
         if (openHistory) {
-            ImGui::Text("Last 100 players:");
+            ImGui::Dummy(ImVec2(0, 3)* State.dpiScale);
+            if (ImGui::CollapsingHeader("Player History", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Text("Last 100 players:");
 
             static std::string historySearchBuf = "";
             ImGui::SetNextItemWidth(200);
@@ -1365,8 +1367,9 @@ namespace GameTab {
             }
 
             ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
+            }
 
-            if (ImGui::CollapsingHeader("Lobby History")) {
+            if (ImGui::CollapsingHeader("Lobby History", ImGuiTreeNodeFlags_DefaultOpen)) {
                 if (State.LobbyHistory.empty()) {
                     ImGui::TextDisabled("No lobbies visited yet.");
                 }

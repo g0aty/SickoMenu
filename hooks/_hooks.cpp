@@ -233,6 +233,7 @@ void DetourInitilization() {
 	HOOKFUNC(MatchMakerGameButton_SetGame);
 	HOOKFUNC(ModManager_LateUpdate);
 	HOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
+	HOOKFUNC(EndGameManager_ShowButtons);
 	HOOKFUNC(PlayerControl_SetLevel);
 	HOOKFUNC(Vent_TryMoveToVent);
 	HOOKFUNC(PlayerControl_get_CalculatedAlpha);
@@ -409,6 +410,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(MatchMakerGameButton_SetGame);
 	UNHOOKFUNC(ModManager_LateUpdate);
 	UNHOOKFUNC(EndGameNavigation_ShowDefaultNavigation);
+	UNHOOKFUNC(EndGameManager_ShowButtons);
 	UNHOOKFUNC(PlayerControl_SetLevel);
 	UNHOOKFUNC(Vent_TryMoveToVent);
 	UNHOOKFUNC(PlayerControl_get_CalculatedAlpha);

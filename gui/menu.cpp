@@ -274,10 +274,7 @@ namespace Menu {
 			if (openEsp) EspTab::Render();
 			if (openPlayers) {
 				if (IsInGame() || IsInLobby()) PlayersTab::Render();
-				else {
-					CloseAllOtherTabs(Tabs::Game);
-					GameTab::Render();
-				}
+				else GameTab::Render();
 			}
 			if (openTasks) {
 				if (IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) TasksTab::Render();

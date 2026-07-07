@@ -258,10 +258,14 @@ void Settings::Load() {
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
         JSON_TRYGET("AutoCopyLobbyCode", this->AutoCopyLobbyCode);
+        JSON_TRYGET("AutoRejoin", this->AutoRejoin);
+        JSON_TRYGET("AutoKickSlackers", this->AutoKickSlackers);
+        JSON_TRYGET("AutoKickSlackersIgnoreWhitelist", this->AutoKickSlackersIgnoreWhitelist);
+        JSON_TRYGET("AutoKickSlackersThreshold", this->AutoKickSlackersThreshold);
+        JSON_TRYGET("AutoKickSlackersGrace", this->AutoKickSlackersGrace);
         JSON_TRYGET("DisableLobbyMusic", this->DisableLobbyMusic);
         JSON_TRYGET("ReportOnMurder", this->ReportOnMurder);
         JSON_TRYGET("PreventSelfReport", this->PreventSelfReport);
-        //JSON_TRYGET("AutoRejoin", this->AutoRejoin);
         JSON_TRYGET("OldStylePingText", this->OldStylePingText);
         JSON_TRYGET("NoSeekerAnim", this->NoSeekerAnim);
         JSON_TRYGET("BetterChatNotifications", this->BetterChatNotifications);
@@ -489,7 +493,17 @@ void Settings::Load() {
             }
         }
 
-		if (j.contains("PlayerHistory") && j["PlayerHistory"].is_array()) {
+        if (j.contains("LobbyHistory") && j["LobbyHistory"].is_array()) {
+            this->LobbyHistory.clear();
+            for (auto& item : j["LobbyHistory"]) {
+                Settings::RememberedLobby l;
+                if (item.contains("Code"))     l.Code = item["Code"].get<std::string>();
+                if (item.contains("HostName")) l.HostName = item["HostName"].get<std::string>();
+                this->LobbyHistory.push_front(l);
+            }
+        }
+
+        if (j.contains("PlayerHistory") && j["PlayerHistory"].is_array()) {
             this->PlayerHistory.clear();
             for (auto& item : j["PlayerHistory"]) {
                 Settings::RememberedPlayer p;
@@ -773,7 +787,11 @@ void Settings::Save() {
                 { "DisableLobbyMusic", this->DisableLobbyMusic },
                 { "ReportOnMurder", this->ReportOnMurder },
                 { "PreventSelfReport", this->PreventSelfReport },
-                //{ "AutoRejoin", this->AutoRejoin },
+                { "AutoRejoin", this->AutoRejoin },
+                { "AutoKickSlackers", this->AutoKickSlackers },
+                { "AutoKickSlackersIgnoreWhitelist", this->AutoKickSlackersIgnoreWhitelist },
+                { "AutoKickSlackersThreshold", this->AutoKickSlackersThreshold },
+                { "AutoKickSlackersGrace", this->AutoKickSlackersGrace },
                 { "OldStylePingText", this->OldStylePingText },
                 { "NoSeekerAnim", this->NoSeekerAnim },
                 { "BetterChatNotifications", this->BetterChatNotifications },
@@ -993,7 +1011,17 @@ void Settings::Save() {
                     return banList;
                 }() },
 
-			    { "PlayerHistory", [&]() {
+                { "LobbyHistory", [&]() {
+            nlohmann::ordered_json arr = nlohmann::ordered_json::array();
+            for (const auto& l : this->LobbyHistory) {
+                arr.push_back({
+                    { "Code",     l.Code },
+                    { "HostName", l.HostName }
+                });
+            }
+            return arr;
+        }() },
+                { "PlayerHistory", [&]() {
                     nlohmann::ordered_json arr = nlohmann::ordered_json::array();
                     for (const auto& p : this->PlayerHistory) {
                         arr.push_back({
