@@ -6,13 +6,13 @@
 // deprecated
 bool dSaveManager_GetPurchase(String* itemKey, String* bundleKey, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dSaveManager_GetPurchase executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dSaveManager_GetPurchase executed", false);
 	return true;
 }
 
 // v2022.10.25s
 bool dPlayerPurchasesData_GetPurchase(PlayerPurchasesData* __this, String* itemKey, String* bundleKey, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dPlayerPurchasesData_GetPurchase executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dPlayerPurchasesData_GetPurchase executed", false);
 	if (State.UnlockCosmetics) {
 		return true;
 	}

@@ -6,7 +6,7 @@
 
 void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dAirshipStatus_OnEnable executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dAirshipStatus_OnEnable executed", false);
 	AirshipStatus_OnEnable(__this, method);
 	State.mapType = Settings::MapType::Airship;
 	if (IsHost() && State.TaskSpeedrun && State.GameLoaded)
@@ -45,7 +45,7 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 }
 
 float dAirshipStatus_CalculateLightRadius(AirshipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
-	if (State.ShowHookLogs) LOG_DEBUG("Hook dAirshipStatus_CalculateLightRadius executed");
+	if (State.ShowHookLogs) Log.Debug("Hook dAirshipStatus_CalculateLightRadius executed", false);
 	if (!State.PanicMode && State.MaxVision)
 		return 420.F;
 	return AirshipStatus_CalculateLightRadius(__this, player, method);

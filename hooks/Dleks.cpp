@@ -6,7 +6,7 @@ constexpr int32_t AnticheatPenalty = 25;
 
 void LogIfEnabled(const std::string& message) {
     if (State.ShowHookLogs) {
-        LOG_DEBUG(message.c_str());
+        Log.Debug(message.c_str(), false);
     }
 }
 
@@ -43,7 +43,7 @@ bool dConstants_1_IsVersionModded(MethodInfo* method) {
 }
 
 /*AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_1(AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method) {
-    LogIfEnabled("Hook dAssetReference_InstantiateAsync_1 executed");
+    LogIfEnabled("Hook dAssetReference_InstantiateAsync_1 executed", false);
     LOG_DEBUG(std::format("AssetReference_InstantiateAsync executed with scene {}", State.CurrentScene).c_str());
     return AssetReference_InstantiateAsync_1(__this, parent, instantiateInWorldSpace, method);
 }*/

@@ -9,7 +9,7 @@ static app::Type* voteSpreaderType = nullptr;
 static bool calloutOver = false;
 
 void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Awake executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_Awake executed", false);
     try {
         State.BlinkPlayersTab = true;
         State.voteMonitor.clear();
@@ -29,7 +29,7 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 
 void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
     State.vanishedPlayers.clear();
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Close executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_Close executed", false);
     try {
         State.BlinkPlayersTab = true;
         State.InMeeting = false;
@@ -150,7 +150,7 @@ void ManageCallout(uint8_t playerId, uint8_t suspectIdx) {
 }
 
 void dMeetingHud_PopulateResults(MeetingHud* __this, Il2CppArraySize* states, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_PopulateResults executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_PopulateResults executed", false);
     try {// remove all votes before populating results
         for (auto votedForArea : il2cpp::Array(__this->fields.playerStates)) {
             if (!votedForArea) {
@@ -196,7 +196,7 @@ void RevealAnonymousVotes() {
 }
 
 void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_Update executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_Update executed", false);
     try {
         const bool isBeforeResultsState = __this->fields.state < app::MeetingHud_VoteStates__Enum::Results;
         il2cpp::Array playerStates(__this->fields.playerStates);
@@ -376,7 +376,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 }
 
 /*void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_RpcVotingComplete executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_RpcVotingComplete executed", false);
     if (!State.PanicMode) {
         if (State.VoteOffPlayerId == Game::SkippedVote || (State.GodMode && exiled == GetPlayerData(*Game::pLocalPlayer))) {
             exiled = NULL;
@@ -394,7 +394,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 }*/ // this is an inlined function, so this hook won't execute, thanks https://allofus.dev/il2cpp/
 
 void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dMeetingHud_RpcVotingComplete executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_RpcVotingComplete executed", false);
     if (State.PanicMode) return MeetingHud_CheckForEndVoting(__this, method);
 
     il2cpp::Array playerStates(__this->fields.playerStates);
@@ -416,12 +416,12 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
 }
 
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicOptions_GetAnonymousVotes executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dLogicOptions_GetAnonymousVotes executed", false);
     return LogicOptions_GetAnonymousVotes(__this, method);
 }
 
 
 void dMeetingHud_CastVote(MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dLogicOptions_GetAnonymousVotes executed");
+    if (State.ShowHookLogs) Log.Debug("Hook dLogicOptions_GetAnonymousVotes executed", false);
     MeetingHud_CastVote(__this, playerId, suspectIdx, method);
 }
