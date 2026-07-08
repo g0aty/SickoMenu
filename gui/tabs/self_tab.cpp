@@ -588,10 +588,6 @@ namespace SelfTab {
             }
             ImGui::SameLine();
             if (ToggleButton("No Seeker Animation", &State.NoSeekerAnim)) State.Save();
-            ImGui::SameLine();
-            if (ToggleButton("Auto Rejoin Lobby", &State.AutoRejoin)) {
-                State.Save();
-            }
 
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
