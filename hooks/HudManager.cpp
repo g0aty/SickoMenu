@@ -341,26 +341,6 @@ void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodI
     EndGameNavigation_ShowDefaultNavigation(__this, method);
 }
 
-void dEndGameManager_ShowButtons(Il2CppObject* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) LOG_DEBUG("Hook dEndGameManager_ShowButtons executed");
-    EndGameManager_ShowButtons(__this, method);
-    if (!State.PanicMode && State.AutoRejoin) {
-        if (IsHost() && EndGameNavigation_NextGame != nullptr) {
-            EndGameNavigation* nav = *reinterpret_cast<EndGameNavigation**>(reinterpret_cast<uint8_t*>(__this) + 56);
-            if (nav != nullptr)
-                EndGameNavigation_NextGame(nav, NULL);
-        }
-        else if (!IsHost() && !State.LastLobbyJoined.empty()
-            && AmongUsClient_CoFindGameInfoFromCodeAndJoin != nullptr
-            && MonoBehaviour_StartCoroutine != nullptr) {
-            int32_t gameId = GameCode_GameNameToInt(convert_to_string(State.LastLobbyJoined), NULL);
-            void* routine = AmongUsClient_CoFindGameInfoFromCodeAndJoin(*Game::pAmongUsClient, gameId, NULL);
-            if (routine)
-                MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
-        }
-    }
-}
-
 void dFriendsListUI_UpdateFriendCodeUI(FriendsListUI* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dFriendsListUI_UpdateFriendCodeUI executed", false);
     FriendsListUI_UpdateFriendCodeUI(__this, method);
