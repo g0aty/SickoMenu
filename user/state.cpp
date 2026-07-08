@@ -258,7 +258,6 @@ void Settings::Load() {
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
         JSON_TRYGET("AutoCopyLobbyCode", this->AutoCopyLobbyCode);
-        JSON_TRYGET("AutoRejoin", this->AutoRejoin);
         JSON_TRYGET("AutoKickSlackers", this->AutoKickSlackers);
         JSON_TRYGET("AutoKickSlackersIgnoreWhitelist", this->AutoKickSlackersIgnoreWhitelist);
         JSON_TRYGET("AutoKickSlackersThreshold", this->AutoKickSlackersThreshold);
@@ -787,7 +786,6 @@ void Settings::Save() {
                 { "DisableLobbyMusic", this->DisableLobbyMusic },
                 { "ReportOnMurder", this->ReportOnMurder },
                 { "PreventSelfReport", this->PreventSelfReport },
-                { "AutoRejoin", this->AutoRejoin },
                 { "AutoKickSlackers", this->AutoKickSlackers },
                 { "AutoKickSlackersIgnoreWhitelist", this->AutoKickSlackersIgnoreWhitelist },
                 { "AutoKickSlackersThreshold", this->AutoKickSlackersThreshold },
