@@ -448,14 +448,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             static int joinDelay = 0;
             if (joinDelay > 0) joinDelay--;
             if (State.AutoJoinLobby && joinDelay <= 0) {
+                void* routine = AmongUsClient_CoFindGameInfoFromCodeAndJoin(*Game::pAmongUsClient,
+                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
+                    NULL);
+                MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
                 State.AutoJoinLobby = false;
-                if (!State.AutoJoinLobbyCode.empty()) {
-                    void* routine = AmongUsClient_CoFindGameInfoFromCodeAndJoin(*Game::pAmongUsClient,
-                        GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
-                        NULL);
-                    if (routine)
-                        MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
-                }
+                joinDelay = 100;
             }
 
             static int reportDelay = 0;
@@ -1632,7 +1630,7 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
         if (__this->fields.GameState == InnerNetClient_GameStates__Enum::Started
             || __this->fields.GameState == InnerNetClient_GameStates__Enum::Joined
             || __this->fields.NetworkMode == NetworkModes__Enum::FreePlay) {
-            if (!State.AutoJoinLobby) onGameEnd();
+            onGameEnd();
             State.LastDisconnectReason = reason;
             if (reason == DisconnectReasons__Enum::Banned || reason == DisconnectReasons__Enum::ConnectionLimit || reason == DisconnectReasons__Enum::GameNotFound || reason == DisconnectReasons__Enum::ServerError)
                 State.AutoJoinLobby = false;
@@ -1652,7 +1650,7 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
             (reasonStr == "Timeout while waiting for player ID assignment" || reasonStr == "Timeout while waiting for player data containers"))
             return;
         State.FollowerCam = nullptr;
-        if (!(State.AutoJoinLobby && reason == DisconnectReasons__Enum::NewConnection)) onGameEnd(); //removed antiban cuz it glitches the game
+        onGameEnd(); //removed antiban cuz it glitches the game
     }
     catch (...) {
         LOG_ERROR("Exception occurred in InnerNetClient_EnqueueDisconnect (InnerNetClient)");
