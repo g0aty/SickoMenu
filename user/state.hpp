@@ -129,8 +129,6 @@ public:
     int CrashChatSpamMode = 1;
     bool AutoJoinLobby = false;
     std::string AutoJoinLobbyCode = "";
-    std::string PendingJoinCode = "";
-    bool AutoJoinLobbyInstant = false;
     std::unordered_map<std::string, std::string> LobbyHostCache;
     int LobbyHistoryLimit = 20;
     static const int LobbyHistoryMaxStored = 50;
@@ -256,10 +254,10 @@ public:
     bool DoTasksAsImpostor = false;
     bool AlwaysUseKillExploit = false;
     bool AutoCopyLobbyCode = false;
-    bool AutoRejoin = false;
     bool DisableLobbyMusic = false;
     bool ReportOnMurder = false;
     bool PreventSelfReport = true;
+    bool AutoRejoin = false;
     bool OldStylePingText = false;
     bool NoSeekerAnim = false;
     bool BetterChatNotifications = false;
