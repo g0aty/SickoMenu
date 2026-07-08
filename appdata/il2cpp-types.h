@@ -11029,7 +11029,6 @@ namespace app {
     typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
     typedef Il2CppObject MatchMakerGameButton;
     typedef Il2CppObject EndGameNavigation;
-    typedef Il2CppObject EndGameManager;
     typedef Il2CppObject HideAndSeekManager;
     typedef Il2CppObject NormalGameManager;
     typedef Il2CppObject QuickChatPhraseBuilderResult;
