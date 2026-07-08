@@ -739,20 +739,20 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         queue->push(new SetRole(RoleTypes__Enum::CrewmateGhost)); //prevent being unable to protect
                     }
                 }
-
+                static float slackerTimer = 0.f;
+                if (!IsInGame()) slackerTimer = 0.f;
                 if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer && !autoStartedGame) {
                     autoStartedGame = true;
                     InnerNetClient_SendStartGame(__this, NULL);
                 }
-
                 if (IsHost() && IsInGame() && State.AutoKickSlackers) {
-                    static float slackerTimer = 0.f;
                     slackerTimer += Time_get_deltaTime(NULL);
                     if (slackerTimer >= (float)State.AutoKickSlackersGrace) {
                         for (auto pc : GetAllPlayerControl()) {
                             if (pc == nullptr || pc == *Game::pLocalPlayer) continue;
                             auto pd = GetPlayerData(pc);
-                            if (pd == nullptr || pd->fields.Disconnected || pd->fields.IsDead) continue;
+                            if (pd == nullptr || pd->fields.Disconnected) continue;
+                            if (PlayerIsImpostor(pd)) continue;
                             auto tasks = GetNormalPlayerTasks(pc);
                             if (tasks.empty()) continue;
                             int total = (int)tasks.size();
@@ -770,7 +770,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                     LOG_DEBUG("Task Enforcer: kicking " + playerName + " (" + std::to_string(pct) + "% tasks)");
                                     InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
                                     if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
-                                        auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
+                                        Sprite* spriteBackup = notifier->fields.playerDisconnectSprite;
                                         Color colorBackup = notifier->fields.disconnectColor;
                                         notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
                                         notifier->fields.disconnectColor = Color(1.0f, 0.5f, 0.0f, 1.0f);

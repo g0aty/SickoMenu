@@ -177,6 +177,18 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
         systemType == SystemTypes__Enum::MedBay)
         return ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
     if (!State.PanicMode && State.DisableSabotages) return;
+
+    if (player != nullptr && systemType != SystemTypes__Enum::Electrical) {
+        auto evtPlayer = GetEventPlayerControl(player);
+        if (evtPlayer.has_value()) {
+            bool isSabotage = amount >= 128;
+            SABOTAGE_ACTIONS action = isSabotage ? SABOTAGE_ACTIONS::SABOTAGE_CALL : SABOTAGE_ACTIONS::SABOTAGE_FIX;
+            synchronized(Replay::replayEventMutex) {
+                State.liveConsoleEvents.emplace_back(std::make_unique<SabotageEvent>(evtPlayer.value(), systemType, action));
+            }
+        }
+    }
+
     ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
 }
 

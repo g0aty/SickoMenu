@@ -164,12 +164,12 @@ namespace TasksTab {
 					if (ToggleButton("Auto Kick Slackers", &State.AutoKickSlackers))
 						State.Save();
 					ImGui::SameLine();
-					if (ToggleButton("Ignore Whitelist", &State.AutoKickSlackersIgnoreWhitelist))
+					if (ToggleButton("Ignore Whitelisted Players", &State.AutoKickSlackersIgnoreWhitelist))
 						State.Save();
 					ImGui::Text("Kicks players below task threshold after grace period.");
 					if (SliderIntV2("Task Threshold %", &State.AutoKickSlackersThreshold, 1, 100, "%d%%", ImGuiSliderFlags_NoInput))
 						State.Save();
-					if (SliderIntV2("Grace Period (sec)", &State.AutoKickSlackersGrace, 50, 500, "%ds", ImGuiSliderFlags_NoInput))
+					if (SliderIntV2("Grace Period (sec)", &State.AutoKickSlackersGrace, 10, 500, "%ds", ImGuiSliderFlags_NoInput))
 						State.Save();
 				}
 			}
