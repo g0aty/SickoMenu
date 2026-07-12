@@ -14,7 +14,8 @@ namespace Menu {
 		Sabotage,
 		Doors,
 		Host,
-		Debug
+		Debug,
+		Search
 	};
 	void CloseAllOtherTabs(Tabs openTab);
 	void Init();

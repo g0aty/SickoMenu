@@ -35,6 +35,7 @@ namespace Menu {
 	static bool openSabotage = false;
 	static bool openDoors = false;
 	static bool openHost = false;
+	static bool openSearch = false;
 #ifdef _DEBUG
 	static bool openDebug = false;
 #endif
@@ -89,6 +90,7 @@ namespace Menu {
 		openSabotage = openTab == Tabs::Sabotage;
 		openDoors = openTab == Tabs::Doors;
 		openHost = openTab == Tabs::Host;
+		openSearch = openTab == Tabs::Search;
 #ifdef _DEBUG
 		openDebug = openTab == Tabs::Debug;
 #endif
@@ -120,22 +122,40 @@ namespace Menu {
 
 		std::string lowerQuery = ToLower(State.searchQuery);
 
-		std::vector<std::string> searchResults = {};
+		std::vector<std::pair<std::string, std::string>> searchResults = {};
 
 		for (const auto& category : categories) {
 			for (const auto& setting : category.second) {
 				if (ToLower(setting).find(lowerQuery) != std::string::npos) {
-					searchResults.push_back(category.first);
-					break;
+					searchResults.push_back({category.first, setting});
 				}
 			}
 		}
-		ImGui::TextColored(ImVec4(0.f, 0.f, 0.f, 0.f), "space");
-		if (searchResults.size() == 0) BoldText("No results.");
+		
+		if (searchResults.size() == 0) {
+			BoldText("No results.");
+		}
 		else {
 			BoldText(("Search Result" + std::string(searchResults.size() == 1 ? "" : "s")).c_str());
-			for (std::string i : searchResults) {
-				ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.f), i.c_str());
+			for (auto const& [category, setting] : searchResults) {
+				if (ImGui::Selectable(std::format("{} ({})", setting, category).c_str())) {
+					Tabs targetTab = Tabs::About;
+					if (category == "Settings") targetTab = Tabs::Settings;
+					else if (category == "Game") targetTab = Tabs::Game;
+					else if (category == "Self") targetTab = Tabs::Self;
+					else if (category == "Radar") targetTab = Tabs::Radar;
+					else if (category == "Replay") targetTab = Tabs::Replay;
+					else if (category == "ESP") targetTab = Tabs::Esp;
+					else if (category == "Players") targetTab = Tabs::Players;
+					else if (category == "Tasks") targetTab = Tabs::Tasks;
+					else if (category == "Sabotage") targetTab = Tabs::Sabotage;
+					else if (category == "Doors") targetTab = Tabs::Doors;
+					else if (category == "Host") targetTab = Tabs::Host;
+					#ifdef _DEBUG
+					else if (category == "Debug") targetTab = Tabs::Debug;
+					#endif
+					CloseAllOtherTabs(targetTab);
+				}
 			}
 		}
 	}
@@ -165,14 +185,8 @@ namespace Menu {
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 			// Search field
 			ImGui::SetNextItemWidth(90 * State.dpiScale); // Adjust the width of the input box
-			if (InputStringWithHint("##Search", "Search...", &State.searchQuery)/* && State.AprilFoolsMode*/) {
-				/*if (ToLower(searchQuery) == StrRev("nosduh")) {
-					State.AprilFoolsMode = !State.AprilFoolsMode;
-					if (!State.AprilFoolsMode) State.DiddyPartyMode = false;
-				}
-				if (ToLower(searchQuery) == StrRev("yddid")) {
-					State.DiddyPartyMode = !State.DiddyPartyMode;
-				}*/
+			if (InputStringWithHint("##Search", "Search...", &State.searchQuery)) {
+				CloseAllOtherTabs(Tabs::Search);
 			}
 			if (ImGui::Selectable("About", openAbout)) {
 				CloseAllOtherTabs(Tabs::About);
@@ -215,7 +229,7 @@ namespace Menu {
 				CloseAllOtherTabs(Tabs::Debug);
 			}
 #endif
-			RenderSearchResults();
+			if (openSearch) RenderSearchResults();
 
 			ImVec4 PanicCol = ImVec4(1.f, 0.f, 0.f, 1.f);
 			ImVec4 GreenCol = ImVec4(0.f, 1.f, 0.f, 1.f);
@@ -307,6 +321,7 @@ namespace Menu {
 					GameTab::Render();
 				}
 			}
+			if (openSearch) RenderSearchResults();
 #ifdef _DEBUG
 			if (openDebug) {
 				if (State.showDebugTab) DebugTab::Render();
