@@ -64,6 +64,11 @@ static void onGameEnd() {
         State.protectMonitor.clear();
         State.vanishedPlayers.clear();
         State.validDeadBodyIds.clear();
+        State.ventTpSeqIds.clear();
+        State.SpamVentTpEveryoneRandom = false;
+        State.SpamVentTpEveryone = false;
+        State.spamRandomVentTpPlayers.clear();
+        State.spamVentTpPlayers.clear();
         State.VoteKicks = 0;
         State.OutfitCooldown = 50;
         State.CanChangeOutfit = false;
@@ -103,7 +108,7 @@ static void onGameEnd() {
 
 void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 {
-    if (State.ShowHookLogs) Log.Debug("Hook dInnerNetClient_Update executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_Update executed", false);
     try {
         if (!State.PanicMode) {
             if (IsHost() && !State.Mod_PendingRulesMessages.empty()) {
@@ -143,6 +148,28 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     if (player != *Game::pLocalPlayer)
                         app::GameObject_set_layer(app::Component_get_gameObject((Component_1*)(player), NULL), app::LayerMask_NameToLayer(convert_to_string("Ghost"), NULL), NULL);
                 }*/ //unintentionally prevents admin from working, workaround can be found later
+            }
+
+            if (!State.PanicMode && State.ModDetection && (IsInLobby()/* || State.BroadcastedMod == 1*/)) {
+                uint8_t rpcCall = (uint8_t)420;
+                /*switch (State.BroadcastedMod) {
+                case 1:
+                    rpcCall = (uint8_t)42069;
+                    break;
+                case 2:
+                    rpcCall = (uint8_t)250;
+                    break;
+                }*/
+                if (State.rpcCooldown <= 0) {
+                    //SickoMenu users can detect this rpc
+                    MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, rpcCall, SendOption__Enum::Reliable, -1, NULL);
+                    MessageWriter_WriteString(writer, convert_to_string(State.SickoVersion), NULL);
+                    InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                    State.rpcCooldown = int(0.5 * GetFps());
+                }
+                else {
+                    State.rpcCooldown--;
+                }
             }
 
             if (!IsInGame()) {
@@ -808,6 +835,73 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     }
                 }
 
+                if (IsInGame() && (*Game::pShipStatus) != NULL) {
+                    const std::vector<const char*> SHIPVENTS = { "Admin", "Hallway", "Cafeteria", "Electrical", "Upper Engine", "Security", "Medbay", "Weapons", "Lower Reactor", "Lower Engine", "Shields", "Upper Reactor", "Upper Navigation", "Lower Navigation" };
+                    const std::vector<const char*> HQVENTS = { "Balcony", "Cafeteria", "Reactor", "Laboratory", "Office", "Admin", "Greenhouse", "Medbay", "Decontamination", "Locker Room", "Launchpad" };
+                    const std::vector<const char*> PBVENTS = { "Security", "Electrical", "O2", "Communications", "Office", "Admin", "Laboratory", "Lava Pool", "Storage", "Right Seismic", "Left Seismic", "Outside Admin" };
+                    const std::vector<const char*> AIRSHIPVENTS = { "Vault", "Cockpit", "Viewing Deck", "Engine", "Kitchen", "Lower Main Hall", "Upper Main Hall", "Right Gap Room", "Left Gap Room", "Showers", "Records", "Cargo Bay" };
+                    const std::vector<const char*> FUNGLEVENTS = { "Communications", "Kitchen", "Lookout", "Outside Dorm", "Laboratory", "Reactor", "Jungle (Laboratory)", "Jungle (Greenhouse)", "Splash Zone", "Cafeteria" };
+
+                    std::vector<const char*> allVents;
+                    switch (State.mapType) {
+                    case Settings::MapType::Ship:
+                        allVents = SHIPVENTS;
+                        break;
+                    case Settings::MapType::Hq:
+                        allVents = HQVENTS;
+                        break;
+                    case Settings::MapType::Pb:
+                        allVents = PBVENTS;
+                        break;
+                    case Settings::MapType::Airship:
+                        allVents = AIRSHIPVENTS;
+                        break;
+                    case Settings::MapType::Fungle:
+                        allVents = FUNGLEVENTS;
+                        break;
+                    }
+                    int hqOffset = (int)(State.mapType == Settings::MapType::Hq);
+
+                    static float ventTpDelay = 0.f;
+                    if (ventTpDelay <= 0.f) {
+                        if (State.SpamVentTpEveryoneRandom || State.spamRandomVentTpPlayers.size() != 0) {
+                            for (auto p : GetAllPlayerControl()) {
+                                if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
+                                if (!State.SpamVentTpEveryone) {
+                                    auto it = std::find(State.spamRandomVentTpPlayers.begin(), State.spamRandomVentTpPlayers.end(), p->fields.PlayerId);
+                                    if (it == State.spamRandomVentTpPlayers.end()) continue;
+                                }
+
+                                int ventId = randi(0 + hqOffset, allVents.size() - 1 + hqOffset);
+
+                                if (IsHost() || !State.SafeMode)
+                                    PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, ventId, NULL);
+                                else
+                                    SendBootVentNonHost(p, ventId);
+                            }
+                        }
+
+                        else if (State.SpamVentTpEveryone || State.spamVentTpPlayers.size() != 0) {
+                            for (auto p : GetAllPlayerControl()) {
+                                if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
+
+                                bool isSpamVentedSeparately = State.spamVentTpPlayers.find(p->fields.PlayerId) != State.spamVentTpPlayers.end();
+
+                                if (!State.SpamVentTpEveryone && !isSpamVentedSeparately) continue;
+
+                                int ventId = isSpamVentedSeparately ? State.spamVentTpPlayers.at(p->fields.PlayerId) : State.SelectedVentId;
+
+                                if (IsHost() || !State.SafeMode)
+                                    PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, ventId, NULL);
+                                else
+                                    SendBootVentNonHost(p, ventId);
+                            }
+                        }
+                        ventTpDelay = 0.5f;
+                    }
+                    else ventTpDelay -= Time_get_deltaTime(NULL);
+                }
+
                 /*if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount && !autoStartedGame) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
                     int playerCount = 0;
                     for (auto p : GetAllPlayerControl()) {
@@ -1436,7 +1530,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 }
 
 void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnGameJoined executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnGameJoined executed", false);
     try {
         State.AutoJoinLobby = false;
         if (!State.PanicMode) {
@@ -1487,7 +1581,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 }
 
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnPlayerLeft executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnPlayerLeft executed", false);
     try {
         State.BlinkPlayersTab = true;
         if (data->fields.Character) { // Don't use Object_1_IsNotNull().
@@ -1511,13 +1605,12 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
             if (State.modUsers.find(playerId) != State.modUsers.end())
                 State.modUsers.erase(playerId);
 
-            if (playerId < State.assignedRolesPlayer.size()) {
-                State.assignedRolesPlayer[playerId] = nullptr;
-                State.assignedRoles[playerId] = RoleType::Random;
-            }
+            if (State.spamVentTpPlayers.find(playerId) != State.spamVentTpPlayers.end())
+                State.spamVentTpPlayers.erase(playerId);
 
-            if (State.modUsers.find(playerId) != State.modUsers.end())
-                State.modUsers.erase(playerId);
+            auto it = std::find(State.spamRandomVentTpPlayers.begin(), State.spamRandomVentTpPlayers.end(), playerId);
+            if (it != State.spamRandomVentTpPlayers.end())
+                State.spamRandomVentTpPlayers.erase(it);
 
             if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                 synchronized(Replay::replayEventMutex) {
@@ -1538,7 +1631,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
 }
 
 void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnPlayerJoined executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnPlayerJoined executed", false);
     State.BlinkPlayersTab = true;
     AmongUsClient_OnPlayerJoined(__this, data, method);
 }
@@ -1577,7 +1670,7 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
 }
 
 void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dCustomNetworkTransform_SnapTo executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dCustomNetworkTransform_SnapTo executed", false);
     /*try {//Leave this out until we fix it.
         if (!State.PanicMode) {
             if (!IsInGame()) {
@@ -1606,7 +1699,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
 }
 
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResult, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnGameEnd executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnGameEnd executed", false);
     try {
         if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
             RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
@@ -1679,7 +1772,7 @@ void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResul
 }
 
 void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dInnerNetClient_DisconnectInternal executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_DisconnectInternal executed", false);
     try {
         // IsInGame() || IsInLobby()
         if (__this->fields.GameState == InnerNetClient_GameStates__Enum::Started
@@ -1698,7 +1791,7 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
 }
 
 void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dInnerNetClient_EnqueueDisconnect executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_EnqueueDisconnect executed", false);
     try {
         std::string reasonStr = convert_from_string(stringReason);
         if (reason == DisconnectReasons__Enum::Error &&
@@ -1714,14 +1807,14 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
 }
 
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dGameManager_RpcEndGame executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dGameManager_RpcEndGame executed", false);
     if (!State.PanicMode && IsHost() && State.NoGameEnd)
         return;
     GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
 
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* killer, NetworkedPlayerInfo* victim, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dKillOverlay_ShowKillAnimation_1 executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dKillOverlay_ShowKillAnimation_1 executed", false);
     try {
         if (!State.PanicMode && State.DisableKillAnimation)
             return;
@@ -1733,7 +1826,7 @@ void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* 
 }
 
 float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dLogicOptions_GetKillDistance executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLogicOptions_GetKillDistance executed", false);
     try {
         if (!State.PanicMode) {
             State.GameKillDistance = LogicOptions_GetKillDistance(__this, method);
@@ -1750,7 +1843,7 @@ float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
 }
 
 void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dLadder_SetDestinationCooldown executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLadder_SetDestinationCooldown executed", false);
     try {
         if (!State.PanicMode && State.NoAbilityCD) {
             __this->fields._CoolDown_k__BackingField = 0.f;
@@ -1764,7 +1857,7 @@ void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
 }
 
 void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dVoteBanSystem_AddVote executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dVoteBanSystem_AddVote executed", false);
     try {
         if (clientId == (*Game::pLocalPlayer)->fields._.OwnerId)
             State.VoteKicks++;
@@ -1798,7 +1891,7 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
 }*/
 
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dDisconnectPopup_DoShow executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dDisconnectPopup_DoShow executed", false);
     DisconnectPopup_DoShow(__this, method);
     bool shouldCopyCode = State.AutoCopyLobbyCode && State.LastLobbyJoined != "";
     if (!State.PanicMode || State.TempPanicMode) {
@@ -1835,6 +1928,6 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
 }
 
 bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dGameManager_DidImpostorsWin executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dGameManager_DidImpostorsWin executed", false);
     return GameManager_DidImpostorsWin(__this, reason, method);
 }

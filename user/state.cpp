@@ -121,6 +121,14 @@ void Settings::Load() {
         //JSON_TRYGET("CycleBetweenOutfits", this->CycleBetweenOutfits);
         //JSON_TRYGET("ChangeBodyType", this->ChangeBodyType);
         //JSON_TRYGET("BodyType", this->BodyType);
+        JSON_TRYGET("ShowTime", this->ShowTime);
+        JSON_TRYGET("TimeOffsetMinutes", this->TimeOffsetMinutes);
+        JSON_TRYGET("NegativeTimeOffset", this->NegativeTimeOffset);
+        JSON_TRYGET("Use12HourFormat", this->Use12HourFormat);
+        JSON_TRYGET("ShowSeconds", this->ShowSeconds);
+        JSON_TRYGET("UseLeadingZeroForHours", this->UseLeadingZeroForHours);
+        JSON_TRYGET("AmString", this->AmString);
+        JSON_TRYGET("PmString", this->PmString);
         JSON_TRYGET("CycleInMeeting", this->CycleInMeeting);
         JSON_TRYGET("CycleTimer", this->CycleTimer);
         JSON_TRYGET("CyclerUserNames", this->cyclerUserNames);
@@ -231,6 +239,7 @@ void Settings::Load() {
         JSON_TRYGET("ShowRadar_Ghosts", this->ShowRadar_Ghosts);
         JSON_TRYGET("HideRadar_During_Meetings", this->HideRadar_During_Meetings);
         JSON_TRYGET("ShowRadar_RightClickTP", this->ShowRadar_RightClickTP);
+        JSON_TRYGET("ShowRadar_ShiftLeftClickClosesRoomDoor", this->ShowRadar_ShiftLeftClickClosesRoomDoor);
         JSON_TRYGET("LockRadar", this->LockRadar);
         JSON_TRYGET("RadarColor_R", this->SelectedColor.x);
         JSON_TRYGET("RadarColor_G", this->SelectedColor.y);
@@ -372,6 +381,7 @@ void Settings::Load() {
         JSON_TRYGET("ShiftRightClickTP", this->ShiftRightClickTP);
         JSON_TRYGET("RotateRadius", this->RotateRadius);
         JSON_TRYGET("RelativeTeleport", this->RelativeTeleport);
+        JSON_TRYGET("IgnoreVentTpSelf", this->IgnoreVentTpSelf);
         JSON_TRYGET("ShowKillCD", this->ShowKillCD);
 
         JSON_TRYGET("Confuser", this->confuser);
@@ -406,7 +416,7 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_AddToBlacklist", this->SMAC_AddToBlacklist);
         JSON_TRYGET("SMAC_PunishBlacklist", this->SMAC_PunishBlacklist);
         JSON_TRYGET("SMAC_IgnoreWhitelist", this->SMAC_IgnoreWhitelist);
-        JSON_TRYGET("SMAC_CheckAUM", this->SMAC_CheckAUM);
+        JSON_TRYGET("SMAC_CheckOtherCheats", this->SMAC_CheckOtherCheats);
         JSON_TRYGET("SMAC_CheckSicko", this->SMAC_CheckSicko);
         JSON_TRYGET("SMAC_CheckBadNames", this->SMAC_CheckBadNames);
         JSON_TRYGET("SMAC_CheckColor", this->SMAC_CheckColor);
@@ -731,6 +741,14 @@ void Settings::Save() {
                 //{ "CycleBetweenOutfits", this->CycleBetweenOutfits },
                 //{ "ChangeBodyType", this->ChangeBodyType },
                 //{ "BodyType", this->BodyType },
+                { "ShowTime", this->ShowTime },
+                { "TimeOffsetMinutes", this->TimeOffsetMinutes },
+                { "NegativeTimeOffset", this->NegativeTimeOffset },
+                { "Use12HourFormat", this->Use12HourFormat },
+                { "ShowSeconds", this->ShowSeconds },
+                { "UseLeadingZeroForHours", this->UseLeadingZeroForHours },
+                { "AmString", this->AmString },
+                { "PmString", this->PmString },
                 { "CycleInMeeting", this->CycleInMeeting },
                 { "CycleTimer", this->CycleTimer },
                 { "CyclerUserNames", this->cyclerUserNames },
@@ -771,6 +789,7 @@ void Settings::Save() {
                 { "HideRadar_During_Meetings", this->HideRadar_During_Meetings },
                 { "LockRadar", this->LockRadar },
                 { "ShowRadar_RightClickTP", this->ShowRadar_RightClickTP },
+                { "ShowRadar_ShiftLeftClickClosesRoomDoor", this->ShowRadar_ShiftLeftClickClosesRoomDoor },
                 { "RadarColor_R", this->SelectedColor.x },
                 { "RadarColor_G", this->SelectedColor.y },
                 { "RadarColor_B", this->SelectedColor.z },
@@ -875,6 +894,7 @@ void Settings::Save() {
                 { "UnlockKillButton", this->UnlockKillButton },
                 { "ChatPaste", this->ChatPaste },
                 { "RevealRoles", this->RevealRoles },
+                { "AbbreviatedRoleNames", this->AbbreviatedRoleNames },
                 { "LocalizeRoleNames", this->LocalizeRoleNames },
                 { "PlayerColoredDots", this->PlayerColoredDots },
                 { "ShowPlayerInfo", this->ShowPlayerInfo },
@@ -973,6 +993,7 @@ void Settings::Save() {
                 { "ShiftRightClickTP", this->ShiftRightClickTP },
                 { "RotateRadius", this->RotateRadius },
                 { "RelativeTeleport", this->RelativeTeleport },
+                { "IgnoreVentTpSelf", this->IgnoreVentTpSelf },
                 { "ShowKillCD", this->ShowKillCD },
 
                 { "Confuser", this->confuser },
@@ -1006,7 +1027,7 @@ void Settings::Save() {
                 { "SMAC_AddToBlacklist", this->SMAC_AddToBlacklist },
                 { "SMAC_PunishBlacklist", this->SMAC_PunishBlacklist },
                 { "SMAC_IgnoreWhitelist", this->SMAC_IgnoreWhitelist },
-                { "SMAC_CheckAUM", this->SMAC_CheckAUM },
+                { "SMAC_CheckOtherCheats", this->SMAC_CheckOtherCheats },
                 { "SMAC_CheckSicko", this->SMAC_CheckSicko },
                 { "SMAC_CheckBadNames", this->SMAC_CheckBadNames },
                 { "SMAC_CheckColor", this->SMAC_CheckColor },

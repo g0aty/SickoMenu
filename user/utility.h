@@ -29,8 +29,7 @@ enum class MapType {
 	MAP_FUNGLE = 4
 };
 
-enum class RoleType
-{
+enum class RoleType {
 	Random = 0,
 	Crewmate = 1,
 	Scientist = 2,
@@ -99,6 +98,17 @@ class PlayerSelection {
 			#endif*/
 			try {
 				return _playerControl->fields._.OwnerId == (*Game::pAmongUsClient)->fields._.ClientId;
+			}
+			catch (...) {
+				return false;
+			}
+		}
+		constexpr bool is_Host() const {
+			/*#if _CONTAINER_DEBUG_LEVEL > 0
+						assert(has_value() && "is_LocalPlayer() called on empty result");
+			#endif*/
+			try {
+				return _playerControl->fields._.OwnerId == ((InnerNetClient*)(*Game::pAmongUsClient))->fields.HostId;
 			}
 			catch (...) {
 				return false;
@@ -221,6 +231,7 @@ void CompleteAllTasks(PlayerControl* player = NULL);
 const char* TranslateTaskTypes(TaskTypes__Enum taskType);
 const char* TranslateSystemTypes(SystemTypes__Enum systemType);
 Color32 GetPlayerColor(Game::ColorId colorId);
+Color32 GetPlayerTextColor(Game::ColorId colorId, bool isOutline = false);
 std::filesystem::path getModulePath(HMODULE hModule);
 std::string getGameVersion();
 SystemTypes__Enum GetSystemTypes(const Vector2& vector);
@@ -287,6 +298,8 @@ std::string strToLower(std::string str);
 bool IsRandomAUName(const std::string& name);
 bool IsDater(std::string username, int playerCount = 4);
 void SendKillImmuneToggle(bool enabled);
+void SendBootVentNonHost(PlayerControl* player, int ventId, int targetNetId = -2);
+std::string GetTimeString(bool useLeadingZeroForHours = true, bool showSeconds = true);
 
 /// <summary>
 /// Simplifies a list of points by ensuring the distance between consecutive points is greater than the squared distance threshold; all other points are discarded.

@@ -299,6 +299,14 @@ public:
     bool CycleBetweenOutfits = false;
     bool ChangeBodyType = false;
     int BodyType = 0;
+    bool ShowTime = false;
+    int TimeOffsetMinutes = 0;
+    bool NegativeTimeOffset = false;
+    bool Use12HourFormat = false;
+    bool ShowSeconds = false;
+    bool UseLeadingZeroForHours = true;
+    std::string AmString = "AM";
+    std::string PmString = "PM";
 
     bool NoClip = false;
     bool HotkeyNoClip = false;
@@ -356,6 +364,7 @@ public:
     bool ShowRadar_Ghosts = false;
     bool HideRadar_During_Meetings = false;
     bool ShowRadar_RightClickTP = false;
+    bool ShowRadar_ShiftLeftClickClosesRoomDoor = false;
     bool LockRadar = false;
     bool RadarDrawIcons = false;
     bool RadarVisorRoleColor = false;
@@ -386,18 +395,12 @@ public:
     bool RotateEveryone = false;
     bool RotateServerSide = false;
     bool RelativeTeleport = false;
-    std::string Mod_SickoSocials = "";
-    std::queue<std::string> Mod_PendingRulesMessages; 
-    float Mod_PendingRulesDelay = 0.f; 
-    std::vector<std::string> Mod_RoleNames = {};
-    std::vector<std::vector<std::string>> Mod_RoleMembers = {}; 
-    std::vector<std::map<std::string, bool>> Mod_RolePermissions = {}; 
-    std::vector<int> Mod_RoleRank = {}; 
-    bool SMAC_CheckStartWords = false;
-    bool SMAC_StartWordsStrict = true;
-    int SMAC_StartWordsThreshold = 1;
-    std::vector<std::string> SMAC_StartWords = {};
-    std::map<uint8_t, int> SMAC_StartWordsCount;
+    bool SpamVentTpEveryone = false;
+    bool SpamVentTpEveryoneRandom = false;
+    bool IgnoreVentTpSelf = false;
+    int SelectedVentId = 0;
+    std::vector<Game::PlayerId> spamRandomVentTpPlayers = {};
+    std::map<Game::PlayerId, int> spamVentTpPlayers = {};
     float RotateRadius = 1.f;
     float xCoordinate = 0.f;
     float yCoordinate = 0.f;
@@ -441,7 +444,8 @@ public:
     //std::vector<Game::PlayerId> sickoUsers;
     std::vector<Game::PlayerId> vanishedPlayers;
     std::vector<Game::PlayerId> validDeadBodyIds;
-    std::map<Game::PlayerId, std::string> modUsers;
+    std::map<Game::PlayerId, int> ventTpSeqIds;
+    std::map<Game::PlayerId, std::vector<std::string>> modUsers;
     int32_t rpcCooldown = 15;
     int32_t playerKilledId = 0;
     std::string searchQuery = "";
@@ -689,7 +693,7 @@ public:
     bool SMAC_AddToBlacklist = false;
     bool SMAC_IgnoreWhitelist = false;
     bool SMAC_PunishBlacklist = false;
-    bool SMAC_CheckAUM = true;
+    bool SMAC_CheckOtherCheats = true;
     bool SMAC_CheckSicko = true;
     bool SMAC_CheckBadNames = true;
     bool SMAC_CheckColor = true;

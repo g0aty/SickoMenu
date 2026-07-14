@@ -487,7 +487,7 @@ void RpcForceDetectAum::Process()
     MessageWriter_WriteByte(rpcMessage, player->fields.PlayerId, NULL);
     //we do a little trolling >:)
     //aum only checks for the player id thus making it, so we can send whoever we want to (even as ourselves)
-    MessageWriter_EndMessage(rpcMessage, NULL);
+    InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), rpcMessage, NULL);
 }
 
 RpcForceSickoChat::RpcForceSickoChat(const PlayerSelection& target, std::string_view msg, bool completeForce)
@@ -571,6 +571,37 @@ void RpcBootFromVent::Process()
     if (!PlayerSelection(Player).has_value()) return;
 
     PlayerPhysics_RpcBootFromVent(Player->fields.MyPhysics, ventId, NULL);
+}
+
+RpcBootFromVentNonHost::RpcBootFromVentNonHost(PlayerControl* Player, int ventId)
+{
+    this->Player = Player;
+    this->ventId = ventId;
+}
+
+void RpcBootFromVentNonHost::Process()
+{
+    if (!PlayerSelection(Player).has_value()) return;
+
+    SendBootVentNonHost(Player, ventId);
+}
+
+AttemptToBan::AttemptToBan(PlayerControl* Player)
+{
+    this->Player = Player;
+}
+
+void AttemptToBan::Process()
+{
+    auto hostPc = InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Character;
+    if (hostPc == NULL) return;
+
+    if (Player == NULL) {
+        SendBootVentNonHost(hostPc, 1, -1);
+        return;
+    }
+
+    SendBootVentNonHost(hostPc, 1, Player->fields._.OwnerId);
 }
 
 SendKillImmunity::SendKillImmunity(bool enabled, int ventId)

@@ -288,9 +288,9 @@ namespace SettingsTab {
 					Achievements::UnlockAll();
 			}
 
-			if (ToggleButton("Allow other mod users to see you're using", &State.ModDetection)) State.Save();
-			ImGui::SameLine();
-			if (CustomListBoxInt(" ", &State.BroadcastedMod, MODS, 100.f * State.dpiScale)) State.Save();
+			if (ToggleButton("Allow other mod users to see you're using SickoMenu", &State.ModDetection)) State.Save();
+			/*ImGui::SameLine();
+			if (CustomListBoxInt(" ", &State.BroadcastedMod, MODS, 100.f * State.dpiScale)) State.Save();*/
 		}
 		if (openSpoofing) {
 			/*if (ToggleButton("Spoof Guest Account", &State.SpoofGuestAccount)) {
@@ -464,6 +464,63 @@ namespace SettingsTab {
 				ImGui::SameLine();
 				if (CustomListBoxInt(" ", &State.ChatFontType, FONTS, 160.f * State.dpiScale)) {
 					State.Save();
+				}
+			}
+
+			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
+
+			ImGui::Text("Show/Hide Next to Ping:");
+			if (ToggleButton("Show FPS", &State.ShowFps)) {
+				State.Save();
+			}
+			ImGui::SameLine();
+			if (ToggleButton("Show Time", &State.ShowTime)) {
+				State.Save();
+			}
+
+			if (ImGui::CollapsingHeader("Time Format")) {
+				ImGui::Text(("Time Preview: " +
+					GetTimeString(State.UseLeadingZeroForHours, State.ShowSeconds)).c_str());
+
+				static int hours = State.TimeOffsetMinutes / 60, minutes = State.TimeOffsetMinutes % 60;
+				static int timeOffsetChoice = State.NegativeTimeOffset;
+				
+				ImGui::Text("Time Offset (from UTC)");
+				ImGui::SameLine();
+				if (CustomListBoxInt("  ", &timeOffsetChoice, TIME_OFFSETS, 20.f * State.dpiScale)) {
+					State.NegativeTimeOffset = (bool)timeOffsetChoice;
+					State.Save();
+				}
+				ImGui::SameLine();
+				// there can only be 1440 minutes in a day
+				ImGui::SetNextItemWidth(60 * State.dpiScale);
+				if (ImGui::InputInt("  :", &hours)) {
+					hours = std::clamp(hours, 0, 23);
+					State.TimeOffsetMinutes = hours * 60 + minutes;
+					hours = State.TimeOffsetMinutes / 60, minutes = State.TimeOffsetMinutes % 60;
+					State.Save();
+				}
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(60 * State.dpiScale);
+				if (ImGui::InputInt("   ", &minutes)) {
+					minutes = std::clamp(minutes, 0, 59);
+					State.TimeOffsetMinutes = hours * 60 + minutes;
+					hours = State.TimeOffsetMinutes / 60, minutes = State.TimeOffsetMinutes % 60;
+					State.Save();
+				}
+
+				if (ToggleButton("Use 12-Hour Format", &State.Use12HourFormat)) State.Save();
+
+				if (ToggleButton("Use Leading Zero for Hours", &State.UseLeadingZeroForHours)) State.Save();
+
+				if (ToggleButton("Show Seconds", &State.ShowSeconds)) State.Save();
+
+				if (State.Use12HourFormat) {
+					ImGui::SetNextItemWidth(100 * State.dpiScale);
+					if (InputString("AM String", &State.AmString)) State.Save();
+					ImGui::SameLine();
+					ImGui::SetNextItemWidth(100 * State.dpiScale);
+					if (InputString("PM String", &State.PmString)) State.Save();
 				}
 			}
 

@@ -5,100 +5,24 @@
 #include "logger.h"
 #include "utility.h"
 
+std::string SafelyReadString(MessageReader* reader) {
+	int32_t pos = reader->fields._position, head = reader->fields.readHead;
+	int32_t num = MessageReader_ReadPackedInt32(reader, NULL);
+	bool hasString = MessageReader_get_BytesRemaining(reader, NULL) >= num;
+	reader->fields._position = pos;
+	reader->fields.readHead = head;
+
+	return hasString ? convert_from_string(MessageReader_ReadString(reader, NULL)) : "";
+}
+
 void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 	if (player == nullptr) return;
-	switch (callId) {
-	case (uint8_t)420:
-	{
-		uint8_t playerId = player->fields.PlayerId; //true SickoMenu detection
-		if (State.modUsers.find(playerId) == State.modUsers.end() && MessageReader_get_BytesRemaining(reader, NULL) == 0) {
-			State.modUsers.insert({ playerId, "<#ff006c>SickoMenu</color>" });
-			STREAM_DEBUG("RPC Received for another SickoMenu user from " << ToString((Game::PlayerId)playerId));
-			if (State.SMAC_CheckSicko) SMAC_OnCheatDetected(player, "SickoMenu User");
-		}
-	}
-	break;
-	case (uint8_t)42069:
-	{
-		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
-		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#f55>AmongUsMenu</color>" });
-			STREAM_DEBUG("RPC Received for an AmongUsMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-			if (State.SMAC_CheckAUM) SMAC_OnCheatDetected(player, "AmongUsMenu User");
-		}
-	}
-	break;
-	case (uint8_t)150:
-	{
-		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
-		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#5f5>BetterAmongUs</color>" });
-			STREAM_DEBUG("RPC Received for a BetterAmongUs user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-		}
-	}
-	break;
-	case (uint8_t)250:
-	{
-		uint8_t playerId = player->fields.PlayerId; //MessageReader_ReadByte(reader, NULL);
-		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#f00>KillNetwork</color>" });
-			STREAM_DEBUG("RPC Received for a KillNetwork user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-			if (State.SMAC_CheckAUM) SMAC_OnCheatDetected(player, "KillNetwork User");
-		}
-	}
-	break;
-	case (uint8_t)176:
-	{
-		uint8_t playerId = player->fields.PlayerId;
-		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#ADD8E6>HostGuard</color>" });
-			STREAM_DEBUG("RPC Received for a HostGuard user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-			//Check Build -> https://t.me/UnrealHost/193 (Developer: Loot)
-		}
-	}
-	break;
-	/*case (uint8_t)666:
-	{
-		uint8_t playerId = player->fields.PlayerId;
-		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#c40033>GoatNetClient</color>" });
-			STREAM_DEBUG("RPC Received for a GoatNetClient user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-			// A mod to destroy e-daters on Among Us
-		}
-	}
-	break;*/ // Unused
-	case (uint8_t)121:
-	{
-		uint8_t playerId = player->fields.PlayerId;
-		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#ad2225>ChocooMenu</color>" });
-			STREAM_DEBUG("RPC Received for a ChocooMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-			// Developer: unnikuttan1753
-		}
-	}
-	break;
-	case (uint8_t)201:
-	case (uint8_t)202:
-	{
-		uint8_t playerId = player->fields.PlayerId;
-		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#7c0>SlopMenuCrew</color>" });
-			STREAM_DEBUG("RPC Received for a SlopMenuCrew user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-		}
-	}
-	break;
-	case (uint8_t)103:
-	{
-		uint8_t playerId = player->fields.PlayerId;
-		if (State.modUsers.find(playerId) == State.modUsers.end()) {
-			State.modUsers.insert({ playerId, "<#030303>Unknown</color>" });
-			STREAM_DEBUG("RPC Received for an <Unknown mod-client> user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
-			// Developer: Askinchik
-		}
-	}
-	break;
-	case (uint8_t)101:
-	{
+
+	uint8_t playerId = player->fields.PlayerId; //true mod detection
+
+	if (callId == 101) {
+		if (State.PanicMode || !State.ReadAndSendSickoChat) return;
+
 		using namespace std::chrono;
 
 		auto now = steady_clock::now();
@@ -131,35 +55,126 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 					}
 				}
 			}
-			break;
+			return;
 		}
 
-		std::string playerName = convert_from_string(MessageReader_ReadString(reader, NULL));
-		std::string message = convert_from_string(MessageReader_ReadString(reader, NULL));
+		std::string playerName = SafelyReadString(reader);
+		std::string message = SafelyReadString(reader);
 		uint32_t colorId = MessageReader_ReadInt32(reader, NULL);
 
-		if (message.empty()) break;
+		if (message.empty()) return;
 
-		if (!State.PanicMode && State.ReadAndSendSickoChat) {
-			NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
-			bool wasDead = false;
+		NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
+		bool wasDead = false;
 
-			if (player != NULL && GetPlayerData(player)->fields.IsDead && local != NULL && !local->fields.IsDead) {
-				local->fields.IsDead = true;
-				wasDead = true;
-			}
+		if (player != NULL && GetPlayerData(player)->fields.IsDead && local != NULL && !local->fields.IsDead) {
+			local->fields.IsDead = true;
+			wasDead = true;
+		}
 
-			State.IsProcessingSickoChat = true;
-			ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(message), false, NULL);
-			State.IsProcessingSickoChat = false;
+		State.IsProcessingSickoChat = true;
+		ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(message), false, NULL);
+		State.IsProcessingSickoChat = false;
 
-			if (wasDead) {
-				local->fields.IsDead = false;
-			}
+		if (wasDead) {
+			local->fields.IsDead = false;
+		}
 
-			STREAM_DEBUG("SickoChat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+		STREAM_DEBUG("SickoChat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+	}
+
+	if (State.modUsers.find(playerId) != State.modUsers.end()) return;
+
+	switch (callId) {
+	case (uint8_t)420:
+	{
+		std::string version = SafelyReadString(reader);
+
+		std::string formattedVersion = "<#fb0>" + version + "</color>";
+		if (version.find("pr") != std::string::npos || version.find("rc") != std::string::npos) {
+			formattedVersion = "<#a700ff>" + version + "</color>";
+		}
+
+		if (State.modUsers.find(playerId) == State.modUsers.end() && MessageReader_get_BytesRemaining(reader, NULL) == 0) {
+			State.modUsers.insert({ playerId, { "<#ff006c>SickoMenu</color>", formattedVersion } });
+			STREAM_DEBUG("RPC Received for another SickoMenu user from " << ToString((Game::PlayerId)playerId));
+			if (State.SMAC_CheckSicko) SMAC_OnCheatDetected(player, "SickoMenu User");
 		}
 	}
+	break;
+	/*case (uint8_t)42069:
+	{
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, { "<#f55>AmongUsMenu</color>", "" } });
+			STREAM_DEBUG("RPC Received for an AmongUsMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			if (State.SMAC_CheckOtherCheats) SMAC_OnCheatDetected(player, "AmongUsMenu User");
+		}
+	}
+	break;*/ // discontinued
+	case (uint8_t)151:
+	case (uint8_t)152:
+	{
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, { "<#5f5>BetterAmongUs</color>", "" } });
+			STREAM_DEBUG("RPC Received for a BetterAmongUs user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+		}
+	}
+	break;
+	/*case (uint8_t)250:
+	{
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, { "<#f00>KillNetwork</color>", "" } });
+			STREAM_DEBUG("RPC Received for a KillNetwork user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			if (State.SMAC_CheckOtherCheats) SMAC_OnCheatDetected(player, "KillNetwork User");
+		}
+	}
+	break;*/ // discontinued
+	case (uint8_t)176:
+	{
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, { "<#ADD8E6>HostGuard</color>", "" } });
+			STREAM_DEBUG("RPC Received for a HostGuard user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			// Developer: Loot
+		}
+	}
+	break;
+	case (uint8_t)121:
+	{
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, { "<#ad2225>ChocooMenu</color>", "" } });
+			STREAM_DEBUG("RPC Received for a ChocooMenu user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			if (State.SMAC_CheckOtherCheats) SMAC_OnCheatDetected(player, "ChocooMenu User");
+			// Developer: unnikuttan1753
+		}
+	}
+	break;
+	case (uint8_t)201:
+	case (uint8_t)202:
+	{
+		std::string aiSlopVersion = "";
+
+		if (callId == 202) {
+			SafelyReadString(reader); // handle signature
+			MessageReader_ReadByte(reader, NULL); // handle player ID
+			aiSlopVersion = SafelyReadString(reader);
+		}
+
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, { "<#7c0>SlopMenuCrew</color>", aiSlopVersion } });
+			STREAM_DEBUG("RPC Received for a SlopMenuCrew user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			if (State.SMAC_CheckOtherCheats) SMAC_OnCheatDetected(player, "SlopMenuCrew User");
+		}
+	}
+	break;
+	case (uint8_t)103:
+	{
+		if (State.modUsers.find(playerId) == State.modUsers.end()) {
+			State.modUsers.insert({ playerId, { "<#030303>Unknown</color>", "" } });
+			STREAM_DEBUG("RPC Received for an <Unknown mod-client> user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
+			// Developer: Askinchik
+		}
+	}
+	break;
 	break;
 	}
 }

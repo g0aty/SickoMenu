@@ -228,6 +228,7 @@ void DetourInitilization() {
 	HOOKFUNC(MeetingHud_CheckForEndVoting);
 	HOOKFUNC(AccountManager_CanPlayOnline);
 	HOOKFUNC(LogicOptions_GetAnonymousVotes);
+	HOOKFUNC(LogicOptions_GetVisualTasks);
 	HOOKFUNC(AssetReference_InstantiateAsync_1);
 	HOOKFUNC(AprilFoolsMode_ShouldFlipSkeld);
 	HOOKFUNC(MatchMakerGameButton_SetGame);
@@ -271,6 +272,11 @@ void DetourInitilization() {
 	HOOKFUNC(RoleBehaviour_get_Blurb);
 	HOOKFUNC(IntroCutscene_CoBegin);
 	HOOKFUNC(RoleBehaviour_AppendTaskHint);
+	HOOKFUNC(FriendsListButton_Update);
+	HOOKFUNC(ProgressTracker_FixedUpdate);
+	HOOKFUNC(HideAndSeekTimerBar_Update);
+	HOOKFUNC(LobbyInfoPane_Update);
+	HOOKFUNC(Mushroom_FixedUpdate);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -278,7 +284,7 @@ void DetourInitilization() {
 }
 
 void DetourUninitialization()
-{
+ {
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
 
@@ -413,6 +419,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(MeetingHud_CheckForEndVoting);
 	UNHOOKFUNC(AccountManager_CanPlayOnline);
 	UNHOOKFUNC(LogicOptions_GetAnonymousVotes);
+	UNHOOKFUNC(LogicOptions_GetVisualTasks);
 	UNHOOKFUNC(AssetReference_InstantiateAsync_1);
 	UNHOOKFUNC(AprilFoolsMode_ShouldFlipSkeld);
 	UNHOOKFUNC(MatchMakerGameButton_SetGame);
@@ -456,6 +463,11 @@ void DetourUninitialization()
 	UNHOOKFUNC(RoleBehaviour_get_Blurb);
 	UNHOOKFUNC(IntroCutscene_CoBegin);
 	UNHOOKFUNC(RoleBehaviour_AppendTaskHint);
+	UNHOOKFUNC(FriendsListButton_Update);
+	UNHOOKFUNC(ProgressTracker_FixedUpdate);
+	UNHOOKFUNC(HideAndSeekTimerBar_Update);
+	UNHOOKFUNC(LobbyInfoPane_Update);
+	UNHOOKFUNC(Mushroom_FixedUpdate);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

@@ -5,7 +5,7 @@
 #include <memory>
 
 float dVent_CanUse(Vent* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
-	if (State.ShowHookLogs) Log.Debug("Hook dVent_CanUse executed", false);
+	if (State.ShowHookLogs) Log.HookDebug("Hook dVent_CanUse executed", false);
 	if (!State.PanicMode && (State.UnlockVents || (*Game::pLocalPlayer)->fields.inVent)) {
 		auto object = NetworkedPlayerInfo_get_Object(pc, nullptr);
 		if (!object) {
@@ -33,8 +33,8 @@ float dVent_CanUse(Vent* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* co
 	return app::Vent_CanUse(__this, pc, canUse, couldUse, method);
 };
 
-void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
-	if (State.ShowHookLogs) Log.Debug("Hook dVent_EnterVent executed", false);
+void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo * method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dVent_EnterVent executed", false);
 	if (!State.PanicMode) {
 		auto ventVector = app::Transform_get_position(app::Component_get_transform((Component_1*)__this, NULL), NULL);
 		app::Vector2 ventVector2D = { ventVector.x, ventVector.y };
@@ -49,7 +49,7 @@ void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 }
 
 void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
-	if (State.ShowHookLogs) Log.Debug("Hook dVent_ExitVent executed", false);
+	if (State.ShowHookLogs) Log.HookDebug("Hook dVent_ExitVent executed", false);
 	if (!State.PanicMode) {
 		auto ventVector = app::Transform_get_position(app::Component_get_transform((Component_1*)__this, NULL), NULL);
 		app::Vector2 ventVector2D = { ventVector.x, ventVector.y };
@@ -65,7 +65,7 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 }
 
 bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodInfo* method) {
-	if (State.ShowHookLogs) Log.Debug("Hook dVent_TryMoveToVent executed", false);
+	if (State.ShowHookLogs) Log.HookDebug("Hook dVent_TryMoveToVent executed", false);
 	if (!State.PanicMode && *Game::pLocalPlayer != NULL) {
 		bool wasVisible = PlayerControl_get_Visible(*Game::pLocalPlayer, NULL) && !(*Game::pLocalPlayer)->fields.walkingToVent && State.ShowPlayersInVents && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead;
 		if (wasVisible && (*Game::pLocalPlayer)->fields.inVent) {

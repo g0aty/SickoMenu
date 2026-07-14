@@ -697,6 +697,28 @@ Color32 GetPlayerColor(Game::ColorId colorId) {
     return colorArray[colorId];
 }
 
+Color32 GetPlayerTextColor(Game::ColorId colorId, bool isOutline) {
+    il2cpp::Array colorArray = isOutline ?
+        app::Palette__TypeInfo->static_fields->TextOutlineColors :
+        app::Palette__TypeInfo->static_fields->TextColors;
+    if ((colorId < 0 || colorId > 17) || (size_t)colorId >= colorArray.size()) {
+        // oops: game bug
+        Color32 fortegreen = Color32();
+        fortegreen.r = (uint8_t)38;
+        fortegreen.g = (uint8_t)166;
+        fortegreen.b = (uint8_t)98;
+        fortegreen.a = (uint8_t)255;
+        if (isOutline) {
+            fortegreen.r /= 2;
+            fortegreen.g /= 2;
+            fortegreen.b /= 2;
+            fortegreen.a /= 2;
+        }
+        return fortegreen;
+    }
+    return colorArray[colorId];
+}
+
 std::filesystem::path getModulePath(HMODULE hModule) {
     TCHAR buff[MAX_PATH];
     GetModuleFileName(hModule, buff, MAX_PATH);
@@ -1443,7 +1465,9 @@ std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = fals
 {
     if (roleBehaviour == nullptr) return (abbreviated ? "Unk" : "Unknown");
 
-    if ((roleBehaviour->fields.Role == RoleTypes__Enum::Tracker || roleBehaviour->fields.Role == (RoleTypes__Enum)55050) &&
+    const uint16_t trackerRoleId = 55050;
+
+    if ((roleBehaviour->fields.Role == RoleTypes__Enum::Tracker || roleBehaviour->fields.Role == (RoleTypes__Enum)trackerRoleId) &&
         roleBehaviour->fields.StringName != (StringNames__Enum)1681) {
         roleBehaviour->fields.StringName = (StringNames__Enum)1681;
     }
@@ -1473,7 +1497,7 @@ std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = fals
     case RoleTypes__Enum::Noisemaker:
         return (abbreviated ? "NM" : (localized ? fullRoleName : "Noisemaker"));
     case RoleTypes__Enum::Tracker:
-    case (RoleTypes__Enum)55055:
+    case (RoleTypes__Enum)trackerRoleId:
         return (abbreviated ? "Tra" : (localized ? fullRoleName : "Tracker"));
     case RoleTypes__Enum::Phantom:
         return (abbreviated ? "Ph" : (localized ? fullRoleName : "Phantom"));
@@ -1482,6 +1506,7 @@ std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = fals
     case RoleTypes__Enum::Viper:
         return (abbreviated ? "Vip" : (localized ? fullRoleName : "Viper"));
     default:
+        // LOG_DEBUG(std::format("{}", (int)roleBehaviour->fields.Role));
         return (abbreviated ? "Unk" : "Unknown");
     }
 }
@@ -2316,6 +2341,120 @@ void SendKillImmuneToggle(bool enabled) {
     State.rpcQueue.push(new SendKillImmunity(enabled, 67));
 }
 
+void SendBootVentNonHost(PlayerControl* player, int ventId, int targetNetId) {
+    // original code: https://github.com/MrDiamond64/Hydra/blob/main/src/Teleporter.cs#L172
+
+    if (!IsInGame() || (*Game::pShipStatus) == NULL) return;
+    if (player == NULL || (player)->fields.MyPhysics == NULL) return;
+
+    uint8_t gameDataTag = 5, gameDataToTag = 6, rpcFlag = 2;
+
+    if (targetNetId == -2) {
+        Game::PlayerId playerId = player->fields.PlayerId;
+
+        if (State.ventTpSeqIds.find(playerId) == State.ventTpSeqIds.end())
+            State.ventTpSeqIds[playerId] = 6767;
+
+        auto enterWriter = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+        MessageWriter_WriteUShort(enterWriter, ++State.ventTpSeqIds[playerId], NULL);
+        MessageWriter_WriteByte(enterWriter, (uint8_t)VentilationSystem_Operation__Enum::Enter, NULL);
+        MessageWriter_WriteByte(enterWriter, (uint8_t)ventId, NULL);
+
+        auto bootWriter = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+        MessageWriter_WriteUShort(bootWriter, ++State.ventTpSeqIds[playerId], NULL);
+        MessageWriter_WriteByte(bootWriter, (uint8_t)VentilationSystem_Operation__Enum::BootImpostors, NULL);
+        MessageWriter_WriteByte(bootWriter, (uint8_t)ventId, NULL);
+
+        auto mainWriter = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+        MessageWriter_StartMessage(mainWriter, gameDataToTag, NULL);
+        MessageWriter_WriteInt32(mainWriter, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+        MessageWriter_WritePacked(mainWriter,
+            targetNetId == -2 ? ((InnerNetClient*)(*Game::pAmongUsClient))->fields.HostId : targetNetId,
+            NULL);
+
+        for (int i = 0; i < 2; ++i) {
+            MessageWriter_StartMessage(mainWriter, rpcFlag, NULL);
+            MessageWriter_WritePacked(mainWriter, (*Game::pShipStatus)->fields._.NetId, NULL);
+            MessageWriter_WriteByte(mainWriter, (uint8_t)RpcCalls__Enum::UpdateSystem, NULL);
+            MessageWriter_WriteByte(mainWriter, (uint8_t)SystemTypes__Enum::Ventilation, NULL);
+            MessageExtensions_WriteNetObject(mainWriter, (InnerNetObject*)player, NULL);
+            MessageWriter_WriteMessageWriter(mainWriter, i == 0 ? enterWriter : bootWriter, false, NULL);
+            MessageWriter_EndMessage(mainWriter, NULL);
+        }
+
+        MessageWriter_EndMessage(mainWriter, NULL);
+        InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), mainWriter, NULL);
+        MessageWriter_Recycle(mainWriter, NULL);
+
+        MessageWriter_Recycle(enterWriter, NULL);
+        MessageWriter_Recycle(bootWriter, NULL);
+    }
+    else if (player->fields._.OwnerId != targetNetId) {
+        // https://github.com/MrDiamond64/Hydra/blob/main/src/Utilities.cs#L299
+
+        auto enterWriter = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+        MessageWriter_WriteUShort(enterWriter, 6, NULL);
+        MessageWriter_WriteByte(enterWriter, (uint8_t)VentilationSystem_Operation__Enum::Enter, NULL);
+        MessageWriter_WriteByte(enterWriter, (uint8_t)ventId, NULL);
+
+        auto bootWriter = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+        MessageWriter_WriteUShort(bootWriter, 7, NULL);
+        MessageWriter_WriteByte(bootWriter, (uint8_t)VentilationSystem_Operation__Enum::BootImpostors, NULL);
+        MessageWriter_WriteByte(bootWriter, (uint8_t)ventId, NULL);
+
+        auto mainWriter = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+        MessageWriter_StartMessage(mainWriter, targetNetId >= 0 ? gameDataToTag : gameDataTag, NULL);
+        MessageWriter_WriteInt32(mainWriter, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+        if (targetNetId >= 0) MessageWriter_WritePacked(mainWriter, targetNetId, NULL);
+
+        for (int i = 0; i < 2; ++i) {
+            MessageWriter_StartMessage(mainWriter, rpcFlag, NULL);
+            MessageWriter_WritePacked(mainWriter, (*Game::pShipStatus)->fields._.NetId, NULL);
+            MessageWriter_WriteByte(mainWriter, (uint8_t)RpcCalls__Enum::UpdateSystem, NULL);
+            MessageWriter_WriteByte(mainWriter, (uint8_t)SystemTypes__Enum::Ventilation, NULL);
+            MessageExtensions_WriteNetObject(mainWriter, (InnerNetObject*)player, NULL);
+            MessageWriter_WriteMessageWriter(mainWriter, i == 0 ? enterWriter : bootWriter, false, NULL);
+            MessageWriter_EndMessage(mainWriter, NULL);
+        }
+
+        MessageWriter_EndMessage(mainWriter, NULL);
+        InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), mainWriter, NULL);
+        MessageWriter_Recycle(mainWriter, NULL);
+
+        MessageWriter_Recycle(enterWriter, NULL);
+        MessageWriter_Recycle(bootWriter, NULL);
+
+        if (player == *Game::pLocalPlayer && !State.PanicMode && State.KillImmunity)
+            SendKillImmuneToggle(true);
+    }
+}
+
+std::string GetTimeString(bool useLeadingZeroForHours, bool showSeconds) {
+    auto nowTime = std::chrono::system_clock::now();
+    int offsetMin = State.TimeOffsetMinutes;
+    if (State.NegativeTimeOffset) offsetMin *= -1;
+    auto offsetTime = nowTime + std::chrono::minutes(offsetMin);
+
+    std::time_t t = std::chrono::system_clock::to_time_t(offsetTime);
+    std::tm tm = {};
+    gmtime_s(&tm, &t);
+    int hours = tm.tm_hour;
+    std::string secondStr = showSeconds ? std::format(":{}{}", tm.tm_sec < 10 ? "0" : "", tm.tm_sec) : "";
+    
+    if (State.Use12HourFormat) {
+        int h12 = (hours % 12 == 0) ? 12 : (hours % 12);
+        std::string hourStr = useLeadingZeroForHours ? std::format("{:%I}", offsetTime) :
+            std::format("{}", h12);
+        std::string remaining = std::format("{:%M}", offsetTime) + secondStr;
+        return std::format("{}:{} {}", hourStr, remaining, hours < 12 ? State.AmString : State.PmString);
+    }
+    
+    std::string hourStr = useLeadingZeroForHours ? std::format("{:%H}", offsetTime) :
+        std::format("{}", hours);
+    std::string remaining = std::format("{:%M}", offsetTime) + secondStr;
+    return std::format("{}:{}", hourStr, remaining);
+}
+
 //TODO: Workaround
 #define GET_VIRTUAL_INVOKE(obj, method) \
     ((VirtualInvokeData*)(&obj->klass->vtable))[ \
@@ -2605,7 +2744,8 @@ void TrackPlayers()
         int pid = data->fields.PlayerId;
         auto modIt = State.modUsers.find(pid);
         if (modIt != State.modUsers.end()) {
-            cheatName = RemoveHtmlTags(modIt->second);
+            std::string modVersionDisplay = modIt->second[1].empty() ? "" : " " + modIt->second[1];
+            cheatName = RemoveHtmlTags(modIt->second[0] + modVersionDisplay);
             isCheater = true;
         }
 

@@ -339,6 +339,55 @@ namespace GameTab {
                 State.Save();
             }
 
+            if (IsInGame()/* && (IsHost() || !State.SafeMode)*/) {
+                std::vector<const char*> allVents;
+                switch (State.mapType) {
+                case Settings::MapType::Ship:
+                    allVents = SHIPVENTS;
+                    break;
+                case Settings::MapType::Hq:
+                    allVents = HQVENTS;
+                    break;
+                case Settings::MapType::Pb:
+                    allVents = PBVENTS;
+                    break;
+                case Settings::MapType::Airship:
+                    allVents = AIRSHIPVENTS;
+                    break;
+                case Settings::MapType::Fungle:
+                    allVents = FUNGLEVENTS;
+                    break;
+                }
+                State.SelectedVentId = std::clamp(State.SelectedVentId, 0, (int)allVents.size() - 1);
+
+                ImGui::SetNextItemWidth(100 * State.dpiScale);
+                CustomListBoxInt("Vent", &State.SelectedVentId, allVents);
+                ImGui::SameLine();
+                if (AnimatedButton("Teleport All to Vent")) {
+                    for (auto p : GetAllPlayerControl()) {
+                        if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
+                        if (IsHost() || !State.SafeMode)
+                            State.rpcQueue.push(new RpcBootFromVent(p, (State.mapType == Settings::MapType::Hq) ? State.SelectedVentId + 1 : State.SelectedVentId)); //MiraHQ vents start from 1 instead of 0
+                        else
+                            State.rpcQueue.push(new RpcBootFromVentNonHost(p, (State.mapType == Settings::MapType::Hq) ? State.SelectedVentId + 1 : State.SelectedVentId)); //MiraHQ vents start from 1 instead of 0
+                    }
+                }
+                if (ToggleButton("Spam TP All to Vent", &State.SpamVentTpEveryone)) {
+                    if (State.SpamVentTpEveryone) State.SpamVentTpEveryoneRandom = false;
+                }
+                ImGui::SameLine();
+                if (ToggleButton("Spam TP All to Random Vents", &State.SpamVentTpEveryoneRandom)) {
+                    if (State.SpamVentTpEveryoneRandom) State.SpamVentTpEveryone = false;
+                }
+
+                if (ToggleButton("Ignore Self", &State.IgnoreVentTpSelf)) {
+                    State.Save();
+                }
+                if (IsInMultiplayerGame() && AnimatedButton("Attempt to Ban Everyone")) {
+                    State.rpcQueue.push(new AttemptToBan(NULL));
+                }
+            }
+
             if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode)) {
                 if (AnimatedButton("Kill All Crewmates")) {
                     for (auto player : GetAllPlayerControl()) {
@@ -388,38 +437,6 @@ namespace GameTab {
                                     State.lobbyRpcQueue.push(new RpcMurderPlayer(player, player,
                                         player->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
                             }
-                        }
-                    }
-                }
-
-                static int ventId = 0;
-                if (IsInGame() && (IsHost() || !State.SafeMode)) {
-                    std::vector<const char*> allVents;
-                    switch (State.mapType) {
-                    case Settings::MapType::Ship:
-                        allVents = SHIPVENTS;
-                        break;
-                    case Settings::MapType::Hq:
-                        allVents = HQVENTS;
-                        break;
-                    case Settings::MapType::Pb:
-                        allVents = PBVENTS;
-                        break;
-                    case Settings::MapType::Airship:
-                        allVents = AIRSHIPVENTS;
-                        break;
-                    case Settings::MapType::Fungle:
-                        allVents = FUNGLEVENTS;
-                        break;
-                    }
-                    ventId = std::clamp(ventId, 0, (int)allVents.size() - 1);
-
-                    ImGui::SetNextItemWidth(100 * State.dpiScale);
-                    CustomListBoxInt("Vent", &ventId, allVents);
-                    ImGui::SameLine();
-                    if (AnimatedButton("Teleport All to Vent")) {
-                        for (auto p : GetAllPlayerControl()) {
-                            State.rpcQueue.push(new RpcBootFromVent(p, (State.mapType == Settings::MapType::Hq) ? ventId + 1 : ventId)); //MiraHQ vents start from 1 instead of 0
                         }
                     }
                 }
@@ -633,7 +650,7 @@ namespace GameTab {
                 }
             }
             ImGui::Text("Detect Actions:");
-            if (ToggleButton("AUM/KillNetwork Usage", &State.SMAC_CheckAUM)) State.Save();
+            if (ToggleButton("Known Cheat Usage", &State.SMAC_CheckOtherCheats)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
             ImGui::SameLine();
@@ -1398,7 +1415,8 @@ namespace GameTab {
                     int pid = data->fields.PlayerId;
                     auto modIt = State.modUsers.find(pid);
                     if (modIt != State.modUsers.end()) {
-                        cheatName = RemoveHtmlTags(modIt->second);
+                        std::string modVersionDisplay = modIt->second[1].empty() ? "" : " " + modIt->second[1];
+                        cheatName = RemoveHtmlTags(modIt->second[0] + modVersionDisplay);
                         isCheater = true;
                     }
 

@@ -2839,6 +2839,8 @@ namespace app {
         Il2CppClass_1 _1;
         struct Component_1__VTable vtable;
     };
+
+    WRAPPER_IL2CPP_ARRAY(Component_1, struct Component_1*);
 #pragma endregion
 
 #pragma region Behaviour
@@ -4369,6 +4371,42 @@ namespace app {
     };
 
 #endif
+#pragma endregion
+
+#pragma region PoolablePlayer
+    struct PoolablePlayer__Fields {
+        struct MonoBehaviour__Fields _;
+        struct SpriteRenderer__Array* Hands;
+        struct SpriteRenderer__Array* OtherBodySprites;
+        struct CosmeticsLayer* cosmetics;
+        int32_t bodyType;
+        bool ignoreLongMode;
+    };
+
+    struct PoolablePlayer {
+        struct PoolablePlayer__Class* klass;
+        MonitorData* monitor;
+        struct PoolablePlayer__Fields fields;
+    };
+
+    struct PoolablePlayer__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct PoolablePlayer__StaticFields {
+    };
+
+    struct PoolablePlayer__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct PoolablePlayer__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PoolablePlayer__VTable vtable;
+    };
 #pragma endregion
 
 #pragma region AccountTab
@@ -11172,6 +11210,249 @@ namespace app {
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct EndGameNavigation__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region PassiveButton
+    struct PassiveButton__Fields {
+        void* _;
+        struct Button_ButtonClickedEvent* OnClick;
+        struct AudioClip* ClickSound;
+        struct AudioClip* HoverSound;
+        bool OnUp;
+        bool OnDown;
+        bool OnRepeat;
+        bool OnUpGraphic;
+        bool OnDownGraphic;
+        float RepeatDuration;
+        struct SpriteRenderer* HeldButtonSprite;
+        struct ActionButton* TargetActionButton;
+        bool HoldToUse;
+        bool beingHeldDown;
+        float repeatTimer;
+        float totalHeldTime;
+        bool checkedClickEvent;
+        bool selected;
+        struct GameObject* selectedSprites;
+        struct GameObject* activeSprites;
+        struct GameObject* inactiveSprites;
+        struct GameObject* disabledSprites;
+        struct GameObject* selectedInactiveSprites;
+        struct GameObject* onClickSprites;
+        bool forceInactiveSpritesMobile;
+        bool forceClickGraphicMobile;
+        struct TextMeshPro* buttonText;
+        struct Color selectedTextColor;
+        struct Color activeTextColor;
+        struct Color inactiveTextColor;
+        struct Color disabledTextColor;
+        struct Color selectedInactiveTextColor;
+    };
+
+    struct PassiveButton {
+        struct PassiveButton__Class* klass;
+        MonitorData* monitor;
+        struct PassiveButton__Fields fields;
+    };
+
+    struct PassiveButton__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData ReceiveMouseOut;
+        VirtualInvokeData ReceiveMouseOver;
+        VirtualInvokeData get_HandleUp;
+        VirtualInvokeData get_HandleDown;
+        VirtualInvokeData get_HandleRepeat;
+        VirtualInvokeData get_HandleUpClickGraphic;
+        VirtualInvokeData get_HandleDownClickGraphic;
+        VirtualInvokeData get_HandleDrag;
+        VirtualInvokeData get_HandleOverOut;
+        VirtualInvokeData OnEnable;
+        VirtualInvokeData Start;
+        VirtualInvokeData Update;
+        VirtualInvokeData OnDisable;
+        VirtualInvokeData OnDestroy;
+        VirtualInvokeData ReceiveClickDown;
+        VirtualInvokeData ReceiveRepeatDown;
+        VirtualInvokeData ReceiveClickUp;
+        VirtualInvokeData ReleaseButton;
+        VirtualInvokeData ReceiveClickDrag;
+        VirtualInvokeData ReceiveClickUpGraphic;
+        VirtualInvokeData ReceiveClickDownGraphic;
+    };
+
+    struct PassiveButton__StaticFields {
+        int32_t STENCIL_COMP;
+        int32_t STENCIL;
+    };
+
+    struct PassiveButton__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct PassiveButton__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PassiveButton__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region FriendsListButton
+    struct FriendsListButton__Fields {
+        struct MonoBehaviour__Fields _;
+        struct GameObject* Button;
+        struct TextMeshPro* NotifCount;
+        struct GameObject* NotifCircle;
+        struct ActionMapGlyphDisplay* gamepadButton;
+        bool showInScene;
+    };
+
+    struct FriendsListButton {
+        struct FriendsListButton__Class* klass;
+        MonitorData* monitor;
+        struct FriendsListButton__Fields fields;
+    };
+
+    struct FriendsListButton__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct FriendsListButton__StaticFields {
+    };
+
+    struct FriendsListButton__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct FriendsListButton__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct FriendsListButton__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region ProgressTracker
+    struct ProgressTracker__Fields {
+        struct MonoBehaviour__Fields _;
+        struct MeshRenderer* TileParent;
+        float curValue;
+    };
+
+    struct ProgressTracker {
+        struct ProgressTracker__Class* klass;
+        MonitorData* monitor;
+        struct ProgressTracker__Fields fields;
+    };
+
+    struct ProgressTracker__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct ProgressTracker__StaticFields {
+    };
+
+    struct ProgressTracker__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct ProgressTracker__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ProgressTracker__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region HideAndSeekTimerBar
+    struct HideAndSeekTimerBar__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* timeText;
+        struct Transform* timerBar;
+        struct MeshRenderer* timerBarRenderer;
+        struct Transform* chunkBar;
+        float targetBarSize;
+        bool freezeChunk;
+        struct Coroutine* chunkCoroutine;
+    };
+
+    struct HideAndSeekTimerBar {
+        struct HideAndSeekTimerBar__Class* klass;
+        MonitorData* monitor;
+        struct HideAndSeekTimerBar__Fields fields;
+    };
+
+    struct HideAndSeekTimerBar__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct HideAndSeekTimerBar__StaticFields {
+    };
+
+    struct HideAndSeekTimerBar__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct HideAndSeekTimerBar__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct HideAndSeekTimerBar__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region LobbyInfoPane
+    struct LobbyInfoPane__Fields {
+        void* _;
+        struct SpriteRenderer* InfoPaneBackground;
+        struct Sprite* InfoPaneInactive;
+        struct Sprite* InfoPaneActive;
+        struct UiElement* EditButton;
+        struct UiElement* HostViewButton;
+        struct UiElement* ClientViewButton;
+        struct UiElement* CopyCodeButton;
+        struct UiElement* ActivateButton;
+        struct UiElement* BackButton;
+        struct List_1_UiElement_* ControllerSelectable;
+        struct UiElement* HostPrivateButton;
+        struct UiElement* HostPublicButton;
+        struct LobbyViewSettingsPane* LobbyViewSettingsPane;
+        struct GameObject* CopyCodeText;
+        struct AudioClip* CopyCodeSound;
+        struct UiElement* DefaultButtonSelected;
+        struct IEnumerator* copyGameCodeCoroutine;
+        bool IsPaneActive;
+    };
+
+    struct LobbyInfoPane {
+        struct LobbyInfoPane__Class* klass;
+        MonitorData* monitor;
+        struct LobbyInfoPane__Fields fields;
+    };
+
+    struct LobbyInfoPane__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData OnDestroy;
+    };
+
+    struct LobbyInfoPane__StaticFields {
+    };
+
+    struct LobbyInfoPane__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct LobbyInfoPane__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct LobbyInfoPane__VTable vtable;
     };
 #pragma endregion
 

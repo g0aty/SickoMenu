@@ -3,11 +3,7 @@
 #include "state.hpp"
 
 void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dKeyboardJoystick_Update executed", false);
-    if (ImGui::GetIO().WantTextInput) {
-        __this->fields.del = app::Vector2(); //Typing in a SickoMenu text field, suppress movement input entirely
-        return;
-    }
+    if (State.ShowHookLogs) Log.HookDebug("Hook dKeyboardJoystick_Update executed", false);
     if ((!State.FreeCam && !State.playerToAttach.has_value()) || State.PanicMode) {
         app::KeyboardJoystick_Update(__this, method);
     }
@@ -17,7 +13,7 @@ void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method) {
 
 void dScreenJoystick_FixedUpdate(ScreenJoystick* __this, MethodInfo* method)
 {
-    if (State.ShowHookLogs) Log.Debug("Hook dScreenJoystick_FixedUpdate executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dScreenJoystick_FixedUpdate executed", false);
     static int countdown;
     if ((!State.FreeCam && !State.playerToAttach.has_value()) || State.PanicMode) {
         app::ScreenJoystick_FixedUpdate(__this, method);

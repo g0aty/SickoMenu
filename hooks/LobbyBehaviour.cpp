@@ -33,7 +33,7 @@ void RequestApplyHostPreset(int idx) {
 
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 {
-    if (State.ShowHookLogs) Log.Debug("Hook dLobbyBehaviour_Start executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLobbyBehaviour_Start executed", false);
     State.LobbyTimer = 600;
     LobbyBehaviour_Start(__this, method);
     if (!State.PanicMode && State.AutoApplyCosmeticPreset && !State.CosmeticPresets.empty()) {
@@ -50,7 +50,7 @@ void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
 {
     static bool hasStarted = true;
-    if (State.ShowHookLogs) Log.Debug("Hook dLobbyBehaviour_Update executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLobbyBehaviour_Update executed", false);
     LobbyBehaviour_Update(__this, method);
     if (s_pendingCosmeticApply && IsInLobby()) {
         s_pendingCosmeticApply = false;
@@ -94,7 +94,7 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
 }
 
 void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dMatchMakerGameButton_SetGame executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMatchMakerGameButton_SetGame executed", false);
     /*if (State.PanicMode || !State.ShowLobbyInfo) return MatchMakerGameButton_SetGame(__this, gameListing, method);
     MatchMakerGameButton_SetGame(__this, gameListing, method);
     auto platform = gameListing.Platform;
@@ -147,7 +147,7 @@ void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gam
 }
 
 void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dGameContainer_SetupGameInfo executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dGameContainer_SetupGameInfo executed", false);
 
     // Cache code- host mapping for all visible lobbies
     {
@@ -274,7 +274,7 @@ void ApplyHostPreset(const Settings::HostPreset& p) {
 }
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dGameStartManager_Update executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dGameStartManager_Update executed", false);
     try {
         if (*Game::pLobbyBehaviour != NULL)
             State.LobbyTimer -= Time_get_deltaTime(NULL);

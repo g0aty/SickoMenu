@@ -538,10 +538,6 @@ namespace SelfTab {
             if (ToggleButton("Show Vote Kicks", &State.ShowVoteKicks)) {
                 State.Save();
             }
-            ImGui::SameLine();
-            if (ToggleButton("Show FPS", &State.ShowFps)) {
-                State.Save();
-            }
 
             if (ToggleButton("Show Chat Cooldown", &State.ShowChatTimer)) {
                 State.Save();

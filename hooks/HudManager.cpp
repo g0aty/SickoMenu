@@ -18,8 +18,86 @@ static std::string strRev(std::string str) {
     return new_str;
 }
 
+void SetHoverStateBasedColors(Transform* transform, Color col, bool capitalizeBackground = true) {
+    if (transform == NULL) return;
+
+    static std::string spriteRendererTypeName = translate_type_name("UnityEngine.SpriteRenderer, UnityEngine.CoreModule");
+    Type* spriteRendererType = app::Type_GetType(convert_to_string(spriteRendererTypeName), NULL);
+
+    auto backgroundChild = (Component_1*)Transform_FindChild(transform,
+        convert_to_string(capitalizeBackground ? "Background" : "background"), NULL);
+    auto backgroundSprite = backgroundChild == NULL ? NULL : (SpriteRenderer*)Component_GetComponent(backgroundChild, spriteRendererType, NULL);
+
+    auto inactiveChild = (Component_1*)Transform_FindChild(transform, convert_to_string("Inactive"), NULL);
+    auto inactiveSprite = inactiveChild == NULL ? NULL : (SpriteRenderer*)Component_GetComponent(inactiveChild, spriteRendererType, NULL);
+
+    auto activeChild = (Component_1*)Transform_FindChild(transform, convert_to_string("Active"), NULL);
+    auto activeSprite = activeChild == NULL ? NULL : (SpriteRenderer*)Component_GetComponent(activeChild, spriteRendererType, NULL);
+
+    auto selectedChild = (Component_1*)Transform_FindChild(transform, convert_to_string("Selected"), NULL);
+    auto selectedSprite = selectedChild == NULL ? NULL : (SpriteRenderer*)Component_GetComponent(selectedChild, spriteRendererType, NULL);
+
+    if (backgroundSprite != NULL)
+        SpriteRenderer_set_color(backgroundSprite, col, NULL);
+
+    if (inactiveSprite != NULL)
+        SpriteRenderer_set_color(inactiveSprite, col, NULL);
+
+    /*if (activeSprite != NULL)
+        SpriteRenderer_set_color(activeSprite, col, NULL);
+
+    if (selectedSprite != NULL)
+        SpriteRenderer_set_color(selectedSprite, col, NULL);*/
+}
+
+void ChangeOtherHudObjectColors(HudManager* hudManager, Color col) {
+    float brighteningFactor = 2.36f;
+    if (col.r * brighteningFactor <= 1 && col.g * brighteningFactor <= 1 && col.b * brighteningFactor <= 1) {
+        col.r *= brighteningFactor;
+        col.g *= brighteningFactor;
+        col.b *= brighteningFactor;
+    }
+
+    if (hudManager == NULL) return;
+
+    // https://github.com/xChipseq/VanillaEnhancements/blob/main/VanillaEnhancements/Patches/DarkModePatches.cs
+
+    auto mapButton = hudManager->fields.MapButton;
+    auto mapButtonTransform = mapButton == NULL ? NULL : Component_get_transform((Component_1*)mapButton, NULL);
+
+    auto settingsButtonObj = hudManager->fields.SettingsButton;
+    static std::string passiveButtonTypeName = translate_type_name("PassiveButton, Assembly-CSharp");
+    Type* passiveButtonType = app::Type_GetType(convert_to_string(passiveButtonTypeName), NULL);
+    auto settingsButton = (PassiveButton*)GameObject_GetComponent(settingsButtonObj, passiveButtonType, NULL);
+    auto settingsButtonTransform = settingsButton == NULL ? NULL : Component_get_transform((Component_1*)settingsButton, NULL);
+
+    SetHoverStateBasedColors(mapButtonTransform, col);
+    SetHoverStateBasedColors(settingsButtonTransform, col);
+}
+
+void ChangeFriendsListButtonColors(FriendsListButton* friendsListButton, Color col) {
+    float brighteningFactor = 2.36f;
+    if (col.r * brighteningFactor <= 1 && col.g * brighteningFactor <= 1 && col.b * brighteningFactor <= 1) {
+        col.r *= brighteningFactor;
+        col.g *= brighteningFactor;
+        col.b *= brighteningFactor;
+    }
+
+    if (friendsListButton == NULL) return;
+
+    // https://github.com/xChipseq/VanillaEnhancements/blob/main/VanillaEnhancements/Patches/DarkModePatches.cs
+
+    auto buttonObj = friendsListButton->fields.Button;
+    static std::string passiveButtonTypeName = translate_type_name("PassiveButton, Assembly-CSharp");
+    Type* passiveButtonType = app::Type_GetType(convert_to_string(passiveButtonTypeName), NULL);
+    auto button = (PassiveButton*)GameObject_GetComponent(buttonObj, passiveButtonType, NULL);
+    auto buttonTransform = button == NULL ? NULL : Component_get_transform((Component_1*)button, NULL);
+
+    SetHoverStateBasedColors(buttonTransform, col, false);
+}
+
 void dHudManager_Update(HudManager* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dHudManager_Update executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dHudManager_Update executed", false);
     try {
         static bool bChatAlwaysActivePrevious = false;
         if (bChatAlwaysActivePrevious != State.ChatAlwaysActive)
@@ -49,53 +127,55 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
             }
         }
 
-        if ((IsInGame() || IsInLobby())) {
+        Color uiCol = (!State.PanicMode && State.DarkMode) ? Color(0.5f, 0.5f, 0.5f, 1.f) :
+            Palette__TypeInfo->static_fields->White;
+
+        ChangeOtherHudObjectColors(__this, uiCol);
+
+        if (IsInGame() || IsInLobby()) {
             auto localData = GetPlayerData(*Game::pLocalPlayer);
             GameObject* shadowLayerObject = Component_get_gameObject((Component_1*)__this->fields.ShadowQuad, NULL);
+            bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby())))
+                && (localData != NULL && !localData->fields.IsDead);
             if (shadowLayerObject != NULL)
-                GameObject_SetActive(shadowLayerObject,
-                    ((!(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby()))))
-                    && (localData != NULL && !localData->fields.IsDead),
-                    NULL);
+                GameObject_SetActive(shadowLayerObject, shouldShowShadowQuad, NULL);
             if (!localData) {
                 // oops: game bug
                 return;
             }
-            if (IsInGame() || IsInLobby()) {
 
-                if (State.OutfitCooldown == 0) {
+            if (State.OutfitCooldown == 0) {
+                if (State.PanicMode && State.TempPanicMode) {
+                    State.PanicMode = false;
+                    State.TempPanicMode = false;
+                }
+                if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin)
+                    ControlAppearance(true);
+                State.CanChangeOutfit = true;
+                if (State.ProGamer) {
+                    std::string rofl = "sesaeler/uneMokciS/yta0g/moc.buhtig//:sptth morf unem eht dedaolnwod ev'uoy erus ekaM\n.uneMokciS fo noisrev dezirohtuanu na gnisu ma I";
+                    rofl = strRev(rofl);
+                    PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(rofl), NULL);
+                    CustomNetworkTransform_RpcSnapTo((*Game::pLocalPlayer)->fields.NetTransform, app::Vector2(0.f, 0.f), NULL);
+                    (*Game::pLocalPlayer)->fields.moveable = false;
+                    InnerNetClient_DisconnectInternal((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
+                    InnerNetClient_EnqueueDisconnect((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
+                    State.OutfitCooldown = 50;
                     if (State.PanicMode && State.TempPanicMode) {
                         State.PanicMode = false;
                         State.TempPanicMode = false;
                     }
-                    if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin)
-                        ControlAppearance(true);
-                    State.CanChangeOutfit = true;
-                    if (State.ProGamer) {
-                        std::string rofl = "sesaeler/uneMokciS/yta0g/moc.buhtig//:sptth morf unem eht dedaolnwod ev'uoy erus ekaM\n.uneMokciS fo noisrev dezirohtuanu na gnisu ma I";
-                        rofl = strRev(rofl);
-                        PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(rofl), NULL);
-                        CustomNetworkTransform_RpcSnapTo((*Game::pLocalPlayer)->fields.NetTransform, app::Vector2(0.f, 0.f), NULL);
-                        (*Game::pLocalPlayer)->fields.moveable = false;
-                        InnerNetClient_DisconnectInternal((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
-                        InnerNetClient_EnqueueDisconnect((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
-                        State.OutfitCooldown = 50;
-                        if (State.PanicMode && State.TempPanicMode) {
-                            State.PanicMode = false;
-                            State.TempPanicMode = false;
-                        }
-                    }
                 }
-                else if (State.OutfitCooldown == 25) {
-                    if (State.PanicMode && State.TempPanicMode) {
-                        State.PanicMode = false;
-                        State.TempPanicMode = false;
-                    }
-                    ChatController_SetVisible(__this->fields.Chat, true, NULL);
-                    State.OutfitCooldown--;
-                }
-                else State.OutfitCooldown--;
             }
+            else if (State.OutfitCooldown == 25) {
+                if (State.PanicMode && State.TempPanicMode) {
+                    State.PanicMode = false;
+                    State.TempPanicMode = false;
+                }
+                ChatController_SetVisible(__this->fields.Chat, true, NULL);
+                State.OutfitCooldown--;
+            }
+            else State.OutfitCooldown--;
 
             if (!State.InMeeting && !State.DisableHud)
             {
@@ -166,7 +246,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 }
 
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dVersionShower_Start executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dVersionShower_Start executed", false);
     State.versionShower = __this;
     VersionShower_Start(__this, method);
     State.versionShowerDefaultText = convert_from_string(app::TMP_Text_get_text((app::TMP_Text*)__this->fields.text, nullptr));
@@ -231,7 +311,7 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 }
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dPingTracker_Update executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPingTracker_Update executed", false);
     __this->fields.gamePos.x = 0.f, __this->fields.lobbyPos.x = -0.09f; // Make the PingTracker actually look centered
     bool isFreeplay = ((InnerNetClient*)(*Game::pAmongUsClient))->fields.NetworkMode == NetworkModes__Enum::FreePlay;
     app::PingTracker_Update(__this, method);
@@ -274,6 +354,8 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
                 else if (fps <= 40) fpsText += std::format("<#ff0>FPS: {}</color>", fps);
                 else fpsText += std::format("<#0f0>FPS: {}</color>", fps);
             }
+            std::string timeText = State.ShowTime ? sep + "<#b0f>Time: " +
+                GetTimeString(State.UseLeadingZeroForHours, State.ShowSeconds) + "</color>" : "";
             std::string autoKill = State.AutoKill ? (sep + "<#f00>Autokill</color>") : "";
             std::string noClip = State.NoClip ? (sep + "NoClip") : "";
             std::string freeCam = State.FreeCam ? (sep + "Freecam") : "";
@@ -324,8 +406,8 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
                 IsInGame() ? pingSize : 100, sickoText, State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson"), goatText, sep) :*/
                 std::format("<size={}%>{} {} by {}{}", IsInGame() ? pingSize : 100, sickoText, versionText, goatText, sep);
             std::string pingText = (isFreeplay && !State.OldStylePingText ? "<size=150%><#0000>0</color></size>\n" : "") +
-                std::format("{}{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
-                    State.HideWatermark ? "" : watermarkText, ping, fpsText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating, overflowText);
+                std::format("{}{}{}{}{}{}{}{}{}{}{}{}</color></size>", State.DarkMode ? "<#666>" : "<#fff>",
+                    State.HideWatermark ? "" : watermarkText, ping, fpsText, timeText, hostText, voteKicksText, autoKill, noClip, freeCam, spectating, overflowText);
             app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, State.OldStylePingText ? 
                 app::TextAlignmentOptions__Enum::TopRight : app::TextAlignmentOptions__Enum::Top, nullptr);
             app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(pingText), nullptr);
@@ -343,55 +425,55 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
 }
 
 bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dLogicGameFlowNormal_IsGameOverDueToDeath executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLogicGameFlowNormal_IsGameOverDueToDeath executed", false);
     return false; //fix black screen when you set fake role
 }
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dLogicGameFlowHnS_IsGameOverDueToDeath executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLogicGameFlowHnS_IsGameOverDueToDeath executed", false);
     return false; //fix black screen when you set fake role
 }
 
 void dModManager_LateUpdate(ModManager* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dModManager_LateUpdate executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dModManager_LateUpdate executed", false);
     ModManager_LateUpdate(__this, method);
 }
 
 void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dEndGameNavigation_ShowDefaultNavigation executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dEndGameNavigation_ShowDefaultNavigation executed", false);
     EndGameNavigation_ShowDefaultNavigation(__this, method);
 }
 
 void dFriendsListUI_UpdateFriendCodeUI(FriendsListUI* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dFriendsListUI_UpdateFriendCodeUI executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dFriendsListUI_UpdateFriendCodeUI executed", false);
     FriendsListUI_UpdateFriendCodeUI(__this, method);
 }
 
 void dMapCountOverlay_OnEnable(MapCountOverlay* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dMapCountOverlay_OnEnable executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMapCountOverlay_OnEnable executed", false);
     State.IsAdminMapOpen = true;
     MapCountOverlay_OnEnable(__this, method);
 }
 
 void dMapCountOverlay_OnDisable(MapCountOverlay* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dMapCountOverlay_OnDisable executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMapCountOverlay_OnDisable executed", false);
     State.IsAdminMapOpen = false;
     MapCountOverlay_OnDisable(__this, method);
 }
 
 void* dIntroCutscene_ShowTeam(IntroCutscene* __this, List_1_PlayerControl_* teamToShow, float duration, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dIntroCutscene_ShowTeam executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dIntroCutscene_ShowTeam executed", false);
     return IntroCutscene_ShowTeam(__this, teamToShow, duration, method);
 }
 
 void dEndGameManager_ShowButtons(EndGameManager* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dEndGameManager_ShowButtons executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dEndGameManager_ShowButtons executed", false);
     EndGameManager_ShowButtons(__this, method);
     if (!State.PanicMode && State.AutoRejoin)
         EndGameNavigation_NextGame(__this->fields.Navigation, NULL);
 }
 
 void* dShhhBehaviour_PlayAnimation(ShhhBehaviour* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dShhhBehaviour_Update executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dShhhBehaviour_Update executed", false);
     if (!State.PanicMode && State.DisableShushAnimation) {
         auto shhhEmblemObject = app::Component_get_gameObject((Component_1*)Game::HudManager.GetInstance()->fields.shhhEmblem, NULL);
         if (shhhEmblemObject != NULL) {
@@ -400,4 +482,87 @@ void* dShhhBehaviour_PlayAnimation(ShhhBehaviour* __this, MethodInfo* method) {
         return nullptr;
     }
     return ShhhBehaviour_PlayAnimation(__this, NULL);
+}
+
+void dFriendsListButton_Update(FriendsListButton* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dFriendsListButton_Update executed", false);
+    FriendsListButton_Update(__this, method);
+
+    Color uiCol = (!State.PanicMode && State.DarkMode) ? Color(0.5f, 0.5f, 0.5f, 1.f) :
+        Palette__TypeInfo->static_fields->White;
+
+    Color notifCol = (!State.PanicMode && State.DarkMode) ? Color(0.8f, 0.8f, 0.8f, 1.f) :
+        Palette__TypeInfo->static_fields->White;
+
+    ChangeFriendsListButtonColors(__this, uiCol);
+
+    auto buttonObj = __this->fields.Button;
+    static std::string passiveButtonTypeName = translate_type_name("PassiveButton, Assembly-CSharp");
+    Type* passiveButtonType = app::Type_GetType(convert_to_string(passiveButtonTypeName), NULL);
+    auto button = (PassiveButton*)GameObject_GetComponent(buttonObj, passiveButtonType, NULL);
+    auto buttonTransform = button == NULL ? NULL : Component_get_transform((Component_1*)button, NULL);
+
+    if (buttonTransform != NULL) {
+        static std::string spriteRendererTypeName = translate_type_name("UnityEngine.SpriteRenderer, UnityEngine.CoreModule");
+        Type* spriteRendererType = app::Type_GetType(convert_to_string(spriteRendererTypeName), NULL);
+
+        auto notifChild = (Component_1*)Transform_FindChild(buttonTransform, convert_to_string("NotifCount"), NULL);
+        auto notifSprite = notifChild == NULL ? NULL : (SpriteRenderer*)Component_GetComponent(notifChild, spriteRendererType, NULL);
+        SpriteRenderer_set_color(notifSprite, notifCol, NULL);
+    }
+}
+
+void dProgressTracker_FixedUpdate(ProgressTracker* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dProgressTracker_FixedUpdate executed", false);
+    ProgressTracker_FixedUpdate(__this, method);
+
+    auto ptTransform = Component_get_transform((Component_1*)__this, NULL);
+    if (ptTransform == NULL) return;
+
+    auto backgroundChild = (Component_1*)Transform_FindChild(ptTransform, convert_to_string("Background"), NULL);
+    if (backgroundChild == NULL) return;
+
+    static std::string spriteRendererTypeName = translate_type_name("UnityEngine.SpriteRenderer, UnityEngine.CoreModule");
+    Type* spriteRendererType = app::Type_GetType(convert_to_string(spriteRendererTypeName), NULL);
+
+    auto bgSprite = (SpriteRenderer*)Component_GetComponent(backgroundChild, spriteRendererType, NULL);
+    if (bgSprite == NULL) return;
+
+    Color ptCol = (!State.PanicMode && State.DarkMode) ? Color(0.2f, 0.2f, 0.2f, 1.f) : Palette__TypeInfo->static_fields->White;
+
+    SpriteRenderer_set_color(bgSprite, ptCol, NULL);
+}
+
+void dHideAndSeekTimerBar_Update(HideAndSeekTimerBar* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dHideAndSeekTimerBar_Update executed", false);
+    HideAndSeekTimerBar_Update(__this, method);
+
+    auto barTransform = Component_get_transform((Component_1*)__this, NULL);
+    if (barTransform == NULL) return;
+
+    auto backgroundChild = (Component_1*)Transform_FindChild(barTransform, convert_to_string("Background"), NULL);
+    if (backgroundChild == NULL) return;
+
+    static std::string spriteRendererTypeName = translate_type_name("UnityEngine.SpriteRenderer, UnityEngine.CoreModule");
+    Type* spriteRendererType = app::Type_GetType(convert_to_string(spriteRendererTypeName), NULL);
+
+    auto bgSprite = (SpriteRenderer*)Component_GetComponent(backgroundChild, spriteRendererType, NULL);
+    if (bgSprite == NULL) return;
+
+    Color barCol = (!State.PanicMode && State.DarkMode) ? Color(0.2f, 0.2f, 0.2f, 1.f) : Palette__TypeInfo->static_fields->White;
+
+    SpriteRenderer_set_color(bgSprite, barCol, NULL);
+}
+
+void dLobbyInfoPane_Update(LobbyInfoPane* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLobbyInfoPane_Update executed", false);
+    LobbyInfoPane_Update(__this, method);
+
+    // the following code is used as __this->fields.InfoPaneBackground throws null reference errors when directly used
+    static FieldInfo* field = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "InfoPaneBackground");
+    if (field == nullptr) return;
+    auto bgSprite = (SpriteRenderer*)il2cpp_field_get_value_object(field, (Il2CppObject*)__this);
+
+    Color bgCol = (!State.PanicMode && State.DarkMode) ? Color(0.5f, 0.5f, 0.5f, 1.f) : Palette__TypeInfo->static_fields->White;
+    SpriteRenderer_set_color(bgSprite, bgCol, NULL);
 }

@@ -5,7 +5,7 @@
 
 void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) Log.Debug("Hook dPlayerPhysics_FixedUpdate executed", false);
+	if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerPhysics_FixedUpdate executed", false);
 	/*if (!State.PanicMode && ((*Game::pLocalPlayer) != NULL && __this->fields.myPlayer == *Game::pLocalPlayer && (*Game::pLocalPlayer)->fields.inVent && State.MoveInVentAndShapeshift)) {
 		(*Game::pLocalPlayer)->fields.inVent = false;
 		app::PlayerPhysics_FixedUpdate(__this, method);

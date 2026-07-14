@@ -6,7 +6,7 @@ constexpr int32_t AnticheatPenalty = 25;
 
 void LogIfEnabled(const std::string& message) {
     if (State.ShowHookLogs) {
-        Log.Debug(message.c_str(), false);
+        Log.HookDebug(message.c_str());
     }
 }
 

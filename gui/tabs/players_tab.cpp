@@ -181,23 +181,23 @@ namespace PlayersTab {
                             }
                             else if (localData && PlayerIsImpostor(localData) && PlayerIsImpostor(playerData))
                                 tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRoleRed);
-                            else if (playerCtrl == *Game::pLocalPlayer || State.modUsers.count(pid)) {
-                                if (playerCtrl == *Game::pLocalPlayer) {}
-                                else if (State.modUsers.at(pid) == "<#f00>KillNetwork</color>")
+                            else if ((playerCtrl == *Game::pLocalPlayer && State.ModDetection) || State.modUsers.count(pid)) {
+                                std::string modName = State.modUsers.count(pid) ? RemoveHtmlTags(State.modUsers.at(pid)[0]) : "SickoMenu";
+                                if (modName == "KillNetwork")
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->ImpostorRed);
-                                else if (State.modUsers.at(pid) == "<#5f5>BetterAmongUs</color>")
+                                else if (modName == "BetterAmongUs")
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LogSuccessColor);
-                                else if (State.modUsers.at(pid) == "<#f55>AmongUsMenu</color>")
+                                else if (modName == "AmongUsMenu")
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Orange);
-                                else if (State.modUsers.at(pid) == "<#ADD8E6>HostGuard</color>")
+                                else if (modName == "HostGuard")
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->LightBlue);
-                                else if (State.modUsers.at(pid) == "<#ad2225>ChocooMenu</color>")
+                                else if (modName == "ChocooMenu")
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->Purple);
-                                else if (State.modUsers.at(pid) == "<#030303>Unknown</color>")
+                                else if (modName == "Unknown")
                                     tempColor = AmongUsColorToImVec4(Palette__TypeInfo->static_fields->DisabledGrey);
-                                else if (State.modUsers.at(pid) == "<#ff006c>SickoMenu</color>")
+                                else if (modName == "SickoMenu")
                                     tempColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
-                                else if (State.modUsers.at(pid) == "<#7c0>SlopMenuCrew</color>")
+                                else if (modName == "SlopMenuCrew")
                                     tempColor = ImVec4(0.744f, 0.855f, 0.1227f, 1.f);
                             }
                         }
@@ -397,9 +397,11 @@ namespace PlayersTab {
                     CachedPlayerData& cachedDetails = it->second;
 
                     if (!selectedPlayer.get_PlayerControl()->fields.notRealPlayer && selectedPlayer.get_PlayerData() != NULL) {
-                        bool isUsingMod = selectedPlayer.is_LocalPlayer() || State.modUsers.count(selectedPid);
+                        bool isUsingMod = (selectedPlayer.is_LocalPlayer() && State.ModDetection) || State.modUsers.count(selectedPid);
                         ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
-                        if (isUsingMod) ImGui::Text("Client Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPid)).c_str());
+                        if (isUsingMod) ImGui::Text("Mod Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPid)[0]).c_str());
+                        if (isUsingMod && ((selectedPlayer.is_LocalPlayer() && State.ModDetection) || !State.modUsers.at(selectedPid)[1].empty()))
+                            ImGui::Text("Mod Version: %s", selectedPlayer.is_LocalPlayer() ? State.SickoVersion.c_str() : RemoveHtmlTags(State.modUsers.at(selectedPid)[1]).c_str());
 
                         ImGui::Text("Player ID: %d", selectedPid);
 
@@ -620,6 +622,9 @@ namespace PlayersTab {
                             future.get();
                         }
                     }
+
+                    auto hostId = ((InnerNetClient*)(*Game::pAmongUsClient))->fields.HostId;
+
                     if (!State.SafeMode) {
                         if (AnimatedButton("Attempt to Kick")) {
                             State.selectedPlayer = {};
@@ -635,19 +640,16 @@ namespace PlayersTab {
                             }
                         }
                     }
-                    /*else if (IsInGame()) {
+                    else if (IsInGame() && (!selectedPlayer.is_Host() || selectedPlayers.size() != 1)) {
                         if (AnimatedButton("Attempt to Ban")) {
                             for (auto p : selectedPlayers) {
                                 if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-                                if (IsInGame()) {
-                                    State.rpcQueue.push(new RpcSpamMeeting(*Game::pLocalPlayer, p.validate().get_PlayerControl(), State.InMeeting));
-                                }
-                                else if (IsInLobby()) {
-                                    State.lobbyRpcQueue.push(new RpcSpamMeeting(*Game::pLocalPlayer, p.validate().get_PlayerControl(), State.InMeeting));
-                                }
+                                if (p.has_value() &&
+                                    p.validate().get_PlayerControl()->fields._.NetId == hostId) continue;
+                                State.rpcQueue.push(new AttemptToBan(p.validate().get_PlayerControl()));
                             }
                         }
-                    }*/
+                    }
 
                     if (IsHost() && AnimatedButton("Ban")) {
                         State.selectedPlayer = {};
@@ -860,7 +862,7 @@ namespace PlayersTab {
                 }
 
                 static int ventId = 0;
-                if ((IsHost() || !State.SafeMode) && IsInGame()) {
+                if (/*(IsHost() || !State.SafeMode) && */IsInGame()) {
                     std::vector<const char*> allVents;
                     switch (State.mapType) {
                     case Settings::MapType::Ship:
@@ -885,8 +887,40 @@ namespace PlayersTab {
 
                     if (AnimatedButton("Teleport to Vent")) {
                         for (auto p : selectedPlayers) {
-                            State.rpcQueue.push(new RpcBootFromVent(p.validate().get_PlayerControl(),
-                                (State.mapType == Settings::MapType::Hq) ? ventId + 1 : ventId)); //MiraHQ vents start from 1 instead of 0
+                            if (IsHost() || !State.SafeMode)
+                                State.rpcQueue.push(new RpcBootFromVent(p.validate().get_PlayerControl(),
+                                    (State.mapType == Settings::MapType::Hq) ? ventId + 1 : ventId)); //MiraHQ vents start from 1 instead of 0
+                            else    
+                                State.rpcQueue.push(new RpcBootFromVentNonHost(p.validate().get_PlayerControl(),
+                                    (State.mapType == Settings::MapType::Hq) ? ventId + 1 : ventId)); //MiraHQ vents start from 1 instead of 0
+                        }
+                    }
+
+                    if (selectedPlayers.size() == 1) {
+                        for (auto p : selectedPlayers) {
+                            if (!p.has_value()) break;
+                            auto playerId = p.get_PlayerId();
+                            auto it = std::find(State.spamRandomVentTpPlayers.begin(), State.spamRandomVentTpPlayers.end(), playerId);
+                            bool isRandomTpSpammed = it != State.spamRandomVentTpPlayers.end();
+                            bool isTpSpammed = State.spamVentTpPlayers.find(playerId) != State.spamVentTpPlayers.end();
+
+                            if (!isRandomTpSpammed && (!State.IgnoreVentTpSelf || !p.validate().is_LocalPlayer()) && AnimatedButton("Spam Teleport to Random Vents")) {
+                                State.spamRandomVentTpPlayers.push_back(p.get_PlayerId());
+                                if (isTpSpammed) State.spamVentTpPlayers.erase(playerId);
+                            }
+                            else if (isRandomTpSpammed && AnimatedButton("Stop Spam Teleport to Random Vents")) {
+                                State.spamRandomVentTpPlayers.erase(it);
+                            }
+
+                            if (!isTpSpammed && (!State.IgnoreVentTpSelf || !p.validate().is_LocalPlayer()) && AnimatedButton("Spam Teleport to Vent")) {
+                                State.spamVentTpPlayers[p.get_PlayerId()] = ventId;
+                                if (isRandomTpSpammed) State.spamRandomVentTpPlayers.erase(it);
+
+                            }
+                            else if (isTpSpammed && AnimatedButton("Stop Spam Teleport to Vent")) {
+                                State.spamVentTpPlayers.erase(playerId);
+                            }
+                            break;
                         }
                     }
                 }

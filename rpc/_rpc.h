@@ -490,6 +490,21 @@ public:
 	virtual void Process() override;
 };
 
+class RpcBootFromVentNonHost : public RPCInterface {
+	PlayerControl* Player;
+	int ventId;
+public:
+	RpcBootFromVentNonHost(PlayerControl* Player, int ventId);
+	virtual void Process() override;
+};
+
+class AttemptToBan : public RPCInterface {
+	PlayerControl* Player;
+public:
+	AttemptToBan(PlayerControl* Player);
+	virtual void Process() override;
+};
+
 class SendKillImmunity : public RPCInterface {
 	bool enabled;
 	int ventId;

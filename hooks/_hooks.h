@@ -139,6 +139,7 @@ void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Ar
 void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method);
 bool dAccountManager_CanPlayOnline(AccountManager* __this, MethodInfo* method);
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method);
+bool dLogicOptions_GetVisualTasks(LogicOptions* __this, MethodInfo* method);
 AsyncOperationHandle_1_UnityEngine_GameObject_ dAssetReference_InstantiateAsync_1(AssetReference* __this, Transform* parent, bool instantiateInWorldSpace, MethodInfo* method);
 bool dAprilFoolsMode_ShouldFlipSkeld(MethodInfo* method);
 void dMatchMakerGameButton_SetGame(MatchMakerGameButton* __this, GameListing gameListing, MethodInfo* method);
@@ -183,3 +184,8 @@ String* dRoleBehaviour_get_NiceName(RoleBehaviour* __this, MethodInfo* method);
 String* dRoleBehaviour_get_Blurb(RoleBehaviour* __this, MethodInfo* method);
 void* dIntroCutscene_CoBegin(IntroCutscene* __this, MethodInfo* method);
 void dRoleBehaviour_AppendTaskHint(RoleBehaviour* role, void* taskStringBuilder, MethodInfo* method);
+void dFriendsListButton_Update(FriendsListButton* __this, MethodInfo* method);
+void dProgressTracker_FixedUpdate(ProgressTracker* __this, MethodInfo* method);
+void dHideAndSeekTimerBar_Update(HideAndSeekTimerBar* __this, MethodInfo* method);
+void dLobbyInfoPane_Update(LobbyInfoPane* __this, MethodInfo* method);
+void dMushroom_FixedUpdate(Mushroom* __this, MethodInfo* method);

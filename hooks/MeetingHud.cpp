@@ -8,8 +8,45 @@
 static app::Type* voteSpreaderType = nullptr;
 static bool calloutOver = false;
 
+void ChangeMeetingObjectColors(MeetingHud* meetingHud) {
+    // https://github.com/xChipseq/VanillaEnhancements/blob/main/VanillaEnhancements/Patches/DarkModePatches.cs
+
+    auto defaultColor = (!State.PanicMode && State.DarkMode) ? Color(0.5f, 0.5f, 0.5f, 1.f) : Palette__TypeInfo->static_fields->White;
+    auto baseColor = (!State.PanicMode && State.DarkMode) ? Color(0.01f, 0.01f, 0.01f, 1.f) : Color(0.1792f, 0.1792f, 0.1792f, 1.f);
+    auto glassColor = (!State.PanicMode && State.DarkMode) ? Color(0.7f, 0.7f, 0.7f, 0.4039f) : Color(1.f, 1.f, 1.f, 0.4039f);
+
+    static std::string spriteRendererTypeName = translate_type_name("UnityEngine.SpriteRenderer, UnityEngine.CoreModule");
+    Type* spriteRendererType = app::Type_GetType(convert_to_string(spriteRendererTypeName), NULL);
+
+    auto meetingContents = meetingHud->fields.meetingContents;
+    if (meetingContents != NULL) {
+        auto phoneUi = Transform_FindChild(meetingContents, convert_to_string("PhoneUI"), NULL);
+        auto baseColorChild = (Component_1*)Transform_FindChild(phoneUi, convert_to_string("baseColor"), NULL);
+
+        auto baseColorSprite = (SpriteRenderer*)Component_GetComponent(baseColorChild, spriteRendererType, NULL);
+        SpriteRenderer_set_color(baseColorSprite, baseColor, NULL);
+    }
+
+    auto glass = meetingHud->fields.Glass;
+    if (glass != NULL) {
+        SpriteRenderer_set_color(glass, glassColor, NULL);
+    }
+
+    auto skipVoteButton = (Component_1*)meetingHud->fields.SkipVoteButton;
+    if (skipVoteButton != NULL) {
+        auto skipVoteSprite = (SpriteRenderer*)Component_GetComponent(skipVoteButton, spriteRendererType, NULL);
+        SpriteRenderer_set_color(skipVoteSprite, defaultColor, NULL);
+    }
+
+    il2cpp::Array playerColoredParts = meetingHud->fields.PlayerColoredParts;
+    for (auto sprite : playerColoredParts) {
+        if (sprite == NULL) continue;
+        SpriteRenderer_set_color(sprite, defaultColor, NULL);
+    }
+}
+
 void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_Awake executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_Awake executed", false);
     try {
         State.BlinkPlayersTab = true;
         State.voteMonitor.clear();
@@ -29,7 +66,7 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 
 void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
     State.vanishedPlayers.clear();
-    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_Close executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_Close executed", false);
     try {
         State.BlinkPlayersTab = true;
         State.InMeeting = false;
@@ -152,7 +189,7 @@ void ManageCallout(uint8_t playerId, uint8_t suspectIdx) {
 }
 
 void dMeetingHud_PopulateResults(MeetingHud* __this, Il2CppArraySize* states, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_PopulateResults executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_PopulateResults executed", false);
     try {// remove all votes before populating results
         for (auto votedForArea : il2cpp::Array(__this->fields.playerStates)) {
             if (!votedForArea) {
@@ -198,8 +235,9 @@ void RevealAnonymousVotes() {
 }
 
 void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_Update executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_Update executed", false);
     try {
+        ChangeMeetingObjectColors(__this);
         const bool isBeforeResultsState = __this->fields.state < app::MeetingHud_VoteStates__Enum::Results;
         il2cpp::Array playerStates(__this->fields.playerStates);
         for (auto playerVoteArea : playerStates) {
@@ -358,7 +396,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
             std::unordered_set<std::string> noPlateSet = { "", "nameplate_NoPlate", "nameplate_Transparent"/*, "nameplate_bsb2_notes", "nameplate_bsb2_breach", "nameplate_bsb2_frame", "nameplate_bsb2_error", "nameplate_racing_beanCar"*/ };
             // the reason additional nameplates were included was to set their theme,
             // and unknown nameplates show up as blank ones
-            // the commented out nameplates were not in v16.0.0 & v16.0.2, but in v16.0.5 & v16.1.0
+            // the commented out nameplates were not in v16.0.0 & v16.0.2, but in v16.1.0
             if (!noPlateSet.contains(namePlate)) continue;
             if (!State.PanicMode && State.CustomGameTheme) {
                 auto bg = Color(State.GameBgColor.x, State.GameBgColor.y, State.GameBgColor.z, State.GameBgColor.w);
@@ -378,7 +416,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 }
 
 /*void dMeetingHud_RpcVotingComplete(MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_RpcVotingComplete executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_RpcVotingComplete executed", false);
     if (!State.PanicMode) {
         if (State.VoteOffPlayerId == Game::SkippedVote || (State.GodMode && exiled == GetPlayerData(*Game::pLocalPlayer))) {
             exiled = NULL;
@@ -396,7 +434,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
 }*/ // this is an inlined function, so this hook won't execute, thanks https://allofus.dev/il2cpp/
 
 void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dMeetingHud_RpcVotingComplete executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_RpcVotingComplete executed", false);
     if (State.PanicMode) return MeetingHud_CheckForEndVoting(__this, method);
 
     il2cpp::Array playerStates(__this->fields.playerStates);
@@ -418,18 +456,12 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
 }
 
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dLogicOptions_GetAnonymousVotes executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLogicOptions_GetAnonymousVotes executed", false);
     return LogicOptions_GetAnonymousVotes(__this, method);
 }
 
 
 void dMeetingHud_CastVote(MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dLogicOptions_GetAnonymousVotes executed", false);
-    if (!State.PanicMode && IsHost() && !State.VoteImmunePlayers.empty()) {
-        if (std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), suspectIdx) != State.VoteImmunePlayers.end()) {
-            auto it = State.VoteRedirectTargets.find(suspectIdx);
-            suspectIdx = (it != State.VoteRedirectTargets.end()) ? it->second : 253;
-        }
-    }
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLogicOptions_GetAnonymousVotes executed", false);
     MeetingHud_CastVote(__this, playerId, suspectIdx, method);
 }
