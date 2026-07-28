@@ -44,6 +44,11 @@ enum class RoleType
 	Viper = 10
 };
 
+struct RoleColor {
+	const char* name;
+	ImU32 color;
+};
+
 class RoleRates {
 public:
 	int ImpostorCount = 0;

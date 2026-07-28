@@ -55,6 +55,63 @@ bool CustomListBoxInt(const char* label, int* value, const std::vector<const cha
 	return response;
 }
 
+bool CustomListBoxIntColored(const char* label, int* value, const std::vector<const char*> list, float width, ImVec4 col, ImGuiComboFlags flags, const char* visualLabel, const RoleColor* itemColors, size_t itemColorsCount)
+{
+	auto comboLabel = "##" + std::string(label);
+	auto leftArrow = "##" + std::string(label) + "Left";
+	auto rightArrow = "##" + std::string(label) + "Right";
+
+	ImGuiStyle& style = GetStyle();
+	float spacing = style.ItemInnerSpacing.x;
+	PushItemWidth(width);
+	PushStyleColor(ImGuiCol_Text, itemColors[*value].color);
+	bool response = BeginCombo(comboLabel.c_str(), (*value >= 0 ? list.at(*value) : nullptr), ImGuiComboFlags_NoArrowButton | flags);
+	PopStyleColor();
+	if (response) {
+		response = false;
+		for (size_t i = 0; i < list.size(); i++) {
+			const bool hasColor = itemColors != nullptr && i < itemColorsCount;
+			if (hasColor)
+				PushStyleColor(ImGuiCol_Text, itemColors[i].color);
+
+			bool is_selected = (*value == i);
+			if (Selectable(list.at(i), is_selected)) {
+				*value = (int)i;
+				response = true;
+			}
+
+			if (hasColor)
+				PopStyleColor();
+			if (is_selected)
+				SetItemDefaultFocus();
+		}
+		EndCombo();
+	}
+
+	PopItemWidth();
+	SameLine(0, spacing);
+
+	const bool LeftResponse = ArrowButton(leftArrow.c_str(), ImGuiDir_Left);
+	if (LeftResponse) {
+		*value -= 1;
+		if (*value < 0) *value = int(list.size() - 1);
+		return LeftResponse;
+	}
+	SameLine(0, spacing);
+	const bool RightResponse = ArrowButton(rightArrow.c_str(), ImGuiDir_Right);
+	if (RightResponse) {
+		*value += 1;
+		if (*value > (int)(list.size() - 1)) *value = 0;
+		return RightResponse;
+	}
+	SameLine(0, spacing);
+	//noobuild by gdjkhp
+	if (col.x == 0 && col.y == 0 && col.z == 0 && col.w == 0) Text(visualLabel == "" ? label : visualLabel);
+	else TextColored(col, visualLabel == "" ? label : visualLabel);
+
+	return response;
+}
+
 bool CustomListBoxIntMultiple(const char* label, std::vector<std::pair<const char*, bool>>* list, float width, bool resetButton, ImGuiComboFlags flags) {
 	auto comboLabel = "##" + std::string(label);
 	auto buttonLabel = "Reset##" + std::string(label);
