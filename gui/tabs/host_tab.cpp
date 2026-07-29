@@ -100,17 +100,17 @@ namespace HostTab {
                             //player colors in host tab by gdjkhp (https://github.com/GDjkhp/AmongUsMenu/commit/53b017183bac503c546f198e2bc03539a338462c)
 							//now with role colors in role selection
                             RoleColor ROLE_NAMES_COLOR[] = {
-                                {"Random",			IM_COL32(0, 255, 0, 255)},
-                                {"Crewmate",		ImGui::ColorConvertFloat4ToU32(State.CrewmateColor)},
-                                {"Scientist",		ImGui::ColorConvertFloat4ToU32(State.ScientistColor)},
-                                {"Engineer",		ImGui::ColorConvertFloat4ToU32(State.EngineerColor)},
-                                {"Noisemaker",		ImGui::ColorConvertFloat4ToU32(State.NoisemakerColor)},
-                                {"Tracker",			ImGui::ColorConvertFloat4ToU32(State.TrackerColor)},
-                                {"Detective",		ImGui::ColorConvertFloat4ToU32(State.DetectiveColor)},
-                                {"Impostor",		ImGui::ColorConvertFloat4ToU32(State.ImpostorColor)},
-                                {"Shapeshifter",	ImGui::ColorConvertFloat4ToU32(State.ShapeshifterColor)},
-                                {"Phantom",			ImGui::ColorConvertFloat4ToU32(State.PhantomColor)},
-                                {"Viper",			ImGui::ColorConvertFloat4ToU32(State.ViperColor)},
+                                {"Random",			ImVec4(1.f, 1.f, 1.f, 1.f)},
+                                {"Crewmate",		State.CrewmateColor},
+                                {"Scientist",		State.ScientistColor},
+                                {"Engineer",		State.EngineerColor},
+                                {"Noisemaker",		State.NoisemakerColor},
+                                {"Tracker",			State.TrackerColor},
+                                {"Detective",		State.DetectiveColor},
+                                {"Impostor",		State.ImpostorColor},
+                                {"Shapeshifter",	State.ShapeshifterColor},
+                                {"Phantom",			State.PhantomColor},
+                                {"Viper",			State.ViperColor},
                             };
                             if (CustomListBoxIntColored((playerName + "###" + ToString(playerData)).c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId)), 0, RemoveHtmlTags(playerName).c_str(), ROLE_NAMES_COLOR, IM_ARRAYSIZE(ROLE_NAMES_COLOR)))
                             {

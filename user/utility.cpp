@@ -1339,7 +1339,7 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
         break;
     }
     default: {
-        c = GetColorFromImVec4(State.CrewmateColor);;
+        c = GetColorFromImVec4(State.CrewmateColor);
         break;
     }
     }

@@ -508,8 +508,8 @@ namespace SettingsTab {
 
 				if (AnimatedButton("Reset Role Colors")) {
 					State.CrewmateGhostColor = ImVec4(1.f, 1.f, 1.f, 0.5f);
-					State.CrewmateColor = ImVec4(1.f, 1.f, 1.f, 1.f);
-					State.EngineerColor = ImVec4(0.f, 1.f, 1.f, 1.f);
+					State.CrewmateColor = ImVec4(0.f, 1.f, 1.f, 1.f);
+					State.EngineerColor = ImVec4(0.f, 0.5f, 0.5f, 1.f);
 					State.GuardianAngelColor = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
 					State.ScientistColor = ImVec4(0.2f, 0.2f, 1.f, 1.f);
 					State.ImpostorColor = ImVec4(1.f, 0.1f, 0.1f, 1.f);

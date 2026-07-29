@@ -46,7 +46,7 @@ enum class RoleType
 
 struct RoleColor {
 	const char* name;
-	ImU32 color;
+	ImVec4 color;
 };
 
 class RoleRates {
