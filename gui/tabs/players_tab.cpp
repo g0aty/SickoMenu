@@ -760,14 +760,47 @@ namespace PlayersTab {
                     }
                 }
 
-                if (IsHost() && IsInGame() && !selectedPlayer.is_LocalPlayer() && selectedPlayers.size() == 1) {
+                if (IsHost() && IsInGame() && selectedPlayers.size() == 1) {
                     auto pid = selectedPlayer.get_PlayerData()->fields.PlayerId;
                     bool isVoteImmune = std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), pid) != State.VoteImmunePlayers.end();
                     if (AnimatedButton(isVoteImmune ? "Remove Vote Immunity" : "Vote Immune")) {
-                        if (isVoteImmune)
+                        if (isVoteImmune) {
                             State.VoteImmunePlayers.erase(std::remove(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), pid), State.VoteImmunePlayers.end());
+                            State.VoteRedirectTargets.erase(pid);
+                        }
                         else
                             State.VoteImmunePlayers.push_back(pid);
+                    }
+                    if (isVoteImmune) {
+                        // build candidate list: Skip (253) first, then other players
+                        std::vector<uint8_t> candidates = { 253 };
+                        std::vector<std::string> candidateNames = { "Skip" };
+                        for (auto pc : GetAllPlayerControl()) {
+                            if (pc == nullptr) continue;
+                            auto pd = GetPlayerData(pc);
+                            if (pd == nullptr || pd->fields.Disconnected) continue;
+                            uint8_t otherPid = pd->fields.PlayerId;
+                            if (otherPid == pid) continue; 
+                            candidates.push_back(otherPid);
+                            candidateNames.push_back(RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pd, NULL))));
+                        }
+
+                        uint8_t currentTarget = State.VoteRedirectTargets.count(pid) ? State.VoteRedirectTargets[pid] : 253;
+                        int curIndex = 0;
+                        for (int i = 0; i < (int)candidates.size(); i++) {
+                            if (candidates[i] == currentTarget) { curIndex = i; break; }
+                        }
+                        // if the stored target left the game, snap back to Skip
+                        if (candidates[curIndex] != currentTarget) {
+                            curIndex = 0;
+                            State.VoteRedirectTargets[pid] = 253;
+                        }
+
+                        std::vector<const char*> candidateNamesRaw;
+                        for (auto& n : candidateNames) candidateNamesRaw.push_back(n.c_str());
+                        ImGui::Text("Redirect Votes To:");
+                        if (CustomListBoxInt("Redirect Votes To", &curIndex, candidateNamesRaw))
+                            State.VoteRedirectTargets[pid] = candidates[curIndex];
                     }
                 }
 

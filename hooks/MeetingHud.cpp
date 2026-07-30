@@ -425,7 +425,8 @@ void dMeetingHud_CastVote(MeetingHud* __this, uint8_t playerId, uint8_t suspectI
     if (State.ShowHookLogs) Log.Debug("Hook dLogicOptions_GetAnonymousVotes executed", false);
     if (!State.PanicMode && IsHost() && !State.VoteImmunePlayers.empty()) {
         if (std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), suspectIdx) != State.VoteImmunePlayers.end()) {
-            suspectIdx = 253; 
+            auto it = State.VoteRedirectTargets.find(suspectIdx);
+            suspectIdx = (it != State.VoteRedirectTargets.end()) ? it->second : 253;
         }
     }
     MeetingHud_CastVote(__this, playerId, suspectIdx, method);

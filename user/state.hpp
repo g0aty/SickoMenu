@@ -309,6 +309,7 @@ public:
     bool KillInVanish = false;
     bool OnlyProtectCrewmates = false;
     std::vector<uint8_t> VoteImmunePlayers;
+    std::unordered_map<uint8_t, uint8_t> VoteRedirectTargets;
     bool BypassAngelProt = false;
     bool InfiniteKillRange = false;
     bool KillInLobbies = false;
