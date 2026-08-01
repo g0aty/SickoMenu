@@ -22,10 +22,12 @@ DO_APP_FUNC(int32_t, LayerMask_NameToLayer, (String* layerName, MethodInfo* meth
 DO_APP_FUNC(Object_1__Array*, Object_1_FindObjectsOfType, (Type* type, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Object[] UnityEngine.Object::FindObjectsOfType(System.Type)");
 DO_APP_FUNC(String*, Scene_GetNameInternal, (int32_t sceneHandle, MethodInfo* method), "UnityEngine.CoreModule, System.String UnityEngine.SceneManagement.Scene::GetNameInternal(System.Int32)");
 DO_APP_FUNC(void, SceneManager_Internal_ActiveSceneChanged, (Scene previousActiveScene, Scene newActiveScene, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.SceneManagement.SceneManager::Internal_ActiveSceneChanged(UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.Scene)");
+DO_APP_FUNC(void, SceneManager_LoadScene, (String* sceneName, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.SceneManagement.SceneManager::LoadScene(System.String)");
 DO_APP_FUNC(Vector3, Transform_get_position, (Transform* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Vector3 UnityEngine.Transform::get_position()");
 DO_APP_FUNC(void, Transform_set_position, (Transform* __this, Vector3 value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Transform::set_position(UnityEngine.Vector3)");
 DO_APP_FUNC(Vector3, Transform_get_localPosition, (Transform* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Vector3 UnityEngine.Transform::get_localPosition()");
 DO_APP_FUNC(Vector3, Transform_get_localScale, (Transform* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Vector3 UnityEngine.Transform::get_localScale()");
+DO_APP_FUNC(void, Transform_set_localScale, (Transform* __this, Vector3 value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Transform::set_localScale(UnityEngine.Vector3)");
 DO_APP_FUNC(void, Transform_set_localPosition, (Transform* __this, Vector3 value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Transform::set_localPosition(UnityEngine.Vector3)");
 DO_APP_FUNC(Transform*, Transform_FindChild, (Transform* __this, String* name, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Transform UnityEngine.Transform::FindChild(System.String)");
 DO_APP_FUNC(float, Vector2_Distance, (Vector2 a, Vector2 b, MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Vector2::Distance(UnityEngine.Vector2, UnityEngine.Vector2)");
@@ -37,6 +39,7 @@ DO_APP_FUNC(int32_t, Camera_get_allCamerasCount, (MethodInfo* method), "UnityEng
 DO_APP_FUNC(Camera*, Camera_get_main, (MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Camera UnityEngine.Camera::get_main()");
 DO_APP_FUNC(void, Camera_set_orthographicSize, (Camera* __this, float value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Camera::set_orthographicSize(System.Single)");
 DO_APP_FUNC(float, Camera_get_orthographicSize, (Camera* __this, MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Camera::get_orthographicSize()");
+DO_APP_FUNC(float, Camera_get_aspect, (Camera* __this, MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Camera::get_aspect()");
 DO_APP_FUNC(Color, SpriteRenderer_get_color, (SpriteRenderer* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Color UnityEngine.SpriteRenderer::get_color()");
 DO_APP_FUNC(void, SpriteRenderer_set_color, (SpriteRenderer* __this, Color value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.SpriteRenderer::set_color(UnityEngine.Color)");
 DO_APP_FUNC(float, Time_get_deltaTime, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_deltaTime()");
@@ -245,6 +248,7 @@ DO_APP_FUNC(String*, Object_ToString, (Object* __this, MethodInfo* method), "msc
 DO_APP_FUNC(void, VersionShower_Start, (VersionShower* __this, MethodInfo* method), "Assembly-CSharp, System.Void VersionShower::Start()");
 
 DO_APP_FUNC(void, EOSManager_StartInitialLoginFlow, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::StartInitialLoginFlow()");
+DO_APP_FUNC(void, EOSManager_BeginLoginFlowWithDeviceID, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::BeginLoginFlowWithDeviceID()");
 DO_APP_FUNC(void, EOSManager_LoginFromAccountTab, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::LoginFromAccountTab()");
 DO_APP_FUNC(bool, EOSManager_HasFinishedLoginFlow, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean EOSManager::HasFinishedLoginFlow()");
 DO_APP_FUNC(void, EOSManager_InitializePlatformInterface, (EOSManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void EOSManager::InitializePlatformInterface()");
@@ -445,7 +449,10 @@ DO_APP_FUNC(void, MainMenuManager_LateUpdate, (MainMenuManager* __this, MethodIn
 DO_APP_FUNC(AudioSource*, SoundManager_PlaySound, (SoundManager* __this, AudioClip* clip, bool loop, float volume, AudioMixerGroup* audioMixer, MethodInfo* method), "Assembly-CSharp, UnityEngine.AudioSource SoundManager::PlaySound(UnityEngine.AudioClip, System.Boolean, System.Single, UnityEngine.Audio.AudioMixerGroup)");
 DO_APP_FUNC(void, AudioSource_set_pitch, (AudioSource* __this, float value, MethodInfo* method), "UnityEngine.AudioModule, System.Void UnityEngine.AudioSource::set_pitch(System.Single)");
 DO_APP_FUNC(void, PassiveButton_SetButtonEnableState, (PassiveButton* __this, bool enabled, MethodInfo* method), "Assembly-CSharp, System.Void PassiveButton::SetButtonEnableState(System.Boolean)");
-DO_APP_FUNC(void, PassiveButton_ChangeButtonText, (PassiveButton* __this, String* s, MethodInfo* method), "Assembly-CSharp, System.Void PassiveButton::ChangeButtonText(System.String)");
+DO_APP_FUNC(void, PassiveButton_ReceiveClickDown, (PassiveButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void PassiveButton::ReceiveClickDown()");
+DO_APP_FUNC(void, PassiveButton_ReceiveRepeatDown, (PassiveButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void PassiveButton::ReceiveRepeatDown()");
+DO_APP_FUNC(void, PassiveButton_ReceiveClickUp, (PassiveButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void PassiveButton::ReceiveClickUp()");
+DO_APP_FUNC(void, PassiveButton_ReceiveMouseOver, (PassiveButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void PassiveButton::ReceiveMouseOver()");
 DO_APP_FUNC(void, AmongUsClient_Awake, (AmongUsClient* __this, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::Awake()");
 DO_APP_FUNC(void, GameData_Awake, (GameData* __this, MethodInfo* method), "Assembly-CSharp, System.Void GameData::Awake()");
 DO_APP_FUNC(void, GameData_DestroyInstance, (GameData* __this, MethodInfo* method), "Assembly-CSharp, System.Void GameData::DestroyInstance()");
@@ -468,3 +475,4 @@ DO_APP_FUNC(void, FriendsListButton_Update, (FriendsListButton* __this, MethodIn
 DO_APP_FUNC(void, ProgressTracker_FixedUpdate, (ProgressTracker* __this, MethodInfo* method), "Assembly-CSharp, System.Void ProgressTracker::FixedUpdate()");
 DO_APP_FUNC(void, HideAndSeekTimerBar_Update, (HideAndSeekTimerBar* __this, MethodInfo* method), "Assembly-CSharp, System.Void HideAndSeekTimerBar::Update()");
 DO_APP_FUNC(void, LobbyInfoPane_Update, (LobbyInfoPane* __this, MethodInfo* method), "Assembly-CSharp, System.Void LobbyInfoPane::Update()");
+DO_APP_FUNC(void, ShadowCollab_OnEnable, (ShadowCollab* __this, MethodInfo* method), "Assembly-CSharp, System.Void ShadowCollab::OnEnable()");

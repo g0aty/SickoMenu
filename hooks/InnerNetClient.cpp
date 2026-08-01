@@ -51,6 +51,7 @@ static void onGameEnd() {
         State.modUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
+        State.shadowCollab = nullptr;
         //State.EnableZoom = false;
         State.FreeCam = false;
         State.MatchEnd = std::chrono::system_clock::now();
@@ -867,12 +868,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         if (State.SpamVentTpEveryoneRandom || State.spamRandomVentTpPlayers.size() != 0) {
                             for (auto p : GetAllPlayerControl()) {
                                 if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
-                                if (!State.SpamVentTpEveryone) {
+                                if (!State.SpamVentTpEveryoneRandom) {
                                     auto it = std::find(State.spamRandomVentTpPlayers.begin(), State.spamRandomVentTpPlayers.end(), p->fields.PlayerId);
                                     if (it == State.spamRandomVentTpPlayers.end()) continue;
                                 }
 
-                                int ventId = randi(0 + hqOffset, allVents.size() - 1 + hqOffset);
+                                int ventId = randi(0 + hqOffset, (int)allVents.size() - 1 + hqOffset);
 
                                 if (IsHost() || !State.SafeMode)
                                     PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, ventId, NULL);
@@ -897,7 +898,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                     SendBootVentNonHost(p, ventId);
                             }
                         }
-                        ventTpDelay = 0.5f;
+                        ventTpDelay = 0.75f;
                     }
                     else ventTpDelay -= Time_get_deltaTime(NULL);
                 }
@@ -1456,20 +1457,30 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         AutoRepairSabotageDelay--;
     }
 
-    if (State.FollowerCam != nullptr) {
+    if (State.FollowerCam != nullptr && State.shadowCollab != nullptr) {
         auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
         bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
         float oldCamHeight = Camera_get_orthographicSize(State.FollowerCam, NULL);
         float camHeight = (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) ?
             (State.CameraHeight * 3) : 3.f;
+
         float del = camHeight - oldCamHeight;
         float step = std::abs(del) * Time_get_deltaTime(NULL) * 10;
-        if (del < 0) {
-            Camera_set_orthographicSize(State.FollowerCam, (std::max)(camHeight, oldCamHeight - step), NULL);
+
+        float newCamHeight = 0.f;
+        if (!State.EnableZoom_SmoothZoom) newCamHeight = camHeight;
+        else if (del < 0.f) newCamHeight = (std::max)(camHeight, oldCamHeight - step);
+        else if (del > 0.f) newCamHeight = (std::min)(camHeight, oldCamHeight + step);
+
+        if (del != 0.f) {
+            Camera_set_orthographicSize(State.FollowerCam, newCamHeight, NULL);
+
+            float aspect = Camera_get_aspect(State.FollowerCam, NULL);
+            Camera_set_orthographicSize(State.shadowCollab->fields.ShadowCamera, newCamHeight, NULL);
+            auto shadowQuadTransform = Component_get_transform((Component_1*)State.shadowCollab->fields.ShadowQuad, NULL);
+            Transform_set_localScale(shadowQuadTransform, { newCamHeight * aspect * 2.f, newCamHeight * 2.f, 0.f }, NULL);
         }
-        if (del > 0) {
-            Camera_set_orthographicSize(State.FollowerCam, (std::min)(camHeight, oldCamHeight + step), NULL);
-        }
+
         /*if (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
             Camera_set_orthographicSize(State.FollowerCam, State.CameraHeight * 3, NULL);
         else

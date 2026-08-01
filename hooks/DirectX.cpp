@@ -138,7 +138,10 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Leave_Game) && (IsInGame() || IsInLobby()) && !State.PanicMode)
             app::AmongUsClient_ExitGame((*Game::pAmongUsClient), DisconnectReasons__Enum::ExitGame, NULL);
     }
-    if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) State.PanicMode = !State.PanicMode;
+    if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) {
+        State.PanicMode = !State.PanicMode;
+        ReloadCurrentSceneIfNeeded();
+    }
 
     if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
@@ -146,7 +149,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     if ((IsInGame() || IsInLobby()) && Game::HudManager.GetInstance()->fields.Chat != NULL && shouldKeybindsActivate) {
         auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
         bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
-        bool isScrollModifierAllowed = !chatOpen && !State.InMeeting;
+        bool isScrollModifierAllowed = !chatOpen && !State.InMeeting && State.EnableZoom_ScrollZoom;
 
         if (isScrollModifierAllowed && State.EnableZoom && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f)  State.CameraHeight += 0.5f;

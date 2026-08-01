@@ -35,6 +35,10 @@ void dFollowerCamera_Update(FollowerCamera* __this, MethodInfo* method) {
 			if (auto playerToFollow = State.playerToFollow.validate(); playerToFollow.has_value())
 			{
 				__this->fields.Target = (MonoBehaviour*)playerToFollow.get_PlayerControl();
+				auto shadowCamTransform = Component_get_transform((Component_1*)State.shadowCollab->fields.ShadowCamera, NULL);
+				auto camTransform = Component_get_transform((Component_1*)State.FollowerCam, NULL);
+				Vector3 position = Transform_get_position(camTransform, NULL);
+				Transform_set_position(shadowCamTransform, position, NULL);
 			}
 			else if (__this->fields.Target != (MonoBehaviour*)(*Game::pLocalPlayer)) {
 				__this->fields.Target = (MonoBehaviour*)(*Game::pLocalPlayer);

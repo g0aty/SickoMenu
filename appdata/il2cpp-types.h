@@ -4401,7 +4401,6 @@ namespace app {
 
     struct PoolablePlayer__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PoolablePlayer__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -5650,7 +5649,6 @@ namespace app {
 
     struct VitalsPanel__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct VitalsPanel__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -5698,7 +5696,6 @@ namespace app {
 
     struct VitalsMinigame__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct VitalsMinigame__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -7960,7 +7957,6 @@ namespace app {
 
     struct ViperDeadBody__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ViperDeadBody__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11171,7 +11167,6 @@ namespace app {
 
     struct EndGameManager__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct EndGameManager__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11205,7 +11200,6 @@ namespace app {
 
     struct EndGameNavigation__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct EndGameNavigation__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11290,7 +11284,6 @@ namespace app {
 
     struct PassiveButton__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PassiveButton__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11326,7 +11319,6 @@ namespace app {
 
     struct FriendsListButton__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct FriendsListButton__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11359,7 +11351,6 @@ namespace app {
 
     struct ProgressTracker__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ProgressTracker__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11397,7 +11388,6 @@ namespace app {
 
     struct HideAndSeekTimerBar__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct HideAndSeekTimerBar__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11448,11 +11438,43 @@ namespace app {
 
     struct LobbyInfoPane__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct LobbyInfoPane__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct LobbyInfoPane__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region ShadowCollab
+    struct ShadowCollab__Fields {
+        struct MonoBehaviour__Fields _;
+        struct Camera* ShadowCamera;
+        struct MeshRenderer* ShadowQuad;
+        float oldAspect;
+    };
+
+    struct ShadowCollab {
+        struct ShadowCollab__Class* klass;
+        MonitorData* monitor;
+        struct ShadowCollab__Fields fields;
+    };
+
+    struct ShadowCollab__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct ShadowCollab__StaticFields {
+    };
+
+    struct ShadowCollab__Class {
+        Il2CppClass_0 _0;
+        struct ShadowCollab__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ShadowCollab__VTable vtable;
     };
 #pragma endregion
 

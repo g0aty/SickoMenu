@@ -20,11 +20,24 @@ void fakeSuccessfulLogin(EOSManager* eosManager)
 	il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
 }
 
-void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
+/*void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) Log.HookDebug("Hook dEOSManager_StartInitialLoginFlow executed", false);
 	EOSManager_DeleteDeviceID(__this, NULL, NULL);
 	if (!State.SpoofGuestAccount) {
 		EOSManager_StartInitialLoginFlow(__this, method);
+		EOSManager_EndMergeGuestAccountFlow(__this, method);
+		return;
+	}
+	EOSManager_StartTempAccountFlow(__this, method);
+	//isGuestAccount = true;
+	EOSManager_CloseStartupWaitScreen(__this, method);
+}*/
+
+void dEOSManager_BeginLoginFlowWithDeviceID(EOSManager* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dEOSManager_BeginLoginFlowWithDeviceID executed", false);
+	EOSManager_DeleteDeviceID(__this, NULL, NULL);
+	if (!State.SpoofGuestAccount) {
+		EOSManager_BeginLoginFlowWithDeviceID(__this, method);
 		EOSManager_EndMergeGuestAccountFlow(__this, method);
 		return;
 	}

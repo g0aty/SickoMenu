@@ -278,14 +278,23 @@ namespace SelfTab {
 
             if (ToggleButton("Zoom", &State.EnableZoom)) {
                 State.Save();
-                if (!State.EnableZoom) RefreshChat();
             }
 
             ImGui::SameLine(130.f * State.dpiScale);
             SteppedSliderFloat("Scale", &State.CameraHeight, 0.5f, 10.0f, 0.5f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
-            ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-            ImGui::Separator();
+            if (ToggleButton("Scroll to Zoom / Shift + Scroll to Change Freecam Speed", &State.EnableZoom_ScrollZoom)) {
+                State.Save();
+            }
+            
+            if (ToggleButton("Smooth Zoom", &State.EnableZoom_SmoothZoom)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Show Shadows While Zoomed", &State.EnableZoom_ShowShadows)) {
+                State.Save();
+            }
+
             ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
             if (ToggleButton("Always show Chat Button", &State.ChatAlwaysActive)) {

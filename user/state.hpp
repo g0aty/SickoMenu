@@ -81,6 +81,7 @@ public:
     bool SpoofAUVersion = false;
     int FakeAUVersion = 1;
     bool DisableAnimations = false;
+    bool ClickThroughMenuUI = false;
     float AnimationSpeed = 1.f;
     float RoundingRadiusMultiplier = 1.f;
 
@@ -468,10 +469,13 @@ public:
     bool FreeCam = false;
     float FreeCamSpeed = 1.f;
 
-    float CameraHeight = 3.0;
+    float CameraHeight = 3.f;
     Camera* FollowerCam = nullptr;
-    Camera* ShadowCam = nullptr;
+    ShadowCollab* shadowCollab = nullptr;
     bool EnableZoom = false;
+    bool EnableZoom_ScrollZoom = true;
+    bool EnableZoom_SmoothZoom = true;
+    bool EnableZoom_ShowShadows = false;
 
     VersionShower* versionShower = nullptr;
     std::string versionShowerDefaultText = "";

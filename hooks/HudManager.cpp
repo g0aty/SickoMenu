@@ -117,12 +117,15 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
         if (State.InMeeting)
             HudManager_SetHudActive(__this, false, NULL);
         else {
+            auto hudTransform = Component_get_transform((Component_1*)__this, NULL);
             if (State.DisableHud && !State.PanicMode) {
                 HudManager_SetHudActive(__this, false, NULL);
+                Transform_set_localScale(hudTransform, { 0.f, 0.f, 0.f }, NULL);
                 DisableActivation = false;
             }
             else if (!DisableActivation) {
                 HudManager_SetHudActive(__this, true, NULL);
+                Transform_set_localScale(hudTransform, { 1.f, 1.f, 1.f }, NULL);
                 DisableActivation = true;
             }
         }
@@ -135,7 +138,8 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
         if (IsInGame() || IsInLobby()) {
             auto localData = GetPlayerData(*Game::pLocalPlayer);
             GameObject* shadowLayerObject = Component_get_gameObject((Component_1*)__this->fields.ShadowQuad, NULL);
-            bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby())))
+            bool showZoomShadows = !State.EnableZoom || State.EnableZoom_ShowShadows;
+            bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || !showZoomShadows/* || State.playerToFollow.has_value()*/ || State.Wallhack || (State.MaxVision && IsInLobby())))
                 && (localData != NULL && !localData->fields.IsDead);
             if (shadowLayerObject != NULL)
                 GameObject_SetActive(shadowLayerObject, shouldShowShadowQuad, NULL);
@@ -242,6 +246,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
     catch (...) {
         //LOG_ERROR("Exception occurred in HudManager_Update (HudManager)");
     }
+
     HudManager_Update(__this, method);
 }
 
@@ -436,6 +441,15 @@ bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo
 void dModManager_LateUpdate(ModManager* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dModManager_LateUpdate executed", false);
     ModManager_LateUpdate(__this, method);
+
+    ModManager_ShowModStamp(__this, NULL);
+
+    static FieldInfo* field = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "ModStamp");
+    if (field == nullptr) return;
+    auto modStampSprite = (SpriteRenderer*)il2cpp_field_get_value_object(field, (Il2CppObject*)__this);
+
+    bool shouldShowModStamp = !State.PanicMode && !State.DisableHud && !State.HideWatermark;
+    SpriteRenderer_set_color(modStampSprite, Color(1.f, 1.f, 1.f, shouldShowModStamp ? 0.498f : 0.f), NULL);
 }
 
 void dEndGameNavigation_ShowDefaultNavigation(EndGameNavigation* __this, MethodInfo* method) {
@@ -565,4 +579,31 @@ void dLobbyInfoPane_Update(LobbyInfoPane* __this, MethodInfo* method) {
 
     Color bgCol = (!State.PanicMode && State.DarkMode) ? Color(0.5f, 0.5f, 0.5f, 1.f) : Palette__TypeInfo->static_fields->White;
     SpriteRenderer_set_color(bgSprite, bgCol, NULL);
+}
+
+void dShadowCollab_OnEnable(ShadowCollab* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dShadowCollab_OnEnable executed", false);
+    ShadowCollab_OnEnable(__this, method);
+
+    State.shadowCollab = __this;
+}
+
+void dPassiveButton_ReceiveClickDown(PassiveButton* __this, MethodInfo* method) {
+    if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
+    PassiveButton_ReceiveClickDown(__this, method);
+}
+
+void dPassiveButton_ReceiveRepeatDown(PassiveButton* __this, MethodInfo* method) {
+    if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
+    PassiveButton_ReceiveRepeatDown(__this, method);
+}
+
+void dPassiveButton_ReceiveClickUp(PassiveButton* __this, MethodInfo* method) {
+    if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
+    PassiveButton_ReceiveClickUp(__this, method);
+}
+
+void dPassiveButton_ReceiveMouseOver(PassiveButton* __this, MethodInfo* method) {
+    if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
+    PassiveButton_ReceiveMouseOver(__this, method);
 }

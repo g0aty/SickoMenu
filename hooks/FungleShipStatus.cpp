@@ -65,7 +65,8 @@ void dMushroom_FixedUpdate(Mushroom* __this, MethodInfo* method) {
 
 	Vector3 sporeMaskPos = Transform_get_position(transform, NULL);
 	auto localData = GetPlayerData(*Game::pLocalPlayer);
-	bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || State.EnableZoom || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby())))
+	bool showZoomShadows = !State.EnableZoom || State.EnableZoom_ShowShadows;
+	bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || !showZoomShadows/* || State.playerToFollow.has_value()*/ || State.Wallhack || (State.MaxVision && IsInLobby())))
 		&& (localData != NULL && !localData->fields.IsDead);
 	sporeMaskPos.z = shouldShowShadowQuad ? 5.f : -1.f;
 	// https://github.com/scp222thj/MalumMenu/blob/main/src/Cheats/MalumESP.cs

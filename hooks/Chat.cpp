@@ -659,9 +659,8 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 				}
 			}
 		}
-		if (State.BetterMessageSounds && (State.ReadGhostMessages || !player->fields.IsDead) &&
-			(sourcePlayer != *Game::pLocalPlayer ||
-				(State.BetterChatNotifications && __this->fields.state == ChatControllerState__Enum::Closed))) {
+		if (State.BetterMessageSounds && (State.ReadGhostMessages || !player->fields.IsDead) && player != local &&
+			(__this->fields.state == ChatControllerState__Enum::Open || __this->fields.state == ChatControllerState__Enum::Opening)) {
 			auto audioSource = SoundManager_PlaySound(SoundManager__TypeInfo->static_fields->instance, (AudioClip*)__this->fields.messageSound, false, 1.f, NULL, NULL);
 			AudioSource_set_pitch(audioSource, 0.5f + (float)sourcePlayer->fields.PlayerId / 15, NULL);
 		}

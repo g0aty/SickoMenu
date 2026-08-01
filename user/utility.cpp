@@ -2455,6 +2455,12 @@ std::string GetTimeString(bool useLeadingZeroForHours, bool showSeconds) {
     return std::format("{}:{}", hourStr, remaining);
 }
 
+void ReloadCurrentSceneIfNeeded() {
+    if (State.CurrentScene == "MainMenu" || State.CurrentScene == "MatchMaking") {
+        SceneManager_LoadScene(convert_to_string(State.CurrentScene), NULL);
+    }
+}
+
 //TODO: Workaround
 #define GET_VIRTUAL_INVOKE(obj, method) \
     ((VirtualInvokeData*)(&obj->klass->vtable))[ \

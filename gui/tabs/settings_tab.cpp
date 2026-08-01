@@ -66,6 +66,11 @@ namespace SettingsTab {
 			if (ToggleButton("Allow Activating Keybinds while Chatting", &State.KeybindsWhileChatting)) {
 				State.Save();
 			}
+
+			if (ToggleButton("Allow Clicking Through Menu UIs", &State.ClickThroughMenuUI)) {
+				State.Save();
+			}
+
 			if (ToggleButton("Always Show Menu on Startup", &State.ShowMenuOnStartup)) {
 				State.Save();
 			}
@@ -405,6 +410,7 @@ namespace SettingsTab {
 		if (openCustomization) {
 			if (ToggleButton("Hide Watermark", &State.HideWatermark)) {
 				State.Save();
+				ReloadCurrentSceneIfNeeded();
 			}
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
@@ -446,7 +452,10 @@ namespace SettingsTab {
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-			if (ToggleButton("Dark Game Theme", &State.DarkMode)) State.Save();
+			if (ToggleButton("Dark Game Theme", &State.DarkMode)) {
+				State.Save();
+				ReloadCurrentSceneIfNeeded();
+			}
 			ImGui::SameLine();
 			if (ToggleButton("Custom Game Theme", &State.CustomGameTheme)) State.Save();
 

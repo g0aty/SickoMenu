@@ -100,6 +100,7 @@ void Settings::Load() {
         // JSON_TRYGET("FakeAUVersion_", this->FakeAUVersion);
         JSON_TRYGET("PanicWarning", this->PanicWarning);
         JSON_TRYGET("DisableAnimations", this->DisableAnimations);
+        JSON_TRYGET("ClickThroughMenuUI", this->ClickThroughMenuUI);
         JSON_TRYGET("AnimationSpeed", this->AnimationSpeed);
         JSON_TRYGET("RoundingRadiusMultiplier", this->RoundingRadiusMultiplier);
 		this->RoundingRadiusMultiplier = std::clamp(this->RoundingRadiusMultiplier, 0.f, 2.f);
@@ -274,8 +275,12 @@ void Settings::Load() {
         JSON_TRYGET("Wallhack", this->Wallhack);
         JSON_TRYGET("FreeCamSpeed", this->FreeCamSpeed);
         JSON_TRYGET("ZoomLevel", this->CameraHeight);
+        JSON_TRYGET("EnableZoom_ScrollZoom", this->EnableZoom_ScrollZoom);
+        JSON_TRYGET("EnableZoom_SmoothZoom", this->EnableZoom_SmoothZoom);
+        JSON_TRYGET("EnableZoom_ShowShadows", this->EnableZoom_ShowShadows);
         JSON_TRYGET("UnlockVents", this->UnlockVents);
         JSON_TRYGET("RolesBypassCommsSabotage", this->RolesBypassCommsSabotage);
+        JSON_TRYGET("KillImmunity", this->KillImmunity);
         JSON_TRYGET("UnlockKillButton", this->UnlockKillButton);
         JSON_TRYGET("ChatPaste", this->ChatPaste);
         JSON_TRYGET("RevealRoles", this->RevealRoles);
@@ -721,6 +726,7 @@ void Settings::Save() {
                 // { "FakeAUVersion_", this->FakeAUVersion },
                 { "PanicWarning", this->PanicWarning },
                 { "DisableAnimations", this->DisableAnimations },
+                { "ClickThroughMenuUI", this->ClickThroughMenuUI },
                 { "AnimationSpeed", this->AnimationSpeed },
                 { "RoundingRadiusMultiplier", this->RoundingRadiusMultiplier },
                 { "ExtraCommands", this->ExtraCommands },
@@ -889,8 +895,12 @@ void Settings::Save() {
                 { "Wallhack", this->Wallhack },
                 { "FreeCamSpeed", this->FreeCamSpeed },
                 { "ZoomLevel", this->CameraHeight },
+                { "EnableZoom_ScrollZoom", this->EnableZoom_ScrollZoom },
+                { "EnableZoom_SmoothZoom", this->EnableZoom_SmoothZoom },
+                { "EnableZoom_ShowShadows", this->EnableZoom_ShowShadows },
                 { "UnlockVents", this->UnlockVents },
                 { "RolesBypassCommsSabotage", this->RolesBypassCommsSabotage },
+                { "KillImmunity", this->KillImmunity },
                 { "UnlockKillButton", this->UnlockKillButton },
                 { "ChatPaste", this->ChatPaste },
                 { "RevealRoles", this->RevealRoles },
@@ -960,6 +970,10 @@ void Settings::Save() {
                 { "ShowFps", this->ShowFps },
                 { "DoTasksAsImpostor", this->DoTasksAsImpostor },
                 { "AutoCopyLobbyCode", this->AutoCopyLobbyCode },
+                { "AutoKickSlackers", this->AutoKickSlackers },
+                { "AutoKickSlackersIgnoreWhitelist", this->AutoKickSlackersIgnoreWhitelist },
+                { "AutoKickSlackersThreshold", this->AutoKickSlackersThreshold },
+                { "AutoKickSlackersGrace", this->AutoKickSlackersGrace },
                 { "DisableLobbyMusic", this->DisableLobbyMusic },
                 { "ReportOnMurder", this->ReportOnMurder },
                 { "PreventSelfReport", this->PreventSelfReport },

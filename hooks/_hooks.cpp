@@ -164,7 +164,8 @@ void DetourInitilization() {
 	HOOKFUNC(Debug_LogException);
 	HOOKFUNC(Debug_LogWarning);
 	HOOKFUNC(VersionShower_Start);
-	HOOKFUNC(EOSManager_StartInitialLoginFlow);
+	// HOOKFUNC(EOSManager_StartInitialLoginFlow);
+	HOOKFUNC(EOSManager_BeginLoginFlowWithDeviceID);
 	HOOKFUNC(EOSManager_LoginFromAccountTab);
 	HOOKFUNC(EOSManager_InitializePlatformInterface);
 	HOOKFUNC(EOSManager_IsFreechatAllowed);
@@ -277,6 +278,11 @@ void DetourInitilization() {
 	HOOKFUNC(HideAndSeekTimerBar_Update);
 	HOOKFUNC(LobbyInfoPane_Update);
 	HOOKFUNC(Mushroom_FixedUpdate);
+	HOOKFUNC(ShadowCollab_OnEnable);
+	HOOKFUNC(PassiveButton_ReceiveClickDown);
+	HOOKFUNC(PassiveButton_ReceiveRepeatDown);
+	HOOKFUNC(PassiveButton_ReceiveClickUp);
+	HOOKFUNC(PassiveButton_ReceiveMouseOver);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -357,7 +363,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(Debug_LogException);
 	UNHOOKFUNC(Debug_LogWarning);
 	UNHOOKFUNC(VersionShower_Start);
-	UNHOOKFUNC(EOSManager_StartInitialLoginFlow);
+	// UNHOOKFUNC(EOSManager_StartInitialLoginFlow);
+	UNHOOKFUNC(EOSManager_BeginLoginFlowWithDeviceID);
 	UNHOOKFUNC(EOSManager_LoginFromAccountTab);
 	UNHOOKFUNC(EOSManager_InitializePlatformInterface);
 	UNHOOKFUNC(EOSManager_IsFreechatAllowed);
@@ -468,6 +475,11 @@ void DetourUninitialization()
 	UNHOOKFUNC(HideAndSeekTimerBar_Update);
 	UNHOOKFUNC(LobbyInfoPane_Update);
 	UNHOOKFUNC(Mushroom_FixedUpdate);
+	UNHOOKFUNC(ShadowCollab_OnEnable);
+	UNHOOKFUNC(PassiveButton_ReceiveClickDown);
+	UNHOOKFUNC(PassiveButton_ReceiveRepeatDown);
+	UNHOOKFUNC(PassiveButton_ReceiveClickUp);
+	UNHOOKFUNC(PassiveButton_ReceiveMouseOver);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 
