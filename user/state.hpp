@@ -401,8 +401,8 @@ public:
     ImVec4 GameBgColor = ImVec4(1.f, 1.f, 1.f, 1.f);
 
     ImVec4 CrewmateGhostColor = ImVec4(1.f, 1.f, 1.f, 0.5f);
-    ImVec4 CrewmateColor = ImVec4(1.f, 1.f, 1.f, 1.f);
-    ImVec4 EngineerColor = ImVec4(0.f, 1.f, 1.f, 1.f);
+    ImVec4 CrewmateColor = ImVec4(0.f, 1.f, 1.f, 1.f);
+    ImVec4 EngineerColor = ImVec4(0.f, 0.5f, 1.f, 1.f);
     ImVec4 GuardianAngelColor = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
     ImVec4 ScientistColor = ImVec4(0.2f, 0.2f, 1.f, 1.f);
     ImVec4 ImpostorColor = ImVec4(1.f, 0.1f, 0.1f, 1.f);
