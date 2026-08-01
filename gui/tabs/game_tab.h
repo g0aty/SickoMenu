@@ -16,4 +16,5 @@ namespace GameTab {
 	const std::vector<const char*> FUNGLEVENTS = { "Communications", "Kitchen", "Lookout", "Outside Dorm", "Laboratory", "Jungle (Laboratory)", "Jungle (Greenhouse)", "Splash Zone", "Cafeteria" };
 	const std::vector<std::string> PLATFORM_FILTERS = { "Epic Games (PC)", "Steam (PC)", "Mac", "Microsoft Store (PC)", "itch.io (PC)", "iOS/iPadOS (Mobile)", "Android (Mobile)", "Nintendo Switch (Console)", "Xbox (Console)", "Playstation (Console)", "Unknown" };
 	void Render();
+	void OpenSubGroup(const std::string& name);
 }

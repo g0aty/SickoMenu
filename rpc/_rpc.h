@@ -495,3 +495,10 @@ public:
 	PunishPlayer(PlayerControl* Player, bool isBan);
 	virtual void Process() override;
 };
+
+class RpcRainbowPlayer : public RPCInterface {
+	PlayerControl* Player;
+public:
+	RpcRainbowPlayer(PlayerControl* Player);
+	virtual void Process() override;
+};

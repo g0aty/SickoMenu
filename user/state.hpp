@@ -145,6 +145,72 @@ public:
     bool ExtendChatLimit = false;
     bool ExtendChatHistory = false;
 
+    bool AutoApplyHostPreset = false;
+    struct RolePreset {
+        int32_t Count = 0;
+        int32_t Chance = 0;
+    };
+    struct HostPreset {
+        std::string Name = "Preset";
+        // Base settings
+        float PlayerSpeed = 1.f;
+        float CrewmateVision = 1.f;
+        float ImpostorVision = 1.5f;
+        float KillCooldown = 45.f;
+        int KillDistance = 1;
+        int NumImpostors = 1;
+        int MaxPlayers = 15;
+        uint8_t MapId = 0;
+        bool VisualTasks = true;
+        bool ConfirmImpostor = true;
+        bool AnonymousVotes = false;
+        int NumEmergencyMeetings = 1;
+        int EmergencyCooldown = 15;
+        int DiscussionTime = 15;
+        int VotingTime = 120;
+        int TaskBarMode = 0;
+        int NumCommonTasks = 1;
+        int NumLongTasks = 1;
+        int NumShortTasks = 1;
+        // Role counts and chances
+        std::map<int, RolePreset> RoleRates; // key = RoleTypes__Enum int value
+        // Role-specific settings
+        float ShapeshifterCooldown = 10.f;
+        float ShapeshifterDuration = 3.f;
+        bool ShapeshifterLeaveSkin = false;
+        float GuardianAngelCooldown = 60.f;
+        bool GuardianAngelProtectVisible = false;
+        float GuardianAngelProtectDuration = 10.f;
+        float ScientistCooldown = 15.f;
+        float ScientistBatteryCharge = 5.f;
+        float EngineerCooldown = 10.f;
+        float EngineerInVentMaxTime = 10.f;
+        float PhantomCooldown = 10.f;
+        float PhantomDuration = 3.f;
+        float TrackerCooldown = 10.f;
+        float TrackerDuration = 5.f;
+        float TrackerDelay = 2.f;
+        float NoisemakerAlertDuration = 3.f;
+        bool NoisemakerImpostorAlert = true;
+        float ViperDissolveTime = 3.f;
+        float DetectiveSuspectLimit = 3.f;
+    };
+    std::vector<HostPreset> HostPresets;
+    int SelectedHostPreset = 0;
+
+    struct CosmeticPreset {
+        std::string Name = "Preset";
+        std::string HatId = "";
+        std::string SkinId = "";
+        std::string VisorId = "";
+        std::string PetId = "";
+        std::string NamePlateId = "";
+        int32_t ColorId = 0;
+    };
+    std::vector<CosmeticPreset> CosmeticPresets;
+    int SelectedCosmeticPreset = 0;
+    bool AutoApplyCosmeticPreset = false;
+
     bool ShowKillCD = false;
 
     bool ChatPaste = false;
@@ -242,6 +308,8 @@ public:
     bool KillImpostors = false;
     bool KillInVanish = false;
     bool OnlyProtectCrewmates = false;
+    std::vector<uint8_t> VoteImmunePlayers;
+    std::unordered_map<uint8_t, uint8_t> VoteRedirectTargets;
     bool BypassAngelProt = false;
     bool InfiniteKillRange = false;
     bool KillInLobbies = false;
@@ -562,8 +630,9 @@ public:
     bool AutoStartGame = false;
     bool AutoKickSlackers = false;
     bool AutoKickSlackersIgnoreWhitelist = true;
-    int AutoKickSlackersThreshold = 50; 
-    int AutoKickSlackersGrace = 60; 
+    int AutoKickSlackersThreshold = 50;
+    int AutoKickSlackersGrace = 60;
+
     int AutoStartTimer = 60;
     bool AutoStartGamePlayers = false;
     int AutoStartPlayerCount = 15;
@@ -719,6 +788,7 @@ public:
 
     // Disable Tasks
     bool DisableMedbayScan = false;
+    std::unordered_set<int> DisabledTaskTypes;
 
     /*int BanDays = 0;
     int BanHours = 0;

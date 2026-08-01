@@ -13,12 +13,34 @@ static std::string getHexCodeFromImVec4(ImVec4 vec) {
         int(vec.x * 255), int(vec.y * 255), int(vec.z * 255), int(vec.w * 255));
 }
 
+void ApplyCosmeticPreset(const Settings::CosmeticPreset& p) {
+    std::queue<RPCInterface*>* queue = IsInGame() ? &State.rpcQueue : (IsInLobby() ? &State.lobbyRpcQueue : nullptr);
+    if (queue == nullptr) return;
+    queue->push(new RpcSetColor((uint8_t)p.ColorId));
+    if (!p.HatId.empty()) queue->push(new RpcSetHat(convert_to_string(p.HatId)));
+    if (!p.SkinId.empty()) queue->push(new RpcSetSkin(convert_to_string(p.SkinId)));
+    if (!p.VisorId.empty()) queue->push(new RpcSetVisor(convert_to_string(p.VisorId)));
+    if (!p.PetId.empty()) queue->push(new RpcSetPet(convert_to_string(p.PetId)));
+    if (!p.NamePlateId.empty()) queue->push(new RpcSetNamePlate(convert_to_string(p.NamePlateId)));
+}
+
+static bool s_pendingCosmeticApply = false;
+
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 {
     if (State.ShowHookLogs) Log.Debug("Hook dLobbyBehaviour_Start executed", false);
     State.LobbyTimer = 600;
     LobbyBehaviour_Start(__this, method);
-    if (IsHost()) State.JoinedAsHost = true;
+    if (!State.PanicMode && State.AutoApplyCosmeticPreset && !State.CosmeticPresets.empty()) {
+        s_pendingCosmeticApply = true;
+    }
+    if (IsHost()) {
+        State.JoinedAsHost = true;
+        if (!State.PanicMode && State.AutoApplyHostPreset && !State.HostPresets.empty()) {
+            int idx = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
+            ApplyHostPreset(State.HostPresets[idx]);
+        }
+    }
 }
 
 void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
@@ -26,6 +48,13 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
     static bool hasStarted = true;
     if (State.ShowHookLogs) Log.Debug("Hook dLobbyBehaviour_Update executed", false);
     LobbyBehaviour_Update(__this, method);
+    if (s_pendingCosmeticApply && IsInLobby()) {
+        s_pendingCosmeticApply = false;
+        if (!State.CosmeticPresets.empty()) {
+            int idx = std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1);
+            ApplyCosmeticPreset(State.CosmeticPresets[idx]);
+        }
+    }
     if (State.DisableLobbyMusic) {
         hasStarted = false;
         SoundManager_StopSound(SoundManager__TypeInfo->static_fields->instance, (AudioClip*)__this->fields.MapTheme, NULL);
@@ -184,6 +213,55 @@ void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
     std::string playerCountDisplay = std::format("<size=40%>{}\n{}\n{}\n{}{}</color>\n{}{}</color>{}\n{}</size>",
         separator, trueHostName, playerCount, lobbyCodeCol, lobbyCode, platformCol, platformId, lobbyTimeDisplay, separator);
     TMP_Text_set_text((TMP_Text*)__this->fields.capacity, convert_to_string(playerCountDisplay), NULL);
+}
+void ApplyHostPreset(const Settings::HostPreset& p) {
+    if (!IsHost() || !GameOptions().HasOptions()) return;
+    GameOptions()
+        .SetFloat(app::FloatOptionNames__Enum::PlayerSpeedMod, p.PlayerSpeed)
+        .SetFloat(app::FloatOptionNames__Enum::CrewLightMod, p.CrewmateVision)
+        .SetFloat(app::FloatOptionNames__Enum::ImpostorLightMod, p.ImpostorVision)
+        .SetFloat(app::FloatOptionNames__Enum::KillCooldown, p.KillCooldown)
+        .SetInt(app::Int32OptionNames__Enum::KillDistance, p.KillDistance)
+        .SetInt(app::Int32OptionNames__Enum::NumImpostors, p.NumImpostors)
+        .SetInt(app::Int32OptionNames__Enum::MaxPlayers, p.MaxPlayers)
+        .SetByte(app::ByteOptionNames__Enum::MapId, p.MapId)
+        .SetBool(app::BoolOptionNames__Enum::VisualTasks, p.VisualTasks)
+        .SetBool(app::BoolOptionNames__Enum::AnonymousVotes, p.AnonymousVotes)
+        .SetInt(app::Int32OptionNames__Enum::NumEmergencyMeetings, p.NumEmergencyMeetings)
+        .SetInt(app::Int32OptionNames__Enum::EmergencyCooldown, p.EmergencyCooldown)
+        .SetInt(app::Int32OptionNames__Enum::DiscussionTime, p.DiscussionTime)
+        .SetInt(app::Int32OptionNames__Enum::VotingTime, p.VotingTime)
+        .SetInt(app::Int32OptionNames__Enum::TaskBarMode, p.TaskBarMode)
+        .SetInt(app::Int32OptionNames__Enum::NumCommonTasks, p.NumCommonTasks)
+        .SetInt(app::Int32OptionNames__Enum::NumLongTasks, p.NumLongTasks)
+        .SetInt(app::Int32OptionNames__Enum::NumShortTasks, p.NumShortTasks)
+        .SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, p.ShapeshifterCooldown)
+        .SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, p.ShapeshifterCooldown)
+        .SetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, p.ShapeshifterDuration)
+        .SetBool(app::BoolOptionNames__Enum::ShapeshifterLeaveSkin, p.ShapeshifterLeaveSkin)
+        .SetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, p.GuardianAngelCooldown)
+        .SetBool(app::BoolOptionNames__Enum::ImpostorsCanSeeProtect, p.GuardianAngelProtectVisible)
+        .SetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, p.GuardianAngelProtectDuration)
+        .SetFloat(app::FloatOptionNames__Enum::ScientistCooldown, p.ScientistCooldown)
+        .SetFloat(app::FloatOptionNames__Enum::ScientistBatteryCharge, p.ScientistBatteryCharge)
+        .SetFloat(app::FloatOptionNames__Enum::EngineerCooldown, p.EngineerCooldown)
+        .SetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, p.EngineerInVentMaxTime)
+        .SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, p.PhantomCooldown)
+        .SetFloat(app::FloatOptionNames__Enum::PhantomDuration, p.PhantomDuration)
+        .SetFloat(app::FloatOptionNames__Enum::TrackerCooldown, p.TrackerCooldown)
+        .SetFloat(app::FloatOptionNames__Enum::TrackerDuration, p.TrackerDuration)
+        .SetFloat(app::FloatOptionNames__Enum::TrackerDelay, p.TrackerDelay)
+        .SetFloat(app::FloatOptionNames__Enum::NoisemakerAlertDuration, p.NoisemakerAlertDuration)
+        .SetBool(app::BoolOptionNames__Enum::NoisemakerImpostorAlert, p.NoisemakerImpostorAlert)
+        .SetFloat(app::FloatOptionNames__Enum::ViperDissolveTime, p.ViperDissolveTime)
+        .SetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit, p.DetectiveSuspectLimit);
+    auto roleOpts = GameOptions().GetRoleOptions();
+    for (auto& [role, rp] : p.RoleRates)
+        roleOpts.SetRoleRate((app::RoleTypes__Enum)role, rp.Count, rp.Chance);
+    if (GameOptionsManager_get_Instance && GameManager_get_Instance && GameManager_get_LogicOptions && LogicOptions_SyncOptions) {
+        auto* gm = GameManager_get_Instance(NULL);
+        if (gm) { auto* lo = GameManager_get_LogicOptions(gm, NULL); if (lo) LogicOptions_SyncOptions(lo, NULL); }
+    }
 }
 
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {

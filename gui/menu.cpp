@@ -40,40 +40,99 @@ namespace Menu {
 #endif
 	// static std::string searchQuery = (std::string)"";
 
-	std::map<std::string, std::vector<std::string>> categories = {
-		{"Settings", {"Show Keybinds", "Allow Activating Keybinds while Chatting", "Always Show Menu on Startup", "Panic (Disable SickoMenu)",
-					  "Config Name", "Load Config", "Save Config", "Adjust by DPI", "Menu Scale", "Menu Theme Color", "Gradient Theme", "Match Background with Theme",
-					  "RGB Menu Theme", "Reset Menu Theme", "Opacity", "Show Debug Tab", "Username", "Set as Account Name", "Automatically Set Name", "Custom Code",
-					  "Replace Streamer Mode Lobby Code", "RGB Lobby Code", "Unlock Cosmetics", "Safe Mode", "Allow other SickoMenu users to see you're using SickoMenu",
-					  "Spoof Guest Account", "Use Custom Guest Friend Code", "Spoof Level", "Spoof Platform", "Disable Host Anticheat (+25 Mode)", "FPS"}},
-		{"Game", {"Player Speed Multiplier", "Kill Distance", "No Ability Cooldown", "Multiply Speed", "Modify Kill Distance", "Random Color", "Set Color", "Snipe Color", "Console",
-				  "Reset Appearance", "Kill Everyone", "Protect Everyone", "Disable Venting", "Spam Report", "Kill All Crewmates", "Kill All Impostors", "Kick Everyone From Vents",
-				  "Chat Message", "Send", "Send to AUM", "Spam", "Chat Presets", "Attempt to Crash", "Overload Everyone", "Lag Everyone", "Enable Anticheat (SMAC)",
-				  "Whitelist", "Blacklist"}},
-		{"Self", {"Max Vision", "Wallhack", "Disable HUD", "Freecam", "Zoom", "Always show Chat Button", "Allow Ctrl+(C/V) in Chat", "Read Messages by Ghosts",
-				  "Read and Send SickoChat", "Custom Name", "Custom Name for Everyone", "Server-sided Custom Name", "Reveal Roles", "Abbrv. Role", "Player Colored Dots Next To Names",
-				  "Show Player Info in Lobby", "Reveal Votes", "See Ghosts", "See Protections", "See Kill Cooldown", "Disable Kill Animation", "Dark Mode",
-				  "Show Host", "Hide Watermark", "Show Vote Kicks", "Show FPS",
-				  "Unlock Vents", "Move While in Vent & Shapeshifting", "Always Move", "No Shapeshift Animation", "Copy Lobby Code on Disconnect", "NoClip",
-				  "Allow Killing in Lobbies", "Kill Other Impostors", "Infinite Kill Range", "Bypass Guardian Angel Protections", "Autokill", "Do Tasks as Impostor",
-				  "Fake Alive", "God Mode", "Teleport", "Rotate everyone", "Select Role", "Set Role", "Set Fake Role", "Automatically Set Fake Role",
-				  "Show Lobby Info", "See Phantoms", "Report Body on Murder", "Prevent Self-Report",
-				  "Cycler", "Cycle in Meeting", "Cycle Between Players", "Confuser (Randomize Appearance at Will"}},
-		{"Radar", {"Show Radar", "Show Dead Bodies", "Show Ghosts", "Right Click to Teleport", "Hide Radar During Meetings", "Draw Player Icons", "Lock Radar Position", "Show Border"}},
-		{"Replay", {"Show Replay", "Show Only last seconds", "Clear after meeting"}},
-		{"ESP", {"Enable", "Show Ghosts", "Hide During Meetings", "Show Boxes", "Show Tracers", "Show Distances", "Role-based"}},
-		{"Players", {"Players"}},
-		{"Tasks", {"Complete All Tasks", "Play Medbay Scan Animation"}},
-		{"Sabotage", {"Disable Sabotage", "Auto Repair Sabotages", "Repair Sabotage", "Sabotage All", "Random Sabotage", "Sabotage Lights", "Sabotage Reactor", "Sabotage Oxygen", "Sabotage Comms", "Disable Lights",
-					  "Activate Mushroom Mixup"}},
-		{"Doors", {"Close All Doors", "Close Room Door", "Pin All Doors", "Unpin All Doors", "Auto Open Doors"}},
-		{"Host", {"Custom Impostor Amount", "Impostor Count", "Force Start of Game", "Disable Meetings", "Disable Sabotages", "Disable Game Ending", "End Game", "Force Color for Everyone",
-				  "Force Name for Everyone", "Spam Moving Platform", "Unlock Kill Button", "Allow Killing in Lobbies", "Kill While Vanished", "Game Mode", "Show Lobby Timer", "Auto Start Game", "Spectator Mode"}},
+	struct SearchEntry {
+		std::string Name;
+		std::string SubGroup; // empty if the tab has no sub-groups or setting isn't mapped
+	};
+
+	std::map<std::string, std::vector<SearchEntry>> categories = {
+		{"Settings", {
+			{"Show Keybinds", "Keybinds"}, {"Allow Activating Keybinds while Chatting", "Keybinds"},
+			{"Always Show Menu on Startup", "General"}, {"Panic (Disable SickoMenu)", "General"},
+			{"Config Name", "General"}, {"Load Config", "General"}, {"Save Config", "General"},
+			{"Adjust by DPI", "Customization"}, {"Menu Scale", "Customization"}, {"Menu Theme Color", "Customization"},
+			{"Gradient Theme", "Customization"}, {"Match Background with Theme", "Customization"},
+			{"RGB Menu Theme", "Customization"}, {"Reset Menu Theme", "Customization"}, {"Opacity", "Customization"},
+			{"Show Debug Tab", "General"}, {"Username", "Spoofing"}, {"Set as Account Name", "Spoofing"},
+			{"Automatically Set Name", "Spoofing"}, {"Custom Code", "Customization"},
+			{"Replace Streamer Mode Lobby Code", "Customization"}, {"RGB Lobby Code", "Customization"},
+			{"Unlock Cosmetics", "Spoofing"}, {"Safe Mode", "General"},
+			{"Allow other SickoMenu users to see you're using SickoMenu", "General"},
+			{"Spoof Guest Account", "Spoofing"}, {"Use Custom Guest Friend Code", "Spoofing"},
+			{"Spoof Level", "Spoofing"}, {"Spoof Platform", "Spoofing"},
+			{"Disable Host Anticheat (+25 Mode)", "General"}, {"FPS", "General"}
+		}},
+		{"Game", {
+			{"Player Speed Multiplier", "General"}, {"Kill Distance", "General"}, {"No Ability Cooldown", "General"},
+			{"Multiply Speed", "General"}, {"Modify Kill Distance", "General"}, {"Random Color", "General"},
+			{"Set Color", "General"}, {"Snipe Color", "General"}, {"Console", "General"},
+			{"Reset Appearance", "General"}, {"Kill Everyone", "General"}, {"Protect Everyone", "General"},
+			{"Disable Venting", "General"}, {"Spam Report", "General"}, {"Kill All Crewmates", "General"},
+			{"Kill All Impostors", "General"}, {"Kick Everyone From Vents", "General"},
+			{"Chat Message", "Chat"}, {"Send", "Chat"}, {"Send to AUM", "Chat"}, {"Spam", "Chat"},
+			{"Chat Presets", "Chat"}, {"Attempt to Crash", "Utils"}, {"Overload Everyone", "Utils"},
+			{"Lag Everyone", "Utils"}, {"Enable Anticheat (SMAC)", "Anticheat"},
+			{"Whitelist", "Anticheat"}, {"Blacklist", "Anticheat"}
+		}},
+		{"Self", {
+			{"Max Vision", "Visuals"}, {"Wallhack", "Visuals"}, {"Disable HUD", "Visuals"}, {"Freecam", "Visuals"},
+			{"Zoom", "Visuals"}, {"Always show Chat Button", "Visuals"}, {"Allow Ctrl+(C/V) in Chat", "Visuals"},
+			{"Read Messages by Ghosts", "Visuals"}, {"Read and Send SickoChat", "Visuals"}, {"Custom Name", "Visuals"},
+			{"Custom Name for Everyone", "Visuals"}, {"Server-sided Custom Name", "Visuals"}, {"Reveal Roles", "Visuals"},
+			{"Abbrv. Role", "Visuals"}, {"Player Colored Dots Next To Names", "Visuals"}, {"Show Player Info in Lobby", "Visuals"},
+			{"Reveal Votes", "Visuals"}, {"See Ghosts", "Visuals"}, {"See Protections", "Visuals"}, {"See Kill Cooldown", "Visuals"},
+			{"Disable Kill Animation", "Visuals"}, {"Dark Mode", "Visuals"}, {"Show Host", "Visuals"}, {"Hide Watermark", "Visuals"},
+			{"Show Vote Kicks", "Visuals"}, {"Show FPS", "Visuals"}, {"Show Lobby Info", "Visuals"}, {"See Phantoms", "Visuals"},
+			{"Unlock Vents", "Utils"}, {"Move While in Vent & Shapeshifting", "Utils"}, {"Always Move", "Utils"},
+			{"No Shapeshift Animation", "Utils"}, {"Copy Lobby Code on Disconnect", "Utils"}, {"NoClip", "Utils"},
+			{"Allow Killing in Lobbies", "Utils"}, {"Kill Other Impostors", "Utils"}, {"Infinite Kill Range", "Utils"},
+			{"Bypass Guardian Angel Protections", "Utils"}, {"Autokill", "Utils"}, {"Do Tasks as Impostor", "Utils"},
+			{"Fake Alive", "Utils"}, {"God Mode", "Utils"}, {"Teleport", "Utils"}, {"Rotate everyone", "Utils"},
+			{"Select Role", "Utils"}, {"Set Role", "Utils"}, {"Set Fake Role", "Utils"}, {"Automatically Set Fake Role", "Utils"},
+			{"Report Body on Murder", "Utils"}, {"Prevent Self-Report", "Utils"},
+			{"Cycler", "Randomizers"}, {"Cycle in Meeting", "Randomizers"}, {"Cycle Between Players", "Randomizers"},
+			{"Confuser (Randomize Appearance at Will", "Randomizers"}
+		}},
+		{"Radar", {
+			{"Show Radar", ""}, {"Show Dead Bodies", ""}, {"Show Ghosts", ""}, {"Right Click to Teleport", ""},
+			{"Hide Radar During Meetings", ""}, {"Draw Player Icons", ""}, {"Lock Radar Position", ""}, {"Show Border", ""}
+		}},
+		{"Replay", {
+			{"Show Replay", ""}, {"Show Only last seconds", ""}, {"Clear after meeting", ""}
+		}},
+		{"ESP", {
+			{"Enable", ""}, {"Show Ghosts", ""}, {"Hide During Meetings", ""}, {"Show Boxes", ""},
+			{"Show Tracers", ""}, {"Show Distances", ""}, {"Role-based", ""}
+		}},
+		{"Players", {
+			{"Players", ""}
+		}},
+		{"Tasks", {
+			{"Complete All Tasks", ""}, {"Play Medbay Scan Animation", ""}
+		}},
+		{"Sabotage", {
+			{"Disable Sabotage", ""}, {"Auto Repair Sabotages", ""}, {"Repair Sabotage", ""}, {"Sabotage All", ""},
+			{"Random Sabotage", ""}, {"Sabotage Lights", ""}, {"Sabotage Reactor", ""}, {"Sabotage Oxygen", ""},
+			{"Sabotage Comms", ""}, {"Disable Lights", ""}, {"Activate Mushroom Mixup", ""}
+		}},
+		{"Doors", {
+			{"Close All Doors", ""}, {"Close Room Door", ""}, {"Pin All Doors", ""}, {"Unpin All Doors", ""}, {"Auto Open Doors", ""}
+		}},
+		{"Host", {
+			{"Custom Impostor Amount", "Utils"}, {"Impostor Count", "Utils"}, {"Force Start of Game", "Utils"},
+			{"Disable Meetings", "Utils"}, {"Disable Sabotages", "Utils"}, {"Disable Game Ending", "Utils"}, {"End Game", "Utils"},
+			{"Force Color for Everyone", "Utils"}, {"Force Name for Everyone", "Utils"}, {"Spam Moving Platform", "Utils"},
+			{"Unlock Kill Button", "Utils"}, {"Allow Killing in Lobbies", "Utils"}, {"Kill While Vanished", "Utils"},
+			{"Game Mode", "Utils"}, {"Show Lobby Timer", "Utils"}, {"Auto Start Game", "Utils"}, {"Spectator Mode", "Utils"}
+		}},
 #ifdef _DEBUG
-		{"Debug", {"Enable Occlusion Culling", "Force Load Settings", "Force Save Settings", "Clear RPC Queues", "Log Unity Debug Messages", "Log Hook Debug Messages", "Colors", "Profiler",
-				   "Experiments", "Enable Anticheat (SMAC)", "Point System (Only for Hosting)"}},
+		{"Debug", {
+			{"Enable Occlusion Culling", ""}, {"Force Load Settings", ""}, {"Force Save Settings", ""}, {"Clear RPC Queues", ""},
+			{"Log Unity Debug Messages", ""}, {"Log Hook Debug Messages", ""}, {"Colors", ""}, {"Profiler", ""},
+			{"Experiments", ""}, {"Enable Anticheat (SMAC)", ""}, {"Point System (Only for Hosting)", ""}
+		}},
 #endif
-				   // Add more settings here as needed
+		// Add more settings here as needed
 	};
 
 	void CloseAllOtherTabs(Tabs openTab) {
@@ -115,17 +174,44 @@ namespace Menu {
 		return new_str;
 	}
 
+	Tabs CategoryNameToTab(const std::string& name) {
+		if (name == "Settings") return Tabs::Settings;
+		if (name == "Game") return Tabs::Game;
+		if (name == "Self") return Tabs::Self;
+		if (name == "Radar") return Tabs::Radar;
+		if (name == "Replay") return Tabs::Replay;
+		if (name == "ESP") return Tabs::Esp;
+		if (name == "Players") return Tabs::Players;
+		if (name == "Tasks") return Tabs::Tasks;
+		if (name == "Sabotage") return Tabs::Sabotage;
+		if (name == "Doors") return Tabs::Doors;
+		if (name == "Host") return Tabs::Host;
+#ifdef _DEBUG
+		if (name == "Debug") return Tabs::Debug;
+#endif
+		return Tabs::About;
+	}
+
+	void OpenTabSubGroup(const std::string& tabName, const std::string& subGroup) {
+		if (subGroup.empty()) return;
+		if (tabName == "Self") SelfTab::OpenSubGroup(subGroup);
+		else if (tabName == "Game") GameTab::OpenSubGroup(subGroup);
+		else if (tabName == "Host") HostTab::OpenSubGroup(subGroup);
+		else if (tabName == "Settings") SettingsTab::OpenSubGroup(subGroup);
+	}
+
 	void RenderSearchResults() {
 		if (State.searchQuery.size() == 0) return;
 
 		std::string lowerQuery = ToLower(State.searchQuery);
 
-		std::vector<std::string> searchResults = {};
+		// category name -> first matching sub-group found for it
+		std::vector<std::pair<std::string, std::string>> searchResults = {};
 
 		for (const auto& category : categories) {
-			for (const auto& setting : category.second) {
-				if (ToLower(setting).find(lowerQuery) != std::string::npos) {
-					searchResults.push_back(category.first);
+			for (const auto& entry : category.second) {
+				if (ToLower(entry.Name).find(lowerQuery) != std::string::npos) {
+					searchResults.push_back({ category.first, entry.SubGroup });
 					break;
 				}
 			}
@@ -134,8 +220,13 @@ namespace Menu {
 		if (searchResults.size() == 0) BoldText("No results.");
 		else {
 			BoldText(("Search Result" + std::string(searchResults.size() == 1 ? "" : "s")).c_str());
-			for (std::string i : searchResults) {
-				ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.f), i.c_str());
+			for (auto& [tabName, subGroup] : searchResults) {
+				std::string label = subGroup.empty() ? tabName : (tabName + " > " + subGroup);
+				if (ImGui::Selectable((label + "##searchresult").c_str())) {
+					CloseAllOtherTabs(CategoryNameToTab(tabName));
+					OpenTabSubGroup(tabName, subGroup);
+					State.searchQuery = "";
+				}
 			}
 		}
 	}
@@ -198,7 +289,7 @@ namespace Menu {
 			if ((IsInGame() || IsInLobby()) && ImGui::Selectable("Players", openPlayers)) {
 				CloseAllOtherTabs(Tabs::Players);
 			}
-			if ((IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) && ImGui::Selectable("Tasks", openTasks)) {
+			if (((IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) || (IsInLobby() && IsHost())) && ImGui::Selectable("Tasks", openTasks)) {
 				CloseAllOtherTabs(Tabs::Tasks);
 			}
 			if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance != NULL && ImGui::Selectable("Sabotage", openSabotage)) {
@@ -280,7 +371,7 @@ namespace Menu {
 				}
 			}
 			if (openTasks) {
-				if (IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) TasksTab::Render();
+				if ((IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) || (IsInLobby() && IsHost())) TasksTab::Render();
 				else {
 					CloseAllOtherTabs(Tabs::Game);
 					GameTab::Render();

@@ -12,4 +12,5 @@ namespace HostTab {
 	const std::vector<const char*> HOSTCOLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral", "Fortegreen" };
 	void Render();
 	const ptrdiff_t GetRoleCount(RoleType role);
+	void OpenSubGroup(const std::string& name);
 }

@@ -193,17 +193,16 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
 }
 
 void dShipStatus_AddTasksFromList(ShipStatus* __this, int32_t* start, int32_t count, void* tasks, void* usedTaskTypes, List_1_NormalPlayerTask_* unusedTasks, MethodInfo* method) {
-    if (State.DisableMedbayScan) {
-        il2cpp::List<List_1_NormalPlayerTask_> tasks = unusedTasks;
-        size_t max = tasks.size();
-        size_t medScanIndex = max;
-        for (size_t i = 0; i < max; i++) {
-            if (tasks[i]->fields._.TaskType == TaskTypes__Enum::SubmitScan) {
-                medScanIndex = i;
-            }
+    if (State.DisableMedbayScan || !State.DisabledTaskTypes.empty()) {
+        il2cpp::List<List_1_NormalPlayerTask_> taskList = unusedTasks;
+        for (int i = (int)taskList.size() - 1; i >= 0; i--) {
+            if ((int)taskList.size() <= count) break; 
+            auto taskType = taskList[i]->fields._.TaskType;
+            bool remove = (State.DisableMedbayScan && taskType == TaskTypes__Enum::SubmitScan)
+                || State.DisabledTaskTypes.count((int)taskType);
+            if (remove) taskList.erase(i);
         }
-        if (medScanIndex != max) tasks.erase(medScanIndex);
-        unusedTasks = tasks.get();
+        unusedTasks = taskList.get();
     }
     ShipStatus_AddTasksFromList(__this, start, count, tasks, usedTaskTypes, unusedTasks, method);
 }

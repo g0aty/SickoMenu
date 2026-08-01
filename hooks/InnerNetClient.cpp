@@ -741,6 +741,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 }
                 static float slackerTimer = 0.f;
                 if (!IsInGame()) slackerTimer = 0.f;
+                if (!IsInGame() && !IsInLobby()) {
+                    State.VoteImmunePlayers.clear();
+                }
+                
                 if (IsHost() && IsInLobby() && State.AutoStartGame && (600 - State.LobbyTimer) >= State.AutoStartTimer && !autoStartedGame) {
                     autoStartedGame = true;
                     InnerNetClient_SendStartGame(__this, NULL);
@@ -1615,6 +1619,9 @@ void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResul
         }
         if (count == 0) LOG_DEBUG("No one was a winner in the game.");
         else LOG_DEBUG(winnersText.substr(0, (size_t)winnersText.size() - 2));
+
+        State.VoteImmunePlayers.clear();
+
         onGameEnd();
     }
     catch (...) {

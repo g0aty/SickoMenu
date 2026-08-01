@@ -5,6 +5,7 @@
 #include "utility.h"
 #include "state.hpp"
 #include "logger.h"
+#include "_hooks.h"
 
 extern void RevealAnonymousVotes(); // in MeetingHud.cpp
 
@@ -52,6 +53,13 @@ namespace SelfTab {
         openUtils = group == Groups::Utils;
         openRandomizers = group == Groups::Randomizers;
         openTextEditor = group == Groups::TextEditor;
+    }
+
+    void OpenSubGroup(const std::string& name) {
+        if (name == "Visuals") CloseOtherGroups(Groups::Visuals);
+        else if (name == "Utils") CloseOtherGroups(Groups::Utils);
+        else if (name == "Randomizers") CloseOtherGroups(Groups::Randomizers);
+        else if (name == "Text Editor") CloseOtherGroups(Groups::TextEditor);
     }
 
     std::string GetTextEditorName(std::string str) {
@@ -813,67 +821,68 @@ namespace SelfTab {
         }
 
         if (openRandomizers) {
-            if (ToggleButton("Cycler", &State.Cycler)) {
-                State.Save();
-            }
-            ImGui::SameLine();
-            if (ToggleButton("Cycle in Meeting", &State.CycleInMeeting)) {
-                State.Save();
-            }
-            ImGui::SameLine();
-            if (ToggleButton(State.SafeMode ? "Cycle Between Players' Outfits" : "Cycle Between Players", &State.CycleBetweenPlayers)) {
-                State.Save();
-            }
+            ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
+                if (ToggleButton("Cycler", &State.Cycler)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (ToggleButton("Cycle in Meeting", &State.CycleInMeeting)) {
+                    State.Save();
+                }
+                ImGui::SameLine();
+                if (ToggleButton(State.SafeMode ? "Cycle Between Players' Outfits" : "Cycle Between Players", &State.CycleBetweenPlayers)) {
+                    State.Save();
+                }
 
-            if (SteppedSliderFloat("Cycle Timer", &State.CycleTimer, 0.2f, 1.f, 0.02f, "%.2fs", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
-                State.PrevCycleTimer = State.CycleTimer;
-                State.CycleDuration = State.CycleTimer * 50;
-            }
+                if (SteppedSliderFloat("Cycle Timer", &State.CycleTimer, 0.2f, 1.f, 0.02f, "%.2fs", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
+                    State.PrevCycleTimer = State.CycleTimer;
+                    State.CycleDuration = State.CycleTimer * 50;
+                }
 
-            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-            if (ImGui::CollapsingHeader("Cycler Options")) {
-                if (!State.SafeMode) {
-                    if (ToggleButton("Cycle Name", &State.CycleName)) {
+                ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+                if (ImGui::CollapsingHeader("Cycler Options")) {
+                    ImGui::Dummy(ImVec2(4, 2)* State.dpiScale);
+                    if (!State.SafeMode) {
+                        if (ToggleButton("Cycle Name", &State.CycleName)) {
+                            State.Save();
+                        }
+
+                        ImGui::SameLine(120.0f * State.dpiScale);
+                    }
+                    if (ToggleButton("Cycle Color", &State.RandomColor)) {
+                        State.Save();
+                    }
+
+                    ImGui::SameLine(!State.SafeMode ? (240.0f * State.dpiScale) : (120.0f * State.dpiScale));
+                    if (ToggleButton("Cycle Hat", &State.RandomHat)) {
+                        State.Save();
+                    }
+                    ImGui::SameLine(240.0f * State.dpiScale);
+                    if (ToggleButton("Cycle Nameplate", &State.RandomNamePlate)) {
+                        State.Save();
+                    }
+                    if (ToggleButton("Cycle Visor", &State.RandomVisor)) {
                         State.Save();
                     }
 
                     ImGui::SameLine(120.0f * State.dpiScale);
-                }
-                if (ToggleButton("Cycle Color", &State.RandomColor)) {
-                    State.Save();
-                }
-
-                ImGui::SameLine(!State.SafeMode ? (240.0f * State.dpiScale) : (120.0f * State.dpiScale));
-                if (ToggleButton("Cycle Hat", &State.RandomHat)) {
-                    State.Save();
-                }
-
-                if (ToggleButton("Cycle Visor", &State.RandomVisor)) {
-                    State.Save();
-                }
-
-                ImGui::SameLine(120.0f * State.dpiScale);
-                if (ToggleButton("Cycle Skin", &State.RandomSkin)) {
-                    State.Save();
-                }
-
-                ImGui::SameLine(240.0f * State.dpiScale);
-                if (ToggleButton("Cycle Pet", &State.RandomPet)) {
-                    State.Save();
-                }
-
-                if (ToggleButton("Cycle Nameplate", &State.RandomNamePlate)) {
-                    State.Save();
-                }
-
-                if (IsHost() || !State.SafeMode) {
-                    ImGui::SameLine();
-                    if (ToggleButton(IsHost() ? "Cycle for Everyone (Color ONLY)" : "Cycle for Everyone", &State.CycleForEveryone)) {
+                    if (ToggleButton("Cycle Skin", &State.RandomSkin)) {
                         State.Save();
                     }
-                }
-            }
 
+                    ImGui::SameLine(240.0f * State.dpiScale);
+                    if (ToggleButton("Cycle Pet", &State.RandomPet)) {
+                        State.Save();
+                    }
+
+                    if (IsHost() || !State.SafeMode) {
+                        if (ToggleButton(IsHost() ? "Cycle for Everyone (Color ONLY)" : "Cycle for Everyone", &State.CycleForEveryone)) {
+                            State.Save();
+                        }
+                    }
+                }
+
+            ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
 
             if (!State.SafeMode && ImGui::CollapsingHeader("Cycler Name Options")) {
                 if (CustomListBoxInt("Cycler Name Generation", &State.cyclerNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
@@ -908,11 +917,13 @@ namespace SelfTab {
                 }
             }
 
-            if (ToggleButton("Confuser (Randomize Appearance at Will)", &State.confuser)) {
-                State.Save();
-            }
+            if (ImGui::CollapsingHeader("Confuser", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Dummy(ImVec2(4, 2) * State.dpiScale);
+                if (ToggleButton("Confuser (Randomize Appearance at Will)", &State.confuser)) {
+                    State.Save();
+                }
 
-            if (ImGui::CollapsingHeader("Confuser Options")) {
+                ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
                 if ((IsInGame() || IsInLobby()) && AnimatedButton("Confuse Now")) {
                     ControlAppearance(true);
                 }
@@ -1004,6 +1015,69 @@ namespace SelfTab {
                         ImGui::SameLine();
                         if (AnimatedButton("Delete "))
                             State.cyclerUserNames.erase(State.cyclerUserNames.begin() + selectedNameIndex);
+                    }
+                }
+            }
+            ImGui::Dummy(ImVec2(4, 2)* State.dpiScale);
+            if (ImGui::CollapsingHeader("Cosmetic Presets", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Dummy(ImVec2(4, 2) * State.dpiScale);
+                if (ToggleButton("Auto Apply on Join", &State.AutoApplyCosmeticPreset))
+                    State.Save();
+                ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+                if (!State.CosmeticPresets.empty()) {
+                    std::vector<const char*> names;
+                    for (auto& p : State.CosmeticPresets) names.push_back(p.Name.c_str());
+                    CustomListBoxInt("##cosmeticpresetselect", &State.SelectedCosmeticPreset, names, 200.0f * State.dpiScale);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Apply##cosmeticpreset")) {
+                        ApplyCosmeticPreset(State.CosmeticPresets[std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1)]);
+                    }
+                    ImGui::SameLine();
+                    if (AnimatedButton("Update##cosmeticpreset")) {
+                        auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+                        if (outfit != nullptr) {
+                            int idx = std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1);
+                            auto& p = State.CosmeticPresets[idx];
+                            p.ColorId = outfit->fields.ColorId;
+                            p.HatId = outfit->fields.HatId ? convert_from_string(outfit->fields.HatId) : "";
+                            p.SkinId = outfit->fields.SkinId ? convert_from_string(outfit->fields.SkinId) : "";
+                            p.VisorId = outfit->fields.VisorId ? convert_from_string(outfit->fields.VisorId) : "";
+                            p.PetId = outfit->fields.PetId ? convert_from_string(outfit->fields.PetId) : "";
+                            p.NamePlateId = outfit->fields.NamePlateId ? convert_from_string(outfit->fields.NamePlateId) : "";
+                            State.Save();
+                        }
+                    }
+                    ImGui::SameLine();
+                    if (AnimatedButton("Delete##cosmeticpreset")) {
+                        int idx = std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1);
+                        State.CosmeticPresets.erase(State.CosmeticPresets.begin() + idx);
+                        State.SelectedCosmeticPreset = std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1);
+                        State.Save();
+                    }
+                }
+                else {
+                    ImGui::TextDisabled("No cosmetic presets saved.");
+                }
+
+                ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+                static std::string newCosmeticName = "My Outfit";
+                ImGui::SetNextItemWidth(160 * State.dpiScale);
+                InputString("Preset Name##cosmetic", &newCosmeticName);
+                ImGui::SameLine();
+                if (AnimatedButton("Save Current##cosmeticpreset")) {
+                    auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+                    if (outfit != nullptr) {
+                        Settings::CosmeticPreset p;
+                        p.Name = newCosmeticName.empty() ? "Preset" : newCosmeticName;
+                        p.ColorId = outfit->fields.ColorId;
+                        p.HatId = outfit->fields.HatId ? convert_from_string(outfit->fields.HatId) : "";
+                        p.SkinId = outfit->fields.SkinId ? convert_from_string(outfit->fields.SkinId) : "";
+                        p.VisorId = outfit->fields.VisorId ? convert_from_string(outfit->fields.VisorId) : "";
+                        p.PetId = outfit->fields.PetId ? convert_from_string(outfit->fields.PetId) : "";
+                        p.NamePlateId = outfit->fields.NamePlateId ? convert_from_string(outfit->fields.NamePlateId) : "";
+                        State.CosmeticPresets.push_back(p);
+                        State.SelectedCosmeticPreset = (int)State.CosmeticPresets.size() - 1;
+                        State.Save();
                     }
                 }
             }

@@ -147,6 +147,78 @@ void Settings::Load() {
         JSON_TRYGET("FakeRoleId", this->FakeRoleId);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
 
+        JSON_TRYGET("AutoApplyHostPreset", this->AutoApplyHostPreset);
+        if (j.contains("HostPresets") && j["HostPresets"].is_array()) {
+            this->HostPresets.clear();
+            for (auto& p : j["HostPresets"]) {
+                HostPreset preset;
+                if (p.contains("Name")) preset.Name = p["Name"].get<std::string>();
+                if (p.contains("PlayerSpeed")) preset.PlayerSpeed = p["PlayerSpeed"].get<float>();
+                if (p.contains("CrewVision")) preset.CrewmateVision = p["CrewVision"].get<float>();
+                if (p.contains("ImpVision")) preset.ImpostorVision = p["ImpVision"].get<float>();
+                if (p.contains("KillCooldown")) preset.KillCooldown = p["KillCooldown"].get<float>();
+                if (p.contains("KillDistance")) preset.KillDistance = p["KillDistance"].get<int>();
+                if (p.contains("NumImpostors")) preset.NumImpostors = p["NumImpostors"].get<int>();
+                if (p.contains("MaxPlayers")) preset.MaxPlayers = p["MaxPlayers"].get<int>();
+                if (p.contains("MapId")) preset.MapId = p["MapId"].get<uint8_t>();
+                if (p.contains("VisualTasks")) preset.VisualTasks = p["VisualTasks"].get<bool>();
+                if (p.contains("ConfirmImpostor")) preset.ConfirmImpostor = p["ConfirmImpostor"].get<bool>();
+                if (p.contains("AnonymousVotes")) preset.AnonymousVotes = p["AnonymousVotes"].get<bool>();
+                if (p.contains("NumEmergencyMeetings")) preset.NumEmergencyMeetings = p["NumEmergencyMeetings"].get<int>();
+                if (p.contains("EmergencyCooldown")) preset.EmergencyCooldown = p["EmergencyCooldown"].get<int>();
+                if (p.contains("DiscussionTime")) preset.DiscussionTime = p["DiscussionTime"].get<int>();
+                if (p.contains("VotingTime")) preset.VotingTime = p["VotingTime"].get<int>();
+                if (p.contains("TaskBarMode")) preset.TaskBarMode = p["TaskBarMode"].get<int>();
+                if (p.contains("NumCommonTasks")) preset.NumCommonTasks = p["NumCommonTasks"].get<int>();
+                if (p.contains("NumLongTasks")) preset.NumLongTasks = p["NumLongTasks"].get<int>();
+                if (p.contains("NumShortTasks")) preset.NumShortTasks = p["NumShortTasks"].get<int>();
+                if (p.contains("ShapeshifterCooldown")) preset.ShapeshifterCooldown = p["ShapeshifterCooldown"].get<float>();
+                if (p.contains("ShapeshifterDuration")) preset.ShapeshifterDuration = p["ShapeshifterDuration"].get<float>();
+                if (p.contains("ShapeshifterLeaveSkin")) preset.ShapeshifterLeaveSkin = p["ShapeshifterLeaveSkin"].get<bool>();
+                if (p.contains("GuardianAngelCooldown")) preset.GuardianAngelCooldown = p["GuardianAngelCooldown"].get<float>();
+                if (p.contains("GuardianAngelProtectVisible")) preset.GuardianAngelProtectVisible = p["GuardianAngelProtectVisible"].get<bool>();
+                if (p.contains("GuardianAngelProtectDuration")) preset.GuardianAngelProtectDuration = p["GuardianAngelProtectDuration"].get<float>();
+                if (p.contains("ScientistCooldown")) preset.ScientistCooldown = p["ScientistCooldown"].get<float>();
+                if (p.contains("ScientistBatteryCharge")) preset.ScientistBatteryCharge = p["ScientistBatteryCharge"].get<float>();
+                if (p.contains("EngineerCooldown")) preset.EngineerCooldown = p["EngineerCooldown"].get<float>();
+                if (p.contains("EngineerInVentMaxTime")) preset.EngineerInVentMaxTime = p["EngineerInVentMaxTime"].get<float>();
+                if (p.contains("PhantomCooldown")) preset.PhantomCooldown = p["PhantomCooldown"].get<float>();
+                if (p.contains("PhantomDuration")) preset.PhantomDuration = p["PhantomDuration"].get<float>();
+                if (p.contains("TrackerCooldown")) preset.TrackerCooldown = p["TrackerCooldown"].get<float>();
+                if (p.contains("TrackerDuration")) preset.TrackerDuration = p["TrackerDuration"].get<float>();
+                if (p.contains("TrackerDelay")) preset.TrackerDelay = p["TrackerDelay"].get<float>();
+                if (p.contains("NoisemakerAlertDuration")) preset.NoisemakerAlertDuration = p["NoisemakerAlertDuration"].get<float>();
+                if (p.contains("NoisemakerImpostorAlert")) preset.NoisemakerImpostorAlert = p["NoisemakerImpostorAlert"].get<bool>();
+                if (p.contains("ViperDissolveTime")) preset.ViperDissolveTime = p["ViperDissolveTime"].get<float>();
+                if (p.contains("DetectiveSuspectLimit")) preset.DetectiveSuspectLimit = p["DetectiveSuspectLimit"].get<float>();
+                if (p.contains("RoleRates") && p["RoleRates"].is_array()) {
+                    for (auto& r : p["RoleRates"]) {
+                        if (r.contains("Role") && r.contains("Count") && r.contains("Chance")) {
+                            Settings::RolePreset rp;
+                            rp.Count = r["Count"].get<int32_t>();
+                            rp.Chance = r["Chance"].get<int32_t>();
+                            preset.RoleRates[r["Role"].get<int>()] = rp;
+                        }
+                    }
+                }
+                this->HostPresets.push_back(preset);
+            }
+        }
+        if (j.contains("CosmeticPresets") && j["CosmeticPresets"].is_array()) {
+            this->CosmeticPresets.clear();
+            for (auto& p : j["CosmeticPresets"]) {
+                CosmeticPreset cp;
+                if (p.contains("Name")) cp.Name = p["Name"].get<std::string>();
+                if (p.contains("HatId")) cp.HatId = p["HatId"].get<std::string>();
+                if (p.contains("SkinId")) cp.SkinId = p["SkinId"].get<std::string>();
+                if (p.contains("VisorId")) cp.VisorId = p["VisorId"].get<std::string>();
+                if (p.contains("PetId")) cp.PetId = p["PetId"].get<std::string>();
+                if (p.contains("NamePlateId")) cp.NamePlateId = p["NamePlateId"].get<std::string>();
+                if (p.contains("ColorId")) cp.ColorId = p["ColorId"].get<int32_t>();
+                this->CosmeticPresets.push_back(cp);
+            }
+        }
+
         JSON_TRYGET("NoGameEnd", this->NoGameEnd);
         JSON_TRYGET("DisableMeetings", this->DisableMeetings);
         JSON_TRYGET("DisableSabotages", this->DisableSabotages);
@@ -700,6 +772,72 @@ void Settings::Save() {
                 { "ReplayLastSecondsValue", this->Replay_LastSecondsValue },
                 { "ReplayClearAfterMeeting", this->Replay_ClearAfterMeeting },
 
+                { "AutoApplyHostPreset", this->AutoApplyHostPreset },
+                { "HostPresets", [&]() {
+                    nlohmann::json arr = nlohmann::json::array();
+                    for (auto& p : this->HostPresets) {
+                        arr.push_back({
+                            { "Name", p.Name },
+                            { "PlayerSpeed", p.PlayerSpeed },
+                            { "CrewVision", p.CrewmateVision },
+                            { "ImpVision", p.ImpostorVision },
+                            { "KillCooldown", p.KillCooldown },
+                            { "KillDistance", p.KillDistance },
+                            { "NumImpostors", p.NumImpostors },
+                            { "MaxPlayers", p.MaxPlayers },
+                            { "MapId", p.MapId },
+                            { "VisualTasks", p.VisualTasks },
+                            { "ConfirmImpostor", p.ConfirmImpostor },
+                            { "AnonymousVotes", p.AnonymousVotes },
+                            { "NumEmergencyMeetings", p.NumEmergencyMeetings },
+                            { "EmergencyCooldown", p.EmergencyCooldown },
+                            { "DiscussionTime", p.DiscussionTime },
+                            { "VotingTime", p.VotingTime },
+                            { "TaskBarMode", p.TaskBarMode },
+                            { "NumCommonTasks", p.NumCommonTasks },
+                            { "NumLongTasks", p.NumLongTasks },
+                            { "NumShortTasks", p.NumShortTasks },
+                            { "ShapeshifterCooldown", p.ShapeshifterCooldown },
+                            { "ShapeshifterDuration", p.ShapeshifterDuration },
+                            { "ShapeshifterLeaveSkin", p.ShapeshifterLeaveSkin },
+                            { "GuardianAngelCooldown", p.GuardianAngelCooldown },
+                            { "GuardianAngelProtectVisible", p.GuardianAngelProtectVisible },
+                            { "GuardianAngelProtectDuration", p.GuardianAngelProtectDuration },
+                            { "ScientistCooldown", p.ScientistCooldown },
+                            { "ScientistBatteryCharge", p.ScientistBatteryCharge },
+                            { "EngineerCooldown", p.EngineerCooldown },
+                            { "EngineerInVentMaxTime", p.EngineerInVentMaxTime },
+                            { "PhantomCooldown", p.PhantomCooldown },
+                            { "PhantomDuration", p.PhantomDuration },
+                            { "TrackerCooldown", p.TrackerCooldown },
+                            { "TrackerDuration", p.TrackerDuration },
+                            { "TrackerDelay", p.TrackerDelay },
+                            { "NoisemakerAlertDuration", p.NoisemakerAlertDuration },
+                            { "NoisemakerImpostorAlert", p.NoisemakerImpostorAlert },
+                            { "ViperDissolveTime", p.ViperDissolveTime },
+                            { "DetectiveSuspectLimit", p.DetectiveSuspectLimit },
+                            { "RoleRates", [&]() {
+                                nlohmann::json rarr = nlohmann::json::array();
+                                for (auto& [role, rp] : p.RoleRates) {
+                                    rarr.push_back({ {"Role", role}, {"Count", rp.Count}, {"Chance", rp.Chance} });
+                                }
+                                return rarr;
+                            }() }
+                        });
+                    }
+                    return arr;
+                    }() },
+                { "CosmeticPresets", [&]() {
+                    nlohmann::json arr = nlohmann::json::array();
+                    for (auto& p : this->CosmeticPresets) {
+                        arr.push_back({
+                            { "Name", p.Name }, { "HatId", p.HatId }, { "SkinId", p.SkinId },
+                            { "VisorId", p.VisorId }, { "PetId", p.PetId },
+                            { "NamePlateId", p.NamePlateId }, { "ColorId", p.ColorId }
+                        });
+                    }
+                    return arr;
+                }() },
                 { "ShowEsp", this->ShowEsp },
                 { "ShowEsp_Ghosts", this->ShowEsp_Ghosts },
                 { "ShowEsp_Box", this->ShowEsp_Box },

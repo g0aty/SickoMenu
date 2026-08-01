@@ -143,7 +143,7 @@ namespace AboutTab {
             }
 
             if (ColoredButton(DevCol, "Luckyheat")) {
-                OpenLink("https://github.com/Luckyheat");
+                OpenLink("https://github.com/L9-ILVrnl");
             }
             ImGui::SameLine(100.f * State.dpiScale);
             if (ColoredButton(DevCol, "UN83991956")) {
@@ -154,8 +154,8 @@ namespace AboutTab {
                 OpenLink("https://github.com/HarithGamerPk");
             }
 
-            if (ColoredButton(DevCol, "dark-lord333")) {
-                OpenLink("https://github.com/dark-lord333");
+            if (ColoredButton(DevCol, "Hisoka")) {
+                OpenLink("https://github.com/mad-magician7");
             }
             ImGui::SameLine(100.f * State.dpiScale);
             if (ColoredButton(DevCol, "WhoAboutYT")) {

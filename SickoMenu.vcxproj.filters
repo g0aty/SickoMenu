@@ -319,6 +319,9 @@
     <ClCompile Include="hooks\PlayerBanData.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
+    <ClCompile Include="rpc\RpcRainbow.cpp">
+      <Filter>rpc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="appdata\il2cpp-api-functions.h">

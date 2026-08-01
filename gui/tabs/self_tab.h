@@ -8,4 +8,5 @@ namespace SelfTab {
 	const std::vector<const char*> FONTS = { "Barlow-Italic", "Barlow-Medium", "Barlow-Bold", "Barlow-SemiBold", "Barlow-SemiBold (Masked)", "Barlow-ExtraBold", "Barlow-BoldItalic", "Barlow-BoldItalic (Masked)", "Barlow-Black", "Barlow-Light", "Barlow-Regular", "Barlow-Regular (Masked)", "Barlow-Regular (Outline)", "Brook", "LiberationSans", "NotoSans", "VCR", "CONSOLA", "digital-7", "OCRAEXT", "DIN_Pro_Bold_700" };
 	//const std::vector<const char*> MATERIALS = { "Barlow-Italic Outline", "Barlow-BoldItalic Outline", "Barlow-SemiBold Outline" };
 	void Render();
+	void OpenSubGroup(const std::string& name);
 }

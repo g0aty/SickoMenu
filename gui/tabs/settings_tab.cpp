@@ -29,6 +29,12 @@ namespace SettingsTab {
 		openKeybinds = group == Groups::Keybinds;
 	}
 
+	void OpenSubGroup(const std::string& name) {
+		if (name == "General") CloseOtherGroups(Groups::General);
+		else if (name == "Spoofing") CloseOtherGroups(Groups::Spoofing);
+		else if (name == "Customization") CloseOtherGroups(Groups::Customization);
+		else if (name == "Keybinds") CloseOtherGroups(Groups::Keybinds);
+	}
 	void CheckKeybindEdit(bool hotKey) {
 		State.KeybindsBeingEdited = State.KeybindsBeingEdited || hotKey;
 	}
