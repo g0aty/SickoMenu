@@ -25,6 +25,11 @@ void ApplyCosmeticPreset(const Settings::CosmeticPreset& p) {
 }
 
 static bool s_pendingCosmeticApply = false;
+static int s_pendingApplyHostPresetIndex = -1;
+
+void RequestApplyHostPreset(int idx) {
+    s_pendingApplyHostPresetIndex = idx;
+}
 
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 {
@@ -37,8 +42,7 @@ void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
     if (IsHost()) {
         State.JoinedAsHost = true;
         if (!State.PanicMode && State.AutoApplyHostPreset && !State.HostPresets.empty()) {
-            int idx = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
-            ApplyHostPreset(State.HostPresets[idx]);
+            s_pendingApplyHostPresetIndex = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
         }
     }
 }
@@ -54,6 +58,12 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
             int idx = std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1);
             ApplyCosmeticPreset(State.CosmeticPresets[idx]);
         }
+    }
+    if (s_pendingApplyHostPresetIndex >= 0 && IsHost() && (IsInLobby() || IsInGame())) {
+        int idx = s_pendingApplyHostPresetIndex;
+        s_pendingApplyHostPresetIndex = -1;
+        if (idx < (int)State.HostPresets.size())
+            ApplyHostPreset(State.HostPresets[idx]);
     }
     if (State.DisableLobbyMusic) {
         hasStarted = false;
@@ -235,7 +245,6 @@ void ApplyHostPreset(const Settings::HostPreset& p) {
         .SetInt(app::Int32OptionNames__Enum::NumCommonTasks, p.NumCommonTasks)
         .SetInt(app::Int32OptionNames__Enum::NumLongTasks, p.NumLongTasks)
         .SetInt(app::Int32OptionNames__Enum::NumShortTasks, p.NumShortTasks)
-        .SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, p.ShapeshifterCooldown)
         .SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, p.ShapeshifterCooldown)
         .SetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, p.ShapeshifterDuration)
         .SetBool(app::BoolOptionNames__Enum::ShapeshifterLeaveSkin, p.ShapeshifterLeaveSkin)

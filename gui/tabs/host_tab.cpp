@@ -533,7 +533,7 @@ namespace HostTab {
                         ImGui::SameLine();
                         if (AnimatedButton("Apply")) {
                             int idx = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
-                            ApplyHostPreset(State.HostPresets[idx]);
+                            RequestApplyHostPreset(idx);
                         }
                         ImGui::SameLine();
                         if (AnimatedButton("Update##preset")) {
