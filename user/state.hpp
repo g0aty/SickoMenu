@@ -683,6 +683,7 @@ public:
     bool SMAC_CheckVent = true;
     bool SMAC_CheckSabotage = true;
     bool SMAC_CheckTaskCompletion = true;
+    bool SMAC_CheckTeleport = true;
     int SMAC_HighLevel = 10000;
     int SMAC_LowLevel = 0;
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};

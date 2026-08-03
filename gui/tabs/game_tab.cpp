@@ -663,6 +663,8 @@ namespace GameTab {
             if (ToggleButton("Abnormal Task Completion", &State.SMAC_CheckTaskCompletion)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Teleport", &State.SMAC_CheckTeleport)) State.Save();
             if (ToggleButton("Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
             if (State.SMAC_CheckLevel && ImGui::InputInt("Level >=", &State.SMAC_HighLevel)) {
                 State.Save();

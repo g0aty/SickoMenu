@@ -1773,6 +1773,13 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; // Avoid detecting yourself and practice mode dummies
     if (reason == "Bad Sabotage" && !IsHost()) return; // Without host, we cannot detect who sent UpdateSystem rpc properly
 
+    static std::unordered_map<std::string, std::chrono::steady_clock::time_point> smacLastFlagTime;
+    std::string smacFlagKey = std::to_string(pCtrl->fields.PlayerId) + "|" + reason;
+    auto smacNow = std::chrono::steady_clock::now();
+    auto smacFlagIt = smacLastFlagTime.find(smacFlagKey);
+    if (smacFlagIt != smacLastFlagTime.end() && std::chrono::duration<float>(smacNow - smacFlagIt->second).count() < 3.0f) return; // Don't re-flag the same player for the same reason more than once every 3s
+    smacLastFlagTime[smacFlagKey] = smacNow;
+
     auto pData = GetPlayerData(pCtrl);
     std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName));
     if (name == "") name = convert_from_string(InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), pCtrl, NULL)->fields.PlayerName);

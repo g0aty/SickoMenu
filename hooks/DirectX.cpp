@@ -96,7 +96,21 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         ReleaseSemaphore(DirectX::hRenderSemaphore, 1, NULL);
     }
 
-    KeyBinds::WndProc(uMsg, wParam, lParam);
+    if (!ImGui::GetIO().WantTextInput) {
+        KeyBinds::WndProc(uMsg, wParam, lParam);
+    }
+    else {
+        // block WASD (and arrow keys) from reaching the game while typing in any SickoMenu text field
+        switch (uMsg) {
+        case WM_KEYDOWN: case WM_KEYUP: case WM_SYSKEYDOWN: case WM_SYSKEYUP:
+            switch (wParam) {
+            case 'W': case 'A': case 'S': case 'D':
+            case VK_UP: case VK_DOWN: case VK_LEFT: case VK_RIGHT:
+                return true;
+            }
+            break;
+        }
+    }
 
     bool shouldKeybindsActivate = !State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/;
 

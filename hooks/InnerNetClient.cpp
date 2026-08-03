@@ -1512,9 +1512,9 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
     auto killDistance = killDistances[std::clamp(GameOptions().GetInt(app::Int32OptionNames__Enum::KillDistance), 0, 2)];
     auto initialSpawnLocation = GetSpawnLocation(player.get_PlayerControl()->fields.PlayerId, (int)il2cpp::List((*Game::pGameData)->fields.AllPlayers).size(), true);
     auto meetingSpawnLocation = GetSpawnLocation(player.get_PlayerControl()->fields.PlayerId, (int)il2cpp::List((*Game::pGameData)->fields.AllPlayers).size(), false);
-    if (Equals(initialSpawnLocation, newPosition)) return false;
-    if (Equals(meetingSpawnLocation, newPosition)) return false;  //You are warped to your spawn at meetings and start of games
-    //if (IsAirshipSpawnLocation(newPosition)) return false;
+    if (Vector2_Distance(initialSpawnLocation, newPosition, NULL) <= 1.0f) return false;
+    if (Vector2_Distance(meetingSpawnLocation, newPosition, NULL) <= 1.0f) return false;  //You are warped to your spawn at meetings and start of games
+    if (State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle) return false; //Ladders/platforms aren't tracked yet, avoid false positives on these two maps
     if (PlayerIsImpostor(player.get_PlayerData()) && distanceToTarget <= killDistance)
         return false;
     std::ostringstream ss;
@@ -1530,20 +1530,20 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
 
 void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dCustomNetworkTransform_SnapTo executed", false);
-    /*try {//Leave this out until we fix it.
-        if (!State.PanicMode) {
-            if (!IsInGame()) {
-                CustomNetworkTransform_SnapTo(__this, position, minSid, method);
-                return;
-            }
-
+    try {
+        if (!State.PanicMode && IsInGame()) {
             for (auto p : GetAllPlayerControl()) {
                 if (p->fields.NetTransform == __this) {
-                    PlayerSelection pSel = PlayerSelection(p);
-                    if (bogusTransformSnap(pSel, position))
-                    {
-                        synchronized(Replay::replayEventMutex) {
-                            State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayer(GetPlayerData(p)).value(), CHEAT_ACTIONS::CHEAT_TELEPORT));
+                    if (p != *Game::pLocalPlayer) {
+                        PlayerSelection pSel = PlayerSelection(p);
+                        if (bogusTransformSnap(pSel, position))
+                        {
+                            synchronized(Replay::replayEventMutex) {
+                                State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayer(GetPlayerData(p)).value(), CHEAT_ACTIONS::CHEAT_TELEPORT));
+                                State.liveConsoleEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayer(GetPlayerData(p)).value(), CHEAT_ACTIONS::CHEAT_TELEPORT));
+                            }
+                            if (State.Enable_SMAC && State.SMAC_CheckTeleport)
+                                SMAC_OnCheatDetected(p, "Abnormal Teleport");
                         }
                     }
                     break;
@@ -1553,7 +1553,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
     }
     catch (...) {
         LOG_ERROR("Exception occurred in CustomNetworkTransform_SnapTo (InnerNetClient)");
-    }*/
+    }
     CustomNetworkTransform_SnapTo(__this, position, minSid, method);
 }
 

@@ -31,6 +31,10 @@ void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo
         for (auto normalPlayerTask : normalPlayerTasks)
             if (normalPlayerTask->fields._._Id_k__BackingField == idx) taskType = normalPlayerTask->fields._.TaskType;
 
+        if (!taskType.has_value() && State.Enable_SMAC && State.SMAC_CheckTaskCompletion && IsInGame() && __this != *Game::pLocalPlayer) {
+            SMAC_OnCheatDetected(__this, "Abnormal Task Completion (Invalid Task Id)");
+        }
+
         synchronized(Replay::replayEventMutex) {
             State.liveReplayEvents.emplace_back(std::make_unique<TaskCompletedEvent>(GetEventPlayerControl(__this).value(), taskType, PlayerControl_GetTruePosition(__this, NULL)));
             State.liveConsoleEvents.emplace_back(std::make_unique<TaskCompletedEvent>(GetEventPlayerControl(__this).value(), taskType, PlayerControl_GetTruePosition(__this, NULL)));
