@@ -96,10 +96,8 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         ReleaseSemaphore(DirectX::hRenderSemaphore, 1, NULL);
     }
 
-    if (!ImGui::GetIO().WantTextInput) {
-        KeyBinds::WndProc(uMsg, wParam, lParam);
-    }
-    else {
+    KeyBinds::WndProc(uMsg, wParam, lParam);
+    if (ImGui::GetIO().WantTextInput) {
         // block WASD (and arrow keys) from reaching the game while typing in any SickoMenu text field
         switch (uMsg) {
         case WM_KEYDOWN: case WM_KEYUP: case WM_SYSKEYDOWN: case WM_SYSKEYUP:

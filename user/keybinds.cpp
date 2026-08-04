@@ -1,4 +1,7 @@
+#include "pch-il2cpp.h"
 #include "keybinds.h"
+#include "state.hpp"
+#include <imgui/imgui.h>
 #include <bitset>
 #include <map>
 
@@ -178,6 +181,8 @@ bool KeyBinds::IsKeyDown(uint8_t key)
 
 bool KeyBinds::IsKeyPressed(uint8_t key)
 {
+    if (ImGui::GetIO().WantTextInput && key != State.KeyBinds.Toggle_Menu)
+        return false;
     return (!PrevKeyState[key] && KeyState[key]);
 }
 
