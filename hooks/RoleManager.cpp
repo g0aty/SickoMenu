@@ -187,7 +187,7 @@ bool CanPlayerBeAssignedToRole(app::PlayerControl* player, std::vector<uint8_t>&
 
 void EvenOutImpostorRoleCounts(RoleRates& roleRates) {
 	for (int i = 0; i < 60; ++i) { // My sanity is lost after this code
-		int MoreThanImpostorCountOfImpostorRoles = preChosenImpCount + roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter) + roleRates.GetRoleCount(RoleTypes__Enum::Phantom) + roleRates.GetRoleCount(RoleTypes__Enum::Viper);
+		int MoreThanImpostorCountOfImpostorRoles = roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter) + roleRates.GetRoleCount(RoleTypes__Enum::Phantom) + roleRates.GetRoleCount(RoleTypes__Enum::Viper);
 		if (roleRates.ImpostorCount < MoreThanImpostorCountOfImpostorRoles) {
 			uint8_t numImpRoles = 3; // Add support for more roles as they are added
 			switch (randi(1, numImpRoles)) {

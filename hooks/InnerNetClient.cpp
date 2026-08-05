@@ -1188,11 +1188,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             GameOptions options;
             if (State.AutoHostRole) {
                 auto allPlayers = GetAllPlayerData();
-                for (size_t index = 0; index < allPlayers.size(); index++) {
-                    auto playerData = allPlayers[index];
+                for (size_t listIndex = 0; listIndex < allPlayers.size(); listIndex++) {
+                    auto playerData = allPlayers[listIndex];
                     if (playerData == nullptr) continue;
                     PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
                     if (playerCtrl == nullptr) continue;
+                    size_t index = playerData->fields.PlayerId;
 
                     if (*Game::pLocalPlayer == playerCtrl && State.assignedRoles[index] != State.HostRoleToSet) {
                         State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
@@ -1433,6 +1434,8 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
                 State.Save();
             }
             State.LobbyHostCache.clear();
+            State.assignedRolesPlayer.fill(nullptr);
+            State.assignedRoles.fill(RoleType::Random);
 
             /*if (!State.PanicMode) {
                 State.PanicMode = true;
@@ -1467,6 +1470,14 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
             uint8_t playerId = data->fields.Character->fields.PlayerId;
+
+            if (State.modUsers.find(playerId) != State.modUsers.end())
+                State.modUsers.erase(playerId);
+
+            if (playerId < State.assignedRolesPlayer.size()) {
+                State.assignedRolesPlayer[playerId] = nullptr;
+                State.assignedRoles[playerId] = RoleType::Random;
+            }
 
             if (State.modUsers.find(playerId) != State.modUsers.end())
                 State.modUsers.erase(playerId);
@@ -1512,9 +1523,9 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
     auto killDistance = killDistances[std::clamp(GameOptions().GetInt(app::Int32OptionNames__Enum::KillDistance), 0, 2)];
     auto initialSpawnLocation = GetSpawnLocation(player.get_PlayerControl()->fields.PlayerId, (int)il2cpp::List((*Game::pGameData)->fields.AllPlayers).size(), true);
     auto meetingSpawnLocation = GetSpawnLocation(player.get_PlayerControl()->fields.PlayerId, (int)il2cpp::List((*Game::pGameData)->fields.AllPlayers).size(), false);
-    if (Vector2_Distance(initialSpawnLocation, newPosition, NULL) <= 1.0f) return false;
-    if (Vector2_Distance(meetingSpawnLocation, newPosition, NULL) <= 1.0f) return false;  //You are warped to your spawn at meetings and start of games
-    if (State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle) return false; //Ladders/platforms aren't tracked yet, avoid false positives on these two maps
+    if (Equals(initialSpawnLocation, newPosition)) return false;
+    if (Equals(meetingSpawnLocation, newPosition)) return false;  //You are warped to your spawn at meetings and start of games
+    //if (IsAirshipSpawnLocation(newPosition)) return false;
     if (PlayerIsImpostor(player.get_PlayerData()) && distanceToTarget <= killDistance)
         return false;
     std::ostringstream ss;
@@ -1530,20 +1541,20 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
 
 void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dCustomNetworkTransform_SnapTo executed", false);
-    try {
-        if (!State.PanicMode && IsInGame()) {
+    /*try {//Leave this out until we fix it.
+        if (!State.PanicMode) {
+            if (!IsInGame()) {
+                CustomNetworkTransform_SnapTo(__this, position, minSid, method);
+                return;
+            }
+
             for (auto p : GetAllPlayerControl()) {
                 if (p->fields.NetTransform == __this) {
-                    if (p != *Game::pLocalPlayer) {
-                        PlayerSelection pSel = PlayerSelection(p);
-                        if (bogusTransformSnap(pSel, position))
-                        {
-                            synchronized(Replay::replayEventMutex) {
-                                State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayer(GetPlayerData(p)).value(), CHEAT_ACTIONS::CHEAT_TELEPORT));
-                                State.liveConsoleEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayer(GetPlayerData(p)).value(), CHEAT_ACTIONS::CHEAT_TELEPORT));
-                            }
-                            if (State.Enable_SMAC && State.SMAC_CheckTeleport)
-                                SMAC_OnCheatDetected(p, "Abnormal Teleport");
+                    PlayerSelection pSel = PlayerSelection(p);
+                    if (bogusTransformSnap(pSel, position))
+                    {
+                        synchronized(Replay::replayEventMutex) {
+                            State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayer(GetPlayerData(p)).value(), CHEAT_ACTIONS::CHEAT_TELEPORT));
                         }
                     }
                     break;
@@ -1553,7 +1564,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
     }
     catch (...) {
         LOG_ERROR("Exception occurred in CustomNetworkTransform_SnapTo (InnerNetClient)");
-    }
+    }*/
     CustomNetworkTransform_SnapTo(__this, position, minSid, method);
 }
 

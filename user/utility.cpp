@@ -1321,7 +1321,6 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
         c = GetColorFromImVec4(State.NoisemakerColor);
         break;
     }
-    case (RoleTypes__Enum)10:
     case RoleTypes__Enum::Tracker: {
         c = GetColorFromImVec4(State.TrackerColor);
         break;
@@ -1370,7 +1369,6 @@ std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = fals
         return (abbreviated ? "IG" : "Impostor Ghost");
     case RoleTypes__Enum::Noisemaker:
         return (abbreviated ? "NM" : "Noisemaker");
-    case (RoleTypes__Enum)10:
     case RoleTypes__Enum::Tracker:
         return (abbreviated ? "Tra" : "Tracker");
     case RoleTypes__Enum::Phantom:

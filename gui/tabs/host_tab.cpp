@@ -151,11 +151,12 @@ namespace HostTab {
                         auto allPlayers = GetAllPlayerData();
                         auto playerAmount = allPlayers.size();
                         auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
-                        for (size_t index = 0; index < playerAmount; index++) {
-                            auto playerData = allPlayers[index];
+                        for (size_t listIndex = 0; listIndex < playerAmount; listIndex++) {
+                            auto playerData = allPlayers[listIndex];
                             if (playerData == nullptr) continue;
                             PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
                             if (playerCtrl == nullptr) continue;
+                            size_t index = playerData->fields.PlayerId; // stable per-player key, doesn't shift when others join/leave
                             State.assignedRolesPlayer[index] = playerCtrl;
                             if (State.assignedRolesPlayer[index] == nullptr)
                                 continue;
@@ -206,12 +207,7 @@ namespace HostTab {
                                     State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
                                 }
 
-                                if (State.assignedRoles[index] == RoleType::Engineer || State.assignedRoles[index] == RoleType::Scientist ||
-                                    State.assignedRoles[index] == RoleType::Tracker || State.assignedRoles[index] == RoleType::Noisemaker ||
-                                    State.assignedRoles[index] == RoleType::Detective || State.assignedRoles[index] == RoleType::Crewmate) {
-                                    if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.crewmates_amount >= (int)playerAmount)
-                                        State.assignedRoles[index] = RoleType::Random;
-                                } //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps.
+                          
 
                                 if (options.GetGameMode() == GameModes__Enum::HideNSeek)
                                 {
@@ -297,14 +293,14 @@ namespace HostTab {
 
                         if (!State.AutoHostRole) {
                             auto allPlayers = GetAllPlayerData();
-                            for (size_t index = 0; index < allPlayers.size(); index++) {
-                                auto playerData = allPlayers[index];
+                            for (size_t listIndex = 0; listIndex < allPlayers.size(); listIndex++) {
+                                auto playerData = allPlayers[listIndex];
                                 if (playerData == nullptr) continue;
                                 PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
                                 if (playerCtrl == nullptr) continue;
 
                                 if (*Game::pLocalPlayer == playerCtrl) {
-                                    State.assignedRoles[index] = RoleType::Random;
+                                    State.assignedRoles[playerData->fields.PlayerId] = RoleType::Random;
                                     break;
                                 }
                             }
