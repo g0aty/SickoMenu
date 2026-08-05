@@ -206,8 +206,12 @@ namespace HostTab {
                                     State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
                                     State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
                                 }
-
-                          
+                                /* if (State.assignedRoles[index] == RoleType::Engineer || State.assignedRoles[index] == RoleType::Scientist ||
+                                    State.assignedRoles[index] == RoleType::Tracker || State.assignedRoles[index] == RoleType::Noisemaker ||
+                                    State.assignedRoles[index] == RoleType::Detective || State.assignedRoles[index] == RoleType::Crewmate) {
+                                    if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.crewmates_amount >= (int)playerAmount)
+                                        State.assignedRoles[index] = RoleType::Random;
+                                } //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps. */
 
                                 if (options.GetGameMode() == GameModes__Enum::HideNSeek)
                                 {
