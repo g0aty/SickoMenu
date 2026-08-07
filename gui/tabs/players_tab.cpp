@@ -1524,21 +1524,14 @@ namespace PlayersTab {
                         }
                     }
                 }
-                ImGui::NewLine();
-                CustomListBoxInt(" ", &forcedColor, COLORS, 85.0f * State.dpiScale);
-                ImGui::SameLine();
-                if (AnimatedButton("Force Color"))
-                {
-                    if (IsInGame()) {
-                        if (IsHost())
+if (IsHost() && (IsInGame() || IsInLobby())) {
+                    CustomListBoxInt(" ", &forcedColor, COLORS, 85.0f * State.dpiScale);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Force Color"))
+                    {
+                        if (IsInGame())
                             State.rpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
-                        else
-                            State.rpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
-                    }
-                    else if (IsInLobby()) {
-                        if (IsHost())
-                            State.lobbyRpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
-                        else
+                        else if (IsInLobby())
                             State.lobbyRpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
                     }
                 }
