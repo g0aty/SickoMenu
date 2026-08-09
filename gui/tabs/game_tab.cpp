@@ -329,7 +329,12 @@ namespace GameTab {
             if (IsInGame() && ToggleButton("Disable Venting", &State.DisableVents)) {
                 State.Save();
             }
-            if (IsInGame() && (IsHost() || !State.SafeMode)) ImGui::SameLine();
+            if (IsInGame()) {
+                ImGui::SameLine();
+                if (ToggleButton("Pause Vent Blocking While Venting", &State.PauseVentBlockingWhileVenting)) {
+                    State.Save();
+                }
+            }
             if (IsInGame() && (IsHost() || !State.SafeMode) && ToggleButton("Spam Report", &State.SpamReport)) {
                 State.Save();
             }

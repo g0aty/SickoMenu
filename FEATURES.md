@@ -94,6 +94,7 @@
 - **Kill Everyone** *(Only as host/Safe Mode disabled)* Kills all players as yourself
 - **Protect Everyone** Casts a guardian angel shield with the same color as the player around them 
 - **Disable Venting** Instantly kicks anyone in the vents out (Default: OFF)
+- **Pause Vent Blocking While Venting** Temporarily pauses Disable Venting while you are in a vent (Default: OFF)
 - **Spam Report** Spams dead body reports (Default: OFF)
 - **Kill All Crewmates** *(Only as host/Safe Mode disabled)* Kills all crewmates as yourself
 - **Kill All Impostors** *(Only as host/Safe Mode disabled)* Kills all impostors as yourself

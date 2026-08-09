@@ -146,6 +146,7 @@ void Settings::Load() {
         JSON_TRYGET("FakeRole", this->FakeRole);
         JSON_TRYGET("FakeRoleId", this->FakeRoleId);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
+        JSON_TRYGET("PauseVentBlockingWhileVenting", this->PauseVentBlockingWhileVenting);
 
         JSON_TRYGET("AutoApplyHostPreset", this->AutoApplyHostPreset);
         if (j.contains("HostPresets") && j["HostPresets"].is_array()) {
@@ -740,6 +741,7 @@ void Settings::Save() {
                 { "FakeRole", this->FakeRole },
                 { "FakeRoleId", this->FakeRoleId },
                 { "AutoFakeRole", this->AutoFakeRole },
+                { "PauseVentBlockingWhileVenting", this->PauseVentBlockingWhileVenting },
 
                 { "NoGameEnd", this->NoGameEnd },
                 { "DisableMeetings", this->DisableMeetings },

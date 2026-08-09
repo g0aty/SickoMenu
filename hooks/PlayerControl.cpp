@@ -100,7 +100,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                 }
             }
 
-            if (!State.PanicMode && IsInGame() && State.DisableVents && __this->fields.inVent) {
+            const bool pauseVentBlocking = State.PauseVentBlockingWhileVenting && (*Game::pLocalPlayer)->fields.inVent;
+            if (!State.PanicMode && IsInGame() && State.DisableVents && !pauseVentBlocking && __this->fields.inVent) {
                 if (State.rpcCooldown == 0) {
                     //copy rpc code so that we don't spam the rpc queue
                     il2cpp::Array<Vent__Array> allVents = (*Game::pShipStatus)->fields._AllVents_k__BackingField;
