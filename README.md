@@ -3,6 +3,15 @@
   </p>
 
 <h1 align="center">👺 SickoMenu v4.5.2</h1>
+
+<p align="center">
+  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen" alt="Latest Release"></a>
+  <a href="https://github.com/g0aty/SickoMenu/stargazers"><img src="https://img.shields.io/github/stars/g0aty/SickoMenu?style=flat&color=red" alt="Stars"></a>
+  <a href="https://github.com/g0aty/SickoMenu/network/members"><img src="https://img.shields.io/github/forks/g0aty/SickoMenu?style=flat&color=red" alt="Forks"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/g0aty/SickoMenu?style=flat&color=orange" alt="License"></a>
+  <a href="https://discord.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat&logo=discord&logoColor=blue" alt="Discord"></a>
+</p>
+
 A powerful utility for Among Us designed to enrich your game experience with custom features!
 
 **Intended for educational and experimental use only.**
@@ -186,7 +195,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 7. Locate the Among Us folder:  
    - Open **Finder** > Go to **Go > Go to Folder** and paste:  
      `~/AmongUsWine/drive_c/Program Files (x86)/Steam/steamapps/common/Among Us`  
-   - Drag the `version.dll` file into this fold.
+   - Drag the `version.dll` file into this folder.
 8. In Terminal, run:  
    ```bash
    WINEPREFIX=~/AmongUsWine winecfg
@@ -196,7 +205,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
    - Click **Apply** > **OK**.
 9. Launch Steam from Terminal (as in Step 3.3).  
 - Start Among Us from your Steam library.  
-- Use **Command + Backspace or Fn+Backspace** to toggle SickoMenu in-game, depending onn your Mac model.
+- Use **Command + Backspace or Fn+Backspace** to toggle SickoMenu in-game, depending on your Mac model.
 
 ### Method 4: Whisky + Apple Game Porting Toolkit (Apple Silicon)
 
@@ -276,22 +285,25 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 **Injection issues**
 - Verify that the injected DLL matches your game version.
 - Ensure your injector is running with sufficient permissions.
-- If issues persists, try a different injection method or injector.
+- If issues persist, try a different injection method or injector.
 
 **Other issues**
 - If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
 
 ---
 ## ⌨️ Default Hotkeys
-- Show Menu - DELETE
-- Show Radar - INSERT
-- Show Console - HOME
-- Show Replay - END
-- Repair Sabotage - PAGE DOWN (PgDn)
-- NoClip - CTRL
-- Panic / Disable SickoMenu - PAUSE BREAK (Break)
 
-The Default Hotkeys can be customized in-game through the menu Settings → Keybinds.
+| Action                    | Key              |
+|---------------------------|------------------|
+| Show Menu                 | `DELETE`         |
+| Show Radar                | `INSERT`         |
+| Show Console              | `HOME`           |
+| Show Replay               | `END`            |
+| Repair Sabotage           | `PAGE DOWN`      |
+| NoClip                    | `CTRL`           |
+| Panic / Disable SickoMenu | `PAUSE BREAK`    |
+
+Hotkeys can be customized in-game under **Settings → Keybinds**.
 
 ## ⚒️ Building / Compilation
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
@@ -309,11 +321,22 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 - Release_Version (Optimized with all information stripped)
 
 ## 💁 Contributing
-1. Fork it [here](<https://github.com/g0aty/SickoMenu/fork>)
-2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Commit your changes (`git commit -am 'Add some fooBar'`)
-4. Push to the branch (`git push origin feature/fooBar`)
-5. Create a new Pull Request
+
+Contributions are welcome and appreciated!
+
+1. Fork the repository [here](https://github.com/g0aty/SickoMenu/fork)
+2. Create your feature branch:  
+   `git checkout -b feature/your-feature-name`
+3. Commit your changes:  
+   `git commit -am 'Add some feature'`
+4. Push to the branch:  
+   `git push origin feature/your-feature-name`
+5. Open a Pull Request
+
+> [!TIP]
+> - Keep your changes focused and well-described  
+> - Documentation and README improvements are always welcome  
+> - For larger features or big changes, consider discussing them in the [Discord](https://discord.gg/sickos) first
 
 ## ✨ Inspiration
 * [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
