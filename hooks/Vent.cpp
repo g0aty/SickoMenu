@@ -57,12 +57,6 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 			State.liveReplayEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_EXIT));
 			State.liveConsoleEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_EXIT));
 		}
-		if (State.Enable_SMAC && State.SMAC_CheckVent && pc != *Game::pLocalPlayer) {
-			auto pData = GetPlayerData(pc);
-			if (pData != NULL && !pData->fields.IsDead && !(PlayerIsImpostor(pData) || pData->fields.RoleType == RoleTypes__Enum::Engineer)) {
-				SMAC_OnCheatDetected(pc, "Abnormal Venting");
-			}
-		}
 	}
 	return Vent_ExitVent(__this, pc, method);
 }
