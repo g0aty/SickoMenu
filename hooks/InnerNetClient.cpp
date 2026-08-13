@@ -73,7 +73,6 @@ static void onGameEnd() {
         State.SpeedrunTimer = 0.f;
         State.GameModeDurationTimer = 0.f;
         State.GameModeDurationOver = false;
-        State.SnS_MissCount.clear();
         autoStartedGame = false;
 
         State.VoteOffPlayerId = Game::HasNotVoted;
@@ -117,81 +116,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.Mod_PendingRulesDelay = 2.0f;
                 }
             }
-			// Shift and Seek:
-            if (IsHost() && State.SnS && IsInGame()) {
-                bool shapeshifterNearTarget = false;
-
-                for (auto shapeshifter : GetAllPlayerControl()) {
-                    if (shapeshifter == nullptr || GetPlayerData(shapeshifter)->fields.IsDead) continue;
-
-                    if (!shapeshifter->fields.shapeshifting) continue;
-
-                    int32_t targetId = shapeshifter->fields.shapeshiftTargetPlayerId;
-                    if (targetId == 255) continue; 
-
-                    PlayerControl* shapeshiftTarget = nullptr;
-                    for (auto candidate : GetAllPlayerControl()) {
-                        if (candidate != nullptr && candidate->fields.PlayerId == (uint8_t)targetId) {
-                            shapeshiftTarget = candidate;
-                            break;
-                        }
-                    }
-                    if (shapeshiftTarget == nullptr || GetPlayerData(shapeshiftTarget)->fields.IsDead) continue;
-
-                    float distance = Vector2_Distance(PlayerControl_GetTruePosition(shapeshifter, NULL), PlayerControl_GetTruePosition(shapeshiftTarget, NULL), NULL);
-                    if (distance <= 3.f) {
-                        shapeshifterNearTarget = true;
-                        break;
-                    }
-                }
-
-                float newCooldown = shapeshifterNearTarget ? 1.f : 0.f;
-                if (GameLogicOptions().GetKillCooldown() != newCooldown) {
-                    GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, newCooldown);
-                    State.rpcQueue.push(new RpcSyncSettings()); // broadcast the change - SetFloat alone only updates the host's own local copy
-                }
-            }
-
-            // Poof and Seek:
-            if (IsHost() && State.PnS && IsInGame()) {
-                struct PnsTrackingInfo {
-                    Vector2 lastPosition{};
-                    float visibleMoveTimer = 0.f;
-                    bool hasSeen = false;
-                };
-                static std::unordered_map<int, PnsTrackingInfo> pnsTracking;
-
-                for (auto player : GetAllPlayerControl()) {
-                    if (player == nullptr) continue;
-                    auto pData = GetPlayerData(player);
-                    if (pData == nullptr || pData->fields.IsDead || pData->fields.RoleType != RoleTypes__Enum::Phantom) continue;
-
-                    int playerId = player->fields.PlayerId;
-                    auto& info = pnsTracking[playerId];
-                    Vector2 currentPosition = GetTrueAdjustedPosition(player);
-
-                    if (!info.hasSeen) {
-                        info = { currentPosition, 0.f, true };
-                        continue;
-                    }
-
-                    bool isVanished = std::find(State.vanishedPlayers.begin(), State.vanishedPlayers.end(), (uint8_t)playerId) != State.vanishedPlayers.end();
-                    bool moved = (currentPosition.x != info.lastPosition.x || currentPosition.y != info.lastPosition.y);
-                    info.lastPosition = currentPosition;
-
-                    if (isVanished || !moved) {
-                        info.visibleMoveTimer = 0.f;
-                        continue;
-                    }
-
-                    info.visibleMoveTimer += Time_get_deltaTime(NULL);
-                    if (info.visibleMoveTimer >= (float)State.PnS_VisibilityThreshold) {
-                        info.visibleMoveTimer = 0.f;
-                        PlayerControl_RpcSetRole(player, RoleTypes__Enum::ImpostorGhost, false, NULL);
-                    }
-                }
-            }
-
             static bool onStart = true;
             if (!IsInLobby()) {
                 State.LobbyTimer = 600.f;
@@ -845,15 +769,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     InnerNetClient_SendStartGame(__this, NULL);
                 }
 
-                bool zkcActive = State.GameMode == (State.DisableHostAnticheat ? 3 : 2);
-                if (IsHost() && zkcActive && (IsInGame() || IsInLobby()) && GameOptionsManager_get_HasOptions(GameOptionsManager_get_Instance(NULL), NULL)) {
-                    bool inSpawnWindow = !State.ZKC_AllowSpawnKills && IsInGame() && State.GameModeDurationTimer < (float)State.ZKC_SpawnKillWindow;
-                    float targetCooldown = inSpawnWindow ? (float)State.ZKC_SpawnKillWindow : 0.01f;
-                    if (GameLogicOptions().GetKillCooldown() != targetCooldown) {
-                        GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, targetCooldown);
-                        State.rpcQueue.push(new RpcSyncSettings()); 
-                    }
-                }
+
 
                 if (IsHost() && IsInGame() && State.AutoKickSlackers) {
                     slackerTimer += Time_get_deltaTime(NULL);

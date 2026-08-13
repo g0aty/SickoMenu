@@ -125,8 +125,6 @@ public:
     int GameModeDuration = 240;
     float GameModeDurationTimer = 0.f; 
     bool GameModeDurationOver = false; 
-    bool ZKC_AllowSpawnKills = true; 
-    int ZKC_SpawnKillWindow = 5;
     bool NoGameEnd = false;
     bool ChatSpam = false;
     bool CrashChatSpam = false;
@@ -384,13 +382,6 @@ public:
     int Mod_KickLowLevelThreshold = 30;
     bool Mod_KickLowLevelBanInstead = false;
     bool Mod_KickLowLevelIgnoreWhitelist = false;
-    bool SnS = false;
-    int SnS_GhostThreshold = 1; 
-    bool PnS = false;
-    int PnS_VisibilityThreshold = 3; 
-    bool ImpostorsCanVent = true; 
-    std::map<uint8_t, int> SnS_MissCount; 
-    std::map<uint8_t, uint8_t> SnS_ShapeshiftTarget; 
     std::set<int32_t> Mod_LowLevelAlreadyFlagged; 
     bool Mod_KickInvalidFriendcode = false;
     bool Mod_KickInvalidFriendcodeBanInstead = false;

@@ -196,43 +196,17 @@ static const std::string SICKO_SOCIALS_MESSAGE = "Check out SickoMenu!\n\nGitHub
 
 static std::string GetCurrentGameModeName() {
 	std::vector<std::string> GAMEMODES = State.DisableHostAnticheat
-		? std::vector<std::string>{ "Default", "Task Speedrun", "Battle Royale", "0 Kill Cooldown", "Shift And Seek", "Poof And Seek" }
-	: std::vector<std::string>{ "Default", "Task Speedrun", "0 Kill Cooldown", "Shift And Seek", "Poof And Seek" };
+		? std::vector<std::string>{ "Default", "Task Speedrun", "Battle Royale" }
+	: std::vector<std::string>{ "Default", "Task Speedrun" };
 	int idx = std::clamp(State.GameMode, 0, (int)GAMEMODES.size() - 1);
 	return GAMEMODES[idx];
 }
 
 static std::vector<std::string> BuildGameRulesMessages(const std::string& modeName) {
-	if (modeName == "Shift And Seek") {
-		return {
-			"Shift and Seek:\n\nImposters can only kill a crewmate \nwhile being shapeshifted as them.\n\n" +
-				std::to_string(State.SnS_GhostThreshold) + " miskill/s = become ghost.",
-			"Reports / Meetings are disabled.\nCrewmates win by doing tasks\nor by surviving " +
-				std::to_string(State.GameModeDuration) + " seconds.\n\nFaster team wins!"
-		};
-	}
 	if (modeName == "Task Speedrun") {
 		return {
 			"Task Speedrun:\n\nEveryone is a crewmate\nFirst player to complete their tasks wins!\nGame Timer: " +
 				std::to_string(State.GameModeDuration) + "s"
-		};
-	}
-	if (modeName == "0 Kill Cooldown") {
-		return {
-			"0 Kill Cooldown:\n\nImposters have no kill cooldown\nKill everyone fast to win\n" +
-				(State.ZKC_AllowSpawnKills ? std::string("Spawn kills are allowed")
-					: ("Spawn kills are prevented by " + std::to_string(State.ZKC_SpawnKillWindow) + "s")),
-			"Crewmates report / complete tasks fast to win.\nGame timer = " +
-				std::to_string(State.GameModeDuration) + "s\n\nFaster team wins!"
-		};
-	}
-	if (modeName == "Poof And Seek") {
-		return {
-			"Poof and Seek:\n\nImpostors can only move while vanished\nKill within " +
-				std::to_string(State.PnS_VisibilityThreshold) + "s of appearing\nVisibly move beyond " +
-				std::to_string(State.PnS_VisibilityThreshold) + "s = turn ghost",
-			"Reports / Meetings are disabled.\nCrewmates win by doing tasks\nor by surviving " +
-				std::to_string(State.GameModeDuration) + " seconds.\n\nFaster team wins!"
 		};
 	}
 	return {};

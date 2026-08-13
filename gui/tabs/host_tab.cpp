@@ -389,64 +389,20 @@ namespace HostTab {
 
                 {
                     std::vector<const char*> GAMEMODES = { "Default", "Task Speedrun" };
-                    if (State.DisableHostAnticheat) GAMEMODES = { "Default", "Task Speedrun", "Battle Royale", "0 Kill Cooldown", "Shift And Seek", "Poof And Seek" };
-                    else GAMEMODES = { "Default", "Task Speedrun", "0 Kill Cooldown", "Shift And Seek", "Poof And Seek" };
-                    int maxIndex = State.DisableHostAnticheat ? 5 : 4;
+                    if (State.DisableHostAnticheat) GAMEMODES = { "Default", "Task Speedrun", "Battle Royale" };
+                    int maxIndex = State.DisableHostAnticheat ? 2 : 1;
                     State.GameMode = std::clamp(State.GameMode, 0, maxIndex);
                     if (IsInLobby() && CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 100 * State.dpiScale)) {
                         State.TaskSpeedrun = (State.GameMode == 1);
                         State.BattleRoyale = (State.DisableHostAnticheat && State.GameMode == 2);
-                        int snsIndex = State.DisableHostAnticheat ? 4 : 3;
-                        int pnsIndex = State.DisableHostAnticheat ? 5 : 4;
-                        State.SnS = (State.GameMode == snsIndex);
-                        State.PnS = (State.GameMode == pnsIndex);
-                        if (State.SnS || State.PnS) State.DisableMeetings = true;
                         State.Save();
                     }
 
                     if (State.GameMode != 0) {
-                        float stepperOverhead = 2.0f * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x);
-                        float matchedWidth = (100 * State.dpiScale) + stepperOverhead;
-
-                        ImGui::SetNextItemWidth(matchedWidth);
+                        ImGui::SetNextItemWidth(100 * State.dpiScale);
                         if (ImGui::InputInt("Game Duration", &State.GameModeDuration)) {
                             State.GameModeDuration = std::clamp(State.GameModeDuration, 100, 500);
                             State.Save();
-                        }
-
-                        if (State.SnS) {
-                            ImGui::SetNextItemWidth(matchedWidth);
-                            if (ImGui::InputInt("Miskills Until Ghost", &State.SnS_GhostThreshold)) {
-                                State.SnS_GhostThreshold = std::clamp(State.SnS_GhostThreshold, 1, 10);
-                                State.Save();
-                            }
-                        }
-
-                        if (State.PnS) {
-                            ImGui::SetNextItemWidth(matchedWidth);
-                            if (ImGui::InputInt("Visibility Threshold", &State.PnS_VisibilityThreshold)) {
-                                State.PnS_VisibilityThreshold = std::clamp(State.PnS_VisibilityThreshold, 3, 7);
-                                State.Save();
-                            }
-                        }
-
-                        if (State.SnS || State.PnS) {
-                            if (ToggleButton("Imposters Can Vent", &State.ImpostorsCanVent))
-                                State.Save();
-                        }
-
-                        bool zkcSelected = (State.GameMode == (State.DisableHostAnticheat ? 3 : 2));
-                        if (zkcSelected && IsInLobby()) {
-                            if (ToggleButton("Allow Spawn Kills", &State.ZKC_AllowSpawnKills))
-                                State.Save();
-
-                            if (!State.ZKC_AllowSpawnKills) {
-                                ImGui::SetNextItemWidth(matchedWidth);
-                                if (ImGui::InputInt("Spawn Kill Window", &State.ZKC_SpawnKillWindow)) {
-                                    State.ZKC_SpawnKillWindow = std::clamp(State.ZKC_SpawnKillWindow, 0, 20);
-                                    State.Save();
-                                }
-                            }
                         }
                     }
                 }

@@ -44,14 +44,7 @@ void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 		}
 		if (State.confuser && State.confuseOnVent && pc == *Game::pLocalPlayer)
 			ControlAppearance(true);
-
-		if (IsHost() && (State.SnS || State.PnS) && !State.ImpostorsCanVent && pc != nullptr) {
-			auto pData = GetPlayerData(pc);
-			if (pData != nullptr && pData->fields.Role != nullptr && pData->fields.Role->fields.TeamType == RoleTeamTypes__Enum::Impostor) {
-				State.rpcQueue.push(new RpcBootFromVent(pc, __this->fields.Id));
-			}
 		}
-	}
 	Vent_EnterVent(__this, pc, method);
 }
 

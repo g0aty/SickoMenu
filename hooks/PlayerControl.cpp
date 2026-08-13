@@ -881,27 +881,6 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
             return;
         }
 
-        if (State.SnS && IsHost() && __this != NULL && target != NULL &&
-            (static_cast<int32_t>(resultFlags) & static_cast<int32_t>(MurderResultFlags__Enum::Succeeded))) {
-            auto snsIt = State.SnS_ShapeshiftTarget.find(__this->fields.PlayerId);
-            bool validShapeshiftKill = (snsIt != State.SnS_ShapeshiftTarget.end() && snsIt->second == target->fields.PlayerId);
-            if (!validShapeshiftKill) {
-                int missCount = ++State.SnS_MissCount[__this->fields.PlayerId];
-                int threshold = std::clamp(State.SnS_GhostThreshold, 1, 10);
-                auto offenderEvt = GetEventPlayerControl(__this);
-                if (missCount >= threshold) {
-                    if (offenderEvt.has_value()) {
-                        ShowHudNotification(offenderEvt->playerName + " was turned into a ghost for misfiring");
-                    }
-                    if (IsInGame()) State.rpcQueue.push(new RpcSetRole(__this, RoleTypes__Enum::ImpostorGhost));
-                    else if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(__this, RoleTypes__Enum::ImpostorGhost));
-                    State.SnS_MissCount.erase(__this->fields.PlayerId);
-                }
-                else if (offenderEvt.has_value()) {
-                    ShowHudNotification(offenderEvt->playerName + " misfired (" + std::to_string(missCount) + "/" + std::to_string(threshold) + ")");
-                }
-            }
-        }
         if (static_cast<int32_t>(resultFlags) & static_cast<int32_t>(MurderResultFlags__Enum::Succeeded)) {
             State.validDeadBodyIds.push_back(target->fields.PlayerId);
         }
@@ -1047,9 +1026,6 @@ void dPlayerControl_CmdCheckShapeshift(PlayerControl* __this, PlayerControl* tar
 void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
 {
     if (State.ShowHookLogs) Log.Debug("Hook dPlayerControl_CmdCheckRevertShapeshift executed", false);
-    if (State.SnS && __this != NULL) {
-        State.SnS_ShapeshiftTarget.erase(__this->fields.PlayerId);
-    }
     if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, __this, (!State.AnimationlessShapeshift && animate), method);
     else if (IsInGame()) PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
 }
@@ -1262,10 +1238,6 @@ void dPlayerControl_RpcStartMeeting(PlayerControl* __this, NetworkedPlayerInfo* 
 void dPlayerControl_Shapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dPlayerControl_Shapeshift executed", false);
     try {
-        if (State.SnS && IsHost() && __this != NULL && target != NULL) {
-            if (target == __this) State.SnS_ShapeshiftTarget.erase(__this->fields.PlayerId);
-            else State.SnS_ShapeshiftTarget[__this->fields.PlayerId] = target->fields.PlayerId;
-        }
         synchronized(Replay::replayEventMutex) {
             State.liveReplayEvents.emplace_back(std::make_unique<ShapeShiftEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));
             State.liveConsoleEvents.emplace_back(std::make_unique<ShapeShiftEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));

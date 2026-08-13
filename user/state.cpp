@@ -394,14 +394,6 @@ void Settings::Load() {
         JSON_TRYGET("StartCountdown", this->StartCountdown);
         JSON_TRYGET("GameModeDuration", this->GameModeDuration);
         this->GameModeDuration = std::clamp(this->GameModeDuration, 100, 500);
-        JSON_TRYGET("SnS_GhostThreshold", this->SnS_GhostThreshold);
-        this->SnS_GhostThreshold = std::clamp(this->SnS_GhostThreshold, 1, 10);
-        JSON_TRYGET("PnS_VisibilityThreshold", this->PnS_VisibilityThreshold);
-        this->PnS_VisibilityThreshold = std::clamp(this->PnS_VisibilityThreshold, 3, 7);
-        JSON_TRYGET("ImpostorsCanVent", this->ImpostorsCanVent);
-        JSON_TRYGET("ZKC_AllowSpawnKills", this->ZKC_AllowSpawnKills);
-        JSON_TRYGET("ZKC_SpawnKillWindow", this->ZKC_SpawnKillWindow);
-        this->ZKC_SpawnKillWindow = std::clamp(this->ZKC_SpawnKillWindow, 0, 20);
 
         JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
@@ -1007,11 +999,6 @@ void Settings::Save() {
                 { "ModifyStartCountdown", this->ModifyStartCountdown },
                 { "StartCountdown", this->StartCountdown },
                 { "GameModeDuration", this->GameModeDuration },
-                { "SnS_GhostThreshold", this->SnS_GhostThreshold },
-                { "PnS_VisibilityThreshold", this->PnS_VisibilityThreshold },
-                { "ImpostorsCanVent", this->ImpostorsCanVent },
-                { "ZKC_AllowSpawnKills", this->ZKC_AllowSpawnKills },
-                { "ZKC_SpawnKillWindow", this->ZKC_SpawnKillWindow },
 
                 { "Enable_SMAC", this->Enable_SMAC },
                 { "SMAC_Punishment", this->SMAC_Punishment },
