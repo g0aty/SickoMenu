@@ -5,6 +5,7 @@
 #include "state.hpp"
 #include "gui-helpers.hpp"
 #include "_hooks.h"
+#include "sabotage_tab.h"
 
 bool editingAutoStartPlayerCount = false;
 
@@ -12,12 +13,14 @@ namespace HostTab {
     enum Groups {
         Utils,
         Settings,
-        Tournaments
+        Tournaments,
+        Moderation
     };
 
     static bool openUtils = true; //default to utils tab group
     static bool openSettings = false;
     static bool openTournaments = false;
+    static bool openModeration = false;
 
     static bool hideRolesList = false;
 
@@ -25,12 +28,14 @@ namespace HostTab {
         openUtils = group == Groups::Utils;
         openSettings = group == Groups::Settings;
         openTournaments = group == Groups::Tournaments;
+        openModeration = group == Groups::Moderation;
     }
 
     void OpenSubGroup(const std::string& name) {
         if (name == "Utils") CloseOtherGroups(Groups::Utils);
         else if (name == "Settings") CloseOtherGroups(Groups::Settings);
         else if (name == "Tournaments") CloseOtherGroups(Groups::Tournaments);
+        else if (name == "Moderation") CloseOtherGroups(Groups::Moderation);
     }
 
     /*std::string GetPlayerNameFromFriendCode(std::string friendCode) {
@@ -142,9 +147,14 @@ namespace HostTab {
                     CloseOtherGroups(Groups::Tournaments);
                 }
             }
+            ImGui::SameLine();
+            if (TabGroup("Moderation", openModeration)) {
+                CloseOtherGroups(Groups::Moderation);
+            }
             GameOptions options;
             if (openUtils) {
                 if (IsInLobby()) {
+                    ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
                     ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
                     if (!State.DisableRoleManager && (!hideRolesList || !State.TournamentMode)) {
                         bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
@@ -377,21 +387,67 @@ namespace HostTab {
                 if (ToggleButton("Disable All Votekicks", &State.DisableAllVotekicks))
                     State.Save();
 
-                std::vector<const char*> GAMEMODES = { "Default", "Task Speedrun" };
-                if (State.DisableHostAnticheat) GAMEMODES = { "Default", "Task Speedrun", "Battle Royale" };
-                State.GameMode = std::clamp(State.GameMode, 0, State.DisableHostAnticheat ? 2 : 1);
-                if (IsInLobby() && CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 100 * State.dpiScale)) {
-                    if (State.GameMode == 1) {
-                        State.TaskSpeedrun = true;
-                        State.BattleRoyale = false;
+                {
+                    std::vector<const char*> GAMEMODES = { "Default", "Task Speedrun" };
+                    if (State.DisableHostAnticheat) GAMEMODES = { "Default", "Task Speedrun", "Battle Royale", "0 Kill Cooldown", "Shift And Seek", "Poof And Seek" };
+                    else GAMEMODES = { "Default", "Task Speedrun", "0 Kill Cooldown", "Shift And Seek", "Poof And Seek" };
+                    int maxIndex = State.DisableHostAnticheat ? 5 : 4;
+                    State.GameMode = std::clamp(State.GameMode, 0, maxIndex);
+                    if (IsInLobby() && CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 100 * State.dpiScale)) {
+                        State.TaskSpeedrun = (State.GameMode == 1);
+                        State.BattleRoyale = (State.DisableHostAnticheat && State.GameMode == 2);
+                        int snsIndex = State.DisableHostAnticheat ? 4 : 3;
+                        int pnsIndex = State.DisableHostAnticheat ? 5 : 4;
+                        State.SnS = (State.GameMode == snsIndex);
+                        State.PnS = (State.GameMode == pnsIndex);
+                        if (State.SnS || State.PnS) State.DisableMeetings = true;
+                        State.Save();
                     }
-                    else if (State.GameMode == 2) {
-                        State.TaskSpeedrun = false;
-                        State.BattleRoyale = true;
-                    }
-                    else {
-                        State.TaskSpeedrun = false;
-                        State.BattleRoyale = false;
+
+                    if (State.GameMode != 0) {
+                        float stepperOverhead = 2.0f * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x);
+                        float matchedWidth = (100 * State.dpiScale) + stepperOverhead;
+
+                        ImGui::SetNextItemWidth(matchedWidth);
+                        if (ImGui::InputInt("Game Duration", &State.GameModeDuration)) {
+                            State.GameModeDuration = std::clamp(State.GameModeDuration, 100, 500);
+                            State.Save();
+                        }
+
+                        if (State.SnS) {
+                            ImGui::SetNextItemWidth(matchedWidth);
+                            if (ImGui::InputInt("Miskills Until Ghost", &State.SnS_GhostThreshold)) {
+                                State.SnS_GhostThreshold = std::clamp(State.SnS_GhostThreshold, 1, 10);
+                                State.Save();
+                            }
+                        }
+
+                        if (State.PnS) {
+                            ImGui::SetNextItemWidth(matchedWidth);
+                            if (ImGui::InputInt("Visibility Threshold", &State.PnS_VisibilityThreshold)) {
+                                State.PnS_VisibilityThreshold = std::clamp(State.PnS_VisibilityThreshold, 3, 7);
+                                State.Save();
+                            }
+                        }
+
+                        if (State.SnS || State.PnS) {
+                            if (ToggleButton("Imposters Can Vent", &State.ImpostorsCanVent))
+                                State.Save();
+                        }
+
+                        bool zkcSelected = (State.GameMode == (State.DisableHostAnticheat ? 3 : 2));
+                        if (zkcSelected && IsInLobby()) {
+                            if (ToggleButton("Allow Spawn Kills", &State.ZKC_AllowSpawnKills))
+                                State.Save();
+
+                            if (!State.ZKC_AllowSpawnKills) {
+                                ImGui::SetNextItemWidth(matchedWidth);
+                                if (ImGui::InputInt("Spawn Kill Window", &State.ZKC_SpawnKillWindow)) {
+                                    State.ZKC_SpawnKillWindow = std::clamp(State.ZKC_SpawnKillWindow, 0, 20);
+                                    State.Save();
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -517,6 +573,10 @@ namespace HostTab {
             }
 
             if (openSettings) {
+                ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+                if (ImGui::CollapsingHeader("Disable Sabotages", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    SabotageTab::RenderDisableSabotages();
+                }
                 ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
                 if (ImGui::CollapsingHeader("Host Presets", ImGuiTreeNodeFlags_DefaultOpen)) {
                     ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
@@ -855,7 +915,205 @@ namespace HostTab {
                     ImGui::Text(text.c_str());
                 }
             }
+            if (openModeration) {
+                ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
+                if (ImGui::CollapsingHeader("Roles", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
+                    static const std::vector<std::pair<const char*, const char*>> ROLE_COMMANDS = {
+                        { "/color", "color" }, { "/rules", "r" },
+                        { "/sicko", "sicko" }, { "/warn & /unwarn", "warn" },
+                        { "/kick & /kickc", "kick" }, { "/ban & /banc", "ban" },
+                        { "/callmeeting", "callmeeting" }, { "/endmeeting", "endmeeting" }, { "/start", "start" }, { "/end", "end" },
+                    };
+                    static int selectedRole = 0;
+                    static std::string newRoleName = "";
+                    static std::string renameBuf = "";
+                    static std::string newMemberCode = "";
+                    static int selectedMemberIndex = 0;
+
+                    ImGui::Text("Create Role:");
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(140.0f * State.dpiScale);
+                    InputString("##NewRoleName", &newRoleName, ImGuiInputTextFlags_EnterReturnsTrue);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Add Role")) {
+                        if (!newRoleName.empty()) {
+                            State.Mod_RoleNames.push_back(newRoleName);
+                            State.Mod_RoleMembers.push_back({});
+                            State.Mod_RolePermissions.push_back({});
+                            State.Mod_RoleRank.push_back(0);
+                            selectedRole = (int)State.Mod_RoleNames.size() - 1;
+                            newRoleName = "";
+                            State.Save();
+                        }
+                    }
+
+                    ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+
+                    if (State.Mod_RoleRank.size() < State.Mod_RoleNames.size()) State.Mod_RoleRank.resize(State.Mod_RoleNames.size(), 0); 
+
+                    if (!State.Mod_RoleNames.empty()) {
+                        selectedRole = std::clamp(selectedRole, 0, (int)State.Mod_RoleNames.size() - 1);
+                        std::vector<const char*> roleVector(State.Mod_RoleNames.size(), nullptr);
+                        for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) roleVector[i] = State.Mod_RoleNames[i].c_str();
+                        ImGui::Text("Select Role:");
+                        ImGui::SameLine();
+                        CustomListBoxInt("SelectedRole", &selectedRole, roleVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(60.0f * State.dpiScale);
+                        ImGui::InputInt("##EditRoleRank", &State.Mod_RoleRank[selectedRole]);
+                        ImGui::SameLine();
+                        if (AnimatedButton("Set Rank")) {
+                            State.Save();
+                        }
+                    }
+                    else {
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No roles created yet.");
+                    }
+
+                    if (!State.Mod_RoleNames.empty()) {
+                        ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+                        ImGui::SetNextItemWidth(150.0f * State.dpiScale);
+                        InputString("##RenameRole", &renameBuf, ImGuiInputTextFlags_EnterReturnsTrue);
+                        ImGui::SameLine();
+                        if (AnimatedButton("Rename Role")) {
+                            if (!renameBuf.empty()) {
+                                State.Mod_RoleNames[selectedRole] = renameBuf;
+                                renameBuf = "";
+                                State.Save();
+                            }
+                        }
+                        ImGui::SameLine();
+                        if (AnimatedButton("Delete Role")) {
+                            State.Mod_RoleNames.erase(State.Mod_RoleNames.begin() + selectedRole);
+                            State.Mod_RoleMembers.erase(State.Mod_RoleMembers.begin() + selectedRole);
+                            State.Mod_RolePermissions.erase(State.Mod_RolePermissions.begin() + selectedRole);
+                            State.Mod_RoleRank.erase(State.Mod_RoleRank.begin() + selectedRole);
+                            State.Save();
+                        }
+
+                        ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
+                        ImGui::Text("Permissions for %s:", State.Mod_RoleNames[selectedRole].c_str());
+                        ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
+                        ImVec4 themeColDark = ImVec4(themeCol.x * 0.7f, themeCol.y * 0.7f, themeCol.z * 0.7f, themeCol.w);
+                        ImVec4 themeColDarker = ImVec4(themeCol.x * 0.5f, themeCol.y * 0.5f, themeCol.z * 0.5f, themeCol.w);
+                        ImGui::Columns(2, "rolePermCols", false);
+                        for (auto& cmd : ROLE_COMMANDS) {
+                            bool granted = State.Mod_RolePermissions[selectedRole].count(cmd.second) && State.Mod_RolePermissions[selectedRole][cmd.second];
+                            ImGui::PushStyleColor(ImGuiCol_Button, granted ? themeCol : ImVec4(0.f, 0.f, 0.f, 0.f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, granted ? themeColDarker : themeColDark);
+                            ImGui::PushStyleColor(ImGuiCol_ButtonActive, themeCol);
+                            if (AnimatedButton((std::string(cmd.first) + "##roleperm" + std::to_string(selectedRole)).c_str())) {
+                                State.Mod_RolePermissions[selectedRole][cmd.second] = !granted;
+                                State.Save();
+                            }
+                            ImGui::PopStyleColor(3);
+                            ImGui::NextColumn();
+                        }
+                        ImGui::Columns(1);
+
+                        ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
+                        ImGui::Text("Members:");
+                        ImGui::SetNextItemWidth(150.0f * State.dpiScale);
+                        InputString("##NewMemberCode", &newMemberCode, ImGuiInputTextFlags_EnterReturnsTrue);
+                        ImGui::SameLine();
+                        if (AnimatedButton("Add (friendcode)##RoleMember")) {
+                            if (!newMemberCode.empty()) {
+                                State.Mod_RoleMembers[selectedRole].push_back(newMemberCode);
+                                newMemberCode = "";
+                                State.Save();
+                            }
+                        }
+                        auto& members = State.Mod_RoleMembers[selectedRole];
+                        if (!members.empty()) {
+                            selectedMemberIndex = std::clamp(selectedMemberIndex, 0, (int)members.size() - 1);
+                            std::vector<const char*> memberVector(members.size(), nullptr);
+                            for (size_t i = 0; i < members.size(); i++) memberVector[i] = members[i].c_str();
+                            CustomListBoxInt("##RemoveRoleMember", &selectedMemberIndex, memberVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
+                            ImGui::SameLine();
+                            if (AnimatedButton("Remove##RoleMember")) {
+                                members.erase(members.begin() + selectedMemberIndex);
+                                State.Save();
+                            }
+                        }
+                    }
+                }
+
+                ImGui::Dummy(ImVec2(0, 4)* State.dpiScale);
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0, 4)* State.dpiScale);
+
+                ImGui::PushID("LowLevel");
+                if (ToggleButton("Kick Low Level Players", &State.Mod_KickLowLevel)) State.Save();
+                if (State.Mod_KickLowLevel) {
+                        ImGui::SameLine();
+                        if (ToggleButton("Ban Instead", &State.Mod_KickLowLevelBanInstead)) State.Save();
+                        ImGui::SameLine();
+                        if (ToggleButton("Ignore Whitelisted Players", &State.Mod_KickLowLevelIgnoreWhitelist)) State.Save();
+                        if (ImGui::InputInt("Kick Players Under Level", &State.Mod_KickLowLevelThreshold)) {
+                            State.Mod_KickLowLevelThreshold = std::clamp(State.Mod_KickLowLevelThreshold, 0, 200);
+                            State.Save();
+                        }
+                    }
+                    ImGui::PopID();
+
+                    ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
+                    ImGui::PushID("Friendcode");
+                    if (ToggleButton("Kick Empty Friendcodes", &State.Mod_KickInvalidFriendcode)) State.Save();
+                    if (State.Mod_KickInvalidFriendcode) {
+                        ImGui::SameLine();
+                        if (ToggleButton("Ban Instead", &State.Mod_KickInvalidFriendcodeBanInstead)) State.Save();
+                        ImGui::SameLine();
+                        if (ToggleButton("Ignore Whitelisted Players", &State.Mod_KickInvalidFriendcodeIgnoreWhitelist)) State.Save();
+                    }
+                    ImGui::PopID();
+
+                    ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
+                    ImGui::PushID("StartWords");
+                    if (ToggleButton("Kick Players Who Say Start Words", &State.Mod_KickStartWords)) State.Save();
+                    if (State.Mod_KickStartWords) {
+                        ImGui::SameLine();
+                        if (ToggleButton("Ban Instead", &State.Mod_StartWordsBanInstead)) State.Save();
+                        if (ToggleButton("Ignore Whitelisted Players", &State.Mod_StartWordsIgnoreWhitelist)) State.Save();
+                        ImGui::SameLine();
+                        if (ToggleButton("Strict Detection", &State.Mod_StartWordsStrict)) State.Save();
+                    if (ImGui::InputInt("Messages Before Kick", &State.Mod_StartWordsThreshold)) {
+                        if (State.Mod_StartWordsThreshold < 1) State.Mod_StartWordsThreshold = 1;
+                        State.Save();
+                    }
+                    if (State.Mod_StartWords.empty())
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No start words added!");
+                    static std::string newStartWord = "";
+                    InputString("New Start Word", &newStartWord, ImGuiInputTextFlags_EnterReturnsTrue);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Add##StartWord")) {
+                        State.Mod_StartWords.push_back(newStartWord);
+                        State.Save();
+                        newStartWord = "";
+                    }
+                    if (!State.Mod_StartWords.empty()) {
+                        static int selectedStartWordIndex = 0;
+                        selectedStartWordIndex = std::clamp(selectedStartWordIndex, 0, (int)State.Mod_StartWords.size() - 1);
+                        std::vector<const char*> startWordVector(State.Mod_StartWords.size(), nullptr);
+                        for (size_t i = 0; i < State.Mod_StartWords.size(); i++) {
+                            startWordVector[i] = State.Mod_StartWords[i].c_str();
+                        }
+                        CustomListBoxInt("Start Word to Remove", &selectedStartWordIndex, startWordVector);
+                        ImGui::SameLine();
+                        if (AnimatedButton("Remove##StartWord")) {
+                            State.Mod_StartWords.erase(State.Mod_StartWords.begin() + selectedStartWordIndex);
+                            State.Save();
+                        }
+                    }
+                    }
+                    ImGui::PopID();
+            }
+            if (openModeration) {
+                ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
+                if (ToggleButton("Show Kick Notifications", &State.ShowModNotifications)) State.Save();
+
+            }
+            }
             ImGui::EndChild();
         }
     }
-}

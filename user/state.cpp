@@ -392,6 +392,16 @@ void Settings::Load() {
         JSON_TRYGET("AlwaysAllowStart", this->AlwaysAllowStart);
         JSON_TRYGET("ModifyStartCountdown", this->ModifyStartCountdown);
         JSON_TRYGET("StartCountdown", this->StartCountdown);
+        JSON_TRYGET("GameModeDuration", this->GameModeDuration);
+        this->GameModeDuration = std::clamp(this->GameModeDuration, 100, 500);
+        JSON_TRYGET("SnS_GhostThreshold", this->SnS_GhostThreshold);
+        this->SnS_GhostThreshold = std::clamp(this->SnS_GhostThreshold, 1, 10);
+        JSON_TRYGET("PnS_VisibilityThreshold", this->PnS_VisibilityThreshold);
+        this->PnS_VisibilityThreshold = std::clamp(this->PnS_VisibilityThreshold, 3, 7);
+        JSON_TRYGET("ImpostorsCanVent", this->ImpostorsCanVent);
+        JSON_TRYGET("ZKC_AllowSpawnKills", this->ZKC_AllowSpawnKills);
+        JSON_TRYGET("ZKC_SpawnKillWindow", this->ZKC_SpawnKillWindow);
+        this->ZKC_SpawnKillWindow = std::clamp(this->ZKC_SpawnKillWindow, 0, 20);
 
         JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
@@ -423,6 +433,21 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckBadWords", this->SMAC_CheckBadWords);
         JSON_TRYGET("SMAC_BadWords", this->SMAC_BadWords);
         JSON_TRYGET("ChatPresets", this->ChatPresets);
+
+        JSON_TRYGET("Mod_KickLowLevel", this->Mod_KickLowLevel);
+        JSON_TRYGET("Mod_KickLowLevelThreshold", this->Mod_KickLowLevelThreshold);
+        JSON_TRYGET("Mod_KickLowLevelBanInstead", this->Mod_KickLowLevelBanInstead);
+        JSON_TRYGET("Mod_KickInvalidFriendcode", this->Mod_KickInvalidFriendcode);
+        JSON_TRYGET("Mod_KickInvalidFriendcodeBanInstead", this->Mod_KickInvalidFriendcodeBanInstead);
+        JSON_TRYGET("Mod_SickoSocials", this->Mod_SickoSocials);
+        JSON_TRYGET("Mod_RoleNames", this->Mod_RoleNames);
+        JSON_TRYGET("Mod_RoleMembers", this->Mod_RoleMembers);
+        JSON_TRYGET("Mod_RolePermissions", this->Mod_RolePermissions);
+        JSON_TRYGET("Mod_RoleRank", this->Mod_RoleRank);
+        JSON_TRYGET("Mod_KickStartWords", this->Mod_KickStartWords);
+        JSON_TRYGET("Mod_StartWordsBanInstead", this->Mod_StartWordsBanInstead);
+        JSON_TRYGET("Mod_StartWordsThreshold", this->Mod_StartWordsThreshold);
+        JSON_TRYGET("Mod_StartWords", this->Mod_StartWords);
 
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
         JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
@@ -981,6 +1006,12 @@ void Settings::Save() {
                 { "AlwaysAllowStart", this->AlwaysAllowStart },
                 { "ModifyStartCountdown", this->ModifyStartCountdown },
                 { "StartCountdown", this->StartCountdown },
+                { "GameModeDuration", this->GameModeDuration },
+                { "SnS_GhostThreshold", this->SnS_GhostThreshold },
+                { "PnS_VisibilityThreshold", this->PnS_VisibilityThreshold },
+                { "ImpostorsCanVent", this->ImpostorsCanVent },
+                { "ZKC_AllowSpawnKills", this->ZKC_AllowSpawnKills },
+                { "ZKC_SpawnKillWindow", this->ZKC_SpawnKillWindow },
 
                 { "Enable_SMAC", this->Enable_SMAC },
                 { "SMAC_Punishment", this->SMAC_Punishment },
@@ -1012,6 +1043,21 @@ void Settings::Save() {
                 { "SMAC_CheckBadWords", this->SMAC_CheckBadWords },
                 { "SMAC_BadWords", this->SMAC_BadWords },
                 { "ChatPresets", this->ChatPresets },
+
+                { "Mod_KickLowLevel", this->Mod_KickLowLevel },
+                { "Mod_KickLowLevelThreshold", this->Mod_KickLowLevelThreshold },
+                { "Mod_KickLowLevelBanInstead", this->Mod_KickLowLevelBanInstead },
+                { "Mod_KickInvalidFriendcode", this->Mod_KickInvalidFriendcode },
+                { "Mod_KickInvalidFriendcodeBanInstead", this->Mod_KickInvalidFriendcodeBanInstead },
+                { "Mod_SickoSocials", this->Mod_SickoSocials },
+                { "Mod_RoleNames", this->Mod_RoleNames },
+                { "Mod_RoleMembers", this->Mod_RoleMembers },
+                { "Mod_RolePermissions", this->Mod_RolePermissions },
+                { "Mod_RoleRank", this->Mod_RoleRank },
+                { "Mod_KickStartWords", this->Mod_KickStartWords },
+                { "Mod_StartWordsBanInstead", this->Mod_StartWordsBanInstead },
+                { "Mod_StartWordsThreshold", this->Mod_StartWordsThreshold },
+                { "Mod_StartWords", this->Mod_StartWords },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
                 { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },
                 { "TimerAFK", this->TimerAFK },

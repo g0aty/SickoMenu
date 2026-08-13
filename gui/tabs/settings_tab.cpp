@@ -610,7 +610,13 @@ namespace SettingsTab {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Panic Mode");
 
-			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
+
+			CheckKeybindEdit(HotKey(State.KeyBinds.Leave_Game));
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Leave Game");
+
+			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Hud));
 			ImGui::SameLine(100 * State.dpiScale);

@@ -1275,6 +1275,97 @@ bool PlayerIsImpostor(NetworkedPlayerInfo* player) {
     return role->fields.TeamType == RoleTeamTypes__Enum::Impostor;
 }
 
+bool FriendCodeHasPermission(const std::string& friendCode, const std::string& commandKey) {
+    if (friendCode.empty()) return false;
+    for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) {
+        if (i >= State.Mod_RoleMembers.size() || i >= State.Mod_RolePermissions.size()) continue;
+        auto& members = State.Mod_RoleMembers[i];
+        if (std::find(members.begin(), members.end(), friendCode) == members.end()) continue;
+        auto it = State.Mod_RolePermissions[i].find(commandKey);
+        if (it != State.Mod_RolePermissions[i].end() && it->second) return true;
+    }
+    return false;
+}
+
+bool PlayerHasPermission(PlayerControl* pc, const std::string& commandKey) {
+    if (pc == *Game::pLocalPlayer) return true; // no permission check applies to yourself
+    if (pc == NULL) return false;
+    auto pd = GetPlayerData(pc);
+    if (pd == NULL || pd->fields.FriendCode == NULL) return false;
+    return FriendCodeHasPermission(convert_from_string(pd->fields.FriendCode), commandKey);
+}
+
+static std::string strToLower(std::string str); 
+
+int FindColorIdByName(const std::string& lowerName) {
+    static const std::vector<std::string> COLOR_NAMES = { "red", "blue", "green", "pink", "orange", "yellow", "black", "white", "purple", "brown", "cyan", "lime", "maroon", "rose", "banana", "gray", "tan", "coral" };
+    for (size_t i = 0; i < COLOR_NAMES.size(); i++) if (COLOR_NAMES[i] == lowerName) return (int)i;
+    return -1;
+}
+
+PlayerControl* ResolveTargetByName(const std::string& lowerName) {
+    PlayerControl* target = NULL;
+    int matches = 0;
+    for (auto p : GetAllPlayerControl()) {
+        auto pd = GetPlayerData(p);
+        if (pd == NULL) continue;
+        std::string pname = strToLower(convert_from_string(NetworkedPlayerInfo_get_PlayerName(pd, nullptr)));
+        if (pname == lowerName) { target = p; matches++; }
+    }
+    return matches == 1 ? target : NULL;
+}
+
+PlayerControl* ResolveTargetByColor(int colorId) {
+    if (colorId == -1) return NULL;
+    PlayerControl* target = NULL;
+    int matches = 0;
+    for (auto p : GetAllPlayerControl()) {
+        auto pd = GetPlayerData(p);
+        if (pd == NULL) continue;
+        auto outfit = GetPlayerOutfit(pd);
+        if (outfit != NULL && (int)outfit->fields.ColorId == colorId) { target = p; matches++; }
+    }
+    return matches == 1 ? target : NULL;
+}
+
+std::vector<int> GetFriendCodeRoleIndices(const std::string& friendCode) {
+    std::vector<int> result;
+    if (friendCode.empty()) return result;
+    for (size_t i = 0; i < State.Mod_RoleMembers.size(); i++) {
+        auto& members = State.Mod_RoleMembers[i];
+        if (std::find(members.begin(), members.end(), friendCode) != members.end()) result.push_back((int)i);
+    }
+    return result;
+}
+
+void SetFriendCodeInRole(const std::string& friendCode, int roleIndex, bool member) {
+    if (friendCode.empty() || roleIndex < 0 || roleIndex >= (int)State.Mod_RoleMembers.size()) return;
+    auto& members = State.Mod_RoleMembers[roleIndex];
+    bool alreadyMember = std::find(members.begin(), members.end(), friendCode) != members.end();
+    if (member && !alreadyMember) members.push_back(friendCode);
+    else if (!member && alreadyMember) members.erase(std::remove(members.begin(), members.end(), friendCode), members.end());
+    State.Save();
+}
+
+int GetFriendCodeMaxRank(const std::string& friendCode) {
+    int maxRank = -1; //-1 = holds no roles at all, always outranked by any real role
+    if (friendCode.empty()) return maxRank;
+    for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) {
+        if (i >= State.Mod_RoleMembers.size() || i >= State.Mod_RoleRank.size()) continue;
+        auto& members = State.Mod_RoleMembers[i];
+        if (std::find(members.begin(), members.end(), friendCode) == members.end()) continue;
+        if (State.Mod_RoleRank[i] > maxRank) maxRank = State.Mod_RoleRank[i];
+    }
+    return maxRank;
+}
+
+int GetPlayerMaxRank(PlayerControl* pc) {
+    if (pc == NULL) return -1;
+    auto pd = GetPlayerData(pc);
+    if (pd == NULL || pd->fields.FriendCode == NULL) return -1;
+    return GetFriendCodeMaxRank(convert_from_string(pd->fields.FriendCode));
+}
+
 Color GetColorFromImVec4(ImVec4 vec) {
     return Color(vec.x, vec.y, vec.z, vec.w);
 }
@@ -1427,8 +1518,7 @@ float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2)
 }
 
 void ShowHudNotification(std::string text) {
-    return;
-    std::string notificationText = "</size><#fb0>[<#ff006c>SickoMenu</color>]</color> " + text + "<size=0>";
+    if (!State.ShowModNotifications) return;
     if (IsInGame() || IsInLobby())
         NotificationPopper_AddDisconnectMessage((NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier), convert_to_string(text), NULL);
 }

@@ -880,6 +880,28 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
             app::PlayerControl_MurderPlayer(__this, target, resultFlags, method);
             return;
         }
+
+        if (State.SnS && IsHost() && __this != NULL && target != NULL &&
+            (static_cast<int32_t>(resultFlags) & static_cast<int32_t>(MurderResultFlags__Enum::Succeeded))) {
+            auto snsIt = State.SnS_ShapeshiftTarget.find(__this->fields.PlayerId);
+            bool validShapeshiftKill = (snsIt != State.SnS_ShapeshiftTarget.end() && snsIt->second == target->fields.PlayerId);
+            if (!validShapeshiftKill) {
+                int missCount = ++State.SnS_MissCount[__this->fields.PlayerId];
+                int threshold = std::clamp(State.SnS_GhostThreshold, 1, 10);
+                auto offenderEvt = GetEventPlayerControl(__this);
+                if (missCount >= threshold) {
+                    if (offenderEvt.has_value()) {
+                        ShowHudNotification(offenderEvt->playerName + " was turned into a ghost for misfiring");
+                    }
+                    if (IsInGame()) State.rpcQueue.push(new RpcSetRole(__this, RoleTypes__Enum::ImpostorGhost));
+                    else if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSetRole(__this, RoleTypes__Enum::ImpostorGhost));
+                    State.SnS_MissCount.erase(__this->fields.PlayerId);
+                }
+                else if (offenderEvt.has_value()) {
+                    ShowHudNotification(offenderEvt->playerName + " misfired (" + std::to_string(missCount) + "/" + std::to_string(threshold) + ")");
+                }
+            }
+        }
         if (static_cast<int32_t>(resultFlags) & static_cast<int32_t>(MurderResultFlags__Enum::Succeeded)) {
             State.validDeadBodyIds.push_back(target->fields.PlayerId);
         }
@@ -1025,6 +1047,9 @@ void dPlayerControl_CmdCheckShapeshift(PlayerControl* __this, PlayerControl* tar
 void dPlayerControl_CmdCheckRevertShapeshift(PlayerControl* __this, bool animate, MethodInfo* method)
 {
     if (State.ShowHookLogs) Log.Debug("Hook dPlayerControl_CmdCheckRevertShapeshift executed", false);
+    if (State.SnS && __this != NULL) {
+        State.SnS_ShapeshiftTarget.erase(__this->fields.PlayerId);
+    }
     if (!State.PanicMode && !State.SafeMode && __this == *Game::pLocalPlayer) PlayerControl_RpcShapeshift(__this, __this, (!State.AnimationlessShapeshift && animate), method);
     else if (IsInGame()) PlayerControl_CmdCheckRevertShapeshift(__this, (State.PanicMode ? animate : (!State.AnimationlessShapeshift && animate)), method);
 }
@@ -1102,6 +1127,9 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
             ((State.DisableSabotages || (State.BattleRoyale || State.TaskSpeedrun)) &&
                 ((callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType && State.mapType != Settings::MapType::Hq) || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
             //we cannot prevent murderplayer because the player will force it
+            return;
+        if (IsHost() && !State.PanicMode && callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType &&
+            State.DisabledSabotageTypes.count((int)SystemTypes__Enum::Doors))
             return;
         if (!State.GameLoaded && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting))
             return;
@@ -1234,6 +1262,10 @@ void dPlayerControl_RpcStartMeeting(PlayerControl* __this, NetworkedPlayerInfo* 
 void dPlayerControl_Shapeshift(PlayerControl* __this, PlayerControl* target, bool animate, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dPlayerControl_Shapeshift executed", false);
     try {
+        if (State.SnS && IsHost() && __this != NULL && target != NULL) {
+            if (target == __this) State.SnS_ShapeshiftTarget.erase(__this->fields.PlayerId);
+            else State.SnS_ShapeshiftTarget[__this->fields.PlayerId] = target->fields.PlayerId;
+        }
         synchronized(Replay::replayEventMutex) {
             State.liveReplayEvents.emplace_back(std::make_unique<ShapeShiftEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));
             State.liveConsoleEvents.emplace_back(std::make_unique<ShapeShiftEvent>(GetEventPlayerControl(__this).value(), GetEventPlayerControl(target).value()));
@@ -1244,7 +1276,6 @@ void dPlayerControl_Shapeshift(PlayerControl* __this, PlayerControl* target, boo
     }
     PlayerControl_Shapeshift(__this, target, animate, method);
 }
-
 void dPlayerControl_ProtectPlayer(PlayerControl* __this, PlayerControl* target, int32_t colorId, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dPlayerControl_ProtectPlayer executed", false);
     try {
@@ -1614,6 +1645,24 @@ void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* 
     if (State.SMAC_CheckLevel && (IsInGame() ||
         ((State.SMAC_HighLevel != 0 && playerLevel >= (uint32_t)State.SMAC_HighLevel) || (State.SMAC_LowLevel != 0 && playerLevel <= (uint32_t)State.SMAC_LowLevel)))) {
         SMAC_OnCheatDetected(__this, "Abnormal Level");
+    }
+
+    if (IsHost() && __this != *Game::pLocalPlayer && State.Mod_KickLowLevel &&
+        (int)playerLevel < State.Mod_KickLowLevelThreshold) {
+        auto lowLevelPd = GetPlayerData(__this);
+        std::string lowLevelFc = (lowLevelPd != NULL && lowLevelPd->fields.FriendCode != NULL) ? convert_from_string(lowLevelPd->fields.FriendCode) : "";
+        bool lowLevelWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), lowLevelFc) != State.WhitelistFriendCodes.end();
+        if (!(State.Mod_KickLowLevelIgnoreWhitelist && lowLevelWhitelisted) &&
+            State.Mod_LowLevelAlreadyFlagged.insert(__this->fields._.OwnerId).second) { 
+            InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.OwnerId, State.Mod_KickLowLevelBanInstead, NULL);
+            auto lowLevelEvt = GetEventPlayerControl(__this);
+            if (lowLevelEvt.has_value()) {
+                std::string notif = lowLevelEvt->playerName + " (level " + std::to_string(playerLevel) + ") was " + (State.Mod_KickLowLevelBanInstead ? "banned" : "kicked") +
+                    " for being under level " + std::to_string(State.Mod_KickLowLevelThreshold);
+                State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(lowLevelEvt.value(), notif));
+                if (State.ShowModNotifications) ShowHudNotification(notif);
+            }
+        }
     }
 
     if (__this != *Game::pLocalPlayer && level > 2147483647) level = 2147483647; //anti level 0 exploit
