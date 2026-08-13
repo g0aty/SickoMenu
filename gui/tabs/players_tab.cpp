@@ -98,6 +98,29 @@ namespace PlayersTab {
         g_FrameCounter++;
 
         if ((IsInGame() || IsInLobby())) {
+            ColorMapping FAKEROLE_NAMES_COLOR[] = {
+                {"Crewmate",		State.CrewmateColor},
+                {"Impostor",		State.ImpostorColor},
+                {"Scientist",		State.ScientistColor},
+                {"Engineer",		State.EngineerColor},
+                {"Guardian Angel",	State.GuardianAngelColor},
+                {"Shapeshifter",	State.ShapeshifterColor},
+                {"Crewmate Ghost",  State.CrewmateGhostColor},
+                {"Impostor Ghost",	State.ImpostorGhostColor},
+                {"Noisemaker",		State.NoisemakerColor},
+                {"Phantom",			State.PhantomColor},
+                {"Tracker",			State.TrackerColor},
+                {"Detective",		State.DetectiveColor},
+                {"Viper",			State.ViperColor},
+            }; // needs to be updated every render
+
+            ColorMapping GHOSTROLE_NAMES_COLOR[] = {
+                {"Guardian Angel",	State.GuardianAngelColor},
+                {"Crewmate Ghost",  State.CrewmateGhostColor},
+                {"Impostor Ghost",	State.ImpostorGhostColor},
+
+            }; // this too
+
             ImGui::SameLine(100 * State.dpiScale);
             ImGui::BeginChild("players#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 
@@ -1462,7 +1485,7 @@ namespace PlayersTab {
                 if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
                     if (!IsInMultiplayerGame() || !selectedPlayer.get_PlayerControl()->fields.roleAssigned)
                     {
-                        if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale)) {
+                        if (CustomListBoxIntColored("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", FAKEROLE_NAMES_COLOR, IM_ARRAYSIZE(FAKEROLE_NAMES_COLOR))) {
                             // for some reason, detective is 12 (0x0c) instead of 11, and viper is 18 (0x12) instead of 12
                             if (State.FakeRole == 12) State.FakeRoleId = State.FakeRole + 6;
                             else if (State.FakeRole == 11) State.FakeRoleId = State.FakeRole + 1;
@@ -1480,7 +1503,7 @@ namespace PlayersTab {
                     }
                     else {
                         static int ghostRole = 0;
-                        if (CustomListBoxInt("Select Role", &ghostRole, GHOSTROLES, 100.0f * State.dpiScale))
+                        if (CustomListBoxIntColored("Select Role", &ghostRole, GHOSTROLES, 100.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", GHOSTROLE_NAMES_COLOR, IM_ARRAYSIZE(GHOSTROLE_NAMES_COLOR)))
                             State.Save();
                         ImGui::SameLine();
                         if (AnimatedButton("Set Role"))
@@ -1525,7 +1548,7 @@ namespace PlayersTab {
                     }
                 }
                 ImGui::NewLine();
-                CustomListBoxInt(" ", &forcedColor, COLORS, 85.0f * State.dpiScale);
+                CustomListBoxIntColored(" ", &forcedColor, COLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
                 ImGui::SameLine();
                 if (AnimatedButton("Force Color"))
                 {

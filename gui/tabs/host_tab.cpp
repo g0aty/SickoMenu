@@ -187,6 +187,16 @@ namespace HostTab {
 
                             auto outfit = GetPlayerOutfit(playerData);
                             if (outfit == NULL) continue;
+                            //ImVec4 the_info = AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId));
+                            //char hex_buf[10];
+                            //// Format as #AARRGGBB (standard alpha-first hex)
+                            //std::snprintf(hex_buf, sizeof(hex_buf), "#%02X%02X%02X%02X",
+                            //    (int)(the_info.w * 255.0f), // Alpha
+                            //    (int)(the_info.z * 255.0f)  // Blue
+                            //    (int)(the_info.y * 255.0f), // Green
+                            //    (int)(the_info.x * 255.0f), // Red
+                            //);
+                            //const std::string playerName = hex_buf;
                             const std::string& playerName = convert_from_string(outfit->fields.PlayerName);
                             //player colors in host tab by gdjkhp (https://github.com/GDjkhp/AmongUsMenu/commit/53b017183bac503c546f198e2bc03539a338462c)
 							//now with role colors in role selection
@@ -482,7 +492,7 @@ namespace HostTab {
                     }
                 }
 
-                CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
+                CustomListBoxIntColored(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
 
                 if (ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
                     State.Save();
