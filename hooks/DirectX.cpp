@@ -103,7 +103,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         // let the menu get toggled while in any menu text field but suppress every other keybind like zoom etc
         switch (uMsg) {
         case WM_KEYDOWN: case WM_KEYUP: case WM_SYSKEYDOWN: case WM_SYSKEYUP:
-            if ((uint8_t)wParam == State.KeyBinds.Toggle_Sicko)
+            if ((uint8_t)wParam == State.KeyBinds.Toggle_Sicko || (uint8_t)wParam == State.KeyBinds.Toggle_Menu) // panic mode or show/hide menu
                 KeyBinds::WndProc(uMsg, wParam, lParam);
             break;
         default:
