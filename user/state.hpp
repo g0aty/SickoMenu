@@ -109,6 +109,7 @@ public:
     int FakeRoleId = 0;
     bool AutoFakeRole = false;
     bool DisableVents = false;
+    bool PauseVentBlockingWhileVenting = false;
     bool SpamReport = false;
     bool CrashSpamReport = false;
     bool DisableMeetings = false;
