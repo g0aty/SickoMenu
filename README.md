@@ -71,6 +71,7 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 > Report unethical usage in our [Discord](https://discord.gg/sickos).
 
 ---
+
 ## ⚙️ Features
 A huge amount of features!
 - NoClip (`CTRL`)  
@@ -92,7 +93,9 @@ A huge amount of features!
 <p align="center">
    <img src="screenshot.png">
 </p>
+
 ---
+
 ## 👌 Supported Versions
 - ✅ Steam (Supported)
 - ✅ itch.io (Supported)
@@ -103,6 +106,7 @@ A huge amount of features!
 - ❌ Switch/Xbox/Playstation (Not Supported)
 
 ---
+
 ## ⬇️ Download & Install
 ### For Windows
 You can find the latest release [here](https://github.com/g0aty/SickoMenu/releases/latest).
@@ -256,7 +260,7 @@ Launch Among Us from your Steam library.
 Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggle SickoMenu.
 
 **Note:** \
-⠀⠀**For Method 2:**
+⠀⠀⠀**For Method 2:**
 - macOS Catalina+ Users: macOS versions ≥10.15 lack 32-bit support, which may cause issues. Use **Wine-Staging** (via Homebrew) for better compatibility:
   ```bash
   brew install --cask wine-stable
@@ -296,6 +300,7 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
 
 ---
+
 ## ⌨️ Default Hotkeys
 
 | Action                    | Key              |
@@ -309,6 +314,8 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 | Panic / Disable SickoMenu | `PAUSE/BREAK`    |
 
 Hotkeys can be customized in-game under **Settings → Keybinds**.
+
+---
 
 ## ⚒️ Building / Compilation
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
@@ -326,6 +333,7 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 - Release_Version (Optimized with all information stripped)
 
 ---
+
 ## 💁 Contributing
 
 Contributions are welcome and appreciated!
@@ -351,6 +359,7 @@ Contributions are welcome and appreciated!
 > - For larger features or big changes, consider discussing them in the [Discord](https://discord.gg/sickos) first
 
 ---
+
 ## ✨ Inspiration
 * [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
 * [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
@@ -358,6 +367,7 @@ Contributions are welcome and appreciated!
 * [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
 
 ---
+
 ## 🙏 Special Thanks
 * The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
 * [KulaGGin](https://github.com/KulaGGin) (Helped with some ImGui code for replay system)
