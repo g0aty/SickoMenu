@@ -5,11 +5,11 @@
 <h1 align="center">👺 SickoMenu v4.5.2</h1>
 
 <p align="center">
-  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen" alt="Latest Release"></a>
-  <a href="https://github.com/g0aty/SickoMenu/stargazers"><img src="https://img.shields.io/github/stars/g0aty/SickoMenu?style=flat&color=red" alt="Stars"></a>
-  <a href="https://github.com/g0aty/SickoMenu/network/members"><img src="https://img.shields.io/github/forks/g0aty/SickoMenu?style=flat&color=red" alt="Forks"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/g0aty/SickoMenu?style=flat&color=orange" alt="License"></a>
-  <a href="https://discord.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat&logo=discord&logoColor=blue" alt="Discord"></a>
+  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen&label=Latest%20Release" alt="Latest Release"></a>
+  <a href="https://github.com/g0aty/SickoMenu/stargazers"><img src="https://img.shields.io/github/stars/g0aty/SickoMenu?style=flat&color=red&label=Stars"></a>
+  <a href="https://github.com/g0aty/SickoMenu/network/members"><img src="https://img.shields.io/github/forks/g0aty/SickoMenu?style=flat&color=red&label=Forks"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/g0aty/SickoMenu?style=flat&color=orange&label=Licence"></a>
+  <a href="https://discord.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat&logo=discord&logoColor=blue"></a>
 </p>
 
 A powerful utility for Among Us designed to enrich your game experience with custom features!
@@ -19,7 +19,6 @@ A powerful utility for Among Us designed to enrich your game experience with cus
 Join our very own **Discord Server** for support, bug reports, and sneak peeks!
 ### Vanity Invite: https://discord.gg/sickos
 ### Permanent invite: https://dsc.gg/sickos
----
 
 ## 📋 Table of Contents
 - [⚠️ Disclaimer](https://github.com/g0aty/SickoMenu#%EF%B8%8F-disclaimer)
@@ -35,7 +34,6 @@ Join our very own **Discord Server** for support, bug reports, and sneak peeks!
 - [✨ Inspiration](https://github.com/g0aty/SickoMenu#-inspiration)
 - [🙏 Special Thanks](https://github.com/g0aty/SickoMenu#-special-thanks)
 
----
 ## ⚠️ Disclaimer
 This project is maintained by **g0aty**, with contributions from other developers.  
 It is intended **solely for educational and non-commercial research purposes**, such as exploring game mechanics and studying anti-cheat systems.
@@ -70,8 +68,6 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 > 🚫 Misuse may result in punitive actions on your Among Us account, including permanent bans. **We do not condone cheating.**  
 > Report unethical usage in our [Discord](https://discord.gg/sickos).
 
----
-
 ## ⚙️ Features
 A huge amount of features!
 - NoClip (`CTRL`)  
@@ -83,18 +79,14 @@ A huge amount of features!
 - Disable Kill Animation
 - SickoChat (`/sc <message>`) 
 
-**Full Features List can be found in [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)**
+**Full Feature List: [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)**
 
 > 🔸 Features marked with **"!"** may impact game balance. Always obtain lobby consent
-
----
 
 ## 📸 Screenshot
 <p align="center">
    <img src="screenshot.png">
 </p>
-
----
 
 ## 👌 Supported Versions
 - ✅ Steam (Supported)
@@ -104,8 +96,6 @@ A huge amount of features!
 - ❓ Cracked (works occasionally, I don't condone it)
 - ❌ iOS/iPadOS/Android (Not Supported)
 - ❌ Switch/Xbox/Playstation (Not Supported)
-
----
 
 ## ⬇️ Download & Install
 ### For Windows
@@ -267,8 +257,8 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
   ```
   **For Method 3:**
 - The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
-
 ---
+
 ## 🛠️ Troubleshooting
 
 **Game crashes on launch**
@@ -299,23 +289,19 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 **Other issues**
 - If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
 
----
-
 ## ⌨️ Default Hotkeys
 
 | Action                    | Key              |
 |---------------------------|------------------|
 | Show Menu                 | `DELETE` or `COMMAND ⌘ + BACKSPACE` or `FN + BACKSPACE`        |
 | Show Radar                | `INSERT` or `FN + ENTER` or `FN + RETURN`        |
-| Show Console              | `HOME`           |
-| Show Replay               | `END`            |
-| Repair Sabotage           | `PAGE DOWN`      |
+| Show Console              | `HOME` or `FN + LEFT-ARROW`           |
+| Show Replay               | `END` or `FN + RIGHT-ARROW`            |
+| Repair Sabotage           | `PAGE DOWN` or `FN + DOWN-ARROW`      |
 | NoClip                    | `CTRL` or `COMMAND ⌘`           |
 | Panic / Disable SickoMenu | `PAUSE/BREAK`    |
 
 Hotkeys can be customized in-game under **Settings → Keybinds**.
-
----
 
 ## ⚒️ Building / Compilation
 You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
@@ -331,8 +317,6 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 
 - Debug_Version (With Debug Information and can be attached to process)
 - Release_Version (Optimized with all information stripped)
-
----
 
 ## 💁 Contributing
 
@@ -358,15 +342,11 @@ Contributions are welcome and appreciated!
 > - Documentation and README improvements are always welcome  
 > - For larger features or big changes, consider discussing them in the [Discord](https://discord.gg/sickos) first
 
----
-
 ## ✨ Inspiration
 * [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
 * [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
 * [BetterAmongUs](https://github.com/D1GQ/BetterAmongUs) by [D1GQ](https://github.com/D1GQ/)
 * [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
-
----
 
 ## 🙏 Special Thanks
 * The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
