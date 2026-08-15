@@ -16,9 +16,9 @@ A powerful utility for Among Us designed to enrich your game experience with cus
 
 **Intended for educational and experimental use only.**
 
-Join our very own Discord server for support, bug reports, and sneak peeks!
-### Vanity Invite: https://discord.gg/sickos  
-### Permanent invite: https://dsc.gg/sickos 
+Join our very own **Discord Server** for support, bug reports, and sneak peeks!
+### Vanity Invite: https://discord.gg/sickos
+### Permanent invite: https://dsc.gg/sickos
 ---
 
 ## 📋 Table of Contents
@@ -35,6 +35,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 - [✨ Inspiration](https://github.com/g0aty/SickoMenu#-inspiration)
 - [🙏 Special Thanks](https://github.com/g0aty/SickoMenu#-special-thanks)
 
+---
 ## ⚠️ Disclaimer
 This project is maintained by **g0aty**, with contributions from other developers.  
 It is intended **solely for educational and non-commercial research purposes**, such as exploring game mechanics and studying anti-cheat systems.
@@ -43,9 +44,9 @@ This project is **not affiliated with, endorsed, or supported by Innersloth LLC*
 
 By downloading, installing, or using this software, you acknowledge and agree that:
 
-- You are solely responsible for how you use it.
-- You will not use it to violate Innersloth’s [Terms of Service](https://www.innersloth.com/terms-of-use-for-the-games/) or disrupt public gameplay.
-- The developers, including **g0aty** and all contributors, **assume no responsibility or liability** for:
+  - You are solely responsible for how you use it.
+  - You will not use it to violate Innersloth’s [Terms of Service](https://www.innersloth.com/terms-of-use-for-the-games/) or disrupt public gameplay.
+  - The developers, including **g0aty** and all contributors, **assume no responsibility or liability** for:
   - Any direct or indirect consequences of misuse,
   - Violations of third-party rules or terms,
   - Game bans, data loss, or damage caused by use of this utility.
@@ -59,7 +60,6 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 > ⚠️ Use responsibly. This software is provided "as is", **without any warranties** or guarantees of safety, support, or fitness for purpose.
 
 ---
-
 ## 🛑 Ethical Use Protocol
 **By using SickoMenu, you agree to:**
 1. **Use exclusively in private lobbies** with consenting players.
@@ -71,7 +71,6 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 > Report unethical usage in our [Discord](https://discord.gg/sickos).
 
 ---
-
 ## ⚙️ Features
 A huge amount of features!
 - NoClip (`CTRL`)  
@@ -81,9 +80,9 @@ A huge amount of features!
 **Miscellaneous Features:**
 - Zoom Out
 - Disable Kill Animation
-- SickoChat (`/sc [message]`)
+- SickoChat (`/sc <message>`) 
 
-**Full Feature List:** [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
+**Full Features List can be found in [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)**
 
 > 🔸 Features marked with **"!"** may impact game balance. Always obtain lobby consent
 
@@ -93,7 +92,7 @@ A huge amount of features!
 <p align="center">
    <img src="screenshot.png">
 </p>
-
+---
 ## 👌 Supported Versions
 - ✅ Steam (Supported)
 - ✅ itch.io (Supported)
@@ -103,6 +102,7 @@ A huge amount of features!
 - ❌ iOS/iPadOS/Android (Not Supported)
 - ❌ Switch/Xbox/Playstation (Not Supported)
 
+---
 ## ⬇️ Download & Install
 ### For Windows
 You can find the latest release [here](https://github.com/g0aty/SickoMenu/releases/latest).
@@ -120,16 +120,19 @@ Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in y
 First you will need [protontricks](https://github.com/Matoking/protontricks), you can install it with your packager of choice.
 
 1. Make sure you are running Among Us under Proton. 
-   On Steam you can check this by going to **Properties -> Compatibility**
+   On Steam you can check this by going to **Properties → Compatibility**
 2. Put version.dll into your Among Us directory (the folder containing `Among Us.exe`).
-3. Run `protontricks --gui`
+3. Run `protontricks --gui` in your terminal
 4. Choose **Among Us**
 5. Click on **Select the default wineprefix** and then **OK**
 6. Click on **Run winecfg** and then **OK**
 7. In the configuration window, click on **Libraries**
 8. Enter `version` into the **New override for library** input field
 9. Click **Add** and then **Apply**
-10. SickoMenu should now work properly in the game
+10. SickoMenu should now work properly in the game!
+
+> [!NOTE]
+> If on an Arch based distro or you are on a steam deck, add `PROTON_USE_WINED3D=1 %command%` to your launch options, then the game will run without crashing.
 
 ### For macOS (Version Proxy Only)
 
@@ -205,9 +208,9 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
    - Click **Apply** > **OK**.
 9. Launch Steam from Terminal (as in Step 3.3).  
 - Start Among Us from your Steam library.  
-- Use **Command + Backspace or Fn+Backspace** to toggle SickoMenu in-game, depending on your Mac model.
+- Use **Command ⌘ + Backspace or Fn + Backspace** to toggle SickoMenu in-game, depending on your Mac model.
 
-### Method 4: Whisky + Apple Game Porting Toolkit (Apple Silicon)
+**Method 4: Whisky + Apple Game Porting Toolkit (Apple Silicon)**
 
 > [!NOTE]
 > This method uses **Whisky** with **Apple’s Game Porting Toolkit**.
@@ -252,15 +255,15 @@ Start Steam from Whisky.
 Launch Among Us from your Steam library.
 Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggle SickoMenu.
 
----
-### **Note:**
-**For Method 2:**
+**Note:** \
+⠀⠀**For Method 2:**
 - macOS Catalina+ Users: macOS versions ≥10.15 lack 32-bit support, which may cause issues. Use **Wine-Staging** (via Homebrew) for better compatibility:
   ```bash
   brew install --cask wine-stable
   ```
   **For Method 3:**
 - The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
+
 ---
 ## 🛠️ Troubleshooting
 
@@ -272,6 +275,8 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 **Menu does not appear**
 - Confirm the DLL was loaded successfully.
 - Verify you are using the correct installation method (Version Proxy or Injection).
+- Make sure that **Disable fullscreen optimizations** is not checked in your **Among Us.exe** properties (Explorer).
+- Ensure that you do not have any overlays other than your platform overlay enabled. Using DirectX overlays can cause the menu to not display. Overlays like MSI afterburner overlay can prevent the menu from showing. Steam overlay does not.
 - Try restarting the game.
 
 **Antivirus removes files**
@@ -295,13 +300,13 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 
 | Action                    | Key              |
 |---------------------------|------------------|
-| Show Menu                 | `DELETE`         |
-| Show Radar                | `INSERT`         |
+| Show Menu                 | `DELETE` or `COMMAND ⌘ + BACKSPACE` or `FN + BACKSPACE`        |
+| Show Radar                | `INSERT` or `FN + ENTER` or `FN + RETURN`        |
 | Show Console              | `HOME`           |
 | Show Replay               | `END`            |
 | Repair Sabotage           | `PAGE DOWN`      |
-| NoClip                    | `CTRL`           |
-| Panic / Disable SickoMenu | `PAUSE BREAK`    |
+| NoClip                    | `CTRL` or `COMMAND ⌘`           |
+| Panic / Disable SickoMenu | `PAUSE/BREAK`    |
 
 Hotkeys can be customized in-game under **Settings → Keybinds**.
 
@@ -320,30 +325,39 @@ Will automatically be loaded by the Game itself if the dll is in the game direct
 - Debug_Version (With Debug Information and can be attached to process)
 - Release_Version (Optimized with all information stripped)
 
+---
 ## 💁 Contributing
 
 Contributions are welcome and appreciated!
 
 1. Fork the repository [here](https://github.com/g0aty/SickoMenu/fork)
 2. Create your feature branch:  
-   `git checkout -b feature/your-feature-name`
-3. Commit your changes:  
-   `git commit -am 'Add some feature'`
-4. Push to the branch:  
-   `git push origin feature/your-feature-name`
-5. Open a Pull Request
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+4. Commit your changes:  
+   ```bash
+   git commit -am 'Add some feature'
+   ```
+5. Push to the branch:  
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+6. Open a Pull Request
 
-> [!TIP]
+> [!NOTE]
 > - Keep your changes focused and well-described  
 > - Documentation and README improvements are always welcome  
 > - For larger features or big changes, consider discussing them in the [Discord](https://discord.gg/sickos) first
 
+---
 ## ✨ Inspiration
 * [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
 * [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
 * [BetterAmongUs](https://github.com/D1GQ/BetterAmongUs) by [D1GQ](https://github.com/D1GQ/)
 * [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
 
+---
 ## 🙏 Special Thanks
 * The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
 * [KulaGGin](https://github.com/KulaGGin) (Helped with some ImGui code for replay system)
