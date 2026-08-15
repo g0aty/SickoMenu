@@ -330,6 +330,8 @@ void Settings::Load() {
         JSON_TRYGET("ShowVoteKicks", this->ShowVoteKicks);
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
+        JSON_TRYGET("AutoCompleteTasks", this->AutoCompleteTasks);
+        JSON_TRYGET("DelayCompleteTasks", this->DelayCompleteTasks);
         JSON_TRYGET("AutoCopyLobbyCode", this->AutoCopyLobbyCode);
         JSON_TRYGET("AutoKickSlackers", this->AutoKickSlackers);
         JSON_TRYGET("AutoKickSlackersIgnoreWhitelist", this->AutoKickSlackersIgnoreWhitelist);
@@ -922,6 +924,8 @@ void Settings::Save() {
                 { "ShowVoteKicks", this->ShowVoteKicks },
                 { "ShowFps", this->ShowFps },
                 { "DoTasksAsImpostor", this->DoTasksAsImpostor },
+                { "AutoCompleteTasks", this->AutoCompleteTasks },
+                { "DelayCompleteTasks", this->DelayCompleteTasks },
                 { "AutoCopyLobbyCode", this->AutoCopyLobbyCode },
                 { "DisableLobbyMusic", this->DisableLobbyMusic },
                 { "ReportOnMurder", this->ReportOnMurder },

@@ -16,6 +16,41 @@ using namespace std::string_view_literals;
 static bool autoStartedGame = false;
 extern bool editingAutoStartPlayerCount;
 
+static void ProcessAutoCompleteTasks() {
+    using Clock = std::chrono::steady_clock;
+    static int previousMode = 0;
+    static Clock::time_point nextCompletion;
+
+    const bool inGame = IsInGame();
+    const int mode = !State.AutoCompleteTasks ? 0 : (State.DelayCompleteTasks ? 2 : 1);
+    if (!inGame || mode == 0) {
+        previousMode = 0;
+        return;
+    }
+
+    const auto now = Clock::now();
+    const auto completionDelay = mode == 1
+        ? std::chrono::milliseconds(100)
+        : std::chrono::milliseconds(10000);
+    if (previousMode != mode) {
+        previousMode = mode;
+        nextCompletion = now + completionDelay;
+        return;
+    }
+
+    if (now < nextCompletion || !Game::pLocalPlayer || !*Game::pLocalPlayer)
+        return;
+
+    const auto tasks = GetNormalPlayerTasks(*Game::pLocalPlayer);
+    for (auto task : tasks) {
+        if (task != nullptr && !NormalPlayerTask_get_IsComplete(task, NULL)) {
+            State.taskRpcQueue.push(new RpcCompleteTask(task->fields._._Id_k__BackingField));
+            nextCompletion = now + completionDelay;
+            return;
+        }
+    }
+}
+
 static std::string strToLower(std::string str) {
     std::string new_str = "";
     for (auto i : str) {
@@ -270,6 +305,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (!IsInGame() && !State.rpcQueue.empty()) State.rpcQueue = {};
             if (!IsInLobby() && !State.lobbyRpcQueue.empty()) State.lobbyRpcQueue = {};
             if (!IsInGame() && !IsInLobby() && !State.taskRpcQueue.empty()) State.taskRpcQueue = {};
+
+            ProcessAutoCompleteTasks();
 
             if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::Normal) {
                 auto localData = GetPlayerData(*Game::pLocalPlayer);

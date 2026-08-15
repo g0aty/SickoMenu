@@ -321,6 +321,8 @@ public:
     bool ShowVoteKicks = false;
     bool ShowFps = false;
     bool DoTasksAsImpostor = false;
+    bool AutoCompleteTasks = false;
+    bool DelayCompleteTasks = false;
     bool AlwaysUseKillExploit = false;
     bool AutoCopyLobbyCode = false;
     bool DisableLobbyMusic = false;

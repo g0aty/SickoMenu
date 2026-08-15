@@ -125,6 +125,11 @@ namespace TasksTab {
 		ImGui::SameLine(100 * State.dpiScale);
 		ImGui::BeginChild("###Tasks", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+		if (ToggleButton("Auto-Complete Tasks", &State.AutoCompleteTasks))
+			State.Save();
+		if (ToggleButton("Delay Complete Tasks", &State.DelayCompleteTasks))
+			State.Save();
+		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 		if (inGameWithTasks) {
 			auto tasks = GetNormalPlayerTasks(*Game::pLocalPlayer);

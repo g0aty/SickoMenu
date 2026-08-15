@@ -283,6 +283,8 @@ A dedicated player menu for viewing and manipulating players
 <img width="400" height="300" alt="Screenshot 2025-09-12 161253" src="https://github.com/user-attachments/assets/f4f6f3d4-848c-4d35-8ce0-1fd4efeb6111" />
 
 - **Complete All Tasks** Completes your tasks
+- **Auto-Complete Tasks** Completes all of your tasks after the game starts
+- **Delay Complete Tasks** Makes Auto-Complete Tasks wait 10 seconds between each task
 - **Complete Everyone's Tasks** *(Only with Safe Mode disabled)* Completes everyone's tasks
 - **Complete Specific Task** Completes the selected task
 - **Play Animations** Plays the map-specific animations specified
