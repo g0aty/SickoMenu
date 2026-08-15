@@ -424,22 +424,17 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_LowLevel", this->SMAC_LowLevel);
         JSON_TRYGET("SMAC_CheckBadWords", this->SMAC_CheckBadWords);
         JSON_TRYGET("SMAC_BadWords", this->SMAC_BadWords);
+        JSON_TRYGET("SMAC_CheckFriendcode", this->SMAC_CheckFriendcode);
         JSON_TRYGET("ChatPresets", this->ChatPresets);
 
-        JSON_TRYGET("Mod_KickLowLevel", this->Mod_KickLowLevel);
-        JSON_TRYGET("Mod_KickLowLevelThreshold", this->Mod_KickLowLevelThreshold);
-        JSON_TRYGET("Mod_KickLowLevelBanInstead", this->Mod_KickLowLevelBanInstead);
-        JSON_TRYGET("Mod_KickInvalidFriendcode", this->Mod_KickInvalidFriendcode);
-        JSON_TRYGET("Mod_KickInvalidFriendcodeBanInstead", this->Mod_KickInvalidFriendcodeBanInstead);
         JSON_TRYGET("Mod_SickoSocials", this->Mod_SickoSocials);
         JSON_TRYGET("Mod_RoleNames", this->Mod_RoleNames);
         JSON_TRYGET("Mod_RoleMembers", this->Mod_RoleMembers);
         JSON_TRYGET("Mod_RolePermissions", this->Mod_RolePermissions);
         JSON_TRYGET("Mod_RoleRank", this->Mod_RoleRank);
-        JSON_TRYGET("Mod_KickStartWords", this->Mod_KickStartWords);
-        JSON_TRYGET("Mod_StartWordsBanInstead", this->Mod_StartWordsBanInstead);
-        JSON_TRYGET("Mod_StartWordsThreshold", this->Mod_StartWordsThreshold);
-        JSON_TRYGET("Mod_StartWords", this->Mod_StartWords);
+        JSON_TRYGET("SMAC_CheckStartWords", this->SMAC_CheckStartWords);
+        JSON_TRYGET("SMAC_StartWordsThreshold", this->SMAC_StartWordsThreshold);
+        JSON_TRYGET("SMAC_StartWords", this->SMAC_StartWords);
 
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
         JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
@@ -1029,22 +1024,17 @@ void Settings::Save() {
                 { "SMAC_LowLevel", this->SMAC_LowLevel },
                 { "SMAC_CheckBadWords", this->SMAC_CheckBadWords },
                 { "SMAC_BadWords", this->SMAC_BadWords },
+                { "SMAC_CheckFriendcode", this->SMAC_CheckFriendcode },
                 { "ChatPresets", this->ChatPresets },
 
-                { "Mod_KickLowLevel", this->Mod_KickLowLevel },
-                { "Mod_KickLowLevelThreshold", this->Mod_KickLowLevelThreshold },
-                { "Mod_KickLowLevelBanInstead", this->Mod_KickLowLevelBanInstead },
-                { "Mod_KickInvalidFriendcode", this->Mod_KickInvalidFriendcode },
-                { "Mod_KickInvalidFriendcodeBanInstead", this->Mod_KickInvalidFriendcodeBanInstead },
                 { "Mod_SickoSocials", this->Mod_SickoSocials },
                 { "Mod_RoleNames", this->Mod_RoleNames },
                 { "Mod_RoleMembers", this->Mod_RoleMembers },
                 { "Mod_RolePermissions", this->Mod_RolePermissions },
                 { "Mod_RoleRank", this->Mod_RoleRank },
-                { "Mod_KickStartWords", this->Mod_KickStartWords },
-                { "Mod_StartWordsBanInstead", this->Mod_StartWordsBanInstead },
-                { "Mod_StartWordsThreshold", this->Mod_StartWordsThreshold },
-                { "Mod_StartWords", this->Mod_StartWords },
+                { "SMAC_CheckStartWords", this->SMAC_CheckStartWords },
+                { "SMAC_StartWordsThreshold", this->SMAC_StartWordsThreshold },
+                { "SMAC_StartWords", this->SMAC_StartWords },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
                 { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },
                 { "TimerAFK", this->TimerAFK },

@@ -1619,22 +1619,10 @@ void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* 
         SMAC_OnCheatDetected(__this, "Abnormal Level");
     }
 
-    if (IsHost() && __this != *Game::pLocalPlayer && State.Mod_KickLowLevel &&
-        (int)playerLevel < State.Mod_KickLowLevelThreshold) {
-        auto lowLevelPd = GetPlayerData(__this);
-        std::string lowLevelFc = (lowLevelPd != NULL && lowLevelPd->fields.FriendCode != NULL) ? convert_from_string(lowLevelPd->fields.FriendCode) : "";
-        bool lowLevelWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), lowLevelFc) != State.WhitelistFriendCodes.end();
-        if (!(State.Mod_KickLowLevelIgnoreWhitelist && lowLevelWhitelisted) &&
-            State.Mod_LowLevelAlreadyFlagged.insert(__this->fields._.OwnerId).second) { 
-            InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.OwnerId, State.Mod_KickLowLevelBanInstead, NULL);
-            auto lowLevelEvt = GetEventPlayerControl(__this);
-            if (lowLevelEvt.has_value()) {
-                std::string notif = lowLevelEvt->playerName + " (level " + std::to_string(playerLevel) + ") was " + (State.Mod_KickLowLevelBanInstead ? "banned" : "kicked") +
-                    " for being under level " + std::to_string(State.Mod_KickLowLevelThreshold);
-                State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(lowLevelEvt.value(), notif));
-                if (State.ShowModNotifications) ShowHudNotification(notif);
-            }
-        }
+    if (State.SMAC_CheckFriendcode && __this != *Game::pLocalPlayer) {
+        auto fcPd = GetPlayerData(__this);
+        std::string fc = (fcPd != NULL && fcPd->fields.FriendCode != NULL) ? convert_from_string(fcPd->fields.FriendCode) : "";
+        if (fc.empty()) SMAC_OnCheatDetected(__this, "Abnormal Friendcode");
     }
 
     if (__this != *Game::pLocalPlayer && level > 2147483647) level = 2147483647; //anti level 0 exploit

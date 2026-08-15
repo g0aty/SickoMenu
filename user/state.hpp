@@ -378,14 +378,6 @@ public:
     bool RotateEveryone = false;
     bool RotateServerSide = false;
     bool RelativeTeleport = false;
-    bool Mod_KickLowLevel = false;
-    int Mod_KickLowLevelThreshold = 30;
-    bool Mod_KickLowLevelBanInstead = false;
-    bool Mod_KickLowLevelIgnoreWhitelist = false;
-    std::set<int32_t> Mod_LowLevelAlreadyFlagged; 
-    bool Mod_KickInvalidFriendcode = false;
-    bool Mod_KickInvalidFriendcodeBanInstead = false;
-    bool Mod_KickInvalidFriendcodeIgnoreWhitelist = false;
     std::string Mod_SickoSocials = "";
     std::queue<std::string> Mod_PendingRulesMessages; 
     float Mod_PendingRulesDelay = 0.f; 
@@ -393,14 +385,11 @@ public:
     std::vector<std::vector<std::string>> Mod_RoleMembers = {}; 
     std::vector<std::map<std::string, bool>> Mod_RolePermissions = {}; 
     std::vector<int> Mod_RoleRank = {}; 
-    bool Mod_KickStartWords = false;
-    bool Mod_StartWordsBanInstead = false;
-    bool Mod_StartWordsIgnoreWhitelist = false;
-    bool Mod_StartWordsStrict = true; 
-    bool ShowModNotifications = true;
-    int Mod_StartWordsThreshold = 1;
-    std::vector<std::string> Mod_StartWords = {};
-    std::map<uint8_t, int> Mod_StartWordsCount;
+    bool SMAC_CheckStartWords = false;
+    bool SMAC_StartWordsStrict = true;
+    int SMAC_StartWordsThreshold = 1;
+    std::vector<std::string> SMAC_StartWords = {};
+    std::map<uint8_t, int> SMAC_StartWordsCount;
     float RotateRadius = 1.f;
     float xCoordinate = 0.f;
     float yCoordinate = 0.f;
@@ -715,6 +704,7 @@ public:
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
     bool SMAC_CheckBadWords = true;
     std::vector<std::string> SMAC_BadWords = {};
+    bool SMAC_CheckFriendcode = true;
 
     std::vector<std::string> ChatPresets = {};
 

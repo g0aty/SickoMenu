@@ -1525,17 +1525,6 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
 void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnPlayerJoined executed", false);
     State.BlinkPlayersTab = true;
-    if (IsHost() && State.Mod_KickInvalidFriendcode && data->fields.Id != (*Game::pLocalPlayer)->fields._.OwnerId) {
-        std::string friendCode = data->fields.FriendCode != NULL ? convert_from_string(data->fields.FriendCode) : "";
-        if (friendCode.empty() && !(State.Mod_KickInvalidFriendcodeIgnoreWhitelist &&
-            std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end())) {
-            InnerNetClient_KickPlayer((InnerNetClient*)__this, data->fields.Id, State.Mod_KickInvalidFriendcodeBanInstead, NULL);
-            std::string invalidFcNotif = std::string(convert_from_string(data->fields.PlayerName)) + " was " + (State.Mod_KickInvalidFriendcodeBanInstead ? "banned" : "kicked") + " by " + GetHostUsername(false) + " for having an empty friend code";
-            State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(EVENT_PLAYER(), invalidFcNotif));
-            if (State.ShowModNotifications) ShowHudNotification(invalidFcNotif);
-            ShowHudNotification(invalidFcNotif);
-        }
-    }
     AmongUsClient_OnPlayerJoined(__this, data, method);
 }
 

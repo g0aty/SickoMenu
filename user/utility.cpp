@@ -1518,7 +1518,6 @@ float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2)
 }
 
 void ShowHudNotification(std::string text) {
-    if (!State.ShowModNotifications) return;
     if (IsInGame() || IsInLobby())
         NotificationPopper_AddDisconnectMessage((NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier), convert_to_string(text), NULL);
 }

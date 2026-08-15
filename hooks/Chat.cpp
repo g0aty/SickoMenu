@@ -496,24 +496,16 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 		if (IsHost() && sourcePlayer != *Game::pLocalPlayer) {
 			std::string lowerMessage = strToLower(message);
 			uint8_t chatterId = sourcePlayer->fields.PlayerId;
-			if (State.Mod_KickStartWords && !IsInGame()) {
+			if (State.SMAC_CheckStartWords && !IsInGame()) {
 				std::string firstWord = lowerMessage.substr(0, lowerMessage.find(' '));
-				for (auto word : State.Mod_StartWords) {
+				for (auto word : State.SMAC_StartWords) {
 					std::string lowerWord = strToLower(word);
 					if (lowerWord.empty()) continue;
-					bool matched = State.Mod_StartWordsStrict ? (lowerMessage.find(lowerWord) != std::string::npos) : (firstWord == lowerWord);
+					bool matched = State.SMAC_StartWordsStrict ? (lowerMessage.find(lowerWord) != std::string::npos) : (firstWord == lowerWord);
 					if (matched) {
-						std::string chatterFc = (GetPlayerData(sourcePlayer) != NULL && GetPlayerData(sourcePlayer)->fields.FriendCode != NULL) ? convert_from_string(GetPlayerData(sourcePlayer)->fields.FriendCode) : "";
-						bool chatterWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), chatterFc) != State.WhitelistFriendCodes.end();
-						if (!(State.Mod_StartWordsIgnoreWhitelist && chatterWhitelisted) &&
-							++State.Mod_StartWordsCount[chatterId] >= State.Mod_StartWordsThreshold) {
-							InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), sourcePlayer->fields._.OwnerId, State.Mod_StartWordsBanInstead, NULL);
-							auto startWordEvt = GetEventPlayerControl(sourcePlayer);
-							if (startWordEvt.has_value()) {
-								std::string startWordNotif = startWordEvt->playerName + " was " + (State.Mod_StartWordsBanInstead ? "banned" : "kicked") + " for saying a banned start word (" + word + ")";
-								State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(startWordEvt.value(), startWordNotif));
-								if (State.ShowModNotifications) ShowHudNotification(startWordNotif);
-							}
+						if (++State.SMAC_StartWordsCount[chatterId] >= State.SMAC_StartWordsThreshold) {
+							SMAC_OnCheatDetected(sourcePlayer, "Start Word: " + word);
+							State.SMAC_StartWordsCount[chatterId] = 0;
 						}
 						break;
 					}
