@@ -5,11 +5,11 @@
 <h1 align="center">👺 SickoMenu v4.5.2</h1>
 
 <p align="center">
-  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen&label=Latest%20Release" alt="Latest Release"></a>
-  <a href="https://github.com/g0aty/SickoMenu/stargazers"><img src="https://img.shields.io/github/stars/g0aty/SickoMenu?style=flat&color=red&label=Stars"></a>
-  <a href="https://github.com/g0aty/SickoMenu/network/members"><img src="https://img.shields.io/github/forks/g0aty/SickoMenu?style=flat&color=red&label=Forks"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/g0aty/SickoMenu?style=flat&color=orange&label=Licence"></a>
-  <a href="https://discord.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat&logo=discord&logoColor=blue"></a>
+  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=plastic&color=brightgreen&label=Latest%20Release"></a>
+  <a href="https://github.com/g0aty/SickoMenu/stargazers"><img src="https://img.shields.io/github/stars/g0aty/SickoMenu?style=plastic&color=red&label=Stars"></a>
+  <a href="https://github.com/g0aty/SickoMenu/network/members"><img src="https://img.shields.io/github/forks/g0aty/SickoMenu?style=plastic&color=red&label=Forks"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/g0aty/SickoMenu?style=plastic&color=orange&label=Licence"></a>
+  <a href="https://discord.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=plastic&logo=discord&logoColor=blue"></a>
 </p>
 
 A powerful utility for Among Us designed to enrich your game experience with custom features!
@@ -294,11 +294,11 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 | Action                    | Key              |
 |---------------------------|------------------|
 | Show Menu                 | `DELETE` or `COMMAND ⌘ + BACKSPACE` or `FN + BACKSPACE`        |
-| Show Radar                | `INSERT` or `FN + ENTER` or `FN + RETURN`        |
-| Show Console              | `HOME` or `FN + LEFT-ARROW`           |
-| Show Replay               | `END` or `FN + RIGHT-ARROW`            |
-| Repair Sabotage           | `PAGE DOWN` or `FN + DOWN-ARROW`      |
-| NoClip                    | `CTRL` or `COMMAND ⌘`           |
+| Show Radar                | `INSERT`        |
+| Show Console              | `HOME`           |
+| Show Replay               | `END`            |
+| Repair Sabotage           | `PAGE DOWN`      |
+| NoClip                    | `CTRL`           |
 | Panic / Disable SickoMenu | `PAUSE/BREAK`    |
 
 Hotkeys can be customized in-game under **Settings → Keybinds**.
@@ -337,7 +337,7 @@ Contributions are welcome and appreciated!
    ```
 6. Open a Pull Request
 
-> [!NOTE]
+> [!TIP]
 > - Keep your changes focused and well-described  
 > - Documentation and README improvements are always welcome  
 > - For larger features or big changes, consider discussing them in the [Discord](https://discord.gg/sickos) first
