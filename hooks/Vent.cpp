@@ -44,7 +44,7 @@ void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 		}
 		if (State.confuser && State.confuseOnVent && pc == *Game::pLocalPlayer)
 			ControlAppearance(true);
-		}
+	}
 	Vent_EnterVent(__this, pc, method);
 }
 
