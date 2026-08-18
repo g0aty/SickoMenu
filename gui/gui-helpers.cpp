@@ -2,6 +2,7 @@
 #include "gui-helpers.hpp"
 #include "keybinds.h"
 #include "state.hpp"
+#include "utility.h"
 #include "game.h"
 #include "logger.h"
 #include "DirectX.h"

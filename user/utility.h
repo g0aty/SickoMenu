@@ -37,10 +37,11 @@ enum class RoleType {
 	Noisemaker = 4,
 	Tracker = 5,
 	Detective = 6,
-	Impostor = 7,
-	Shapeshifter = 8,
-	Phantom = 9,
-	Viper = 10
+	Judge = 7,
+	Impostor = 8,
+	Shapeshifter = 9,
+	Phantom = 10,
+	Viper = 11
 };
 
 struct RoleColor {
@@ -67,6 +68,8 @@ public:
 	int EngineerChance = 0;
 	int DetectiveCount = 0;
 	int DetectiveChance = 0;
+	int JudgeCount = 0;
+	int JudgeChance = 0;
 	int GuardianAngelCount = 0;
 	int GuardianAngelChance = 0;
 	int MaxCrewmates = Game::MAX_PLAYERS;

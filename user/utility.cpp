@@ -52,6 +52,7 @@ RoleRates::RoleRates(const class GameOptions& gameOptions, int playerAmount) {
     GET_ROLE_RATE(Tracker);
     GET_ROLE_RATE(Detective);
     GET_ROLE_RATE(Noisemaker);
+    GET_ROLE_RATE(Judge);
     GET_ROLE_RATE(Shapeshifter);
     GET_ROLE_RATE(Phantom);
     GET_ROLE_RATE(Viper);
@@ -79,6 +80,8 @@ int RoleRates::GetRoleCount(RoleTypes__Enum role) {
         return this->NoisemakerCount;
     case RoleTypes__Enum::Detective:
         return this->DetectiveCount;
+    case RoleTypes__Enum::Judge:
+        return this->JudgeCount;
     case RoleTypes__Enum::GuardianAngel:
         return this->GuardianAngelCount;
     case RoleTypes__Enum::Crewmate:
@@ -151,6 +154,12 @@ void RoleRates::SubtractRole(RoleTypes__Enum role) {
         if (this->DetectiveCount < 1)
             return;
         this->DetectiveCount--;
+    }
+    else if (role == RoleTypes__Enum::Judge)
+    {
+        if (this->JudgeCount < 1)
+            return;
+        this->JudgeCount--;
     }
     /*else if (role == RoleTypes__Enum::GuardianAngel)
     {
@@ -1317,8 +1326,6 @@ bool PlayerHasPermission(PlayerControl* pc, const std::string& commandKey) {
     return FriendCodeHasPermission(convert_from_string(pd->fields.FriendCode), commandKey);
 }
 
-static std::string strToLower(std::string str); 
-
 int FindColorIdByName(const std::string& lowerName) {
     static const std::vector<std::string> COLOR_NAMES = { "red", "blue", "green", "pink", "orange", "yellow", "black", "white", "purple", "brown", "cyan", "lime", "maroon", "rose", "banana", "gray", "tan", "coral" };
     for (size_t i = 0; i < COLOR_NAMES.size(); i++) if (COLOR_NAMES[i] == lowerName) return (int)i;
@@ -1453,6 +1460,10 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
         c = GetColorFromImVec4(State.ViperColor);
         break;
     }
+    case RoleTypes__Enum::Judge: {
+        c = GetColorFromImVec4(State.JudgeColor);
+        break;
+    }
     default: {
         c = GetColorFromImVec4(State.CrewmateColor);
         break;
@@ -1505,6 +1516,8 @@ std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = fals
         return (abbreviated ? "Det" : (localized ? fullRoleName : "Detective"));
     case RoleTypes__Enum::Viper:
         return (abbreviated ? "Vip" : (localized ? fullRoleName : "Viper"));
+    case RoleTypes__Enum::Judge:
+        return (abbreviated ? "Jdg" : (localized ? fullRoleName : "Judge"));
     default:
         // LOG_DEBUG(std::format("{}", (int)roleBehaviour->fields.Role));
         return (abbreviated ? "Unk" : "Unknown");
@@ -1539,6 +1552,9 @@ RoleTypes__Enum GetRoleTypesEnum(RoleType role)
     }
     else if (role == RoleType::Detective) {
         return RoleTypes__Enum::Detective;
+    }
+    else if (role == RoleType::Judge) {
+        return RoleTypes__Enum::Judge;
     }
     return RoleTypes__Enum::Crewmate;
 }
@@ -2335,7 +2351,7 @@ void SendKillImmuneToggle(bool enabled) {
     // we use a custom vent id that isn't on any map
     // (67 in this case, 50 is used on Hydra) for this exploit
 
-    if (!IsInGame()) return;
+    if (!IsInGame() || *Game::pShipStatus == NULL) return;
     if (*Game::pLocalPlayer == NULL || (*Game::pLocalPlayer)->fields.MyPhysics == NULL) return;
 
     State.rpcQueue.push(new SendKillImmunity(enabled, 67));

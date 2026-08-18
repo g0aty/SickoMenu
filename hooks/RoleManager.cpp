@@ -26,6 +26,7 @@ void dRoleManager_SelectRoles(RoleManager* __this, MethodInfo* method) {
 	AssignRoles(roleRates, roleRates.TrackerChance, RoleTypes__Enum::Tracker, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.NoisemakerChance, RoleTypes__Enum::Noisemaker, allPlayers, assignedPlayers);
 	AssignRoles(roleRates, roleRates.DetectiveChance, RoleTypes__Enum::Detective, allPlayers, assignedPlayers);
+	AssignRoles(roleRates, roleRates.JudgeChance, RoleTypes__Enum::Judge, allPlayers, assignedPlayers);
 	if (options.GetGameMode() == GameModes__Enum::HideNSeek) {
 		AssignRoles(roleRates, 100, RoleTypes__Enum::Engineer, allPlayers, assignedPlayers);
 	}

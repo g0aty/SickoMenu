@@ -116,7 +116,7 @@ namespace HostTab {
             app::RoleTypes__Enum::GuardianAngel, app::RoleTypes__Enum::Shapeshifter,
             app::RoleTypes__Enum::Noisemaker, app::RoleTypes__Enum::Phantom,
             app::RoleTypes__Enum::Tracker, app::RoleTypes__Enum::Detective,
-            app::RoleTypes__Enum::Viper
+            app::RoleTypes__Enum::Viper, RoleTypes__Enum::Judge
         };
         for (auto role : roles) {
             Settings::RolePreset rp;
@@ -184,6 +184,7 @@ namespace HostTab {
                                 {"Noisemaker",		State.NoisemakerColor},
                                 {"Tracker",			State.TrackerColor},
                                 {"Detective",		State.DetectiveColor},
+                                {"Judge",		    State.JudgeColor},
                                 {"Impostor",		State.ImpostorColor},
                                 {"Shapeshifter",	State.ShapeshifterColor},
                                 {"Phantom",			State.PhantomColor},
@@ -196,6 +197,7 @@ namespace HostTab {
                                 State.trackers_amount = (int)GetRoleCount(RoleType::Tracker);
                                 State.noisemakers_amount = (int)GetRoleCount(RoleType::Noisemaker);
                                 State.detectives_amount = (int)GetRoleCount(RoleType::Detective);
+                                State.judges_amount = (int)GetRoleCount(RoleType::Detective);
                                 State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
                                 State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
                                 State.vipers_amount = (int)GetRoleCount(RoleType::Viper);
@@ -239,6 +241,8 @@ namespace HostTab {
                                         State.assignedRoles[index] = RoleType::Engineer;
                                     else if (State.assignedRoles[index] == RoleType::Scientist)
                                         State.assignedRoles[index] = RoleType::Engineer;
+                                    else if (State.assignedRoles[index] == RoleType::Judge)
+                                        State.assignedRoles[index] = RoleType::Engineer;
                                     else if (State.assignedRoles[index] == RoleType::Crewmate)
                                         State.assignedRoles[index] = RoleType::Engineer;
                                     else if (State.assignedRoles[index] == RoleType::Engineer) // what?! lmao (see line 98)
@@ -255,6 +259,7 @@ namespace HostTab {
                                     SetRoleAmount(RoleTypes__Enum::Tracker, State.trackers_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Noisemaker, State.noisemakers_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Detective, State.detectives_amount, options);
+                                    SetRoleAmount(RoleTypes__Enum::Judge, State.judges_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Shapeshifter, State.shapeshifters_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Phantom, State.phantoms_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Viper, State.vipers_amount, options);

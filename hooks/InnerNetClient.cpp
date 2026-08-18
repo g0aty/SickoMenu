@@ -77,6 +77,8 @@ static void onGameEnd() {
         State.RealRole = RoleTypes__Enum::Crewmate;
         State.mapType = Settings::MapType::Ship;
         State.SpeedrunTimer = 0.f;
+        State.GameModeDurationTimer = 0.f;
+        State.GameModeDurationOver = false;
         autoStartedGame = false;
         State.ChatFocused = false;
 
@@ -96,6 +98,8 @@ static void onGameEnd() {
         State.tournamentCorrectCallers.clear();
         State.tournamentAllTasksCompleted.clear();
         State.SpeedrunOver = false;
+
+        State.VoteImmunePlayers.clear();
 
         drawing_t& instance = Esp::GetDrawing();
         synchronized(instance.m_DrawingMutex) {
@@ -1641,6 +1645,14 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
             auto it = std::find(State.spamRandomVentTpPlayers.begin(), State.spamRandomVentTpPlayers.end(), playerId);
             if (it != State.spamRandomVentTpPlayers.end())
                 State.spamRandomVentTpPlayers.erase(it);
+
+            auto voteIt = std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), playerId);
+            if (voteIt != State.VoteImmunePlayers.end()) {
+                State.VoteImmunePlayers.erase(voteIt);
+
+                if (State.VoteRedirectTargets.find(playerId) != State.VoteRedirectTargets.end())
+                    State.VoteRedirectTargets.erase(playerId);
+            }
 
             if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                 synchronized(Replay::replayEventMutex) {

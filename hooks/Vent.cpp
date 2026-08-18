@@ -60,7 +60,7 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 	}
 
 	auto ret = Vent_ExitVent(__this, pc, method);
-	if (!State.PanicMode && State.KillImmunity) SendKillImmuneToggle(true);
+	if (!State.PanicMode && State.KillImmunity && pc == *Game::pLocalPlayer) SendKillImmuneToggle(true);
 	return ret;
 }
 

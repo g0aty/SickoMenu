@@ -776,10 +776,10 @@ namespace PlayersTab {
                     }
                 }
 
-                if (IsHost() && IsInGame() && selectedPlayers.size() == 1) {
+                if (IsHost() && selectedPlayers.size() == 1) {
                     auto pid = selectedPlayer.get_PlayerData()->fields.PlayerId;
                     bool isVoteImmune = std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), pid) != State.VoteImmunePlayers.end();
-                    if (AnimatedButton(isVoteImmune ? "Remove Vote Immunity" : "Vote Immune")) {
+                    if (AnimatedButton(isVoteImmune ? "Remove Vote Immunity" : "Give Vote Immunity")) {
                         if (isVoteImmune) {
                             State.VoteImmunePlayers.erase(std::remove(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), pid), State.VoteImmunePlayers.end());
                             State.VoteRedirectTargets.erase(pid);

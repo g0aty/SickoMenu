@@ -745,7 +745,7 @@ namespace SelfTab {
 
             if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale)) {
                 // for some reason, detective is 12 (0x0c) instead of 11, and viper is 18 (0x12) instead of 12
-                if (State.FakeRole == 12) State.FakeRoleId = State.FakeRole + 6;
+                if (State.FakeRole >= 12) State.FakeRoleId = State.FakeRole + 6;
                 else if (State.FakeRole == 11) State.FakeRoleId = State.FakeRole + 1;
                 else State.FakeRoleId = State.FakeRole;
                 State.Save();
@@ -781,6 +781,13 @@ namespace SelfTab {
             case (int)RoleTypes__Enum::CrewmateGhost:
             case (int)RoleTypes__Enum::ImpostorGhost:
             case (int)RoleTypes__Enum::GuardianAngel:
+                roleAllowed = true;
+                break;
+            case (int)RoleTypes__Enum::Judge:
+                if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Judge) {
+                    roleAllowed = false;
+                    break;
+                }
                 roleAllowed = true;
                 break;
             case (int)RoleTypes__Enum::Impostor:

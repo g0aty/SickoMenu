@@ -398,6 +398,13 @@ public:
     bool RotateEveryone = false;
     bool RotateServerSide = false;
     bool RelativeTeleport = false;
+    std::string Mod_SickoSocials = "";
+    std::queue<std::string> Mod_PendingRulesMessages;
+    float Mod_PendingRulesDelay = 0.f;
+    std::vector<std::string> Mod_RoleNames = {};
+    std::vector<std::vector<std::string>> Mod_RoleMembers = {};
+    std::vector<std::map<std::string, bool>> Mod_RolePermissions = {};
+    std::vector<int> Mod_RoleRank = {};
     bool SpamVentTpEveryone = false;
     bool SpamVentTpEveryoneRandom = false;
     bool IgnoreVentTpSelf = false;
@@ -465,6 +472,7 @@ public:
     int trackers_amount = 0;
     int noisemakers_amount = 0;
     int detectives_amount = 0;
+    int judges_amount = 0;
     int crewmates_amount = 0;
 
     bool Wallhack = false;
@@ -517,6 +525,7 @@ public:
     ImVec4 PhantomColor = ImVec4(0.53f, 0.f, 0.f, 1.f);
     ImVec4 DetectiveColor = ImVec4(0.39f, 0.735f, 1.f, 1.f);
     ImVec4 ViperColor = ImVec4(1.f, 1.f, 0.f, 1.f);
+    ImVec4 JudgeColor = ImVec4(0.f, 0.6f, 0.345f, 1.f);
 
     ImVec4 HostColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
     ImVec4 PlayerIdColor = ImVec4(1.f, 0.f, 0.f, 1.f);
@@ -728,6 +737,11 @@ public:
     bool SMAC_CheckBadWords = true;
     std::vector<std::string> SMAC_BadWords = {};
     bool SMAC_CheckFriendcode = true;
+    bool SMAC_CheckStartWords = false;
+    bool SMAC_StartWordsStrict = true;
+    int SMAC_StartWordsThreshold = 1;
+    std::vector<std::string> SMAC_StartWords = {};
+    std::map<uint8_t, int> SMAC_StartWordsCount;
 
     std::vector<std::string> ChatPresets = {};
 

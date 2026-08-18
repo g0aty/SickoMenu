@@ -530,6 +530,10 @@ void Settings::Load() {
         JSON_TRYGET("ViperColor_G", this->ViperColor.y);
         JSON_TRYGET("ViperColor_B", this->ViperColor.z);
         JSON_TRYGET("ViperColor_A", this->ViperColor.w);
+        JSON_TRYGET("JudgeColor_R", this->JudgeColor.x);
+        JSON_TRYGET("JudgeColor_G", this->JudgeColor.y);
+        JSON_TRYGET("JudgeColor_B", this->JudgeColor.z);
+        JSON_TRYGET("JudgeColor_A", this->JudgeColor.w);
 
         JSON_TRYGET("HostColor_R", this->HostColor.x);
         JSON_TRYGET("HostColor_G", this->HostColor.y);
@@ -1149,6 +1153,10 @@ void Settings::Save() {
                 { "ViperColor_G", this->ViperColor.y },
                 { "ViperColor_B", this->ViperColor.z },
                 { "ViperColor_A", this->ViperColor.w },
+                { "JudgeColor_R", this->JudgeColor.x },
+                { "JudgeColor_G", this->JudgeColor.y },
+                { "JudgeColor_B", this->JudgeColor.z },
+                { "JudgeColor_A", this->JudgeColor.w },
                 { "HostColor_R", this->HostColor.x },
                 { "HostColor_G", this->HostColor.y },
                 { "HostColor_B", this->HostColor.z },
