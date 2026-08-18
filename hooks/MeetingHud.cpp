@@ -53,6 +53,7 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
         State.validDeadBodyIds.clear(); // since dead bodies are cleared every meeting
         State.InMeeting = true;
         Camera_set_orthographicSize(State.FollowerCam, 3.f, NULL); // reset camera height to show the meeting caller/dead body
+        Camera_set_orthographicSize(Game::HudManager.GetInstance()->fields.UICamera, 3.f, NULL);
         static std::string strVoteSpreaderType = translate_type_name("VoteSpreader, Assembly-CSharp");
         voteSpreaderType = app::Type_GetType(convert_to_string(strVoteSpreaderType), nullptr);
         if (State.confuser && State.confuseOnMeeting && !State.PanicMode)
@@ -69,6 +70,7 @@ void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_Close executed", false);
     try {
         State.BlinkPlayersTab = true;
+        State.InExileUI = true;
         State.InMeeting = false;
         calloutOver = false;
         if (IsHost() && State.TournamentMode && !State.tournamentFirstMeetingOver) State.tournamentFirstMeetingOver = true;

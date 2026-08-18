@@ -71,14 +71,14 @@ static void onGameEnd() {
         State.spamRandomVentTpPlayers.clear();
         State.spamVentTpPlayers.clear();
         State.VoteKicks = 0;
-        State.OutfitCooldown = 50;
+        State.OutfitCooldown = GetFps();
         State.CanChangeOutfit = false;
         State.GameLoaded = false;
         State.RealRole = RoleTypes__Enum::Crewmate;
         State.mapType = Settings::MapType::Ship;
         State.SpeedrunTimer = 0.f;
-        State.ChatFocused = false;
         autoStartedGame = false;
+        State.ChatFocused = false;
 
         State.VoteOffPlayerId = Game::HasNotVoted;
 
@@ -125,6 +125,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (!IsInLobby()) {
                 State.LobbyTimer = 600.f;
                 State.JoinedAsHost = false;
+                State.JoinedLobby = false;
             }
 
             if (!IsInGame()) {
@@ -1378,7 +1379,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         MessageWriter_StartMessage(writer, rpcFlag, NULL);
                         MessageWriter_WritePacked(writer, (*Game::pLocalPlayer)->fields._.NetId, NULL);
                         MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::MurderPlayer, NULL);
-                        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)(*Game::pLocalPlayer), NULL);
+                        MessageWriter_WriteInt32(writer, 0, NULL);
                         MessageWriter_WriteInt32(writer, (int32_t)MurderResultFlags__Enum::Succeeded, NULL);
                         MessageWriter_EndMessage(writer, NULL);
                     }
@@ -1458,27 +1459,45 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     }
 
     if (State.FollowerCam != nullptr && State.shadowCollab != nullptr) {
-        auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
+        auto hud = Game::HudManager.GetInstance();
+        auto chatState = hud->fields.Chat->fields.state;
         bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
+        auto fullScreen = hud->fields.FullScreen;
+        Color fullScreenCol = fullScreen != NULL ? SpriteRenderer_get_color(fullScreen, NULL) : Color(1.f, 1.f, 1.f, 0.f);
+        bool isFullScreenActive = fullScreen != NULL &&
+            fullScreenCol.r == 0.f && fullScreenCol.g == 0.f && fullScreenCol.b == 0.f &&
+            GameObject_GetActive(Component_get_gameObject((Component_1*)fullScreen, NULL), NULL);
         float oldCamHeight = Camera_get_orthographicSize(State.FollowerCam, NULL);
-        float camHeight = (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) ?
+        // State.EnableZoom_ResolutionSetFlag = false;
+        bool shouldEnableZoom = (!State.InMeeting && !State.InExileUI && !chatOpen && !isFullScreenActive &&
+            (State.GameLoaded || (IsInLobby() && State.LobbyTimer <= 600.f - (Time_get_deltaTime(NULL) * 20) )) && !State.PanicMode);
+        // from my testing, deltaTime * 20 doesn't cause UI bugs in the lobby
+        float camHeight = shouldEnableZoom && State.EnableZoom ?
             (State.CameraHeight * 3) : 3.f;
 
         float del = camHeight - oldCamHeight;
-        float step = std::abs(del) * Time_get_deltaTime(NULL) * 10;
+        float step = std::abs(del) * Time_get_deltaTime(NULL) * 12;
 
         float newCamHeight = 0.f;
-        if (!State.EnableZoom_SmoothZoom) newCamHeight = camHeight;
+        float precision = 1e-6f;
+
+        if (!State.EnableZoom_SmoothZoom || !shouldEnableZoom) newCamHeight = camHeight;
         else if (del < 0.f) newCamHeight = (std::max)(camHeight, oldCamHeight - step);
         else if (del > 0.f) newCamHeight = (std::min)(camHeight, oldCamHeight + step);
 
-        if (del != 0.f) {
+        if (std::abs(del) > precision) { // minimize floating point errors
+            State.HasRefreshedUI = false;
             Camera_set_orthographicSize(State.FollowerCam, newCamHeight, NULL);
-
+            // State.EnableZoom_PreResolutionSetCamHeight = newCamHeight;
             float aspect = Camera_get_aspect(State.FollowerCam, NULL);
             Camera_set_orthographicSize(State.shadowCollab->fields.ShadowCamera, newCamHeight, NULL);
+            Camera_set_orthographicSize(hud->fields.UICamera, newCamHeight, NULL);
             auto shadowQuadTransform = Component_get_transform((Component_1*)State.shadowCollab->fields.ShadowQuad, NULL);
             Transform_set_localScale(shadowQuadTransform, { newCamHeight * aspect * 2.f, newCamHeight * 2.f, 0.f }, NULL);
+            // rescale most UI elements accordingly (done in KeyboardJoystick.cpp)
+        }
+        else if (!State.HasRefreshedUI) {
+            State.HasRefreshedUI = true;
         }
 
         /*if (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting

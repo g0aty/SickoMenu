@@ -1236,3 +1236,34 @@ AudioSource* dSoundManager_PlaySound(SoundManager* __this, AudioClip* clip, bool
 	if (State.BetterMessageSounds && State.MessageSound != NULL && clip == State.MessageSound) volume = 0.f;
 	return SoundManager_PlaySound(__this, clip, loop, volume, audioMixer, method);
 }
+
+void dChatController_Toggle(ChatController* __this, MethodInfo* method) {
+	auto hud = Game::HudManager.GetInstance();
+	auto chatState = hud->fields.Chat->fields.state;
+	bool isOpenOrOpening = chatState == ChatControllerState__Enum::Open ||
+		chatState == ChatControllerState__Enum::Opening;
+
+	if (State.FollowerCam != NULL && Camera_get_orthographicSize(State.FollowerCam, NULL) != 3.f &&
+		!isOpenOrOpening) {
+		Camera_set_orthographicSize(State.FollowerCam, 3.f, NULL);
+		Camera_set_orthographicSize(Game::HudManager.GetInstance()->fields.UICamera, 3.f, NULL);
+		State.HasRefreshedUI = false;
+	}
+
+	if (isOpenOrOpening) {
+		auto hudGameObject = Component_get_gameObject((Component_1*)Game::HudManager.GetInstance(), NULL);
+		auto fullScreen = hud->fields.FullScreen;
+		Color fullScreenCol = fullScreen != NULL ? SpriteRenderer_get_color(fullScreen, NULL) : Color(1.f, 1.f, 1.f, 0.f);
+		bool isFullScreenActive = fullScreen != NULL &&
+			fullScreenCol.r == 0.f && fullScreenCol.g == 0.f && fullScreenCol.b == 0.f &&
+			GameObject_GetActive(Component_get_gameObject((Component_1*)fullScreen, NULL), NULL);
+		bool shouldEnableZoom = (!State.InMeeting && !State.InExileUI && !isFullScreenActive && (State.GameLoaded || IsInLobby()) && !State.PanicMode);
+
+		if (hudGameObject != NULL && isOpenOrOpening && shouldEnableZoom) {
+			GameObject_SetActive(hudGameObject, false, NULL);
+			GameObject_SetActive(hudGameObject, true, NULL);
+			// restore the HUD after closing the chat UI
+		}
+	}
+	ChatController_Toggle(__this, method);
+}

@@ -384,6 +384,8 @@ public:
     bool ShowEsp_Imp = true;
 
     bool InMeeting = false;
+    bool InExileUI = false;
+    bool HasRefreshedUI = false;
     bool PlayMedbayScan = false;
     bool PlayWeaponsAnimation = false;
 
@@ -476,6 +478,8 @@ public:
     bool EnableZoom_ScrollZoom = true;
     bool EnableZoom_SmoothZoom = true;
     bool EnableZoom_ShowShadows = false;
+    bool EnableZoom_ResolutionSetFlag = false;
+    float EnableZoom_PreResolutionSetCamHeight = 3.f;
 
     VersionShower* versionShower = nullptr;
     std::string versionShowerDefaultText = "";
@@ -570,6 +574,7 @@ public:
     float LobbyTimer = 600.f;
     bool ShowLobbyTimer = false;
     bool SpamMovingPlatform = false;
+    bool JoinedLobby = false;
     bool JoinedAsHost = false;
     float ChatCooldown = 0.f;
     bool MessageSent = false;

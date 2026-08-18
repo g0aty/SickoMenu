@@ -138,8 +138,9 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
         if (IsInGame() || IsInLobby()) {
             auto localData = GetPlayerData(*Game::pLocalPlayer);
             GameObject* shadowLayerObject = Component_get_gameObject((Component_1*)__this->fields.ShadowQuad, NULL);
-            bool showZoomShadows = !State.EnableZoom || State.EnableZoom_ShowShadows;
-            bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || !showZoomShadows/* || State.playerToFollow.has_value()*/ || State.Wallhack || (State.MaxVision && IsInLobby())))
+            float camHeight = State.FollowerCam == NULL ? 3.f : Camera_get_orthographicSize(State.FollowerCam, NULL);
+            bool hideZoomShadows = State.EnableZoom && !State.EnableZoom_ShowShadows;
+            bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || hideZoomShadows || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby())))
                 && (localData != NULL && !localData->fields.IsDead);
             if (shadowLayerObject != NULL)
                 GameObject_SetActive(shadowLayerObject, shouldShowShadowQuad, NULL);
@@ -148,6 +149,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                 return;
             }
 
+            static int initialOutfitCooldown = 0;
             if (State.OutfitCooldown == 0) {
                 if (State.PanicMode && State.TempPanicMode) {
                     State.PanicMode = false;
@@ -164,14 +166,15 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                     (*Game::pLocalPlayer)->fields.moveable = false;
                     InnerNetClient_DisconnectInternal((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
                     InnerNetClient_EnqueueDisconnect((InnerNetClient*)(*Game::pAmongUsClient), DisconnectReasons__Enum::Sanctions, convert_to_string(rofl), NULL);
-                    State.OutfitCooldown = 50;
+                    State.OutfitCooldown = GetFps();
+                    initialOutfitCooldown = State.OutfitCooldown;
                     if (State.PanicMode && State.TempPanicMode) {
                         State.PanicMode = false;
                         State.TempPanicMode = false;
                     }
                 }
             }
-            else if (State.OutfitCooldown == 25) {
+            else if (State.OutfitCooldown == (int)(initialOutfitCooldown / 2)) {
                 if (State.PanicMode && State.TempPanicMode) {
                     State.PanicMode = false;
                     State.TempPanicMode = false;
@@ -218,7 +221,6 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                     {
                         auto playerInfo = GetPlayerData(player);
                         if (!playerInfo) break; //This happens sometimes during loading
-
 
                         if ((!IsInLobby()) && !State.PanicMode && State.KillImpostors && !playerInfo->fields.IsDead && amImpostor)
                             playerInfo->fields.Role->fields.CanBeKilled = true;
@@ -317,20 +319,22 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
 
 void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPingTracker_Update executed", false);
-    __this->fields.gamePos.x = 0.f, __this->fields.lobbyPos.x = -0.09f; // Make the PingTracker actually look centered
+    __this->fields.gamePos.x = 0.f, __this->fields.lobbyPos.x = 0.f; // Make the PingTracker actually look centered
     bool isFreeplay = ((InnerNetClient*)(*Game::pAmongUsClient))->fields.NetworkMode == NetworkModes__Enum::FreePlay;
     app::PingTracker_Update(__this, method);
     float initialYdist = IsInGame() ? __this->fields.gamePos.y : __this->fields.lobbyPos.y;
-    float camHeight = State.FollowerCam == NULL ? 3.f : Camera_get_orthographicSize(State.FollowerCam, NULL);
-    if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y = initialYdist + 3 * (camHeight - 1);
+    // float camHeight = State.FollowerCam == NULL ? 3.f : Camera_get_orthographicSize(State.FollowerCam, NULL);
+    // if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y = initialYdist;
     app::TMP_Text_set_alignment((app::TMP_Text*)__this->fields.text, app::TextAlignmentOptions__Enum::Top, nullptr);
     if (isFreeplay) {
-        GameObject_SetActive(Component_get_gameObject((Component_1*)__this, NULL), true, NULL);
+        auto obj = (GameObject*)Component_get_gameObject((Component_1*)__this, NULL);
+        if (!GameObject_GetActive(obj, NULL))
+            GameObject_SetActive(obj, true, NULL);
         if ((State.PanicMode && !State.TempPanicMode) || State.OldStylePingText)
             return app::TMP_Text_set_text((app::TMP_Text*)__this->fields.text, convert_to_string(""), nullptr);
         else {
             __this->fields.aspectPosition->fields.DistanceFromEdge = __this->fields.gamePos;
-            if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y = initialYdist + 3 * (camHeight - 1);
+            // if (!State.PanicMode && State.EnableZoom) __this->fields.aspectPosition->fields.DistanceFromEdge.y = initialYdist;
         }
     }
     try {
@@ -341,7 +345,10 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
                 float xOffset = aspectRatio * 2.925f - 2.7f;
 
                 Vector3 oldDistFromEdge = Vector3(xOffset, 5.9f, 0.f);
-                if (!State.PanicMode && State.EnableZoom) oldDistFromEdge.y = initialYdist + 3 * (camHeight - 1);
+                float camHeight = State.FollowerCam != NULL ? Camera_get_orthographicSize(State.FollowerCam, NULL) / 3.f : 1.f;
+                // if (!State.PanicMode && State.EnableZoom)
+                oldDistFromEdge.x *= camHeight * (camHeight * 0.425f + 0.575f);
+                oldDistFromEdge.y *= camHeight;
                 __this->fields.aspectPosition->fields.DistanceFromEdge = oldDistFromEdge;
             }
             std::string sep = State.OldStylePingText ? "\n" : " • ";
@@ -549,6 +556,14 @@ void dProgressTracker_FixedUpdate(ProgressTracker* __this, MethodInfo* method) {
 
 void dHideAndSeekTimerBar_Update(HideAndSeekTimerBar* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dHideAndSeekTimerBar_Update executed", false);
+
+    auto gameObject = Component_get_gameObject((Component_1*)__this, NULL);
+    if (gameObject != NULL && !State.HasRefreshedUI) {
+        // update the timer bar according to the camera zoom
+        GameObject_SetActive(gameObject, false, NULL);
+        GameObject_SetActive(gameObject, true, NULL);
+    }
+
     HideAndSeekTimerBar_Update(__this, method);
 
     auto barTransform = Component_get_transform((Component_1*)__this, NULL);
@@ -606,4 +621,17 @@ void dPassiveButton_ReceiveClickUp(PassiveButton* __this, MethodInfo* method) {
 void dPassiveButton_ReceiveMouseOver(PassiveButton* __this, MethodInfo* method) {
     if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
     PassiveButton_ReceiveMouseOver(__this, method);
+}
+
+void dMapBehaviour_FixedUpdate(MapBehaviour* __this, MethodInfo* method) {
+    MapBehaviour_FixedUpdate(__this, method);
+}
+
+void dRoomTracker_FixedUpdate(RoomTracker* __this, MethodInfo* method) {
+    RoomTracker_FixedUpdate(__this, method);
+}
+
+void ColorRoomTrackerText(RoomTracker* roomTracker) {
+    // the reason that this isn't done in dRoomTracker_FixedUpdate is because
+    // the slide in/out animations are hardcoded to start with white text
 }

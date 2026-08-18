@@ -4,6 +4,20 @@
 
 void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dKeyboardJoystick_Update executed", false);
+
+    auto hudGameObject = Component_get_gameObject((Component_1*)Game::HudManager.GetInstance(), NULL);
+    auto shadowGameObject = Component_get_gameObject((Component_1*)Game::HudManager.GetInstance()->fields.ShadowQuad, NULL);
+    if (hudGameObject != NULL && !State.HasRefreshedUI) {
+        // this is done here to not disable movement while zooming in/out
+        bool wasShadowQuadActive = shadowGameObject == NULL ? true : GameObject_GetActive(shadowGameObject, NULL);
+
+        GameObject_SetActive(hudGameObject, false, NULL);
+        GameObject_SetActive(hudGameObject, true, NULL);
+
+        if (shadowGameObject != NULL)
+            GameObject_SetActive(shadowGameObject, wasShadowQuadActive, NULL);
+    }
+
     if ((!State.FreeCam && !State.playerToAttach.has_value()) || State.PanicMode) {
         app::KeyboardJoystick_Update(__this, method);
     }

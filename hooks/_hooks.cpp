@@ -283,6 +283,10 @@ void DetourInitilization() {
 	HOOKFUNC(PassiveButton_ReceiveRepeatDown);
 	HOOKFUNC(PassiveButton_ReceiveClickUp);
 	HOOKFUNC(PassiveButton_ReceiveMouseOver);
+	HOOKFUNC(Screen_SetResolution);
+	HOOKFUNC(ChatController_Toggle);
+	HOOKFUNC(MapBehaviour_FixedUpdate);
+	HOOKFUNC(RoomTracker_FixedUpdate);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -480,6 +484,10 @@ void DetourUninitialization()
 	UNHOOKFUNC(PassiveButton_ReceiveRepeatDown);
 	UNHOOKFUNC(PassiveButton_ReceiveClickUp);
 	UNHOOKFUNC(PassiveButton_ReceiveMouseOver);
+	UNHOOKFUNC(Screen_SetResolution);
+	UNHOOKFUNC(ChatController_Toggle);
+	UNHOOKFUNC(MapBehaviour_FixedUpdate);
+	UNHOOKFUNC(RoomTracker_FixedUpdate);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

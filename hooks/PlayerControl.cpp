@@ -1577,13 +1577,11 @@ void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader
 
 void dPlayerControl_CmdCheckVanish(PlayerControl* __this, float maxDuration, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_CmdCheckVanish executed", false);
-    if (!State.PanicMode && State.AnimationlessShapeshift) maxDuration = 0.f;
     PlayerControl_CmdCheckVanish(__this, maxDuration, method);
 }
 
 void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_CmdCheckAppear executed", false);
-    if (!State.PanicMode && State.AnimationlessShapeshift) shouldAnimate = false;
     PlayerControl_CmdCheckAppear(__this, shouldAnimate, method);
 }
 

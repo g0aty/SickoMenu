@@ -110,6 +110,13 @@ public:
 	virtual void Process() override;
 };
 
+class RpcDrainHideTimer : public RPCInterface {
+	float timeToSubtract;
+public:
+	RpcDrainHideTimer(float timeToSubtract);
+	virtual void Process() override;
+};
+
 class RpcForceCompleteTask : public RPCInterface {
 	PlayerControl* Player;
 	uint32_t taskId;

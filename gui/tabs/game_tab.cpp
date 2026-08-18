@@ -771,13 +771,13 @@ namespace GameTab {
 
             if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
 
-            if (!IsInGame() && !IsInLobby()) {
+            /*if (!IsInGame() && !IsInLobby()) {
                 if (ToggleButton("Overflow", &State.Overflow)) {
                     State.Save();
                 }
 
                 if (State.Overflow) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Players who joined a lobby before you are disconnected after 30 seconds"));
-            }
+            }*/
 
             if (State.AprilFoolsMode) {
                 ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? "Diddy Party Mode" : (IsChatCensored() || IsStreamerMode() ? "F***son Mode" : "Fuckson Mode"));

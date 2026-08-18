@@ -46,6 +46,7 @@ DO_APP_FUNC(float, Time_get_deltaTime, (MethodInfo* method), "UnityEngine.CoreMo
 DO_APP_FUNC(float, Time_get_fixedDeltaTime, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_fixedDeltaTime()");
 DO_APP_FUNC(float, Time_get_realtimeSinceStartup, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_realtimeSinceStartup()");
 DO_APP_FUNC(float, Time_get_time, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_time()");
+DO_APP_FUNC(void, Behaviour_set_enabled, (Behaviour* __this, bool value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Behaviour::set_enabled(System.Boolean)");
 
 DO_APP_FUNC(int32_t, Screen_get_width, (MethodInfo* method), "UnityEngine.CoreModule, System.Int32 UnityEngine.Screen::get_width()");
 DO_APP_FUNC(int32_t, Screen_get_height, (MethodInfo* method), "UnityEngine.CoreModule, System.Int32 UnityEngine.Screen::get_height()");
@@ -70,6 +71,7 @@ DO_APP_FUNC(Vector2, DeadBody_get_TruePosition, (DeadBody* __this, MethodInfo* m
 DO_APP_FUNC(void, ViperDeadBody_FixedUpdate, (ViperDeadBody* __this, MethodInfo* method), "Assembly-CSharp, System.Void ViperDeadBody::FixedUpdate()");
 
 DO_APP_FUNC(NetworkedPlayerInfo*, GameData_GetPlayerById, (GameData* __this, uint8_t id, MethodInfo* method), "Assembly-CSharp, NetworkedPlayerInfo GameData::GetPlayerById(System.Byte)");
+DO_APP_FUNC(int32_t, GameData_get_PlayerCount, (GameData* __this, MethodInfo* method), "Assembly-CSharp, System.Int32 GameData::get_PlayerCount()");
 
 DO_APP_FUNC(void, GameObject_SetActive, (GameObject* __this, bool value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.GameObject::SetActive(System.Boolean)");
 DO_APP_FUNC(bool, GameObject_GetActive, (GameObject* __this, MethodInfo* method), "UnityEngine.CoreModule, System.Boolean UnityEngine.GameObject::get_active()");
@@ -179,6 +181,7 @@ DO_APP_FUNC(void, ChatController_AddChatWarning, (ChatController* __this, String
 DO_APP_FUNC(void, ChatController_SetVisible, (ChatController* __this, bool visible, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::SetVisible(System.Boolean)");
 DO_APP_FUNC(void, ChatController_Update, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::Update()");
 DO_APP_FUNC(void, ChatController_UpdateChatMode, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::UpdateChatMode()");
+DO_APP_FUNC(void, ChatController_Toggle, (ChatController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::Toggle()");
 DO_APP_FUNC(void, ChatBubble_SetName, (ChatBubble* __this, String* playerName, bool isDead, bool voted, Color color, MethodInfo* method), "Assembly-CSharp, System.Void ChatBubble::SetName(System.String, System.Boolean, System.Boolean, UnityEngine.Color)");
 
 DO_APP_FUNC(void, AmongUsClient_OnGameJoined, (AmongUsClient* __this, String* gameIdString, MethodInfo* method), "Assembly-CSharp, System.Void AmongUsClient::OnGameJoined(System.String)");
@@ -384,9 +387,11 @@ DO_APP_FUNC(void, ShipStatus_HandleRpc, (ShipStatus* __this, uint8_t callId, Mes
 DO_APP_FUNC(Color, TMP_Text_get_color, (TMP_Text* __this, MethodInfo* method), "Unity.TextMeshPro, UnityEngine.Color TMPro.TMP_Text::get_color()");
 DO_APP_FUNC(void, TMP_Text_set_color, (TMP_Text* __this, Color value, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TMP_Text::set_color(UnityEngine.Color)");
 DO_APP_FUNC(void, TMP_Text_set_outlineColor, (TMP_Text* __this, Color32 value, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TMP_Text::set_outlineColor(UnityEngine.Color32)");
+DO_APP_FUNC(void, TMP_Text_set_fontStyle, (TMP_Text* __this, FontStyles__Enum value, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TMP_Text::set_fontStyle(TMPro.FontStyles)");
 DO_APP_FUNC(void, ChatBubble_SetText, (ChatBubble* __this, String* chatText, MethodInfo* method), "Assembly-CSharp, System.Void ChatBubble::SetText(System.String)");
 DO_APP_FUNC(void, Mushroom_FixedUpdate, (Mushroom* __this, MethodInfo* method), "Assembly-CSharp, System.Void Mushroom::FixedUpdate()");
-DO_APP_FUNC(void, Screen_SetResolution_1, (int32_t width, int32_t height, bool fullscreen, int32_t preferredRefreshRate, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Screen::SetResolution(System.Int32, System.Int32, System.Boolean, System.Int32)");
+DO_APP_FUNC(void, Screen_SetResolution, (int32_t width, int32_t height, bool fullscreen, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Screen::SetResolution(System.Int32, System.Int32, System.Boolean)");
+DO_APP_FUNC(void, ResolutionManager_SetResolution, (int32_t width, int32_t height, bool fullscreen, MethodInfo* method), "Assembly-CSharp, System.Void ResolutionManager::SetResolution(System.Int32, System.Int32, System.Boolean)");
 DO_APP_FUNC(void, GameData_ShowNotification, (GameData* __this, String* playerName, DisconnectReasons__Enum reason, MethodInfo* method), "Assembly-CSharp, System.Void GameData::ShowNotification(System.String, DisconnectReasons)");
 DO_APP_FUNC(void, PlayerControl_CmdCheckVanish, (PlayerControl* __this, float maxDuration, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdCheckVanish(System.Single)");
 DO_APP_FUNC(void, PlayerControl_RpcVanish, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcVanish()");
@@ -476,3 +481,6 @@ DO_APP_FUNC(void, ProgressTracker_FixedUpdate, (ProgressTracker* __this, MethodI
 DO_APP_FUNC(void, HideAndSeekTimerBar_Update, (HideAndSeekTimerBar* __this, MethodInfo* method), "Assembly-CSharp, System.Void HideAndSeekTimerBar::Update()");
 DO_APP_FUNC(void, LobbyInfoPane_Update, (LobbyInfoPane* __this, MethodInfo* method), "Assembly-CSharp, System.Void LobbyInfoPane::Update()");
 DO_APP_FUNC(void, ShadowCollab_OnEnable, (ShadowCollab* __this, MethodInfo* method), "Assembly-CSharp, System.Void ShadowCollab::OnEnable()");
+DO_APP_FUNC(void, MapBehaviour_FixedUpdate, (MapBehaviour* __this, MethodInfo* method), "Assembly-CSharp, System.Void MapBehaviour::FixedUpdate()");
+DO_APP_FUNC(void, RoomTracker_FixedUpdate, (RoomTracker* __this, MethodInfo* method), "Assembly-CSharp, System.Void RoomTracker::FixedUpdate()");
+DO_APP_FUNC(void, LogicGameFlowHnS_AdjustEscapeTimer, (LogicGameFlowHnS* __this, float timeDeduction, bool forceDirty, MethodInfo* method), "Assembly-CSharp, System.Void LogicGameFlowHnS::AdjustEscapeTimer(System.Single, System.Boolean)");

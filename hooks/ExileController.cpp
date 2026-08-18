@@ -11,6 +11,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
     app::ExileController_ReEnableGameplay(__this, method);
 
     try {// ESP: Reset Kill Cooldown
+        State.InExileUI = false;
         for (auto pc : GetAllPlayerControl()) {
             if (auto player = PlayerSelection(pc).validate();
                 player.has_value() && !player.is_LocalPlayer() && !player.is_Disconnected()) {

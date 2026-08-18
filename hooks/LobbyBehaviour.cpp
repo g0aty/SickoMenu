@@ -15,21 +15,10 @@ static std::string getHexCodeFromImVec4(ImVec4 vec) {
 void dLobbyBehaviour_Start(LobbyBehaviour* __this, MethodInfo* method)
 {
     if (State.ShowHookLogs) Log.HookDebug("Hook dLobbyBehaviour_Start executed", false);
-    State.LobbyTimer = 600;
     LobbyBehaviour_Start(__this, method);
-    if (!State.PanicMode && State.AutoApplyCosmeticPreset && !State.CosmeticPresets.empty()) {
-        s_pendingCosmeticApply = true;
-    }
-    if (IsHost()) {
-        State.JoinedAsHost = true;
-        if (!State.PanicMode && State.AutoApplyHostPreset && !State.HostPresets.empty()) {
-            s_pendingApplyHostPresetIndex = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
-        }
-    }
 }
 
-void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
-{
+void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method) {
     static bool hasStarted = true;
     if (State.ShowHookLogs) Log.HookDebug("Hook dLobbyBehaviour_Update executed", false);
     LobbyBehaviour_Update(__this, method);
@@ -40,6 +29,21 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method)
             ApplyCosmeticPreset(State.CosmeticPresets[idx]);
         }
     }
+
+    if (!State.JoinedLobby) {
+        State.JoinedLobby = true;
+        if (!State.PanicMode && State.AutoApplyCosmeticPreset && !State.CosmeticPresets.empty()) {
+            s_pendingCosmeticApply = true;
+        }
+
+        if (IsHost()) {
+            State.JoinedAsHost = true;
+            if (!State.PanicMode && State.AutoApplyHostPreset && !State.HostPresets.empty()) {
+                s_pendingApplyHostPresetIndex = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
+            }
+        }
+    }
+
     if (s_pendingApplyHostPresetIndex >= 0 && IsHost() && (IsInLobby() || IsInGame())) {
         int idx = s_pendingApplyHostPresetIndex;
         s_pendingApplyHostPresetIndex = -1;
@@ -209,27 +213,30 @@ void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
 void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dGameStartManager_Update executed", false);
     try {
-        if (*Game::pLobbyBehaviour != NULL)
-            State.LobbyTimer -= Time_get_deltaTime(NULL);
+        State.LobbyTimer -= Time_get_deltaTime(NULL);
         std::string LobbyCode = convert_from_string(InnerNet_GameCode_IntToGameName((*Game::pAmongUsClient)->fields._.GameId, NULL));
-        if (LobbyCode != "LWQQQQ" && LobbyCode != "QQQQQQ") {
-            int LobbyTime = (int)State.LobbyTimer;
-            std::string lobbyTimeDisplay = "";
+        
+        std::string lobbyTimeDisplay = "";
+        int LobbyTime = (int)State.LobbyTimer;
+        if (LobbyTime >= 0 && LobbyCode != "LWQQQQ" && LobbyCode != "QQQQQQ") {
             if (!State.PanicMode && State.ShowLobbyTimer && IsHost()) {
-                if (LobbyTime < 0)
-                    lobbyTimeDisplay = std::format(" <#0f0>({}0:00)</color>", State.JoinedAsHost ? "" : "~");
-                else if (LobbyTime <= 60)
-                    lobbyTimeDisplay = std::format(" <#f00>({}{}:{}{})</color>", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+                std::string formattedLobbyTime = std::format("{}{}:{}{}", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+                std::string lobbyTimeColor = "<#0f0>";
+                if (LobbyTime <= 60)
+                    lobbyTimeColor = "<#f00>";
                 else if (LobbyTime <= 180)
-                    lobbyTimeDisplay = std::format(" <#ff0>({}{}:{}{})</color>", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
-                else
-                    lobbyTimeDisplay = std::format(" ({}{}:{}{})", State.JoinedAsHost ? "" : "~", int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
+                    lobbyTimeColor = "<#ff0>";
+
+                lobbyTimeDisplay = State.LobbyTimer < 0 ? "" : std::format("\n<size=50%>{}Lobby Closes in{} {}</color></size>",
+                    lobbyTimeColor, State.JoinedAsHost ? ":" : " (approx.):", formattedLobbyTime);
             }
             /*std::string glitchDisplay = "";
             if (!State.PanicMode && State.ShowLobbyInfo) {
                 std::string codeEnding = LobbyCode.substr(LobbyCode.length() - 4);
                 if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " * ";
             }*/
+
+            TMP_Text_set_fontStyle((TMP_Text*)__this->fields.GameRoomNameCode, FontStyles__Enum::Normal, NULL);
 
             if (State.HideCode && IsStreamerMode() && !State.PanicMode && LobbyCode != "") {
                 std::string customCode = State.HideCode && IsStreamerMode() ? State.customCode : "******";
@@ -243,6 +250,36 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
                     TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ LobbyCode + lobbyTimeDisplay), NULL);
                 else
                     TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode + /*glitchDisplay +*/ lobbyTimeDisplay), NULL);
+            }
+        }
+
+        auto transform = Component_get_transform((Component_1*)__this, NULL);
+        if (transform != NULL) {
+            float camHeight = State.FollowerCam != NULL ? Camera_get_orthographicSize(State.FollowerCam, NULL) : 3.f;
+            auto sgaTransform = Transform_FindChild(transform, convert_to_string("StartGameArea"), NULL);
+
+            if (sgaTransform != NULL) {
+                auto hostInfoPanel = Transform_FindChild(sgaTransform, convert_to_string("Host Info"), NULL);
+                auto hostButton = Transform_FindChild(sgaTransform, convert_to_string("StartButton (Host)"), NULL);
+                auto clientButton = Transform_FindChild(sgaTransform, convert_to_string("StartButton (Client)"), NULL);
+                auto startingButton = Transform_FindChild(sgaTransform, convert_to_string("GameStarting"), NULL);
+
+                auto hostButtonPos = Transform_get_localPosition(hostButton, NULL);
+                auto clientButtonPos = Transform_get_localPosition(clientButton, NULL);
+                auto startingButtonPos = Transform_get_localPosition(startingButton, NULL);
+
+                // center the buttons and move them with the camera height
+                Transform_set_localPosition(hostButton, { 0.3006f, 3.2736f - camHeight, hostButtonPos.z }, NULL);
+                Transform_set_localPosition(clientButton, { -0.131f, 3.309f - camHeight, clientButtonPos.z }, NULL);
+                Transform_set_localPosition(startingButton, { -0.131f, 3.309f - camHeight, startingButtonPos.z }, NULL);
+
+                static std::string aspectPositionTypeName = translate_type_name("AspectPosition, Assembly-CSharp");
+                Type* aspectPositionType = app::Type_GetType(convert_to_string(aspectPositionTypeName), NULL);
+
+                auto hostInfoAspectPosition = (AspectPosition*)Component_GetComponent((Component_1*)hostInfoPanel, aspectPositionType, NULL);
+                if (hostInfoAspectPosition != NULL) {
+                    hostInfoAspectPosition->fields.DistanceFromEdge.x = 0.095f;
+                }
             }
         }
     }

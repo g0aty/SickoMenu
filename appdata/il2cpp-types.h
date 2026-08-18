@@ -4905,6 +4905,7 @@ namespace app {
 
     typedef Il2CppObject CosmeticsCache;
     typedef Il2CppObject ExileController;
+    typedef Il2CppObject MapBehaviour;
 
     struct ShipStatus__Fields {
         struct InnerNetObject__Fields _;
@@ -11478,11 +11479,135 @@ namespace app {
     };
 #pragma endregion
 
+#pragma region RoomTracker
+    struct RoomTracker__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* text;
+        float SourceY;
+        float TargetY;
+        struct Collider2D* playerCollider;
+        void* filter;
+        struct Collider2D__Array* buffer;
+        struct Collider2D__Array* detectiveBuffer;
+        struct PlainShipRoom* LastRoom;
+        struct Coroutine* slideInRoutine;
+    };
+
+    struct RoomTracker {
+        struct RoomTracker__Class* klass;
+        MonitorData* monitor;
+        struct RoomTracker__Fields fields;
+    };
+
+    struct RoomTracker__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct RoomTracker__StaticFields {
+        struct RoomTracker* Instance;
+    };
+
+    struct RoomTracker__Class {
+        Il2CppClass_0 _0;
+        struct RoomTracker__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct RoomTracker__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region FontStyles__Enum
+#if defined(_CPLUSPLUS_)
+    enum class FontStyles__Enum : int32_t {
+        Normal = 0x00000000,
+        Bold = 0x00000001,
+        Italic = 0x00000002,
+        Underline = 0x00000004,
+        LowerCase = 0x00000008,
+        UpperCase = 0x00000010,
+        SmallCaps = 0x00000020,
+        Strikethrough = 0x00000040,
+        Superscript = 0x00000080,
+        Subscript = 0x00000100,
+        Highlight = 0x00000200,
+    };
+
+#else
+    enum FontStyles__Enum {
+        FontStyles__Enum_Normal = 0x00000000,
+        FontStyles__Enum_Bold = 0x00000001,
+        FontStyles__Enum_Italic = 0x00000002,
+        FontStyles__Enum_Underline = 0x00000004,
+        FontStyles__Enum_LowerCase = 0x00000008,
+        FontStyles__Enum_UpperCase = 0x00000010,
+        FontStyles__Enum_SmallCaps = 0x00000020,
+        FontStyles__Enum_Strikethrough = 0x00000040,
+        FontStyles__Enum_Superscript = 0x00000080,
+        FontStyles__Enum_Subscript = 0x00000100,
+        FontStyles__Enum_Highlight = 0x00000200,
+    };
+
+#endif
+#pragma endregion
+
+#pragma region LogicGameFlowHnS
+    typedef Il2CppObject HideAndSeekManager;
+
+    struct LogicGameFlowHnS__Fields {
+        void* _;
+        struct HideAndSeekManager* hideAndSeekManager;
+        struct HideAndSeekTimerBar* timerBarPrefab;
+        struct HideAndSeekTimerBar* timerBar;
+        float totalHideTime;
+        float currentHideTime;
+        float totalFinalHideTime;
+        float currentFinalHideTime;
+        float secondsSinceLastSetDirty;
+        struct Coroutine* beepCoroutine;
+    };
+
+    struct LogicGameFlowHnS {
+        struct LogicGameFlowHnS__Class* klass;
+        MonitorData* monitor;
+        struct LogicGameFlowHnS__Fields fields;
+    };
+
+    struct LogicGameFlowHnS__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData OnGameStart;
+        VirtualInvokeData OnGameEnd;
+        VirtualInvokeData FixedUpdate;
+        VirtualInvokeData OnDestroy;
+        VirtualInvokeData OnPlayerDisconnect;
+        VirtualInvokeData HandleRPC;
+        VirtualInvokeData Serialize;
+        VirtualInvokeData Deserialize;
+        VirtualInvokeData CheckEndCriteria;
+        VirtualInvokeData IsGameOverDueToDeath;
+    };
+
+    struct LogicGameFlowHnS__StaticFields {
+    };
+
+    struct LogicGameFlowHnS__Class {
+        Il2CppClass_0 _0;
+        struct LogicGameFlowHnS__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct LogicGameFlowHnS__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ImpostorRole;
     typedef Il2CppObject LogicGameFlowNormal;
-    typedef Il2CppObject LogicGameFlowHnS;
     typedef Il2CppObject PlayerData;
     typedef Il2CppObject PlayerAccountData;
     typedef Il2CppObject MultiplayerSettingsData;
@@ -11498,7 +11623,6 @@ namespace app {
     typedef Il2CppObject AbstractSaveData;
     typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
     typedef Il2CppObject MatchMakerGameButton;
-    typedef Il2CppObject HideAndSeekManager;
     typedef Il2CppObject NormalGameManager;
     typedef Il2CppObject QuickChatPhraseBuilderResult;
     typedef Il2CppObject MapCountOverlay;

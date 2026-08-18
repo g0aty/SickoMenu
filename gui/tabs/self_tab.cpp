@@ -277,7 +277,8 @@ namespace SelfTab {
             SteppedSliderFloat("Speed", &State.FreeCamSpeed, 0.f, 10.f, 0.1f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 
             if (ToggleButton("Zoom", &State.EnableZoom)) {
-                State.Save();
+                // State.Save();
+                State.HasRefreshedUI = false;
             }
 
             ImGui::SameLine(130.f * State.dpiScale);
