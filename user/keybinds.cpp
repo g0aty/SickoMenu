@@ -1,4 +1,7 @@
+#include "pch-il2cpp.h"
 #include "keybinds.h"
+#include "state.hpp"
+#include <imgui/imgui.h>
 #include <bitset>
 #include <map>
 
@@ -178,6 +181,8 @@ bool KeyBinds::IsKeyDown(uint8_t key)
 
 bool KeyBinds::IsKeyPressed(uint8_t key)
 {
+    if (ImGui::GetIO().WantTextInput && key != State.KeyBinds.Toggle_Menu)
+        return false;
     return (!PrevKeyState[key] && KeyState[key]);
 }
 
@@ -207,6 +212,7 @@ void KeyBinds::to_json(nlohmann::ordered_json& j, KeyBinds::Config value)
         {"Randomize_Appearance", value.Randomize_Appearance},
         {"Complete_Tasks", value.Complete_Tasks},
         {"Toggle_Sicko", value.Toggle_Sicko},
+        {"Leave_Game", value.Leave_Game},
         {"Cancel_Start", value.Cancel_Start},
     };
 }
@@ -231,4 +237,5 @@ void KeyBinds::from_json(const nlohmann::ordered_json& j, KeyBinds::Config& valu
     j.at("Randomize_Appearance").get_to(value.Randomize_Appearance);
     j.at("Complete_Tasks").get_to(value.Complete_Tasks);
     j.at("Toggle_Sicko").get_to(value.Toggle_Sicko);
+    j.at("Leave_Game").get_to(value.Leave_Game);
 }

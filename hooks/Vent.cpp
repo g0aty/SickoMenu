@@ -33,7 +33,7 @@ float dVent_CanUse(Vent* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* co
 	return app::Vent_CanUse(__this, pc, canUse, couldUse, method);
 };
 
-void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo * method) {
+void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 	if (State.ShowHookLogs) Log.Debug("Hook dVent_EnterVent executed", false);
 	if (!State.PanicMode) {
 		auto ventVector = app::Transform_get_position(app::Component_get_transform((Component_1*)__this, NULL), NULL);

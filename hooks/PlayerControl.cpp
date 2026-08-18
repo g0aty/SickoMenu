@@ -31,6 +31,10 @@ void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo
         for (auto normalPlayerTask : normalPlayerTasks)
             if (normalPlayerTask->fields._._Id_k__BackingField == idx) taskType = normalPlayerTask->fields._.TaskType;
 
+        if (!taskType.has_value() && State.Enable_SMAC && State.SMAC_CheckTaskCompletion && IsInGame() && __this != *Game::pLocalPlayer) {
+            SMAC_OnCheatDetected(__this, "Abnormal Task Completion (Invalid Task Id)");
+        }
+
         synchronized(Replay::replayEventMutex) {
             State.liveReplayEvents.emplace_back(std::make_unique<TaskCompletedEvent>(GetEventPlayerControl(__this).value(), taskType, PlayerControl_GetTruePosition(__this, NULL)));
             State.liveConsoleEvents.emplace_back(std::make_unique<TaskCompletedEvent>(GetEventPlayerControl(__this).value(), taskType, PlayerControl_GetTruePosition(__this, NULL)));
@@ -877,6 +881,7 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
             app::PlayerControl_MurderPlayer(__this, target, resultFlags, method);
             return;
         }
+
         if (static_cast<int32_t>(resultFlags) & static_cast<int32_t>(MurderResultFlags__Enum::Succeeded)) {
             State.validDeadBodyIds.push_back(target->fields.PlayerId);
         }
@@ -1100,6 +1105,9 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
                 ((callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType && State.mapType != Settings::MapType::Hq) || callId == (uint8_t)RpcCalls__Enum::UpdateSystem))))
             //we cannot prevent murderplayer because the player will force it
             return;
+        if (IsHost() && !State.PanicMode && callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType &&
+            State.DisabledSabotageTypes.count((int)SystemTypes__Enum::Doors))
+            return;
         if (!State.GameLoaded && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting))
             return;
         if (!State.PanicMode && State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder) {
@@ -1241,7 +1249,6 @@ void dPlayerControl_Shapeshift(PlayerControl* __this, PlayerControl* target, boo
     }
     PlayerControl_Shapeshift(__this, target, animate, method);
 }
-
 void dPlayerControl_ProtectPlayer(PlayerControl* __this, PlayerControl* target, int32_t colorId, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dPlayerControl_ProtectPlayer executed", false);
     try {
@@ -1611,6 +1618,12 @@ void dPlayerControl_SetLevel(PlayerControl* __this, uint32_t level, MethodInfo* 
     if (State.SMAC_CheckLevel && (IsInGame() ||
         ((State.SMAC_HighLevel != 0 && playerLevel >= (uint32_t)State.SMAC_HighLevel) || (State.SMAC_LowLevel != 0 && playerLevel <= (uint32_t)State.SMAC_LowLevel)))) {
         SMAC_OnCheatDetected(__this, "Abnormal Level");
+    }
+
+    if (State.SMAC_CheckFriendcode && __this != *Game::pLocalPlayer) {
+        auto fcPd = GetPlayerData(__this);
+        std::string fc = (fcPd != NULL && fcPd->fields.FriendCode != NULL) ? convert_from_string(fcPd->fields.FriendCode) : "";
+        if (fc.empty()) SMAC_OnCheatDetected(__this, "Abnormal Friendcode");
     }
 
     if (__this != *Game::pLocalPlayer && level > 2147483647) level = 2147483647; //anti level 0 exploit

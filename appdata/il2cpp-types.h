@@ -5209,11 +5209,10 @@ namespace app {
         ImpostorGhost = 0x0007,
         Noisemaker = 0x0008,
         Phantom = 0x0009,
-        Tracker = 0x000b,
+        Tracker = 0x000a,
         Detective = 0x000c,
         Viper = 0x0012,
     };
-
 #else
     enum RoleTypes__Enum {
         RoleTypes__Enum_Crewmate = 0x0000,
@@ -5226,7 +5225,7 @@ namespace app {
         RoleTypes__Enum_ImpostorGhost = 0x0007,
         RoleTypes__Enum_Noisemaker = 0x0008,
         RoleTypes__Enum_Phantom = 0x0009,
-        RoleTypes__Enum_Tracker = 0x000b,
+        RoleTypes__Enum_Tracker = 0x000a,
         RoleTypes__Enum_Detective = 0x000c,
         RoleTypes__Enum_Viper = 0x0012,
     };

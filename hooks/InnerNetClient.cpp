@@ -71,6 +71,8 @@ static void onGameEnd() {
         State.RealRole = RoleTypes__Enum::Crewmate;
         State.mapType = Settings::MapType::Ship;
         State.SpeedrunTimer = 0.f;
+        State.GameModeDurationTimer = 0.f;
+        State.GameModeDurationOver = false;
         autoStartedGame = false;
 
         State.VoteOffPlayerId = Game::HasNotVoted;
@@ -105,6 +107,15 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
     if (State.ShowHookLogs) Log.Debug("Hook dInnerNetClient_Update executed", false);
     try {
         if (!State.PanicMode) {
+            if (IsHost() && !State.Mod_PendingRulesMessages.empty()) {
+                State.Mod_PendingRulesDelay -= Time_get_deltaTime(NULL);
+                if (State.Mod_PendingRulesDelay <= 0.f) {
+                    std::string nextRulesMsg = State.Mod_PendingRulesMessages.front();
+                    State.Mod_PendingRulesMessages.pop();
+                    PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(nextRulesMsg), NULL);
+                    State.Mod_PendingRulesDelay = 2.0f;
+                }
+            }
             static bool onStart = true;
             if (!IsInLobby()) {
                 State.LobbyTimer = 600.f;
@@ -189,6 +200,14 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 if (State.MoveInVentAndShapeshift && (((*Game::pLocalPlayer)->fields.inVent) || (*Game::pLocalPlayer)->fields.shapeshifting)) {
                     (*Game::pLocalPlayer)->fields.moveable = true;
+                }
+
+                if (IsHost() && State.GameLoaded && State.GameMode != 0 && !State.GameModeDurationOver) {
+                    State.GameModeDurationTimer += Time_get_deltaTime(NULL);
+                    if (State.GameModeDurationTimer >= (float)State.GameModeDuration) {
+                        State.GameModeDurationOver = true; 
+                        GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::CrewmatesByTask, false, NULL);
+                    }
                 }
             }
 
@@ -749,6 +768,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     autoStartedGame = true;
                     InnerNetClient_SendStartGame(__this, NULL);
                 }
+
+
+
                 if (IsHost() && IsInGame() && State.AutoKickSlackers) {
                     slackerTimer += Time_get_deltaTime(NULL);
                     if (slackerTimer >= (float)State.AutoKickSlackersGrace) {
@@ -1188,11 +1210,12 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             GameOptions options;
             if (State.AutoHostRole) {
                 auto allPlayers = GetAllPlayerData();
-                for (size_t index = 0; index < allPlayers.size(); index++) {
-                    auto playerData = allPlayers[index];
+                for (size_t listIndex = 0; listIndex < allPlayers.size(); listIndex++) {
+                    auto playerData = allPlayers[listIndex];
                     if (playerData == nullptr) continue;
                     PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
                     if (playerCtrl == nullptr) continue;
+                    size_t index = playerData->fields.PlayerId;
 
                     if (*Game::pLocalPlayer == playerCtrl && State.assignedRoles[index] != State.HostRoleToSet) {
                         State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
@@ -1433,6 +1456,8 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
                 State.Save();
             }
             State.LobbyHostCache.clear();
+            State.assignedRolesPlayer.fill(nullptr);
+            State.assignedRoles.fill(RoleType::Random);
 
             /*if (!State.PanicMode) {
                 State.PanicMode = true;
@@ -1467,6 +1492,14 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 Log.Debug(ToString(data->fields.Character) + " has left the game.");
 
             uint8_t playerId = data->fields.Character->fields.PlayerId;
+
+            if (State.modUsers.find(playerId) != State.modUsers.end())
+                State.modUsers.erase(playerId);
+
+            if (playerId < State.assignedRolesPlayer.size()) {
+                State.assignedRolesPlayer[playerId] = nullptr;
+                State.assignedRoles[playerId] = RoleType::Random;
+            }
 
             if (State.modUsers.find(playerId) != State.modUsers.end())
                 State.modUsers.erase(playerId);

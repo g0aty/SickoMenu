@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include <bitset>
 #include <queue>
 #include <unordered_set>
@@ -122,6 +123,9 @@ public:
     float SpeedrunTimer = 0.f;
     bool SpeedrunOver = false;
     int GameMode = 0;
+    int GameModeDuration = 240;
+    float GameModeDurationTimer = 0.f; 
+    bool GameModeDurationOver = false; 
     bool NoGameEnd = false;
     bool ChatSpam = false;
     bool CrashChatSpam = false;
@@ -375,6 +379,18 @@ public:
     bool RotateEveryone = false;
     bool RotateServerSide = false;
     bool RelativeTeleport = false;
+    std::string Mod_SickoSocials = "";
+    std::queue<std::string> Mod_PendingRulesMessages; 
+    float Mod_PendingRulesDelay = 0.f; 
+    std::vector<std::string> Mod_RoleNames = {};
+    std::vector<std::vector<std::string>> Mod_RoleMembers = {}; 
+    std::vector<std::map<std::string, bool>> Mod_RolePermissions = {}; 
+    std::vector<int> Mod_RoleRank = {}; 
+    bool SMAC_CheckStartWords = false;
+    bool SMAC_StartWordsStrict = true;
+    int SMAC_StartWordsThreshold = 1;
+    std::vector<std::string> SMAC_StartWords = {};
+    std::map<uint8_t, int> SMAC_StartWordsCount;
     float RotateRadius = 1.f;
     float xCoordinate = 0.f;
     float yCoordinate = 0.f;
@@ -689,6 +705,7 @@ public:
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
     bool SMAC_CheckBadWords = true;
     std::vector<std::string> SMAC_BadWords = {};
+    bool SMAC_CheckFriendcode = true;
 
     std::vector<std::string> ChatPresets = {};
 
@@ -790,6 +807,7 @@ public:
     // Disable Tasks
     bool DisableMedbayScan = false;
     std::unordered_set<int> DisabledTaskTypes;
+    std::set<int> DisabledSabotageTypes;
 
     /*int BanDays = 0;
     int BanHours = 0;

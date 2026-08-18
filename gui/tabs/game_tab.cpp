@@ -669,6 +669,8 @@ namespace GameTab {
             ImGui::SameLine();
             if (ToggleButton("Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
             if (ToggleButton("Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Abnormal Friendcode", &State.SMAC_CheckFriendcode)) State.Save();
             if (State.SMAC_CheckLevel && ImGui::InputInt("Level >=", &State.SMAC_HighLevel)) {
                 State.Save();
             }
@@ -698,6 +700,42 @@ namespace GameTab {
                     ImGui::SameLine();
                     if (AnimatedButton("Remove"))
                         State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
+                }
+            }
+
+            if (ToggleButton("Blocked Start Words", &State.SMAC_CheckStartWords)) State.Save();
+            if (State.SMAC_CheckStartWords) {
+                ImGui::SameLine();
+                if (ToggleButton("Strict Detection", &State.SMAC_StartWordsStrict)) State.Save();
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(80.0f * State.dpiScale);
+                if (ImGui::InputInt("Violations Before Action", &State.SMAC_StartWordsThreshold)) {
+                    if (State.SMAC_StartWordsThreshold < 1) State.SMAC_StartWordsThreshold = 1;
+                    State.Save();
+                }
+                if (State.SMAC_StartWords.empty())
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No start words added!");
+                static std::string newStartWord = "";
+                InputString("New W\u043Erd", &newStartWord, ImGuiInputTextFlags_EnterReturnsTrue);
+                ImGui::SameLine();
+                if (AnimatedButton("Add Word##StartWord")) {
+                    State.SMAC_StartWords.push_back(newStartWord);
+                    State.Save();
+                    newStartWord = "";
+                }
+                if (!State.SMAC_StartWords.empty()) {
+                    static int selectedStartWordIndex = 0;
+                    selectedStartWordIndex = std::clamp(selectedStartWordIndex, 0, (int)State.SMAC_StartWords.size() - 1);
+                    std::vector<const char*> startWordVector(State.SMAC_StartWords.size(), nullptr);
+                    for (size_t i = 0; i < State.SMAC_StartWords.size(); i++) {
+                        startWordVector[i] = State.SMAC_StartWords[i].c_str();
+                    }
+                    CustomListBoxInt("Start Word to Remove", &selectedStartWordIndex, startWordVector);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Remove##StartWord")) {
+                        State.SMAC_StartWords.erase(State.SMAC_StartWords.begin() + selectedStartWordIndex);
+                        State.Save();
+                    }
                 }
             }
         }
