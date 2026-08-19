@@ -287,6 +287,11 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - Ensure your injector is running with sufficient permissions.
 - If issues persist, try a different injection method or injector.
 
+**Online Matches Unavaibable (SteamworksAuthFail)**
+- Go to your among us folder if you use steam to play.
+- Make a .txt in there named steam_appid.txt with the contents "945360", with NOTHING else.
+- If theres still issues reach out in our Discord.
+  
 **Other issues**
 - If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
 
