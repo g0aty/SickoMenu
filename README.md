@@ -287,8 +287,11 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - Ensure your injector is running with sufficient permissions.
 - If issues persist, try a different injection method or injector.
 
+**Online not being avaibable (STEAM)**
+- Go to where your Among Us game files (not config) are, and put a steam_appid.txt file in it (with the Among Us executable) and put this in it: "945360".
+
 **Other issues**
-- If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
+- If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).ñañ
 
 ---
 ## ⌨️ Default Hotkeys
