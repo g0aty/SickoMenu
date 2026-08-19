@@ -4,6 +4,7 @@
 #include <format>
 #include "il2cpp-helpers.h"
 #include "game.h"
+#include "imgui/imgui.h"
 
 using namespace app;
 
@@ -20,7 +21,8 @@ using namespace app;
 	ADD_EVENT (PROTECTPLAYER, "Protect"), \
 	ADD_EVENT (PHANTOM, "Vanish/Appear"), \
 	ADD_EVENT (SABOTAGE, "Sabotage"), \
-	ADD_EVENT (WALK, "Walk")
+	ADD_EVENT (WALK, "Walk"), \
+	ADD_EVENT (MODERATION, "Moderation")
 
 enum class EVENT_TYPES {
 #define ADD_EVENT(name, desc) EVENT_ ## name
@@ -268,6 +270,31 @@ public:
 	DisconnectEvent(const EVENT_PLAYER& source);
 	virtual void Output() override;
 	virtual void ColoredEventOutput() override;
+};
+
+class ModerationEvent : public EventInterface {
+private:
+	std::string message;
+public:
+	ModerationEvent(const EVENT_PLAYER& source, const std::string& message) : EventInterface(source, EVENT_TYPES::EVENT_MODERATION) {
+		this->message = message;
+	}
+	virtual void Output() override {
+		ImGui::Text("%s", this->message.c_str());
+		ImGui::SameLine();
+		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - this->timestamp);
+		long long totalSeconds = elapsed.count();
+		long long minutes = totalSeconds / 60;
+		long long seconds = totalSeconds % 60;
+		ImGui::Text("[%02lld:%02lld ago]", minutes, seconds);
+	}
+	virtual void ColoredEventOutput() override {
+		ImGui::Text("[");
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(1.f, 0.65f, 0.f, 1.f), "MOD");
+		ImGui::SameLine();
+		ImGui::Text("]");
+	}
 };
 
 class ShapeShiftEvent : public EventInterface {

@@ -96,7 +96,21 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         ReleaseSemaphore(DirectX::hRenderSemaphore, 1, NULL);
     }
 
-    KeyBinds::WndProc(uMsg, wParam, lParam);
+    if (!ImGui::GetIO().WantTextInput) {
+        KeyBinds::WndProc(uMsg, wParam, lParam);
+    }
+    else {
+        // let the menu get toggled while in any menu text field but suppress every other keybind like zoom etc
+        switch (uMsg) {
+        case WM_KEYDOWN: case WM_KEYUP: case WM_SYSKEYDOWN: case WM_SYSKEYUP:
+            if ((uint8_t)wParam == State.KeyBinds.Toggle_Sicko || (uint8_t)wParam == State.KeyBinds.Toggle_Menu) // panic mode or show/hide menu
+                KeyBinds::WndProc(uMsg, wParam, lParam);
+            break;
+        default:
+            KeyBinds::WndProc(uMsg, wParam, lParam);
+            break;
+        }
+    }
 
     bool shouldKeybindsActivate = !State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/;
 
@@ -121,6 +135,8 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Reset_Appearance) && (IsInGame() || IsInLobby())) ControlAppearance(false);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Randomize_Appearance)) ControlAppearance(true);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Complete_Tasks) && IsInGame()) CompleteAllTasks();
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Leave_Game) && (IsInGame() || IsInLobby()) && !State.PanicMode)
+            app::AmongUsClient_ExitGame((*Game::pAmongUsClient), DisconnectReasons__Enum::ExitGame, NULL);
     }
     if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) State.PanicMode = !State.PanicMode;
 

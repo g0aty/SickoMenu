@@ -25,6 +25,7 @@ namespace KeyBinds {
         uint8_t Complete_Tasks;
         uint8_t Toggle_Sicko;
         uint8_t Cancel_Start;
+        uint8_t Leave_Game;
     };
 
     void WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);

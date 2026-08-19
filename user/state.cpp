@@ -146,6 +146,7 @@ void Settings::Load() {
         JSON_TRYGET("FakeRole", this->FakeRole);
         JSON_TRYGET("FakeRoleId", this->FakeRoleId);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
+        JSON_TRYGET("PauseVentBlockingWhileVenting", this->PauseVentBlockingWhileVenting);
 
         JSON_TRYGET("AutoApplyHostPreset", this->AutoApplyHostPreset);
         if (j.contains("HostPresets") && j["HostPresets"].is_array()) {
@@ -392,6 +393,8 @@ void Settings::Load() {
         JSON_TRYGET("AlwaysAllowStart", this->AlwaysAllowStart);
         JSON_TRYGET("ModifyStartCountdown", this->ModifyStartCountdown);
         JSON_TRYGET("StartCountdown", this->StartCountdown);
+        JSON_TRYGET("GameModeDuration", this->GameModeDuration);
+        this->GameModeDuration = std::clamp(this->GameModeDuration, 100, 500);
 
         JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
@@ -422,7 +425,17 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_LowLevel", this->SMAC_LowLevel);
         JSON_TRYGET("SMAC_CheckBadWords", this->SMAC_CheckBadWords);
         JSON_TRYGET("SMAC_BadWords", this->SMAC_BadWords);
+        JSON_TRYGET("SMAC_CheckFriendcode", this->SMAC_CheckFriendcode);
         JSON_TRYGET("ChatPresets", this->ChatPresets);
+
+        JSON_TRYGET("Mod_SickoSocials", this->Mod_SickoSocials);
+        JSON_TRYGET("Mod_RoleNames", this->Mod_RoleNames);
+        JSON_TRYGET("Mod_RoleMembers", this->Mod_RoleMembers);
+        JSON_TRYGET("Mod_RolePermissions", this->Mod_RolePermissions);
+        JSON_TRYGET("Mod_RoleRank", this->Mod_RoleRank);
+        JSON_TRYGET("SMAC_CheckStartWords", this->SMAC_CheckStartWords);
+        JSON_TRYGET("SMAC_StartWordsThreshold", this->SMAC_StartWordsThreshold);
+        JSON_TRYGET("SMAC_StartWords", this->SMAC_StartWords);
 
         JSON_TRYGET("Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist);
         JSON_TRYGET("Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist);
@@ -740,6 +753,7 @@ void Settings::Save() {
                 { "FakeRole", this->FakeRole },
                 { "FakeRoleId", this->FakeRoleId },
                 { "AutoFakeRole", this->AutoFakeRole },
+                { "PauseVentBlockingWhileVenting", this->PauseVentBlockingWhileVenting },
 
                 { "NoGameEnd", this->NoGameEnd },
                 { "DisableMeetings", this->DisableMeetings },
@@ -981,6 +995,7 @@ void Settings::Save() {
                 { "AlwaysAllowStart", this->AlwaysAllowStart },
                 { "ModifyStartCountdown", this->ModifyStartCountdown },
                 { "StartCountdown", this->StartCountdown },
+                { "GameModeDuration", this->GameModeDuration },
 
                 { "Enable_SMAC", this->Enable_SMAC },
                 { "SMAC_Punishment", this->SMAC_Punishment },
@@ -1011,7 +1026,17 @@ void Settings::Save() {
                 { "SMAC_LowLevel", this->SMAC_LowLevel },
                 { "SMAC_CheckBadWords", this->SMAC_CheckBadWords },
                 { "SMAC_BadWords", this->SMAC_BadWords },
+                { "SMAC_CheckFriendcode", this->SMAC_CheckFriendcode },
                 { "ChatPresets", this->ChatPresets },
+
+                { "Mod_SickoSocials", this->Mod_SickoSocials },
+                { "Mod_RoleNames", this->Mod_RoleNames },
+                { "Mod_RoleMembers", this->Mod_RoleMembers },
+                { "Mod_RolePermissions", this->Mod_RolePermissions },
+                { "Mod_RoleRank", this->Mod_RoleRank },
+                { "SMAC_CheckStartWords", this->SMAC_CheckStartWords },
+                { "SMAC_StartWordsThreshold", this->SMAC_StartWordsThreshold },
+                { "SMAC_StartWords", this->SMAC_StartWords },
                 { "Destruct_IgnoreWhitelist", this->Destruct_IgnoreWhitelist },
                 { "Ban_IgnoreWhitelist", this->Ban_IgnoreWhitelist },
                 { "TimerAFK", this->TimerAFK },

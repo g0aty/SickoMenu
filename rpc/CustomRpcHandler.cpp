@@ -204,14 +204,46 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 			return;
 		}
 		break;
-	case (uint8_t)RpcCalls__Enum::SetScanner:
-		if (State.SMAC_CheckScanner && (IsInLobby() ||
-			((State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle)
-			&& MessageReader_ReadBoolean(reader, NULL))) ) {
+	case (uint8_t)RpcCalls__Enum::SetScanner: {
+		bool scanning = MessageReader_ReadBoolean(reader, NULL);
+		if (State.SMAC_CheckScanner && (IsInLobby() || PlayerIsImpostor(pData) ||
+			((State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle) && scanning))) {
 			SMAC_OnCheatDetected(player, "Abnormal MedBay Scan");
 			return;
 		}
+
+		if (State.SMAC_CheckScanner && scanning && IsInGame()) {
+			bool hasScanTask = false;
+			for (auto task : GetNormalPlayerTasks(player))
+				if (task->fields._.TaskType == TaskTypes__Enum::SubmitScan) { hasScanTask = true; break; }
+			if (!hasScanTask) {
+				SMAC_OnCheatDetected(player, "Abnormal MedBay Scan (No Scan Task)");
+				return;
+			}
+		}
 		break;
+	}
+	case (uint8_t)RpcCalls__Enum::PlayAnimation: {
+		if (State.SMAC_CheckAnimation && IsInGame()) {
+			if (PlayerIsImpostor(pData)) {
+				SMAC_OnCheatDetected(player, "Abnormal Animation (Impostor Has No Visual Tasks)");
+				return;
+			}
+			uint8_t animType = MessageReader_ReadByte(reader, NULL);
+			if (animType == (uint8_t)TaskTypes__Enum::PrimeShields ||
+				animType == (uint8_t)TaskTypes__Enum::ClearAsteroids ||
+				animType == (uint8_t)TaskTypes__Enum::EmptyGarbage) {
+				bool hasTask = false;
+				for (auto task : GetNormalPlayerTasks(player))
+					if ((uint8_t)task->fields._.TaskType == animType) { hasTask = true; break; }
+				if (!hasTask) {
+					SMAC_OnCheatDetected(player, "Abnormal Animation (No Matching Visual Task)");
+					return;
+				}
+			}
+		}
+		break;
+	}
 	case (uint8_t)RpcCalls__Enum::SetTasks:
 		if (State.SMAC_CheckTasks && (IsInLobby() || State.InMeeting)) {
 			SMAC_OnCheatDetected(player, "Abnormal Set Tasks");
@@ -281,6 +313,10 @@ void SMAC_HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader
 	}
 	case (uint8_t)RpcCalls__Enum::CompleteTask: {
 		if (State.SMAC_CheckTaskCompletion && IsInGame()) {
+			if (PlayerIsImpostor(pData)) {
+				SMAC_OnCheatDetected(player, "Abnormal Task Completion (Impostor Has No Tasks)");
+				return;
+			}
 			uint8_t playerId = player->fields.PlayerId;
 			auto now = std::chrono::steady_clock::now();
 			auto it = State.lastTaskCompletionTime.find(playerId);

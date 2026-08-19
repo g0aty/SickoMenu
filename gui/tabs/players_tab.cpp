@@ -1548,20 +1548,14 @@ namespace PlayersTab {
                     }
                 }
                 ImGui::NewLine();
-                CustomListBoxIntColored(" ", &forcedColor, COLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
-                ImGui::SameLine();
-                if (AnimatedButton("Force Color"))
-                {
-                    if (IsInGame()) {
-                        if (IsHost())
+                if (IsHost() && (IsInGame() || IsInLobby())) {
+                    CustomListBoxInt(" ", &forcedColor, COLORS, 85.0f * State.dpiScale);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Force Color"))
+                    {
+                        if (IsInGame())
                             State.rpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
-                        else
-                            State.rpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
-                    }
-                    else if (IsInLobby()) {
-                        if (IsHost())
-                            State.lobbyRpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
-                        else
+                        else if (IsInLobby())
                             State.lobbyRpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
                     }
                 }
@@ -1701,6 +1695,47 @@ namespace PlayersTab {
                     }
                 }
 
+                if (IsHost() && !selectedPlayer.is_LocalPlayer()) {
+                    ImGui::Dummy(ImVec2(0, 8) * State.dpiScale);
+                    std::string targetFC = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+                    if (targetFC.empty()) {
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No friend code available for this player.");
+                    }
+                    else if (State.Mod_RoleNames.empty()) {
+                        ImGui::TextDisabled("No roles created yet - add some in the Host tab.");
+                    }
+                    else {
+                        static int addRoleIndex = 0;
+                        addRoleIndex = std::clamp(addRoleIndex, 0, (int)State.Mod_RoleNames.size() - 1);
+                        std::vector<const char*> roleVector(State.Mod_RoleNames.size(), nullptr);
+                        for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) roleVector[i] = State.Mod_RoleNames[i].c_str();
+
+                        ImGui::Text("Add Role:");
+                        ImGui::SameLine();
+                        CustomListBoxInt("AddPlayerRole", &addRoleIndex, roleVector, 130.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
+                        ImGui::SameLine();
+                        if (AnimatedButton("Add##PlayerRole")) {
+                            SetFriendCodeInRole(targetFC, addRoleIndex, true);
+                        }
+
+                        auto currentRoles = GetFriendCodeRoleIndices(targetFC);
+                        if (!currentRoles.empty()) {
+                            ImGui::Text("Current Roles:");
+                            ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
+                            for (int roleIdx : currentRoles) {
+                                if (roleIdx < 0 || roleIdx >= (int)State.Mod_RoleNames.size()) continue;
+                                ImGui::PushStyleColor(ImGuiCol_Button, themeCol);
+                                if (AnimatedButton((State.Mod_RoleNames[roleIdx] + " x##playerrole" + std::to_string(roleIdx)).c_str())) {
+                                    SetFriendCodeInRole(targetFC, roleIdx, false);
+                                }
+                                ImGui::PopStyleColor(1);
+                                ImGui::SameLine();
+                            }
+                            ImGui::NewLine();
+                        }
+                    }
+                }
+                
                 if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
                     ImGui::NewLine(); //force a new line
 

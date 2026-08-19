@@ -2,4 +2,5 @@
 
 namespace SabotageTab {
 	void Render();
+	void RenderDisableSabotages();
 }

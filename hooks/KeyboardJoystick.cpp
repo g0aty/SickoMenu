@@ -4,6 +4,10 @@
 
 void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dKeyboardJoystick_Update executed", false);
+    if (ImGui::GetIO().WantTextInput) {
+        __this->fields.del = app::Vector2(); //Typing in a SickoMenu text field, suppress movement input entirely
+        return;
+    }
     if ((!State.FreeCam && !State.playerToAttach.has_value()) || State.PanicMode) {
         app::KeyboardJoystick_Update(__this, method);
     }

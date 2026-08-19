@@ -90,14 +90,26 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
     ShipStatus_OnEnable(__this, method);
 }
 
+static bool IsSabotageTriggerAmount(SystemTypes__Enum systemType, int32_t amount) {
+    switch (systemType) {
+    case SystemTypes__Enum::Electrical: return amount >= 5;
+    case SystemTypes__Enum::MushroomMixupSabotage: return amount >= 1;
+    default: return amount >= 128;
+    }
+}
+
 void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, int32_t amount, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_RpcUpdateSystem executed", false);
-
+    if (!State.PanicMode && State.DisabledSabotageTypes.count((int)systemType) &&
+        IsSabotageTriggerAmount(systemType, amount))
+        return;
     ShipStatus_RpcUpdateSystem(__this, systemType, amount, method);
 }
 
 void dShipStatus_RpcCloseDoorsOfType(ShipStatus* __this, SystemTypes__Enum type, MethodInfo* method) {
     if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_RpcCloseDoorsOfType executed", false);
+    if (!State.PanicMode && State.DisabledSabotageTypes.count((int)SystemTypes__Enum::Doors))
+        return;
     ShipStatus_RpcCloseDoorsOfType(__this, type, method);
 }
 
@@ -116,6 +128,11 @@ void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* re
         (callId == 35 && systemType == SystemTypes__Enum::MedBay))
         return ShipStatus_HandleRpc(__this, callId, reader, method);
     if (!State.PanicMode && State.DisableSabotages) return;
+    if (!State.PanicMode && callId == 27 &&
+        State.DisabledSabotageTypes.count((int)SystemTypes__Enum::Doors))
+        return;
+    if (!State.PanicMode && State.DisabledSabotageTypes.count((int)systemType))
+        return;
     ShipStatus_HandleRpc(__this, callId, reader, method);
 }
 
@@ -178,6 +195,15 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
         return ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
     if (!State.PanicMode && State.DisableSabotages) return;
 
+    if (!State.PanicMode && IsHost() && IsSabotageTriggerAmount(systemType, amount)) {
+        if (State.DisabledSabotageTypes.count((int)systemType)) {
+            RepairSabotage(player);
+            return;
+        }
+        if (systemType == SystemTypes__Enum::Doors &&
+            State.DisabledSabotageTypes.count((int)SystemTypes__Enum::Doors))
+            return;
+    }
     if (player != nullptr && systemType != SystemTypes__Enum::Electrical) {
         auto evtPlayer = GetEventPlayerControl(player);
         if (evtPlayer.has_value()) {
