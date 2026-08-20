@@ -99,13 +99,13 @@ A huge amount of features!
 - ✅ itch.io (Supported)
 - 🟡 Epic Games (Supported - Experimental)
 - 🟡 Microsoft Store/Xbox App (Windows) (Supported - Experimental)
-- ❓ Cracked (works occasionally, I don't condone it)
-- ❌ iOS/iPadOS/Android (Not Supported)
+- ❓ Cracked (works occasionally; I don't condone it)
+- ❌ ,iOS/iPadOS/Android (Not Supported)
 - ❌ Switch/Xbox/Playstation (Not Supported)
 
 ## ⬇️ Download & Install
 ### For Windows
-You can find the latest release [here](https://github.com/g0aty/SickoMenu/releases/latest).
+You can find the latest release [here](https://github.com/g0at,y/SickoMenu/releases/latest).
 Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in your Among Us directory (the folder containing `Among Us.exe`). Make sure to use the correct DLL for your Among Us platform!
 
 **Accessing the Among Us directory for supported platforms:**
@@ -167,7 +167,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
    - Place the `version.dll` file here.
 6.  In PlayOnMac, select your virtual drive > **Configure** > **Wine** > **Libraries**.
    - Add `version` to the overrides and set it to **Native (Windows)**.
-7.Run Among Us through Steam in PlayOnMac. Use the hotkey **Fn+Backspace or Command+Backspace** to toggle the mod menu, depending on your model.
+7. Run Among Us through Steam in PlayOnMac. Use the hotkey **Fn+Backspace or Command+Backspace** to toggle the mod menu, depending on your model.
 
 **Method 3: (recommended)**
 
@@ -287,10 +287,10 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - Ensure your injector is running with sufficient permissions.
 - If issues persist, try a different injection method or injector.
 
-**Online Matches Unavaibable (SteamworksAuthFail)**
-- Go to your among us folder if you use steam to play.
+**Online Matches Unavailable (SteamworksAuthFail)**
+- Go to your Among Us folder if you use Steam to play.
 - Make a .txt in there named steam_appid.txt with the contents "945360", with NOTHING else.
-- If theres still issues reach out in our Discord.
+- If there are still issues, reach out in our Discord.
   
 **Other issues**
 - If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
