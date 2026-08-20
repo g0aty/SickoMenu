@@ -301,7 +301,7 @@ A: SickoMenu is provided for educational and experimental purposes only. It is n
 
 Q: How do I uninstall SickoMenu?
 
-A: To uninstall the Version Proxy (version.dll), remove the `version.dll` file from your Among Us game directory. If you injected `SickoMenu.dll`, close Among Us, remove the DLL from the game's process (if still loaded), and delete the DLL file from wherever you stored it. You may also want to verify game files via Steam or your launcher to restore original game files.
+A: To uninstall the Version Proxy (version.dll), remove the `version.dll` file from your Among Us game directory along with `SickoMenu.dll`, close Among Us, remove the DLLs, and delete the DLLs file from your plugin folder. You also want to verify game files via Steam or your launcher to restore original game files.
 
 Q: My antivirus deleted the DLL — what should I do?
 
@@ -322,10 +322,6 @@ A: See the "⚒️ Building / Compilation" section for instructions and build ta
 Q: How can I report bugs or request features?
 
 A: Join our Discord and open a bug report or feature request in the appropriate channel. Include steps to reproduce, logs, and screenshots when possible.
-
-Q: How do I change hotkeys?
-
-A: Hotkeys can be customized in-game under **Settings → Keybinds**.
 
 ---
 
