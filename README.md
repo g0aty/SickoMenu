@@ -124,7 +124,7 @@ Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in y
 2. Add `WINEDLLOVERRIDES="version=n,b" %command%` to your Among Us launch options. 
 SickoMenu should now load!
 
-**If you're facing issues - try Option 2:**
+**If you're facing issues - try Method 2:**
 
 First, you'll need [protontricks](https://github.com/Matoking/protontricks). You can install it with your packager of choice.
 
