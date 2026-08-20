@@ -325,7 +325,7 @@ A: Join our Discord and open a bug report or feature request in the appropriate 
 
 Q: How do I change hotkeys?
 
-A: Hotkeys can be customized in-game under **Settings → Keybinds**. If you want different default keys, consider contributing a change or opening a PR with a clear rationale.
+A: Hotkeys can be customized in-game under **Settings → Keybinds**.
 
 ---
 
