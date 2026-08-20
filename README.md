@@ -120,7 +120,9 @@ Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in y
 
 **Method 1: (Recommended)**
 
-Place `version.dll` in your Among Us directory - then add `WINEDLLOVERRIDES="version=n,b" %command%` to your Among Us launch options. SickoMenu should now load!
+1. Place `version.dll` in your Among Us directory
+2. Add `WINEDLLOVERRIDES="version=n,b" %command%` to your Among Us launch options. 
+SickoMenu should now load!
 
 **If you're facing issues - try Option 2:**
 
