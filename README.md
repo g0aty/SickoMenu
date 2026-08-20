@@ -116,12 +116,19 @@ Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in y
 - **❎ XBOX App** Right-click Among Us in your Library → Click **Manage** → Open the **FILES** tab → Click **BROWSE...** → Open the **Among Us** folder → Open the **Content** folder.
 - **❌ Other Platforms** Unsupported!
 
-### For Proton (Version Proxy Only)
-First you will need [protontricks](https://github.com/Matoking/protontricks), you can install it with your packager of choice.
+### For Linux (Proton/Wine) (Version Proxy Only)
+
+**Method 1: (Recommended)**
+
+Place `version.dll` in your Among Us directory - then add `WINEDLLOVERRIDES="version=n,b" %command%` to your Among Us launch options. SickoMenu should now load!
+
+**If you're facing issues - try Option 2:**
+
+First, you'll need [protontricks](https://github.com/Matoking/protontricks). You can install it with your packager of choice.
 
 1. Make sure you are running Among Us under Proton. 
-   On Steam you can check this by going to **Properties -> Compatibility**
-2. Put version.dll into your Among Us directory (the folder containing `Among Us.exe`).
+   On Steam, you can check by going to **Properties -> Compatibility**
+2. Put `version.dll` into your Among Us directory (the folder containing `Among Us.exe`).
 3. Run `protontricks --gui`
 4. Choose **Among Us**
 5. Click on **Select the default wineprefix** and then **OK**
@@ -129,7 +136,7 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
 7. In the configuration window, click on **Libraries**
 8. Enter `version` into the **New override for library** input field
 9. Click **Add** and then **Apply**
-10. SickoMenu should now work properly in the game
+10. SickoMenu should now work properly!
 
 ### For macOS (Version Proxy Only)
 
