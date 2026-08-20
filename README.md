@@ -319,7 +319,7 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 Hotkeys can be customized in-game under **Settings → Keybinds**.
 
 ## ⚒️ Building / Compilation
-You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here]().
+You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
 
 ### Normal (SickoMenu.dll)
 Inject it with any injector you have.
