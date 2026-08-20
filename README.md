@@ -29,6 +29,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 - [👌 Supported Versions](https://github.com/g0aty/SickoMenu#-supported-versions)
 - [⬇️ Download & Install](https://github.com/g0aty/SickoMenu#%EF%B8%8F-download--install)
 - [🛠️ Troubleshooting](https://github.com/g0aty/SickoMenu#%EF%B8%8F-troubleshooting)
+- [❓ FAQ](https://github.com/g0aty/SickoMenu#-faq)
 - [⌨️ Default Hotkeys](https://github.com/g0aty/SickoMenu#%EF%B8%8F-default-hotkeys)
 - [⚒️ Building / Compilation](https://github.com/g0aty/SickoMenu#%EF%B8%8F-building--compilation)
 - [💁 Contributing](https://github.com/g0aty/SickoMenu#-contributing)
@@ -106,7 +107,7 @@ A huge amount of features!
 ## ⬇️ Download & Install
 ### For Windows
 You can find the latest release [here](https://github.com/g0aty/SickoMenu/releases/latest).
-Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in your Among Us directory (the folder containing `Among Us.exe`). Make sure to use the correct DLL for your Among Us platform!
+Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in your Among Us directory (the folder containing `Among Us.exe`). Make sure to use the correct DLL for your Among Us p[...]
 
 **Accessing the Among Us directory for supported platforms:**
 - **🚂 Steam** Right-click **Among Us** in your Library → Click **Manage** → Click **Browse local files**.
@@ -165,44 +166,44 @@ First you will need [protontricks](https://github.com/Matoking/protontricks), yo
    - Navigate to:  
      `drive_c/Program Files (x86)/Steam/steamapps/common/Among Us`  
    - Place the `version.dll` file here.
-6.  In PlayOnMac, select your virtual drive > **Configure** > **Wine** > **Libraries**.
-   - Add `version` to the overrides and set it to **Native (Windows)**.
+6.  In PlayOnMac, select your virtual drive > **Configure** > **Wine** > **Libraries`.
+    - Add `version` to the overrides and set it to **Native (Windows)`.
 7.Run Among Us through Steam in PlayOnMac. Use the hotkey **Fn+Backspace or Command+Backspace** to toggle the mod menu, depending on your model.
 
 **Method 3: (recommended)**
 
 1. Open **Terminal** and install Wine via Homebrew.
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   brew install --cask wine-stable
-   ```  
+    ```bash
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    brew install --cask wine-stable
+    ```  
 2. In Terminal, create a dedicated Wine prefix for Among Us:  
-   ```bash
-   mkdir -p ~/AmongUsWine
-   WINEPREFIX=~/AmongUsWine winecfg
-   ```  
-   - In the Wine Configuration window, set **Windows Version** to **Windows 10** and close.
+    ```bash
+    mkdir -p ~/AmongUsWine
+    WINEPREFIX=~/AmongUsWine winecfg
+    ```  
+    - In the Wine Configuration window, set **Windows Version** to **Windows 10** and close.
 3. Download the **Steam Installer** from [store.steampowered.com](https://store.steampowered.com/about/).  
 4. Install Steam into your Wine prefix:  
-   ```bash
-   WINEPREFIX=~/AmongUsWine wine ~/Downloads/SteamSetup.exe
-   ```  
+    ```bash
+    WINEPREFIX=~/AmongUsWine wine ~/Downloads/SteamSetup.exe
+    ```  
 5. Follow the installer prompts. Launch Steam from Terminal afterward:  
-   ```bash
-   WINEPREFIX=~/AmongUsWine wine ~/AmongUsWine/drive_c/Program\ Files\ \(x86\)/Steam/Steam.exe
-   ```  
+    ```bash
+    WINEPREFIX=~/AmongUsWine wine ~/AmongUsWine/drive_c/Program\ Files\ \(x86\)/Steam/Steam.exe
+    ```  
 6. Log in to Steam and install **Among Us**.
 7. Locate the Among Us folder:  
-   - Open **Finder** > Go to **Go > Go to Folder** and paste:  
-     `~/AmongUsWine/drive_c/Program Files (x86)/Steam/steamapps/common/Among Us`  
-   - Drag the `version.dll` file into this folder.
+    - Open **Finder** > Go to **Go > Go to Folder** and paste:  
+      `~/AmongUsWine/drive_c/Program Files (x86)/Steam/steamapps/common/Among Us`  
+    - Drag the `version.dll` file into this folder.
 8. In Terminal, run:  
-   ```bash
-   WINEPREFIX=~/AmongUsWine winecfg
-   ```  
-   - Go to the **Libraries** tab.  
-   - Under **New override for library**, type `version`, click **Add**, then set it to **Native (Windows)**.  
-   - Click **Apply** > **OK**.
+    ```bash
+    WINEPREFIX=~/AmongUsWine winecfg
+    ```  
+    - Go to the **Libraries** tab.  
+    - Under **New override for library**, type `version`, click **Add**, then set it to **Native (Windows)**.  
+    - Click **Apply** > **OK**.
 9. Launch Steam from Terminal (as in Step 3.3).  
 - Start Among Us from your Steam library.  
 - Use **Command + Backspace or Fn+Backspace** to toggle SickoMenu in-game, depending on your Mac model.
@@ -291,6 +292,43 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
 
 ---
+
+## ❓ FAQ
+
+Q: Is SickoMenu legal to use?
+
+A: SickoMenu is provided for educational and experimental purposes only. It is not affiliated with Innersloth LLC. Using mods in public games or in ways that violate the game's Terms of Service can lead to account sanctions. Always use SickoMenu only in private lobbies with consenting players and follow the Ethical Use Protocol.
+
+Q: How do I uninstall SickoMenu?
+
+A: To uninstall the Version Proxy (version.dll), remove the `version.dll` file from your Among Us game directory. If you injected `SickoMenu.dll`, close Among Us, remove the DLL from the game's process (if still loaded), and delete the DLL file from wherever you stored it. You may also want to verify game files via Steam or your launcher to restore original game files.
+
+Q: My antivirus deleted the DLL — what should I do?
+
+A: Many antivirus engines flag modding tools as potentially unwanted. Check your antivirus quarantine and restore the file if you trust the source. Add an exclusion for the `Among Us` folder or the DLL only if you are certain the file is safe. Always download releases from the official repository or verified releases page.
+
+Q: The menu does not show — what now?
+
+A: Ensure you're running a supported platform and Among Us version. Double-check the installation method (Version Proxy vs injection). Try restarting the game and, if applicable, your injector. If the problem persists, consult the Troubleshooting section or ask for help on our [Discord](https://discord.gg/sickos).
+
+Q: Can I use this in public matches?
+
+A: No. Using this mod in public matches is against our Ethical Use Protocol and may violate Innersloth's Terms of Service. Use only in private lobbies with informed consent from all players.
+
+Q: How do I build from source?
+
+A: See the "⚒️ Building / Compilation" section for instructions and build targets. If you need further assistance, open an issue or ask in Discord with details about your platform and build errors.
+
+Q: How can I report bugs or request features?
+
+A: Join our Discord and open a bug report or feature request in the appropriate channel. Include steps to reproduce, logs, and screenshots when possible.
+
+Q: How do I change hotkeys?
+
+A: Hotkeys can be customized in-game under **Settings → Keybinds**. If you want different default keys, consider contributing a change or opening a PR with a clear rationale.
+
+---
+
 ## ⌨️ Default Hotkeys
 
 | Action                    | Key              |
@@ -306,7 +344,7 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 Hotkeys can be customized in-game under **Settings → Keybinds**.
 
 ## ⚒️ Building / Compilation
-You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/edit?usp=sharing).
+You can compile two different versions of the menu. Normal or Version Proxy. Steps to compile can be found [here](https://docs.google.com/document/d/1bdXyasr7suassff_or3ywPyItGkjhlTfbBJtvaJ6udQ/e[...]
 
 ### Normal (SickoMenu.dll)
 Inject it with any injector you have.
