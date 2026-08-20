@@ -25,6 +25,9 @@
     <ClCompile Include="gui\radar.cpp">
       <Filter>gui</Filter>
     </ClCompile>
+    <ClCompile Include="gui\dino.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
     <ClCompile Include="gui\tabs\about_tab.cpp">
       <Filter>gui\tabs</Filter>
     </ClCompile>
@@ -355,6 +358,9 @@
       <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="gui\radar.hpp">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\dino.hpp">
       <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="gui\theme.hpp">

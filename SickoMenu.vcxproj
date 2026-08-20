@@ -357,6 +357,7 @@
     <ClCompile Include="framework\il2cpp-init.cpp" />
     <ClCompile Include="gui\menu.cpp" />
     <ClCompile Include="gui\radar.cpp" />
+    <ClCompile Include="gui\dino.cpp" />
     <ClCompile Include="includes\imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -575,6 +576,7 @@
     <ClInclude Include="framework\il2cpp-init.h" />
     <ClInclude Include="gui\menu.hpp" />
     <ClInclude Include="gui\radar.hpp" />
+    <ClInclude Include="gui\dino.hpp" />
     <ClInclude Include="gui\theme.hpp" />
     <ClInclude Include="includes\stb_image.h" />
     <ClInclude Include="includes\imgui\imconfig.h" />

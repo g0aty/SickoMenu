@@ -60,6 +60,7 @@ public:
     bool SpoofLevel = false;
     int FakeLevel = 1;
     bool ShowKeybinds = true;
+    bool ShowDino = false;
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
     bool UseNewFriendCode = false;

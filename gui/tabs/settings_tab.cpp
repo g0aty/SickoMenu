@@ -63,6 +63,10 @@ namespace SettingsTab {
 				State.Save();
 			}
 			ImGui::SameLine();
+			if (ToggleButton("Show Dino Game", &State.ShowDino)) {
+				State.Save();
+			}
+			ImGui::SameLine();
 			if (ToggleButton("Allow Activating Keybinds while Chatting", &State.KeybindsWhileChatting)) {
 				State.Save();
 			}

@@ -19,6 +19,7 @@
 #include "resource_data.h"
 #include "game.h"
 #include "console.hpp"
+#include "dino.hpp"
 #include "profiler.h"
 
 #include <future>
@@ -344,6 +345,11 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
     if (!State.PanicMode && State.ShowConsole)
     {
         ImGuiRenderer::Submit([]() { ConsoleGui::Render(); });
+    }
+
+    if (!State.PanicMode && State.ShowDino)
+    {
+        ImGuiRenderer::Submit([]() { Dino::Render(); });
     }
 
     if (CanDrawEsp()) {
