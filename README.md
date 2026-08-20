@@ -124,7 +124,7 @@ Either inject `SickoMenu.dll` with a reliable injector or put `version.dll` in y
 2. Add `WINEDLLOVERRIDES="version=n,b" %command%` to your Among Us launch options. 
 SickoMenu should now load!
 
-**If you're facing issues - try Method 2:**
+**If you're facing issues, try Method 2:**
 
 First, you'll need [protontricks](https://github.com/Matoking/protontricks). You can install it with your packager of choice.
 
@@ -173,10 +173,10 @@ First, you'll need [protontricks](https://github.com/Matoking/protontricks). You
    - Right-click your virtual drive in PlayOnMac > **Open virtual drive’s directory**.
    - Navigate to:  
      `drive_c/Program Files (x86)/Steam/steamapps/common/Among Us`  
-   - Place the `version.dll` file here.
+   - Place the `version.dll` file there.
 6.  In PlayOnMac, select your virtual drive > **Configure** > **Wine** > **Libraries**.
    - Add `version` to the overrides and set it to **Native (Windows)**.
-7.Run Among Us through Steam in PlayOnMac. Use the hotkey **Fn+Backspace or Command+Backspace** to toggle the mod menu, depending on your model.
+7. Run Among Us through Steam in PlayOnMac. Use the hotkey **Fn+Backspace or Command+Backspace** to toggle the mod menu, depending on your model.
 
 **Method 3: (recommended)**
 
@@ -237,8 +237,7 @@ Leave architecture at default (64-bit).
 Create the bottle.
 3. Install Steam inside the bottle:
 Select your bottle and click Run Installer.
-Download the Steam installer from
-https://store.steampowered.com/about/
+Download the Steam installer from [store.steampowered.com](https://store.steampowered.com/about/). 
 Select SteamSetup.exe and complete the installation.
 Launch Steam from Whisky:
 Log in to your Steam account.
@@ -269,7 +268,7 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
   brew install --cask wine-stable
   ```
   **For Method 3:**
-- The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
+- The bash script in the first step will install Homebrew if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
 ---
 ## 🛠️ Troubleshooting
 
@@ -296,6 +295,11 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
 - Ensure your injector is running with sufficient permissions.
 - If issues persist, try a different injection method or injector.
 
+** Can't play online (Steam)**
+- Verify that you have the "steam_appid.txt" file.
+- If you don't have it, which you likely don't, make a .txt file named that, write "945360" into it, and press save.
+- You'll also need Steam running in the background, which stops the issue.
+  
 **Other issues**
 - If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
 
@@ -320,13 +324,13 @@ You can compile two different versions of the menu. Normal or Version Proxy. Ste
 ### Normal (SickoMenu.dll)
 Inject it with any injector you have.
 
-- Debug (With Debug Information and can be attached to process)
+- Debug (With Debug Information and can be attached to the process)
 - Release (Optimized with all information stripped)
 
 ### Version Proxy (version.dll)
 Will automatically be loaded by the Game itself if the dll is in the game directory.
 
-- Debug_Version (With Debug Information and can be attached to process)
+- Debug_Version (With Debug Information and can be attached to the process)
 - Release_Version (Optimized with all information stripped)
 
 ## 💁 Contributing
