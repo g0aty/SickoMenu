@@ -1549,7 +1549,7 @@ namespace PlayersTab {
                 }
                 ImGui::NewLine();
                 if (IsHost() && (IsInGame() || IsInLobby())) {
-                    CustomListBoxInt(" ", &forcedColor, COLORS, 85.0f * State.dpiScale);
+                    CustomListBoxIntColored(" ", &forcedColor, COLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
                     ImGui::SameLine();
                     if (AnimatedButton("Force Color"))
                     {

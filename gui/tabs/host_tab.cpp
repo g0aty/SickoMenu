@@ -200,7 +200,7 @@ namespace HostTab {
                             if (outfit == NULL) continue;
                             //ImVec4 the_info = AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId));
                             //char hex_buf[10];
-                            //// Format as #AARRGGBB (standard alpha-first hex)
+                            //// Format as #AABBGGRR (standard alpha-first hex)
                             //std::snprintf(hex_buf, sizeof(hex_buf), "#%02X%02X%02X%02X",
                             //    (int)(the_info.w * 255.0f), // Alpha
                             //    (int)(the_info.z * 255.0f)  // Blue
