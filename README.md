@@ -27,7 +27,7 @@ Join our very own **Discord Server** for support, bug reports, and sneak peeks!
 
 ## 📋 Table of Contents
 - [⚠️ Disclaimer](#%EF%B8%8F-disclaimer)
-- [⁉️ Frequently Asked Questions](#-frequently-asked-questions)
+- [⁉️ Frequently Asked Questions](#%EF%B8%8F-frequently-asked-questions)
 - [🛑 Ethical Use Protocol](#-ethical-use-protocol)
 - [⚙️ Features](#%EF%B8%8F-features)
 - [📸 Screenshot](#-screenshot)
