@@ -66,6 +66,10 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 > ⚠️ Use responsibly. This software is provided "as is", **without any warranties** or guarantees of safety, support, or fitness for purpose.
 
 ---
+
+## ⁉️ Frequently Asked Questions
+Click [here](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md) to read the list of FAQs!
+
 ## 🛑 Ethical Use Protocol
 **By using SickoMenu, you agree to:**
 1. **Use exclusively in private lobbies** with consenting players.
