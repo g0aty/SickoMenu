@@ -958,7 +958,7 @@ Game::ColorId GetRandomColorId()
     Game::ColorId colorId;
     il2cpp::Array PlayerColors = app::Palette__TypeInfo->static_fields->PlayerColors;
     assert(PlayerColors.size() > 0);
-    if (IsInGame() || IsInLobby())
+    if ((IsInGame() || IsInLobby()) && !IsHost())
     {
         auto players = GetAllPlayerControl();
         std::vector<Game::ColorId> availableColors = { };
@@ -1299,11 +1299,12 @@ NetworkedPlayerInfo_PlayerOutfit* GetPlayerOutfit(NetworkedPlayerInfo* player, b
 }
 
 bool PlayerIsImpostor(NetworkedPlayerInfo* player) {
-
     if (player->fields.Role == nullptr) return false;
 
-    RoleBehaviour* role = player->fields.Role;
-    return role->fields.TeamType == RoleTeamTypes__Enum::Impostor;
+    // equating roles because TeamType wasn't giving the correct result
+    auto role = player->fields.RoleType;
+    return role == RoleTypes__Enum::ImpostorGhost || role == RoleTypes__Enum::Impostor || role == RoleTypes__Enum::Shapeshifter ||
+        role == RoleTypes__Enum::Phantom || role == RoleTypes__Enum::Viper;
 }
 
 bool FriendCodeHasPermission(const std::string& friendCode, const std::string& commandKey) {

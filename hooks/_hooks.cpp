@@ -239,7 +239,6 @@ void DetourInitilization() {
 	HOOKFUNC(Vent_TryMoveToVent);
 	HOOKFUNC(PlayerControl_get_CalculatedAlpha);
 	HOOKFUNC(PlayerControl_get_Visible);
-	HOOKFUNC(MeetingHud_CastVote);
 	HOOKFUNC(MultiplayerSettingsData_get_ChatMode);
 	//HOOKFUNC(VentilationSystem_Update);
 	HOOKFUNC(PlayerPhysics_RpcExitVent);
@@ -287,6 +286,21 @@ void DetourInitilization() {
 	HOOKFUNC(ChatController_Toggle);
 	HOOKFUNC(MapBehaviour_FixedUpdate);
 	HOOKFUNC(RoomTracker_FixedUpdate);
+	HOOKFUNC(EngineerRole_FixedUpdate);
+	HOOKFUNC(ScientistRole_Update);
+	HOOKFUNC(TrackerRole_FixedUpdate);
+	HOOKFUNC(DetectiveRole_FixedUpdate);
+	HOOKFUNC(GuardianAngelRole_FixedUpdate);
+	HOOKFUNC(ShapeshifterRole_FixedUpdate);
+	HOOKFUNC(MeetingHud_CastVote);
+	HOOKFUNC(MatchInfoHudButton_Update);
+	HOOKFUNC(KillButton_DoClick);
+	HOOKFUNC(MatchInfoGuide_Update);
+	HOOKFUNC(PlayerIdentifierButton_Populate);
+	HOOKFUNC(GameManager_ReviveEveryoneFreeplay);
+	HOOKFUNC(PlayerControl_Die);
+	HOOKFUNC(PlayerVoteArea_SetCosmetics);
+	HOOKFUNC(PlayerControl_SetKillTimer);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -440,7 +454,6 @@ void DetourUninitialization()
 	UNHOOKFUNC(Vent_TryMoveToVent);
 	UNHOOKFUNC(PlayerControl_get_CalculatedAlpha);
 	UNHOOKFUNC(PlayerControl_get_Visible);
-	UNHOOKFUNC(MeetingHud_CastVote);
 	UNHOOKFUNC(MultiplayerSettingsData_get_ChatMode);
 	//UNHOOKFUNC(VentilationSystem_Update);
 	UNHOOKFUNC(PlayerPhysics_RpcExitVent);
@@ -488,6 +501,18 @@ void DetourUninitialization()
 	UNHOOKFUNC(ChatController_Toggle);
 	UNHOOKFUNC(MapBehaviour_FixedUpdate);
 	UNHOOKFUNC(RoomTracker_FixedUpdate);
+	UNHOOKFUNC(EngineerRole_FixedUpdate);
+	UNHOOKFUNC(GuardianAngelRole_FixedUpdate);
+	UNHOOKFUNC(ShapeshifterRole_FixedUpdate);
+	UNHOOKFUNC(MeetingHud_CastVote);
+	UNHOOKFUNC(MatchInfoHudButton_Update);
+	UNHOOKFUNC(KillButton_DoClick);
+	UNHOOKFUNC(MatchInfoGuide_Update);
+	UNHOOKFUNC(PlayerIdentifierButton_Populate);
+	UNHOOKFUNC(GameManager_ReviveEveryoneFreeplay);
+	UNHOOKFUNC(PlayerControl_Die);
+	UNHOOKFUNC(PlayerVoteArea_SetCosmetics);
+	UNHOOKFUNC(PlayerControl_SetKillTimer);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

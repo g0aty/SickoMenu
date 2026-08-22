@@ -153,8 +153,9 @@ namespace GameTab {
         else if (name == "Anticheat") CloseOtherGroups(Groups::Anticheat);
         else if (name == "Utils") CloseOtherGroups(Groups::Utils);
         else if (name == "History") CloseOtherGroups(Groups::History);
-        else if (name == "Options") CloseOtherGroups(Groups::Options);
+        else if (name == "Options" && (GameOptions().HasOptions() && (IsInGame() || IsInLobby()))) CloseOtherGroups(Groups::Options);
     }
+
     void Render() {
         ImGui::SameLine(100 * State.dpiScale);
         ImGui::BeginChild("###Game", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
@@ -209,10 +210,10 @@ namespace GameTab {
                 if (CustomListBoxInt("Task Bar Updates", &State.TaskBarUpdates, TASKBARUPDATES, 225 * State.dpiScale))
                     State.PrevTaskBarUpdates = State.TaskBarUpdates;
             }*/
-            if (ToggleButton("No Ability Cooldown", &State.NoAbilityCD)) {
+            /*if (ToggleButton("No Ability Cooldown", &State.NoAbilityCD)) {
                 State.Save();
             }
-            ImGui::SameLine();
+            ImGui::SameLine();*/
             if (ToggleButton("Multiply Speed", &State.MultiplySpeed)) {
                 State.Save();
             }
@@ -542,7 +543,7 @@ namespace GameTab {
             {
                 State.Save();
             }
-            if (IsHost() || !State.SafeMode) {
+            if ((IsHost() && IsInGame()) || !State.SafeMode) {
                 if (CustomListBoxInt("Chat Spam Mode", &State.ChatSpamMode,
                     { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
             }
@@ -851,7 +852,7 @@ namespace GameTab {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
-                if (ToggleButton("Ban Auto-Rejoin Players", &State.BanLeavers)) {
+                if (ToggleButton("Ban Repeatedly Rejoining Players", &State.BanLeavers)) {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);

@@ -83,7 +83,7 @@ namespace AboutTab {
 
             ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(" is a free and open-source software.");
+            ImGui::Text(" is free and open-source software.");
 
             if (State.SickoVersion.find("pr") != std::string::npos || State.SickoVersion.find("rc") != std::string::npos) {
                 if (State.SickoVersion.find("pr") != std::string::npos) ImGui::TextColored(State.RgbColor, "You have access to pre-releases, enjoy!");

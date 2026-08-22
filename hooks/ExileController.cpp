@@ -31,10 +31,10 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
     }
 }
 
-void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method) {
+void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, bool wasOverruled, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dExileController_BeginForGameplay executed", false);
     State.VoteOffPlayerId = Game::HasNotVoted;
-    ExileController_BeginForGameplay(__this, exiled, voteTie, method);
+    ExileController_BeginForGameplay(__this, exiled, voteTie, wasOverruled, method);
     exiledInfo = exiled;
     try {
         if (IsHost() && State.TournamentMode && !voteTie && exiled != NULL) {

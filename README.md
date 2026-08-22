@@ -2,7 +2,7 @@
    <img src="SickoBanner.png">
   </p>
 
-<h1 align="center">👺 SickoMenu v4.5.2</h1>
+<h1 align="center">👺 SickoMenu v5.0</h1>
 
 <p align="center">
   <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen" alt="Latest Release"></a>
@@ -23,6 +23,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 
 ## 📋 Table of Contents
 - [⚠️ Disclaimer](https://github.com/g0aty/SickoMenu#%EF%B8%8F-disclaimer)
+- [⁉️ Frequently Asked Questions](https://github.com/g0aty/SickoMenu#-frequently-asked-questions)
 - [🛑 Ethical Use Protocol](https://github.com/g0aty/SickoMenu#-ethical-use-protocol)
 - [⚙️ Features](https://github.com/g0aty/SickoMenu#%EF%B8%8F-features)
 - [📸 Screenshot](https://github.com/g0aty/SickoMenu#-screenshot)
@@ -60,6 +61,9 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 
 ---
 
+## ⁉️ Frequently Asked Questions
+Click [here](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md) to read the list of FAQs!
+
 ## 🛑 Ethical Use Protocol
 **By using SickoMenu, you agree to:**
 1. **Use exclusively in private lobbies** with consenting players.
@@ -83,11 +87,7 @@ A huge amount of features!
 - Disable Kill Animation
 - SickoChat (`/sc [message]`)
 
-**Full Feature List:** [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)  
-
-> 🔸 Features marked with **"!"** may impact game balance. Always obtain lobby consent
-
----
+**Full Feature List:** [FEATURES.md](https://github.com/g0aty/SickoMenu/blob/main/FEATURES.md)
 
 ## 📸 Screenshot
 <p align="center">
@@ -271,35 +271,6 @@ Use Fn + Backspace or Command + Backspace (depending on your Mac model) to toggl
   **For Method 3:**
 - The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
 ---
-## 🛠️ Troubleshooting
-
-**Game crashes on launch**
-- Ensure you are using a supported Among Us version.
-- Verify you downloaded the correct DLL for your platform.
-- Remove other mods that may conflict with SickoMenu.
-
-**Menu does not appear**
-- Confirm the DLL was loaded successfully.
-- Verify you are using the correct installation method (Version Proxy or Injection).
-- Try restarting the game.
-
-**Antivirus removes files**
-- Some antivirus programs may flag game modifications and remove them automatically.
-- Check your antivirus quarantine if files disappear after installation.
-
-**Wrong DLL version**
-- Make sure you are using the DLL intended for your platform.
-- Download the latest release if you are unsure.
-
-**Injection issues**
-- Verify that the injected DLL matches your game version.
-- Ensure your injector is running with sufficient permissions.
-- If issues persist, try a different injection method or injector.
-
-**Other issues**
-- If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
-
----
 ## ⌨️ Default Hotkeys
 
 | Action                    | Key              |
@@ -344,14 +315,11 @@ Contributions are welcome and appreciated!
 
 > [!TIP]
 > - Keep your changes focused and well-described  
-> - Documentation and README improvements are always welcome  
+> - Documentation and README improvements are welcome as long as they have effort put in to them
 > - For larger features or big changes, consider discussing them in the [Discord](https://discord.gg/sickos) first
 
 ## ✨ Inspiration
-* [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
-* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
-* [BetterAmongUs](https://github.com/D1GQ/BetterAmongUs) by [D1GQ](https://github.com/D1GQ/)
-* [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
+Inspiration from/credit to other mods has been mentioned in the source code. If you think we haven't given you credit for a feature, open an issue for it!
 
 ## 🙏 Special Thanks
 * The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)

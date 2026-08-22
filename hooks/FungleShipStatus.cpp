@@ -45,7 +45,7 @@ void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 void dZiplineConsole_Update(ZiplineConsole* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) Log.HookDebug("Hook dZiplineConsole_Update executed", false);
 
-	if (!State.PanicMode && State.NoAbilityCD) __this->fields._CoolDown_k__BackingField = 0.f;
+	if (!State.PanicMode && State.NoLadderZiplineCooldown) __this->fields._CoolDown_k__BackingField = 0.f;
 
 	return ZiplineConsole_Update(__this, method);
 }

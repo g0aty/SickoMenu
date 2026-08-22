@@ -44,6 +44,7 @@ void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo
         LOG_ERROR("Exception occurred in PlayerControl_CompleteTask (PlayerControl)");
     }
     PlayerControl_CompleteTask(__this, idx, method);
+    State.MIG_ThemeChanged = true; // update player tasks live on the MatchInfoGuide
 }
 
 static Color32 GetKillCooldownColor(float killTimer) {
@@ -139,8 +140,20 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                 }
             }
 
-            bool hideName = GameOptions().GetGameMode() == GameModes__Enum::HideNSeek &&
-                !(GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames));
+            bool isMushroomMixedUp = false;
+
+            if (State.mapType == Settings::MapType::Fungle && GetPlayerTasks(*Game::pLocalPlayer).has_value()) {
+                for (auto task : GetPlayerTasks(*Game::pLocalPlayer).value()) {
+                    if (task->fields.TaskType == TaskTypes__Enum::MushroomMixupSabotage) {
+                        isMushroomMixedUp = true;
+                        // this fixes https://github.com/g0aty/SickoMenu/issues/560
+                        break;
+                    }
+                }
+            }
+
+            bool hideName = isMushroomMixedUp || (GameOptions().GetGameMode() == GameModes__Enum::HideNSeek &&
+                !(GameOptions().GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames)));
 
             bool shouldSeeName = ((!State.PanicMode && (State.RevealRoles || State.ShowKillCD || State.PlayerColoredDots)) || !hideName) && PlayerControl_get_Visible(__this, NULL);
 
@@ -327,16 +340,10 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                     }
                     if (IsHost() && State.TaskSpeedrun && !State.SpeedrunOver) {
                         int speedrunTimer = int(State.SpeedrunTimer);
-                        std::string timerDisplay = std::format("<#fff>{} <#0f0>({}:{}{})</color></color>", playerName, int(speedrunTimer / 60), speedrunTimer % 60 < 10 ? "0" : "", speedrunTimer % 60);
+                        std::string timerDisplay = std::format("<#fff><size=50%><#0000>0</color></size>\n{}\n<#0f0><size=50%>All Tasks Completed in {}:{}{}</size></color></color>", playerName, int(speedrunTimer / 60), speedrunTimer % 60 < 10 ? "0" : "", speedrunTimer % 60);
                         PlayerControl_SetName(__this, convert_to_string(timerDisplay), NULL);
                         // SetName RPC is patched for host as well, so we use the client sided variation of it
-                        for (auto receiver : GetAllPlayerControl()) {
-                            auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.NetId,
-                                uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::Reliable, receiver->fields._.OwnerId, NULL);
-                            MessageWriter_WriteUShort(writer, uint16_t(RoleTypes__Enum::ImpostorGhost), NULL);
-                            MessageWriter_WriteBoolean(writer, false, NULL);
-                            InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-                        }
+                        PlayerControl_RpcSetRole(__this, RoleTypes__Enum::ImpostorGhost, false, NULL);
                         std::string playerName = convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName);
                         State.SpeedrunOver = true; //prevent duplicate timer
                         GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorsByKill, false, NULL);
@@ -359,6 +366,13 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                     }
                 }
             }
+
+            if (IsInGame() && playerData->fields.Role && PlayerIsImpostor(playerData) && !playerData->fields.IsDead) {
+                playerData->fields.Role->fields.CanUseKillButton = true;
+                // AU v18 somehow doesn't recognize the value as true for other players
+                // leading to ShowKillCD not working as intended
+            }
+
             if (IsInGame() && State.ShowKillCD
                 && !playerData->fields.IsDead
                 && playerData->fields.Role
@@ -923,8 +937,8 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
                     State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(killer.value(), CHEAT_ACTIONS::CHEAT_KILL_IMPOSTOR));
                     State.liveConsoleEvents.emplace_back(std::make_unique<CheatDetectedEvent>(killer.value(), CHEAT_ACTIONS::CHEAT_KILL_IMPOSTOR));
                 }
-                if (State.SafeMode && State.Enable_SMAC && State.SMAC_CheckMurder)
-                    SMAC_OnCheatDetected(__this, "Abnormal Murder Player");
+                /*if (State.SafeMode && State.Enable_SMAC && State.SMAC_CheckMurder)
+                    SMAC_OnCheatDetected(__this, "Abnormal Murder Player (Killing Impostor/Ghost)");*/
             }
             synchronized(Replay::replayEventMutex) {
                 State.liveReplayEvents.emplace_back(std::make_unique<KillEvent>(killer.value(), victim.value(), PlayerControl_GetTruePosition(__this, NULL), PlayerControl_GetTruePosition(target, NULL)));
@@ -1046,10 +1060,10 @@ void dPlayerControl_CheckMurder(PlayerControl* __this, PlayerControl* target, Me
         return; // Don't send direct murder from crewmate
     }
     else {
-        if (pData->fields.IsDead || tData->fields.IsDead || PlayerIsImpostor(tData)) {
+        /*if (pData->fields.IsDead || tData->fields.IsDead || PlayerIsImpostor(tData)) {
             if (State.SafeMode && State.Enable_SMAC && State.SMAC_CheckMurder) SMAC_OnCheatDetected(__this, "Abnormal Murder Player");
             return; // Don't send direct murder from dead impostor or to dead target or to an impostor
-        }
+        }*/
         if (target->fields.protectedByGuardianId > 0) {
             return PlayerControl_RpcMurderPlayer(__this, target, false, NULL);
             // Show failed murder
@@ -1343,7 +1357,8 @@ void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method) 
 
 void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dKillButton_SetTarget executed", false);
-    if (!State.PanicMode && IsInGame()) {
+    if (!State.PanicMode && IsInGame() && (*Game::pLocalPlayer) != NULL &&
+        !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) {
         try {
             auto result = target;
             bool amImpostor = PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer));
@@ -1401,6 +1416,16 @@ void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo
         }
     }
     KillButton_SetTarget(__this, target, method);
+}
+
+void dKillButton_DoClick(KillButton* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dKillButton_DoClick executed", false);
+    if (State.UnlockKillButton && !PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer)))
+        __this->fields._.isCoolingDown = false;
+    // as crewmate, isCoolingDown is set to true for some reason
+    // this does have the side effect of giving us zero kill cooldown,
+    // but who really cares, you're going to kill again anyway!
+    KillButton_DoClick(__this, method);
 }
 
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
@@ -1469,12 +1494,12 @@ float dConsole_CanUse(Console* __this, NetworkedPlayerInfo* pc, bool* canUse, bo
     return Console_CanUse(__this, pc, canUse, couldUse, method);
 }
 
-void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method) {
+void* dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_CoSetRole executed", false);
     if (__this == *Game::pLocalPlayer) State.RealRole = role;
+    State.MIG_ThemeChanged = true; // update player roles live on the MatchInfoGuide
     if (!IsInMultiplayerGame() || __this != *Game::pLocalPlayer || !State.AutoFakeRole) {
-        PlayerControl_CoSetRole(__this, role, canOverride, method);
-        return;
+        return PlayerControl_CoSetRole(__this, role, canOverride, method);
     }
     bool hasAlreadySetRole = role == RoleTypes__Enum::GuardianAngel || role == RoleTypes__Enum::CrewmateGhost || role == RoleTypes__Enum::ImpostorGhost;
     bool roleAllowed = false;
@@ -1525,7 +1550,7 @@ void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool 
     if (State.AutoFakeRole && !hasAlreadySetRole && roleAllowed) {
         role = (RoleTypes__Enum)State.FakeRoleId;
     }
-    PlayerControl_CoSetRole(__this, role, canOverride, method);
+    return PlayerControl_CoSetRole(__this, role, canOverride, method);
 }
 
 void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* writer, bool initialState, MethodInfo* method) {
@@ -1738,6 +1763,7 @@ void dBanMenu_Select(BanMenu* __this, int32_t clientId, MethodInfo* method) {
 }
 
 void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_RpcPlayAnimation executed", false);
     bool visualsOn = GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks, false);
     if (!State.PanicMode && State.BypassVisualTasks && !visualsOn) {
         PlayerControl_PlayAnimation(__this, animType, NULL);
@@ -1750,6 +1776,7 @@ void dPlayerControl_RpcPlayAnimation(PlayerControl* __this, uint8_t animType, Me
 }
 
 void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_RpcSetScanner executed", false);
     bool visualsOn = GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks, false);
     if (((!State.PanicMode && State.BypassVisualTasks) || !value) && !visualsOn) {
         __this->fields.scannerCount++;
@@ -1765,12 +1792,14 @@ void dPlayerControl_RpcSetScanner(PlayerControl* __this, bool value, MethodInfo*
 }
 
 void dPlayerControl_RpcSetRole(PlayerControl* __this, RoleTypes__Enum roleType, bool canOverrideRole, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_RpcSetRole executed", false);
     if (IsHost() && State.GodMode && __this == *Game::pLocalPlayer &&
         (roleType == RoleTypes__Enum::CrewmateGhost || roleType == RoleTypes__Enum::GuardianAngel || roleType == RoleTypes__Enum::ImpostorGhost)) return;
     PlayerControl_RpcSetRole(__this, roleType, canOverrideRole, method);
 }
 
 void* dPlayerControl_Start(PlayerControl* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_Start executed", false);
     auto ret = PlayerControl_Start(__this, method);
     if (!State.PanicMode && (IsInGame() || IsInLobby()) && State.SMAC_PunishBlacklist && GetPlayerData(__this) != NULL) {
         std::string friendCode = convert_from_string(GetPlayerData(__this)->fields.FriendCode);
@@ -1783,6 +1812,7 @@ void* dPlayerControl_Start(PlayerControl* __this, MethodInfo* method) {
 }
 
 void dViperDeadBody_FixedUpdate(ViperDeadBody* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dViperDeadBody_FixedUpdate executed", false);
     ViperDeadBody_FixedUpdate(__this, method);
     if ((!__this->fields.victimDissolving && __this->fields.dissolveStage == 2) || __this->fields.maxDissolveTime <= 0.f) {
         auto it = std::find(State.validDeadBodyIds.begin(), State.validDeadBodyIds.end(), __this->fields.myController->fields.PlayerId);
@@ -1792,6 +1822,7 @@ void dViperDeadBody_FixedUpdate(ViperDeadBody* __this, MethodInfo* method) {
 }
 
 void dPlayerControl_RpcSetNamePlate(PlayerControl* __this, String* namePlateId, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_RpcSetNamePlate executed", false);
     // if a nameplate isn't set by us, previously joined clients think that our data hasn't fully loaded in
     // reference: PlayerControl.Start
     // this leads to the 30 second timeout triggering, kicking all previously joined players for a "network error"
@@ -1801,4 +1832,21 @@ void dPlayerControl_RpcSetNamePlate(PlayerControl* __this, String* namePlateId, 
         return;
     }
     PlayerControl_RpcSetNamePlate(__this, namePlateId, method);
+}
+
+void dPlayerControl_Die(PlayerControl* __this, int32_t reason, bool assignGhostRole, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_Die executed", false);
+    PlayerControl_Die(__this, reason, assignGhostRole, method);
+    State.MIG_ThemeChanged = true;
+    // when someone is exiled, their role is set with RoleManager_SetRole, which is inlined
+}
+
+void dPlayerControl_SetKillTimer(PlayerControl* __this, float time, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_SetKillTimer executed", false);
+
+    if (__this == *Game::pLocalPlayer && !State.PanicMode &&
+        (IsHost() || !State.SafeMode) && State.Impostor_NoKillCooldown)
+        time = 0.f;
+
+    PlayerControl_SetKillTimer(__this, time, method);
 }

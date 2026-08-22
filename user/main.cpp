@@ -120,7 +120,7 @@ void Run(LPVOID lpParam) {
     auto assembly = il2cpp_domain_assembly_open(domain, "Assembly-CSharp");
     //auto klass = il2cpp_class_from_name(assembly->image, "", "MovingPlatformBehaviour");
     //output_class_methods(klass);
-    //output_assembly_methods(assembly);
+    // output_assembly_methods(assembly);
     
 #endif
     GAME_STATIC_POINTER(Game::pAmongUsClient, app::AmongUsClient, Instance);

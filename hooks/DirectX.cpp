@@ -135,7 +135,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Replay)) State.ShowReplay = !State.ShowReplay;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_ChatAlwaysActive) && (IsInGame() || IsInLobby())) State.ChatAlwaysActive = !State.ChatAlwaysActive;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_ReadGhostMessages) && (IsInGame() || IsInLobby())) State.ReadGhostMessages = !State.ReadGhostMessages;
-        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Hud) && (IsInGame() || IsInLobby())) State.DisableHud = !State.DisableHud;
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Hud) && IsInGame()) State.DisableHud = !State.DisableHud;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Reset_Appearance) && (IsInGame() || IsInLobby())) ControlAppearance(false);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Randomize_Appearance)) ControlAppearance(true);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Complete_Tasks) && IsInGame()) CompleteAllTasks();
@@ -144,6 +144,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     }
     if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) {
         State.PanicMode = !State.PanicMode;
+        State.MIG_ThemeChanged = true;
         ReloadCurrentSceneIfNeeded();
     }
 
@@ -154,15 +155,16 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
         bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
         bool isScrollModifierAllowed = !chatOpen && !State.InMeeting && State.EnableZoom_ScrollZoom;
+        bool isShifted = ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT);
 
-        if (isScrollModifierAllowed && State.EnableZoom && (IsInGame() || IsInLobby())) {
+        if (!isShifted && isScrollModifierAllowed && State.EnableZoom && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f)  State.CameraHeight += 0.5f;
             if (ImGui::GetIO().MouseWheel > 0.f) {
                 State.CameraHeight -= 0.5f;
                 if (State.CameraHeight < 1.f) State.CameraHeight = 1.f;
             }
         }
-        if ((ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT)) &&
+        if (isShifted &&
             isScrollModifierAllowed && State.FreeCam && (IsInGame() || IsInLobby())) {
             if (ImGui::GetIO().MouseWheel < 0.f) State.FreeCamSpeed += 0.1f;
             if (ImGui::GetIO().MouseWheel > 0.f) {

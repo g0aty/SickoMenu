@@ -185,7 +185,6 @@ void RpcShapeshiftAsHost::Process()
 
     if (prevRole != RoleTypes__Enum::Shapeshifter) {
         // set the player's role temporarily to shapeshifter to get around the vanilla anticheat
-        RoleManager_SetRole(Game::RoleManager.GetInstance(), Player, RoleTypes__Enum::Shapeshifter, NULL);
         MessageWriter_StartMessage(writer, rpcFlag, NULL);
         MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
         MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::SetRole, NULL);
@@ -205,7 +204,6 @@ void RpcShapeshiftAsHost::Process()
 
     if (prevRole != RoleTypes__Enum::Shapeshifter) {
         // set the player's role back to their previous role
-        RoleManager_SetRole(Game::RoleManager.GetInstance(), Player, prevRole, NULL);
         MessageWriter_StartMessage(writer, rpcFlag, NULL);
         MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
         MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::SetRole, NULL);
@@ -340,7 +338,7 @@ void RpcClearVote::Process()
 {
     if (!PlayerSelection(Player).has_value()) return;
 
-    MeetingHud_RpcClearVote(MeetingHud__TypeInfo->static_fields->Instance, Player->fields._.OwnerId, NULL);
+    MeetingHud_RpcClearVote(MeetingHud__TypeInfo->static_fields->Instance, (PlayerId)Player->fields.PlayerId, NULL);
 }
 
 RpcEndMeeting::RpcEndMeeting() {

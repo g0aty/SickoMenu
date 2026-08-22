@@ -14,8 +14,19 @@ void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method) {
         GameObject_SetActive(hudGameObject, false, NULL);
         GameObject_SetActive(hudGameObject, true, NULL);
 
+        auto taskOverlay = (Component_1*)Game::HudManager.GetInstance()->fields.TaskCompleteOverlay;
+        if (taskOverlay != NULL && Component_get_gameObject(taskOverlay, NULL) != NULL) {
+            GameObject_SetActive(Component_get_gameObject(taskOverlay, NULL), false, NULL);
+            // prevent the persistent "Task Completed!" text while zooming
+        }
+
         if (shadowGameObject != NULL)
             GameObject_SetActive(shadowGameObject, wasShadowQuadActive, NULL);
+    }
+
+    if (ImGui::GetIO().WantTextInput) {
+        __this->fields.del = app::Vector2(); //Typing in a SickoMenu text field, suppress movement input entirely
+        return;
     }
 
     if ((!State.FreeCam && !State.playerToAttach.has_value()) || State.PanicMode) {

@@ -24,7 +24,18 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 			bool shouldSeePhantom = __this->fields.myPlayer == *Game::pLocalPlayer || PlayerIsImpostor(localData) || localData->fields.IsDead || State.ShowPhantoms;
 			bool shouldSeeGhost = localData->fields.IsDead || State.ShowGhosts;
 			auto roleType = playerData->fields.RoleType;
+
 			bool isFullyVanished = std::find(State.vanishedPlayers.begin(), State.vanishedPlayers.end(), playerData->fields.PlayerId) != State.vanishedPlayers.end();
+			
+			auto playerTransform = Component_get_transform((Component_1*)player, NULL);
+			if (playerTransform != NULL) {
+				auto vanishEffect = (Component_1*)Transform_FindChild(playerTransform, convert_to_string("VanishChargeEffect(Clone)"), NULL);
+				if (roleType == RoleTypes__Enum::Phantom && vanishEffect != NULL) {
+					isFullyVanished = !isFullyVanished;
+					// this fixes https://github.com/g0aty/SickoMenu/issues/601
+				}
+			}
+
 			bool isDead = playerData->fields.IsDead;
 			auto nameText = Component_get_gameObject((Component_1*)player->fields.cosmetics->fields.nameText, NULL);
 			bool isSeekerBody = player->fields.cosmetics->fields.bodyType == PlayerBodyTypes__Enum::Seeker || player->fields.cosmetics->fields.bodyType == PlayerBodyTypes__Enum::LongSeeker;
@@ -68,5 +79,12 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 }
 
 void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerPhysics_RpcExitVent executed", false);
 	PlayerPhysics_RpcExitVent(__this, id, method);
+}
+
+void dPlayerPhysics_RpcBootFromVent(PlayerPhysics* __this, int32_t ventId, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerPhysics_FixedUpdate executed", false);
+	if (!IsHost() && State.SafeMode) return;
+	PlayerPhysics_RpcBootFromVent(__this, ventId, method);
 }

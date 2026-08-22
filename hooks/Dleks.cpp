@@ -16,8 +16,7 @@ bool ShouldDisableHostAnticheat() {
 
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method) {
     LogIfEnabled("Hook dConstants_1_GetBroadcastVersion executed");
-    if (State.CurrentScene == "" || State.CurrentScene == "SplashIntro" || State.CurrentScene == "MatchMaking" || State.CurrentScene == "Tutorial" ||
-        (State.CurrentScene == "MainMenu" && State.ShouldIgnoreBroadcastVersionHook)) {
+    if (State.CurrentScene != "MainMenu" || State.ShouldIgnoreBroadcastVersionHook) {
         // This should not lead to unexpected behavior with unexpected disconnections
         return Constants_1_GetBroadcastVersion(method);
         }

@@ -11,6 +11,7 @@ RpcCompleteTask::RpcCompleteTask(uint32_t taskId)
 void RpcCompleteTask::Process()
 {
 	PlayerControl_RpcCompleteTask(*Game::pLocalPlayer, taskId, NULL);
+	PlayerControl_CompleteTask(*Game::pLocalPlayer, taskId, NULL);
 }
 
 RpcDrainHideTimer::RpcDrainHideTimer(float timeToSubtract)

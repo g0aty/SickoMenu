@@ -45,7 +45,7 @@ public:
     bool ImGuiInitialized = false;
     bool HasOpenedMenuBefore = false;
     bool ShowMenuOnStartup = true;
-    bool ShowMenu = false;
+    bool ShowMenu = true;
 
 #ifdef _DEBUG
     bool showDebugTab = false;
@@ -82,12 +82,14 @@ public:
     int FakeAUVersion = 1;
     bool DisableAnimations = false;
     bool ClickThroughMenuUI = false;
+    bool ShowUiBorders = true;
     float AnimationSpeed = 1.f;
     float RoundingRadiusMultiplier = 1.f;
 
     bool AdjustByDPI = true;
     float dpiScale = 1.f;
     bool dpiChanged = false;
+    bool unlockAllAchievements = false;
 
     std::string CurrentScene;
 
@@ -205,6 +207,7 @@ public:
         bool NoisemakerImpostorAlert = true;
         float ViperDissolveTime = 3.f;
         float DetectiveSuspectLimit = 3.f;
+        float JudgeTaskRequirement = 50.f;
     };
     std::vector<HostPreset> HostPresets;
     int SelectedHostPreset = 0;
@@ -328,6 +331,7 @@ public:
     bool KillImpostors = false;
     bool KillInVanish = false;
     bool OnlyProtectCrewmates = false;
+    std::vector<uint8_t> ColorCycledPlayers;
     std::vector<uint8_t> VoteImmunePlayers;
     std::unordered_map<uint8_t, uint8_t> VoteRedirectTargets;
     bool BypassAngelProt = false;
@@ -337,6 +341,7 @@ public:
     bool FakeAlive = false;
     bool ShowHost = false;
     bool HideWatermark = false;
+    bool HideModStamp = false;
     bool ShowVoteKicks = false;
     bool ShowFps = false;
     bool DoTasksAsImpostor = false;
@@ -422,6 +427,21 @@ public:
     bool confuseOnVent = false;
     bool confuseOnMeeting = false;
 
+    bool InfiniteMeetings = false;
+    bool NoLadderZiplineCooldown = false;
+    bool Engineer_NoVentCooldown = false;
+    bool Engineer_InfiniteVentTime = false;
+    bool Scientist_NoVitalsCooldown = false;
+    bool Scientist_InfiniteBattery = false;
+    bool Tracker_NoTrackingCooldown = false;
+    bool Tracker_InfiniteTracking = false;
+    bool Detective_NoInterrogateCooldown = false;
+    bool Judge_NoTaskRequirement = false;
+    bool Judge_InfiniteOverrules = false;
+    bool GuardianAngel_NoProtectCooldown = false;
+    bool Impostor_NoKillCooldown = false;
+    bool Shapeshifter_InfiniteShapeshiftDuration = false;
+
     SystemTypes__Enum selectedDoor = SystemTypes__Enum::Hallway;
     std::vector<SystemTypes__Enum> mapDoors;
     std::vector<SystemTypes__Enum> pinnedDoors;
@@ -488,6 +508,8 @@ public:
     bool EnableZoom_ShowShadows = false;
     bool EnableZoom_ResolutionSetFlag = false;
     float EnableZoom_PreResolutionSetCamHeight = 3.f;
+
+    bool MIG_ThemeChanged = true;
 
     VersionShower* versionShower = nullptr;
     std::string versionShowerDefaultText = "";

@@ -92,14 +92,8 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		}
 	}
 	else if (State.TaskSpeedrun) {
-		for (auto sender : GetAllPlayerControl()) {
-			for (auto receiver : GetAllPlayerControl()) {
-				auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), sender->fields._.NetId,
-					uint8_t(RpcCalls__Enum::SetRole), SendOption__Enum::Reliable, receiver->fields._.OwnerId, NULL);
-				MessageWriter_WriteUShort(writer, uint16_t(RoleTypes__Enum::Crewmate), NULL);
-				MessageWriter_WriteBoolean(writer, false, NULL);
-				InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-			}
+		for (auto p : GetAllPlayerControl()) {
+			PlayerControl_RpcSetRole(p, RoleTypes__Enum::Crewmate, false, NULL);
 		}
 	}
 	else {
@@ -211,6 +205,7 @@ void EvenOutImpostorRoleCounts(RoleRates& roleRates) {
 }
 
 bool dRoleBehaviour_get_CommsSabotaged(RoleBehaviour* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dRoleBehaviour_get_CommsSabotaged executed", false);
 	bool ret = RoleBehaviour_get_CommsSabotaged(__this, method);
 
 	if (State.PanicMode) return ret;
@@ -222,6 +217,7 @@ bool dRoleBehaviour_get_CommsSabotaged(RoleBehaviour* __this, MethodInfo* method
 }
 
 void dVitalsMinigame_Update(VitalsMinigame* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dVitalsMinigame_Update executed", false);
 	VitalsMinigame_Update(__this, method);
 
 	if (State.PanicMode || !State.RolesBypassCommsSabotage) return;
@@ -260,6 +256,7 @@ static int trackerRoleStringId = 1681;
 static int trackerRoleId = 55050;
 
 String* dRoleBehaviour_get_Blurb(RoleBehaviour* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dRoleBehaviour_get_Blurb executed", false);
 	if (__this->fields.Role == RoleTypes__Enum::Tracker || __this->fields.Role == (RoleTypes__Enum)trackerRoleId) {
 		int trackerBlurbStringId = 1682;
 		__this->fields.BlurbName = (StringNames__Enum)trackerBlurbStringId;
@@ -268,6 +265,7 @@ String* dRoleBehaviour_get_Blurb(RoleBehaviour* __this, MethodInfo* method) {
 }
 
 void* dIntroCutscene_CoBegin(IntroCutscene* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dIntroCutscene_CoBegin executed", false);
 	auto roleBehaviour = GetPlayerData(*Game::pLocalPlayer)->fields.Role;
 	if (roleBehaviour != nullptr &&
 		(roleBehaviour->fields.Role == RoleTypes__Enum::Tracker ||
@@ -278,10 +276,117 @@ void* dIntroCutscene_CoBegin(IntroCutscene* __this, MethodInfo* method) {
 }
 
 void dRoleBehaviour_AppendTaskHint(RoleBehaviour* role, void* taskStringBuilder, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dRoleBehaviour_AppendTaskHint executed", false);
 	if (role != nullptr &&
 		(role->fields.Role == RoleTypes__Enum::Tracker ||
 		role->fields.Role == (RoleTypes__Enum)trackerRoleId)) {
 		role->fields.StringName = (StringNames__Enum)trackerRoleStringId;
 	}
 	RoleBehaviour_AppendTaskHint(role, taskStringBuilder, method);
+}
+
+// i forgot that i had to use fixedDeltaTime instead of deltaTime
+// but since deltaTime is bound to be less than fixedDeltaTime, it works out
+// "An IQ too high?" ahh moment
+
+// NOTE: the cooldown will be deducted below 0 on the next FixedUpdate call, and the duration can be anything
+
+void dEngineerRole_FixedUpdate(EngineerRole* __this, MethodInfo* method) {
+	float newCooldown = Time_get_deltaTime(NULL), newDuration = 30.f;
+
+	if (!State.PanicMode && (State.Engineer_NoVentCooldown || State.UnlockVents)) {
+		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "cooldownSecondsRemaining");
+		if (cooldownField != nullptr)
+			il2cpp_field_set_value((Il2CppObject*)__this, cooldownField, &newCooldown);
+	}
+
+	if (!State.PanicMode && (State.Engineer_InfiniteVentTime || State.UnlockVents)) {
+		static FieldInfo* durationField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "inVentTimeRemaining");
+		if (durationField != nullptr)
+			il2cpp_field_set_value((Il2CppObject*)__this, durationField, &newDuration);
+	}
+
+	EngineerRole_FixedUpdate(__this, method);
+}
+
+void dScientistRole_Update(ScientistRole* __this, MethodInfo* method) {
+	float newCooldown = Time_get_deltaTime(NULL), newDuration = 69421.f;
+	float defaultMaxDuration = GameOptions().GetFloat(FloatOptionNames__Enum::ScientistBatteryCharge, 1.f);
+
+	if (!State.PanicMode && State.Scientist_NoVitalsCooldown) {
+		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "currentCooldown");
+		if (cooldownField != nullptr)
+			il2cpp_field_set_value((Il2CppObject*)__this, cooldownField, &newCooldown);
+	}
+
+	static FieldInfo* durationField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "currentCharge");
+	if (!State.PanicMode && State.Scientist_InfiniteBattery && durationField != nullptr) {
+		il2cpp_field_set_value((Il2CppObject*)__this, durationField, &newDuration);
+	}
+
+	ScientistRole_Update(__this, method);
+}
+
+void dTrackerRole_FixedUpdate(TrackerRole* __this, MethodInfo* method) {
+	float newCooldown = Time_get_deltaTime(NULL), newDuration = 69421.f;
+	float defaultMaxDuration = GameOptions().GetFloat(FloatOptionNames__Enum::TrackerDuration, 1.f);
+
+	if (!State.PanicMode && State.Tracker_NoTrackingCooldown) {
+		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "cooldownSecondsRemaining");
+		if (cooldownField != nullptr)
+			il2cpp_field_set_value((Il2CppObject*)__this, cooldownField, &newCooldown);
+
+		static FieldInfo* delayField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "delaySecondsRemaining");
+		if (delayField != nullptr)
+			il2cpp_field_set_value((Il2CppObject*)__this, delayField, &newCooldown);
+	}
+
+	static FieldInfo* durationField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "durationSecondsRemaining");
+	if (!State.PanicMode && State.Tracker_InfiniteTracking && durationField != nullptr) {
+		il2cpp_field_set_value((Il2CppObject*)__this, durationField, &newDuration);
+	}
+
+	TrackerRole_FixedUpdate(__this, method);
+}
+
+void dDetectiveRole_FixedUpdate(DetectiveRole* __this, MethodInfo* method) {
+	float newCooldown = Time_get_deltaTime(NULL);
+
+	if (!State.PanicMode && State.Detective_NoInterrogateCooldown) {
+		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "interrogateCooldown");
+		if (cooldownField != nullptr)
+			il2cpp_field_set_value((Il2CppObject*)__this, cooldownField, &newCooldown);
+	}
+
+	DetectiveRole_FixedUpdate(__this, method);
+}
+
+void dGuardianAngelRole_FixedUpdate(GuardianAngelRole* __this, MethodInfo* method) {
+	if (!State.PanicMode && State.GuardianAngel_NoProtectCooldown && (IsHost() || !State.SafeMode)) {
+		float newCooldown = Time_get_deltaTime(NULL);
+
+		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "cooldownSecondsRemaining");
+		if (cooldownField != nullptr)
+			il2cpp_field_set_value((Il2CppObject*)__this, cooldownField, &newCooldown);
+	}
+
+	GuardianAngelRole_FixedUpdate(__this, method);
+}
+
+void dShapeshifterRole_FixedUpdate(ShapeshifterRole* __this, MethodInfo* method) {
+	static FieldInfo* durationField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "durationSecondsRemaining");
+	float defaultMaxDuration = GameOptions().GetFloat(FloatOptionNames__Enum::ShapeshifterDuration, 1.f);
+	float newDuration = 69421.f;
+
+	if (!State.PanicMode && State.Shapeshifter_InfiniteShapeshiftDuration && durationField != nullptr) {
+		il2cpp_field_set_value((Il2CppObject*)__this, durationField, &newDuration);
+	}
+
+	ShapeshifterRole_FixedUpdate(__this, method);
+}
+
+void dGameManager_ReviveEveryoneFreeplay(GameManager* __this, MethodInfo* method) {
+	GameManager_ReviveEveryoneFreeplay(__this, method);
+	State.MIG_ThemeChanged = true;
+	// when the freeplay game ends, roles are reset with RoleManager_SetRole, which is inlined
 }

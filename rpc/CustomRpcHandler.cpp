@@ -156,7 +156,7 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		if (callId == 202) {
 			SafelyReadString(reader); // handle signature
 			MessageReader_ReadByte(reader, NULL); // handle player ID
-			aiSlopVersion = SafelyReadString(reader);
+			aiSlopVersion = "<#7c0>v" + SafelyReadString(reader) + "</color>";
 		}
 
 		if (State.modUsers.find(playerId) == State.modUsers.end()) {

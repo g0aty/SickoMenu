@@ -79,6 +79,8 @@ namespace Radar {
 
 	bool init = false;
 	void Render() {
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
+
 		if (!init)
 			Radar::Init();
 
@@ -146,5 +148,7 @@ namespace Radar {
 			OnClick();
 
 		ImGui::End();
+
+		ImGui::PopStyleVar(1);
 	}
 }

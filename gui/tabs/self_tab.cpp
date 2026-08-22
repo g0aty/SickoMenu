@@ -13,12 +13,14 @@ namespace SelfTab {
     enum Groups {
         Visuals,
         Utils,
+        Roles,
         Randomizers,
         TextEditor
     };
 
     static bool openVisuals = true; //default to visual tab group
     static bool openUtils = false;
+    static bool openRoles = false;
     static bool openRandomizers = false;
     static bool openTextEditor = false;
 
@@ -51,6 +53,7 @@ namespace SelfTab {
     void CloseOtherGroups(Groups group) {
         openVisuals = group == Groups::Visuals;
         openUtils = group == Groups::Utils;
+        openRoles = group == Groups::Roles;
         openRandomizers = group == Groups::Randomizers;
         openTextEditor = group == Groups::TextEditor;
     }
@@ -58,6 +61,7 @@ namespace SelfTab {
     void OpenSubGroup(const std::string& name) {
         if (name == "Visuals") CloseOtherGroups(Groups::Visuals);
         else if (name == "Utils") CloseOtherGroups(Groups::Utils);
+        else if (name == "Roles") CloseOtherGroups(Groups::Roles);
         else if (name == "Randomizers") CloseOtherGroups(Groups::Randomizers);
         else if (name == "Text Editor") CloseOtherGroups(Groups::TextEditor);
     }
@@ -248,6 +252,10 @@ namespace SelfTab {
             CloseOtherGroups(Groups::Utils);
         }
         ImGui::SameLine();
+        if (TabGroup("Roles", openRoles)) {
+            CloseOtherGroups(Groups::Roles);
+        }
+        ImGui::SameLine();
         if (TabGroup("Randomizers", openRandomizers)) {
             CloseOtherGroups(Groups::Randomizers);
         }
@@ -266,7 +274,9 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
-            ToggleButton("Disable HUD", &State.DisableHud);
+            if (ToggleButton("Disable HUD", &State.DisableHud)) {
+                if (!IsInGame()) State.DisableHud = false;
+            }
 
             if (ToggleButton("Freecam", &State.FreeCam)) {
                 State.playerToFollow = {};
@@ -468,6 +478,7 @@ namespace SelfTab {
 
             if (ToggleButton("Reveal Roles", &State.RevealRoles)) {
                 State.Save();
+                State.MIG_ThemeChanged = true;
             }
             ImGui::SameLine();
             if (ToggleButton("Localize Role Names", &State.LocalizeRoleNames))
@@ -484,6 +495,7 @@ namespace SelfTab {
             if (ToggleButton("Player Colored Dots Next To Names", &State.PlayerColoredDots))
             {
                 State.Save();
+                State.MIG_ThemeChanged = true;
             }
 
             if (ToggleButton("Show Player Info in Lobby", &State.ShowPlayerInfo))
@@ -557,9 +569,9 @@ namespace SelfTab {
                 State.Save();
             }
 
-            if (ToggleButton("Extend Chat History", &State.ExtendChatHistory)) {
+            /*if (ToggleButton("Extend Chat History", &State.ExtendChatHistory)) {
                 State.Save();
-            }
+            }*/
 
             /*if (ToggleButton("Change Body Type", &State.ChangeBodyType)) {
                 State.Save();
@@ -604,10 +616,10 @@ namespace SelfTab {
                 State.Save();
             }
 
-            if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) {
+            /*if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) {
                 State.Save();
             }
-            ImGui::SameLine();
+            ImGui::SameLine();*/
             if (ToggleButton("Copy Lobby Code on Disconnect", &State.AutoCopyLobbyCode)) {
                 State.Save();
             }
@@ -618,13 +630,13 @@ namespace SelfTab {
             ImGui::SameLine();
             if (ToggleButton("No Seeker Animation", &State.NoSeekerAnim)) State.Save();
 
-            if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
+            /*if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) {
                 State.Save();
             }
             ImGui::SameLine();
             if (ToggleButton("Infinite Kill Range", &State.InfiniteKillRange)) {
                 State.Save();
-            }
+            }*/
 
             if (ToggleButton("Better Chat Notifications", &State.BetterChatNotifications)) {
                 State.Save();
@@ -650,10 +662,6 @@ namespace SelfTab {
                 State.Save();
             }
 
-            if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) {
-                State.Save();
-            }
-            ImGui::SameLine();
             if (ToggleButton("Report Body on Murder", &State.ReportOnMurder)) {
                 State.Save();
             }
@@ -784,7 +792,7 @@ namespace SelfTab {
                 roleAllowed = true;
                 break;
             case (int)RoleTypes__Enum::Judge:
-                if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Judge) {
+                if (State.SafeMode || State.RealRole != RoleTypes__Enum::Judge) {
                     roleAllowed = false;
                     break;
                 }
@@ -798,7 +806,7 @@ namespace SelfTab {
                 roleAllowed = true;
                 break;
             case (int)RoleTypes__Enum::Shapeshifter:
-                if (State.RealRole != RoleTypes__Enum::Shapeshifter) {
+                if (State.SafeMode || State.RealRole != RoleTypes__Enum::Shapeshifter) {
                     roleAllowed = false;
                     break;
                 }
@@ -852,67 +860,129 @@ namespace SelfTab {
             }
         }
 
-        if (openRandomizers) {
-            ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
-                if (ToggleButton("Cycler", &State.Cycler)) {
-                    State.Save();
-                }
-                ImGui::SameLine();
-                if (ToggleButton("Cycle in Meeting", &State.CycleInMeeting)) {
-                    State.Save();
-                }
-                ImGui::SameLine();
-                if (ToggleButton(State.SafeMode ? "Cycle Between Players' Outfits" : "Cycle Between Players", &State.CycleBetweenPlayers)) {
-                    State.Save();
-                }
+        if (openRoles) {
+            if (ToggleButton("Infinite Emergency Meetings", &State.InfiniteMeetings)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("No Ladder/Zipline Cooldown", &State.NoLadderZiplineCooldown)) State.Save();
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-                if (SteppedSliderFloat("Cycle Timer", &State.CycleTimer, 0.2f, 1.f, 0.02f, "%.2fs", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
-                    State.PrevCycleTimer = State.CycleTimer;
-                    State.CycleDuration = State.CycleTimer * 50;
-                }
+            ImGui::TextColored(State.EngineerColor, "Engineer");
+            if (ToggleButton("No Vent Cooldown", &State.Engineer_NoVentCooldown)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Infinite Vent Time", &State.Engineer_InfiniteVentTime)) State.Save();
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
+            ImGui::TextColored(State.ScientistColor, "Scientist");
+            if (ToggleButton("No Vitals Cooldown", &State.Scientist_NoVitalsCooldown)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Infinite Battery", &State.Scientist_InfiniteBattery)) State.Save();
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+            ImGui::TextColored(State.TrackerColor, "Tracker");
+            if (ToggleButton("No Tracking Cooldown", &State.Tracker_NoTrackingCooldown)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Infinite Tracking", &State.Tracker_InfiniteTracking)) State.Save();
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+            ImGui::TextColored(State.DetectiveColor, "Detective");
+            if (ToggleButton("No Interrogate Cooldown", &State.Detective_NoInterrogateCooldown)) State.Save();
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+            ImGui::TextColored(State.JudgeColor, "Judge");
+            if (ToggleButton("No Task Requirement", &State.Judge_NoTaskRequirement)) State.Save();
+            if (!State.SafeMode) {
+                ImGui::SameLine();
+                if (ToggleButton("Infinite Overrules", &State.Judge_InfiniteOverrules)) State.Save();
+            }
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+            if (IsHost() || !State.SafeMode) {
+                ImGui::TextColored(State.GuardianAngelColor, "Guardian Angel");
+                if (ToggleButton("No Protect Cooldown", &State.GuardianAngel_NoProtectCooldown)) State.Save();
                 ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-                if (ImGui::CollapsingHeader("Cycler Options")) {
-                    ImGui::Dummy(ImVec2(4, 2)* State.dpiScale);
-                    if (!State.SafeMode) {
-                        if (ToggleButton("Cycle Name", &State.CycleName)) {
-                            State.Save();
-                        }
 
-                        ImGui::SameLine(120.0f * State.dpiScale);
-                    }
-                    if (ToggleButton("Cycle Color", &State.RandomColor)) {
-                        State.Save();
-                    }
+                ImGui::TextColored(State.ImpostorColor, "Impostor");
+                if (ToggleButton("No Kill Cooldown", &State.Impostor_NoKillCooldown)) State.Save();
+                ImGui::SameLine();
+                if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) State.Save();
+                ImGui::SameLine();
+                if (ToggleButton("Kill Reach", &State.InfiniteKillRange)) State.Save();
+                
 
-                    ImGui::SameLine(!State.SafeMode ? (240.0f * State.dpiScale) : (120.0f * State.dpiScale));
-                    if (ToggleButton("Cycle Hat", &State.RandomHat)) {
-                        State.Save();
-                    }
-                    ImGui::SameLine(240.0f * State.dpiScale);
-                    if (ToggleButton("Cycle Nameplate", &State.RandomNamePlate)) {
-                        State.Save();
-                    }
-                    if (ToggleButton("Cycle Visor", &State.RandomVisor)) {
+                if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) {
+                    State.Save();
+                }
+                ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+            }
+
+            ImGui::TextColored(State.ShapeshifterColor, "Shapeshifter");
+            if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Infinite Shapeshift Duration", &State.Shapeshifter_InfiniteShapeshiftDuration)) State.Save();
+        }
+
+        if (openRandomizers) {
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
+            if (ToggleButton("Cycler", &State.Cycler)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton("Cycle in Meeting", &State.CycleInMeeting)) {
+                State.Save();
+            }
+            ImGui::SameLine();
+            if (ToggleButton(State.SafeMode ? "Cycle Between Players' Outfits" : "Cycle Between Players", &State.CycleBetweenPlayers)) {
+                State.Save();
+            }
+
+            if (SteppedSliderFloat("Cycle Timer", &State.CycleTimer, 0.2f, 1.f, 0.02f, "%.2fs", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
+                State.PrevCycleTimer = State.CycleTimer;
+                State.CycleDuration = State.CycleTimer * 50;
+            }
+
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+            if (ImGui::CollapsingHeader("Cycler Options")) {
+                ImGui::Dummy(ImVec2(4, 2)* State.dpiScale);
+                if (!State.SafeMode) {
+                    if (ToggleButton("Cycle Name", &State.CycleName)) {
                         State.Save();
                     }
 
                     ImGui::SameLine(120.0f * State.dpiScale);
-                    if (ToggleButton("Cycle Skin", &State.RandomSkin)) {
-                        State.Save();
-                    }
+                }
+                if (ToggleButton("Cycle Color", &State.RandomColor)) {
+                    State.Save();
+                }
 
-                    ImGui::SameLine(240.0f * State.dpiScale);
-                    if (ToggleButton("Cycle Pet", &State.RandomPet)) {
-                        State.Save();
-                    }
+                ImGui::SameLine(!State.SafeMode ? (240.0f * State.dpiScale) : (120.0f * State.dpiScale));
+                if (ToggleButton("Cycle Hat", &State.RandomHat)) {
+                    State.Save();
+                }
+                ImGui::SameLine(240.0f * State.dpiScale);
+                if (ToggleButton("Cycle Nameplate", &State.RandomNamePlate)) {
+                    State.Save();
+                }
+                if (ToggleButton("Cycle Visor", &State.RandomVisor)) {
+                    State.Save();
+                }
 
-                    if (IsHost() || !State.SafeMode) {
-                        if (ToggleButton(IsHost() ? "Cycle for Everyone (Color ONLY)" : "Cycle for Everyone", &State.CycleForEveryone)) {
-                            State.Save();
-                        }
+                ImGui::SameLine(120.0f * State.dpiScale);
+                if (ToggleButton("Cycle Skin", &State.RandomSkin)) {
+                    State.Save();
+                }
+
+                ImGui::SameLine(240.0f * State.dpiScale);
+                if (ToggleButton("Cycle Pet", &State.RandomPet)) {
+                    State.Save();
+                }
+
+                if (IsHost() || !State.SafeMode) {
+                    if (ToggleButton(IsHost() ? "Cycle for Everyone (Color ONLY)" : "Cycle for Everyone", &State.CycleForEveryone)) {
+                        State.Save();
                     }
                 }
+            }
 
             ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
 
@@ -1051,6 +1121,7 @@ namespace SelfTab {
                 }
             }
             ImGui::Dummy(ImVec2(4, 2)* State.dpiScale);
+            bool isPresetDeleted = false;
             if (ImGui::CollapsingHeader("Cosmetic Presets", ImGuiTreeNodeFlags_DefaultOpen)) {
                 ImGui::Dummy(ImVec2(4, 2) * State.dpiScale);
                 if (ToggleButton("Auto Apply on Join", &State.AutoApplyCosmeticPreset))
@@ -1059,7 +1130,7 @@ namespace SelfTab {
                 if (!State.CosmeticPresets.empty()) {
                     std::vector<const char*> names;
                     for (auto& p : State.CosmeticPresets) names.push_back(p.Name.c_str());
-                    CustomListBoxInt("##cosmeticpresetselect", &State.SelectedCosmeticPreset, names, 200.0f * State.dpiScale);
+                    CustomListBoxInt("##cosmeticpresetselect", &State.SelectedCosmeticPreset, names, 200.0f * State.dpiScale, ImVec4(0, 0, 0, 0), 0, "Preset");
                     ImGui::SameLine();
                     if (AnimatedButton("Apply##cosmeticpreset")) {
                         ApplyCosmeticPreset(State.CosmeticPresets[std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1)]);
@@ -1083,7 +1154,9 @@ namespace SelfTab {
                     if (AnimatedButton("Delete##cosmeticpreset")) {
                         int idx = std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1);
                         State.CosmeticPresets.erase(State.CosmeticPresets.begin() + idx);
-                        State.SelectedCosmeticPreset = std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1);
+                        if (State.CosmeticPresets.size() != 0)
+                            State.SelectedCosmeticPreset = std::clamp(State.SelectedCosmeticPreset, 0, (int)State.CosmeticPresets.size() - 1);
+                        isPresetDeleted = true;
                         State.Save();
                     }
                 }
@@ -1091,25 +1164,27 @@ namespace SelfTab {
                     ImGui::TextDisabled("No cosmetic presets saved.");
                 }
 
-                ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-                static std::string newCosmeticName = "My Outfit";
-                ImGui::SetNextItemWidth(160 * State.dpiScale);
-                InputString("Preset Name##cosmetic", &newCosmeticName);
-                ImGui::SameLine();
-                if (AnimatedButton("Save Current##cosmeticpreset")) {
-                    auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
-                    if (outfit != nullptr) {
-                        Settings::CosmeticPreset p;
-                        p.Name = newCosmeticName.empty() ? "Preset" : newCosmeticName;
-                        p.ColorId = outfit->fields.ColorId;
-                        p.HatId = outfit->fields.HatId ? convert_from_string(outfit->fields.HatId) : "";
-                        p.SkinId = outfit->fields.SkinId ? convert_from_string(outfit->fields.SkinId) : "";
-                        p.VisorId = outfit->fields.VisorId ? convert_from_string(outfit->fields.VisorId) : "";
-                        p.PetId = outfit->fields.PetId ? convert_from_string(outfit->fields.PetId) : "";
-                        p.NamePlateId = outfit->fields.NamePlateId ? convert_from_string(outfit->fields.NamePlateId) : "";
-                        State.CosmeticPresets.push_back(p);
-                        State.SelectedCosmeticPreset = (int)State.CosmeticPresets.size() - 1;
-                        State.Save();
+                if (!isPresetDeleted) {
+                    ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+                    static std::string newCosmeticName = "My Outfit";
+                    ImGui::SetNextItemWidth(160 * State.dpiScale);
+                    InputString("Preset Name##cosmetic", &newCosmeticName);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Save Current##cosmeticpreset")) {
+                        auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+                        if (outfit != nullptr) {
+                            Settings::CosmeticPreset p;
+                            p.Name = newCosmeticName.empty() ? "Preset" : newCosmeticName;
+                            p.ColorId = outfit->fields.ColorId;
+                            p.HatId = outfit->fields.HatId ? convert_from_string(outfit->fields.HatId) : "";
+                            p.SkinId = outfit->fields.SkinId ? convert_from_string(outfit->fields.SkinId) : "";
+                            p.VisorId = outfit->fields.VisorId ? convert_from_string(outfit->fields.VisorId) : "";
+                            p.PetId = outfit->fields.PetId ? convert_from_string(outfit->fields.PetId) : "";
+                            p.NamePlateId = outfit->fields.NamePlateId ? convert_from_string(outfit->fields.NamePlateId) : "";
+                            State.CosmeticPresets.push_back(p);
+                            State.SelectedCosmeticPreset = (int)State.CosmeticPresets.size() - 1;
+                            State.Save();
+                        }
                     }
                 }
             }

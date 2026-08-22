@@ -30,6 +30,12 @@ namespace PlayersTab {
         openInfo = group == Groups::Info;
     }
 
+    void OpenSubGroup(const std::string& name) {
+        if (name == "Player") CloseOtherGroups(Groups::Player);
+        else if (name == "Trolling") CloseOtherGroups(Groups::Trolling);
+        else if (name == "Info" && (IsInMultiplayerGame() || IsInLobby())) CloseOtherGroups(Groups::Info);
+    }
+
     struct CachedPlayerData {
         PlayerControl* controlPtr = nullptr;
         std::string nameRaw;
@@ -1078,13 +1084,13 @@ namespace PlayersTab {
                             if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChatNote(p.validate().get_PlayerControl(), 1));
                         }
                     }
-                    ImGui::SameLine();
+                    /*ImGui::SameLine();
                     if (AnimatedButton("Spam Blank Chat As")) {
                         for (auto p : selectedPlayers) {
                             if (IsInGame()) State.rpcQueue.push(new RpcSpamChatNote(p.validate().get_PlayerControl()));
                             if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSpamChatNote(p.validate().get_PlayerControl()));
                         }
-                    }
+                    }*/
                 }
 
                 if ((IsHost() || !State.SafeMode) && IsInGame() && selectedPlayers.size() == 1) {
@@ -1245,7 +1251,7 @@ namespace PlayersTab {
 
                 if (State.activeImpersonation)
                 {
-                    if (AnimatedButton("Reset Impersonation"))
+                    if (AnimatedButton(!State.SafeMode ? "Reset Impersonation" : "Reset Original Outfit"))
                     {
                         ControlAppearance(false);
                     }
@@ -1507,7 +1513,7 @@ namespace PlayersTab {
                     {
                         if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale)) {
                             // for some reason, detective is 12 (0x0c) instead of 11, and viper is 18 (0x12) instead of 12
-                            if (State.FakeRole == 12) State.FakeRoleId = State.FakeRole + 6;
+                            if (State.FakeRole >= 12) State.FakeRoleId = State.FakeRole + 6;
                             else if (State.FakeRole == 11) State.FakeRoleId = State.FakeRole + 1;
                             else State.FakeRoleId = State.FakeRole;
                             State.Save();
@@ -1578,6 +1584,18 @@ namespace PlayersTab {
                         else if (IsInLobby())
                             State.lobbyRpcQueue.push(new RpcForceColor(selectedPlayer.get_PlayerControl(), forcedColor));
                     }
+
+                    auto pid = selectedPlayer.get_PlayerData()->fields.PlayerId;
+                    bool isColorCycling = std::find(State.ColorCycledPlayers.begin(), State.ColorCycledPlayers.end(), pid) != State.ColorCycledPlayers.end();
+                    if (AnimatedButton(isColorCycling ? "Stop Cycling Colors" : "Cycle Colors")) {
+                        if (isColorCycling) {
+                            State.ColorCycledPlayers.erase(std::remove(State.ColorCycledPlayers.begin(), State.ColorCycledPlayers.end(), pid), State.ColorCycledPlayers.end());
+                        }
+                        else
+                            State.ColorCycledPlayers.push_back(pid);
+                    }
+
+                    ImGui::Text("Change cycling interval in Self > Randomizers!");
                 }
 
                 if (IsHost() && (IsInGame() || IsInLobby()) && !selectedPlayer.is_LocalPlayer() && selectedPlayers.size() == 1) {
@@ -1606,13 +1624,16 @@ namespace PlayersTab {
                         if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceDetectAum(selectedPlayer, !State.SafeMode));
                     }
                     ImGui::SameLine();*/
-                    static std::string scMessage = "";
-                    if (AnimatedButton(!State.SafeMode ? "Force SickoChat" : "Fake SickoChat")) {
-                        if (IsInGame()) State.rpcQueue.push(new RpcForceSickoChat(selectedPlayer, scMessage, !State.SafeMode));
-                        if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceSickoChat(selectedPlayer, scMessage, !State.SafeMode));
+                    if (!State.SafeMode) {
+                        static std::string scMessage = "";
+                        if (AnimatedButton("Force SickoChat")) {
+                            if (IsInGame()) State.rpcQueue.push(new RpcForceSickoChat(selectedPlayer, scMessage, !State.SafeMode));
+                            if (IsInLobby()) State.lobbyRpcQueue.push(new RpcForceSickoChat(selectedPlayer, scMessage, !State.SafeMode));
+                        }
+
+                        InputString("SC Message", &scMessage);
                     }
 
-                    InputString("SC Message", &scMessage);
 
                     if (!State.SafeMode && (IsInGame() || IsInLobby()) && !selectedPlayer.is_Disconnected() && !selectedPlayer.is_LocalPlayer())
                     {
@@ -1755,7 +1776,7 @@ namespace PlayersTab {
                         }
                     }
                 }
-                
+
                 if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
                     ImGui::NewLine(); //force a new line
 

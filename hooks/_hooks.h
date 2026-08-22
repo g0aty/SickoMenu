@@ -122,14 +122,14 @@ bool dConstants_1_IsVersionModded(MethodInfo* method);
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method);
 bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, MethodInfo* method);
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method);
-void dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method);
+void* dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method);
 void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* writer, bool initialState, MethodInfo* method);
 void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader* reader, bool initialState, MethodInfo* method);
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method);
 void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method);
 bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method);
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method);
-void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method);
+void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, bool wasOverruled, MethodInfo* method);
 void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* method);
 void dPlayerControl_CmdCheckVanish(PlayerControl* __this, float maxDuration, MethodInfo* method);
 void dPlayerControl_CmdCheckAppear(PlayerControl* __this, bool shouldAnimate, MethodInfo* method);
@@ -152,7 +152,7 @@ PlayerBodyTypes__Enum dNormalGameManager_GetBodyType(NormalGameManager* __this, 
 bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodInfo* method);
 float dPlayerControl_get_CalculatedAlpha(PlayerControl* __this, MethodInfo* method);
 bool dPlayerControl_get_Visible(PlayerControl* __this, MethodInfo* method);
-void dMeetingHud_CastVote(MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method);
+void dMeetingHud_CastVote(MeetingHud* __this, PlayerId playerId, PlayerId suspectIdx, MethodInfo* method);
 QuickChatModes__Enum dMultiplayerSettingsData_get_ChatMode(MultiplayerSettingsData* __this, QuickChatModes__Enum value, MethodInfo* method);
 //void dVentilationSystem_Update(VentilationSystem_Operation__Enum op, int32_t ventId, MethodInfo* method);
 void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* method);
@@ -199,6 +199,22 @@ void dScreen_SetResolution(int32_t width, int32_t height, bool fullscreen, Metho
 void dChatController_Toggle(ChatController* __this, MethodInfo* method);
 void dMapBehaviour_FixedUpdate(MapBehaviour* __this, MethodInfo* method);
 void dRoomTracker_FixedUpdate(RoomTracker* __this, MethodInfo* method);
+void dEngineerRole_FixedUpdate(EngineerRole* __this, MethodInfo* method);
+void dScientistRole_Update(ScientistRole* __this, MethodInfo* method);
+void dTrackerRole_FixedUpdate(TrackerRole* __this, MethodInfo* method);
+void dDetectiveRole_FixedUpdate(DetectiveRole* __this, MethodInfo* method);
+void dGuardianAngelRole_FixedUpdate(GuardianAngelRole* __this, MethodInfo* method);
+void dShapeshifterRole_FixedUpdate(ShapeshifterRole* __this, MethodInfo* method);
+void dMatchInfoHudButton_Update(MatchInfoHudButton* __this, MethodInfo* method);
+void dKillButton_DoClick(KillButton* __this, MethodInfo* method);
+void dMatchInfoGuide_Update(MatchInfoGuide* __this, MethodInfo* method);
+void dMatchInfoGuide_Update(MatchInfoGuide* __this, MethodInfo* method);
+void dPlayerIdentifierButton_Populate(PlayerIdentifierButton* __this, NetworkedPlayerInfo* player, MethodInfo* method);
+void dGameManager_ReviveEveryoneFreeplay(GameManager* __this, MethodInfo* method);
+void dPlayerControl_Die(PlayerControl* __this, int32_t reason, bool assignGhostRole, MethodInfo* method);
+void dPlayerVoteArea_SetCosmetics(PlayerVoteArea* __this, NetworkedPlayerInfo* playerInfo, MethodInfo* method);
+void dPlayerPhysics_RpcBootFromVent(PlayerPhysics* __this, int32_t ventId, MethodInfo* method);
+void dPlayerControl_SetKillTimer(PlayerControl* __this, float time, MethodInfo* method);
 
 // defined in LobbyBehaviour.cpp
 void ApplyHostPreset(const Settings::HostPreset& p);

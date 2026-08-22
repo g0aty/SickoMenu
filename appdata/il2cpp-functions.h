@@ -103,6 +103,7 @@ DO_APP_FUNC(void, MushroomDoorSabotageMinigame_Begin, (MushroomDoorSabotageMinig
 DO_APP_FUNC(void, MushroomDoorSabotageMinigame_SetDoor, (MushroomDoorSabotageMinigame* __this, OpenableDoor* door, MethodInfo* method), "Assembly-CSharp, System.Void MushroomDoorSabotageMinigame::SetDoor(OpenableDoor)");
 
 DO_APP_FUNC(void, PlayerControl_Revive, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::Revive()");
+DO_APP_FUNC(void, PlayerControl_Die, (PlayerControl* __this, int32_t reason, bool assignGhostRole, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::Die(DeathReason, System.Boolean)");
 DO_APP_FUNC(void, PlayerControl_CompleteTask, (PlayerControl* __this, uint32_t idx, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CompleteTask(System.UInt32)");
 DO_APP_FUNC(void, PlayerControl_RpcCompleteTask, (PlayerControl* __this, uint32_t idx, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcCompleteTask(System.UInt32)");
 DO_APP_FUNC(void, PlayerControl_FixedUpdate, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::FixedUpdate()");
@@ -296,7 +297,7 @@ DO_APP_FUNC(void, PlayerControl_ShowFailedMurder, (PlayerControl* __this, Method
 
 DO_APP_FUNC(bool, PlayerControl_get_IsKillTimerEnabled, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean PlayerControl::get_IsKillTimerEnabled()");
 DO_APP_FUNC(void, ExileController_ReEnableGameplay, (ExileController* __this, MethodInfo* method), "Assembly-CSharp, System.Void ExileController::ReEnableGameplay()");
-DO_APP_FUNC(void, ExileController_BeginForGameplay, (ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method), "Assembly-CSharp, System.Void ExileController::BeginForGameplay(NetworkedPlayerInfo, System.Boolean)");
+DO_APP_FUNC(void, ExileController_BeginForGameplay, (ExileController* __this, NetworkedPlayerInfo* player, bool voteTie, bool wasOverruled, MethodInfo* method), "Assembly-CSharp, System.Void ExileController::BeginForGameplay(NetworkedPlayerInfo, System.Boolean, System.Boolean)");
 DO_APP_FUNC(void, SabotageSystemType_SetInitialSabotageCooldown, (SabotageSystemType* __this, MethodInfo* method), "Assembly-CSharp, System.Void SabotageSystemType::SetInitialSabotageCooldown()");
 
 DO_APP_FUNC(PlayerControl*, NetworkedPlayerInfo_get_Object, (NetworkedPlayerInfo* __this, MethodInfo* method), "Assembly-CSharp, PlayerControl NetworkedPlayerInfo::get_Object()");
@@ -307,7 +308,7 @@ DO_APP_FUNC(void, AccountManager_UpdateKidAccountDisplay, (AccountManager* __thi
 DO_APP_FUNC(String*, AccountManager_GetRandomName, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.String AccountManager::GetRandomName()");
 DO_APP_FUNC(void, PlayerStorageManager_OnReadPlayerPrefsComplete, (PlayerStorageManager* __this, void* data, MethodInfo* method), "Assembly-CSharp, System.Void PlayerStorageManager::OnReadPlayerPrefsComplete(Epic.OnlineServices.PlayerDataStorage.ReadFileCallbackInfo&)");
 
-DO_APP_FUNC(void, AchievementManager_1_UnlockAchievement, (AchievementManager_1* __this, String* key, MethodInfo* method), "Assembly-CSharp, System.Void AchievementManager::UnlockAchievement(System.String)");
+DO_APP_FUNC(void, AchievementManager_UnlockAchievement, (AchievementManager* __this, String* key, MethodInfo* method), "Assembly-CSharp, System.Void AchievementManager::UnlockAchievement(System.String)");
 
 // 2022.10.25s
 DO_APP_FUNC(PlayerData*, DataManager_get_Player, (MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Player.PlayerData AmongUs.Data.DataManager::get_Player()");
@@ -332,8 +333,8 @@ DO_APP_FUNC(LogicOptions*, GameManager_get_LogicOptions, (GameManager* __this, M
 
 //adding kick/vote functions; these may have to be updated every time the game updates
 DO_APP_FUNC(void, MeetingHud_CmdCastVote, (MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::CmdCastVote(System.Byte, System.Byte)");
-DO_APP_FUNC(void, MeetingHud_CastVote, (MeetingHud* __this, uint8_t playerId, uint8_t suspectIdx, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::CastVote(System.Byte, System.Byte)");
-DO_APP_FUNC(void, MeetingHud_RpcClearVote, (MeetingHud* __this, int32_t clientId, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcClearVote(System.Int32)");
+DO_APP_FUNC(void, MeetingHud_CastVote, (MeetingHud* __this, PlayerId srcPlayerId, PlayerId suspectPlayerId, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::CastVote(InnerNet.PlayerId, InnerNet.PlayerId)");
+DO_APP_FUNC(void, MeetingHud_RpcClearVote, (MeetingHud* __this, PlayerId voterPlayerId, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcClearVote(InnerNet.PlayerId)");
 DO_APP_FUNC(void, VoteBanSystem_CmdAddVote, (VoteBanSystem* __this, int32_t clientId, MethodInfo* method), "Assembly-CSharp, System.Void VoteBanSystem::CmdAddVote(System.Int32)");
 DO_APP_FUNC(void, VoteBanSystem_AddVote, (VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method), "Assembly-CSharp, System.Void VoteBanSystem::AddVote(System.Int32, System.Int32)");
 DO_APP_FUNC(void, GameStartManager_Update, (GameStartManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void GameStartManager::Update()");
@@ -399,8 +400,8 @@ DO_APP_FUNC(void, PlayerControl_CmdCheckAppear, (PlayerControl* __this, bool sho
 DO_APP_FUNC(void, PlayerControl_RpcAppear, (PlayerControl* __this, bool shouldAnimate, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcAppear(System.Boolean)");
 DO_APP_FUNC(void, PlayerControl_SetRoleInvisibility, (PlayerControl* __this, bool isActive, bool shouldAnimate, bool playFullAnimation, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetRoleInvisibility(System.Boolean, System.Boolean, System.Boolean)");
 DO_APP_FUNC(void, PlayerControl_RpcSendChatNote, (PlayerControl* __this, uint8_t srcPlayerId, ChatNoteTypes__Enum noteType, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcSendChatNote(System.Byte, ChatNoteTypes)");
-DO_APP_FUNC(void, MeetingHud_RpcVotingComplete, (MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcVotingComplete(MeetingHud.VoterState[], NetworkedPlayerInfo, System.Boolean)");
-DO_APP_FUNC(void, MeetingHud_VotingComplete, (MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcVotingComplete(MeetingHud.VoterState[], NetworkedPlayerInfo, System.Boolean)");
+DO_APP_FUNC(void, MeetingHud_RpcVotingComplete, (MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, bool wasOverruled, uint16_t overruleNonce, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::RpcVotingComplete(MeetingHud.VoterState[], NetworkedPlayerInfo, System.Boolean, System.Boolean, System.UInt16)");
+DO_APP_FUNC(void, MeetingHud_VotingComplete, (MeetingHud* __this, MeetingHud_VoterState__Array* states, NetworkedPlayerInfo* exiled, bool tie, bool wasOverruled, uint16_t overruleNonce, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::VotingComplete(MeetingHud.VoterState[], NetworkedPlayerInfo, System.Boolean, System.Boolean, System.UInt16)");
 DO_APP_FUNC(void, MeetingHud_CheckForEndVoting, (MeetingHud* __this, MethodInfo* method), "Assembly-CSharp, System.Void MeetingHud::CheckForEndVoting()");
 DO_APP_FUNC(bool, AccountManager_CanPlayOnline, (AccountManager* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean AccountManager::CanPlayOnline()");
 DO_APP_FUNC(void, SoundManager_StopSound, (SoundManager* __this, AudioClip* clip, MethodInfo* method), "Assembly-CSharp, System.Void SoundManager::StopSound(UnityEngine.AudioClip)");
@@ -484,3 +485,23 @@ DO_APP_FUNC(void, ShadowCollab_OnEnable, (ShadowCollab* __this, MethodInfo* meth
 DO_APP_FUNC(void, MapBehaviour_FixedUpdate, (MapBehaviour* __this, MethodInfo* method), "Assembly-CSharp, System.Void MapBehaviour::FixedUpdate()");
 DO_APP_FUNC(void, RoomTracker_FixedUpdate, (RoomTracker* __this, MethodInfo* method), "Assembly-CSharp, System.Void RoomTracker::FixedUpdate()");
 DO_APP_FUNC(void, LogicGameFlowHnS_AdjustEscapeTimer, (LogicGameFlowHnS* __this, float timeDeduction, bool forceDirty, MethodInfo* method), "Assembly-CSharp, System.Void LogicGameFlowHnS::AdjustEscapeTimer(System.Single, System.Boolean)");
+DO_APP_FUNC(void, EngineerRole_FixedUpdate, (EngineerRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void EngineerRole::FixedUpdate()");
+DO_APP_FUNC(void, ScientistRole_Update, (ScientistRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void ScientistRole::Update()");
+DO_APP_FUNC(void, TrackerRole_FixedUpdate, (TrackerRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void TrackerRole::FixedUpdate()");
+DO_APP_FUNC(void, DetectiveRole_FixedUpdate, (DetectiveRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void DetectiveRole::FixedUpdate()");
+DO_APP_FUNC(void, JudgeRole_set_HasAnOverruleUse, (JudgeRole* __this, bool value, MethodInfo* method), "Assembly-CSharp, System.Void JudgeRole::set_HasAnOverruleUse(System.Boolean)");
+DO_APP_FUNC(void, GuardianAngelRole_FixedUpdate, (GuardianAngelRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void GuardianAngelRole::FixedUpdate()");
+DO_APP_FUNC(void, ShapeshifterRole_FixedUpdate, (ShapeshifterRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void ShapeshifterRole::FixedUpdate()");
+DO_APP_FUNC(void, MatchInfoHudButton_Update, (MatchInfoHudButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void MatchInfoHudButton::Update()");
+DO_APP_FUNC(void, MatchInfoGuide_Update, (MatchInfoGuide* __this, MethodInfo* method), "Assembly-CSharp, System.Void MatchInfoGuide::Update()");
+DO_APP_FUNC(void, MatchInfoGuide_CreatePlayerEntries, (MatchInfoGuide* __this, MethodInfo* method), "Assembly-CSharp, System.Void MatchInfoGuide::CreatePlayerEntries()");
+DO_APP_FUNC(void, PlayerIdentifierButton_Populate, (PlayerIdentifierButton* __this, NetworkedPlayerInfo* player, MethodInfo* method), "Assembly-CSharp, System.Void PlayerIdentifierButton::Populate(NetworkedPlayerInfo)");
+DO_APP_FUNC(void, GameManager_ReviveEveryoneFreeplay, (GameManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void GameManager::ReviveEveryoneFreeplay()");
+DO_APP_FUNC(MatchInfoGuide*, MatchInfoGuide_get_Instance, (MethodInfo* method), "Assembly-CSharp, MatchInfoGuide MatchInfoGuide::get_Instance()");
+DO_APP_FUNC(bool, MatchInfoGuide_get_IsActive, (MatchInfoGuide* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean MatchInfoGuide::get_IsActive()");
+DO_APP_FUNC(void, PlayerVoteArea_SetCosmetics, (PlayerVoteArea* __this, NetworkedPlayerInfo* playerInfo, MethodInfo* method), "Assembly-CSharp, System.Void PlayerVoteArea::SetCosmetics(NetworkedPlayerInfo)");
+DO_APP_FUNC(void, PlayerControl_SetKillTimer, (PlayerControl* __this, float time, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetKillTimer(System.Single)");
+
+DO_APP_FUNC(bool, Player_GetButton, (Player* __this, int32_t actionId, MethodInfo* method), "Rewired_Core, System.Boolean Rewired.Player::GetButton(System.Int32)");
+DO_APP_FUNC(void, KillButton_DoClick, (KillButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::DoClick()");
+DO_APP_FUNC(void, VentButton_DoClick, (VentButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void VentButton::DoClick()");

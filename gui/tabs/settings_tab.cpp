@@ -290,7 +290,7 @@ namespace SettingsTab {
 			{
 				ImGui::SameLine();
 				if (AnimatedButton("Unlock All Achievements"))
-					Achievements::UnlockAll();
+					State.unlockAllAchievements = true;
 			}
 
 			if (ToggleButton("Allow other mod users to see you're using SickoMenu", &State.ModDetection)) State.Save();
@@ -385,12 +385,42 @@ namespace SettingsTab {
 				}
 			}
 
-			if (ToggleButton("Disable Anticheat While Hosting (+25 Mode)", &State.DisableHostAnticheat)) {
+			static bool dhaWarnState = false;
+
+			if (!dhaWarnState && ToggleButton("Reduce Anticheat While Hosting (+25 Mode)", &State.DisableHostAnticheat)) {
+				if (State.DisableHostAnticheat) {
+					dhaWarnState = true;
+					State.DisableHostAnticheat = false;
+				}
+				else State.Save();
+
 				if (!State.DisableHostAnticheat && State.BattleRoyale) {
 					State.BattleRoyale = false;
 					State.GameMode = 0;
 				}
-				State.Save();
+			}
+
+			if (dhaWarnState) {
+				BoldText("Warning", ImVec4(1.f, 0.f, 0.f, 1.f));
+				ImGui::Text("By turning on Reduce Anticheat While Hosting (+25 Mode),");
+				ImGui::Text("your lobby can ONLY be discovered by other users with mods,");
+				ImGui::Text("or users with the lobby code.");
+				ImGui::Text(" ");
+				ImGui::Text("Your lobby will now have a reduced anticheat for everyone,");
+				ImGui::Text("meaning anyone can perform most actions that are usually detected");
+				ImGui::Text("by the anticheat!");
+				ImGui::Text(" ");
+				ImGui::Text("Are you sure that you want to turn it on?");
+
+				if (ColoredButton(ImVec4(0.f, 1.f, 0.f, 1.f), "Yes")) {
+					dhaWarnState = false;
+					State.DisableHostAnticheat = true;
+					State.Save();
+				}
+				ImGui::SameLine();
+				if (ColoredButton(ImVec4(1.f, 0.f, 0.f, 1.f), "No")) {
+					dhaWarnState = false;
+				}
 			}
 			/*if (State.DisableHostAnticheat) {
 				BoldText("Warning (+25 Mode)", ImVec4(1.f, 0.f, 0.f, 1.f));
@@ -412,11 +442,11 @@ namespace SettingsTab {
 				State.Save();
 				ReloadCurrentSceneIfNeeded();
 			}
-
-			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-
-			if (ToggleButton("Light Mode", &State.LightMode)) State.Save();
 			ImGui::SameLine();
+			if (ToggleButton("Hide Mod Stamp", &State.HideModStamp)) {
+				State.Save();
+			}
+
 			if (!State.GradientMenuTheme) {
 				if (ImGui::ColorEdit3("Menu Theme Color", (float*)&State.MenuThemeColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
 					State.Save();
@@ -445,7 +475,11 @@ namespace SettingsTab {
 			ImGui::SameLine();
 			if (AnimatedButton("Reset Menu Theme"))
 			{
-				State.MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, 1.f);
+				State.MenuThemeColor = ImVec4(1.f, 0.f, 0.424f, State.MenuThemeColor.w);
+				State.GradientMenuTheme = false;
+				State.RgbMenuTheme = false;
+				State.MatchBackgroundWithTheme = false;
+				State.Save();
 			}
 
 			SteppedSliderFloat("Opacity", (float*)&State.MenuThemeColor.w, 0.1f, 1.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
@@ -454,14 +488,20 @@ namespace SettingsTab {
 
 			if (ToggleButton("Dark Game Theme", &State.DarkMode)) {
 				State.Save();
+				State.MIG_ThemeChanged = true;
 				ReloadCurrentSceneIfNeeded();
 			}
 			ImGui::SameLine();
-			if (ToggleButton("Custom Game Theme", &State.CustomGameTheme)) State.Save();
+			if (ToggleButton("Custom Game Theme", &State.CustomGameTheme)) {
+				State.Save();
+				State.MIG_ThemeChanged = true;
+			}
 
 			if (State.CustomGameTheme) {
-				if (ImGui::ColorEdit3("Background Color", (float*)&State.GameBgColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview))
+				if (ImGui::ColorEdit3("Background Color", (float*)&State.GameBgColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
 					State.Save();
+					State.MIG_ThemeChanged = true;
+				}
 				ImGui::SameLine();
 				if (ImGui::ColorEdit3("Text Color", (float*)&State.GameTextColor, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview))
 					State.Save();
@@ -487,13 +527,9 @@ namespace SettingsTab {
 				State.Save();
 			}
 
-			if (ImGui::CollapsingHeader("Time Format")) {
-				ImGui::Text(("Time Preview: " +
-					GetTimeString(State.UseLeadingZeroForHours, State.ShowSeconds)).c_str());
-
+			if (State.ShowTime) {
 				static int hours = State.TimeOffsetMinutes / 60, minutes = State.TimeOffsetMinutes % 60;
 				static int timeOffsetChoice = State.NegativeTimeOffset;
-				
 				ImGui::Text("Time Offset (from UTC)");
 				ImGui::SameLine();
 				if (CustomListBoxInt("  ", &timeOffsetChoice, TIME_OFFSETS, 20.f * State.dpiScale)) {
@@ -517,6 +553,11 @@ namespace SettingsTab {
 					hours = State.TimeOffsetMinutes / 60, minutes = State.TimeOffsetMinutes % 60;
 					State.Save();
 				}
+			}
+
+			if (ImGui::CollapsingHeader("Time Format")) {
+				ImGui::Text(("Time Preview: " +
+					GetTimeString(State.UseLeadingZeroForHours, State.ShowSeconds)).c_str());
 
 				if (ToggleButton("Use 12-Hour Format", &State.Use12HourFormat)) State.Save();
 
@@ -536,6 +577,10 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
 
 			if (ImGui::CollapsingHeader("GUI")) {
+				if (ToggleButton("Light Mode", &State.LightMode)) State.Save();
+				ImGui::SameLine();
+				if (ToggleButton("Show UI Borders", &State.ShowUiBorders)) State.Save();
+
 				ImGui::SetNextItemWidth(50 * State.dpiScale);
 				if (ImGui::InputFloat("Menu Scale", &State.dpiScale)) {
 					State.dpiScale = std::clamp(State.dpiScale, 0.5f, 3.f);
@@ -665,7 +710,7 @@ namespace SettingsTab {
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_ChatAlwaysActive));
 			ImGui::SameLine(100 * State.dpiScale);
-			ImGui::Text("Show/Hide Chat");
+			ImGui::Text("Toggle Always Show Chat Button");
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 

@@ -2,6 +2,7 @@
 #include "state.hpp"
 #include <iostream>
 #include <fstream>
+#include <future>
 #include "main.h"
 #include "utility.h"
 #include "logger.h"
@@ -9,24 +10,25 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v5.0_pr2";
+    this->SickoVersion = "v5.0";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
 
-    if (!std::filesystem::exists(configPath))
-        return;
+    if (!std::filesystem::exists(configPath)) {
+        Save();
+    }
 
     try {
         std::ifstream inConfig(configPath);
         nlohmann::ordered_json j = nlohmann::ordered_json::parse(inConfig, NULL, false);
 
 #define JSON_TRYGET(key, value) \
-        try { \
-            j.at(key).get_to(value); \
-        } catch (nlohmann::detail::out_of_range& e) { \
-            Log.Info(e.what()); \
-        }
+    try { \
+        j.at(key).get_to(value); \
+    } catch (nlohmann::detail::out_of_range& e) { \
+        Log.Info(e.what()); \
+    }
 
         if (State.selectedConfig != "") JSON_TRYGET("SelectedConfig", this->selectedConfig);
     }
@@ -44,15 +46,15 @@ void Settings::Load() {
         nlohmann::ordered_json j = nlohmann::ordered_json::parse(inSettings, NULL, false);
 
 #define JSON_TRYGET(key, value) \
-        try { \
-            j.at(key).get_to(value); \
-        } catch (nlohmann::detail::out_of_range& e) { \
-            Log.Info(e.what()); \
-        }
+    try { \
+        j.at(key).get_to(value); \
+    } catch (nlohmann::detail::out_of_range& e) { \
+        Log.Info(e.what()); \
+    }
 
         JSON_TRYGET("HasOpenedMenuBefore", this->HasOpenedMenuBefore);
         JSON_TRYGET("ShowMenuOnStartup", this->ShowMenuOnStartup);
-        if (this->ShowMenuOnStartup) JSON_TRYGET("ShowMenu", this->ShowMenu);
+        if (this->ShowMenuOnStartup) JSON_TRYGET("ShowMenu", this->ShowMenuOnStartup);
         JSON_TRYGET("KeyBinds", this->KeyBinds);
 #ifdef _DEBUG
         JSON_TRYGET("ShowDebug", this->showDebugTab);
@@ -91,7 +93,7 @@ void Settings::Load() {
         JSON_TRYGET("FakeFriendCode", this->FakeFriendCode);
         JSON_TRYGET("SpoofPlatform", this->SpoofPlatform);
         JSON_TRYGET("FakePlatform", this->FakePlatform);
-		JSON_TRYGET("SpoofPsnId", this->SpoofPsnId);
+        JSON_TRYGET("SpoofPsnId", this->SpoofPsnId);
         JSON_TRYGET("FakePsnId", this->FakePsnId);
         JSON_TRYGET("SpoofXboxId", this->SpoofXboxId);
         JSON_TRYGET("FakeXboxId", this->FakeXboxId);
@@ -102,11 +104,12 @@ void Settings::Load() {
         JSON_TRYGET("DisableAnimations", this->DisableAnimations);
         JSON_TRYGET("ClickThroughMenuUI", this->ClickThroughMenuUI);
         JSON_TRYGET("AnimationSpeed", this->AnimationSpeed);
+        JSON_TRYGET("ShowUiBorders", this->ShowUiBorders);
         JSON_TRYGET("RoundingRadiusMultiplier", this->RoundingRadiusMultiplier);
-		this->RoundingRadiusMultiplier = std::clamp(this->RoundingRadiusMultiplier, 0.f, 2.f);
+        this->RoundingRadiusMultiplier = std::clamp(this->RoundingRadiusMultiplier, 0.f, 2.f);
         JSON_TRYGET("ExtraCommands", this->ExtraCommands);
 
-        JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
+        // JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
         JSON_TRYGET("DarkMode", this->DarkMode);
         JSON_TRYGET("CustomGameTheme", this->CustomGameTheme);
         JSON_TRYGET("GameTextColor_R", this->GameTextColor.x);
@@ -201,6 +204,7 @@ void Settings::Load() {
                 if (p.contains("NoisemakerImpostorAlert")) preset.NoisemakerImpostorAlert = p["NoisemakerImpostorAlert"].get<bool>();
                 if (p.contains("ViperDissolveTime")) preset.ViperDissolveTime = p["ViperDissolveTime"].get<float>();
                 if (p.contains("DetectiveSuspectLimit")) preset.DetectiveSuspectLimit = p["DetectiveSuspectLimit"].get<float>();
+                if (p.contains("JudgeTaskRequirement")) preset.JudgeTaskRequirement = p["JudgeTaskRequirement"].get<float>();
                 if (p.contains("RoleRates") && p["RoleRates"].is_array()) {
                     for (auto& r : p["RoleRates"]) {
                         if (r.contains("Role") && r.contains("Count") && r.contains("Chance")) {
@@ -343,6 +347,7 @@ void Settings::Load() {
         JSON_TRYGET("FakeAlive", this->FakeAlive);
         JSON_TRYGET("ShowHost", this->ShowHost);
         JSON_TRYGET("HideWatermark", this->HideWatermark);
+        JSON_TRYGET("HideModStamp", this->HideModStamp);
         JSON_TRYGET("ShowVoteKicks", this->ShowVoteKicks);
         JSON_TRYGET("ShowFps", this->ShowFps);
         JSON_TRYGET("DoTasksAsImpostor", this->DoTasksAsImpostor);
@@ -395,6 +400,21 @@ void Settings::Load() {
         JSON_TRYGET("ConfuseOnKill", this->confuseOnKill);
         JSON_TRYGET("ConfuseOnVent", this->confuseOnVent);
         JSON_TRYGET("ConfuseOnMeeting", this->confuseOnMeeting);
+
+        JSON_TRYGET("InfiniteMeetings", this->InfiniteMeetings);
+        JSON_TRYGET("NoLadderZiplineCooldown", this->NoLadderZiplineCooldown);
+        JSON_TRYGET("Engineer_NoVentCooldown", this->Engineer_NoVentCooldown);
+        JSON_TRYGET("Engineer_InfiniteVentTime", this->Engineer_InfiniteVentTime);
+        JSON_TRYGET("Scientist_NoVitalsCooldown", this->Scientist_NoVitalsCooldown);
+        JSON_TRYGET("Scientist_InfiniteBattery", this->Scientist_InfiniteBattery);
+        JSON_TRYGET("Tracker_NoTrackingCooldown", this->Tracker_NoTrackingCooldown);
+        JSON_TRYGET("Tracker_InfiniteTracking", this->Tracker_InfiniteTracking);
+        JSON_TRYGET("Detective_NoInterrogateCooldown", this->Detective_NoInterrogateCooldown);
+        JSON_TRYGET("Judge_NoTaskRequirement", this->Judge_NoTaskRequirement);
+        JSON_TRYGET("Judge_InfiniteOverrules", this->Judge_InfiniteOverrules);
+        JSON_TRYGET("GuardianAngel_NoProtectCooldown", this->GuardianAngel_NoProtectCooldown);
+        JSON_TRYGET("Impostor_NoKillCooldown", this->Impostor_NoKillCooldown);
+        JSON_TRYGET("Shapeshifter_InfiniteShapeshiftDuration", this->Shapeshifter_InfiniteShapeshiftDuration);
 
         JSON_TRYGET("CyclerNameGeneration", this->cyclerNameGeneration);
         JSON_TRYGET("ConfuserNameGeneration", this->confuserNameGeneration);
@@ -472,7 +492,7 @@ void Settings::Load() {
         JSON_TRYGET("WarnReasons", this->WarnReasons);
         JSON_TRYGET("LockedNames", this->LockedNames);
 
-        JSON_TRYGET("DisableMedbayScan", this->DisableMedbayScan);
+        // JSON_TRYGET("DisableMedbayScan", this->DisableMedbayScan);
 
         JSON_TRYGET("CrewmateGhostColor_R", this->CrewmateGhostColor.x);
         JSON_TRYGET("CrewmateGhostColor_G", this->CrewmateGhostColor.y);
@@ -732,10 +752,11 @@ void Settings::Save() {
                 { "DisableAnimations", this->DisableAnimations },
                 { "ClickThroughMenuUI", this->ClickThroughMenuUI },
                 { "AnimationSpeed", this->AnimationSpeed },
+                { "ShowUiBorders", this->ShowUiBorders },
                 { "RoundingRadiusMultiplier", this->RoundingRadiusMultiplier },
                 { "ExtraCommands", this->ExtraCommands },
 
-                { "NoAbilityCD", this->NoAbilityCD },
+                // { "NoAbilityCD", this->NoAbilityCD },
                 { "DarkMode", this->DarkMode },
                 { "CustomGameTheme", this->CustomGameTheme },
                 { "GameTextColor_R", this->GameTextColor.x },
@@ -863,6 +884,7 @@ void Settings::Save() {
                             { "NoisemakerImpostorAlert", p.NoisemakerImpostorAlert },
                             { "ViperDissolveTime", p.ViperDissolveTime },
                             { "DetectiveSuspectLimit", p.DetectiveSuspectLimit },
+                            { "JudgeTaskRequirement", p.JudgeTaskRequirement },
                             { "RoleRates", [&]() {
                                 nlohmann::json rarr = nlohmann::json::array();
                                 for (auto& [role, rp] : p.RoleRates) {
@@ -969,6 +991,7 @@ void Settings::Save() {
                 { "AutoKill", this->AutoKill },
                 { "FakeAlive", this->FakeAlive },
                 { "HideWatermark", this->HideWatermark },
+                { "HideModStamp", this->HideModStamp },
                 { "ShowHost", this->ShowHost },
                 { "ShowVoteKicks", this->ShowVoteKicks },
                 { "ShowFps", this->ShowFps },
@@ -1020,6 +1043,21 @@ void Settings::Save() {
                 { "ConfuseOnKill", this->confuseOnKill },
                 { "ConfuseOnVent", this->confuseOnVent },
                 { "ConfuseOnMeeting", this->confuseOnMeeting },
+
+                { "InfiniteMeetings", this->InfiniteMeetings },
+                { "NoLadderZiplineCooldown", this->NoLadderZiplineCooldown },
+                { "Engineer_NoVentCooldown", this->Engineer_NoVentCooldown },
+                { "Engineer_InfiniteVentTime", this->Engineer_InfiniteVentTime },
+                { "Scientist_NoVitalsCooldown", this->Scientist_NoVitalsCooldown },
+                { "Scientist_InfiniteBattery", this->Scientist_InfiniteBattery },
+                { "Tracker_NoTrackingCooldown", this->Tracker_NoTrackingCooldown },
+                { "Tracker_InfiniteTracking", this->Tracker_InfiniteTracking },
+                { "Detective_NoInterrogateCooldown", this->Detective_NoInterrogateCooldown },
+                { "Judge_NoTaskRequirement", this->Judge_NoTaskRequirement },
+                { "Judge_InfiniteOverrules", this->Judge_InfiniteOverrules },
+                { "GuardianAngel_NoProtectCooldown", this->GuardianAngel_NoProtectCooldown },
+                { "Impostor_NoKillCooldown", this->Impostor_NoKillCooldown },
+                { "Shapeshifter_InfiniteShapeshiftDuration", this->Shapeshifter_InfiniteShapeshiftDuration },
 
                 { "CyclerNameGeneration", this->cyclerNameGeneration },
                 { "ConfuserNameGeneration", this->confuserNameGeneration },
@@ -1095,7 +1133,7 @@ void Settings::Save() {
                 { "WarnReasons", this->WarnReasons },
                 { "LockedNames", this->LockedNames },
 
-                { "DisableMedbayScan", this->DisableMedbayScan },
+                // { "DisableMedbayScan", this->DisableMedbayScan },
 
                 { "CrewmateGhostColor_R", this->CrewmateGhostColor.x },
                 { "CrewmateGhostColor_G", this->CrewmateGhostColor.y },

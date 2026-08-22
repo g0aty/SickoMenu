@@ -65,6 +65,9 @@ void ChangeOtherHudObjectColors(HudManager* hudManager, Color col) {
     auto mapButton = hudManager->fields.MapButton;
     auto mapButtonTransform = mapButton == NULL ? NULL : Component_get_transform((Component_1*)mapButton, NULL);
 
+    auto matchInfoButton = hudManager->fields.MatchInfoButton;
+    auto matchInfoButtonTransform = matchInfoButton == NULL ? NULL : Component_get_transform((Component_1*)matchInfoButton, NULL);
+
     auto settingsButtonObj = hudManager->fields.SettingsButton;
     static std::string passiveButtonTypeName = translate_type_name("PassiveButton, Assembly-CSharp");
     Type* passiveButtonType = app::Type_GetType(convert_to_string(passiveButtonTypeName), NULL);
@@ -72,6 +75,7 @@ void ChangeOtherHudObjectColors(HudManager* hudManager, Color col) {
     auto settingsButtonTransform = settingsButton == NULL ? NULL : Component_get_transform((Component_1*)settingsButton, NULL);
 
     SetHoverStateBasedColors(mapButtonTransform, col);
+    SetHoverStateBasedColors(matchInfoButtonTransform, col);
     SetHoverStateBasedColors(settingsButtonTransform, col);
 }
 
@@ -186,17 +190,21 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
 
             if (!State.InMeeting && !State.DisableHud)
             {
+                auto kbjPlayer = (Player*)KeyboardJoystick__TypeInfo->static_fields->player;
+
                 app::RoleBehaviour* playerRole = localData->fields.Role; // Nullable
                 app::RoleTypes__Enum role = playerRole != nullptr ? playerRole->fields.Role : app::RoleTypes__Enum::Crewmate;
                 GameObject* ImpostorVentButton = app::Component_get_gameObject((Component_1*)__this->fields.ImpostorVentButton, NULL);
 
                 if (ImpostorVentButton != NULL) {
+                    bool forceShowVentButton = (State.UnlockVents && !State.PanicMode) || (((*Game::pLocalPlayer)->fields.inVent && role != RoleTypes__Enum::Engineer));
+
                     if (role == RoleTypes__Enum::Engineer && State.UnlockVents && !State.PanicMode)
                     {
-                        app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
+                        /*app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
                         if (engineerRole->fields.cooldownSecondsRemaining > 0.0f)
                             engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                        engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
+                        engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written*/
                     }
                     else if ((GetPlayerData(*Game::pLocalPlayer)->fields.IsDead || IsInLobby()))
                     {
@@ -204,14 +212,22 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                     }
                     else
                     {
-                        app::GameObject_SetActive(ImpostorVentButton, (State.UnlockVents && !State.PanicMode) || (((*Game::pLocalPlayer)->fields.inVent && role != RoleTypes__Enum::Engineer)) || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal), nullptr);
+                        app::GameObject_SetActive(ImpostorVentButton, forceShowVentButton || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal), nullptr);
+                    }
+
+                    if (kbjPlayer != NULL && forceShowVentButton &&
+                        !(PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal) &&
+                        Player_GetButton(kbjPlayer, 50, NULL) &&
+                        (PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL) || (*Game::pLocalPlayer)->fields.inVent)) {
+                        // 50 is the ID for the in-game vent keybind
+                        VentButton_DoClick((VentButton*)__this->fields.ImpostorVentButton, NULL);
                     }
                 }
 
                 if ((IsInGame() || (IsInLobby() && State.KillInLobbies))) {
                     bool amImpostor = false;
                     try {
-                        amImpostor = PlayerIsImpostor(localData);
+                        amImpostor = PlayerIsImpostor(localData) && !localData->fields.IsDead;
                     }
                     catch (...) {
                         LOG_ERROR("Exception occured while fetching whether player is impostor or not.");
@@ -229,9 +245,18 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                     }
                     GameObject* KillButton = app::Component_get_gameObject((Component_1*)__this->fields.KillButton, NULL);
                     if (KillButton != NULL && (IsInGame())) {
-                        if ((!State.PanicMode && State.UnlockKillButton && (IsHost() || !State.SafeMode) && !localData->fields.IsDead) || amImpostor) {
+                        if (amImpostor || (!State.PanicMode && State.UnlockKillButton && (IsHost() || !State.SafeMode) && !localData->fields.IsDead)) {
                             app::GameObject_SetActive(KillButton, true, nullptr);
                             playerRole->fields.CanUseKillButton = true;
+
+                            if (kbjPlayer != NULL && !amImpostor &&
+                                Player_GetButton(kbjPlayer, 8, NULL) &&
+                                PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) {
+                                // allow killing as crewmate
+                                __this->fields.KillButton->fields._.isCoolingDown = false;
+                                // 8 is the ID for the in-game kill keybind
+                                KillButton_DoClick(__this->fields.KillButton, NULL);
+                            }
                         }
                         else {
                             app::GameObject_SetActive(KillButton, false, nullptr);
@@ -340,14 +365,21 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
     try {
         if (!State.PanicMode || State.TempPanicMode) {
             if (State.OldStylePingText) {
+                float camHeight = State.FollowerCam != NULL ? Camera_get_orthographicSize(State.FollowerCam, NULL) / 3.f : 1.f;
+
                 // these calculations are based on 16:9 (2.5) and 4:3 (1.2) aspect ratios
                 float aspectRatio = (float)Screen_get_width(NULL) / (float)Screen_get_height(NULL);
-                float xOffset = aspectRatio * 2.925f - 2.7f;
+                float xOffset = aspectRatio * camHeight * 2.925f - 2.7f;
+
+                auto chat = Game::HudManager.GetInstance()->fields.Chat;
+                auto chatGameObject = Component_get_gameObject((Component_1*)chat, NULL);
+
+                if (IsInGame())
+                    xOffset -= GameObject_GetActive(chatGameObject, NULL) ? 1.f : 0.3f; // account for the MatchInfoGuide button
 
                 Vector3 oldDistFromEdge = Vector3(xOffset, 5.9f, 0.f);
-                float camHeight = State.FollowerCam != NULL ? Camera_get_orthographicSize(State.FollowerCam, NULL) / 3.f : 1.f;
                 // if (!State.PanicMode && State.EnableZoom)
-                oldDistFromEdge.x *= camHeight * (camHeight * 0.425f + 0.575f);
+                // oldDistFromEdge.x *= camHeight * (camHeight * 0.425f + 0.575f);
                 oldDistFromEdge.y *= camHeight;
                 __this->fields.aspectPosition->fields.DistanceFromEdge = oldDistFromEdge;
             }
@@ -400,7 +432,10 @@ void dPingTracker_Update(PingTracker* __this, MethodInfo* method) {
                 if (State.SickoVersion.find("pr") != std::string::npos || State.SickoVersion.find("rc") != std::string::npos) {
                     versionText = GetGradientUsername(State.SickoVersion, ImVec4(0.656f, 0.f, 1.f, 1.f), ImVec4(0.334f, 0.f, 0.624f, 1.f), gradientOffset);
                 }
-                else versionText = "<#fb0>" + State.SickoVersion + "</color>";
+                else {
+                    // versionText = "<#fb0>" + State.SickoVersion + "</color>";
+                    versionText = GetGradientUsername(State.SickoVersion, ImVec4(1.f, 0.733f, 0.f, 1.f), ImVec4(0.733f, 0.533f, 0.f, 1.f), gradientOffset);
+                }
 
                 goatText = GetGradientUsername("g0aty", ImVec4(0.937f, 0.004f, 0.263f, 1.f), ImVec4(0.529f, 0.008f, 0.157f, 1.f), gradientOffset);
                 if (gradientDelay <= 0) {
@@ -455,7 +490,7 @@ void dModManager_LateUpdate(ModManager* __this, MethodInfo* method) {
     if (field == nullptr) return;
     auto modStampSprite = (SpriteRenderer*)il2cpp_field_get_value_object(field, (Il2CppObject*)__this);
 
-    bool shouldShowModStamp = !State.PanicMode && !State.DisableHud && !State.HideWatermark;
+    bool shouldShowModStamp = !State.PanicMode && !State.DisableHud && !State.HideModStamp;
     SpriteRenderer_set_color(modStampSprite, Color(1.f, 1.f, 1.f, shouldShowModStamp ? 0.498f : 0.f), NULL);
 }
 
@@ -604,34 +639,199 @@ void dShadowCollab_OnEnable(ShadowCollab* __this, MethodInfo* method) {
 }
 
 void dPassiveButton_ReceiveClickDown(PassiveButton* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPassiveButton_ReceiveClickDown executed", false);
     if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
     PassiveButton_ReceiveClickDown(__this, method);
 }
 
 void dPassiveButton_ReceiveRepeatDown(PassiveButton* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPassiveButton_ReceiveRepeatDown executed", false);
     if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
     PassiveButton_ReceiveRepeatDown(__this, method);
 }
 
 void dPassiveButton_ReceiveClickUp(PassiveButton* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPassiveButton_ReceiveClickUp executed", false);
     if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
     PassiveButton_ReceiveClickUp(__this, method);
 }
 
 void dPassiveButton_ReceiveMouseOver(PassiveButton* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPassiveButton_ReceiveMouseOver executed", false);
     if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
     PassiveButton_ReceiveMouseOver(__this, method);
 }
 
 void dMapBehaviour_FixedUpdate(MapBehaviour* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMapBehaviour_FixedUpdate executed", false);
     MapBehaviour_FixedUpdate(__this, method);
 }
 
 void dRoomTracker_FixedUpdate(RoomTracker* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dRoomTracker_FixedUpdate executed", false);
     RoomTracker_FixedUpdate(__this, method);
 }
 
-void ColorRoomTrackerText(RoomTracker* roomTracker) {
-    // the reason that this isn't done in dRoomTracker_FixedUpdate is because
-    // the slide in/out animations are hardcoded to start with white text
+void dMatchInfoHudButton_Update(MatchInfoHudButton* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMatchInfoHudButton_Update executed", false);
+    // replace the original method entirely, as it only checks for death or MeetingHud existing
+    // instead of the chat button being active
+
+    if (!Game::HudManager.IsInstanceExists()) {
+        MatchInfoHudButton_Update(__this, method);
+        return;
+    }
+
+    auto chat = Game::HudManager.GetInstance()->fields.Chat;
+    auto chatGameObject = Component_get_gameObject((Component_1*)chat, NULL);
+    if (chat == NULL || chatGameObject == NULL) {
+        MatchInfoHudButton_Update(__this, method);
+        return;
+    }
+
+    MatchInfoHudButton_Update(__this, method);
+
+    auto distanceFromEdge = GameObject_GetActive(chatGameObject, NULL) ?
+        Vector3(2.75f, 0.505f, -400.f) : Vector3(2.15f, 0.505f, -400.f);
+
+    // these are the vectors that the game uses
+
+    __this->fields.aspectPosition->fields.DistanceFromEdge = distanceFromEdge;
+}
+
+void dMatchInfoGuide_Update(MatchInfoGuide* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMatchInfoGuide_Update executed", false);
+    MatchInfoGuide_Update(__this, method);
+
+    if (State.MIG_ThemeChanged) {
+        for (int i = 0; i < 2; ++i) {
+            MatchInfoGuide_CreatePlayerEntries(__this, NULL);
+        }
+        // the reason this is done twice is because the order of the players is reversed every time this is called
+        State.MIG_ThemeChanged = false;
+        // don't repeatedly spam player entries
+    }
+
+    auto mip = __this->fields.MatchInfoParent;
+    if (mip == NULL) return;
+
+    auto mipTransform = GameObject_get_transform(mip, NULL);
+    if (mipTransform == NULL) return;
+
+    static std::string spriteRendererTypeName = translate_type_name("UnityEngine.SpriteRenderer, UnityEngine.CoreModule");
+    Type* spriteRendererType = app::Type_GetType(convert_to_string(spriteRendererTypeName), NULL);
+
+    auto backgroundChild = (Component_1*)Transform_FindChild(mipTransform, convert_to_string("Background"), NULL);
+    if (backgroundChild == NULL) return;
+
+    auto backgroundSprite = backgroundChild == NULL ? NULL : (SpriteRenderer*)Component_GetComponent(backgroundChild, spriteRendererType, NULL);
+    if (backgroundSprite == NULL) return;
+
+    Color prevCol = SpriteRenderer_get_color(backgroundSprite, NULL);
+
+    Color bgCol = (!State.PanicMode && State.DarkMode) ? Color(0.5f, 0.5f, 0.5f, prevCol.a) :
+        Color(1.f, 1.f, 1.f, prevCol.a);
+
+    SpriteRenderer_set_color(backgroundSprite, bgCol, NULL);
+}
+
+void dPlayerIdentifierButton_Populate(PlayerIdentifierButton* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerIdentifierButton_Populate executed", false);
+
+    PlayerIdentifierButton_Populate(__this, player, method);
+
+    // recolor the background of the button to match the user's theming choices
+
+    if (__this->fields.buttonSprite != NULL) {
+        auto bgSprite = __this->fields.buttonSprite;
+
+        if (!State.PanicMode && State.CustomGameTheme) {
+            auto bg = Color(State.GameBgColor.x, State.GameBgColor.y, State.GameBgColor.z, State.GameBgColor.w);
+            SpriteRenderer_set_color(bgSprite, bg, NULL);
+        }
+        else {
+            auto col = (!State.PanicMode && State.DarkMode)
+                ? Color(0.133f, 0.133f, 0.133f, 1.f) : Palette__TypeInfo->static_fields->White;
+            SpriteRenderer_set_color(bgSprite, col, NULL);
+        }
+    }
+
+    if (__this->fields.platformIcon != NULL) {
+        auto pfIcon = __this->fields.platformIcon;
+
+        if (!State.PanicMode && State.CustomGameTheme) {
+            auto fg = Color(State.GameTextColor.x, State.GameTextColor.y, State.GameTextColor.z, State.GameTextColor.w);
+            SpriteRenderer_set_color(pfIcon, fg, NULL);
+        }
+        else {
+            auto col = (!State.PanicMode && State.DarkMode)
+                ? Palette__TypeInfo->static_fields->White : Palette__TypeInfo->static_fields->Black;
+            SpriteRenderer_set_color(pfIcon, col, NULL);
+        }
+    }
+
+    // reveal roles and more, code copied from MeetingHud.cpp
+
+    auto outfit = GetPlayerOutfit(player);
+    if (outfit == NULL) return;
+    std::string playerName = convert_from_string(outfit->fields.PlayerName);
+
+    static uint8_t offset = 0; // This should be unsigned or modulo will give unexpected negative results
+    static int offsetCooldown = 0;
+    if (!State.PanicMode && (player == GetPlayerData(*Game::pLocalPlayer) || State.CustomNameForEveryone) && State.CustomName && !State.ServerSideCustomName && !State.userName.empty()) {
+        if (State.CustomName && !State.ServerSideCustomName) {
+            playerName = GetCustomName(playerName, false, 0, offset);
+            if (offsetCooldown <= 0) {
+                offset++;
+                offsetCooldown = int(0.2 * GetFps());
+            }
+            else offsetCooldown--;
+        }
+    }
+
+    if (!State.PanicMode && State.PlayerColoredDots)
+    {
+        Color32&& nameColor = GetPlayerColor(outfit->fields.ColorId);
+        std::string dot = std::format("<#{:02x}{:02x}{:02x}{:02x}> ●</color>",
+            nameColor.r, nameColor.g, nameColor.b,
+            nameColor.a);
+
+        playerName = "<#0000>● </color>" + playerName + dot;
+    }
+    if (!State.PanicMode && State.RevealRoles)
+    {
+        std::string roleName = GetRoleName(player->fields.Role, State.AbbreviatedRoleNames);
+        if (!player->fields.Disconnected) {
+            int completedTasks = 0;
+            int totalTasks = 0;
+            if (player->fields._object) {
+                auto tasks = GetNormalPlayerTasks(player->fields._object);
+                for (auto task : tasks)
+                {
+                    if (task == nullptr) continue;
+                    if (task->fields.taskStep == task->fields.MaxStep) {
+                        completedTasks++;
+                        totalTasks++;
+                    }
+                    else
+                        totalTasks++;
+                }
+            }
+            std::string tasksText = std::format("({}/{})", completedTasks, totalTasks);
+            if (totalTasks == 0 || (PlayerIsImpostor(player) && completedTasks == 0))
+                playerName = "<size=1.2>" + roleName + "\n</size>" + playerName + "\n<size=1.2><#0000>0";
+            else
+                playerName = "<size=1.2>" + roleName + " " + tasksText + "\n</size>" + playerName + "\n<size=1.2><#0000>0";
+        }
+        else
+            playerName = "<size=1.2>" + roleName + " (D/C)\n</size>" + playerName + "\n<size=1.2><#0000>0";
+        Color32&& roleColor = app::Color32_op_Implicit(GetRoleColor(player->fields.Role), NULL);
+
+        playerName = std::format("<color=#{:02x}{:02x}{:02x}{:02x}>{}",
+            roleColor.r, roleColor.g, roleColor.b,
+            roleColor.a, playerName);
+    }
+
+    String* playerNameStr = convert_to_string(playerName);
+    TMP_Text_set_text((app::TMP_Text*)__this->fields.NameText, playerNameStr, NULL);
 }
