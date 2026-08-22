@@ -2,21 +2,21 @@
 
 ## List of Questions
 
-1. [My antivirus shows some detections, is this malware???](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q1)
-2. [What's the difference between release and debug?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q2)
-3. [How do I install the menu?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q3)
-4. [How do I open the menu?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q4)
-5. [How do I get rid of this error "SteamworksAuthFail"?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q5)
-6. [Where do I find the Among Us folder?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q6)
-7. [Why is my menu not showing after I press delete?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q7)
-8. [Is there an "always impostor" feature in the menu?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q8)
-9. [How do I run multiple instances of Among Us?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q9)
-10. [Does SickoMenu support other mods and is it planned?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q10)
-11. [How do I update the menu myself by editing the source code?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q11)
-12. [Among Us updated, did SickoMenu update yet?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q12)
-13. [What does "Reduce Host Anticheat (+25 Mode)" do? / Why am I not seeing any lobbies? / Why is no one joining my lobby?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q13)
-14. [Can I Use SickoMenu on Among Us 3D?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q14)
-15. [My antivirus keeps automatically deleting the file, how do I make it stop???](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q15)
+1. [My antivirus shows some detections, is this malware???](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q1-my-antivirus-shows-some-detections-is-this-malware)
+2. [What's the difference between release and debug?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q2-whats-the-difference-between-release-and-debug)
+3. [How do I install the menu?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q3-how-do-i-install-the-menu)
+4. [How do I open the menu?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q4-how-do-i-open-the-menu)
+5. [How do I get rid of this error "SteamworksAuthFail"?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q5-how-do-i-get-rid-of-this-error-steamworksauthfail)
+6. [Where do I find the Among Us folder?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q6-where-do-i-find-the-among-us-folder)
+7. [Why is my menu not showing after I press delete?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q7-why-is-my-menu-not-showing-after-i-press-delete)
+8. [Is there an "always impostor" feature in the menu?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q8-is-there-an-always-impostor-feature-in-the-menu)
+9. [How do I run multiple instances of Among Us?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q9-how-do-i-run-multiple-instances-of-among-us)
+10. [Does SickoMenu support other mods and is it planned?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q10-does-sickomenu-support-other-mods-and-is-it-planned)
+11. [How do I update the menu myself by editing the source code?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q11-how-do-i-update-the-menu-myself-by-editing-the-source-code)
+12. [Among Us updated, did SickoMenu update yet?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q12-among-us-updated-did-sickomenu-update-yet)
+13. [What does "Reduce Host Anticheat (+25 Mode)" do? / Why am I not seeing any lobbies? / Why is no one joining my lobby?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q13-what-does-reduce-host-anticheat-25-mode-do--why-am-i-not-seeing-any-lobbies--why-is-no-one-joining-my-lobby)
+14. [Can I Use SickoMenu on Among Us 3D?](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q14-can-i-use-sickomenu-on-among-us-3d)
+15. [My antivirus keeps automatically deleting the file, how do I make it stop???](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q15-my-antivirus-keeps-automatically-deleting-the-file-how-do-i-make-it-stop)
 
 ## Q1: My antivirus shows some detections, is this malware???
 A: No and your life must be difficult, huh buddy? Some of those false-positives have "gen" in the detection label. Gen is short for generic and this means it's detected a pattern that's used commonly in all sorts of software. The pattern it's detecting is likely related to memory modification which is necessary for modifying the game like we do. Any detection label ending in "ml" is part of Microsoft Defender’s machine learning-based detection system, which uses patterns and behaviors to flag potential threats. If a file resembles known malware based on these patterns, it could be flagged even if it’s harmless. The compiled DLLs are built **by GitHub itself** directly from the code in the repository. Review the code. There's nothing hidden, and nothing **could** be hidden, it's fully open source. The code for the build automation is there too. In short, the detections are due to the fact that we modify the game's memory.
