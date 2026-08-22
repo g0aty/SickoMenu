@@ -344,7 +344,7 @@ namespace SettingsTab {
 			}
 			if (State.SpoofPlatform) {
 				ImGui::SameLine();
-				if (CustomListBoxInt("Platform", &State.FakePlatform, PLATFORMS))
+				if (CustomListBoxIntColored("Platform", &State.FakePlatform, PLATFORMS, 225.0F, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", PLATFORM_NAMES_COLOR, IM_ARRAYSIZE(PLATFORM_NAMES_COLOR)))
 					State.Save();
 			}
 
