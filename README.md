@@ -334,10 +334,6 @@ Contributions are welcome and appreciated!
 
 ## ✨ Inspiration
 Inspiration from/credit to other mods has been mentioned in the source code. If you think we haven't given you credit for a feature, open an issue for it!
-* [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
-* [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
-* [BetterAmongUs](https://github.com/D1GQ/BetterAmongUs) by [D1GQ](https://github.com/D1GQ/)
-* [MalumMenu](https://github.com/scp222thj/MalumMenu) by [scp222thj](https://github.com/scp222thj)
 
 ## 🙏 Special Thanks
 * The [BitCrackers](https://github.com/BitCrackers) team for creating [AmongUsMenu](https://github.com/BitCrackers/AmongUsMenu)
