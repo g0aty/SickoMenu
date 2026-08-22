@@ -36,7 +36,6 @@ Join our very own **Discord Server** for support, bug reports, and sneak peeks!
   - [For Windows](#for-windows)
   - [For Proton](#for-linux-protonwine-version-proxy-only)
   - [For macOS](#for-macos-version-proxy-only)
-- [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 - [⌨️ Default Hotkeys](#%EF%B8%8F-default-hotkeys)
 - [⚒️ Building / Compilation](#%EF%B8%8F-building--compilation)
 - [💁 Contributing](#-contributing)
