@@ -1,6 +1,6 @@
 <p align="center">
    <img src="SickoBanner.png">
-  </p>
+</p>
 
 <h1 align="center">👺 SickoMenu v5.0</h1>
 
