@@ -111,12 +111,13 @@ namespace HostTab {
         p.NoisemakerImpostorAlert = o.GetBool(app::BoolOptionNames__Enum::NoisemakerImpostorAlert);
         p.ViperDissolveTime = o.GetFloat(app::FloatOptionNames__Enum::ViperDissolveTime);
         p.DetectiveSuspectLimit = o.GetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit);
+        p.JudgeTaskRequirement = o.GetFloat(app::FloatOptionNames__Enum::JudgeTaskRequirementPercentage);
         static const app::RoleTypes__Enum roles[] = {
             app::RoleTypes__Enum::Scientist, app::RoleTypes__Enum::Engineer,
             app::RoleTypes__Enum::GuardianAngel, app::RoleTypes__Enum::Shapeshifter,
             app::RoleTypes__Enum::Noisemaker, app::RoleTypes__Enum::Phantom,
             app::RoleTypes__Enum::Tracker, app::RoleTypes__Enum::Detective,
-            app::RoleTypes__Enum::Viper
+            app::RoleTypes__Enum::Viper, RoleTypes__Enum::Judge
         };
         for (auto role : roles) {
             Settings::RolePreset rp;
@@ -184,6 +185,7 @@ namespace HostTab {
                                 {"Noisemaker",		State.NoisemakerColor},
                                 {"Tracker",			State.TrackerColor},
                                 {"Detective",		State.DetectiveColor},
+                                {"Judge",		    State.JudgeColor},
                                 {"Impostor",		State.ImpostorColor},
                                 {"Shapeshifter",	State.ShapeshifterColor},
                                 {"Phantom",			State.PhantomColor},
@@ -196,6 +198,7 @@ namespace HostTab {
                                 State.trackers_amount = (int)GetRoleCount(RoleType::Tracker);
                                 State.noisemakers_amount = (int)GetRoleCount(RoleType::Noisemaker);
                                 State.detectives_amount = (int)GetRoleCount(RoleType::Detective);
+                                State.judges_amount = (int)GetRoleCount(RoleType::Judge);
                                 State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
                                 State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
                                 State.vipers_amount = (int)GetRoleCount(RoleType::Viper);
@@ -218,8 +221,9 @@ namespace HostTab {
                                 }
                                 if (State.assignedRoles[index] == RoleType::Engineer || State.assignedRoles[index] == RoleType::Scientist ||
                                     State.assignedRoles[index] == RoleType::Tracker || State.assignedRoles[index] == RoleType::Noisemaker ||
-                                    State.assignedRoles[index] == RoleType::Detective || State.assignedRoles[index] == RoleType::Crewmate) {
-                                    if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.crewmates_amount >= (int)playerAmount)
+                                    State.assignedRoles[index] == RoleType::Detective || State.assignedRoles[index] == RoleType::Judge ||
+                                    State.assignedRoles[index] == RoleType::Crewmate) {
+                                    if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.judges_amount + State.crewmates_amount >= (int)playerAmount)
                                         State.assignedRoles[index] = RoleType::Random;
                                 } //Some may set all players to non imps. This hangs the game on beginning. Leave space to Random so we have imps. 
 
@@ -239,6 +243,8 @@ namespace HostTab {
                                         State.assignedRoles[index] = RoleType::Engineer;
                                     else if (State.assignedRoles[index] == RoleType::Scientist)
                                         State.assignedRoles[index] = RoleType::Engineer;
+                                    else if (State.assignedRoles[index] == RoleType::Judge)
+                                        State.assignedRoles[index] = RoleType::Engineer;
                                     else if (State.assignedRoles[index] == RoleType::Crewmate)
                                         State.assignedRoles[index] = RoleType::Engineer;
                                     else if (State.assignedRoles[index] == RoleType::Engineer) // what?! lmao (see line 98)
@@ -255,6 +261,7 @@ namespace HostTab {
                                     SetRoleAmount(RoleTypes__Enum::Tracker, State.trackers_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Noisemaker, State.noisemakers_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Detective, State.detectives_amount, options);
+                                    SetRoleAmount(RoleTypes__Enum::Judge, State.judges_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Shapeshifter, State.shapeshifters_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Phantom, State.phantoms_amount, options);
                                     SetRoleAmount(RoleTypes__Enum::Viper, State.vipers_amount, options);
@@ -322,7 +329,7 @@ namespace HostTab {
                     }
                     ImGui::SameLine();
                     int hostRoleInt = (int)State.HostRoleToSet;
-                    if (CustomListBoxInt("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "")) {
+                    if (CustomListBoxInt("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ")) {
                         if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
                             if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount + 1 > GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
                                 State.AutoHostRole = false;
@@ -332,7 +339,7 @@ namespace HostTab {
                             }
                         }
                         else {
-                            if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.crewmates_amount + 1 >= (int)GetAllPlayerData().size()) {
+                            if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.judges_amount + State.crewmates_amount + 1 >= (int)GetAllPlayerData().size()) {
                                 State.AutoHostRole = false;
                             }
                             else {
@@ -517,12 +524,28 @@ namespace HostTab {
                     State.Save();
                 }
 
-                if (ToggleButton("Disable Medbay Scan", &State.DisableMedbayScan)) {
+                /*if (ToggleButton("Disable Medbay Scan", &State.DisableMedbayScan)) {
+                    State.Save();
+                }*/
+
+                if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
                     State.Save();
                 }
 
-                /*if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
-                    State.Save();
+                /*if (GetAllPlayerControl().size() == 1 && IsInGame()) { \
+                    if (!State.farmLoop && AnimatedButton("Level Farm (50000 Kills)")) {
+                        State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::ImpostorGhost));
+                        State.farmCount = 5000; //controls how many times the player is to be murdered
+                        State.farmLoop = true;
+                    }
+                    if (State.farmLoop && AnimatedButton("Stop Level Farm (End Game by Impostor Kill Win)")) {
+                        State.farmLoop = false;
+                        State.farmCount = 0;
+                        State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
+                        State.rpcQueue.push(new SetRole(RoleTypes__Enum::Impostor));
+                        State.rpcQueue.push(new RpcEndGame(GameOverReason__Enum::ImpostorsByKill));
+                    }
+                    if (State.farmLoop) ImGui::Text(std::format("({} Kills)", 50000 - 10 * State.farmCount).c_str());
                 }*/
 
                 ImGui::EndChild();
@@ -545,7 +568,7 @@ namespace HostTab {
                     if (!State.HostPresets.empty()) {
                         std::vector<const char*> presetNames;
                         for (auto& p : State.HostPresets) presetNames.push_back(p.Name.c_str());
-                        CustomListBoxInt("##presetselect", &State.SelectedHostPreset, presetNames, 200.0f * State.dpiScale);
+                        CustomListBoxInt("##presetselect", &State.SelectedHostPreset, presetNames, 200.0f * State.dpiScale, ImVec4(0, 0, 0, 0), 0, "Preset");
                         ImGui::SameLine();
                         if (AnimatedButton("Apply")) {
                             int idx = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
@@ -562,7 +585,8 @@ namespace HostTab {
                         if (AnimatedButton("Delete##preset")) {
                             int idx = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
                             State.HostPresets.erase(State.HostPresets.begin() + idx);
-                            State.SelectedHostPreset = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
+                            if (State.HostPresets.size() != 0)
+                                State.SelectedHostPreset = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
                             State.Save();
                         }
                     }
@@ -589,17 +613,15 @@ namespace HostTab {
                 }
                 ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
                 // AU v2022.8.24 has been able to change maps in lobby.
-                // State.mapHostChoice = State.FlipSkeld ? 3 : options.GetByte(app::ByteOptionNames__Enum::MapId);
+                // AU v2022.8.24 has been able to change maps in lobby.
+                State.mapHostChoice = State.FlipSkeld ? 3 : options.GetByte(app::ByteOptionNames__Enum::MapId);
                 /*if (State.mapHostChoice > 3)
                     State.mapHostChoice--;*/
-                    // State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
-                int mapId = options.GetByte(app::ByteOptionNames__Enum::MapId);
-                if (mapId == 3) mapId = 0; // Dleks is the map with ID 3, and we are disabling it for now
-                State.mapHostChoice = mapId > 3 ? (mapId - 1) : mapId;
+                State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
                 if (IsInLobby() && CustomListBoxInt("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale)) {
                     //if (!IsInGame()) {
                         // disable flip
-                    /*if (State.mapHostChoice == 3) {
+                    if (State.mapHostChoice == 3) {
                         options.SetByte(app::ByteOptionNames__Enum::MapId, 0);
                         State.FlipSkeld = true;
                         SyncAllSettings();
@@ -608,11 +630,11 @@ namespace HostTab {
                         options.SetByte(app::ByteOptionNames__Enum::MapId, State.mapHostChoice);
                         State.FlipSkeld = false;
                         SyncAllSettings();
-                    }*/
-                    auto id = State.mapHostChoice;
+                    }
+                    /*auto id = State.mapHostChoice;
                     if (id >= 3) id++;
                     options.SetByte(app::ByteOptionNames__Enum::MapId, id);
-                    SyncAllSettings();
+                    SyncAllSettings();*/
                     //}
                 }
                 auto gamemode = options.GetGameMode();
@@ -756,8 +778,10 @@ namespace HostTab {
 #pragma region Noisemaker
                     ImGui::Text("Noisemaker");
                     static float alertDuration = 1.f;
+                    static bool alertImps = false;
 
                     MakeFloat("Alert Duration", alertDuration, FloatOptionNames__Enum::NoisemakerAlertDuration);
+                    MakeBool("Noisemakers Alert Impostors", alertImps, BoolOptionNames__Enum::NoisemakerImpostorAlert);
 #pragma endregion
 #pragma region Tracker
                     ImGui::Text("Tracker");
@@ -786,6 +810,12 @@ namespace HostTab {
 
                     MakeFloat("Viper Dissolve Time", viperDissolveTime, FloatOptionNames__Enum::ViperDissolveTime);
 #pragma endregion
+#pragma region Viper
+                    ImGui::Text("Judge");
+                    static float judgeTaskRequirement = 50.f;
+
+                    MakeFloat("Tasks Required %", judgeTaskRequirement, FloatOptionNames__Enum::JudgeTaskRequirementPercentage);
+#pragma endregion
                 }
 #pragma region Hide and Seek
                 if (gamemode == GameModes__Enum::HideNSeek || gamemode == GameModes__Enum::SeekFools) {
@@ -799,7 +829,12 @@ namespace HostTab {
 
                     MakeFloat("Hider Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
                     MakeFloat("Seeker Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
-                    MakeFloat("Kill Cooldown", killCooldown, FloatOptionNames__Enum::KillCooldown);
+                    if (ImGui::InputFloat("Kill Cooldown", &killCooldown)) {
+                        if (killCooldown <= 0.f) killCooldown = 0.000001f;
+                        options.SetFloat(FloatOptionNames__Enum::KillCooldown, killCooldown);
+                        SyncAllSettings();
+                    }
+                    else killCooldown = options.GetFloat(FloatOptionNames__Enum::KillCooldown);
 
                     std::string killDistInfo = "";
                     if (killDistance >= 0 && killDistance <= 2) {
@@ -824,7 +859,7 @@ namespace HostTab {
                     MakeFloat("Hiding Time", hidingTime, FloatOptionNames__Enum::EscapeTime);
                     MakeFloat("Final Hide Time", finalHideTime, FloatOptionNames__Enum::FinalEscapeTime);
                     MakeInt("Max Vent Uses", maxVents, Int32OptionNames__Enum::CrewmateVentUses);
-                    MakeFloat("Max Time In Vent", ventTime, FloatOptionNames__Enum::CrewmateTimeInVent);
+                    MakeFloat("Max Time in Vent", ventTime, FloatOptionNames__Enum::CrewmateTimeInVent);
                     MakeBool("Flashlight Mode", flashlight, BoolOptionNames__Enum::UseFlashlight);
                     MakeFloat("Hider Flashlight Size", crewLight, FloatOptionNames__Enum::CrewmateFlashlightSize);
                     MakeFloat("Seeker Flashlight Size", impLight, FloatOptionNames__Enum::ImpostorFlashlightSize);
@@ -872,9 +907,9 @@ namespace HostTab {
                 }
             }
             if (openModeration) {
-                ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
+                ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
                 if (ImGui::CollapsingHeader("Roles", ImGuiTreeNodeFlags_DefaultOpen)) {
-                    ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
+                    ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
                     static const std::vector<std::pair<const char*, const char*>> ROLE_COMMANDS = {
                         { "/color", "color" }, { "/rules", "r" },
                         { "/sicko", "sicko" }, { "/warn & /unwarn", "warn" },
@@ -886,7 +921,9 @@ namespace HostTab {
                     static std::string renameBuf = "";
                     static std::string newMemberCode = "";
                     static int selectedMemberIndex = 0;
+                    static bool isRoleDeleted = false;
 
+                    if (isRoleDeleted) isRoleDeleted = false;
                     ImGui::Text("Create Role:");
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(140.0f * State.dpiScale);
@@ -906,7 +943,7 @@ namespace HostTab {
 
                     ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
 
-                    if (State.Mod_RoleRank.size() < State.Mod_RoleNames.size()) State.Mod_RoleRank.resize(State.Mod_RoleNames.size(), 0); 
+                    if (State.Mod_RoleRank.size() < State.Mod_RoleNames.size()) State.Mod_RoleRank.resize(State.Mod_RoleNames.size(), 0);
 
                     if (!State.Mod_RoleNames.empty()) {
                         selectedRole = std::clamp(selectedRole, 0, (int)State.Mod_RoleNames.size() - 1);
@@ -946,57 +983,59 @@ namespace HostTab {
                             State.Mod_RolePermissions.erase(State.Mod_RolePermissions.begin() + selectedRole);
                             State.Mod_RoleRank.erase(State.Mod_RoleRank.begin() + selectedRole);
                             State.Save();
+                            isRoleDeleted = true;
                         }
 
-                        ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
-                        ImGui::Text("Permissions for %s:", State.Mod_RoleNames[selectedRole].c_str());
-                        ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
-                        ImVec4 themeColDark = ImVec4(themeCol.x * 0.7f, themeCol.y * 0.7f, themeCol.z * 0.7f, themeCol.w);
-                        ImVec4 themeColDarker = ImVec4(themeCol.x * 0.5f, themeCol.y * 0.5f, themeCol.z * 0.5f, themeCol.w);
-                        ImGui::Columns(2, "rolePermCols", false);
-                        for (auto& cmd : ROLE_COMMANDS) {
-                            bool granted = State.Mod_RolePermissions[selectedRole].count(cmd.second) && State.Mod_RolePermissions[selectedRole][cmd.second];
-                            ImGui::PushStyleColor(ImGuiCol_Button, granted ? themeCol : ImVec4(0.f, 0.f, 0.f, 0.f));
-                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, granted ? themeColDarker : themeColDark);
-                            ImGui::PushStyleColor(ImGuiCol_ButtonActive, themeCol);
-                            if (AnimatedButton((std::string(cmd.first) + "##roleperm" + std::to_string(selectedRole)).c_str())) {
-                                State.Mod_RolePermissions[selectedRole][cmd.second] = !granted;
-                                State.Save();
+                        if (!isRoleDeleted) {
+                            ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
+                            ImGui::Text("Permissions for %s:", State.Mod_RoleNames[selectedRole].c_str());
+                            ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
+                            ImVec4 themeColDark = ImVec4(themeCol.x * 0.7f, themeCol.y * 0.7f, themeCol.z * 0.7f, themeCol.w);
+                            ImVec4 themeColDarker = ImVec4(themeCol.x * 0.5f, themeCol.y * 0.5f, themeCol.z * 0.5f, themeCol.w);
+                            ImGui::Columns(2, "rolePermCols", false);
+                            for (auto& cmd : ROLE_COMMANDS) {
+                                bool granted = State.Mod_RolePermissions[selectedRole].count(cmd.second) && State.Mod_RolePermissions[selectedRole][cmd.second];
+                                ImGui::PushStyleColor(ImGuiCol_Button, granted ? themeCol : ImVec4(0.f, 0.f, 0.f, 0.f));
+                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, granted ? themeColDarker : themeColDark);
+                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, themeCol);
+                                if (AnimatedButton((std::string(cmd.first) + "##roleperm" + std::to_string(selectedRole)).c_str())) {
+                                    State.Mod_RolePermissions[selectedRole][cmd.second] = !granted;
+                                    State.Save();
+                                }
+                                ImGui::PopStyleColor(3);
+                                ImGui::NextColumn();
                             }
-                            ImGui::PopStyleColor(3);
-                            ImGui::NextColumn();
-                        }
-                        ImGui::Columns(1);
+                            ImGui::Columns(1);
 
-                        ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
-                        ImGui::Text("Members:");
-                        ImGui::SetNextItemWidth(150.0f * State.dpiScale);
-                        InputString("##NewMemberCode", &newMemberCode, ImGuiInputTextFlags_EnterReturnsTrue);
-                        ImGui::SameLine();
-                        if (AnimatedButton("Add (friendcode)##RoleMember")) {
-                            if (!newMemberCode.empty()) {
-                                State.Mod_RoleMembers[selectedRole].push_back(newMemberCode);
-                                newMemberCode = "";
-                                State.Save();
-                            }
-                        }
-                        auto& members = State.Mod_RoleMembers[selectedRole];
-                        if (!members.empty()) {
-                            selectedMemberIndex = std::clamp(selectedMemberIndex, 0, (int)members.size() - 1);
-                            std::vector<const char*> memberVector(members.size(), nullptr);
-                            for (size_t i = 0; i < members.size(); i++) memberVector[i] = members[i].c_str();
-                            CustomListBoxInt("##RemoveRoleMember", &selectedMemberIndex, memberVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
+                            ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
+                            ImGui::Text("Members:");
+                            ImGui::SetNextItemWidth(150.0f * State.dpiScale);
+                            InputString("##NewMemberCode", &newMemberCode, ImGuiInputTextFlags_EnterReturnsTrue);
                             ImGui::SameLine();
-                            if (AnimatedButton("Remove##RoleMember")) {
-                                members.erase(members.begin() + selectedMemberIndex);
-                                State.Save();
+                            if (AnimatedButton("Add (friendcode)##RoleMember")) {
+                                if (!newMemberCode.empty()) {
+                                    State.Mod_RoleMembers[selectedRole].push_back(newMemberCode);
+                                    newMemberCode = "";
+                                    State.Save();
+                                }
+                            }
+                            auto& members = State.Mod_RoleMembers[selectedRole];
+                            if (!members.empty()) {
+                                selectedMemberIndex = std::clamp(selectedMemberIndex, 0, (int)members.size() - 1);
+                                std::vector<const char*> memberVector(members.size(), nullptr);
+                                for (size_t i = 0; i < members.size(); i++) memberVector[i] = members[i].c_str();
+                                CustomListBoxInt("##RemoveRoleMember", &selectedMemberIndex, memberVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
+                                ImGui::SameLine();
+                                if (AnimatedButton("Remove##RoleMember")) {
+                                    members.erase(members.begin() + selectedMemberIndex);
+                                    State.Save();
+                                }
                             }
                         }
                     }
                 }
-
-}
             }
             ImGui::EndChild();
         }
     }
+}

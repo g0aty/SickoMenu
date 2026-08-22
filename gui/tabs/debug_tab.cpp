@@ -47,6 +47,67 @@ namespace DebugTab {
 
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
+		if (ImGui::CollapsingHeader("Experiments##debug")) {
+			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "These features are in development and can break at any time.");
+			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Use these at your own risk.");
+			if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
+			if (ToggleButton("April Fools' Mode", &State.AprilFoolsMode)) State.Save();
+			/*static float timer = 0.0f;
+			static bool SafeModeNotification = false;*/
+			static bool safeModeWarnState = false;
+
+			if (!safeModeWarnState && ToggleButton("Safe Mode", &State.SafeMode)) {
+				if (!State.SafeMode) {
+					safeModeWarnState = true;
+					State.SafeMode = true;
+				}
+				/*SafeModeNotification = true;
+				timer = static_cast<float>(ImGui::GetTime());*/
+			}
+
+			if (safeModeWarnState) {
+				BoldText("Warning", ImVec4(1.f, 0.f, 0.f, 1.f));
+				ImGui::Text("By turning off Safe Mode, you can unlock functions");
+				ImGui::Text("that are usually detected by the anticheat.");
+				ImGui::Text(" ");
+				ImGui::Text("However, you NEED to ensure that the lobby host has a reduced");
+				ImGui::Text("anticheat (host authority), so the other functions work.");
+				ImGui::Text(" ");
+				ImGui::Text("Otherwise, you will get banned from the lobby by the anticheat!");
+				ImGui::Text("NOTE: The developers will NOT be held responsible for this.");
+				ImGui::Text(" ");
+				ImGui::Text("Are you sure that you want to turn it off?");
+
+				if (ColoredButton(ImVec4(0.f, 1.f, 0.f, 1.f), "Yes")) {
+					safeModeWarnState = false;
+					State.SafeMode = false;
+				}
+				ImGui::SameLine();
+				if (ColoredButton(ImVec4(1.f, 0.f, 0.f, 1.f), "No")) {
+					safeModeWarnState = false;
+				}
+			}
+
+			/*if (SafeModeNotification) {
+				float currentTime = static_cast<float>(ImGui::GetTime());
+
+				if (currentTime - timer < 5.0f) {
+					ImGui::SameLine();
+					if (State.SafeMode)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Safe Mode is Enabled!");
+					else
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Safe Mode is Disabled! (The likelihood of getting banned increases)");
+				}
+				else {
+					SafeModeNotification = false;
+				}
+			}*/
+
+			// ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
+		}
+
+		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
 		if (ImGui::CollapsingHeader("Replay##debug"))
 		{
 			synchronized(Replay::replayEventMutex) {
@@ -118,37 +179,6 @@ namespace DebugTab {
 		ImGui::Text(std::format("Active Scene: {}", State.CurrentScene).c_str());
 
 		ImGui::Text(std::format("Current FPS: {}", GetFps()).c_str());
-
-		if (ImGui::CollapsingHeader("Experiments##debug")) {
-			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "These features are in development and can break at any time.");
-			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Use these at your own risk.");
-			if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
-			if (ToggleButton("April Fools' Mode", &State.AprilFoolsMode)) State.Save();
-			static float timer = 0.0f;
-			static bool SafeModeNotification = false;
-			if (ToggleButton("Safe Mode", &State.SafeMode)) {
-				State.Save();
-				SafeModeNotification = true;
-				timer = static_cast<float>(ImGui::GetTime());
-			}
-
-			if (SafeModeNotification) {
-				float currentTime = static_cast<float>(ImGui::GetTime());
-
-				if (currentTime - timer < 5.0f) {
-					ImGui::SameLine();
-					if (State.SafeMode)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Safe Mode is Enabled!");
-					else
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Safe Mode is Disabled! (The likelihood of getting banned increases)");
-				}
-				else {
-					SafeModeNotification = false;
-				}
-			}
-
-			ImGui::Text("Keep safe mode on in official servers (NA, Europe, Asia) to prevent anticheat detection!");
-		}
 
 		ImGui::EndChild();
 	}

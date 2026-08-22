@@ -29,8 +29,7 @@ enum class MapType {
 	MAP_FUNGLE = 4
 };
 
-enum class RoleType
-{
+enum class RoleType {
 	Random = 0,
 	Crewmate = 1,
 	Scientist = 2,
@@ -38,10 +37,11 @@ enum class RoleType
 	Noisemaker = 4,
 	Tracker = 5,
 	Detective = 6,
-	Impostor = 7,
-	Shapeshifter = 8,
-	Phantom = 9,
-	Viper = 10
+	Judge = 7,
+	Impostor = 8,
+	Shapeshifter = 9,
+	Phantom = 10,
+	Viper = 11
 };
 
 struct RoleColor {
@@ -68,6 +68,8 @@ public:
 	int EngineerChance = 0;
 	int DetectiveCount = 0;
 	int DetectiveChance = 0;
+	int JudgeCount = 0;
+	int JudgeChance = 0;
 	int GuardianAngelCount = 0;
 	int GuardianAngelChance = 0;
 	int MaxCrewmates = Game::MAX_PLAYERS;
@@ -99,6 +101,17 @@ class PlayerSelection {
 			#endif*/
 			try {
 				return _playerControl->fields._.OwnerId == (*Game::pAmongUsClient)->fields._.ClientId;
+			}
+			catch (...) {
+				return false;
+			}
+		}
+		constexpr bool is_Host() const {
+			/*#if _CONTAINER_DEBUG_LEVEL > 0
+						assert(has_value() && "is_LocalPlayer() called on empty result");
+			#endif*/
+			try {
+				return _playerControl->fields._.OwnerId == ((InnerNetClient*)(*Game::pAmongUsClient))->fields.HostId;
 			}
 			catch (...) {
 				return false;
@@ -221,6 +234,7 @@ void CompleteAllTasks(PlayerControl* player = NULL);
 const char* TranslateTaskTypes(TaskTypes__Enum taskType);
 const char* TranslateSystemTypes(SystemTypes__Enum systemType);
 Color32 GetPlayerColor(Game::ColorId colorId);
+Color32 GetPlayerTextColor(Game::ColorId colorId, bool isOutline = false);
 std::filesystem::path getModulePath(HMODULE hModule);
 std::string getGameVersion();
 SystemTypes__Enum GetSystemTypes(const Vector2& vector);
@@ -273,7 +287,7 @@ int GetFriendCodeMaxRank(const std::string& friendCode);
 int GetPlayerMaxRank(PlayerControl* pc);
 NetworkedPlayerInfo_PlayerOutfit* GetPlayerOutfit(NetworkedPlayerInfo* player, bool includeShapeshifted = false);
 Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui = false);
-std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated = false);
+std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated = false, bool localized = false);
 RoleTypes__Enum GetRoleTypesEnum(RoleType role);
 float GetDistanceBetweenPoints_Unity(const Vector2& p1, const Vector2& p2);
 float GetDistanceBetweenPoints_ImGui(const ImVec2& p1, const ImVec2& p2);
@@ -283,7 +297,13 @@ std::vector<std::string> GetAllConfigs();
 bool CheckConfigExists(std::string configName);
 void UpdatePoints(NetworkedPlayerInfo* playerData, float points);
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason);
+std::string strToLower(std::string str);
+bool IsRandomAUName(const std::string& name);
 bool IsDater(std::string username, int playerCount = 4);
+void SendKillImmuneToggle(bool enabled);
+void SendBootVentNonHost(PlayerControl* player, int ventId, int targetNetId = -2);
+std::string GetTimeString(bool useLeadingZeroForHours = true, bool showSeconds = true);
+void ReloadCurrentSceneIfNeeded();
 
 /// <summary>
 /// Simplifies a list of points by ensuring the distance between consecutive points is greater than the squared distance threshold; all other points are discarded.

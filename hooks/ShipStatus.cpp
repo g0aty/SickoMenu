@@ -8,7 +8,7 @@
 #include "game.h"
 
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_CalculateLightRadius executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_CalculateLightRadius executed", false);
     if (IsHost() && State.TaskSpeedrun && State.GameLoaded && State.mapType != Settings::MapType::Airship)
         State.SpeedrunTimer += Time_get_deltaTime(NULL);
     CosmeticsCache_PopulateFromPlayers((CosmeticsCache*)__this->fields._CosmeticsCache_k__BackingField, NULL);
@@ -34,7 +34,7 @@ float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* 
 }
 
 void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_OnEnable executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_OnEnable executed", false);
     try {
         State.BlinkPlayersTab = false;
 
@@ -62,6 +62,18 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
         if (State.AutoFakeRole) {
             if (!State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
         }
+
+        auto transform = Component_get_transform((Component_1*)__this, NULL);
+        auto localScale = transform == NULL ? Vector3(0.f, 0.f, 0.f) : Transform_get_localScale(transform, NULL);
+
+        if (State.mapType == Settings::MapType::Ship) {
+            State.FlipSkeld = localScale.x < 0;
+            // By default, the x coordinate of the local scale of the Skeld is 1.2,
+            // whereas it is -1.2 for Dleks.
+            // This allows us to flip stuff such as the radar,
+            // even when we aren't hosting and the host plays with Dleks.
+        }
+        else State.FlipSkeld = false;
 
         //if (!State.mapDoors.empty() && Constants_1_ShouldFlipSkeld(NULL))
             //State.FlipSkeld = true; fix later
@@ -99,22 +111,18 @@ static bool IsSabotageTriggerAmount(SystemTypes__Enum systemType, int32_t amount
 }
 
 void dShipStatus_RpcUpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, int32_t amount, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_RpcUpdateSystem executed", false);
-    if (!State.PanicMode && State.DisabledSabotageTypes.count((int)systemType) &&
-        IsSabotageTriggerAmount(systemType, amount))
-        return;
+    if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_RpcUpdateSystem executed", false);
+
     ShipStatus_RpcUpdateSystem(__this, systemType, amount, method);
 }
 
 void dShipStatus_RpcCloseDoorsOfType(ShipStatus* __this, SystemTypes__Enum type, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_RpcCloseDoorsOfType executed", false);
-    if (!State.PanicMode && State.DisabledSabotageTypes.count((int)SystemTypes__Enum::Doors))
-        return;
+    if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_RpcCloseDoorsOfType executed", false);
     ShipStatus_RpcCloseDoorsOfType(__this, type, method);
 }
 
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_HandleRpc executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_HandleRpc executed", false);
     if (callId != 27 && callId != 35) return;
     int32_t pos = reader->fields._position, head = reader->fields.readHead;
     auto systemType = (SystemTypes__Enum)MessageReader_ReadByte(reader, NULL);
@@ -184,7 +192,7 @@ bool DetectCheatSabotage(SystemTypes__Enum systemType, PlayerControl* player, ui
 }
 
 void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dShipStatus_UpdateSystem executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_UpdateSystem executed", false);
     LOG_DEBUG(std::format("SystemType {} updated with amount {}", (std::string)TranslateSystemTypes(systemType), amount).c_str());
     if (systemType == SystemTypes__Enum::Ventilation ||
         systemType == SystemTypes__Enum::Security ||

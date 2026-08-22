@@ -45,7 +45,7 @@ public:
     bool ImGuiInitialized = false;
     bool HasOpenedMenuBefore = false;
     bool ShowMenuOnStartup = true;
-    bool ShowMenu = false;
+    bool ShowMenu = true;
 
 #ifdef _DEBUG
     bool showDebugTab = false;
@@ -81,12 +81,15 @@ public:
     bool SpoofAUVersion = false;
     int FakeAUVersion = 1;
     bool DisableAnimations = false;
+    bool ClickThroughMenuUI = false;
+    bool ShowUiBorders = true;
     float AnimationSpeed = 1.f;
     float RoundingRadiusMultiplier = 1.f;
 
     bool AdjustByDPI = true;
     float dpiScale = 1.f;
     bool dpiChanged = false;
+    bool unlockAllAchievements = false;
 
     std::string CurrentScene;
 
@@ -102,6 +105,8 @@ public:
     float PrevCycleTimer = 0.5f;
     float CycleDuration = CycleTimer * 50;
     bool UnlockVents = false;
+    bool RolesBypassCommsSabotage = false;
+    bool KillImmunity = false;
     bool UnlockKillButton = false;
     bool ShowGhosts = false;
     bool ShowPhantoms = false;
@@ -113,6 +118,7 @@ public:
     bool PauseVentBlockingWhileVenting = false;
     bool SpamReport = false;
     bool CrashSpamReport = false;
+    bool Overflow = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
     bool DisableAllVotekicks = false;
@@ -134,6 +140,8 @@ public:
     int CrashChatSpamMode = 1;
     bool AutoJoinLobby = false;
     std::string AutoJoinLobbyCode = "";
+    bool JoinLobby = false;
+    std::string JoinLobbyCode = "";
     std::unordered_map<std::string, std::string> LobbyHostCache;
     int LobbyHistoryLimit = 20;
     static const int LobbyHistoryMaxStored = 50;
@@ -199,6 +207,7 @@ public:
         bool NoisemakerImpostorAlert = true;
         float ViperDissolveTime = 3.f;
         float DetectiveSuspectLimit = 3.f;
+        float JudgeTaskRequirement = 50.f;
     };
     std::vector<HostPreset> HostPresets;
     int SelectedHostPreset = 0;
@@ -221,6 +230,7 @@ public:
     bool ChatPaste = false;
     bool RevealRoles = false;
     bool AbbreviatedRoleNames = false;
+    bool LocalizeRoleNames = false;
     bool PlayerColoredDots = false;
     bool ShowPlayerInfo = false;
     bool HideWhitelistedPlayerInfo = true;
@@ -293,6 +303,14 @@ public:
     bool CycleBetweenOutfits = false;
     bool ChangeBodyType = false;
     int BodyType = 0;
+    bool ShowTime = false;
+    int TimeOffsetMinutes = 0;
+    bool NegativeTimeOffset = false;
+    bool Use12HourFormat = false;
+    bool ShowSeconds = false;
+    bool UseLeadingZeroForHours = true;
+    std::string AmString = "AM";
+    std::string PmString = "PM";
 
     bool NoClip = false;
     bool HotkeyNoClip = false;
@@ -313,6 +331,7 @@ public:
     bool KillImpostors = false;
     bool KillInVanish = false;
     bool OnlyProtectCrewmates = false;
+    std::vector<uint8_t> ColorCycledPlayers;
     std::vector<uint8_t> VoteImmunePlayers;
     std::unordered_map<uint8_t, uint8_t> VoteRedirectTargets;
     bool BypassAngelProt = false;
@@ -322,6 +341,7 @@ public:
     bool FakeAlive = false;
     bool ShowHost = false;
     bool HideWatermark = false;
+    bool HideModStamp = false;
     bool ShowVoteKicks = false;
     bool ShowFps = false;
     bool DoTasksAsImpostor = false;
@@ -331,6 +351,7 @@ public:
     bool ReportOnMurder = false;
     bool PreventSelfReport = true;
     bool AutoRejoin = false;
+    bool DisableShushAnimation = false;
     bool OldStylePingText = false;
     bool NoSeekerAnim = false;
     bool BetterChatNotifications = false;
@@ -349,6 +370,7 @@ public:
     bool ShowRadar_Ghosts = false;
     bool HideRadar_During_Meetings = false;
     bool ShowRadar_RightClickTP = false;
+    bool ShowRadar_ShiftLeftClickClosesRoomDoor = false;
     bool LockRadar = false;
     bool RadarDrawIcons = false;
     bool RadarVisorRoleColor = false;
@@ -367,6 +389,8 @@ public:
     bool ShowEsp_Imp = true;
 
     bool InMeeting = false;
+    bool InExileUI = false;
+    bool HasRefreshedUI = false;
     bool PlayMedbayScan = false;
     bool PlayWeaponsAnimation = false;
 
@@ -380,17 +404,18 @@ public:
     bool RotateServerSide = false;
     bool RelativeTeleport = false;
     std::string Mod_SickoSocials = "";
-    std::queue<std::string> Mod_PendingRulesMessages; 
-    float Mod_PendingRulesDelay = 0.f; 
+    std::queue<std::string> Mod_PendingRulesMessages;
+    float Mod_PendingRulesDelay = 0.f;
     std::vector<std::string> Mod_RoleNames = {};
-    std::vector<std::vector<std::string>> Mod_RoleMembers = {}; 
-    std::vector<std::map<std::string, bool>> Mod_RolePermissions = {}; 
-    std::vector<int> Mod_RoleRank = {}; 
-    bool SMAC_CheckStartWords = false;
-    bool SMAC_StartWordsStrict = true;
-    int SMAC_StartWordsThreshold = 1;
-    std::vector<std::string> SMAC_StartWords = {};
-    std::map<uint8_t, int> SMAC_StartWordsCount;
+    std::vector<std::vector<std::string>> Mod_RoleMembers = {};
+    std::vector<std::map<std::string, bool>> Mod_RolePermissions = {};
+    std::vector<int> Mod_RoleRank = {};
+    bool SpamVentTpEveryone = false;
+    bool SpamVentTpEveryoneRandom = false;
+    bool IgnoreVentTpSelf = false;
+    int SelectedVentId = 0;
+    std::vector<Game::PlayerId> spamRandomVentTpPlayers = {};
+    std::map<Game::PlayerId, int> spamVentTpPlayers = {};
     float RotateRadius = 1.f;
     float xCoordinate = 0.f;
     float yCoordinate = 0.f;
@@ -401,6 +426,21 @@ public:
     bool confuseOnKill = false;
     bool confuseOnVent = false;
     bool confuseOnMeeting = false;
+
+    bool InfiniteMeetings = false;
+    bool NoLadderZiplineCooldown = false;
+    bool Engineer_NoVentCooldown = false;
+    bool Engineer_InfiniteVentTime = false;
+    bool Scientist_NoVitalsCooldown = false;
+    bool Scientist_InfiniteBattery = false;
+    bool Tracker_NoTrackingCooldown = false;
+    bool Tracker_InfiniteTracking = false;
+    bool Detective_NoInterrogateCooldown = false;
+    bool Judge_NoTaskRequirement = false;
+    bool Judge_InfiniteOverrules = false;
+    bool GuardianAngel_NoProtectCooldown = false;
+    bool Impostor_NoKillCooldown = false;
+    bool Shapeshifter_InfiniteShapeshiftDuration = false;
 
     SystemTypes__Enum selectedDoor = SystemTypes__Enum::Hallway;
     std::vector<SystemTypes__Enum> mapDoors;
@@ -434,7 +474,8 @@ public:
     //std::vector<Game::PlayerId> sickoUsers;
     std::vector<Game::PlayerId> vanishedPlayers;
     std::vector<Game::PlayerId> validDeadBodyIds;
-    std::map<Game::PlayerId, std::string> modUsers;
+    std::map<Game::PlayerId, int> ventTpSeqIds;
+    std::map<Game::PlayerId, std::vector<std::string>> modUsers;
     int32_t rpcCooldown = 15;
     int32_t playerKilledId = 0;
     std::string searchQuery = "";
@@ -451,16 +492,24 @@ public:
     int trackers_amount = 0;
     int noisemakers_amount = 0;
     int detectives_amount = 0;
+    int judges_amount = 0;
     int crewmates_amount = 0;
 
     bool Wallhack = false;
     bool FreeCam = false;
     float FreeCamSpeed = 1.f;
 
-    float CameraHeight = 3.0;
+    float CameraHeight = 3.f;
     Camera* FollowerCam = nullptr;
-    Camera* ShadowCam = nullptr;
+    ShadowCollab* shadowCollab = nullptr;
     bool EnableZoom = false;
+    bool EnableZoom_ScrollZoom = true;
+    bool EnableZoom_SmoothZoom = true;
+    bool EnableZoom_ShowShadows = false;
+    bool EnableZoom_ResolutionSetFlag = false;
+    float EnableZoom_PreResolutionSetCamHeight = 3.f;
+
+    bool MIG_ThemeChanged = true;
 
     VersionShower* versionShower = nullptr;
     std::string versionShowerDefaultText = "";
@@ -498,6 +547,7 @@ public:
     ImVec4 PhantomColor = ImVec4(0.53f, 0.f, 0.f, 1.f);
     ImVec4 DetectiveColor = ImVec4(0.39f, 0.735f, 1.f, 1.f);
     ImVec4 ViperColor = ImVec4(1.f, 1.f, 0.f, 1.f);
+    ImVec4 JudgeColor = ImVec4(0.f, 0.6f, 0.345f, 1.f);
 
     ImVec4 HostColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
     ImVec4 PlayerIdColor = ImVec4(1.f, 0.f, 0.f, 1.f);
@@ -555,6 +605,7 @@ public:
     float LobbyTimer = 600.f;
     bool ShowLobbyTimer = false;
     bool SpamMovingPlatform = false;
+    bool JoinedLobby = false;
     bool JoinedAsHost = false;
     float ChatCooldown = 0.f;
     bool MessageSent = false;
@@ -632,6 +683,8 @@ public:
     };
 
     bool CanChangeOutfit = false;
+    float OverflowTimer = 0.f;
+    std::string OverflowCachedNamePlate = "";
     bool MainMenuLoaded = false;
     bool EndLoginFlowFlag = false;
     QuickChatModes__Enum CurrentChatMode = QuickChatModes__Enum::FreeChatOrQuickChat;
@@ -680,7 +733,7 @@ public:
     bool SMAC_AddToBlacklist = false;
     bool SMAC_IgnoreWhitelist = false;
     bool SMAC_PunishBlacklist = false;
-    bool SMAC_CheckAUM = true;
+    bool SMAC_CheckOtherCheats = true;
     bool SMAC_CheckSicko = true;
     bool SMAC_CheckBadNames = true;
     bool SMAC_CheckColor = true;
@@ -706,6 +759,11 @@ public:
     bool SMAC_CheckBadWords = true;
     std::vector<std::string> SMAC_BadWords = {};
     bool SMAC_CheckFriendcode = true;
+    bool SMAC_CheckStartWords = false;
+    bool SMAC_StartWordsStrict = true;
+    int SMAC_StartWordsThreshold = 1;
+    std::vector<std::string> SMAC_StartWords = {};
+    std::map<uint8_t, int> SMAC_StartWordsCount;
 
     std::vector<std::string> ChatPresets = {};
 

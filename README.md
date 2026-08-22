@@ -1,7 +1,9 @@
 <p align="center">
-  <img src="SickoBanner.png" alt="SickoMenu Banner">
+   <img src="SickoBanner.png">
 </p>
-<h1 align="center">👺 SickoMenu v4.5.2</h1>
+
+<h1 align="center">👺 SickoMenu v5.0</h1>
+
 <p align="center">
   <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen" alt="Latest Release"></a>
   <a href="https://github.com/g0aty/SickoMenu/stargazers"><img src="https://img.shields.io/github/stars/g0aty/SickoMenu?style=flat&color=red" alt="Stars"></a>
@@ -20,6 +22,7 @@ Join our official Discord server for support, bug reports, and sneak peeks!
 
 ## 📋 Table of Contents
 - [⚠️ Disclaimer](https://github.com/g0aty/SickoMenu#%EF%B8%8F-disclaimer)
+- [⁉️ Frequently Asked Questions](https://github.com/g0aty/SickoMenu#-frequently-asked-questions)
 - [🛑 Ethical Use Protocol](https://github.com/g0aty/SickoMenu#-ethical-use-protocol)
 - [⚙️ Features](https://github.com/g0aty/SickoMenu#%EF%B8%8F-features)
 - [📸 Screenshot](https://github.com/g0aty/SickoMenu#-screenshot)
@@ -54,6 +57,9 @@ This project is designed to comply with their [Modding Policy](https://www.inner
 > ⚠️ **Use responsibly.** This software is provided "as is", **without any warranties** or guarantees of safety, support, or fitness for purpose.
 
 ---
+
+## ⁉️ Frequently Asked Questions
+Click [here](https://github.com/g0aty/SickoMenu/blob/main/FAQ.md) to read the list of FAQs!
 
 ## 🛑 Ethical Use Protocol
 **By using SickoMenu, you agree to:**

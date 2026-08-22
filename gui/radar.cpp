@@ -28,26 +28,26 @@ namespace Radar {
 	}
 
 	void OnClick() {
+		ImVec2 mouse = ImGui::GetMousePos();
+		ImVec2 winpos = ImGui::GetWindowPos();
+		ImVec2 winsize = ImGui::GetWindowSize();
+
+		const auto& map = maps[(size_t)State.mapType];
+		float xOffset = getMapXOffsetSkeld(map.x_offset) + (float)State.RadarExtraWidth;
+		float yOffset = map.y_offset + (float)State.RadarExtraHeight;
+
+		Vector2 target = {
+			((mouse.x - winpos.x) / State.dpiScale - xOffset) / map.scale,
+			(((mouse.y - winpos.y) / State.dpiScale - yOffset) * -1.F) / map.scale
+		};
+
+		if (mouse.x < winpos.x
+			|| mouse.x > winpos.x + winsize.x
+			|| mouse.y < winpos.y
+			|| mouse.y > winpos.y + winsize.y)
+			return;
+
 		if (!ImGui::IsKeyPressed(VK_SHIFT) && !ImGui::IsKeyDown(VK_SHIFT) && !ImGui::IsKeyDown(VK_CONTROL) && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
-			ImVec2 mouse = ImGui::GetMousePos();
-			ImVec2 winpos = ImGui::GetWindowPos();
-			ImVec2 winsize = ImGui::GetWindowSize();
-
-			if (mouse.x < winpos.x
-				|| mouse.x > winpos.x + winsize.x
-				|| mouse.y < winpos.y
-				|| mouse.y > winpos.y + winsize.y)
-				return;
-
-			const auto& map = maps[(size_t)State.mapType];
-			float xOffset = getMapXOffsetSkeld(map.x_offset) + (float)State.RadarExtraWidth;
-			float yOffset = map.y_offset + (float)State.RadarExtraHeight;
-
-			Vector2 target = {
-				((mouse.x - winpos.x) / State.dpiScale - xOffset) / map.scale,
-				(((mouse.y - winpos.y) / State.dpiScale - yOffset) * -1.F) / map.scale
-			};
-
 			static int tpDelay = 0;
 
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) State.rpcQueue.push(new RpcSnapTo(target));
@@ -60,28 +60,15 @@ namespace Radar {
 			}
 		}
 		if (State.TeleportEveryone && !(ImGui::IsKeyDown(VK_CONTROL) || ImGui::IsKeyDown(VK_SHIFT)) && (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-			ImVec2 mouse = ImGui::GetMousePos();
-			ImVec2 winpos = ImGui::GetWindowPos();
-			ImVec2 winsize = ImGui::GetWindowSize();
-
-			if (mouse.x < winpos.x
-				|| mouse.x > winpos.x + winsize.x
-				|| mouse.y < winpos.y
-				|| mouse.y > winpos.y + winsize.y)
-				return;
-
-			const auto& map = maps[(size_t)State.mapType];
-			float xOffset = getMapXOffsetSkeld(map.x_offset) + (float)State.RadarExtraWidth;
-			float yOffset = map.y_offset + (float)State.RadarExtraHeight;
-
-			Vector2 target = {
-				((mouse.x - winpos.x) / State.dpiScale - xOffset) / map.scale,
-				(((mouse.y - winpos.y) / State.dpiScale - yOffset) * -1.F) / map.scale
-			};
-
 			for (auto player : GetAllPlayerControl()) {
 				State.rpcQueue.push(new RpcForceSnapTo(player, target));
 			}
+		}
+
+		if (IsInGame() && State.ShowRadar_ShiftLeftClickClosesRoomDoor &&
+			ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+			State.rpcQueue.push(new RpcCloseDoorsOfType(GetSystemTypes(target), false));
+			LOG_DEBUG(std::format("Attempting to close door for room {}", (int)GetSystemTypes(target)));
 		}
 	}
 
@@ -92,13 +79,16 @@ namespace Radar {
 
 	bool init = false;
 	void Render() {
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
+
 		if (!init)
 			Radar::Init();
 
 		const auto& map = maps[(size_t)State.mapType];
 		ImGui::SetNextWindowSize(ImVec2((float)map.mapImage.imageWidth * 0.5F + 10.F + 2.f * State.RadarExtraWidth, (float)map.mapImage.imageHeight * 0.5f + 10.f + 2.f * State.RadarExtraHeight) * State.dpiScale, ImGuiCond_None);
 
-		if (State.LockRadar)
+		if (State.LockRadar || (IsInGame() && State.ShowRadar_ShiftLeftClickClosesRoomDoor &&
+			ImGui::IsKeyDown(VK_SHIFT)))
 			ImGui::Begin("Radar", &State.ShowRadar, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 		else
 			ImGui::Begin("Radar", &State.ShowRadar, ImGuiWindowFlags_NoDecoration);
@@ -158,5 +148,7 @@ namespace Radar {
 			OnClick();
 
 		ImGui::End();
+
+		ImGui::PopStyleVar(1);
 	}
 }

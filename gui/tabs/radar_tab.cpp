@@ -26,6 +26,9 @@ namespace RadarTab {
 		if (ToggleButton("Right Click to Teleport", &State.ShowRadar_RightClickTP)) {
 			State.Save();
 		}
+		if (ToggleButton("(Shift + Left Click) to Close Room Door", &State.ShowRadar_ShiftLeftClickClosesRoomDoor)) {
+			State.Save();
+		}
 
 		ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 		ImGui::Separator();

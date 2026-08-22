@@ -6,7 +6,7 @@
 
 void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 {
-	if (State.ShowHookLogs) Log.Debug("Hook dFungleShipStatus_OnEnable executed", false);
+	if (State.ShowHookLogs) Log.HookDebug("Hook dFungleShipStatus_OnEnable executed", false);
 	FungleShipStatus_OnEnable(__this, method);
 
 	try {
@@ -43,9 +43,33 @@ void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 }
 
 void dZiplineConsole_Update(ZiplineConsole* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) Log.Debug("Hook dZiplineConsole_Update executed", false);
+	if (State.ShowHookLogs) Log.HookDebug("Hook dZiplineConsole_Update executed", false);
 
-	if (!State.PanicMode && State.NoAbilityCD) __this->fields._CoolDown_k__BackingField = 0.f;
+	if (!State.PanicMode && State.NoLadderZiplineCooldown) __this->fields._CoolDown_k__BackingField = 0.f;
 
 	return ZiplineConsole_Update(__this, method);
+}
+
+void dMushroom_FixedUpdate(Mushroom* __this, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dZiplineConsole_Update executed", false);
+	Mushroom_FixedUpdate(__this, method);
+	
+	// the following code is used as __this->fields.sporeMask throws null reference errors when directly used
+	// (last time i checked this was in like 2023)
+	static FieldInfo* field = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "sporeMask");
+	if (field == nullptr) return;
+	auto sporeMask = (GameObject*)il2cpp_field_get_value_object(field, (Il2CppObject*)__this);
+	if(sporeMask == NULL) return;
+	auto transform = GameObject_get_transform(sporeMask, NULL);
+	if (transform == NULL) return;
+
+	Vector3 sporeMaskPos = Transform_get_position(transform, NULL);
+	auto localData = GetPlayerData(*Game::pLocalPlayer);
+	bool showZoomShadows = !State.EnableZoom || State.EnableZoom_ShowShadows;
+	bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || !showZoomShadows || State.playerToFollow.has_value() || State.Wallhack))
+		&& (localData != NULL && !localData->fields.IsDead);
+	sporeMaskPos.z = shouldShowShadowQuad ? 5.f : -1.f;
+	// https://github.com/scp222thj/MalumMenu/blob/main/src/Cheats/MalumESP.cs
+	// the default Z position of the spore mask is 5
+	Transform_set_position(transform, sporeMaskPos, NULL);
 }

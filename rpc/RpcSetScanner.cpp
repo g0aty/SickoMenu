@@ -9,17 +9,18 @@ RpcSetScanner::RpcSetScanner(bool playAnimation)
 
 void RpcSetScanner::Process()
 {
-	if (State.BypassVisualTasks) {
-		PlayerControl_SetScanner(*Game::pLocalPlayer, playAnimation, (*Game::pLocalPlayer)->fields.scannerCount + 1);
-		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
-			uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::Reliable, -1, NULL);
-		MessageWriter_WriteBoolean(writer, playAnimation, NULL);
-		MessageWriter_WriteByte(writer, (*Game::pLocalPlayer)->fields.scannerCount + 1, NULL);
-		MessageWriter_EndMessage(writer, NULL);
-		return;
-	}
-
-	PlayerControl_RpcSetScanner(*Game::pLocalPlayer, playAnimation, NULL);
+    bool visualsOn = GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks, false);
+    if ((State.BypassVisualTasks || !playAnimation) && !visualsOn) {
+        (*Game::pLocalPlayer)->fields.scannerCount++;
+        PlayerControl_SetScanner(*Game::pLocalPlayer, playAnimation, (*Game::pLocalPlayer)->fields.scannerCount);
+        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
+            uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::Reliable, -1, NULL);
+        MessageWriter_WriteBoolean(writer, playAnimation, NULL);
+        MessageWriter_WriteByte(writer, (*Game::pLocalPlayer)->fields.scannerCount, NULL);
+        InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+        return;
+    }
+    PlayerControl_RpcSetScanner(*Game::pLocalPlayer, playAnimation, NULL);
 }
 
 RpcForceScanner::RpcForceScanner(PlayerControl* Player, bool playAnimation)
@@ -32,13 +33,16 @@ void RpcForceScanner::Process()
 {
 	if (Player == nullptr) return;
 
-	//PlayerControl_RpcSetScanner(Player, playAnimation, NULL);
-
-	for (auto p : GetAllPlayerControl()) {
-		MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
-			uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::Reliable, p->fields._.OwnerId, NULL);
-		MessageWriter_WriteBoolean(writer, playAnimation, NULL);
-		MessageWriter_WriteByte(writer, Player->fields.scannerCount + 1, NULL);
-		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-	}
+    bool visualsOn = GameOptions().GetBool(BoolOptionNames__Enum::VisualTasks, false);
+    if ((State.BypassVisualTasks || !playAnimation) && !visualsOn) {
+        Player->fields.scannerCount++;
+        PlayerControl_SetScanner(Player, playAnimation, Player->fields.scannerCount);
+        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId,
+            uint8_t(RpcCalls__Enum::SetScanner), SendOption__Enum::Reliable, -1, NULL);
+        MessageWriter_WriteBoolean(writer, playAnimation, NULL);
+        MessageWriter_WriteByte(writer, Player->fields.scannerCount, NULL);
+        InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+        return;
+    }
+    PlayerControl_RpcSetScanner(Player, playAnimation, NULL);
 }
