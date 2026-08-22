@@ -618,7 +618,7 @@ namespace HostTab {
                 int mapId = options.GetByte(app::ByteOptionNames__Enum::MapId);
                 if (mapId == 3) mapId = 0; // Dleks is the map with ID 3, and we are disabling it for now
                 State.mapHostChoice = mapId > 3 ? (mapId - 1) : mapId;
-                if (IsInLobby() && CustomListBoxInt("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale)) {
+                if (IsInLobby() && CustomListBoxIntColored("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", MAP_NAMES_COLOR, IM_ARRAYSIZE(MAP_NAMES_COLOR))) {
                     //if (!IsInGame()) {
                         // disable flip
                     /*if (State.mapHostChoice == 3) {

@@ -31,6 +31,13 @@ namespace HostTab {
 		{"Coral",			ImColor::ImColor(0xFF6464D7)},
 		{"Fortegreen",      ImColor::ImColor(0xFF62A626)},
 	};
+	const ColorMapping MAP_NAMES_COLOR[] = {
+		{"The Skeld",		ImColor::ImColor(0xFF99A800)}, // 0xAABBGGRR
+		{"Mira HQ",			ImColor::ImColor(0xFFFEDAF3)},
+		{"Polus",			ImColor::ImColor(0xFFFE47F5)},
+		{"The Airship",		ImColor::ImColor(0xFF0B64FF)},
+		{"The Fungle",		ImColor::ImColor(0xFF08FD8E)},
+	};
 	void Render();
 	const ptrdiff_t GetRoleCount(RoleType role);
 	void OpenSubGroup(const std::string& name);
