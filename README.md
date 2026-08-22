@@ -275,36 +275,6 @@ Use `Fn + Backspace` or `Command ⌘ + Backspace` to show/hide the menu, dependi
 - The bash in the first step will install Homebrew, if you don't have it on your os. I recommend this method for users comfortable with basic terminal commands.
 ---
 
-## 🛠️ Troubleshooting
-
-**Game crashes on launch**
-- Ensure you are using a supported Among Us version.
-- Verify you downloaded the correct DLL for your platform.
-- Remove other mods that may conflict with SickoMenu.
-
-**Menu does not appear**
-- Confirm the DLL was loaded successfully.
-- Verify you are using the correct installation method (Version Proxy or Injection).
-- Make sure that **Disable fullscreen optimizations** is not checked in your **Among Us.exe** properties (Explorer).
-- Ensure that you do not have any overlays other than your platform overlay enabled. Using DirectX overlays can cause the menu to not display. Overlays like MSI afterburner overlay can prevent the menu from showing. Steam overlay does not.
-- Try restarting the game.
-
-**Antivirus removes files**
-- Some antivirus programs may flag game modifications and remove them automatically.
-- Check your antivirus quarantine if files disappear after installation.
-
-**Wrong DLL version**
-- Make sure you are using the DLL intended for your platform.
-- Download the latest release if you are unsure.
-
-**Injection issues**
-- Verify that the injected DLL matches your game version.
-- Ensure your injector is running with sufficient permissions.
-- If issues persist, try a different injection method or injector.
-
-**Other issues**
-- If your issue is not listed here, feel free to reach out in our [Discord](https://discord.gg/sickos).
-
 ## ⌨️ Default Hotkeys
 
 | Action                          | Key              |
@@ -355,10 +325,11 @@ Contributions are welcome and appreciated!
 
 > [!TIP]
 > - Keep your changes focused and well-described  
-> - Documentation and README improvements are always welcome  
+> - Documentation and README improvements are welcome as long as they have effort put in to them
 > - For larger features or big changes, consider discussing them in the [Discord](https://discord.gg/sickos) first
 
 ## ✨ Inspiration
+Inspiration from/credit to other mods has been mentioned in the source code. If you think we haven't given you credit for a feature, open an issue for it!
 * [DarkModeAU](https://github.com/the-real-techiee/DarkModeAU) by [the-real-techiee](https://github.com/the-real-techiee/)
 * [YuEzTools](https://github.com/Team-YuTeam/YuEzTools) by [Team-YuTeam](https://github.com/Team-YuTeam)
 * [BetterAmongUs](https://github.com/D1GQ/BetterAmongUs) by [D1GQ](https://github.com/D1GQ/)
