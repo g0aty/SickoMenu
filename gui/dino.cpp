@@ -55,6 +55,7 @@ namespace Dino
 	static bool isDucking = false;
 	static float animTimer = 0.0f;
 	static int animFrame = 0;
+	static float gameOverTimer = 0.0f; // Cooldown to prevent accidental rapid restart / blinking
 
 	static float gameSpeed = 240.0f; // px / sec
 	static float score = 0.0f;
@@ -142,6 +143,7 @@ namespace Dino
 		spawnTimer = 0.0f;
 		nextSpawnInterval = 1.4f;
 		groundScrollX = 0.0f;
+		gameOverTimer = 0.0f;
 		obstacles.clear();
 	}
 
@@ -384,6 +386,7 @@ namespace Dino
 				// Collision AABB
 				if (dinoRight > obsLeft && dinoLeft < obsRight && dinoTop > obsBottom && dinoBottom < obsTop) {
 					state = GameState::GameOver;
+					gameOverTimer = 0.0f;
 				}
 
 				if (obstacles[i].x + obstacles[i].width < -30.0f) {
@@ -395,7 +398,9 @@ namespace Dino
 			}
 		}
 		else if (state == GameState::GameOver) {
-			if (jumpPressed || clickPressed) {
+			gameOverTimer += dt;
+			// Require at least 0.25s cooldown before restart to prevent accidental auto-restart/blinking
+			if (gameOverTimer >= 0.25f && (jumpPressed || clickPressed)) {
 				ResetGame();
 				state = GameState::Playing;
 				dinoVelY = JUMP_FORCE;
@@ -437,15 +442,15 @@ namespace Dino
 			drawList->AddText(ImVec2(canvasPos.x + (canvasSize.x - txtSz.x) * 0.5f, canvasPos.y + canvasSize.y * 0.38f), IM_COL32(200, 210, 225, 255), msg.c_str());
 		}
 		else if (state == GameState::GameOver) {
-			// Game Over Sprite (384x21 -> 256x14 for crisp proportional aspect ratio)
-			float goWidth = (std::min)(256.0f, canvasSize.x - 40.0f);
-			float goHeight = goWidth * (21.0f / 384.0f);
+			// Perfect Game Over Sprite (954, 29, 1335, 50 -> 381x21 -> 286x16 scaled)
+			float goWidth = (std::min)(286.0f, canvasSize.x - 40.0f);
+			float goHeight = goWidth * (21.0f / 381.0f);
 			ImVec2 goPos(canvasPos.x + (canvasSize.x - goWidth) * 0.5f, canvasPos.y + canvasSize.y * 0.28f);
-			DrawSprite(drawList, goPos, ImVec2(goWidth, goHeight), 1294.0f, 29.0f, 1678.0f, 50.0f, spriteTint);
+			DrawSprite(drawList, goPos, ImVec2(goWidth, goHeight), 954.0f, 29.0f, 1335.0f, 50.0f, spriteTint);
 
-			// Restart Button Sprite (72x64 -> 36x32)
-			ImVec2 rstPos(canvasPos.x + (canvasSize.x - 36.0f) * 0.5f, canvasPos.y + canvasSize.y * 0.46f);
-			DrawSprite(drawList, rstPos, ImVec2(36.0f, 32.0f), 2.0f, 2.0f, 74.0f, 66.0f, spriteTint);
+			// Exact Restart Button Sprite Box (98x78 -> 49x39)
+			ImVec2 rstPos(canvasPos.x + (canvasSize.x - 49.0f) * 0.5f, canvasPos.y + canvasSize.y * 0.46f);
+			DrawSprite(drawList, rstPos, ImVec2(49.0f, 39.0f), 2.0f, 2.0f, 100.0f, 80.0f, spriteTint);
 		}
 
 		ImGui::End();
