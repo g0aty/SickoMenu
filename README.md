@@ -2,7 +2,7 @@
    <img src="SickoBanner.png">
 </p>
 
-<h1 align="center">👺 SickoMenu v5.0</h1>
+<h1 align="center">👺 SickoMenu</h1>
 
 <p align="center">
   <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen" alt="Latest Release"></a>
