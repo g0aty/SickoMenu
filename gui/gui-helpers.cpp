@@ -9,7 +9,7 @@
 
 using namespace ImGui;
 
-bool CustomListBoxInt(const char* label, int* value, const std::vector<const char*> list, float width, ImVec4 col, ImGuiComboFlags flags, const char* visualLabel) {
+bool CustomListBoxInt(const char* label, int* value, const std::vector<const char*> list, float width, ImVec4 col, ImGuiComboFlags flags, const char* visualLabel, const std::vector<int>& leftArrowCycle, const std::vector<int>& rightArrowCycle) {
 	auto comboLabel = "##" + std::string(label);
 	auto leftArrow = "##" + std::string(label) + "Left";
 	auto rightArrow = "##" + std::string(label) + "Right";
@@ -37,15 +37,29 @@ bool CustomListBoxInt(const char* label, int* value, const std::vector<const cha
 
 	const bool LeftResponse = ArrowButton(leftArrow.c_str(), ImGuiDir_Left);
 	if (LeftResponse) {
-		*value -= 1;
-		if (*value < 0) *value = int(list.size() - 1);
+		if (leftArrowCycle.empty()) {
+			*value -= 1;
+			if (*value < 0) *value = int(list.size() - 1);
+		}
+		else {
+			auto current = std::find(leftArrowCycle.begin(), leftArrowCycle.end(), *value);
+			size_t next = current == leftArrowCycle.end() ? 0 : (current - leftArrowCycle.begin() + 1) % leftArrowCycle.size();
+			*value = leftArrowCycle[next];
+		}
 		return LeftResponse;
 	}
 	SameLine(0, spacing);
 	const bool RightResponse = ArrowButton(rightArrow.c_str(), ImGuiDir_Right);
 	if (RightResponse) {
-		*value += 1;
-		if (*value > (int)(list.size() - 1)) *value = 0;
+		if (rightArrowCycle.empty()) {
+			*value += 1;
+			if (*value > (int)(list.size() - 1)) *value = 0;
+		}
+		else {
+			auto current = std::find(rightArrowCycle.begin(), rightArrowCycle.end(), *value);
+			size_t next = current == rightArrowCycle.end() ? 0 : (current - rightArrowCycle.begin() + 1) % rightArrowCycle.size();
+			*value = rightArrowCycle[next];
+		}
 		return RightResponse;
 	}
 	SameLine(0, spacing);
@@ -62,7 +76,7 @@ bool CustomListBoxInt(const char* label, int* value, const std::vector<const cha
 	return response;
 }
 
-bool CustomListBoxIntColored(const char* label, int* value, const std::vector<const char*> list, float width, ImVec4 col, ImGuiComboFlags flags, const char* visualLabel, const RoleColor* itemColors, size_t itemColorsCount)
+bool CustomListBoxIntColored(const char* label, int* value, const std::vector<const char*> list, float width, ImVec4 col, ImGuiComboFlags flags, const char* visualLabel, const RoleColor* itemColors, size_t itemColorsCount, const std::vector<int>& leftArrowCycle, const std::vector<int>& rightArrowCycle)
 {
 	auto comboLabel = "##" + std::string(label);
 	auto leftArrow = "##" + std::string(label) + "Left";
@@ -100,15 +114,29 @@ bool CustomListBoxIntColored(const char* label, int* value, const std::vector<co
 
 	const bool LeftResponse = ArrowButton(leftArrow.c_str(), ImGuiDir_Left);
 	if (LeftResponse) {
-		*value -= 1;
-		if (*value < 0) *value = int(list.size() - 1);
+		if (leftArrowCycle.empty()) {
+			*value -= 1;
+			if (*value < 0) *value = int(list.size() - 1);
+		}
+		else {
+			auto current = std::find(leftArrowCycle.begin(), leftArrowCycle.end(), *value);
+			size_t next = current == leftArrowCycle.end() ? 0 : (current - leftArrowCycle.begin() + 1) % leftArrowCycle.size();
+			*value = leftArrowCycle[next];
+		}
 		return LeftResponse;
 	}
 	SameLine(0, spacing);
 	const bool RightResponse = ArrowButton(rightArrow.c_str(), ImGuiDir_Right);
 	if (RightResponse) {
-		*value += 1;
-		if (*value > (int)(list.size() - 1)) *value = 0;
+		if (rightArrowCycle.empty()) {
+			*value += 1;
+			if (*value > (int)(list.size() - 1)) *value = 0;
+		}
+		else {
+			auto current = std::find(rightArrowCycle.begin(), rightArrowCycle.end(), *value);
+			size_t next = current == rightArrowCycle.end() ? 0 : (current - rightArrowCycle.begin() + 1) % rightArrowCycle.size();
+			*value = rightArrowCycle[next];
+		}
 		return RightResponse;
 	}
 	SameLine(0, spacing);
