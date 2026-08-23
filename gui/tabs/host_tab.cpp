@@ -193,8 +193,22 @@ namespace HostTab {
                                 {"Phantom",			State.PhantomColor},
                                 {"Viper",			State.ViperColor},
                             };
-                            if (CustomListBoxIntColored((playerName + "###" + ToString(playerData)).c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId)), 0, RemoveHtmlTags(playerName).c_str(), ROLE_NAMES_COLOR, IM_ARRAYSIZE(ROLE_NAMES_COLOR)))
+                            static const std::vector<int> LEFT_ROLE_CYCLE = { 0, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+                            static const std::vector<int> RIGHT_ROLE_CYCLE = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+                            static std::map<size_t, int> roleSelectorIndices;
+                            auto roleSelectorIt = roleSelectorIndices.find(index);
+                            if (roleSelectorIt == roleSelectorIndices.end())
+                                roleSelectorIt = roleSelectorIndices.emplace(index, (int)State.assignedRoles[index]).first;
+                            int& roleSelectorIndex = roleSelectorIt->second;
+                            static constexpr RoleType roles[] = {
+                                RoleType::Random, RoleType::Crewmate, RoleType::Scientist,
+                                RoleType::Engineer, RoleType::Noisemaker, RoleType::Tracker,
+                                RoleType::Detective, RoleType::Judge, RoleType::Impostor,
+                                RoleType::Shapeshifter, RoleType::Phantom, RoleType::Viper
+                            };
+                            if (CustomListBoxIntColored((playerName + "###" + ToString(playerData)).c_str(), &roleSelectorIndex, ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId)), 0, RemoveHtmlTags(playerName).c_str(), ROLE_NAMES_COLOR, IM_ARRAYSIZE(ROLE_NAMES_COLOR), LEFT_ROLE_CYCLE, RIGHT_ROLE_CYCLE))
                             {
+                                State.assignedRoles[index] = roles[std::clamp(roleSelectorIndex, 0, 11)];
                                 State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
                                 State.scientists_amount = (int)GetRoleCount(RoleType::Scientist);
                                 State.trackers_amount = (int)GetRoleCount(RoleType::Tracker);
@@ -319,25 +333,50 @@ namespace HostTab {
                             }
                         }
                         ImGui::SameLine();
-                        int hostRoleInt = (int)State.HostRoleToSet;
-                        if (CustomListBoxInt("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ")) {
-                            if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
-                                if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount + 1 > GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
+                        static const std::vector<int> LEFT_ROLE_CYCLE = { 0, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+                        static const std::vector<int> RIGHT_ROLE_CYCLE = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+                        auto roleToListIndex = [](RoleType role) {
+                            switch (role) {
+                            case RoleType::Random:       return 0;
+                            case RoleType::Crewmate:     return 1;
+                            case RoleType::Scientist:    return 2;
+                            case RoleType::Engineer:     return 3;
+                            case RoleType::Noisemaker:   return 4;
+                            case RoleType::Tracker:      return 5;
+                            case RoleType::Detective:    return 6;
+                            case RoleType::Judge:        return 7;
+                            case RoleType::Impostor:     return 8;
+                            case RoleType::Shapeshifter: return 9;
+                            case RoleType::Phantom:      return 10;
+                            case RoleType::Viper:        return 11;
+                            default:                     return 0;
+                            }
+                        };
+                        static int hostRoleIndex = roleToListIndex(State.HostRoleToSet);
+                        if (CustomListBoxInt("###RoleSelector", &hostRoleIndex, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ", LEFT_ROLE_CYCLE, RIGHT_ROLE_CYCLE)) {
+                            static constexpr RoleType roles[] = {
+                                RoleType::Random, RoleType::Crewmate, RoleType::Scientist,
+                                RoleType::Engineer, RoleType::Noisemaker, RoleType::Tracker,
+                                RoleType::Detective, RoleType::Judge, RoleType::Impostor,
+                                RoleType::Shapeshifter, RoleType::Phantom, RoleType::Viper
+                            };
+                            State.HostRoleToSet = roles[std::clamp(hostRoleIndex, 0, 11)];
+                            if (State.HostRoleToSet == RoleType::Impostor ||
+                                State.HostRoleToSet == RoleType::Shapeshifter ||
+                                State.HostRoleToSet == RoleType::Phantom ||
+                                State.HostRoleToSet == RoleType::Viper) {
+                                if (State.impostors_amount + State.shapeshifters_amount +
+                                    State.phantoms_amount + State.vipers_amount + 1 >
+                                    GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
                                     State.AutoHostRole = false;
                                 }
-                                else {
-                                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Impostor;
-                                }
                             }
-                            else {
-                                if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.judges_amount + State.crewmates_amount + 1 >= (int)GetAllPlayerData().size()) {
-                                    State.AutoHostRole = false;
-                                }
-                                else {
-                                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Engineer;
-                                }
+                            else if (State.engineers_amount + State.scientists_amount +
+                                     State.trackers_amount + State.noisemakers_amount +
+                                     State.detectives_amount + State.judges_amount +
+                                     State.crewmates_amount + 1 >= (int)GetAllPlayerData().size()) {
+                                State.AutoHostRole = false;
                             }
-                            State.HostRoleToSet = (RoleType)hostRoleInt;
                             State.Save();
                         }
                     }
