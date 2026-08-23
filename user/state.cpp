@@ -54,7 +54,7 @@ void Settings::Load() {
 
         JSON_TRYGET("HasOpenedMenuBefore", this->HasOpenedMenuBefore);
         JSON_TRYGET("ShowMenuOnStartup", this->ShowMenuOnStartup);
-        if (this->ShowMenuOnStartup) JSON_TRYGET("ShowMenu", this->ShowMenuOnStartup);
+        this->ShowMenu = this->ShowMenuOnStartup;
         JSON_TRYGET("KeyBinds", this->KeyBinds);
 #ifdef _DEBUG
         JSON_TRYGET("ShowDebug", this->showDebugTab);
