@@ -78,4 +78,4 @@ A: It turns on modded protocol (host authority mode), which effectively reduces 
 A: Grow a brain. SickoMenu doesn't support Among Us 3D since it's a completely different game from Among Us. It is not planned as of now.
 
 ## Q15: My antivirus keeps automatically deleting the file, how do I make it stop???
-A: Software is made to be used. It very often comes with some form of user interface. You, as a user, are meant to explore this user interface to familiarize yourself with the software you've installed on your computer.... hint: it will likely be a menu named "exclusions" or "whitelist"....
+A: Software is made to be used. It very often comes with some form of user interface. You, as a user, are meant to explore this user interface to familiarize yourself with the software you've installed on your computer... hint: it will likely be a menu named "exclusions" or "whitelist"... For Windows Security, use [this guide](https://www.elevenforum.com/t/add-or-remove-exclusions-for-microsoft-defender-antivirus-in-windows-11.8797/).
