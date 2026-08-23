@@ -67,11 +67,11 @@ namespace Dino
 
 	static std::vector<Obstacle> obstacles;
 
-	const float GRAVITY = 1300.0f;
-	const float JUMP_FORCE = 450.0f;
+	const float GRAVITY = 1200.0f;
+	const float JUMP_FORCE = 460.0f;
 	const float BASE_SPEED = 240.0f;
 
-	// Scaled collision bounds (0.5x scale)
+	// Scaled dimensions (0.5x scale)
 	const float DINO_WIDTH = 44.0f;
 	const float DINO_HEIGHT = 47.0f;
 	const float DINO_DUCK_HEIGHT = 30.0f;
@@ -155,9 +155,9 @@ namespace Dino
 			obs.type = ObstacleType::Pterodactyl;
 			obs.width = 46.0f;
 			obs.height = 40.0f;
-			obs.y = (rand() % 2 == 0) ? 22.0f : 55.0f;
+			obs.y = (rand() % 2 == 0) ? 20.0f : 52.0f;
 		}
-		else if (r < 45) {
+		else if (r < 60) {
 			int sub = rand() % 3;
 			obs.type = (sub == 0) ? ObstacleType::SmallCactus1 : (sub == 1 ? ObstacleType::SmallCactus2 : ObstacleType::SmallCactus3);
 			obs.width = 17.0f;
@@ -367,21 +367,19 @@ namespace Dino
 				SpawnObstacle(canvasSize.x);
 			}
 
-			float dinoHeight = isDucking ? DINO_DUCK_HEIGHT : DINO_HEIGHT;
-			float dinoWidth = isDucking ? DINO_DUCK_WIDTH : DINO_WIDTH;
-
-			float dinoLeft = DINO_X + 6.0f;
-			float dinoRight = DINO_X + dinoWidth - 6.0f;
-			float dinoBottom = dinoY;
-			float dinoTop = dinoY + dinoHeight - 4.0f;
+			// Accurate tight hitboxes
+			float dinoLeft = DINO_X + 10.0f;
+			float dinoRight = DINO_X + (isDucking ? DINO_DUCK_WIDTH - 8.0f : DINO_WIDTH - 10.0f);
+			float dinoBottom = dinoY + 4.0f;
+			float dinoTop = dinoY + (isDucking ? DINO_DUCK_HEIGHT - 4.0f : DINO_HEIGHT - 6.0f);
 
 			for (size_t i = 0; i < obstacles.size(); ) {
 				obstacles[i].x -= gameSpeed * dt;
 
-				float obsLeft = obstacles[i].x + 4.0f;
-				float obsRight = obstacles[i].x + obstacles[i].width - 4.0f;
-				float obsBottom = obstacles[i].y;
-				float obsTop = obstacles[i].y + obstacles[i].height;
+				float obsLeft = obstacles[i].x + 5.0f;
+				float obsRight = obstacles[i].x + obstacles[i].width - 5.0f;
+				float obsBottom = obstacles[i].y + (obstacles[i].type == ObstacleType::Pterodactyl ? 6.0f : 0.0f);
+				float obsTop = obstacles[i].y + obstacles[i].height - (obstacles[i].type == ObstacleType::Pterodactyl ? 6.0f : 8.0f);
 
 				// Collision AABB
 				if (dinoRight > obsLeft && dinoLeft < obsRight && dinoTop > obsBottom && dinoBottom < obsTop) {
@@ -424,13 +422,13 @@ namespace Dino
 		DrawDinoSprite(drawList, groundOrigin, dinoY, isDucking, state == GameState::GameOver, spriteTint);
 
 		// Header Score Display (HI 00000  00000)
-		ImVec2 scorePos(canvasPos.x + canvasSize.x - 130.0f, canvasPos.y + 12.0f);
+		ImVec2 scorePos(canvasPos.x + canvasSize.x - 170.0f, canvasPos.y + 12.0f);
 		if (highScore > 0) {
-			// Draw HI symbol
+			// Draw HI symbol (20x10.5)
 			DrawSprite(drawList, scorePos, ImVec2(20.0f, 10.5f), 1154.0f, 2.0f, 1194.0f, 23.0f, spriteTint);
-			DrawScoreDigits(drawList, ImVec2(scorePos.x + 22.0f, scorePos.y), highScore, 5, spriteTint);
+			DrawScoreDigits(drawList, ImVec2(scorePos.x + 24.0f, scorePos.y), highScore, 5, spriteTint);
 		}
-		DrawScoreDigits(drawList, ImVec2(scorePos.x + 80.0f, scorePos.y), static_cast<int>(score), 5, spriteTint);
+		DrawScoreDigits(drawList, ImVec2(scorePos.x + 95.0f, scorePos.y), static_cast<int>(score), 5, spriteTint);
 
 		// Overlay Messages
 		if (state == GameState::Ready) {
@@ -439,12 +437,14 @@ namespace Dino
 			drawList->AddText(ImVec2(canvasPos.x + (canvasSize.x - txtSz.x) * 0.5f, canvasPos.y + canvasSize.y * 0.38f), IM_COL32(200, 210, 225, 255), msg.c_str());
 		}
 		else if (state == GameState::GameOver) {
-			// Game Over Sprite (384x21 -> 192x10.5)
-			ImVec2 goPos(canvasPos.x + (canvasSize.x - 192.0f) * 0.5f, canvasPos.y + canvasSize.y * 0.30f);
-			DrawSprite(drawList, goPos, ImVec2(192.0f, 10.5f), 1294.0f, 29.0f, 1678.0f, 50.0f, spriteTint);
+			// Game Over Sprite (384x21 -> 256x14 for crisp proportional aspect ratio)
+			float goWidth = (std::min)(256.0f, canvasSize.x - 40.0f);
+			float goHeight = goWidth * (21.0f / 384.0f);
+			ImVec2 goPos(canvasPos.x + (canvasSize.x - goWidth) * 0.5f, canvasPos.y + canvasSize.y * 0.28f);
+			DrawSprite(drawList, goPos, ImVec2(goWidth, goHeight), 1294.0f, 29.0f, 1678.0f, 50.0f, spriteTint);
 
 			// Restart Button Sprite (72x64 -> 36x32)
-			ImVec2 rstPos(canvasPos.x + (canvasSize.x - 36.0f) * 0.5f, canvasPos.y + canvasSize.y * 0.48f);
+			ImVec2 rstPos(canvasPos.x + (canvasSize.x - 36.0f) * 0.5f, canvasPos.y + canvasSize.y * 0.46f);
 			DrawSprite(drawList, rstPos, ImVec2(36.0f, 32.0f), 2.0f, 2.0f, 74.0f, 66.0f, spriteTint);
 		}
 
