@@ -44,7 +44,7 @@ namespace Menu {
 
 	std::map<std::string, std::vector<SearchEntry>> categories = {
 		{"Settings", {
-			{"Show Keybinds", "General"}, {"Show Dino Game", "General"}, {"Allow Activating Keybinds while Chatting", "General"},
+			{"Show Keybinds", "General"}, {"Show Dino Game", "General"}, {"Auto-Show Dino in Lobby", "General"}, {"Allow Activating Keybinds while Chatting", "General"},
 		}},
 		{"Game", {
 			{"Player Speed Multiplier", "General"}, {"Kill Distance", "General"},

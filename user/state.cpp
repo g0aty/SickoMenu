@@ -83,6 +83,7 @@ void Settings::Load() {
         JSON_TRYGET("GameFPS", this->GameFPS);
         JSON_TRYGET("ShowKeybinds", this->ShowKeybinds);
         JSON_TRYGET("ShowDino", this->ShowDino);
+        JSON_TRYGET("ShowDinoInLobby", this->ShowDinoInLobby);
         JSON_TRYGET("KeybindsWhileChatting", this->KeybindsWhileChatting);
         JSON_TRYGET("SpoofLevel", this->SpoofLevel);
         JSON_TRYGET("FakeLevel", this->FakeLevel);
@@ -730,6 +731,7 @@ void Settings::Save() {
                 { "GameFPS", this->GameFPS },
                 { "ShowKeybinds", this->ShowKeybinds },
                 { "ShowDino", this->ShowDino },
+                { "ShowDinoInLobby", this->ShowDinoInLobby },
                 { "KeybindsWhileChatting", this->KeybindsWhileChatting },
                 { "SpoofLevel", this->SpoofLevel },
                 { "FakeLevel", this->FakeLevel },

@@ -61,6 +61,7 @@ public:
     int FakeLevel = 1;
     bool ShowKeybinds = true;
     bool ShowDino = false;
+    bool ShowDinoInLobby = false;
     bool KeybindsWhileChatting = true;
     bool SpoofFriendCode = false;
     bool UseNewFriendCode = false;
