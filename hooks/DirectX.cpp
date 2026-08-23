@@ -124,7 +124,13 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Close_All_Doors) && IsInGame()) State.CloseAllDoors = true;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Zoom) && (IsInGame() || IsInLobby())) {
             State.EnableZoom = !State.EnableZoom;
-            if (!State.EnableZoom) RefreshChat();
+            if (!State.EnableZoom && Game::HudManager.IsInstanceExists()) {
+                auto hud = Game::HudManager.GetInstance();
+                bool isKillOverlayActive = hud->fields.KillOverlay != NULL &&
+                    KillOverlay_get_IsOpen((KillOverlay*)hud->fields.KillOverlay, NULL);
+                if (isKillOverlayActive) State.EnableZoom = true;
+                // the ProgressTracker disappears if you disable zoom during the kill animation
+            }
             State.HasRefreshedUI = false;
         }
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Freecam) && (IsInGame() || IsInLobby())) {

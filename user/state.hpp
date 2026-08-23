@@ -403,6 +403,7 @@ public:
     bool RotateEveryone = false;
     bool RotateServerSide = false;
     bool RelativeTeleport = false;
+    bool Mod_EnableModeration = false;
     std::string Mod_SickoSocials = "";
     std::queue<std::string> Mod_PendingRulesMessages;
     float Mod_PendingRulesDelay = 0.f;

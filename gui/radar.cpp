@@ -47,21 +47,23 @@ namespace Radar {
 			|| mouse.y > winpos.y + winsize.y)
 			return;
 
-		if (!ImGui::IsKeyPressed(VK_SHIFT) && !ImGui::IsKeyDown(VK_SHIFT) && !ImGui::IsKeyDown(VK_CONTROL) && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
-			static int tpDelay = 0;
+		if (State.ShowRadar_RightClickTP) {
+			if (!ImGui::IsKeyPressed(VK_SHIFT) && !ImGui::IsKeyDown(VK_SHIFT) && !ImGui::IsKeyDown(VK_CONTROL) && (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Right))) {
+				static int tpDelay = 0;
 
-			if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) State.rpcQueue.push(new RpcSnapTo(target));
-			else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-				if (tpDelay <= 0) {
-					State.rpcQueue.push(new RpcSnapTo(target));
-					tpDelay = int(0.1 * GetFps());
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) State.rpcQueue.push(new RpcSnapTo(target));
+				else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+					if (tpDelay <= 0) {
+						State.rpcQueue.push(new RpcSnapTo(target));
+						tpDelay = int(0.1 * GetFps());
+					}
+					else tpDelay--;
 				}
-				else tpDelay--;
 			}
-		}
-		if (State.TeleportEveryone && !(ImGui::IsKeyDown(VK_CONTROL) || ImGui::IsKeyDown(VK_SHIFT)) && (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-			for (auto player : GetAllPlayerControl()) {
-				State.rpcQueue.push(new RpcForceSnapTo(player, target));
+			if (State.TeleportEveryone && !(ImGui::IsKeyDown(VK_CONTROL) || ImGui::IsKeyDown(VK_SHIFT)) && (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+				for (auto player : GetAllPlayerControl()) {
+					State.rpcQueue.push(new RpcForceSnapTo(player, target));
+				}
 			}
 		}
 
@@ -144,8 +146,7 @@ namespace Radar {
 			}
 		}
 
-		if (State.ShowRadar_RightClickTP)
-			OnClick();
+		OnClick();
 
 		ImGui::End();
 

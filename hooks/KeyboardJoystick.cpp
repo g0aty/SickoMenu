@@ -5,16 +5,22 @@
 void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dKeyboardJoystick_Update executed", false);
 
-    auto hudGameObject = Component_get_gameObject((Component_1*)Game::HudManager.GetInstance(), NULL);
-    auto shadowGameObject = Component_get_gameObject((Component_1*)Game::HudManager.GetInstance()->fields.ShadowQuad, NULL);
-    if (hudGameObject != NULL && !State.HasRefreshedUI) {
+    auto hud = Game::HudManager.GetInstance();
+
+    auto hudGameObject = Component_get_gameObject((Component_1*)hud, NULL);
+    auto shadowGameObject = Component_get_gameObject((Component_1*)hud->fields.ShadowQuad, NULL);
+
+    bool isKillOverlayActive = hud->fields.KillOverlay != NULL &&
+        KillOverlay_get_IsOpen((KillOverlay*)hud->fields.KillOverlay, NULL);
+
+    if (hudGameObject != NULL && !isKillOverlayActive && !State.HasRefreshedUI) {
         // this is done here to not disable movement while zooming in/out
         bool wasShadowQuadActive = shadowGameObject == NULL ? true : GameObject_GetActive(shadowGameObject, NULL);
 
         GameObject_SetActive(hudGameObject, false, NULL);
         GameObject_SetActive(hudGameObject, true, NULL);
 
-        auto taskOverlay = (Component_1*)Game::HudManager.GetInstance()->fields.TaskCompleteOverlay;
+        auto taskOverlay = (Component_1*)hud->fields.TaskCompleteOverlay;
         if (taskOverlay != NULL && Component_get_gameObject(taskOverlay, NULL) != NULL) {
             GameObject_SetActive(Component_get_gameObject(taskOverlay, NULL), false, NULL);
             // prevent the persistent "Task Completed!" text while zooming
