@@ -288,6 +288,13 @@ namespace SelfTab {
 
             if (ToggleButton("Zoom", &State.EnableZoom)) {
                 // State.Save();
+                if (!State.EnableZoom && Game::HudManager.IsInstanceExists()) {
+                    auto hud = Game::HudManager.GetInstance();
+                    bool isKillOverlayActive = hud->fields.KillOverlay != NULL &&
+                        KillOverlay_get_IsOpen((KillOverlay*)hud->fields.KillOverlay, NULL);
+                    if (isKillOverlayActive) State.EnableZoom = true;
+                    // the ProgressTracker disappears if you disable zoom during the kill animation
+                }
                 State.HasRefreshedUI = false;
             }
 

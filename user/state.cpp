@@ -10,7 +10,7 @@
 Settings State;
 
 void Settings::Load() {
-    this->SickoVersion = "v5.0";
+    this->SickoVersion = "v5.0.1";
 
     auto path = getModulePath(hModule);
     auto configPath = path.parent_path() / "sicko-selected-config.json";
@@ -467,6 +467,7 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckFriendcode", this->SMAC_CheckFriendcode);
         JSON_TRYGET("ChatPresets", this->ChatPresets);
 
+        JSON_TRYGET("Mod_EnableModeration", this->Mod_EnableModeration);
         JSON_TRYGET("Mod_SickoSocials", this->Mod_SickoSocials);
         JSON_TRYGET("Mod_RoleNames", this->Mod_RoleNames);
         JSON_TRYGET("Mod_RoleMembers", this->Mod_RoleMembers);
@@ -1109,6 +1110,7 @@ void Settings::Save() {
                 { "SMAC_CheckFriendcode", this->SMAC_CheckFriendcode },
                 { "ChatPresets", this->ChatPresets },
 
+                { "Mod_EnableModeration", this->Mod_EnableModeration },
                 { "Mod_SickoSocials", this->Mod_SickoSocials },
                 { "Mod_RoleNames", this->Mod_RoleNames },
                 { "Mod_RoleMembers", this->Mod_RoleMembers },

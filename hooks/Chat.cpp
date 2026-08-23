@@ -318,6 +318,7 @@ static std::vector<std::string> BuildGameRulesMessages(const std::string& modeNa
 }
 
 static bool HandleChatCommand(PlayerControl* actor, const std::string& message) {
+	if (!State.Mod_EnableModeration) return false;
 	if (message.empty() || message[0] != '/') return false;
 	bool isLocal = (actor == *Game::pLocalPlayer);
 
@@ -1107,7 +1108,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 			return; //we don't want the chat to know we're using "aum"
 		}
 
-		if (chatText[0] == '/') {
+		if (IsHost() && chatText[0] == '/') {
 			if (HandleChatCommand(*Game::pLocalPlayer, chatText)) return;
 		}
 

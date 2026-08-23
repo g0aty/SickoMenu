@@ -34,8 +34,8 @@ namespace HostTab {
     void OpenSubGroup(const std::string& name) {
         if (name == "Utils") CloseOtherGroups(Groups::Utils);
         else if (name == "Settings") CloseOtherGroups(Groups::Settings);
-        else if (name == "Tournaments") CloseOtherGroups(Groups::Tournaments);
-        else if (name == "Moderation") CloseOtherGroups(Groups::Moderation);
+        else if (name == "Tournaments" && State.TournamentMode) CloseOtherGroups(Groups::Tournaments);
+        else if (name == "Moderation" && State.Mod_EnableModeration) CloseOtherGroups(Groups::Moderation);
     }
 
     /*std::string GetPlayerNameFromFriendCode(std::string friendCode) {
@@ -148,9 +148,11 @@ namespace HostTab {
                     CloseOtherGroups(Groups::Tournaments);
                 }
             }
-            ImGui::SameLine();
-            if (TabGroup("Moderation", openModeration)) {
-                CloseOtherGroups(Groups::Moderation);
+            if (State.Mod_EnableModeration) {
+                ImGui::SameLine();
+                if (TabGroup("Moderation", openModeration)) {
+                    CloseOtherGroups(Groups::Moderation);
+                }
             }
             GameOptions options;
             if (openUtils) {
@@ -273,11 +275,10 @@ namespace HostTab {
                         if (shouldEndListBox)
                             ImGui::ListBoxFooter();
                     }
-                    if (!State.DisableRoleManager) ImGui::NewLine();
+                    if (!State.DisableRoleManager) ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
                     ToggleButton("Disable Role Selection", &State.DisableRoleManager);
 
                     if (State.TournamentMode) {
-                        if (!State.DisableRoleManager || !hideRolesList) ImGui::NewLine();
                         if (AnimatedButton("Randomize Roles")) {
                             std::vector<Game::PlayerId> playerIds = {};
                             std::vector<Game::PlayerId> impostorIds = {};
@@ -297,6 +298,49 @@ namespace HostTab {
                         }
                         ToggleButton("Hide Roles List", &hideRolesList);
                     }
+
+                    if (!State.DisableRoleManager) {
+                        if (ToggleButton("Always", &State.AutoHostRole)) {
+                            State.Save();
+
+                            if (!State.AutoHostRole) {
+                                auto allPlayers = GetAllPlayerData();
+                                for (size_t listIndex = 0; listIndex < allPlayers.size(); listIndex++) {
+                                    auto playerData = allPlayers[listIndex];
+                                    if (playerData == nullptr) continue;
+                                    PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
+                                    if (playerCtrl == nullptr) continue;
+
+                                    if (*Game::pLocalPlayer == playerCtrl) {
+                                        State.assignedRoles[playerData->fields.PlayerId] = RoleType::Random;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        ImGui::SameLine();
+                        int hostRoleInt = (int)State.HostRoleToSet;
+                        if (CustomListBoxInt("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ")) {
+                            if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
+                                if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount + 1 > GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
+                                    State.AutoHostRole = false;
+                                }
+                                else {
+                                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Impostor;
+                                }
+                            }
+                            else {
+                                if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.judges_amount + State.crewmates_amount + 1 >= (int)GetAllPlayerData().size()) {
+                                    State.AutoHostRole = false;
+                                }
+                                else {
+                                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Engineer;
+                                }
+                            }
+                            State.HostRoleToSet = (RoleType)hostRoleInt;
+                            State.Save();
+                        }
+                    }
                     ImGui::EndChild();
                 }
                 if (IsInLobby()) ImGui::SameLine();
@@ -308,47 +352,6 @@ namespace HostTab {
                     State.ImpostorCount = std::clamp(State.ImpostorCount, 0, int(Game::MAX_PLAYERS));
                     if (State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
                         State.Save();
-
-                    if (ToggleButton("Always", &State.AutoHostRole)) {
-                        State.Save();
-
-                        if (!State.AutoHostRole) {
-                            auto allPlayers = GetAllPlayerData();
-                            for (size_t listIndex = 0; listIndex < allPlayers.size(); listIndex++) {
-                                auto playerData = allPlayers[listIndex];
-                                if (playerData == nullptr) continue;
-                                PlayerControl* playerCtrl = GetPlayerControlById(playerData->fields.PlayerId);
-                                if (playerCtrl == nullptr) continue;
-
-                                if (*Game::pLocalPlayer == playerCtrl) {
-                                    State.assignedRoles[playerData->fields.PlayerId] = RoleType::Random;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    ImGui::SameLine();
-                    int hostRoleInt = (int)State.HostRoleToSet;
-                    if (CustomListBoxInt("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ")) {
-                        if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
-                            if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount + 1 > GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
-                                State.AutoHostRole = false;
-                            }
-                            else {
-                                if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Impostor;
-                            }
-                        }
-                        else {
-                            if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.judges_amount + State.crewmates_amount + 1 >= (int)GetAllPlayerData().size()) {
-                                State.AutoHostRole = false;
-                            }
-                            else {
-                                if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Engineer;
-                            }
-                        }
-                        State.HostRoleToSet = (RoleType)hostRoleInt;
-                        State.Save();
-                    }
                 }
 
                 const int32_t currentMaxPlayers = options.GetMaxPlayers();
@@ -373,6 +376,9 @@ namespace HostTab {
                     ColoredButton(ImVec4(1.f, 0.f, 0.f, 1.f), "Cancel Start of Game")) {
                     State.CancelingStartGame = true;
                 }
+
+                if (ToggleButton("Enable Moderation System", &State.Mod_EnableModeration))
+                    State.Save();
 
                 if (ToggleButton("Always Allow Start Button", &State.AlwaysAllowStart))
                     State.Save();

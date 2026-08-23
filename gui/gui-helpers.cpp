@@ -618,10 +618,23 @@ bool ToggleButton(const char* str_id, bool* v) {
 		}
 
 		if (IsItemHovered())
-			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f);
+			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f * State.RoundingRadiusMultiplier);
 		else
-			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBgActive] : colors[ImGuiCol_FrameBg]), height * 0.50f);
-		draw_list->AddCircleFilled(ImVec2(p.x + radius + (*v ? 1 : 0) * (width - radius * 2.0f), p.y + radius), radius - 1.5f, GetColorU32(colors[ImGuiCol_CheckMark]));
+			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBgActive] : colors[ImGuiCol_FrameBg]), height * 0.5f * State.RoundingRadiusMultiplier);
+
+		// draw_list->AddCircleFilled(ImVec2(p.x + radius + (*v ? 1 : 0) * (width - radius * 2.0f), p.y + radius), (radius - 1.5f), GetColorU32(colors[ImGuiCol_CheckMark]));
+
+		float knob_x = *v ? p.x + width - radius : p.x + radius;
+		float knob_size = (radius - 1.5f) * 2.0f;
+		float knob_rounding = (radius - 1.5f) * State.RoundingRadiusMultiplier;
+
+		ImVec2 knob_min(knob_x - knob_size * 0.5f, p.y + radius - knob_size * 0.5f);
+		ImVec2 knob_max(knob_x + knob_size * 0.5f, p.y + radius + knob_size * 0.5f);
+
+		draw_list->AddRectFilled(knob_min, knob_max,
+			GetColorU32(colors[ImGuiCol_CheckMark]),
+			knob_rounding);
+
 		SameLine();
 
 		if (State.searchQuery == "" ||

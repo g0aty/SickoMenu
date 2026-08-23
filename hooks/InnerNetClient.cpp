@@ -1402,13 +1402,17 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         bool isGameMenuActive = gameMenu != NULL &&
             GameObject_GetActive(Component_get_gameObject((Component_1*)gameMenu, NULL), NULL);
 
+        bool isKillOverlayActive = hud->fields.KillOverlay != NULL &&
+            KillOverlay_get_IsOpen((KillOverlay*)hud->fields.KillOverlay, NULL);
+
         float oldCamHeight = Camera_get_orthographicSize(State.FollowerCam, NULL);
         // State.EnableZoom_ResolutionSetFlag = false;
 
         auto mig = MatchInfoGuide_get_Instance(NULL);
         bool migOpen = mig != NULL && MatchInfoGuide_get_IsActive(mig, NULL);
 
-        bool shouldEnableZoom = (!State.InMeeting && !State.InExileUI && !chatOpen && !migOpen && !isFullScreenActive && !isGameMenuActive &&
+        bool shouldEnableZoom = (!State.InMeeting && !State.InExileUI &&
+            !chatOpen && !migOpen && !isFullScreenActive && !isGameMenuActive && !isKillOverlayActive &&
             (State.GameLoaded || (IsInLobby() && State.LobbyTimer <= 600.f - (Time_get_deltaTime(NULL) * 20) )) && !State.PanicMode);
         // from my testing, deltaTime * 20 doesn't cause UI bugs in the lobby
         float camHeight = shouldEnableZoom && State.EnableZoom ?
