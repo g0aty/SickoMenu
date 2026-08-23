@@ -3,7 +3,7 @@
   </p>
 
 # <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&height=225&color=0:ff006c,100:3c0000&text=👺%20SickoMenu%20v5.0.1&reversal=true&fontColor=ffffff&fontSize=50&animation=scaleIn&section=header" width="100%"/>
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=225&color=0:ff006c,100:3c0000&text=👺%20SickoMenu&reversal=true&fontColor=ffffff&fontSize=50&animation=scaleIn&section=header" width="100%"/>
 </div>
 
 <p align="center">
