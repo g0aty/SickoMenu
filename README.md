@@ -2,9 +2,7 @@
    <img src="SickoBanner.png">
   </p>
 
-# <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&height=225&color=0:ff006c,100:3c0000&text=👺%20SickoMenu&reversal=true&fontColor=ffffff&fontSize=50&animation=scaleIn&section=header" width="100%"/>
-</div>
+<h1 align="center">👺 SickoMenu</h1>
 
 <p align="center">
   <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=plastic&color=brightgreen&label=Latest%20Release&logo=github"></a>
