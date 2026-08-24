@@ -118,6 +118,7 @@ namespace PlayersTab {
                 {"Tracker",			State.TrackerColor},
                 {"Detective",		State.DetectiveColor},
                 {"Viper",			State.ViperColor},
+                {"Judge",           State.JudgeColor},
             }; // needs to be updated every render
 
             ColorMapping GHOSTROLE_NAMES_COLOR[] = {

@@ -138,6 +138,7 @@ namespace HostTab {
                 {"Noisemaker",		State.NoisemakerColor},
                 {"Tracker",			State.TrackerColor},
                 {"Detective",		State.DetectiveColor},
+                {"Judge",           State.JudgeColor},
                 {"Impostor",		State.ImpostorColor},
                 {"Shapeshifter",	State.ShapeshifterColor},
                 {"Phantom",			State.PhantomColor},
@@ -214,20 +215,6 @@ namespace HostTab {
                             const std::string& playerName = convert_from_string(outfit->fields.PlayerName);
                             //player colors in host tab by gdjkhp (https://github.com/GDjkhp/AmongUsMenu/commit/53b017183bac503c546f198e2bc03539a338462c)
 							//now with role colors in role selection
-                            RoleColor ROLE_NAMES_COLOR[] = {
-                                {"Random",			ImVec4(1.f, 1.f, 1.f, 1.f)},
-                                {"Crewmate",		State.CrewmateColor},
-                                {"Scientist",		State.ScientistColor},
-                                {"Engineer",		State.EngineerColor},
-                                {"Noisemaker",		State.NoisemakerColor},
-                                {"Tracker",			State.TrackerColor},
-                                {"Detective",		State.DetectiveColor},
-                                {"Judge",		    State.JudgeColor},
-                                {"Impostor",		State.ImpostorColor},
-                                {"Shapeshifter",	State.ShapeshifterColor},
-                                {"Phantom",			State.PhantomColor},
-                                {"Viper",			State.ViperColor},
-                            };
                             if (CustomListBoxIntColored((playerName + "###" + ToString(playerData)).c_str(), reinterpret_cast<int*>(&State.assignedRoles[index]), ROLE_NAMES, 80 * State.dpiScale, AmongUsColorToImVec4(GetPlayerColor(outfit->fields.ColorId)), 0, RemoveHtmlTags(playerName).c_str(), ROLE_NAMES_COLOR, IM_ARRAYSIZE(ROLE_NAMES_COLOR)))
                             {
                                 State.engineers_amount = (int)GetRoleCount(RoleType::Engineer);
@@ -355,7 +342,7 @@ namespace HostTab {
                         }
                         ImGui::SameLine();
                         int hostRoleInt = (int)State.HostRoleToSet;
-                        if (CustomListBoxInt("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ")) {
+                        if (CustomListBoxIntColored("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", ROLE_NAMES_COLOR, IM_ARRAYSIZE(ROLE_NAMES_COLOR))) {
                             if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
                                 if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount + 1 > GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
                                     State.AutoHostRole = false;
@@ -659,7 +646,7 @@ namespace HostTab {
                 /*if (State.mapHostChoice > 3)
                     State.mapHostChoice--;*/
                 State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
-                if (IsInLobby() && CustomListBoxInt("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale)) {
+                if (IsInLobby() && CustomListBoxIntColored("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", MAP_NAMES_COLOR, IM_ARRAYSIZE(MAP_NAMES_COLOR))) {
                     //if (!IsInGame()) {
                         // disable flip
                     if (State.mapHostChoice == 3) {
