@@ -71,7 +71,7 @@ namespace SettingsTab {
 				State.Save();
 			}
 			ImGui::SameLine();
-			if (ToggleButton("Auto-Show Dino in Lobby", &State.ShowDinoInLobby)) {
+			if (ToggleButton("Auto-Hide Dino Game when Match Starts", &State.ShowDinoInLobby)) {
 				State.Save();
 			}
 
