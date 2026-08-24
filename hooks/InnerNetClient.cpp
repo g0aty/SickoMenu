@@ -10,6 +10,7 @@
 #include <sstream>
 #include "esp.hpp"
 #include <chrono>
+#include "achievements.hpp"
 
 using namespace std::string_view_literals;
 
@@ -51,6 +52,7 @@ static void onGameEnd() {
         State.modUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
+        State.shadowCollab = nullptr;
         //State.EnableZoom = false;
         State.FreeCam = false;
         State.MatchEnd = std::chrono::system_clock::now();
@@ -64,8 +66,13 @@ static void onGameEnd() {
         State.protectMonitor.clear();
         State.vanishedPlayers.clear();
         State.validDeadBodyIds.clear();
+        State.ventTpSeqIds.clear();
+        State.SpamVentTpEveryoneRandom = false;
+        State.SpamVentTpEveryone = false;
+        State.spamRandomVentTpPlayers.clear();
+        State.spamVentTpPlayers.clear();
         State.VoteKicks = 0;
-        State.OutfitCooldown = 50;
+        State.OutfitCooldown = GetFps();
         State.CanChangeOutfit = false;
         State.GameLoaded = false;
         State.RealRole = RoleTypes__Enum::Crewmate;
@@ -74,6 +81,10 @@ static void onGameEnd() {
         State.GameModeDurationTimer = 0.f;
         State.GameModeDurationOver = false;
         autoStartedGame = false;
+        State.ChatFocused = false;
+        State.MIG_ThemeChanged = true;
+        State.DisableHud = false;
+        State.ChatSpamMode = 0;
 
         State.VoteOffPlayerId = Game::HasNotVoted;
 
@@ -92,6 +103,9 @@ static void onGameEnd() {
         State.tournamentAllTasksCompleted.clear();
         State.SpeedrunOver = false;
 
+        State.ColorCycledPlayers.clear();
+        State.VoteImmunePlayers.clear();
+
         drawing_t& instance = Esp::GetDrawing();
         synchronized(instance.m_DrawingMutex) {
             instance.m_Players = {};
@@ -104,8 +118,13 @@ static void onGameEnd() {
 
 void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 {
-    if (State.ShowHookLogs) Log.Debug("Hook dInnerNetClient_Update executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_Update executed", false);
     try {
+        if (State.unlockAllAchievements) {
+            Achievements::UnlockAll();
+            State.unlockAllAchievements = false;
+        }
+
         if (!State.PanicMode) {
             if (IsHost() && !State.Mod_PendingRulesMessages.empty()) {
                 State.Mod_PendingRulesDelay -= Time_get_deltaTime(NULL);
@@ -120,6 +139,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (!IsInLobby()) {
                 State.LobbyTimer = 600.f;
                 State.JoinedAsHost = false;
+                State.JoinedLobby = false;
             }
 
             if (!IsInGame()) {
@@ -146,9 +166,36 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 }*/ //unintentionally prevents admin from working, workaround can be found later
             }
 
+            if (!State.PanicMode && State.ModDetection && (IsInLobby()/* || State.BroadcastedMod == 1*/)) {
+                uint8_t rpcCall = (uint8_t)420;
+                /*switch (State.BroadcastedMod) {
+                case 1:
+                    rpcCall = (uint8_t)42069;
+                    break;
+                case 2:
+                    rpcCall = (uint8_t)250;
+                    break;
+                }*/
+                if (State.rpcCooldown <= 0) {
+                    //SickoMenu users can detect this rpc
+                    MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), (*Game::pLocalPlayer)->fields._.NetId, rpcCall, SendOption__Enum::Reliable, -1, NULL);
+                    MessageWriter_WriteString(writer, convert_to_string(State.SickoVersion), NULL);
+                    InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                    State.rpcCooldown = int(0.5 * GetFps());
+                }
+                else {
+                    State.rpcCooldown--;
+                }
+            }
+
             if (!IsInGame()) {
                 State.InMeeting = false;
                 State.DisableLights = false;
+                State.DisableLightSwitches = false;
+                State.DisableComms = false;
+                State.DisableReactor = false;
+                State.DisableOxygen = false;
+                State.InfiniteMushroomMixup = false;
                 State.AutoRepairSabotage = false;
                 State.CloseAllDoors = false;
                 State.SpamReport = false;
@@ -290,123 +337,24 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (!IsInLobby() && !State.lobbyRpcQueue.empty()) State.lobbyRpcQueue = {};
             if (!IsInGame() && !IsInLobby() && !State.taskRpcQueue.empty()) State.taskRpcQueue = {};
 
-            if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::Normal) {
-                auto localData = GetPlayerData(*Game::pLocalPlayer);
-                app::RoleBehaviour* playerRole = localData->fields.Role;
-                app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
-                if (State.NoAbilityCD) {
-                    if (role == RoleTypes__Enum::Engineer)
-                    {
-                        app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
-                        if (engineerRole->fields.cooldownSecondsRemaining > 0.0f)
-                            engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                        engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
-                    }
-                    if (role == RoleTypes__Enum::Scientist) {
-                        app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
-                        if (scientistRole->fields.currentCooldown > 0.0f)
-                            scientistRole->fields.currentCooldown = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                        scientistRole->fields.currentCharge = 69420.0f + 1.0f; //Can be anything as it will always be written
-                    }
-                    if (role == RoleTypes__Enum::Tracker)
-                    {
-                        app::TrackerRole* trackerRole = (app::TrackerRole*)playerRole;
-                        if (trackerRole->fields.cooldownSecondsRemaining > 0.0f)
-                            trackerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                        trackerRole->fields.delaySecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                        trackerRole->fields.durationSecondsRemaining = 69420.f; //Can be anything as it will always be written
-                    }
-                    if (role == RoleTypes__Enum::Scientist) {
-                        app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
-                        if (scientistRole->fields.currentCooldown > 0.0f)
-                            scientistRole->fields.currentCooldown = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                        scientistRole->fields.currentCharge = 69420.0f + 1.0f; //Can be anything as it will always be written
-                    }
-                    if (role == RoleTypes__Enum::GuardianAngel) {
-                        app::GuardianAngelRole* guardianAngelRole = (app::GuardianAngelRole*)playerRole;
-                        if (guardianAngelRole->fields.cooldownSecondsRemaining > 0.0f)
-                            guardianAngelRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                    }
-                    if (IsHost() || !State.SafeMode) {
-                        if (GameLogicOptions().GetKillCooldown() > 0)
-                            (*Game::pLocalPlayer)->fields.killTimer = 0;
-                        else
-                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, 0.0042069f); //force cooldown > 0 as ur unable to kill otherwise
-                        if (IsHost()) {
-                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 0); //force set cooldown, otherwise u get kicked
-                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 0); //force set cooldown, otherwise u get kicked
-                            GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::PhantomDuration, 0); //force set cooldown, otherwise u get kicked
-                        }
-                        else {
-                            if (role == RoleTypes__Enum::Shapeshifter) {
-                                app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
-                                if (shapeshifterRole->fields.cooldownSecondsRemaining > 0.0f)
-                                    shapeshifterRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                            }
-                            if (role == RoleTypes__Enum::Phantom) {
-                                app::PhantomRole* phantomRole = (app::PhantomRole*)playerRole;
-                                if (phantomRole->fields.cooldownSecondsRemaining > 0.0f)
-                                    phantomRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                            }
-                        }
-                    }
-                    if (role == RoleTypes__Enum::Shapeshifter) {
-                        /*app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
-                        shapeshifterRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written*/
-                    }
-                    if (role == RoleTypes__Enum::Phantom) {
-                        app::PhantomRole* phantomRole = (app::PhantomRole*)playerRole;
-                        //phantomRole->fields.durationSecondsRemaining = 69420.0f; //Can be anything as it will always be written
-                    }
-                    if (IsInGame()) {
-                        (*Game::pLocalPlayer)->fields.RemainingEmergencies = 69420;
-                        //if (GameOptions().HasOptions())
-                            //(*Game::pShipStatus)->fields.EmergencyCooldown = (float)GameOptions().GetInt(app::Int32OptionNames__Enum::EmergencyCooldown);
-                    }
+            if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::Normal && GetPlayerData(*Game::pLocalPlayer) != NULL) {
+                if ((IsHost() || !State.SafeMode) && State.Impostor_NoKillCooldown) {
+                    if (GameLogicOptions().GetKillCooldown() > 0)
+                        (*Game::pLocalPlayer)->fields.killTimer = 0.f;
+                    else
+                        GameLogicOptions().SetFloat(app::FloatOptionNames__Enum::KillCooldown, 0.0042069f); //force cooldown > 0 as ur unable to kill otherwise
+                }
+                if (IsInGame() && State.InfiniteMeetings) {
+                    (*Game::pLocalPlayer)->fields.RemainingEmergencies = 69420;
+                    //if (GameOptions().HasOptions())
+                        //(*Game::pShipStatus)->fields.EmergencyCooldown = (float)GameOptions().GetInt(app::Int32OptionNames__Enum::EmergencyCooldown);
                 }
             }
-            if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && State.NoAbilityCD) {
+            if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::HideNSeek && State.Impostor_NoKillCooldown) {
                 auto localData = GetPlayerData(*Game::pLocalPlayer);
                 app::RoleBehaviour* playerRole = localData->fields.Role;
                 app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
                 if (IsHost() || !State.SafeMode) (*Game::pLocalPlayer)->fields.killTimer = 0;
-                if (role == RoleTypes__Enum::Engineer)
-                {
-                    app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
-                    if (engineerRole->fields.cooldownSecondsRemaining > 0.0f)
-                        engineerRole->fields.cooldownSecondsRemaining = 0.01f; //This will be deducted below zero on the next FixedUpdate call
-                    engineerRole->fields.inVentTimeRemaining = 30.0f; //Can be anything as it will always be written
-                }
-            }
-
-            if (!State.NoAbilityCD && (IsInGame() || IsInLobby()) && GameOptions().HasOptions()) {
-                auto localData = GetPlayerData(*Game::pLocalPlayer);
-                app::RoleBehaviour* playerRole = localData->fields.Role;
-                app::RoleTypes__Enum role = playerRole != nullptr ? (playerRole)->fields.Role : app::RoleTypes__Enum::Crewmate;
-                GameOptions options;
-                if (role == RoleTypes__Enum::Engineer)
-                {
-                    app::EngineerRole* engineerRole = (app::EngineerRole*)playerRole;
-                    float ventTime = options.GetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, 1.0F);;
-                    if (engineerRole->fields.inVentTimeRemaining > ventTime)
-                        engineerRole->fields.inVentTimeRemaining = ventTime;
-                }
-                if (role == RoleTypes__Enum::Scientist) {
-                    app::ScientistRole* scientistRole = (app::ScientistRole*)playerRole;
-                    float charge = options.GetFloat(app::FloatOptionNames__Enum::ScientistBatteryCharge, 1.0F);
-                    if (scientistRole->fields.currentCharge > charge)
-                        scientistRole->fields.currentCharge = charge;
-                }
-                if (role == RoleTypes__Enum::Shapeshifter) {
-                    /*app::ShapeshifterRole* shapeshifterRole = (app::ShapeshifterRole*)playerRole;
-                    float shiftTime = options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F);
-                    if (shapeshifterRole->fields.durationSecondsRemaining > shiftTime)
-                        shapeshifterRole->fields.durationSecondsRemaining = shiftTime;*/
-                }
-
-                int emergencies = options.GetInt(app::Int32OptionNames__Enum::NumEmergencyMeetings, 1);
-                if (IsInGame() && (*Game::pLocalPlayer)->fields.RemainingEmergencies > emergencies)
-                    (*Game::pLocalPlayer)->fields.RemainingEmergencies = emergencies;
             }
 
             static int weaponsDelay = 0;
@@ -414,7 +362,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (weaponsDelay <= 0 && IsInGame()) {
                 if (State.PlayWeaponsAnimation == true) {
                     State.rpcQueue.push(new RpcPlayAnimation(6));
-                    weaponsDelay = 50; //Should be approximately 1 second
+                    weaponsDelay = GetFps(); //Should be approximately 1 second
                 }
             }
             else {
@@ -449,12 +397,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             if (State.CycleTimer < 0.2f) {
                 State.CycleTimer = 0.2f;
-                State.Save();
             }
 
             if (State.CycleDuration <= 10) {
                 State.CycleDuration = 10;
-                State.Save();
             }
 
             // Resolve missing host name when joining through a code / invite using GetHostUsername which is known to work
@@ -464,15 +410,17 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.LobbyHistory.front().HostName = RemoveHtmlTags(host);
             }
 
-            static int joinDelay = 0;
-            if (joinDelay > 0) joinDelay--;
-            if (State.AutoJoinLobby && joinDelay <= 0) {
+            // static int joinDelay = 0;
+            // if (joinDelay > 0) joinDelay--;
+            if (State.JoinLobby/* && joinDelay <= 0*/) {
+                AmongUsClient_ExitGame(*Game::pAmongUsClient, DisconnectReasons__Enum::ExitGame, NULL);
                 void* routine = AmongUsClient_CoFindGameInfoFromCodeAndJoin(*Game::pAmongUsClient,
-                    GameCode_GameNameToInt(convert_to_string(State.AutoJoinLobbyCode), NULL),
+                    GameCode_GameNameToInt(convert_to_string(State.JoinLobbyCode), NULL),
                     NULL);
-                MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
-                State.AutoJoinLobby = false;
-                joinDelay = 100;
+                if (routine != NULL)
+                    MonoBehaviour_StartCoroutine((MonoBehaviour*)*Game::pAmongUsClient, routine, NULL);
+                State.JoinLobby = false;
+                // joinDelay = 100;
             }
 
             static int reportDelay = 0;
@@ -522,8 +470,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (State.CycleBetweenPlayers)
                 State.Cycler = false;
 
-            if (State.Cycler && (!State.InMeeting || State.CycleInMeeting) && State.CanChangeOutfit) {
-                if (!State.SafeMode && State.CycleName && cycleNameDelay <= 0) {
+            if ((!State.InMeeting || State.CycleInMeeting) && State.CanChangeOutfit) {
+                if (State.Cycler && !State.SafeMode && State.CycleName && cycleNameDelay <= 0) {
                     std::vector<std::string> validNames;
                     for (std::string i : State.cyclerUserNames) {
                         if (!IsNameValid(i)) continue; // Screw you, g0aty from the past
@@ -556,20 +504,25 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     }
                     cycleNameDelay = int(State.CycleTimer * GetFps()); // Far better
                 }
-                else cycleNameDelay--;
+                else if (cycleNameDelay > 0) cycleNameDelay--;
 
-                if (colorChangeCycleDelay <= 0 && State.RandomColor && !State.activeImpersonation) {
-                    if ((IsHost() || !State.SafeMode) && State.CycleForEveryone) {
+                if (colorChangeCycleDelay <= 0 && ((State.Cycler && State.RandomColor) || State.ColorCycledPlayers.size() != 0)) {
+                    if ((IsHost() || !State.SafeMode) && (State.CycleForEveryone || State.ColorCycledPlayers.size() != 0)) {
                         for (auto p : GetAllPlayerControl()) {
+                            bool isColorCycling = std::find(State.ColorCycledPlayers.begin(), State.ColorCycledPlayers.end(), p->fields.PlayerId) != State.ColorCycledPlayers.end();
+                            if (!State.CycleForEveryone && !isColorCycling &&
+                                !(State.Cycler && State.RandomColor && p == *Game::pLocalPlayer)) continue;
+                            if (p == *Game::pLocalPlayer && State.activeImpersonation) continue;
+
                             PlayerControl_RpcSetColor(p, GetRandomColorId(), NULL);
                         }
                     }
                     else PlayerControl_CmdCheckColor(*Game::pLocalPlayer, GetRandomColorId(), NULL);
                     colorChangeCycleDelay = int(State.CycleTimer * GetFps()); //idk how long this is
                 }
-                else colorChangeCycleDelay--;
+                else if (colorChangeCycleDelay > 0) colorChangeCycleDelay--;
 
-                if (changeCycleDelay <= 0 && !State.activeImpersonation && (State.RandomHat || State.RandomSkin || State.RandomVisor || State.RandomPet || State.RandomNamePlate)) {
+                if (State.Cycler && changeCycleDelay <= 0 && !State.activeImpersonation && (State.RandomHat || State.RandomSkin || State.RandomVisor || State.RandomPet || State.RandomNamePlate)) {
                     if (State.RandomHat) {
                         std::vector availableHats = { "hat_NoHat", "hat_AbominalHat", "hat_anchor", "hat_antenna", "hat_Antenna_Black", "hat_arrowhead", "hat_Astronaut-Blue", "hat_Astronaut-Cyan", "hat_Astronaut-Orange", "hat_astronaut", "hat_axe", "hat_babybean", "hat_Baguette", "hat_BananaGreen", "hat_BananaPurple", "hat_bandanaWBY", "hat_Bandana_Blue", "hat_Bandana_Green", "hat_Bandana_Pink", "hat_Bandana_Red", "hat_Bandana_White", "hat_Bandana_Yellow", "hat_baseball_Black", "hat_baseball_Green", "hat_baseball_Lightblue", "hat_baseball_LightGreen", "hat_baseball_Lilac", "hat_baseball_Orange", "hat_baseball_Pink", "hat_baseball_Purple", "hat_baseball_Red", "hat_baseball_White", "hat_baseball_Yellow", "hat_Basketball", "hat_bat_crewcolor", "hat_bat_green", "hat_bat_ice", "hat_beachball", "hat_Beanie_Black", "hat_Beanie_Blue", "hat_Beanie_Green", "hat_Beanie_Lightblue", "hat_Beanie_LightGreen", "hat_Beanie_LightPurple", "hat_Beanie_Pink", "hat_Beanie_Purple", "hat_Beanie_White", "hat_Beanie_Yellow", "hat_bearyCold", "hat_bone", "hat_Bowlingball", "hat_brainslug", "hat_BreadLoaf", "hat_bucket", "hat_bucketHat", "hat_bushhat", "hat_Butter", "hat_caiatl", "hat_caitlin", "hat_candycorn", "hat_captain", "hat_cashHat", "hat_cat_grey", "hat_cat_orange", "hat_cat_pink", "hat_cat_snow", "hat_chalice", "hat_cheeseBleu", "hat_cheeseMoldy", "hat_cheeseSwiss", "hat_ChefWhiteBlue", "hat_cherryOrange", "hat_cherryPink", "hat_Chocolate", "hat_chocolateCandy", "hat_chocolateMatcha", "hat_chocolateVanillaStrawb", "hat_clagger", "hat_clown_purple", "hat_comper", "hat_croissant", "hat_crownBean", "hat_crownDouble", "hat_crownTall", "hat_CuppaJoe", "hat_Deitied", "hat_devilhorns_black", "hat_devilhorns_crewcolor", "hat_devilhorns_green", "hat_devilhorns_murky", "hat_devilhorns_white", "hat_devilhorns_yellow", "hat_Doc_black", "hat_Doc_Orange", "hat_Doc_Purple", "hat_Doc_Red", "hat_Doc_White", "hat_Dodgeball", "hat_Dorag_Black", "hat_Dorag_Desert", "hat_Dorag_Jungle", "hat_Dorag_Purple", "hat_Dorag_Sky", "hat_Dorag_Snow", "hat_Dorag_Yellow", "hat_doubletophat", "hat_DrillMetal", "hat_DrillStone", "hat_DrillWood", "hat_EarmuffGreen", "hat_EarmuffsPink", "hat_EarmuffsYellow", "hat_EarnmuffBlue", "hat_eggGreen", "hat_eggYellow", "hat_enforcer", "hat_erisMorn", "hat_fairywings", "hat_fishCap", "hat_fishhed", "hat_fishingHat", "hat_flowerpot", "hat_frankenbolts", "hat_frankenbride", "hat_fungleFlower", "hat_geoff", "hat_glowstick", "hat_glowstickCyan", "hat_glowstickOrange", "hat_glowstickPink", "hat_glowstickPurple", "hat_glowstickYellow", "hat_goggles", "hat_Goggles_Black", "hat_Goggles_Chrome", "hat_GovtDesert", "hat_GovtHeadset", "hat_halospartan", "hat_hardhat", "hat_Hardhat_black", "hat_Hardhat_Blue", "hat_Hardhat_Green", "hat_Hardhat_Orange", "hat_Hardhat_Pink", "hat_Hardhat_Purple", "hat_Hardhat_Red", "hat_Hardhat_White", "hat_HardtopHat", "hat_headslug_Purple", "hat_headslug_Red", "hat_headslug_White", "hat_headslug_Yellow", "hat_Heart", "hat_heim", "hat_Herohood_Black", "hat_Herohood_Blue", "hat_Herohood_Pink", "hat_Herohood_Purple", "hat_Herohood_Red", "hat_Herohood_Yellow", "hat_hl_fubuki", "hat_hl_gura", "hat_hl_korone", "hat_hl_marine", "hat_hl_mio", "hat_hl_moona", "hat_hl_okayu", "hat_hl_pekora", "hat_hl_risu", "hat_hl_watson", "hat_hunter", "hat_IceCreamMatcha", "hat_IceCreamMint", "hat_IceCreamNeo", "hat_IceCreamStrawberry", "hat_IceCreamUbe", "hat_IceCreamVanilla", "hat_Igloo", "hat_Janitor", "hat_jayce", "hat_jinx", "hat_killerplant", "hat_lilShroom", "hat_maraSov", "hat_mareLwyd", "hat_military", "hat_MilitaryWinter", "hat_MinerBlack", "hat_MinerYellow", "hat_mira_bush", "hat_mira_case", "hat_mira_cloud", "hat_mira_flower", "hat_mira_flower_red", "hat_mira_gem", "hat_mira_headset_blue", "hat_mira_headset_pink", "hat_mira_headset_yellow", "hat_mira_leaf", "hat_mira_milk", "hat_mira_sign_blue", "hat_mohawk_bubblegum", "hat_mohawk_bumblebee", "hat_mohawk_purple_green", "hat_mohawk_rainbow", "hat_mummy", "hat_mushbuns", "hat_mushroomBeret", "hat_mysteryBones", "hat_NewYear2023", "hat_OrangeHat", "hat_osiris", "hat_pack01_Astronaut0001", "hat_pack02_Tengallon0001", "hat_pack02_Tengallon0002", "hat_pack03_Stickynote0004", "hat_pack04_Geoffmask0001", "hat_pack06holiday_candycane0001", "hat_PancakeStack", "hat_paperhat", "hat_Paperhat_Black", "hat_Paperhat_Blue", "hat_Paperhat_Cyan", "hat_Paperhat_Lightblue", "hat_Paperhat_Pink", "hat_Paperhat_Yellow", "hat_papermask", "hat_partyhat", "hat_pickaxe", "hat_Pineapple", "hat_PizzaSliceHat", "hat_pk01_BaseballCap", "hat_pk02_Crown", "hat_pk02_Eyebrows", "hat_pk02_HaloHat", "hat_pk02_HeroCap", "hat_pk02_PipCap", "hat_pk02_PlungerHat", "hat_pk02_ScubaHat", "hat_pk02_StickminHat", "hat_pk02_StrawHat", "hat_pk02_TenGallonHat", "hat_pk02_ThirdEyeHat", "hat_pk02_ToiletPaperHat", "hat_pk02_Toppat", "hat_pk03_Fedora", "hat_pk03_Goggles", "hat_pk03_Headphones", "hat_pk03_Security1", "hat_pk03_StrapHat", "hat_pk03_Traffic", "hat_pk04_Antenna", "hat_pk04_Archae", "hat_pk04_Balloon", "hat_pk04_Banana", "hat_pk04_Bandana", "hat_pk04_Beanie", "hat_pk04_Bear", "hat_pk04_BirdNest", "hat_pk04_CCC", "hat_pk04_Chef", "hat_pk04_DoRag", "hat_pk04_Fez", "hat_pk04_GeneralHat", "hat_pk04_HunterCap", "hat_pk04_JungleHat", "hat_pk04_MinerCap", "hat_pk04_MiniCrewmate", "hat_pk04_Pompadour", "hat_pk04_RamHorns", "hat_pk04_Slippery", "hat_pk04_Snowman", "hat_pk04_Vagabond", "hat_pk04_WinterHat", "hat_pk05_Burthat", "hat_pk05_Cheese", "hat_pk05_cheesetoppat", "hat_pk05_Cherry", "hat_pk05_davehat", "hat_pk05_Egg", "hat_pk05_Ellie", "hat_pk05_EllieToppat", "hat_pk05_Ellryhat", "hat_pk05_Fedora", "hat_pk05_Flamingo", "hat_pk05_FlowerPin", "hat_pk05_GeoffreyToppat", "hat_pk05_Helmet", "hat_pk05_HenryToppat", "hat_pk05_Macbethhat", "hat_pk05_Plant", "hat_pk05_RHM", "hat_pk05_Svenhat", "hat_pk05_Wizardhat", "hat_pk06_Candycanes", "hat_pk06_ElfHat", "hat_pk06_Lights", "hat_pk06_Present", "hat_pk06_Reindeer", "hat_pk06_Santa", "hat_pk06_Snowman", "hat_pk06_tree", "hat_pkHW01_BatWings", "hat_pkHW01_CatEyes", "hat_pkHW01_Horns", "hat_pkHW01_Machete", "hat_pkHW01_Mohawk", "hat_pkHW01_Pirate", "hat_pkHW01_PlagueHat", "hat_pkHW01_Pumpkin", "hat_pkHW01_ScaryBag", "hat_pkHW01_Witch", "hat_pkHW01_Wolf", "hat_Plunger_Blue", "hat_Plunger_Yellow", "hat_police", "hat_Ponytail", "hat_Pot", "hat_Present", "hat_Prototype", "hat_pusheenGreyHat", "hat_PusheenicornHat", "hat_pusheenMintHat", "hat_pusheenPinkHat", "hat_pusheenPurpleHat", "hat_pusheenSitHat", "hat_pusheenSleepHat", "hat_pyramid", "hat_rabbitEars", "hat_Ramhorn_Black", "hat_Ramhorn_Red", "hat_Ramhorn_White", "hat_ratchet", "hat_Records", "hat_RockIce", "hat_RockLava", "hat_Rubberglove", "hat_Rupert", "hat_russian", "hat_saint14", "hat_sausage", "hat_savathun", "hat_schnapp", "hat_screamghostface", "hat_Scrudge", "hat_sharkfin", "hat_shaxx", "hat_shovel", "hat_SlothHat", "hat_SnowbeanieGreen", "hat_SnowbeanieOrange", "hat_SnowBeaniePurple", "hat_SnowbeanieRed", "hat_Snowman", "hat_Soccer", "hat_Sorry", "hat_starBalloon", "hat_starhorse", "hat_Starless", "hat_StarTopper", "hat_stethescope", "hat_StrawberryLeavesHat", "hat_TenGallon_Black", "hat_TenGallon_White", "hat_ThomasC", "hat_tinFoil", "hat_titan", "hat_ToastButterHat", "hat_tombstone", "hat_tophat", "hat_ToppatHair", "hat_towelwizard", "hat_Traffic_Blue", "hat_traffic_purple", "hat_Traffic_Red", "hat_Traffic_Yellow", "hat_Unicorn", "hat_vi", "hat_viking", "hat_Visor", "hat_Voleyball", "hat_w21_candycane_blue", "hat_w21_candycane_bubble", "hat_w21_candycane_chocolate", "hat_w21_candycane_mint", "hat_w21_elf_pink", "hat_w21_elf_swe", "hat_w21_gingerbread", "hat_w21_holly", "hat_w21_krampus", "hat_w21_lights_white", "hat_w21_lights_yellow", "hat_w21_log", "hat_w21_mistletoe", "hat_w21_mittens", "hat_w21_nutcracker", "hat_w21_pinecone", "hat_w21_present_evil", "hat_w21_present_greenyellow", "hat_w21_present_redwhite", "hat_w21_present_whiteblue", "hat_w21_santa_evil", "hat_w21_santa_green", "hat_w21_santa_mint", "hat_w21_santa_pink", "hat_w21_santa_white", "hat_w21_santa_yellow", "hat_w21_snowflake", "hat_w21_snowman", "hat_w21_snowman_evil", "hat_w21_snowman_greenred", "hat_w21_snowman_redgreen", "hat_w21_snowman_swe", "hat_w21_winterpuff", "hat_wallcap", "hat_warlock", "hat_whitetophat", "hat_wigJudge", "hat_wigTall", "hat_WilfordIV", "hat_Winston", "hat_WinterGreen", "hat_WinterHelmet", "hat_WinterRed", "hat_WinterYellow", "hat_witch_green", "hat_witch_murky", "hat_witch_pink", "hat_witch_white", "hat_wolf_grey", "hat_wolf_murky", "hat_Zipper" };
                         if (!State.SafeMode && State.CycleForEveryone) {
@@ -617,7 +570,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     }
                     changeCycleDelay = int(State.CycleTimer * GetFps());
                 }
-                else changeCycleDelay--;
+                else if (changeCycleDelay > 0) changeCycleDelay--;
             }
 
             if ((IsHost() || !State.SafeMode) && State.ForceColorForEveryone)
@@ -810,6 +763,73 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         }
                         slackerTimer = 0.f;
                     }
+                }
+
+                if (IsInGame() && (*Game::pShipStatus) != NULL) {
+                    const std::vector<const char*> SHIPVENTS = { "Admin", "Hallway", "Cafeteria", "Electrical", "Upper Engine", "Security", "Medbay", "Weapons", "Lower Reactor", "Lower Engine", "Shields", "Upper Reactor", "Upper Navigation", "Lower Navigation" };
+                    const std::vector<const char*> HQVENTS = { "Balcony", "Cafeteria", "Reactor", "Laboratory", "Office", "Admin", "Greenhouse", "Medbay", "Decontamination", "Locker Room", "Launchpad" };
+                    const std::vector<const char*> PBVENTS = { "Security", "Electrical", "O2", "Communications", "Office", "Admin", "Laboratory", "Lava Pool", "Storage", "Right Seismic", "Left Seismic", "Outside Admin" };
+                    const std::vector<const char*> AIRSHIPVENTS = { "Vault", "Cockpit", "Viewing Deck", "Engine", "Kitchen", "Lower Main Hall", "Upper Main Hall", "Right Gap Room", "Left Gap Room", "Showers", "Records", "Cargo Bay" };
+                    const std::vector<const char*> FUNGLEVENTS = { "Communications", "Kitchen", "Lookout", "Outside Dorm", "Laboratory", "Reactor", "Jungle (Laboratory)", "Jungle (Greenhouse)", "Splash Zone", "Cafeteria" };
+
+                    std::vector<const char*> allVents;
+                    switch (State.mapType) {
+                    case Settings::MapType::Ship:
+                        allVents = SHIPVENTS;
+                        break;
+                    case Settings::MapType::Hq:
+                        allVents = HQVENTS;
+                        break;
+                    case Settings::MapType::Pb:
+                        allVents = PBVENTS;
+                        break;
+                    case Settings::MapType::Airship:
+                        allVents = AIRSHIPVENTS;
+                        break;
+                    case Settings::MapType::Fungle:
+                        allVents = FUNGLEVENTS;
+                        break;
+                    }
+                    int hqOffset = (int)(State.mapType == Settings::MapType::Hq);
+
+                    static float ventTpDelay = 0.f;
+                    if (ventTpDelay <= 0.f) {
+                        if (State.SpamVentTpEveryoneRandom || State.spamRandomVentTpPlayers.size() != 0) {
+                            for (auto p : GetAllPlayerControl()) {
+                                if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
+                                if (!State.SpamVentTpEveryoneRandom) {
+                                    auto it = std::find(State.spamRandomVentTpPlayers.begin(), State.spamRandomVentTpPlayers.end(), p->fields.PlayerId);
+                                    if (it == State.spamRandomVentTpPlayers.end()) continue;
+                                }
+
+                                int ventId = randi(0 + hqOffset, (int)allVents.size() - 1 + hqOffset);
+
+                                if (IsHost() || !State.SafeMode)
+                                    PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, ventId, NULL);
+                                else
+                                    SendBootVentNonHost(p, ventId);
+                            }
+                        }
+
+                        else if (State.SpamVentTpEveryone || State.spamVentTpPlayers.size() != 0) {
+                            for (auto p : GetAllPlayerControl()) {
+                                if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
+
+                                bool isSpamVentedSeparately = State.spamVentTpPlayers.find(p->fields.PlayerId) != State.spamVentTpPlayers.end();
+
+                                if (!State.SpamVentTpEveryone && !isSpamVentedSeparately) continue;
+
+                                int ventId = isSpamVentedSeparately ? State.spamVentTpPlayers.at(p->fields.PlayerId) : State.SelectedVentId;
+
+                                if (IsHost() || !State.SafeMode)
+                                    PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, ventId, NULL);
+                                else
+                                    SendBootVentNonHost(p, ventId);
+                            }
+                        }
+                        ventTpDelay = 0.75f;
+                    }
+                    else ventTpDelay -= Time_get_deltaTime(NULL);
                 }
 
                 /*if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount && !autoStartedGame) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
@@ -1223,6 +1243,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         State.trackers_amount = (int)GetRoleCount(RoleType::Tracker);
                         State.noisemakers_amount = (int)GetRoleCount(RoleType::Noisemaker);
                         State.detectives_amount = (int)GetRoleCount(RoleType::Detective);
+                        State.judges_amount = (int)GetRoleCount(RoleType::Judge);
                         State.shapeshifters_amount = (int)GetRoleCount(RoleType::Shapeshifter);
                         State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
                         State.vipers_amount = (int)GetRoleCount(RoleType::Viper);
@@ -1238,7 +1259,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                             }
                         }
                         else {
-                            if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.crewmates_amount >= (int)GetAllPlayerData().size() - 1) {
+                            if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.judges_amount + State.crewmates_amount >= (int)GetAllPlayerData().size() - 1) {
                                 State.assignedRoles[index] = RoleType::Random;
                                 State.AutoHostRole = false;
                             }
@@ -1263,7 +1284,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     else if (IsInLobby()) {
                         State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 1, false));
                     }
-                    State.murderDelay = 5;
+                    State.murderDelay = GetFps() / 12;
                     State.murderCount--;
                 }
                 else {
@@ -1274,39 +1295,53 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             else State.murderDelay--;
         }
 
-        /*if (State.farmLoop) {
-            auto selectedPlayer = State.selectedPlayer.validate();
-            if (State.farmDelay <= 0) {
-                if (State.farmCount > 0 && selectedPlayer.has_value() && !selectedPlayer.get_PlayerData()->fields.Disconnected) {
-                    LOG_DEBUG("Executing RpcMurderLoop for level farm");
-                    State.taskRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, selectedPlayer.get_PlayerControl(), 2, false));
-                    State.farmDelay = 2;
+        if (State.farmLoop) {
+            if (State.farmDelay <= 0 && *Game::pLocalPlayer != NULL) {
+                if (State.farmCount > 0) {                    
+                    uint8_t gameDataTag = 5, rpcFlag = 2;
+
+                    auto writer = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+                    MessageWriter_StartMessage(writer, gameDataTag, NULL);
+                    MessageWriter_WriteInt32(writer, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+
+                    for (int i = 0; i < 10; ++i) {
+                        MessageWriter_StartMessage(writer, rpcFlag, NULL);
+                        MessageWriter_WritePacked(writer, (*Game::pLocalPlayer)->fields._.NetId, NULL);
+                        MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::MurderPlayer, NULL);
+                        MessageWriter_WriteInt32(writer, 0, NULL);
+                        MessageWriter_WriteInt32(writer, (int32_t)MurderResultFlags__Enum::Succeeded, NULL);
+                        MessageWriter_EndMessage(writer, NULL);
+                    }
+
+                    MessageWriter_EndMessage(writer, NULL);
+                    InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+                    MessageWriter_Recycle(writer, NULL);
+
+                    State.farmDelay = GetFps() / 60;
                     State.farmCount--;
                 }
                 else {
-                    LOG_DEBUG("Stopped level farm");
                     State.farmLoop = false;
                     State.farmCount = 0;
-                    State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
-                    State.rpcQueue.push(new SetRole(RoleTypes__Enum::Impostor));
+                    PlayerControl_RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor, true, NULL);
+                    RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
+                    GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorsByKill, false, NULL);
                 }
             }
             else State.farmDelay--;
-        }*/
+        }
 
         if (State.suicideLoop) {
             auto selectedPlayer = State.selectedPlayer.validate();
             if (State.suicideDelay <= 0) {
                 if (State.suicideCount > 0 && selectedPlayer.has_value() && !selectedPlayer.get_PlayerData()->fields.Disconnected) {
                     if (IsInGame()) {
-                        State.rpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl(),
-                            selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+                        State.rpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl()));
                     }
                     else if (IsInLobby()) {
-                        State.lobbyRpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl(),
-                            selectedPlayer.get_PlayerControl()->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
+                        State.lobbyRpcQueue.push(new RpcMurderPlayer(selectedPlayer.get_PlayerControl(), selectedPlayer.get_PlayerControl()));
                     }
-                    State.suicideDelay = 15;
+                    State.suicideDelay = GetFps() / 12;
                     State.suicideCount--;
                 }
                 else {
@@ -1352,20 +1387,62 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
         AutoRepairSabotageDelay--;
     }
 
-    if (State.FollowerCam != nullptr) {
-        auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
+    if (State.FollowerCam != nullptr && State.shadowCollab != nullptr) {
+        auto hud = Game::HudManager.GetInstance();
+        auto chatState = hud->fields.Chat->fields.state;
         bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
+
+        auto fullScreen = hud->fields.FullScreen;
+        Color fullScreenCol = fullScreen != NULL ? SpriteRenderer_get_color(fullScreen, NULL) : Color(1.f, 1.f, 1.f, 0.f);
+        bool isFullScreenActive = fullScreen != NULL &&
+            fullScreenCol.r == 0.f && fullScreenCol.g == 0.f && fullScreenCol.b == 0.f &&
+            GameObject_GetActive(Component_get_gameObject((Component_1*)fullScreen, NULL), NULL);
+
+        auto gameMenu = hud->fields.GameMenu;
+        bool isGameMenuActive = gameMenu != NULL &&
+            GameObject_GetActive(Component_get_gameObject((Component_1*)gameMenu, NULL), NULL);
+
+        bool isKillOverlayActive = hud->fields.KillOverlay != NULL &&
+            KillOverlay_get_IsOpen((KillOverlay*)hud->fields.KillOverlay, NULL);
+
         float oldCamHeight = Camera_get_orthographicSize(State.FollowerCam, NULL);
-        float camHeight = (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) ?
+        // State.EnableZoom_ResolutionSetFlag = false;
+
+        auto mig = MatchInfoGuide_get_Instance(NULL);
+        bool migOpen = mig != NULL && MatchInfoGuide_get_IsActive(mig, NULL);
+
+        bool shouldEnableZoom = (!State.InMeeting && !State.InExileUI &&
+            !chatOpen && !migOpen && !isFullScreenActive && !isGameMenuActive && !isKillOverlayActive &&
+            (State.GameLoaded || (IsInLobby() && State.LobbyTimer <= 600.f - (Time_get_deltaTime(NULL) * 20) )) && !State.PanicMode);
+        // from my testing, deltaTime * 20 doesn't cause UI bugs in the lobby
+        float camHeight = shouldEnableZoom && State.EnableZoom ?
             (State.CameraHeight * 3) : 3.f;
+
         float del = camHeight - oldCamHeight;
-        float step = std::abs(del) * Time_get_deltaTime(NULL) * 10;
-        if (del < 0) {
-            Camera_set_orthographicSize(State.FollowerCam, (std::max)(camHeight, oldCamHeight - step), NULL);
+        float step = std::abs(del) * Time_get_deltaTime(NULL) * 12;
+
+        float newCamHeight = 0.f;
+        float precision = 1e-6f;
+
+        if (!State.EnableZoom_SmoothZoom || !shouldEnableZoom) newCamHeight = camHeight;
+        else if (del < 0.f) newCamHeight = (std::max)(camHeight, oldCamHeight - step);
+        else if (del > 0.f) newCamHeight = (std::min)(camHeight, oldCamHeight + step);
+
+        if (std::abs(del) > precision) { // minimize floating point errors
+            State.HasRefreshedUI = false;
+            Camera_set_orthographicSize(State.FollowerCam, newCamHeight, NULL);
+            // State.EnableZoom_PreResolutionSetCamHeight = newCamHeight;
+            float aspect = Camera_get_aspect(State.FollowerCam, NULL);
+            Camera_set_orthographicSize(State.shadowCollab->fields.ShadowCamera, newCamHeight, NULL);
+            Camera_set_orthographicSize(hud->fields.UICamera, newCamHeight, NULL);
+            auto shadowQuadTransform = Component_get_transform((Component_1*)State.shadowCollab->fields.ShadowQuad, NULL);
+            Transform_set_localScale(shadowQuadTransform, { newCamHeight * aspect * 2.f, newCamHeight * 2.f, 0.f }, NULL);
+            // rescale most UI elements accordingly (done in KeyboardJoystick.cpp)
         }
-        if (del > 0) {
-            Camera_set_orthographicSize(State.FollowerCam, (std::min)(camHeight, oldCamHeight + step), NULL);
+        else if (!State.HasRefreshedUI) {
+            State.HasRefreshedUI = true;
         }
+
         /*if (State.EnableZoom && !State.InMeeting && !chatOpen && (State.GameLoaded || IsInLobby()) && !State.PanicMode) //chat button disappears after meeting
             Camera_set_orthographicSize(State.FollowerCam, State.CameraHeight * 3, NULL);
         else
@@ -1390,20 +1467,23 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             State.prevCamPos = cameraVector3;
         }
 
-        BYTE arr[256];
-        if (GetKeyboardState(arr) && !State.ChatFocused)
+        auto kbjPlayer = (Player*)KeyboardJoystick__TypeInfo->static_fields->player;
+        // BYTE arr[256];
+        if (/*GetKeyboardState(arr) && */kbjPlayer != NULL && !State.ChatFocused)
         {
+            // adhere to the game's keybinds, which can be changed in game
+
             float xOffset = 0, yOffset = 0;
-            if ((arr[0x57] & 0x80) != 0) {
+            if (Player_GetButton(kbjPlayer, 44, NULL) /*(arr[0x57] & 0x80) != 0*/) {
                 yOffset = 1;
             }
-            if ((arr[0x41] & 0x80) != 0) {
+            if (Player_GetButton(kbjPlayer, 39, NULL) /*(arr[0x41] & 0x80) != 0*/) {
                 xOffset = -1;
             }
-            if ((arr[0x53] & 0x80) != 0) {
+            if (Player_GetButton(kbjPlayer, 42, NULL) /*(arr[0x53] & 0x80) != 0*/) {
                 yOffset = -1;
             }
-            if ((arr[0x44] & 0x80) != 0)
+            if (Player_GetButton(kbjPlayer, 40, NULL) /*(arr[0x44] & 0x80) != 0*/)
             {
                 xOffset = 1;
             }
@@ -1418,10 +1498,15 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
         Transform_set_position(cameraTransform, { State.camPos.x, State.camPos.y }, NULL);
     }
+
+    if (State.OverflowTimer > 0.f) {
+        State.OverflowTimer -= Time_get_deltaTime(NULL);
+        if (State.OverflowTimer < 0.f) State.OverflowTimer = 0.f;
+    }
 }
 
 void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnGameJoined executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnGameJoined executed", false);
     try {
         State.AutoJoinLobby = false;
         if (!State.PanicMode) {
@@ -1472,7 +1557,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 }
 
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnPlayerLeft executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnPlayerLeft executed", false);
     try {
         State.BlinkPlayersTab = true;
         if (data->fields.Character) { // Don't use Object_1_IsNotNull().
@@ -1496,13 +1581,25 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
             if (State.modUsers.find(playerId) != State.modUsers.end())
                 State.modUsers.erase(playerId);
 
-            if (playerId < State.assignedRolesPlayer.size()) {
-                State.assignedRolesPlayer[playerId] = nullptr;
-                State.assignedRoles[playerId] = RoleType::Random;
+            if (State.spamVentTpPlayers.find(playerId) != State.spamVentTpPlayers.end())
+                State.spamVentTpPlayers.erase(playerId);
+
+            auto it = std::find(State.spamRandomVentTpPlayers.begin(), State.spamRandomVentTpPlayers.end(), playerId);
+            if (it != State.spamRandomVentTpPlayers.end())
+                State.spamRandomVentTpPlayers.erase(it);
+
+            auto colorCycleIt = std::find(State.ColorCycledPlayers.begin(), State.ColorCycledPlayers.end(), playerId);
+            if (colorCycleIt != State.ColorCycledPlayers.end()) {
+                State.ColorCycledPlayers.erase(colorCycleIt);
             }
 
-            if (State.modUsers.find(playerId) != State.modUsers.end())
-                State.modUsers.erase(playerId);
+            auto voteIt = std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), playerId);
+            if (voteIt != State.VoteImmunePlayers.end()) {
+                State.VoteImmunePlayers.erase(voteIt);
+
+                if (State.VoteRedirectTargets.find(playerId) != State.VoteRedirectTargets.end())
+                    State.VoteRedirectTargets.erase(playerId);
+            }
 
             if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                 synchronized(Replay::replayEventMutex) {
@@ -1520,10 +1617,11 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
         LOG_ERROR("Exception occurred in AmongUsClient_OnPlayerLeft (InnerNetClient)");
     }
     AmongUsClient_OnPlayerLeft(__this, data, reason, method);
+    State.MIG_ThemeChanged = true;
 }
 
 void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnPlayerJoined executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnPlayerJoined executed", false);
     State.BlinkPlayersTab = true;
     AmongUsClient_OnPlayerJoined(__this, data, method);
 }
@@ -1562,7 +1660,7 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
 }
 
 void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dCustomNetworkTransform_SnapTo executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dCustomNetworkTransform_SnapTo executed", false);
     /*try {//Leave this out until we fix it.
         if (!State.PanicMode) {
             if (!IsInGame()) {
@@ -1591,7 +1689,7 @@ void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 posi
 }
 
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResult, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dAmongUsClient_OnGameEnd executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnGameEnd executed", false);
     try {
         if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
             RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
@@ -1653,8 +1751,6 @@ void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResul
         if (count == 0) LOG_DEBUG("No one was a winner in the game.");
         else LOG_DEBUG(winnersText.substr(0, (size_t)winnersText.size() - 2));
 
-        State.VoteImmunePlayers.clear();
-
         onGameEnd();
     }
     catch (...) {
@@ -1664,7 +1760,7 @@ void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResul
 }
 
 void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dInnerNetClient_DisconnectInternal executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_DisconnectInternal executed", false);
     try {
         // IsInGame() || IsInLobby()
         if (__this->fields.GameState == InnerNetClient_GameStates__Enum::Started
@@ -1683,7 +1779,7 @@ void dInnerNetClient_DisconnectInternal(InnerNetClient* __this, DisconnectReason
 }
 
 void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons__Enum reason, String* stringReason, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dInnerNetClient_EnqueueDisconnect executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_EnqueueDisconnect executed", false);
     try {
         std::string reasonStr = convert_from_string(stringReason);
         if (reason == DisconnectReasons__Enum::Error &&
@@ -1699,14 +1795,14 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
 }
 
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dGameManager_RpcEndGame executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dGameManager_RpcEndGame executed", false);
     if (!State.PanicMode && IsHost() && State.NoGameEnd)
         return;
     GameManager_RpcEndGame(__this, endReason, showAd, method);
 }
 
 void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* killer, NetworkedPlayerInfo* victim, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dKillOverlay_ShowKillAnimation_1 executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dKillOverlay_ShowKillAnimation_1 executed", false);
     try {
         if (!State.PanicMode && State.DisableKillAnimation)
             return;
@@ -1718,7 +1814,7 @@ void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* 
 }
 
 float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dLogicOptions_GetKillDistance executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLogicOptions_GetKillDistance executed", false);
     try {
         if (!State.PanicMode) {
             State.GameKillDistance = LogicOptions_GetKillDistance(__this, method);
@@ -1735,9 +1831,9 @@ float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
 }
 
 void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dLadder_SetDestinationCooldown executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dLadder_SetDestinationCooldown executed", false);
     try {
-        if (!State.PanicMode && State.NoAbilityCD) {
+        if (!State.PanicMode && State.NoLadderZiplineCooldown) {
             __this->fields._CoolDown_k__BackingField = 0.f;
             return;
         }
@@ -1749,7 +1845,7 @@ void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
 }
 
 void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dVoteBanSystem_AddVote executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dVoteBanSystem_AddVote executed", false);
     try {
         if (clientId == (*Game::pLocalPlayer)->fields._.OwnerId)
             State.VoteKicks++;
@@ -1783,7 +1879,7 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
 }*/
 
 void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dDisconnectPopup_DoShow executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dDisconnectPopup_DoShow executed", false);
     DisconnectPopup_DoShow(__this, method);
     bool shouldCopyCode = State.AutoCopyLobbyCode && State.LastLobbyJoined != "";
     if (!State.PanicMode || State.TempPanicMode) {
@@ -1820,6 +1916,6 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
 }
 
 bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dGameManager_DidImpostorsWin executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dGameManager_DidImpostorsWin executed", false);
     return GameManager_DidImpostorsWin(__this, reason, method);
 }

@@ -55,7 +55,7 @@ void ApplyTheme()
 	style.Colors[ImGuiCol_WindowBg] = BG(0.15f);
 	style.Colors[ImGuiCol_ChildBg] = BG(0.15f);
 	style.Colors[ImGuiCol_PopupBg] = BG(0.230f, 0.9f);
-	style.Colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+	style.Colors[ImGuiCol_Border] = HI(1.00f);
 	style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 	style.Colors[ImGuiCol_FrameBg] = BG(0.230f, 1.00f);
 	style.Colors[ImGuiCol_FrameBgHovered] = MED(0.78f);
@@ -126,9 +126,9 @@ void ApplyTheme()
 
 	style.WindowTitleAlign.x = 0.50f;
 
-	style.Colors[ImGuiCol_Border] = ImVec4(0.f, 0.f, 0.f, 0.f);
+	// style.Colors[ImGuiCol_Border] = HI(1.00f);
 	style.FrameBorderSize = 0.0f;
-	style.WindowBorderSize = 0.0f;
+	style.WindowBorderSize = State.ShowUiBorders ? 2.0f : 0.0f;
 
 	style.ChildBorderSize = 0.0f;
 

@@ -10,13 +10,23 @@ RpcCompleteTask::RpcCompleteTask(uint32_t taskId)
 
 void RpcCompleteTask::Process()
 {
-	auto tasks = GetNormalPlayerTasks(*Game::pLocalPlayer);
+	PlayerControl_RpcCompleteTask(*Game::pLocalPlayer, taskId, NULL);
+	PlayerControl_CompleteTask(*Game::pLocalPlayer, taskId, NULL);
+}
 
-	for (auto task : tasks) {
-		if (task->fields._._Id_k__BackingField == taskId && !NormalPlayerTask_get_IsComplete(task, NULL)) {
-			CompleteTask(task);
-		}
-	}
+RpcDrainHideTimer::RpcDrainHideTimer(float timeToSubtract)
+{
+	this->timeToSubtract = timeToSubtract;
+}
+
+void RpcDrainHideTimer::Process()
+{
+	auto gameMgr = GameManager_get_Instance(NULL);
+	auto gameFlowHns = (LogicGameFlowHnS*)gameMgr->fields._LogicFlow_k__BackingField;
+
+	if (gameFlowHns == NULL) return;
+
+	LogicGameFlowHnS_AdjustEscapeTimer(gameFlowHns, timeToSubtract, true, NULL);
 }
 
 RpcForceCompleteTask::RpcForceCompleteTask(PlayerControl* Player, uint32_t taskId)
@@ -34,8 +44,6 @@ void RpcForceCompleteTask::Process()
 	for (auto task : tasks) {
 		if (task->fields._._Id_k__BackingField == taskId && !NormalPlayerTask_get_IsComplete(task, NULL)) {
 			PlayerControl_RpcCompleteTask(Player, task->fields._._Id_k__BackingField, NULL);
-			while (task->fields.taskStep < task->fields.MaxStep)
-				app::NormalPlayerTask_NextStep(task, NULL);
 		}
 	}
 }

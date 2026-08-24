@@ -2,7 +2,7 @@
 #include "utility.h"
 
 namespace PlayersTab {
-	const std::vector<const char*> FAKEROLES = { "Crewmate", "Impostor", "Scientist", "Engineer", "Guardian Angel", "Shapeshifter", "Crewmate Ghost", "Impostor Ghost", "Noisemaker", "Phantom", "Tracker", "Detective", "Viper" };
+	const std::vector<const char*> FAKEROLES = { "Crewmate", "Impostor", "Scientist", "Engineer", "Guardian Angel", "Shapeshifter", "Crewmate Ghost", "Impostor Ghost", "Noisemaker", "Phantom", "Tracker", "Detective", "Viper", "Judge"};
 	const std::vector<const char*> GHOSTROLES = { "Guardian Angel", "Crewmate Ghost", "Impostor Ghost" };
 	const std::vector<const char*> SHIPVENTS = { "Admin", "Hallway", "Cafeteria", "Electrical", "Upper Engine", "Security", "Medbay", "Weapons", "Lower Reactor", "Lower Engine", "Shields", "Upper Reactor", "Upper Navigation", "Lower Navigation" };
 	const std::vector<const char*> HQVENTS = { "Balcony", "Cafeteria", "Reactor", "Laboratory", "Office", "Admin", "Greenhouse", "Medbay", "Decontamination", "Locker Room", "Launchpad" };
@@ -32,4 +32,5 @@ namespace PlayersTab {
 		{"Fortegreen",      ImColor::ImColor(0xFF62A626)},
 	};
 	void Render();
+	void OpenSubGroup(const std::string& name);
 }

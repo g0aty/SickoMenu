@@ -1,5 +1,4 @@
-// Generated C++ file by Il2CppInspectorPro - http://www.djkaty.com - https://github.com/djkaty
-// Modified by Jadis0x - https://github.com/jadis0x
+// Generated C++ file by Il2CppInspector - http://www.djkaty.com - https://github.com/djkaty
 // Target Unity version: 2021.3.0 - 2023.1.99
 
 #define IS_LIBCLANG_DECOMPILER (defined(_IDACLANG_) || defined(_BINARYNINJA_))
@@ -2839,6 +2838,8 @@ namespace app {
         Il2CppClass_1 _1;
         struct Component_1__VTable vtable;
     };
+
+    WRAPPER_IL2CPP_ARRAY(Component_1, struct Component_1*);
 #pragma endregion
 
 #pragma region Behaviour
@@ -4371,6 +4372,41 @@ namespace app {
 #endif
 #pragma endregion
 
+#pragma region PoolablePlayer
+    struct PoolablePlayer__Fields {
+        struct MonoBehaviour__Fields _;
+        struct SpriteRenderer__Array* Hands;
+        struct SpriteRenderer__Array* OtherBodySprites;
+        struct CosmeticsLayer* cosmetics;
+        int32_t bodyType;
+        bool ignoreLongMode;
+    };
+
+    struct PoolablePlayer {
+        struct PoolablePlayer__Class* klass;
+        MonitorData* monitor;
+        struct PoolablePlayer__Fields fields;
+    };
+
+    struct PoolablePlayer__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct PoolablePlayer__StaticFields {
+    };
+
+    struct PoolablePlayer__Class {
+        Il2CppClass_0 _0;
+        struct PoolablePlayer__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PoolablePlayer__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region AccountTab
     struct AccountTab__Fields {
         struct MonoBehaviour__Fields _;
@@ -4615,11 +4651,43 @@ namespace app {
     WRAPPER_IL2CPP_ARRAY(OpenableDoor, struct OpenableDoor*);
 #pragma endregion
 
+#pragma region PlayerId
+    struct PlayerId {
+        uint8_t Value;
+    };
+
+    struct PlayerId__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct PlayerId__StaticFields {
+        struct PlayerId Invalid;
+    };
+
+    struct PlayerId__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct PlayerId__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PlayerId__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region PlayerVoteArea
     struct PlayerVoteArea__Fields {
         struct MonoBehaviour__Fields _;
         struct MeetingHud* _Parent_k__BackingField;
-        uint8_t TargetPlayerId;
+        bool _AmDead_k__BackingField;
+        bool _DidReport_k__BackingField;
+        bool _DidVote_k__BackingField;
+        struct PlayerId _PlayerId_k__BackingField;
+        struct PlayerId _VotedForId_k__BackingField;
+        bool _VoteComplete_k__BackingField;
+        int32_t _MaskLayer_k__BackingField;
         struct GameObject* Buttons;
         struct UiElement* ConfirmButton;
         struct UiElement* CancelButton;
@@ -4630,20 +4698,18 @@ namespace app {
         struct SpriteRenderer* Megaphone;
         struct SpriteRenderer* Overlay;
         struct SpriteRenderer* XMark;
-        struct SpriteRenderer* GAIcon;
         struct SpriteRenderer* ThumbsDown;
         struct SpriteRenderer* HighlightedFX;
         struct TextMeshPro* NameText;
         struct TextMeshPro* LevelNumberText;
         struct TextMeshPro* ColorBlindName;
         bool AnimateButtonsFromLeft;
-        bool AmDead;
-        bool DidReport;
-        uint8_t VotedFor;
-        bool voteComplete;
-        bool resultsShowing;
         struct PoolablePlayer* PlayerIcon;
-        int32_t _MaskLayer_k__BackingField;
+        struct UiElement* JudgeOverruleButton;
+        struct GameObject* JudgeOverruleButtonCommsDisable;
+        struct GameObject* JudgeUsedLabel;
+        struct SpriteRenderer* JudgeHandMaterial;
+        bool resultsShowing;
     };
 
     struct PlayerVoteArea {
@@ -4868,6 +4934,7 @@ namespace app {
 
     typedef Il2CppObject CosmeticsCache;
     typedef Il2CppObject ExileController;
+    typedef Il2CppObject MapBehaviour;
 
     struct ShipStatus__Fields {
         struct InnerNetObject__Fields _;
@@ -5212,6 +5279,7 @@ namespace app {
         Tracker = 0x000a,
         Detective = 0x000c,
         Viper = 0x0012,
+        Judge = 0x0013,
     };
 #else
     enum RoleTypes__Enum {
@@ -5228,6 +5296,7 @@ namespace app {
         RoleTypes__Enum_Tracker = 0x000a,
         RoleTypes__Enum_Detective = 0x000c,
         RoleTypes__Enum_Viper = 0x0012,
+        RoleTypes__Enum_Judge = 0x0013,
     };
 
 #endif
@@ -5575,6 +5644,94 @@ namespace app {
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct Minigame__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region VitalsPanel
+    struct VitalsPanel__Fields {
+        struct MonoBehaviour__Fields _;
+        struct NetworkedPlayerInfo* _PlayerInfo_k__BackingField;
+        struct PoolablePlayer* PlayerIcon;
+        struct SpriteRenderer* MaskingArea;
+        struct SpriteRenderer* Background;
+        struct VertLineBehaviour* Cardio;
+        struct Sprite* VitalBgDead;
+        struct Sprite* VitalBgDiscon;
+        struct IntRange* BeatRange;
+        bool IsDead;
+        bool IsDiscon;
+        struct TextMeshPro* ColorBlindName;
+    };
+
+    struct VitalsPanel {
+        struct VitalsPanel__Class* klass;
+        MonitorData* monitor;
+        struct VitalsPanel__Fields fields;
+    };
+
+    struct VitalsPanel__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct VitalsPanel__StaticFields {
+    };
+
+    struct VitalsPanel__Class {
+        Il2CppClass_0 _0;
+        struct VitalsPanel__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct VitalsPanel__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region VitalsPanel__Array
+    WRAPPER_IL2CPP_ARRAY(VitalsPanel, struct VitalsPanel*);
+#pragma endregion
+
+#pragma region VitalsMinigame
+    struct VitalsMinigame__Fields {
+        struct Minigame__Fields _;
+        struct TextMeshPro* BatteryText;
+        struct VitalsPanel* PanelPrefab;
+        struct TextMeshPro* SabText;
+        float XStart;
+        float YStart;
+        float XOffset;
+        float YOffset;
+        struct VitalsPanel__Array* vitals;
+    };
+
+    struct VitalsMinigame {
+        struct VitalsMinigame__Class* klass;
+        MonitorData* monitor;
+        struct VitalsMinigame__Fields fields;
+    };
+
+    struct VitalsMinigame__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData get_SkipMultistageOverlayMenuSetup;
+        VirtualInvokeData Begin;
+        VirtualInvokeData Close;
+        VirtualInvokeData CoAnimateOpen;
+        VirtualInvokeData CoDestroySelf;
+    };
+
+    struct VitalsMinigame__StaticFields {
+    };
+
+    struct VitalsMinigame__Class {
+        Il2CppClass_0 _0;
+        struct VitalsMinigame__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct VitalsMinigame__VTable vtable;
     };
 #pragma endregion
 
@@ -6600,6 +6757,8 @@ namespace app {
 #pragma endregion
 
 #pragma region HudManager
+    typedef Il2CppObject VentButton;
+
     struct DestroyableSingleton_1_HudManager___Fields {
         struct MonoBehaviour__Fields _;
         bool DontDestroy;
@@ -6607,6 +6766,7 @@ namespace app {
 
     typedef Il2CppObject KillOverlay;
     typedef Il2CppObject IntroCutscene;
+    typedef Il2CppObject ShhhBehaviour;
 
     struct HudManager__Fields {
         struct DestroyableSingleton_1_HudManager___Fields _;
@@ -6635,6 +6795,8 @@ namespace app {
         struct Coroutine* _OxyFlash_k__BackingField;
         struct PassiveButton* MapButton;
         struct GameObject* MapButtonGlyph;
+        struct PassiveButton* MatchInfoButton;
+        struct GameObject* MatchInfoButtonGlyph;
         struct KillOverlay* KillOverlay;
         struct IVirtualJoystick* joystick;
         struct VirtualJoystick* joystickR;
@@ -6656,7 +6818,6 @@ namespace app {
         struct GameObject* GameLoadAnimation;
         struct LobbyTimerExtensionUI* LobbyTimerExtensionUI;
         float consoleUIHorizontalShift;
-        struct GameObject* playerListPrompt;
         struct AlertFlash* AlertFlash;
         struct DangerMeter* DangerMeter;
         struct GameObject* SettingsButton;
@@ -6765,6 +6926,8 @@ namespace app {
 #pragma endregion
 
 #pragma region KeyboardJoystick
+    typedef Il2CppObject Player;
+
     struct KeyboardJoystick__Fields {
         struct MonoBehaviour__Fields _;
         struct Vector2 del;
@@ -6790,7 +6953,7 @@ namespace app {
     };
 
     struct KeyboardJoystick__StaticFields {
-        void* player;
+        struct Player* player;
     };
 
     struct KeyboardJoystick__Class {
@@ -6881,7 +7044,7 @@ namespace app {
 #pragma region MeetingHud
 
 #if defined(_CPLUSPLUS_)
-    enum class MeetingHud_VoteStates__Enum : int32_t {
+    enum class MeetingHud_MeetingStates__Enum : int32_t {
         Animating = 0x00000000,
         Discussion = 0x00000001,
         NotVoted = 0x00000002,
@@ -6891,13 +7054,13 @@ namespace app {
     };
 
 #else
-    enum MeetingHud_VoteStates__Enum {
-        MeetingHud_VoteStates__Enum_Animating = 0x00000000,
-        MeetingHud_VoteStates__Enum_Discussion = 0x00000001,
-        MeetingHud_VoteStates__Enum_NotVoted = 0x00000002,
-        MeetingHud_VoteStates__Enum_Voted = 0x00000003,
-        MeetingHud_VoteStates__Enum_Results = 0x00000004,
-        MeetingHud_VoteStates__Enum_Proceeding = 0x00000005,
+    enum MeetingHud_MeetingStates__Enum {
+        MeetingHud_MeetingStates__Enum_Animating = 0x00000000,
+        MeetingHud_MeetingStates__Enum_Discussion = 0x00000001,
+        MeetingHud_MeetingStates__Enum_NotVoted = 0x00000002,
+        MeetingHud_MeetingStates__Enum_Voted = 0x00000003,
+        MeetingHud_MeetingStates__Enum_Results = 0x00000004,
+        MeetingHud_MeetingStates__Enum_Proceeding = 0x00000005,
     };
 
 #endif
@@ -6925,7 +7088,7 @@ namespace app {
         struct AudioClip* VoteEndingSound;
         struct Transform* meetingContents;
 #if defined(_CPLUSPLUS_)
-        MeetingHud_VoteStates__Enum state;
+        MeetingHud_MeetingStates__Enum state;
 #else
         int32_t state;
 #endif
@@ -6933,12 +7096,17 @@ namespace app {
         struct SpriteRenderer* HostIcon;
         struct NetworkedPlayerInfo* exiledPlayer;
         bool wasTie;
+        bool wasOverruled;
         struct TextMeshPro* TimerText;
         float discussionTimer;
         uint8_t reporterId;
-        bool amDead;
+        bool hasForegroundForDeadBeenSet;
         float resultsStartedAt;
         int32_t lastSecond;
+        struct List_1_JudgeOverrule_* judgeOverrulesQueue;
+        struct TextMeshPro* judgeUsesRemaining;
+        struct GameObject* judgeOverruleDisplay;
+        struct GameObject* judgeGavelPrefab;
         struct Logger* logger;
         struct UiElement* DefaultButtonSelected;
         struct UiElement* ProceedButtonUi;
@@ -7831,7 +7999,6 @@ namespace app {
 
     struct ViperDeadBody__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct ViperDeadBody__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -7991,6 +8158,7 @@ namespace app {
         NoisemakerAlertDuration = 0x00000640,
         ViperDissolveTime = 0x00000641,
         DetectiveSuspectLimit = 0x00000642,
+        JudgeTaskRequirementPercentage = 0x00000654,
     };
 
 #else
@@ -8023,6 +8191,7 @@ namespace app {
         FloatOptionNames__Enum_NoisemakerAlertDuration = 0x00000640,
         FloatOptionNames__Enum_ViperDissolveTime = 0x00000641,
         FloatOptionNames__Enum_DetectiveSuspectLimit = 0x00000642,
+        FloatOptionNames__Enum_JudgeTaskRequirementPercentage = 0x00000654,
     };
 
 #endif
@@ -8937,34 +9106,53 @@ namespace app {
     WRAPPER_IL2CPP_DICTIONARY(System_String, List_1_AmongUs_GameOptions_GameModes, \
         struct String*, struct List_1_AmongUs_GameOptions_GameModes_*);
 
-    struct __declspec(align(4)) AchievementManager_1__Fields {
-        void* MethodsPtr;
-        struct Object* MethodsStructure;
-        struct AchievementManager_UserAchievementUpdateHandler* OnUserAchievementUpdate;
+    struct AchievementManager__Fields {
+        void* _;
+        struct Logger* logger;
+        bool gameStarted;
+#if defined(_CPLUSPLUS_)
+        RoleTypes__Enum myRole;
+#else
+        uint16_t myRole;
+#endif
+        int32_t cardSwipesThisMatch;
+        int32_t ventsUsedThisMatch;
+        bool meetingCalledThisMatch;
+        int32_t killsThisMatch;
+        bool sabotageCalledLocally;
+        int32_t timesVoted;
+        int32_t timesVotedForImp;
+        int32_t winMap;
+        struct Dictionary_2_System_String_List_1_AchievementManager_AchievementProgressValue_* statName2AchievementProgressValues;
     };
 
-    struct AchievementManager_1 {
-        struct AchievementManager_1__Class* klass;
+    struct AchievementManager {
+        struct AchievementManager__Class* klass;
         MonitorData* monitor;
-        struct AchievementManager_1__Fields fields;
+        struct AchievementManager__Fields fields;
     };
 
-    struct AchievementManager_1__VTable {
+    struct AchievementManager__VTable {
         VirtualInvokeData Equals;
         VirtualInvokeData Finalize;
         VirtualInvokeData GetHashCode;
         VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData OnDestroy;
     };
 
-    struct AchievementManager_1__StaticFields {
+    struct AchievementManager__StaticFields {
+        struct Dictionary_2_System_String_List_1_AmongUs_GameOptions_GameModes_* AchievementGameModeKey;
+        struct Dictionary_2_System_String_List_1_AmongUs_GameOptions_GameModes_* StatsGameModeKey;
     };
 
-    struct AchievementManager_1__Class {
+    struct AchievementManager__Class {
         Il2CppClass_0 _0;
-        struct AchievementManager_1__StaticFields* static_fields;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct AchievementManager__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
-        struct AchievementManager_1__VTable vtable;
+        struct AchievementManager__VTable vtable;
     };
 #pragma endregion
 
@@ -9008,9 +9196,52 @@ namespace app {
     };
 #pragma endregion
 
+#pragma region ActionButton
+    struct ActionButton__Fields {
+        struct MonoBehaviour__Fields _;
+        struct SpriteRenderer* graphic;
+        struct SpriteRenderer* usesRemainingSprite;
+        struct TextMeshPro* usesRemainingText;
+        struct TextMeshPro* buttonLabelText;
+        struct TextMeshPro* cooldownTimerText;
+        struct ActionMapGlyphDisplay* glyph;
+        bool isCoolingDown;
+        struct Logger* logger;
+        bool canInteract;
+        struct Vector3 position;
+    };
+
+    struct ActionButton {
+        struct ActionButton__Class* klass;
+        MonitorData* monitor;
+        struct ActionButton__Fields fields;
+    };
+
+    struct ActionButton__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData __unknown;
+        VirtualInvokeData Hide;
+        VirtualInvokeData Show;
+    };
+
+    struct ActionButton__StaticFields {
+    };
+
+    struct ActionButton__Class {
+        Il2CppClass_0 _0;
+        struct ActionButton__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ActionButton__VTable vtable;
+    };
+#pragma endregion
+
 #pragma region KillButton
     struct KillButton__Fields {
-        void* _;
+        struct ActionButton__Fields _;
         struct PlayerControl* currentTarget;
         struct TextTranslatorTMP* textTranslator;
         struct Sprite* defaultKillSprite;
@@ -11007,11 +11238,614 @@ namespace app {
     };
 #pragma endregion
 
+#pragma region EndGameManager
+    struct EndGameManager__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* WinText;
+        struct MeshRenderer* BackgroundBar;
+        struct MeshRenderer* Foreground;
+        struct FloatRange* ForegroundRadius;
+        struct SpriteRenderer* FrontMost;
+        struct PoolablePlayer* PlayerPrefab;
+        struct Sprite* GhostSprite;
+        struct AudioClip* DisconnectStinger;
+        struct AudioClip* CrewStinger;
+        struct AudioClip* ImpostorStinger;
+        struct EndGameNavigation* Navigation;
+        float stingerTime;
+    };
+
+    struct EndGameManager {
+        struct EndGameManager__Class* klass;
+        MonitorData* monitor;
+        struct EndGameManager__Fields fields;
+    };
+
+    struct EndGameManager__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct EndGameManager__StaticFields {
+    };
+
+    struct EndGameManager__Class {
+        Il2CppClass_0 _0;
+        struct EndGameManager__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct EndGameManager__VTable vtable;
+    };
+
+    struct EndGameNavigation__Fields {
+        struct MonoBehaviour__Fields _;
+        struct ProgressionScreen* ProgressionScreen;
+        struct EndGameManager* EndGameManager;
+        struct GameObject* ContinueButton;
+        struct SpriteRenderer* PlayAgainButton;
+        struct SpriteRenderer* ExitButton;
+    };
+
+    struct EndGameNavigation {
+        struct EndGameNavigation__Class* klass;
+        MonitorData* monitor;
+        struct EndGameNavigation__Fields fields;
+    };
+
+    struct EndGameNavigation__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct EndGameNavigation__StaticFields {
+    };
+
+    struct EndGameNavigation__Class {
+        Il2CppClass_0 _0;
+        struct EndGameNavigation__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct EndGameNavigation__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region PassiveButton
+    struct PassiveButton__Fields {
+        void* _;
+        struct Button_ButtonClickedEvent* OnClick;
+        struct AudioClip* ClickSound;
+        struct AudioClip* HoverSound;
+        bool OnUp;
+        bool OnDown;
+        bool OnRepeat;
+        bool OnUpGraphic;
+        bool OnDownGraphic;
+        float RepeatDuration;
+        struct SpriteRenderer* HeldButtonSprite;
+        struct ActionButton* TargetActionButton;
+        bool HoldToUse;
+        bool beingHeldDown;
+        float repeatTimer;
+        float totalHeldTime;
+        bool checkedClickEvent;
+        bool selected;
+        struct GameObject* selectedSprites;
+        struct GameObject* activeSprites;
+        struct GameObject* inactiveSprites;
+        struct GameObject* disabledSprites;
+        struct GameObject* selectedInactiveSprites;
+        struct GameObject* onClickSprites;
+        bool forceInactiveSpritesMobile;
+        bool forceClickGraphicMobile;
+        struct TextMeshPro* buttonText;
+        struct Color selectedTextColor;
+        struct Color activeTextColor;
+        struct Color inactiveTextColor;
+        struct Color disabledTextColor;
+        struct Color selectedInactiveTextColor;
+    };
+
+    struct PassiveButton {
+        struct PassiveButton__Class* klass;
+        MonitorData* monitor;
+        struct PassiveButton__Fields fields;
+    };
+
+    struct PassiveButton__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData ReceiveMouseOut;
+        VirtualInvokeData ReceiveMouseOver;
+        VirtualInvokeData get_HandleUp;
+        VirtualInvokeData get_HandleDown;
+        VirtualInvokeData get_HandleRepeat;
+        VirtualInvokeData get_HandleUpClickGraphic;
+        VirtualInvokeData get_HandleDownClickGraphic;
+        VirtualInvokeData get_HandleDrag;
+        VirtualInvokeData get_HandleOverOut;
+        VirtualInvokeData OnEnable;
+        VirtualInvokeData Start;
+        VirtualInvokeData Update;
+        VirtualInvokeData OnDisable;
+        VirtualInvokeData OnDestroy;
+        VirtualInvokeData ReceiveClickDown;
+        VirtualInvokeData ReceiveRepeatDown;
+        VirtualInvokeData ReceiveClickUp;
+        VirtualInvokeData ReleaseButton;
+        VirtualInvokeData ReceiveClickDrag;
+        VirtualInvokeData ReceiveClickUpGraphic;
+        VirtualInvokeData ReceiveClickDownGraphic;
+    };
+
+    struct PassiveButton__StaticFields {
+        int32_t STENCIL_COMP;
+        int32_t STENCIL;
+    };
+
+    struct PassiveButton__Class {
+        Il2CppClass_0 _0;
+        struct PassiveButton__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PassiveButton__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region FriendsListButton
+    struct FriendsListButton__Fields {
+        struct MonoBehaviour__Fields _;
+        struct GameObject* Button;
+        struct TextMeshPro* NotifCount;
+        struct GameObject* NotifCircle;
+        struct ActionMapGlyphDisplay* gamepadButton;
+        bool showInScene;
+    };
+
+    struct FriendsListButton {
+        struct FriendsListButton__Class* klass;
+        MonitorData* monitor;
+        struct FriendsListButton__Fields fields;
+    };
+
+    struct FriendsListButton__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct FriendsListButton__StaticFields {
+    };
+
+    struct FriendsListButton__Class {
+        Il2CppClass_0 _0;
+        struct FriendsListButton__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct FriendsListButton__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region ProgressTracker
+    struct ProgressTracker__Fields {
+        struct MonoBehaviour__Fields _;
+        struct MeshRenderer* TileParent;
+        float curValue;
+    };
+
+    struct ProgressTracker {
+        struct ProgressTracker__Class* klass;
+        MonitorData* monitor;
+        struct ProgressTracker__Fields fields;
+    };
+
+    struct ProgressTracker__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct ProgressTracker__StaticFields {
+    };
+
+    struct ProgressTracker__Class {
+        Il2CppClass_0 _0;
+        struct ProgressTracker__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ProgressTracker__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region HideAndSeekTimerBar
+    struct HideAndSeekTimerBar__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* timeText;
+        struct Transform* timerBar;
+        struct MeshRenderer* timerBarRenderer;
+        struct Transform* chunkBar;
+        float targetBarSize;
+        bool freezeChunk;
+        struct Coroutine* chunkCoroutine;
+    };
+
+    struct HideAndSeekTimerBar {
+        struct HideAndSeekTimerBar__Class* klass;
+        MonitorData* monitor;
+        struct HideAndSeekTimerBar__Fields fields;
+    };
+
+    struct HideAndSeekTimerBar__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct HideAndSeekTimerBar__StaticFields {
+    };
+
+    struct HideAndSeekTimerBar__Class {
+        Il2CppClass_0 _0;
+        struct HideAndSeekTimerBar__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct HideAndSeekTimerBar__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region LobbyInfoPane
+    struct LobbyInfoPane__Fields {
+        void* _;
+        struct SpriteRenderer* InfoPaneBackground;
+        struct Sprite* InfoPaneInactive;
+        struct Sprite* InfoPaneActive;
+        struct UiElement* EditButton;
+        struct UiElement* HostViewButton;
+        struct UiElement* ClientViewButton;
+        struct UiElement* CopyCodeButton;
+        struct UiElement* ActivateButton;
+        struct UiElement* BackButton;
+        struct List_1_UiElement_* ControllerSelectable;
+        struct UiElement* HostPrivateButton;
+        struct UiElement* HostPublicButton;
+        struct LobbyViewSettingsPane* LobbyViewSettingsPane;
+        struct GameObject* CopyCodeText;
+        struct AudioClip* CopyCodeSound;
+        struct UiElement* DefaultButtonSelected;
+        struct IEnumerator* copyGameCodeCoroutine;
+        bool IsPaneActive;
+    };
+
+    struct LobbyInfoPane {
+        struct LobbyInfoPane__Class* klass;
+        MonitorData* monitor;
+        struct LobbyInfoPane__Fields fields;
+    };
+
+    struct LobbyInfoPane__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Awake;
+        VirtualInvokeData OnDestroy;
+    };
+
+    struct LobbyInfoPane__StaticFields {
+    };
+
+    struct LobbyInfoPane__Class {
+        Il2CppClass_0 _0;
+        struct LobbyInfoPane__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct LobbyInfoPane__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region ShadowCollab
+    struct ShadowCollab__Fields {
+        struct MonoBehaviour__Fields _;
+        struct Camera* ShadowCamera;
+        struct MeshRenderer* ShadowQuad;
+        float oldAspect;
+    };
+
+    struct ShadowCollab {
+        struct ShadowCollab__Class* klass;
+        MonitorData* monitor;
+        struct ShadowCollab__Fields fields;
+    };
+
+    struct ShadowCollab__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct ShadowCollab__StaticFields {
+    };
+
+    struct ShadowCollab__Class {
+        Il2CppClass_0 _0;
+        struct ShadowCollab__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct ShadowCollab__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region RoomTracker
+    struct RoomTracker__Fields {
+        struct MonoBehaviour__Fields _;
+        struct TextMeshPro* text;
+        float SourceY;
+        float TargetY;
+        struct Collider2D* playerCollider;
+        void* filter;
+        struct Collider2D__Array* buffer;
+        struct Collider2D__Array* detectiveBuffer;
+        struct PlainShipRoom* LastRoom;
+        struct Coroutine* slideInRoutine;
+    };
+
+    struct RoomTracker {
+        struct RoomTracker__Class* klass;
+        MonitorData* monitor;
+        struct RoomTracker__Fields fields;
+    };
+
+    struct RoomTracker__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct RoomTracker__StaticFields {
+        struct RoomTracker* Instance;
+    };
+
+    struct RoomTracker__Class {
+        Il2CppClass_0 _0;
+        struct RoomTracker__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct RoomTracker__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region FontStyles__Enum
+#if defined(_CPLUSPLUS_)
+    enum class FontStyles__Enum : int32_t {
+        Normal = 0x00000000,
+        Bold = 0x00000001,
+        Italic = 0x00000002,
+        Underline = 0x00000004,
+        LowerCase = 0x00000008,
+        UpperCase = 0x00000010,
+        SmallCaps = 0x00000020,
+        Strikethrough = 0x00000040,
+        Superscript = 0x00000080,
+        Subscript = 0x00000100,
+        Highlight = 0x00000200,
+    };
+
+#else
+    enum FontStyles__Enum {
+        FontStyles__Enum_Normal = 0x00000000,
+        FontStyles__Enum_Bold = 0x00000001,
+        FontStyles__Enum_Italic = 0x00000002,
+        FontStyles__Enum_Underline = 0x00000004,
+        FontStyles__Enum_LowerCase = 0x00000008,
+        FontStyles__Enum_UpperCase = 0x00000010,
+        FontStyles__Enum_SmallCaps = 0x00000020,
+        FontStyles__Enum_Strikethrough = 0x00000040,
+        FontStyles__Enum_Superscript = 0x00000080,
+        FontStyles__Enum_Subscript = 0x00000100,
+        FontStyles__Enum_Highlight = 0x00000200,
+    };
+
+#endif
+#pragma endregion
+
+#pragma region LogicGameFlowHnS
+    typedef Il2CppObject HideAndSeekManager;
+
+    struct LogicGameFlowHnS__Fields {
+        void* _;
+        struct HideAndSeekManager* hideAndSeekManager;
+        struct HideAndSeekTimerBar* timerBarPrefab;
+        struct HideAndSeekTimerBar* timerBar;
+        float totalHideTime;
+        float currentHideTime;
+        float totalFinalHideTime;
+        float currentFinalHideTime;
+        float secondsSinceLastSetDirty;
+        struct Coroutine* beepCoroutine;
+    };
+
+    struct LogicGameFlowHnS {
+        struct LogicGameFlowHnS__Class* klass;
+        MonitorData* monitor;
+        struct LogicGameFlowHnS__Fields fields;
+    };
+
+    struct LogicGameFlowHnS__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData OnGameStart;
+        VirtualInvokeData OnGameEnd;
+        VirtualInvokeData FixedUpdate;
+        VirtualInvokeData OnDestroy;
+        VirtualInvokeData OnPlayerDisconnect;
+        VirtualInvokeData HandleRPC;
+        VirtualInvokeData Serialize;
+        VirtualInvokeData Deserialize;
+        VirtualInvokeData CheckEndCriteria;
+        VirtualInvokeData IsGameOverDueToDeath;
+    };
+
+    struct LogicGameFlowHnS__StaticFields {
+    };
+
+    struct LogicGameFlowHnS__Class {
+        Il2CppClass_0 _0;
+        struct LogicGameFlowHnS__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct LogicGameFlowHnS__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region MatchInfoHudButton
+    struct MatchInfoHudButton__Fields {
+        struct MonoBehaviour__Fields _;
+        struct AspectPosition* aspectPosition;
+    };
+
+    struct MatchInfoHudButton {
+        struct MatchInfoHudButton__Class* klass;
+        MonitorData* monitor;
+        struct MatchInfoHudButton__Fields fields;
+    };
+
+    struct MatchInfoHudButton__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct MatchInfoHudButton__StaticFields {
+        struct Vector3 defaultDistanceFromEdge;
+        struct Vector3 adjustedDistanceFromEdge;
+    };
+
+    struct MatchInfoHudButton__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct MatchInfoHudButton__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct MatchInfoHudButton__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region MatchInfoGuide
+    struct MatchInfoGuide__Fields {
+        struct MonoBehaviour__Fields _;
+        struct GameObject* MatchInfoParent;
+        struct GameObject* MatchInfoSettingPrefab;
+        struct MatchInfoRolePanel* MatchInfoRolePanelPrefab;
+        struct ObjectPoolBehavior* PlayerPool;
+        struct Scroller* MatchInfoRoleScroller;
+        struct SpriteRenderer* MatchInfoRoleMaskArea;
+        struct List_1_MatchInfoGuideTabButton_* TabButtons;
+        struct List_1_UnityEngine_GameObject_* settingsTabs;
+        struct SpriteRenderer* matchInfoSettingsMaskArea;
+        struct Transform* settingsScrollArea;
+        struct SpriteRenderer* matchInfoPlayersMaskArea;
+        struct GameObject* rolesEnabledMessage;
+        struct TransitionOpen* transitionOpen;
+        struct UiElement* closeButton;
+        struct SpriteRenderer* glyphL;
+        struct SpriteRenderer* glyphR;
+        struct List_1_UnityEngine_GameObject_* NormalModeSettings;
+        struct List_1_UnityEngine_GameObject_* HnSModeSettings;
+        float RoleEntryBoundsModifier;
+        struct Player* player;
+        int32_t activeTabIndex;
+        int32_t numOfTabs;
+        struct List_1_UiElement_* ControllerSelectable;
+    };
+
+    struct MatchInfoGuide {
+        struct MatchInfoGuide__Class* klass;
+        MonitorData* monitor;
+        struct MatchInfoGuide__Fields fields;
+    };
+
+    struct MatchInfoGuide__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct MatchInfoGuide__StaticFields {
+        struct MatchInfoGuide* _Instance_k__BackingField;
+    };
+
+    struct MatchInfoGuide__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct MatchInfoGuide__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct MatchInfoGuide__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region PlayerIdentifierButton
+    struct PlayerIdentifierButton__Fields {
+        struct PoolableBehavior__Fields _;
+        struct TextMeshPro* NameText;
+        struct PlatformIdentifier* PlatformIdentifier;
+        struct PoolablePlayer* PlayerPreview;
+        struct SpriteRenderer* MaskArea;
+        struct SpriteRenderer* buttonSprite;
+        struct PassiveButton* button;
+        struct SpriteRenderer* highlight;
+        struct SpriteRenderer* platformIcon;
+        struct TextMeshPro* platformText;
+        uint8_t targetPlayerId;
+    };
+
+    struct PlayerIdentifierButton {
+        struct PlayerIdentifierButton__Class* klass;
+        MonitorData* monitor;
+        struct PlayerIdentifierButton__Fields fields;
+    };
+
+    struct PlayerIdentifierButton__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+        VirtualInvokeData Reset;
+    };
+
+    struct PlayerIdentifierButton__StaticFields {
+        int32_t STENCIL_COMP;
+        int32_t STENCIL;
+    };
+
+    struct PlayerIdentifierButton__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct PlayerIdentifierButton__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PlayerIdentifierButton__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ImpostorRole;
     typedef Il2CppObject LogicGameFlowNormal;
-    typedef Il2CppObject LogicGameFlowHnS;
     typedef Il2CppObject PlayerData;
     typedef Il2CppObject PlayerAccountData;
     typedef Il2CppObject MultiplayerSettingsData;
@@ -11027,12 +11861,12 @@ namespace app {
     typedef Il2CppObject AbstractSaveData;
     typedef Il2CppObject ResolutionManager_ResolutionChangedHandler;
     typedef Il2CppObject MatchMakerGameButton;
-    typedef Il2CppObject EndGameNavigation;
-    typedef Il2CppObject HideAndSeekManager;
     typedef Il2CppObject NormalGameManager;
     typedef Il2CppObject QuickChatPhraseBuilderResult;
     typedef Il2CppObject MapCountOverlay;
     typedef Il2CppObject LogicOptionsHnS;
     typedef Il2CppObject FreeplayPopover;
     typedef Il2CppObject MapNames__Enum;
+    typedef Il2CppObject DetectiveRole;
+    typedef Il2CppObject JudgeRole;
 }

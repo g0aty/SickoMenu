@@ -2,6 +2,7 @@
 #include "gui-helpers.hpp"
 #include "keybinds.h"
 #include "state.hpp"
+#include "utility.h"
 #include "game.h"
 #include "logger.h"
 #include "DirectX.h"
@@ -49,7 +50,13 @@ bool CustomListBoxInt(const char* label, int* value, const std::vector<const cha
 	}
 	SameLine(0, spacing);
 	//noobuild by gdjkhp
-	if (col.x == 0 && col.y == 0 && col.z == 0 && col.w == 0) Text(visualLabel == "" ? label : visualLabel);
+	if (col.x == 0 && col.y == 0 && col.z == 0 && col.w == 0) {
+		std::string trueLabel = visualLabel == "" ? label : visualLabel;
+		if (State.searchQuery == "" || trueLabel.find(strToLower(State.searchQuery)))
+			Text(trueLabel.c_str());
+		else
+			TextDisabled(trueLabel.c_str());
+	}
 	else TextColored(col, visualLabel == "" ? label : visualLabel);
 
 	return response;
@@ -611,12 +618,31 @@ bool ToggleButton(const char* str_id, bool* v) {
 		}
 
 		if (IsItemHovered())
-			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f);
+			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBg] : colors[ImGuiCol_FrameBgActive]), height * 0.5f * State.RoundingRadiusMultiplier);
 		else
-			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBgActive] : colors[ImGuiCol_FrameBg]), height * 0.50f);
-		draw_list->AddCircleFilled(ImVec2(p.x + radius + (*v ? 1 : 0) * (width - radius * 2.0f), p.y + radius), radius - 1.5f, GetColorU32(colors[ImGuiCol_CheckMark]));
+			draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), GetColorU32(*v ? colors[ImGuiCol_FrameBgActive] : colors[ImGuiCol_FrameBg]), height * 0.5f * State.RoundingRadiusMultiplier);
+
+		// draw_list->AddCircleFilled(ImVec2(p.x + radius + (*v ? 1 : 0) * (width - radius * 2.0f), p.y + radius), (radius - 1.5f), GetColorU32(colors[ImGuiCol_CheckMark]));
+
+		float knob_x = *v ? p.x + width - radius : p.x + radius;
+		float knob_size = (radius - 1.5f) * 2.0f;
+		float knob_rounding = (radius - 1.5f) * State.RoundingRadiusMultiplier;
+
+		ImVec2 knob_min(knob_x - knob_size * 0.5f, p.y + radius - knob_size * 0.5f);
+		ImVec2 knob_max(knob_x + knob_size * 0.5f, p.y + radius + knob_size * 0.5f);
+
+		draw_list->AddRectFilled(knob_min, knob_max,
+			GetColorU32(colors[ImGuiCol_CheckMark]),
+			knob_rounding);
+
 		SameLine();
-		Text(str_id);
+
+		if (State.searchQuery == "" ||
+			strToLower((std::string)str_id).find(strToLower(State.searchQuery)) != std::string::npos)
+			Text(str_id);
+		else
+			TextDisabled(str_id);
+
 		return result;
 	}
 	ImVec4* colors = ImGui::GetStyle().Colors;
@@ -649,9 +675,9 @@ bool ToggleButton(const char* str_id, bool* v) {
 
 	float rounding = radius * State.RoundingRadiusMultiplier;
 
-	ImU32 bg_col = ImGui::GetColorU32(
+	ImU32 bg_col = GetColorU32(
 		ImLerp(colors[ImGuiCol_FrameBg], colors[ImGuiCol_FrameBgActive],
-			ImGui::IsItemHovered() ? 0.5f : t_eased));
+			IsItemHovered() ? 0.5f : t_eased));
 
 	draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), bg_col, rounding);
 
@@ -663,11 +689,17 @@ bool ToggleButton(const char* str_id, bool* v) {
 	ImVec2 knob_max(knob_x + knob_size * 0.5f, p.y + radius + knob_size * 0.5f);
 
 	draw_list->AddRectFilled(knob_min, knob_max,
-		ImGui::GetColorU32(colors[ImGuiCol_CheckMark]),
+		GetColorU32(colors[ImGuiCol_CheckMark]),
 		knob_rounding);
 
-	ImGui::SameLine();
-	ImGui::Text(str_id);
+	SameLine();
+
+	if (State.searchQuery == "" ||
+		strToLower((std::string)str_id).find(strToLower(State.searchQuery)) != std::string::npos)
+		Text(str_id);
+	else
+		TextDisabled(str_id);
+
 	return clicked;
 }
 
@@ -686,7 +718,7 @@ bool TabGroup(const char* label, bool highlight)
 	PushStyleColor(ImGuiCol_Button, highlight ? activeCol : defaultCol);
 	PushStyleColor(ImGuiCol_ButtonHovered, hoveredCol);
 	PushStyleColor(ImGuiCol_ButtonActive, activeCol);
-	bool selected = AnimatedButton(label);
+	bool selected = AnimatedButton(label, false);
 	PopStyleColor(3);
 	PopID();
 	return selected;
@@ -698,7 +730,7 @@ bool ColoredButton(ImVec4 col, const char* label) {
 	PushStyleColor(ImGuiCol_Text, col);
 	PushStyleColor(ImGuiCol_ButtonHovered, hoveredCol);
 	PushStyleColor(ImGuiCol_ButtonActive, activeCol);
-	bool ret = AnimatedButton(label);
+	bool ret = AnimatedButton(label, false);
 	PopStyleColor(3);
 	return ret;
 }
@@ -858,7 +890,7 @@ struct PulseAnimState {
 	bool active = false;
 };
 
-bool AnimatedButton(const char* label, const ImVec2& size) {
+bool AnimatedButton(const char* label, bool isAffectedBySearch, const ImVec2& size) {
 	if (State.DisableAnimations) return ImGui::Button(label, size);
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	if (window->SkipItems)
@@ -913,7 +945,19 @@ bool AnimatedButton(const char* label, const ImVec2& size) {
 		bb.Min.x + (button_size.x - text_size.x) * 0.5f,
 		bb.Min.y + (button_size.y - text_size.y) * 0.5f
 	);
-	ImGui::RenderText(text_pos, label, label_end);
+
+
+
+	if (!isAffectedBySearch || State.searchQuery == "" ||
+		strToLower((std::string)label).find(strToLower(State.searchQuery)) != std::string::npos) {
+		RenderText(text_pos, label, label_end);
+	}
+	else {
+		auto col = State.LightMode ? ImVec4(0.2f, 0.2f, 0.2f, 0.4f * State.MenuThemeColor.w) : ImVec4(1.f, 1.f, 1.f, 0.4f * State.MenuThemeColor.w);
+		PushStyleColor(ImGuiCol_Text, col);
+		RenderText(text_pos, label, label_end);
+		PopStyleColor(1);
+	}
 
 	return pressed;
 }

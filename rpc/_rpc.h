@@ -110,6 +110,13 @@ public:
 	virtual void Process() override;
 };
 
+class RpcDrainHideTimer : public RPCInterface {
+	float timeToSubtract;
+public:
+	RpcDrainHideTimer(float timeToSubtract);
+	virtual void Process() override;
+};
+
 class RpcForceCompleteTask : public RPCInterface {
 	PlayerControl* Player;
 	uint32_t taskId;
@@ -245,6 +252,15 @@ class CmdCheckShapeshift : public RPCInterface {
 	bool animate;
 public:
 	CmdCheckShapeshift(PlayerControl* Player, const PlayerSelection& target, bool animate);
+	virtual void Process() override;
+};
+
+class RpcShapeshiftAsHost : public RPCInterface {
+	PlayerControl* Player;
+	PlayerSelection target;
+	bool animate;
+public:
+	RpcShapeshiftAsHost(PlayerControl* Player, const PlayerSelection& target, bool animate);
 	virtual void Process() override;
 };
 
@@ -478,6 +494,29 @@ class RpcBootFromVent : public RPCInterface {
 	int ventId;
 public:
 	RpcBootFromVent(PlayerControl* Player, int ventId);
+	virtual void Process() override;
+};
+
+class RpcBootFromVentNonHost : public RPCInterface {
+	PlayerControl* Player;
+	int ventId;
+public:
+	RpcBootFromVentNonHost(PlayerControl* Player, int ventId);
+	virtual void Process() override;
+};
+
+class AttemptToBan : public RPCInterface {
+	PlayerControl* Player;
+public:
+	AttemptToBan(PlayerControl* Player);
+	virtual void Process() override;
+};
+
+class SendKillImmunity : public RPCInterface {
+	bool enabled;
+	int ventId;
+public:
+	SendKillImmunity(bool enabled, int ventId);
 	virtual void Process() override;
 };
 

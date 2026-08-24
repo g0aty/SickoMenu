@@ -7,10 +7,11 @@
 NetworkedPlayerInfo* exiledInfo = NULL;
 
 void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dExileController_ReEnableGameplay executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dExileController_ReEnableGameplay executed", false);
     app::ExileController_ReEnableGameplay(__this, method);
 
     try {// ESP: Reset Kill Cooldown
+        State.InExileUI = false;
         for (auto pc : GetAllPlayerControl()) {
             if (auto player = PlayerSelection(pc).validate();
                 player.has_value() && !player.is_LocalPlayer() && !player.is_Disconnected()) {
@@ -30,10 +31,10 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
     }
 }
 
-void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.Debug("Hook dExileController_BeginForGameplay executed", false);
+void dExileController_BeginForGameplay(ExileController* __this, NetworkedPlayerInfo* exiled, bool voteTie, bool wasOverruled, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dExileController_BeginForGameplay executed", false);
     State.VoteOffPlayerId = Game::HasNotVoted;
-    ExileController_BeginForGameplay(__this, exiled, voteTie, method);
+    ExileController_BeginForGameplay(__this, exiled, voteTie, wasOverruled, method);
     exiledInfo = exiled;
     try {
         if (IsHost() && State.TournamentMode && !voteTie && exiled != NULL) {

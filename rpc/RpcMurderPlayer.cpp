@@ -16,28 +16,43 @@ RpcMurderPlayer::RpcMurderPlayer(PlayerControl* Player, PlayerControl* target, b
 void RpcMurderPlayer::Process()
 {
     if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) return;
-    if (IsInGame() && !IsInMultiplayerGame()) PlayerControl_RpcMurderPlayer(Player, target, success, NULL);
-    else if (target != *Game::pLocalPlayer || IsInGame()) {
+    if (IsInGame() && !IsInMultiplayerGame()) {
         PlayerControl_RpcMurderPlayer(Player, target, success, NULL);
-        /*for (auto p : GetAllPlayerControl()) {
-            auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
-                uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::Reliable, p->fields._.OwnerId, NULL);
-            MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
-            MessageWriter_WriteInt32(writer, int32_t(MurderResultFlags__Enum::Succeeded), NULL);
-            InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-        }*/
+        return;
+    }
+
+    if (target->fields.protectedByGuardianId >= 0 && success) {
+        // use a batched message for guaranteed killing
+
+        uint8_t gameDataTag = 5, rpcFlag = 2;
+
+        auto writer = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+        MessageWriter_StartMessage(writer, gameDataTag, NULL);
+        MessageWriter_WriteInt32(writer, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+
+        MessageWriter_StartMessage(writer, rpcFlag, NULL);
+        MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
+        MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::MurderPlayer, NULL);
+        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+        MessageWriter_WriteInt32(writer, (int32_t)MurderResultFlags__Enum::Succeeded, NULL);
+        MessageWriter_EndMessage(writer, NULL);
+
+        MessageWriter_EndMessage(writer, NULL);
+        InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+        MessageWriter_Recycle(writer, NULL);
+
+        PlayerControl_MurderPlayer(*Game::pLocalPlayer, target, MurderResultFlags__Enum::Succeeded, NULL);
+    }
+    else if (IsInGame()) {
+        PlayerControl_RpcMurderPlayer(Player, target, success, NULL);
     }
     else {
-        for (auto p : GetAllPlayerControl()) {
-            if (p != *Game::pLocalPlayer) {
-                auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
-                    uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::Reliable, p->fields._.OwnerId, NULL);
-                MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
-                MessageWriter_WriteInt32(writer, int32_t(success ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
-                InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-            }
-            if (success) GetPlayerData(target)->fields.IsDead = true;
-        }
+        auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
+            uint8_t(RpcCalls__Enum::MurderPlayer), SendOption__Enum::Reliable, -1, NULL);
+        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)target, NULL);
+        MessageWriter_WriteInt32(writer, int32_t(success ? MurderResultFlags__Enum::Succeeded : MurderResultFlags__Enum::FailedProtected), NULL);
+        InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+        if (success) GetPlayerData(target)->fields.IsDead = true;
     }
 }
 
@@ -142,6 +157,66 @@ void CmdCheckShapeshift::Process()
     if (!PlayerSelection(Player).has_value() || !target.has_value()) return;
 
     PlayerControl_CmdCheckShapeshift(Player, target.get_PlayerControl().value_or(nullptr), animate, NULL);
+}
+
+RpcShapeshiftAsHost::RpcShapeshiftAsHost(PlayerControl* Player, const PlayerSelection& target, bool animate)
+{
+    this->Player = Player;
+    this->target = target;
+    this->animate = animate;
+}
+
+void RpcShapeshiftAsHost::Process()
+{
+    if (!PlayerSelection(Player).has_value() || !target.has_value() ||
+        !GetPlayerData(Player) || !Game::RoleManager.IsInstanceExists()) return;
+
+    // original code references:
+    // https://github.com/MrDiamond64/Hydra/blob/main/src/Utilities.cs#L192
+    // https://github.com/MrDiamond64/Hydra/blob/main/src/Network.cs#L81
+
+    auto prevRole = GetPlayerData(Player)->fields.Role->fields.Role;
+    uint8_t gameDataTag = 5, rpcFlag = 2;
+    auto targetPc = target.get_PlayerControl().value_or(nullptr);
+
+    auto writer = MessageWriter_Get(SendOption__Enum::Reliable, NULL);
+    MessageWriter_StartMessage(writer, gameDataTag, NULL);
+    MessageWriter_WriteInt32(writer, (*Game::pAmongUsClient)->fields._.GameId, NULL);
+
+    if (prevRole != RoleTypes__Enum::Shapeshifter) {
+        // set the player's role temporarily to shapeshifter to get around the vanilla anticheat
+        MessageWriter_StartMessage(writer, rpcFlag, NULL);
+        MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
+        MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::SetRole, NULL);
+        MessageWriter_WriteUShort(writer, (uint16_t)RoleTypes__Enum::Shapeshifter, NULL);
+        MessageWriter_WriteBoolean(writer, true, NULL); // the role should be able to be overridden
+        MessageWriter_EndMessage(writer, NULL);
+    }
+
+    // actually shapeshift the player
+    PlayerControl_Shapeshift(Player, targetPc, animate, NULL);
+    MessageWriter_StartMessage(writer, rpcFlag, NULL);
+    MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
+    MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::Shapeshift, NULL);
+    MessageExtensions_WriteNetObject(writer, (InnerNetObject*)targetPc, NULL);
+    MessageWriter_WriteBoolean(writer, animate, NULL);
+    MessageWriter_EndMessage(writer, NULL);
+
+    if (prevRole != RoleTypes__Enum::Shapeshifter) {
+        // set the player's role back to their previous role
+        MessageWriter_StartMessage(writer, rpcFlag, NULL);
+        MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
+        MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::SetRole, NULL);
+        MessageWriter_WriteUShort(writer, (uint16_t)prevRole, NULL);
+        MessageWriter_WriteBoolean(writer, true, NULL); // the role should be able to be overridden
+        MessageWriter_EndMessage(writer, NULL);
+    }
+
+    MessageWriter_EndMessage(writer, NULL);
+    InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
+    MessageWriter_Recycle(writer, NULL);
+
+    // PlayerControl_CmdCheckShapeshift(Player, target.get_PlayerControl().value_or(nullptr), animate, NULL);
 }
 
 RpcVanish::RpcVanish(PlayerControl* Player, bool appear)
@@ -263,7 +338,7 @@ void RpcClearVote::Process()
 {
     if (!PlayerSelection(Player).has_value()) return;
 
-    MeetingHud_RpcClearVote(MeetingHud__TypeInfo->static_fields->Instance, Player->fields._.OwnerId, NULL);
+    MeetingHud_RpcClearVote(MeetingHud__TypeInfo->static_fields->Instance, (PlayerId)Player->fields.PlayerId, NULL);
 }
 
 RpcEndMeeting::RpcEndMeeting() {
@@ -410,7 +485,7 @@ void RpcForceDetectAum::Process()
     MessageWriter_WriteByte(rpcMessage, player->fields.PlayerId, NULL);
     //we do a little trolling >:)
     //aum only checks for the player id thus making it, so we can send whoever we want to (even as ourselves)
-    MessageWriter_EndMessage(rpcMessage, NULL);
+    InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), rpcMessage, NULL);
 }
 
 RpcForceSickoChat::RpcForceSickoChat(const PlayerSelection& target, std::string_view msg, bool completeForce)
@@ -494,6 +569,54 @@ void RpcBootFromVent::Process()
     if (!PlayerSelection(Player).has_value()) return;
 
     PlayerPhysics_RpcBootFromVent(Player->fields.MyPhysics, ventId, NULL);
+}
+
+RpcBootFromVentNonHost::RpcBootFromVentNonHost(PlayerControl* Player, int ventId)
+{
+    this->Player = Player;
+    this->ventId = ventId;
+}
+
+void RpcBootFromVentNonHost::Process()
+{
+    if (!PlayerSelection(Player).has_value()) return;
+
+    SendBootVentNonHost(Player, ventId);
+}
+
+AttemptToBan::AttemptToBan(PlayerControl* Player)
+{
+    this->Player = Player;
+}
+
+void AttemptToBan::Process()
+{
+    auto hostPc = InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Character;
+    if (hostPc == NULL) return;
+
+    if (Player == NULL) {
+        SendBootVentNonHost(hostPc, 1, -1);
+        return;
+    }
+
+    SendBootVentNonHost(hostPc, 1, Player->fields._.OwnerId);
+}
+
+SendKillImmunity::SendKillImmunity(bool enabled, int ventId)
+{
+    this->enabled = enabled;
+    this->ventId = ventId;
+}
+
+void SendKillImmunity::Process()
+{
+    if (!IsInGame() || !PlayerSelection(*Game::pLocalPlayer).has_value()) return;
+    auto myPhysics = (*Game::pLocalPlayer)->fields.MyPhysics;
+    if (myPhysics == NULL) return;
+
+    auto ventOp = enabled ? VentilationSystem_Operation__Enum::Enter : VentilationSystem_Operation__Enum::Exit;
+
+    VentilationSystem_Update(ventOp, ventId, NULL);
 }
 
 PunishEveryone::PunishEveryone(bool isBan)

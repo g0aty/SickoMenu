@@ -116,6 +116,51 @@ namespace TasksTab {
 		}
 	}
 
+	void DrainHideTimer() {
+		// reference: https://github.com/MrDiamond64/Hydra/blob/5962db3dbbcb44e63e8afdb20e9173f8f1ced802/src/ui/sections/TrollSection.cs#L126
+
+		if (!GameOptions().HasOptions() || *Game::pGameData == NULL) return;
+
+		GameOptions options;
+		if (options.GetGameMode() != GameModes__Enum::HideNSeek) return;
+
+		auto gameMgr = GameManager_get_Instance(NULL);
+		auto gameFlowHns = (LogicGameFlowHnS*)gameMgr->fields._LogicFlow_k__BackingField;
+
+		if (gameFlowHns == NULL) return;
+
+		auto tasks = GetNormalPlayerTasks(*Game::pLocalPlayer);
+		float hideTime = gameFlowHns->fields.currentHideTime;
+
+		if (IsHost()) {
+			State.rpcQueue.push(new RpcDrainHideTimer(hideTime));
+			return;
+		}
+
+		if (tasks.size() == 0) return; 
+
+		uint32_t targetTaskId = 0;
+		NormalPlayerTask_TaskLength__Enum targetTaskType = NormalPlayerTask_TaskLength__Enum::None;
+		for (auto task : tasks) {
+			// find the longest tasks for the shortest completion count
+			if (task->fields.Length <= targetTaskType) continue;
+
+			targetTaskId = task->fields._._Id_k__BackingField;
+			targetTaskType = task->fields.Length;
+			if (targetTaskType == NormalPlayerTask_TaskLength__Enum::Long) break;
+		}
+
+		// using the game's logic for common/short/long task time deductions instead of using them directly
+		float singleTaskTimeDeduction = 20.f - (float)GameData_get_PlayerCount(*Game::pGameData, NULL);
+		if (targetTaskType != NormalPlayerTask_TaskLength__Enum::Long) singleTaskTimeDeduction /= 2.f;
+
+		int completionCount = (int)ceil(hideTime / singleTaskTimeDeduction);
+
+		for (int i = 0; i < completionCount; ++i) {
+			State.taskRpcQueue.push(new RpcCompleteTask(targetTaskId));
+		}
+	}
+
 	void Render() {
 		bool inGameWithTasks = IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL;
 		bool lobbyHost = IsInLobby() && IsHost();
@@ -124,7 +169,6 @@ namespace TasksTab {
 
 		ImGui::SameLine(100 * State.dpiScale);
 		ImGui::BeginChild("###Tasks", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
-		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 		if (inGameWithTasks) {
 			auto tasks = GetNormalPlayerTasks(*Game::pLocalPlayer);
@@ -135,16 +179,31 @@ namespace TasksTab {
 					++tasksCompleted;
 			}
 
+			auto gameMgr = GameManager_get_Instance(NULL);
+			auto gameFlowHns = (LogicGameFlowHnS*)gameMgr->fields._LogicFlow_k__BackingField;
+
+			if (GameOptions().HasOptions() && gameFlowHns != NULL && IsInGame() &&
+				(tasks.size() != 0 || (IsHost() && gameFlowHns->fields.currentHideTime > 0.f))) {
+				GameOptions options;
+
+				if (options.GetGameMode() == GameModes__Enum::HideNSeek && AnimatedButton("Drain Hide Timer")) {
+					DrainHideTimer();
+				}
+				ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+			}
+
 			if (tasks.size() != tasksCompleted) {
 				if (AnimatedButton("Complete All Tasks")) {
 					CompleteAllTasks();
 				}
+				ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 			}
 			if (!State.SafeMode) ImGui::SameLine();
 			if (!State.SafeMode && AnimatedButton("Complete Everyone's Tasks")) {
 				for (auto player : GetAllPlayerControl()) {
 					CompleteAllTasks(player);
 				}
+				ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 			}
 
 			ImGui::NewLine();
@@ -168,54 +227,102 @@ namespace TasksTab {
 					, TranslateTaskTypes(task->fields._.TaskType));
 			}
 
-			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
-			ImGui::Separator();
-			ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
+			if (tasks.size() > 0) {
+				ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
+				ImGui::Separator();
+				ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
+			}
 
 			GameOptions options;
-			if (!options.GetBool(app::BoolOptionNames__Enum::VisualTasks) && ToggleButton("Bypass Visual Tasks Being Off", &State.BypassVisualTasks))
+			if (!options.GetBool(app::BoolOptionNames__Enum::VisualTasks, false) && ToggleButton("Bypass Visual Tasks Being Off", &State.BypassVisualTasks))
 				State.Save();
 
-			if (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) {
+			if (!State.BypassVisualTasks && options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks, false)) {
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Visual tasks are turned OFF in this lobby.");
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Any animations (other than cameras) are client-sided only!");
 			}
-			else if (options.GetGameMode() == GameModes__Enum::HideNSeek)
+			else if (!State.BypassVisualTasks && options.GetGameMode() == GameModes__Enum::HideNSeek)
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Animations other than cameras are client-sided only in Hide n Seek!");
 
 			if (State.mapType == Settings::MapType::Ship) {
-				bool clientSide = (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek);
-				if (AnimatedButton(clientSide ? "Play Shields Animation (Client-sided)" : "Play Shields Animation")) {
-					State.rpcQueue.push(new RpcPlayAnimation(1));
+				if (!State.BypassVisualTasks && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks, false)) {
+					if (AnimatedButton("Play Shields Animation (Client-sided)"))
+					{
+						State.rpcQueue.push(new RpcPlayAnimation(1));
+					}
+				}
+				else {
+					if (AnimatedButton("Play Shields Animation"))
+					{
+						State.rpcQueue.push(new RpcPlayAnimation(1));
+					}
 				}
 			}
 
 			if (State.mapType == Settings::MapType::Ship) {
-				bool clientSide = (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek);
-				if (AnimatedButton(clientSide ? "Play Trash Animation (Client-sided)" : "Play Trash Animation")) {
-					State.rpcQueue.push(new RpcPlayAnimation(10));
+				if (!State.BypassVisualTasks && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks, false)) {
+					if (AnimatedButton("Play Trash Animation (Client-sided)"))
+					{
+						State.rpcQueue.push(new RpcPlayAnimation(10));
+					}
+				}
+				else {
+					if (AnimatedButton("Play Trash Animation"))
+					{
+						State.rpcQueue.push(new RpcPlayAnimation(10));
+					}
 				}
 			}
 
 			if (State.mapType == Settings::MapType::Ship || State.mapType == Settings::MapType::Pb) {
-				bool clientSide = (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek);
-				if (ToggleButton(clientSide ? "Play Weapons Animation (Client-sided)" : "Play Weapons Animation", &State.PlayWeaponsAnimation)) {
-					State.Save();
+
+				if (!State.BypassVisualTasks && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks, false)) {
+					if (ToggleButton("Play Weapons Animation (Client-sided)", &State.PlayWeaponsAnimation))
+					{
+						State.Save();
+					}
+				}
+				else {
+					if (ToggleButton("Play Weapons Animation", &State.PlayWeaponsAnimation))
+					{
+						State.Save();
+					}
 				}
 			}
 
-			bool clientSide = (!State.BypassVisualTasks && (options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks)) || options.GetGameMode() == GameModes__Enum::HideNSeek);
-			if (ToggleButton(clientSide ? "Play Medbay Scan Animation (Client-sided)" : "Play Medbay Scan Animation", &State.PlayMedbayScan)) {
-				if (State.PlayMedbayScan) State.rpcQueue.push(new RpcSetScanner(true));
-				else State.rpcQueue.push(new RpcSetScanner(false));
+			if (!State.BypassVisualTasks && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks, false)) {
+				if (ToggleButton("Play Medbay Scan Animation (Client-sided)", &State.PlayMedbayScan))
+				{
+					if (State.PlayMedbayScan)
+					{
+						State.rpcQueue.push(new RpcSetScanner(true));
+					}
+					else
+					{
+						State.rpcQueue.push(new RpcSetScanner(false));
+					}
+				}
+			}
+			else {
+				if (ToggleButton("Play Medbay Scan Animation", &State.PlayMedbayScan))
+				{
+					if (State.PlayMedbayScan)
+					{
+						State.rpcQueue.push(new RpcSetScanner(true));
+					}
+					else
+					{
+						State.rpcQueue.push(new RpcSetScanner(false));
+					}
+				}
 			}
 
 			if (!(State.mapType == Settings::MapType::Hq || State.mapType == Settings::MapType::Fungle) && ToggleButton("Fake Cameras In Use", &State.FakeCameraUsage)) {
 				State.rpcQueue.push(new RpcUpdateSystem(SystemTypes__Enum::Security, (State.FakeCameraUsage ? 1 : 0)));
 			}
 
-			if (IsInMultiplayerGame()) {
-				float taskPercentage = (float)(*Game::pGameData)->fields.CompletedTasks / (float)(*Game::pGameData)->fields.TotalTasks;
+			if (IsInMultiplayerGame() && IsInGame()) {
+				float taskPercentage = (*Game::pGameData)->fields.TotalTasks == 0 ? 1.f : (float)(*Game::pGameData)->fields.CompletedTasks / (float)(*Game::pGameData)->fields.TotalTasks;
 				ImGui::TextColored(ImVec4(1.0f - taskPercentage, 1.0f, 1.0f - taskPercentage, 1.0f), "%.2f%% Total Tasks Completed", taskPercentage * 100);
 			}
 		}

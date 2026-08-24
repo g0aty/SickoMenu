@@ -153,8 +153,9 @@ namespace GameTab {
         else if (name == "Anticheat") CloseOtherGroups(Groups::Anticheat);
         else if (name == "Utils") CloseOtherGroups(Groups::Utils);
         else if (name == "History") CloseOtherGroups(Groups::History);
-        else if (name == "Options") CloseOtherGroups(Groups::Options);
+        else if (name == "Options" && (GameOptions().HasOptions() && (IsInGame() || IsInLobby()))) CloseOtherGroups(Groups::Options);
     }
+
     void Render() {
         ImGui::SameLine(100 * State.dpiScale);
         ImGui::BeginChild("###Game", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
@@ -209,10 +210,10 @@ namespace GameTab {
                 if (CustomListBoxInt("Task Bar Updates", &State.TaskBarUpdates, TASKBARUPDATES, 225 * State.dpiScale))
                     State.PrevTaskBarUpdates = State.TaskBarUpdates;
             }*/
-            if (ToggleButton("No Ability Cooldown", &State.NoAbilityCD)) {
+            /*if (ToggleButton("No Ability Cooldown", &State.NoAbilityCD)) {
                 State.Save();
             }
-            ImGui::SameLine();
+            ImGui::SameLine();*/
             if (ToggleButton("Multiply Speed", &State.MultiplySpeed)) {
                 State.Save();
             }
@@ -339,6 +340,55 @@ namespace GameTab {
                 State.Save();
             }
 
+            if (IsInGame()/* && (IsHost() || !State.SafeMode)*/) {
+                std::vector<const char*> allVents;
+                switch (State.mapType) {
+                case Settings::MapType::Ship:
+                    allVents = SHIPVENTS;
+                    break;
+                case Settings::MapType::Hq:
+                    allVents = HQVENTS;
+                    break;
+                case Settings::MapType::Pb:
+                    allVents = PBVENTS;
+                    break;
+                case Settings::MapType::Airship:
+                    allVents = AIRSHIPVENTS;
+                    break;
+                case Settings::MapType::Fungle:
+                    allVents = FUNGLEVENTS;
+                    break;
+                }
+                State.SelectedVentId = std::clamp(State.SelectedVentId, 0, (int)allVents.size() - 1);
+
+                ImGui::SetNextItemWidth(100 * State.dpiScale);
+                CustomListBoxInt("Vent", &State.SelectedVentId, allVents);
+                ImGui::SameLine();
+                if (AnimatedButton("Teleport All to Vent")) {
+                    for (auto p : GetAllPlayerControl()) {
+                        if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
+                        if (IsHost() || !State.SafeMode)
+                            State.rpcQueue.push(new RpcBootFromVent(p, (State.mapType == Settings::MapType::Hq) ? State.SelectedVentId + 1 : State.SelectedVentId)); //MiraHQ vents start from 1 instead of 0
+                        else
+                            State.rpcQueue.push(new RpcBootFromVentNonHost(p, (State.mapType == Settings::MapType::Hq) ? State.SelectedVentId + 1 : State.SelectedVentId)); //MiraHQ vents start from 1 instead of 0
+                    }
+                }
+                if (ToggleButton("Spam TP All to Vent", &State.SpamVentTpEveryone)) {
+                    if (State.SpamVentTpEveryone) State.SpamVentTpEveryoneRandom = false;
+                }
+                ImGui::SameLine();
+                if (ToggleButton("Spam TP All to Random Vents", &State.SpamVentTpEveryoneRandom)) {
+                    if (State.SpamVentTpEveryoneRandom) State.SpamVentTpEveryone = false;
+                }
+
+                if (ToggleButton("Ignore Self", &State.IgnoreVentTpSelf)) {
+                    State.Save();
+                }
+                if (IsInMultiplayerGame() && AnimatedButton("Attempt to Ban Everyone")) {
+                    State.rpcQueue.push(new AttemptToBan(NULL));
+                }
+            }
+
             if ((IsInGame() || (IsInLobby() && State.KillInLobbies)) && (IsHost() || !State.SafeMode)) {
                 if (AnimatedButton("Kill All Crewmates")) {
                     for (auto player : GetAllPlayerControl()) {
@@ -388,38 +438,6 @@ namespace GameTab {
                                     State.lobbyRpcQueue.push(new RpcMurderPlayer(player, player,
                                         player->fields.protectedByGuardianId < 0 || State.BypassAngelProt));
                             }
-                        }
-                    }
-                }
-
-                static int ventId = 0;
-                if (IsInGame() && (IsHost() || !State.SafeMode)) {
-                    std::vector<const char*> allVents;
-                    switch (State.mapType) {
-                    case Settings::MapType::Ship:
-                        allVents = SHIPVENTS;
-                        break;
-                    case Settings::MapType::Hq:
-                        allVents = HQVENTS;
-                        break;
-                    case Settings::MapType::Pb:
-                        allVents = PBVENTS;
-                        break;
-                    case Settings::MapType::Airship:
-                        allVents = AIRSHIPVENTS;
-                        break;
-                    case Settings::MapType::Fungle:
-                        allVents = FUNGLEVENTS;
-                        break;
-                    }
-                    ventId = std::clamp(ventId, 0, (int)allVents.size() - 1);
-
-                    ImGui::SetNextItemWidth(100 * State.dpiScale);
-                    CustomListBoxInt("Vent", &ventId, allVents);
-                    ImGui::SameLine();
-                    if (AnimatedButton("Teleport All to Vent")) {
-                        for (auto p : GetAllPlayerControl()) {
-                            State.rpcQueue.push(new RpcBootFromVent(p, (State.mapType == Settings::MapType::Hq) ? ventId + 1 : ventId)); //MiraHQ vents start from 1 instead of 0
                         }
                     }
                 }
@@ -525,7 +543,7 @@ namespace GameTab {
             {
                 State.Save();
             }
-            if (IsHost() || !State.SafeMode) {
+            if ((IsHost() && IsInGame()) || !State.SafeMode) {
                 if (CustomListBoxInt("Chat Spam Mode", &State.ChatSpamMode,
                     { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
             }
@@ -633,7 +651,7 @@ namespace GameTab {
                 }
             }
             ImGui::Text("Detect Actions:");
-            if (ToggleButton("AUM/KillNetwork Usage", &State.SMAC_CheckAUM)) State.Save();
+            if (ToggleButton("Known Cheat Usage", &State.SMAC_CheckOtherCheats)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
             ImGui::SameLine();
@@ -747,10 +765,21 @@ namespace GameTab {
             if (ToggleButton("Ignore Whitelisted Players [Ban/Kick]", &State.Ban_IgnoreWhitelist)) {
                 State.Save();
             }
+
             if (IsInLobby() && ToggleButton("Attempt to Crash Lobby", &State.CrashSpamReport)) {
                 State.Save();
             }
+
             if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
+
+            /*if (!IsInGame() && !IsInLobby()) {
+                if (ToggleButton("Overflow", &State.Overflow)) {
+                    State.Save();
+                }
+
+                if (State.Overflow) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Players who joined a lobby before you are disconnected after 30 seconds"));
+            }*/
+
             if (State.AprilFoolsMode) {
                 ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? "Diddy Party Mode" : (IsChatCensored() || IsStreamerMode() ? "F***son Mode" : "Fuckson Mode"));
                 if (ToggleButton("Mog Everyone [Sigma]", &State.BrainrotEveryone)) {
@@ -823,7 +852,7 @@ namespace GameTab {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
-                if (ToggleButton("Ban Auto-Rejoin Players", &State.BanLeavers)) {
+                if (ToggleButton("Ban Repeatedly Rejoining Players", &State.BanLeavers)) {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
@@ -1387,7 +1416,8 @@ namespace GameTab {
                     int pid = data->fields.PlayerId;
                     auto modIt = State.modUsers.find(pid);
                     if (modIt != State.modUsers.end()) {
-                        cheatName = RemoveHtmlTags(modIt->second);
+                        std::string modVersionDisplay = modIt->second[1].empty() ? "" : " " + modIt->second[1];
+                        cheatName = RemoveHtmlTags(modIt->second[0] + modVersionDisplay);
                         isCheater = true;
                     }
 
@@ -1451,8 +1481,8 @@ namespace GameTab {
                             ImGui::SetClipboardText(lobby.Code.c_str());
                         ImGui::SameLine();
                         if (AnimatedButton(("Join##" + lobby.Code).c_str())) {
-                            State.AutoJoinLobbyCode = lobby.Code;
-                            State.AutoJoinLobby = true;
+                            State.JoinLobbyCode = lobby.Code;
+                            State.JoinLobby = true;
                         }
                         ImGui::SameLine();
                         if (AnimatedButton(("Clear##" + lobby.Code).c_str())) {

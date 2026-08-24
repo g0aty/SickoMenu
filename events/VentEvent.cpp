@@ -2,15 +2,13 @@
 #include "_events.h"
 #include "utility.h"
 
-VentEvent::VentEvent(const EVENT_PLAYER& source, const Vector2& position, VENT_ACTIONS action) : EventInterface(source, EVENT_TYPES::EVENT_VENT)
-{
+VentEvent::VentEvent(const EVENT_PLAYER& source, const Vector2& position, VENT_ACTIONS action) : EventInterface(source, EVENT_TYPES::EVENT_VENT) {
 	this->position = position;
 	this->systemType = GetSystemTypes(position);
 	this->action = action;
 }
 
-void VentEvent::Output()
-{
+void VentEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
 	ImGui::SameLine();
 	ImGui::Text("(%s)", TranslateSystemTypes(systemType));
@@ -18,8 +16,7 @@ void VentEvent::Output()
 	ImGui::Text("[%s ago]", std::format("{:%OM:%OS}", (std::chrono::system_clock::now() - this->timestamp)).c_str());
 }
 
-void VentEvent::ColoredEventOutput()
-{
+void VentEvent::ColoredEventOutput() {
 	ImGui::Text("[ VENT");
 	ImGui::SameLine();
 
@@ -31,14 +28,12 @@ void VentEvent::ColoredEventOutput()
 	ImGui::Text("]");
 }
 
-SabotageEvent::SabotageEvent(const EVENT_PLAYER& source, SystemTypes__Enum systemType, SABOTAGE_ACTIONS action) : EventInterface(source, EVENT_TYPES::EVENT_SABOTAGE)
-{
+SabotageEvent::SabotageEvent(const EVENT_PLAYER& source, SystemTypes__Enum systemType, SABOTAGE_ACTIONS action) : EventInterface(source, EVENT_TYPES::EVENT_SABOTAGE) {
 	this->systemType = systemType;
 	this->action = action;
 }
 
-void SabotageEvent::Output()
-{
+void SabotageEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
 	ImGui::SameLine();
 	ImGui::Text("(%s)", TranslateSystemTypes(systemType));
@@ -46,8 +41,7 @@ void SabotageEvent::Output()
 	ImGui::Text("[%s ago]", std::format("{:%OM:%OS}", (std::chrono::system_clock::now() - this->timestamp)).c_str());
 }
 
-void SabotageEvent::ColoredEventOutput()
-{
+void SabotageEvent::ColoredEventOutput() {
 	ImGui::Text("[");
 	ImGui::SameLine();
 
