@@ -917,10 +917,10 @@ namespace HostTab {
                 if (ImGui::CollapsingHeader("Roles", ImGuiTreeNodeFlags_DefaultOpen)) {
                     ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
                     static const std::vector<std::pair<const char*, const char*>> ROLE_COMMANDS = {
-                        { "/color", "color" }, { "/rules", "r" },
-                        { "/sicko", "sicko" }, { "/warn & /unwarn", "warn" },
-                        { "/kick & /kickc", "kick" }, { "/ban & /banc", "ban" },
-                        { "/callmeeting", "callmeeting" }, { "/endmeeting", "endmeeting" }, { "/start", "start" }, { "/end", "end" },
+        { "/color", "color" }, { "/preset", "preset" },
+    { "/sicko", "sicko" }, { "/warn & /unwarn", "warn" },
+    { "/kick & /kickc", "kick" }, { "/ban & /banc", "ban" },
+    { "/callmeeting", "callmeeting" }, { "/endmeeting", "endmeeting" }, { "/start", "start" }, { "/end", "end" },
                     };
                     static int selectedRole = 0;
                     static std::string newRoleName = "";
@@ -950,6 +950,8 @@ namespace HostTab {
                     ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
 
                     if (State.Mod_RoleRank.size() < State.Mod_RoleNames.size()) State.Mod_RoleRank.resize(State.Mod_RoleNames.size(), 0);
+                    if (State.Mod_RoleMembers.size() < State.Mod_RoleNames.size()) State.Mod_RoleMembers.resize(State.Mod_RoleNames.size());
+                    if (State.Mod_RolePermissions.size() < State.Mod_RoleNames.size()) State.Mod_RolePermissions.resize(State.Mod_RoleNames.size());
 
                     if (!State.Mod_RoleNames.empty()) {
                         selectedRole = std::clamp(selectedRole, 0, (int)State.Mod_RoleNames.size() - 1);
@@ -958,12 +960,16 @@ namespace HostTab {
                         ImGui::Text("Select Role:");
                         ImGui::SameLine();
                         CustomListBoxInt("SelectedRole", &selectedRole, roleVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
-                        ImGui::SameLine();
-                        ImGui::SetNextItemWidth(60.0f * State.dpiScale);
-                        ImGui::InputInt("##EditRoleRank", &State.Mod_RoleRank[selectedRole]);
-                        ImGui::SameLine();
-                        if (AnimatedButton("Set Rank")) {
-                            State.Save();
+                        if (selectedRole != 0) {
+                            ImGui::SameLine();
+                            ImGui::SetNextItemWidth(60.0f * State.dpiScale);
+                            if (ImGui::InputInt("##EditRoleRank", &State.Mod_RoleRank[selectedRole])) {
+                                if (State.Mod_RoleRank[selectedRole] < 0) State.Mod_RoleRank[selectedRole] = 0;
+                            }
+                            ImGui::SameLine();
+                            if (AnimatedButton("Set Rank")) {
+                                State.Save();
+                            }
                         }
                     }
                     else {
@@ -982,14 +988,16 @@ namespace HostTab {
                                 State.Save();
                             }
                         }
-                        ImGui::SameLine();
-                        if (AnimatedButton("Delete Role")) {
-                            State.Mod_RoleNames.erase(State.Mod_RoleNames.begin() + selectedRole);
-                            State.Mod_RoleMembers.erase(State.Mod_RoleMembers.begin() + selectedRole);
-                            State.Mod_RolePermissions.erase(State.Mod_RolePermissions.begin() + selectedRole);
-                            State.Mod_RoleRank.erase(State.Mod_RoleRank.begin() + selectedRole);
-                            State.Save();
-                            isRoleDeleted = true;
+                        if (selectedRole != 0) {
+                            ImGui::SameLine();
+                            if (AnimatedButton("Delete Role")) {
+                                State.Mod_RoleNames.erase(State.Mod_RoleNames.begin() + selectedRole);
+                                State.Mod_RoleMembers.erase(State.Mod_RoleMembers.begin() + selectedRole);
+                                State.Mod_RolePermissions.erase(State.Mod_RolePermissions.begin() + selectedRole);
+                                State.Mod_RoleRank.erase(State.Mod_RoleRank.begin() + selectedRole);
+                                State.Save();
+                                isRoleDeleted = true;
+                            }
                         }
 
                         if (!isRoleDeleted) {
@@ -1012,17 +1020,33 @@ namespace HostTab {
                                 ImGui::NextColumn();
                             }
                             ImGui::Columns(1);
-
                             ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
-                            ImGui::Text("Members:");
-                            ImGui::SetNextItemWidth(150.0f * State.dpiScale);
-                            InputString("##NewMemberCode", &newMemberCode, ImGuiInputTextFlags_EnterReturnsTrue);
-                            ImGui::SameLine();
-                            if (AnimatedButton("Add (friendcode)##RoleMember")) {
-                                if (!newMemberCode.empty()) {
-                                    State.Mod_RoleMembers[selectedRole].push_back(newMemberCode);
-                                    newMemberCode = "";
-                                    State.Save();
+                            if (selectedRole == 0) {
+                                ImGui::TextDisabled("Applies to every player automatically - no members needed.");
+                            }
+                            else {
+                                ImGui::Text("Members:");
+                                ImGui::SetNextItemWidth(150.0f * State.dpiScale);
+                                InputString("##NewMemberCode", &newMemberCode, ImGuiInputTextFlags_EnterReturnsTrue);
+                                ImGui::SameLine();
+                                if (AnimatedButton("Add (friendcode)##RoleMember")) {
+                                    if (!newMemberCode.empty()) {
+                                        State.Mod_RoleMembers[selectedRole].push_back(newMemberCode);
+                                        newMemberCode = "";
+                                        State.Save();
+                                    }
+                                }
+                                auto& members = State.Mod_RoleMembers[selectedRole];
+                                if (!members.empty()) {
+                                    selectedMemberIndex = std::clamp(selectedMemberIndex, 0, (int)members.size() - 1);
+                                    std::vector<const char*> memberVector(members.size(), nullptr);
+                                    for (size_t i = 0; i < members.size(); i++) memberVector[i] = members[i].c_str();
+                                    CustomListBoxInt("##RemoveRoleMember", &selectedMemberIndex, memberVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
+                                    ImGui::SameLine();
+                                    if (AnimatedButton("Remove##RoleMember")) {
+                                        members.erase(members.begin() + selectedMemberIndex);
+                                        State.Save();
+                                    }
                                 }
                             }
                             auto& members = State.Mod_RoleMembers[selectedRole];

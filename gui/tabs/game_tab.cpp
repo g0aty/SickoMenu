@@ -548,29 +548,149 @@ namespace GameTab {
                     { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
             }
 
-            if (std::find(State.ChatPresets.begin(), State.ChatPresets.end(), State.chatMessage) == State.ChatPresets.end() && AnimatedButton("Add Message as Preset")) {
-                State.ChatPresets.push_back(State.chatMessage);
-                State.Save();
-            }
             if (!(IsHost() || !State.SafeMode) && State.chatMessage.size() > 120) {
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Message will be detected by anticheat.");
             }
-            if (!State.ChatPresets.empty()) {
-                static int selectedPresetIndex = 0;
-                selectedPresetIndex = std::clamp(selectedPresetIndex, 0, (int)State.ChatPresets.size() - 1);
-                std::vector<const char*> presetVector(State.ChatPresets.size(), nullptr);
-                for (size_t i = 0; i < State.ChatPresets.size(); i++) {
-                    presetVector[i] = State.ChatPresets[i].c_str();
+
+            ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+            if (ImGui::CollapsingHeader("Chat Presets", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
+                static std::string newChatPresetName = "MyPreset";
+                static int lastRenameIndex = -1;
+
+                if (!State.ChatPresets.empty()) {
+                    std::vector<const char*> presetNames;
+                    for (auto& p : State.ChatPresets) presetNames.push_back(p.Name.c_str());
+                    State.SelectedChatPreset = std::clamp(State.SelectedChatPreset, 0, (int)State.ChatPresets.size() - 1);
+                    CustomListBoxInt("##chatpresetselect", &State.SelectedChatPreset, presetNames, 200.0f * State.dpiScale, ImVec4(0, 0, 0, 0), 0, "Preset");
+                    auto& selected = State.ChatPresets[State.SelectedChatPreset];
+
+                    if (lastRenameIndex != State.SelectedChatPreset) {
+                        newChatPresetName = selected.Name;
+                        lastRenameIndex = State.SelectedChatPreset;
+                    }
+
+                    ImGui::SameLine();
+                    if (AnimatedButton("Apply##chatpreset")) {
+                        State.chatMessage = selected.Messages.empty() ? "" : selected.Messages[0];
+                    }
+                    ImGui::SameLine();
+                    if (AnimatedButton("Update##chatpreset")) {
+                        selected.Messages = { State.chatMessage };
+                        State.Save();
+                    }
+                    ImGui::SameLine();
+                    if (AnimatedButton("Delete##chatpreset")) {
+                        State.ChatPresets.erase(State.ChatPresets.begin() + State.SelectedChatPreset);
+                        if (!State.ChatPresets.empty())
+                            State.SelectedChatPreset = std::clamp(State.SelectedChatPreset, 0, (int)State.ChatPresets.size() - 1);
+                        lastRenameIndex = -1;
+                        State.Save();
+                    }
                 }
-                CustomListBoxInt("Message to Send/Remove", &selectedPresetIndex, presetVector);
-                auto msg = State.ChatPresets[selectedPresetIndex];
-                if (AnimatedButton("Set as Chat Message"))
-                {
-                    State.chatMessage = msg;
+                else {
+                    ImGui::TextDisabled("No presets saved.");
                 }
+
+                ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+
+                ImGui::SetNextItemWidth(160 * State.dpiScale);
+                InputString("##PresetNameInput", &newChatPresetName);
                 ImGui::SameLine();
-                if (AnimatedButton("Remove"))
-                    State.ChatPresets.erase(State.ChatPresets.begin() + selectedPresetIndex);
+                ImGui::TextUnformatted("Preset Name");
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Preset names can't contain spaces to be usable with /cmd (e.g. /rules).");
+                ImGui::SameLine();
+                if (AnimatedButton("Save Current##chatpreset")) {
+                    std::string sanitizedName = newChatPresetName;
+                    sanitizedName.erase(std::remove(sanitizedName.begin(), sanitizedName.end(), ' '), sanitizedName.end());
+                    Settings::ChatPreset p;
+                    p.Name = sanitizedName.empty() ? "Preset" : sanitizedName;
+                    p.Messages = { State.chatMessage };
+                    State.ChatPresets.push_back(p);
+                    State.SelectedChatPreset = (int)State.ChatPresets.size() - 1;
+                    lastRenameIndex = State.SelectedChatPreset;
+                    State.Save();
+                }
+                if (!State.ChatPresets.empty()) {
+                    ImGui::SameLine();
+                    if (AnimatedButton("Rename##chatpreset")) {
+                        std::string sanitizedName = newChatPresetName;
+                        sanitizedName.erase(std::remove(sanitizedName.begin(), sanitizedName.end(), ' '), sanitizedName.end());
+                        if (!sanitizedName.empty()) {
+                            State.ChatPresets[State.SelectedChatPreset].Name = sanitizedName;
+                            State.Save();
+                        }
+                    }
+                }
+
+                ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+
+                // Only single message presets can be included, to prevent the already combined presets from piling up.
+                std::vector<int> combinableIndices;
+                for (int i = 0; i < (int)State.ChatPresets.size(); i++) {
+                    if (State.ChatPresets[i].Messages.size() <= 1) combinableIndices.push_back(i);
+                }
+
+                if (combinableIndices.size() >= 2 && ImGui::CollapsingHeader("Combine Presets")) {
+                    ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
+                    static std::vector<std::pair<const char*, bool>> combineList;
+                    static std::vector<std::string> combineNamesCache;
+                    static size_t lastCombinableCount = 0;
+                    static std::vector<bool> prevCombineChecked;
+                    static std::vector<int> combineSelectionOrder; // saves into combineList in the order the user checked them
+                    if (combineList.size() != combinableIndices.size()) {
+                        combineNamesCache.clear();
+                        for (int idx : combinableIndices) combineNamesCache.push_back(State.ChatPresets[idx].Name);
+                        combineList.clear();
+                        for (auto& n : combineNamesCache) combineList.push_back({ n.c_str(), false });
+                        lastCombinableCount = combinableIndices.size();
+                        prevCombineChecked.assign(combineList.size(), false);
+                        combineSelectionOrder.clear();
+                    }
+
+                    CustomListBoxIntMultiple("Presets to Combine", &combineList, 220.0f * State.dpiScale);
+
+                    if (prevCombineChecked.size() != combineList.size())
+                        prevCombineChecked.assign(combineList.size(), false);
+                    for (size_t i = 0; i < combineList.size(); i++) {
+                        bool nowChecked = combineList[i].second;
+                        bool wasChecked = prevCombineChecked[i];
+                        if (nowChecked && !wasChecked) {
+                            combineSelectionOrder.push_back((int)i);
+                        }
+                        else if (!nowChecked && wasChecked) {
+                            combineSelectionOrder.erase(std::remove(combineSelectionOrder.begin(), combineSelectionOrder.end(), (int)i), combineSelectionOrder.end());
+                        }
+                        prevCombineChecked[i] = nowChecked;
+                    }
+
+                    ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+                    static std::string combinedPresetName = "CombinedPreset";
+                    ImGui::SetNextItemWidth(160 * State.dpiScale);
+                    InputString("Combined Preset Name", &combinedPresetName);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Combine as New Preset") && combineSelectionOrder.size() >= 2) {
+                        std::string sanitizedName = combinedPresetName;
+                        sanitizedName.erase(std::remove(sanitizedName.begin(), sanitizedName.end(), ' '), sanitizedName.end());
+                        Settings::ChatPreset combined;
+                        combined.Name = sanitizedName.empty() ? "CombinedPreset" : sanitizedName;
+                        combined.Messages.clear();
+                        for (int i : combineSelectionOrder) {
+                            if (i >= 0 && i < (int)combinableIndices.size()) {
+                                for (auto& m : State.ChatPresets[combinableIndices[i]].Messages) combined.Messages.push_back(m);
+                            }
+                        }
+                        if (!combined.Messages.empty()) {
+                            State.ChatPresets.push_back(combined);
+                            State.SelectedChatPreset = (int)State.ChatPresets.size() - 1;
+                            combineList.clear(); 
+                            prevCombineChecked.clear();
+                            combineSelectionOrder.clear();
+                            State.Save();
+                        }
+                    }
+                }
             }
         }
 

@@ -766,7 +766,12 @@ public:
     std::vector<std::string> SMAC_StartWords = {};
     std::map<uint8_t, int> SMAC_StartWordsCount;
 
-    std::vector<std::string> ChatPresets = {};
+    struct ChatPreset {
+        std::string Name = "Preset";
+        std::vector<std::string> Messages = { "" }; 
+    };
+    std::vector<ChatPreset> ChatPresets = {};
+    int SelectedChatPreset = 0;
 
     std::vector<std::string> WhitelistFriendCodes = {};
     std::vector<std::string> BlacklistFriendCodes = {};

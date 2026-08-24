@@ -1311,8 +1311,12 @@ bool FriendCodeHasPermission(const std::string& friendCode, const std::string& c
     if (friendCode.empty()) return false;
     for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) {
         if (i >= State.Mod_RoleMembers.size() || i >= State.Mod_RolePermissions.size()) continue;
-        auto& members = State.Mod_RoleMembers[i];
-        if (std::find(members.begin(), members.end(), friendCode) == members.end()) continue;
+        bool isMember = i == 0; 
+        if (!isMember) {
+            auto& members = State.Mod_RoleMembers[i];
+            isMember = std::find(members.begin(), members.end(), friendCode) != members.end();
+        }
+        if (!isMember) continue;
         auto it = State.Mod_RolePermissions[i].find(commandKey);
         if (it != State.Mod_RolePermissions[i].end() && it->second) return true;
     }
@@ -1361,7 +1365,7 @@ PlayerControl* ResolveTargetByColor(int colorId) {
 std::vector<int> GetFriendCodeRoleIndices(const std::string& friendCode) {
     std::vector<int> result;
     if (friendCode.empty()) return result;
-    for (size_t i = 0; i < State.Mod_RoleMembers.size(); i++) {
+    for (size_t i = 1; i < State.Mod_RoleMembers.size(); i++) { 
         auto& members = State.Mod_RoleMembers[i];
         if (std::find(members.begin(), members.end(), friendCode) != members.end()) result.push_back((int)i);
     }
@@ -1378,12 +1382,16 @@ void SetFriendCodeInRole(const std::string& friendCode, int roleIndex, bool memb
 }
 
 int GetFriendCodeMaxRank(const std::string& friendCode) {
-    int maxRank = -1; //-1 = holds no roles at all, always outranked by any real role
+    int maxRank = 0; 
     if (friendCode.empty()) return maxRank;
     for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) {
         if (i >= State.Mod_RoleMembers.size() || i >= State.Mod_RoleRank.size()) continue;
-        auto& members = State.Mod_RoleMembers[i];
-        if (std::find(members.begin(), members.end(), friendCode) == members.end()) continue;
+        bool isMember = i == 0; 
+        if (!isMember) {
+            auto& members = State.Mod_RoleMembers[i];
+            isMember = std::find(members.begin(), members.end(), friendCode) != members.end();
+        }
+        if (!isMember) continue;
         if (State.Mod_RoleRank[i] > maxRank) maxRank = State.Mod_RoleRank[i];
     }
     return maxRank;

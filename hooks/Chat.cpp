@@ -299,6 +299,9 @@ void ShowChatNotification(ChatNotification* chatNotification, PlayerControl* sen
 
 static const std::string SICKO_SOCIALS_MESSAGE = "Check out SickoMenu!\n\nGitHub: github.com/g0aty/SickoMenu\nDisc\u043Erd: Disc\u043Erd.gg/sickos";
 
+// GetCurrentGameModeName / BuildGameRulesMessages are on hold until more gamemodes are added back -
+// /preset (below) replaces this system in the meantime, driven by user-saved presets instead of hardcoded rules.
+/*
 static std::string GetCurrentGameModeName() {
 	std::vector<std::string> GAMEMODES = State.DisableHostAnticheat
 		? std::vector<std::string>{ "Default", "Task Speedrun", "Battle Royale" }
@@ -316,6 +319,22 @@ static std::vector<std::string> BuildGameRulesMessages(const std::string& modeNa
 	}
 	return {};
 }
+*/
+
+static void SendChatPreset(const Settings::ChatPreset& preset) {
+	if (preset.Messages.empty()) return;
+	PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(preset.Messages.front()), NULL);
+	State.Mod_PendingRulesMessages = {};
+	for (size_t i = 1; i < preset.Messages.size(); i++) State.Mod_PendingRulesMessages.push(preset.Messages[i]);
+	State.Mod_PendingRulesDelay = 2.0f;
+}
+
+static const Settings::ChatPreset* FindChatPresetByName(const std::string& lowerName) {
+	for (auto& p : State.ChatPresets) {
+		if (strToLower(p.Name) == lowerName) return &p;
+	}
+	return nullptr;
+}
 
 static bool HandleChatCommand(PlayerControl* actor, const std::string& message) {
 	if (!State.Mod_EnableModeration) return false;
@@ -329,13 +348,22 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 	std::string argsLower = strToLower(rawArgs);
 
 	if (cmd == "/s") cmd = "/start";
-	if (cmd == "/rules") cmd = "/r";
 	if (cmd == "/w") cmd = "/warn";
 	if (cmd == "/uw") cmd = "/unwarn";
 	if (cmd == "/cw") cmd = "/checkwarns";
 
+
+	if (cmd != "/preset") {
+		std::string shorthandName = cmd.substr(1); // strip leading '/'
+		const Settings::ChatPreset* shorthandPreset = FindChatPresetByName(shorthandName);
+		if (shorthandPreset != nullptr) {
+			if (PlayerHasPermission(actor, "preset")) SendChatPreset(*shorthandPreset);
+			return true;
+		}
+	}
+
 	static const std::set<std::string> KNOWN_COMMANDS = {
-		"/color", "/colour", "/r", "/sicko",
+		"/color", "/colour", "/preset", "/sicko",
 		"/kick", "/kickc", "/ban", "/banc",
 		"/warn", "/warnc", "/unwarn", "/unwarnc", "/checkwarns",
 		"/callmeeting", "/endmeeting", "/start", "/end",
@@ -363,15 +391,10 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 			PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(sickoText), NULL);
 		}
 	}
-	else if (cmd == "/r") {
-		if (PlayerHasPermission(actor, "r")) {
-			auto rulesMessages = BuildGameRulesMessages(GetCurrentGameModeName());
-			if (!rulesMessages.empty()) {
-				PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(rulesMessages.front()), NULL);
-				State.Mod_PendingRulesMessages = {};
-				for (size_t i = 1; i < rulesMessages.size(); i++) State.Mod_PendingRulesMessages.push(rulesMessages[i]);
-				State.Mod_PendingRulesDelay = 2.0f;
-			}
+	else if (cmd == "/preset") {
+		if (PlayerHasPermission(actor, "preset") && !rawArgs.empty()) {
+			const Settings::ChatPreset* preset = FindChatPresetByName(argsLower);
+			if (preset != nullptr) SendChatPreset(*preset);
 		}
 	}
 	else if (cmd == "/kick" || cmd == "/kickc" || cmd == "/ban" || cmd == "/banc") {
