@@ -16,6 +16,7 @@
 #include <string>
 #include <format>
 #include <algorithm>
+#include <cmath>
 
 extern ID3D11Device* pDevice;
 
@@ -55,7 +56,7 @@ namespace Dino
 	static bool isDucking = false;
 	static float animTimer = 0.0f;
 	static int animFrame = 0;
-	static float gameOverTimer = 0.0f; // Cooldown to prevent accidental rapid restart / blinking
+	static float gameOverTimer = 0.0f;
 
 	static float gameSpeed = 240.0f; // px / sec
 	static float score = 0.0f;
@@ -64,7 +65,7 @@ namespace Dino
 	static float nextSpawnInterval = 1.6f;
 	static float groundScrollX = 0.0f;
 
-	static bool wasAutoOpenedInLobby = false;
+	static bool wasInLobbyPrev = false;
 
 	static std::vector<Obstacle> obstacles;
 
@@ -127,9 +128,10 @@ namespace Dino
 	static void DrawSprite(ImDrawList* drawList, ImVec2 pos, ImVec2 size, float x1, float y1, float x2, float y2, ImU32 tint = IM_COL32_WHITE)
 	{
 		if (g_DinoTextureSRV == nullptr) return;
+		ImVec2 roundedPos(floorf(pos.x), floorf(pos.y));
 		ImVec2 uv0(x1 / (float)g_SpriteWidth, y1 / (float)g_SpriteHeight);
 		ImVec2 uv1(x2 / (float)g_SpriteWidth, y2 / (float)g_SpriteHeight);
-		drawList->AddImage((ImTextureID)g_DinoTextureSRV, pos, ImVec2(pos.x + size.x, pos.y + size.y), uv0, uv1, tint);
+		drawList->AddImage((ImTextureID)g_DinoTextureSRV, roundedPos, ImVec2(roundedPos.x + floorf(size.x), roundedPos.y + floorf(size.y)), uv0, uv1, tint);
 	}
 
 	static void ResetGame()
@@ -261,26 +263,20 @@ namespace Dino
 
 	void Render()
 	{
-		// Auto-show in lobby / Auto-hide in game logic
+		// Auto-show in lobby / Auto-hide when leaving lobby (game starts or left lobby)
+		bool currentlyInLobby = IsInLobby();
+
 		if (State.ShowDinoInLobby) {
-			if (IsInLobby()) {
-				if (!State.ShowDino && !wasAutoOpenedInLobby) {
-					State.ShowDino = true;
-					wasAutoOpenedInLobby = true;
-				}
+			if (currentlyInLobby && !wasInLobbyPrev) {
+				// Just entered lobby -> auto open
+				State.ShowDino = true;
 			}
-			else if (IsInGame()) {
-				if (State.ShowDino && wasAutoOpenedInLobby) {
-					State.ShowDino = false;
-					wasAutoOpenedInLobby = false;
-				}
-			}
-			else {
-				if (wasAutoOpenedInLobby) {
-					wasAutoOpenedInLobby = false;
-				}
+			else if (!currentlyInLobby && wasInLobbyPrev) {
+				// Just left lobby (game started) -> auto close
+				State.ShowDino = false;
 			}
 		}
+		wasInLobbyPrev = currentlyInLobby;
 
 		if (!State.ShowDino) return;
 
@@ -407,7 +403,7 @@ namespace Dino
 			}
 		}
 
-		// --- RENDERING SPRITES ---
+		// --- RENDERING SPRITES (with floorf pixel rounding) ---
 
 		// Scrolling Ground Track (2400x24 HD sheet -> 1200x12 scaled)
 		float trackWidth = 1200.0f;
@@ -448,9 +444,9 @@ namespace Dino
 			ImVec2 goPos(canvasPos.x + (canvasSize.x - goWidth) * 0.5f, canvasPos.y + canvasSize.y * 0.28f);
 			DrawSprite(drawList, goPos, ImVec2(goWidth, goHeight), 954.0f, 29.0f, 1335.0f, 50.0f, spriteTint);
 
-			// Exact Restart Button Sprite Box (98x78 -> 49x39)
-			ImVec2 rstPos(canvasPos.x + (canvasSize.x - 49.0f) * 0.5f, canvasPos.y + canvasSize.y * 0.46f);
-			DrawSprite(drawList, rstPos, ImVec2(49.0f, 39.0f), 2.0f, 2.0f, 100.0f, 80.0f, spriteTint);
+			// Clean Restart Button Sprite (2, 2, 74, 66 -> 36x32 - ZERO dino tail/butt!)
+			ImVec2 rstPos(canvasPos.x + (canvasSize.x - 36.0f) * 0.5f, canvasPos.y + canvasSize.y * 0.46f);
+			DrawSprite(drawList, rstPos, ImVec2(36.0f, 32.0f), 2.0f, 2.0f, 74.0f, 66.0f, spriteTint);
 		}
 
 		ImGui::End();
