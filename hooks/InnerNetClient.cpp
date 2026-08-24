@@ -1248,6 +1248,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
                         State.vipers_amount = (int)GetRoleCount(RoleType::Viper);
                         State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
+                        State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
                         if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
                             if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount >= GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
                                 State.assignedRoles[index] = RoleType::Random;
