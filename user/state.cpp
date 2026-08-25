@@ -37,7 +37,7 @@ void Settings::Load() {
     }
 
     auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
-
+    this->dpiChanged = true;
     if (!std::filesystem::exists(settingsPath))
         return;
 
@@ -60,7 +60,6 @@ void Settings::Load() {
         JSON_TRYGET("ShowDebug", this->showDebugTab);
 #endif
         JSON_TRYGET("dpiScale", this->dpiScale);
-        this->dpiChanged = true;
         JSON_TRYGET("RgbTheme", this->RgbMenuTheme);
         JSON_TRYGET("GradientTheme", this->GradientMenuTheme);
         JSON_TRYGET("MatchBackgroundWithTheme", this->MatchBackgroundWithTheme);
