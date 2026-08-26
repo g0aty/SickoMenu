@@ -404,8 +404,8 @@ namespace SelfTab {
                 if (ToggleButton("Enable Prefix and Suffix", &State.UsePrefixAndSuffix)) State.Save();
                 if (ToggleButton("New Lines for Prefix and Suffix", &State.PrefixAndSuffixNewLines)) State.Save();
 
-                if (InputString("Name Prefix", &State.NamePrefix)) State.Save();
-                if (InputString("Name Suffix", &State.NameSuffix)) State.Save();
+                InputString("Name Prefix", &State.NamePrefix);
+                InputString("Name Suffix", &State.NameSuffix);
                 if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: Prefix and/or suffix will be cleared from the ends of the name if it contains them."));
                 if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("This is done to prevent name overflowing."));
 
@@ -589,11 +589,10 @@ namespace SelfTab {
                     State.Save();
             }*/
 
-            if (State.InMeeting && AnimatedButton("Move in Meeting"))
+            if (State.InMeeting && AnimatedButton("Exit Meeting"))
             {
                 if (IsHost()) State.rpcQueue.push(new RpcEndMeeting());
                 else State.rpcQueue.push(new EndMeeting());
-                State.InMeeting = false;
             }
         }
 
@@ -758,13 +757,32 @@ namespace SelfTab {
                 }
             }
 
-            if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale)) {
+            ColorMapping FAKEROLE_NAMES_COLOR[] = {
+                {"Crewmate",		State.CrewmateColor},
+                {"Impostor",		State.ImpostorColor},
+                {"Scientist",		State.ScientistColor},
+                {"Engineer",		State.EngineerColor},
+                {"Guardian Angel",	State.GuardianAngelColor},
+                {"Shapeshifter",	State.ShapeshifterColor},
+                {"Crewmate Ghost",  State.CrewmateGhostColor},
+                {"Impostor Ghost",	State.ImpostorGhostColor},
+                {"Noisemaker",		State.NoisemakerColor},
+                {"Phantom",			State.PhantomColor},
+                {"Tracker",			State.TrackerColor},
+                {"Detective",		State.DetectiveColor},
+                {"Viper",			State.ViperColor},
+                {"Judge",           State.JudgeColor},
+            }; // needs to be updated every render
+
+            if (CustomListBoxIntColored("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ", FAKEROLE_NAMES_COLOR, IM_ARRAYSIZE(FAKEROLE_NAMES_COLOR))) {
                 // for some reason, detective is 12 (0x0c) instead of 11, and viper is 18 (0x12) instead of 12
                 if (State.FakeRole >= 12) State.FakeRoleId = State.FakeRole + 6;
                 else if (State.FakeRole == 11) State.FakeRoleId = State.FakeRole + 1;
                 else State.FakeRoleId = State.FakeRole;
                 State.Save();
             }
+            ImGui::SameLine(0.0f, 0.0f);
+            ImGui::Text("Select Role");
             ImGui::SameLine();
             if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && AnimatedButton("Set Role")) {
                 // State.FakeRole = std::clamp(State.FakeRole, 0, 10);

@@ -640,25 +640,25 @@ void dShadowCollab_OnEnable(ShadowCollab* __this, MethodInfo* method) {
 
 void dPassiveButton_ReceiveClickDown(PassiveButton* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPassiveButton_ReceiveClickDown executed", false);
-    if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
+    if (!State.ClickThroughMenuUI && State.HoveringOverAnyWindowButRadar) return;
     PassiveButton_ReceiveClickDown(__this, method);
 }
 
 void dPassiveButton_ReceiveRepeatDown(PassiveButton* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPassiveButton_ReceiveRepeatDown executed", false);
-    if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
+    if (!State.ClickThroughMenuUI && State.HoveringOverAnyWindowButRadar) return;
     PassiveButton_ReceiveRepeatDown(__this, method);
 }
 
 void dPassiveButton_ReceiveClickUp(PassiveButton* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPassiveButton_ReceiveClickUp executed", false);
-    if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
+    if (!State.ClickThroughMenuUI && State.HoveringOverAnyWindowButRadar) return;
     PassiveButton_ReceiveClickUp(__this, method);
 }
 
 void dPassiveButton_ReceiveMouseOver(PassiveButton* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPassiveButton_ReceiveMouseOver executed", false);
-    if (!State.ClickThroughMenuUI && ImGui::GetIO().WantCaptureMouse) return;
+    if (!State.ClickThroughMenuUI && State.HoveringOverAnyWindowButRadar) return;
     PassiveButton_ReceiveMouseOver(__this, method);
 }
 

@@ -183,7 +183,7 @@
 - Show Vote Kicks
 - Show Chat Cooldown
 - Extend Chat Character Limit
-- Move in Meeting
+- Exit Meeting
 
 ### Utils
 - Unlock Vents

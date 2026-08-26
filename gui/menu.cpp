@@ -115,7 +115,7 @@ namespace Menu {
 			{"See Players In Vents", "Visuals"}, {"See Protections", "Visuals"}, {"See Kill Cooldown", "Visuals"},
 			{"Disable Kill Animation", "Visuals"}, {"Disable Lobby Music", "Visuals"},
 			{"Old Ping Text", "Visuals"}, {"Show Host", "Visuals"},
-			{"Show Vote Kicks", "Visuals"}, {"Show Chat Cooldown", "Visuals"}, {"Extend Chat Character Limit", "Visuals"}, {"Move in Meeting", "Visuals"},
+			{"Show Vote Kicks", "Visuals"}, {"Show Chat Cooldown", "Visuals"}, {"Extend Chat Character Limit", "Visuals"}, {"Exit Meeting", "Visuals"},
 			{"Unlock Vents", "Utils"}, {"Move While in Vent & Shapeshifting", "Utils"}, {"Always Move", "Utils"},
 			{"Make Role Abilities Bypass Comms Sabotages", "Utils"},
 			{"Copy Lobby Code on Disconnect", "Utils"}, {"NoClip", "Utils"},

@@ -71,6 +71,16 @@ struct EVENT_PLAYER {
 	}
 
 	EVENT_PLAYER(NetworkedPlayerInfo* playerInfo) {
+		if (playerInfo == NULL) {
+			playerId = Game::NoPlayerId;
+			colorId = Game::NoColorId;
+			playerName = "ERROR";
+			isDead = false;
+			isAngel = false;
+			isProtected = false;
+			return;
+		}
+
 		playerId = playerInfo->fields.PlayerId;
 
 		auto outfit = app::NetworkedPlayerInfo_get_DefaultOutfit(playerInfo, nullptr);

@@ -44,7 +44,7 @@ enum class RoleType {
 	Viper = 11
 };
 
-struct RoleColor {
+struct ColorMapping {
 	const char* name;
 	ImVec4 color;
 };

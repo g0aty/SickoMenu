@@ -8,6 +8,7 @@ DO_APP_FUNC(Type*, RuntimeType_MakeGenericType_1, (Type* gt, /*Type__Array**/voi
 DO_APP_FUNC(GameObject*, Component_get_gameObject, (Component_1* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.GameObject UnityEngine.Component::get_gameObject()");
 DO_APP_FUNC(Transform*, Component_get_transform, (Component_1* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Transform UnityEngine.Component::get_transform()");
 
+DO_APP_FUNC(void, Object_Destroy, (Object_1* obj, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Object::Destroy(UnityEngine.Object)");
 DO_APP_FUNC(void, Object_DestroyImmediate, (Object_1* obj, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.Object::DestroyImmediate(UnityEngine.Object)");
 DO_APP_FUNC(Component_1*, Component_GetComponent, (Component_1* __this, Type* type, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Component UnityEngine.Component::GetComponent(System.Type)");
 
@@ -176,6 +177,7 @@ DO_APP_FUNC(void*, Vent_ExitVent, (Vent* __this, PlayerControl* pc, MethodInfo* 
 DO_APP_FUNC(void, VentilationSystem_Update, (VentilationSystem_Operation__Enum op, int32_t ventId, MethodInfo* method), "Assembly-CSharp, System.Void VentilationSystem::Update(VentilationSystem.Operation, System.Int32)");
 
 DO_APP_FUNC(void, HudManager_Update, (HudManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void HudManager::Update()");
+DO_APP_FUNC(void, HudManager_SetMapAndInfoButtonsEnabled, (HudManager* __this, bool enabled, MethodInfo* method), "Assembly-CSharp, System.Void HudManager::SetMapAndInfoButtonsEnabled(System.Boolean)");
 DO_APP_FUNC(void, HudManager_SetHudActive, (HudManager* __this, bool isActive, MethodInfo* method), "Assembly-CSharp, System.Void HudManager::SetHudActive(System.Boolean)");
 DO_APP_FUNC(void, ChatController_AddChat, (ChatController* __this, PlayerControl* sourcePlayer, String* chatText, bool censor, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::AddChat(PlayerControl, System.String, System.Boolean)");
 DO_APP_FUNC(void, ChatController_AddChatWarning, (ChatController* __this, String* warningText, MethodInfo* method), "Assembly-CSharp, System.Void ChatController::AddChatWarning(System.String)");
@@ -225,6 +227,7 @@ DO_APP_FUNC(float, MessageReader_ReadSingle, (MessageReader* __this, MethodInfo*
 DO_APP_FUNC(String*, MessageReader_ReadString, (MessageReader* __this, MethodInfo* method), "Hazel, System.String Hazel.MessageReader::ReadString()");
 DO_APP_FUNC(Byte__Array*, MessageReader_ReadBytesAndSize, (MessageReader* __this, MethodInfo* method), "Hazel, System.Byte[] Hazel.MessageReader::ReadBytesAndSize()");
 DO_APP_FUNC(Byte__Array*, MessageReader_ReadBytes, (MessageReader* __this, int32_t length, MethodInfo* method), "Hazel, System.Byte[] Hazel.MessageReader::ReadBytes(System.Int32)");
+DO_APP_FUNC(uint16_t, MessageReader_ReadUInt16, (MessageReader* __this, MethodInfo* method), "Hazel, System.UInt16 Hazel.MessageReader::ReadUInt16()");
 DO_APP_FUNC(int32_t, MessageReader_get_BytesRemaining, (MessageReader* __this, MethodInfo* method), "Hazel, System.Int32 Hazel.MessageReader::get_BytesRemaining()");
 DO_APP_FUNC(void, MessageWriter_WriteBoolean, (MessageWriter* __this, bool value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Boolean)");
 DO_APP_FUNC(void, MessageWriter_WriteByte, (MessageWriter* __this, uint8_t value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Byte)");
@@ -502,6 +505,7 @@ DO_APP_FUNC(bool, MatchInfoGuide_get_IsActive, (MatchInfoGuide* __this, MethodIn
 DO_APP_FUNC(void, PlayerVoteArea_SetCosmetics, (PlayerVoteArea* __this, NetworkedPlayerInfo* playerInfo, MethodInfo* method), "Assembly-CSharp, System.Void PlayerVoteArea::SetCosmetics(NetworkedPlayerInfo)");
 DO_APP_FUNC(void, PlayerControl_SetKillTimer, (PlayerControl* __this, float time, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetKillTimer(System.Single)");
 DO_APP_FUNC(bool, KillOverlay_get_IsOpen, (KillOverlay* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean KillOverlay::get_IsOpen()");
+DO_APP_FUNC(void, VentilationSystem_UpdateSystem, (VentilationSystem* __this, PlayerControl* player, MessageReader* msgReader, MethodInfo* method), "Assembly-CSharp, System.Void VentilationSystem::UpdateSystem(PlayerControl, Hazel.MessageReader)");
 
 DO_APP_FUNC(bool, Player_GetButton, (Player* __this, int32_t actionId, MethodInfo* method), "Rewired_Core, System.Boolean Rewired.Player::GetButton(System.Int32)");
 DO_APP_FUNC(void, KillButton_DoClick, (KillButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::DoClick()");

@@ -5,31 +5,24 @@
 <h1 align="center">👺 SickoMenu</h1>
 
 <p align="center">
-  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen" alt="Latest Release"></a>
-  <a href="https://github.com/g0aty/SickoMenu/stargazers"><img src="https://img.shields.io/github/stars/g0aty/SickoMenu?style=flat&color=red" alt="Stars"></a>
-  <a href="https://github.com/g0aty/SickoMenu/network/members"><img src="https://img.shields.io/github/forks/g0aty/SickoMenu?style=flat&color=red" alt="Forks"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/g0aty/SickoMenu?style=flat&color=orange" alt="License"></a>
-  <a href="https://discord.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat&logo=discord&logoColor=blue" alt="Discord"></a>
+  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat-square&label=Version&color=brightgreen"></a>
+  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/downloads/g0aty/SickoMenu/total?style=flat-square&label=Downloads&color=deeppink"></a>
+  <a href="https://dsc.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat-square&logoColor=white&color=mediumslateblue" alt="Discord"></a>
 </p>
 
 A powerful utility for Among Us designed to enrich your game experience with custom features!
 
 **Intended for educational and experimental use only.**
-
-Join our very own Discord server for support, bug reports, and sneak peeks!
-### Vanity Invite: https://discord.gg/sickos  
-### Permanent invite: https://dsc.gg/sickos 
 ---
 
 ## 📋 Table of Contents
 - [⚠️ Disclaimer](https://github.com/g0aty/SickoMenu#%EF%B8%8F-disclaimer)
-- [⁉️ Frequently Asked Questions](https://github.com/g0aty/SickoMenu#-frequently-asked-questions)
+- [⁉️ Frequently Asked Questions](https://github.com/g0aty/SickoMenu#%EF%B8%8F-frequently-asked-questions)
 - [🛑 Ethical Use Protocol](https://github.com/g0aty/SickoMenu#-ethical-use-protocol)
 - [⚙️ Features](https://github.com/g0aty/SickoMenu#%EF%B8%8F-features)
 - [📸 Screenshot](https://github.com/g0aty/SickoMenu#-screenshot)
 - [👌 Supported Versions](https://github.com/g0aty/SickoMenu#-supported-versions)
 - [⬇️ Download & Install](https://github.com/g0aty/SickoMenu#%EF%B8%8F-download--install)
-- [🛠️ Troubleshooting](https://github.com/g0aty/SickoMenu#%EF%B8%8F-troubleshooting)
 - [⌨️ Default Hotkeys](https://github.com/g0aty/SickoMenu#%EF%B8%8F-default-hotkeys)
 - [⚒️ Building / Compilation](https://github.com/g0aty/SickoMenu#%EF%B8%8F-building--compilation)
 - [💁 Contributing](https://github.com/g0aty/SickoMenu#-contributing)

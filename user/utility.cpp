@@ -442,10 +442,10 @@ PlayerControl* GetPlayerControlById(Game::PlayerId id) {
 
 bool IsColorAvailable(int colorId) {
     for (auto player : GetAllPlayerData()) {
-        if (GetPlayerOutfit(player)->fields.ColorId == colorId) { //aw hell nah, i made a classic mistake: forgetting another =
-            return false;
-            break;
-        }
+        auto playerOutfit = GetPlayerOutfit(player);
+
+        if (playerOutfit == NULL) continue;
+        if (playerOutfit->fields.ColorId == colorId) return false;
     }
     return true;
 }
@@ -459,7 +459,7 @@ std::string GenerateRandomString(bool completelyRandom) {
         std::string outputString = "";
 
         for (int i = 0; i < outputLength; ++i) {
-            randomIndex = rand() % (allowedChars.length() - 1);
+            randomIndex = rand() % allowedChars.length();
             outputString += allowedChars[randomIndex];
         }
         return outputString;
@@ -759,6 +759,8 @@ std::optional<EVENT_PLAYER> GetEventPlayer(NetworkedPlayerInfo* playerInfo)
 
 std::optional<EVENT_PLAYER> GetEventPlayerControl(PlayerControl* player)
 {
+    if (!player) return std::nullopt;
+
     NetworkedPlayerInfo* playerInfo = GetPlayerData(player);
 
     if (!playerInfo) return std::nullopt;
@@ -1065,8 +1067,8 @@ std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2, i
     if (State.StrikethroughName) opener += "<s>";
 
     std::string closer = "";
-    if (State.UnderlineName) closer += "</s>";
-    if (State.StrikethroughName) closer += "</u>";
+    if (State.UnderlineName) closer += "</u>";
+    if (State.StrikethroughName) closer += "</s>";
 
     if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
         return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);
@@ -1474,7 +1476,7 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
         break;
     }
     default: {
-        c = GetColorFromImVec4(State.CrewmateColor);
+        c = GetColorFromImVec4(ImVec4(1.f, 1.f, 1.f, 1.f));
         break;
     }
     }

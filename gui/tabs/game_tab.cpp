@@ -227,11 +227,11 @@ namespace GameTab {
             ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
             if (IsHost() || !State.SafeMode) {
-                CustomListBoxInt(" ", &State.SelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale);
+                CustomListBoxIntColored(" ", &State.SelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
             }
             else {
                 if (State.SelectedColorId >= (int)COLORS.size()) State.SelectedColorId = 0;
-                CustomListBoxInt(" ", &State.SelectedColorId, COLORS, 85.0f * State.dpiScale);
+                CustomListBoxIntColored(" ", &State.SelectedColorId, COLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
             }
             ImGui::SameLine();
             if (AnimatedButton("Random Color"))
@@ -480,9 +480,7 @@ namespace GameTab {
                         State.Save();
                     }
 
-                    if (InputString("Username", &State.hostUserName)) {
-                        State.Save();
-                    }
+                    InputString("Username", &State.hostUserName);
 
                     if (AnimatedButton("Set Color for Everyone")) {
                         for (auto p : GetAllPlayerControl()) {
@@ -495,19 +493,18 @@ namespace GameTab {
                         State.Save();
                     }
 
-                    if (CustomListBoxInt(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale)) State.Save();
+                    if (CustomListBoxIntColored(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR))) State.Save();
                 }
             }
         }
 
         if (openChat) {
             bool msgAllowed = IsChatValid(State.chatMessage);
-            if (!msgAllowed) {
-                ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.f, 0.f, State.MenuThemeColor.w));
-                if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) State.Save();
-                ImGui::PopStyleColor();
-            }
-            else if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) State.Save();
+
+            if (!msgAllowed) ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.f, 0.f, State.MenuThemeColor.w));
+            InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage);
+            if (!msgAllowed) ImGui::PopStyleColor();
+
             if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && IsChatValid(State.chatMessage)) {
                 ImGui::SameLine();
                 if (AnimatedButton("Send"))
