@@ -209,12 +209,12 @@ namespace SettingsTab {
 				if (InputString("Username", &State.userName)) State.Save();
 				ImGui::PopStyleColor();
 			}
-			else */if (InputString("Username", &State.userName)) State.Save();
+			else */InputString("Username", &State.userName);
 
 			if (!IsNameValid(State.userName) && !IsHost() && State.SafeMode) {
 				if (State.userName == "")
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Empty username gets detected by anticheat. This name will be ignored.");
-				if (State.userName.length() >= (size_t)13)
+				if (State.userName.length() > (size_t)10)
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username is too long, gets detected by anticheat. This name will be ignored.");
 				else if (!IsNameValid(State.userName))
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username contains characters blocked by anticheat. This name will be ignored.");
@@ -246,9 +246,8 @@ namespace SettingsTab {
 				}
 			}
 
-			if (InputString("Custom Code", &State.customCode)) {
-				State.Save();
-			}
+			InputString("Custom Code", &State.customCode);
+
 			if (ToggleButton("Replace Streamer Mode Lobby Code", &State.HideCode)) {
 				State.Save();
 			}
@@ -326,10 +325,18 @@ namespace SettingsTab {
 			}
 			if (State.UseNewFriendCode) {
 				ImGui::SetNextItemWidth(150 * State.dpiScale); // Adjust the width of the input box
-				if (InputString("Friend Code (For New/Guest Account ONLY)", &State.NewFriendCode)) {
-					State.Save();
-				}
-				ImGui::Text("This new friend code should be <= 10 characters long and cannot have spaces.");
+
+				bool isFriendCodeValid = State.NewFriendCode.find(" ") == std::string::npos && State.NewFriendCode.length() <= 10;
+				if (!isFriendCodeValid) ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.f, 0.f, State.MenuThemeColor.w));
+				InputString("Friend Code (For New/Guest Account ONLY)", &State.NewFriendCode);
+				if (!isFriendCodeValid) ImGui::PopStyleColor();
+
+				auto friendCodeValidText = "This new friend code should be <= 10 characters long and cannot have spaces.";
+
+				if (isFriendCodeValid)
+					ImGui::Text(friendCodeValidText);
+				else
+					ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), friendCodeValidText);
 			}
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
@@ -567,10 +574,10 @@ namespace SettingsTab {
 
 				if (State.Use12HourFormat) {
 					ImGui::SetNextItemWidth(100 * State.dpiScale);
-					if (InputString("AM String", &State.AmString)) State.Save();
+					InputString("AM String", &State.AmString);
 					ImGui::SameLine();
 					ImGui::SetNextItemWidth(100 * State.dpiScale);
-					if (InputString("PM String", &State.PmString)) State.Save();
+					InputString("PM String", &State.PmString);
 				}
 			}
 

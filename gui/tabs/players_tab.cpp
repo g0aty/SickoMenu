@@ -1660,13 +1660,9 @@ namespace PlayersTab {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(15, 15) * State.dpiScale);
-                if (InputString("PUID", &State.StealedPUID)) {
-                    State.Save();
-                }
+                InputString("PUID", &State.StealedPUID);
                 ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
-                if (InputString("Friend Code", &State.StealedFC)) {
-                    State.Save();
-                }
+                InputString("Friend Code", &State.StealedFC);
                 ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
                 {
                     if (convert_from_string(selectedPlayer.get_PlayerData()->fields.Puid) != "" && AnimatedButton("Copy PUID"))

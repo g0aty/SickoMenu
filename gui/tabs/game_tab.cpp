@@ -480,9 +480,7 @@ namespace GameTab {
                         State.Save();
                     }
 
-                    if (InputString("Username", &State.hostUserName)) {
-                        State.Save();
-                    }
+                    InputString("Username", &State.hostUserName);
 
                     if (AnimatedButton("Set Color for Everyone")) {
                         for (auto p : GetAllPlayerControl()) {
@@ -502,12 +500,11 @@ namespace GameTab {
 
         if (openChat) {
             bool msgAllowed = IsChatValid(State.chatMessage);
-            if (!msgAllowed) {
-                ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.f, 0.f, State.MenuThemeColor.w));
-                if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) State.Save();
-                ImGui::PopStyleColor();
-            }
-            else if (InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage)) State.Save();
+
+            if (!msgAllowed) ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.f, 0.f, State.MenuThemeColor.w));
+            InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage);
+            if (!msgAllowed) ImGui::PopStyleColor();
+
             if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && IsChatValid(State.chatMessage)) {
                 ImGui::SameLine();
                 if (AnimatedButton("Send"))

@@ -506,9 +506,7 @@ namespace HostTab {
                     if (ToggleButton("Force Name for Everyone", &State.ForceNameForEveryone)) {
                         State.Save();
                     }
-                    if (InputString("Username", &State.hostUserName)) {
-                        State.Save();
-                    }
+                    InputString("Username", &State.hostUserName);
                 }
 
                 /*if (IsHost() && IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && AnimatedButton("Revive Yourself"))
