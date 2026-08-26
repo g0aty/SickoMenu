@@ -757,7 +757,24 @@ namespace SelfTab {
                 }
             }
 
-            if (CustomListBoxInt("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale)) {
+            ColorMapping FAKEROLE_NAMES_COLOR[] = {
+                {"Crewmate",		State.CrewmateColor},
+                {"Impostor",		State.ImpostorColor},
+                {"Scientist",		State.ScientistColor},
+                {"Engineer",		State.EngineerColor},
+                {"Guardian Angel",	State.GuardianAngelColor},
+                {"Shapeshifter",	State.ShapeshifterColor},
+                {"Crewmate Ghost",  State.CrewmateGhostColor},
+                {"Impostor Ghost",	State.ImpostorGhostColor},
+                {"Noisemaker",		State.NoisemakerColor},
+                {"Phantom",			State.PhantomColor},
+                {"Tracker",			State.TrackerColor},
+                {"Detective",		State.DetectiveColor},
+                {"Viper",			State.ViperColor},
+                {"Judge",           State.JudgeColor},
+            }; // needs to be updated every render
+
+            if (CustomListBoxIntColored("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", FAKEROLE_NAMES_COLOR, IM_ARRAYSIZE(FAKEROLE_NAMES_COLOR))) {
                 // for some reason, detective is 12 (0x0c) instead of 11, and viper is 18 (0x12) instead of 12
                 if (State.FakeRole >= 12) State.FakeRoleId = State.FakeRole + 6;
                 else if (State.FakeRole == 11) State.FakeRoleId = State.FakeRole + 1;

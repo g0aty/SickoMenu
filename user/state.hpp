@@ -536,20 +536,20 @@ public:
     ImVec4 GameTextColor = ImVec4(0.f, 0.f, 0.f, 1.f);
     ImVec4 GameBgColor = ImVec4(1.f, 1.f, 1.f, 1.f);
 
-    ImVec4 CrewmateGhostColor = ImVec4(1.f, 1.f, 1.f, 0.5f);
-    ImVec4 CrewmateColor = ImVec4(0.f, 1.f, 1.f, 1.f);
-    ImVec4 EngineerColor = ImVec4(0.f, 0.5f, 1.f, 1.f);
-    ImVec4 GuardianAngelColor = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
-    ImVec4 ScientistColor = ImVec4(0.2f, 0.2f, 1.f, 1.f);
-    ImVec4 ImpostorColor = ImVec4(1.f, 0.1f, 0.1f, 1.f);
-    ImVec4 ShapeshifterColor = ImVec4(1.f, 0.67f, 0.f, 1.f);
-    ImVec4 ImpostorGhostColor = ImVec4(0.25f, 0.25f, 0.25f, 0.5f);
-    ImVec4 NoisemakerColor = ImVec4(0.f, 1.f, 0.47f, 1.f);
-    ImVec4 TrackerColor = ImVec4(0.65f, 0.36f, 1.f, 1.f);
-    ImVec4 PhantomColor = ImVec4(0.53f, 0.f, 0.f, 1.f);
-    ImVec4 DetectiveColor = ImVec4(0.39f, 0.735f, 1.f, 1.f);
-    ImVec4 ViperColor = ImVec4(1.f, 1.f, 0.f, 1.f);
-    ImVec4 JudgeColor = ImVec4(0.f, 0.6f, 0.345f, 1.f);
+    ImVec4 CrewmateGhostColor = ImVec4(0.482f, 0.741f, 0.580f, 0.5f);
+    ImVec4 CrewmateColor = ImVec4(0.071f, 0.984f, 0.996f, 1.f);
+    ImVec4 EngineerColor = ImVec4(0.043f, 0.506f, 0.780f, 1.f);
+    ImVec4 GuardianAngelColor = ImVec4(0.129f, 0.737f, 0.988f, 0.5f);
+    ImVec4 ScientistColor = ImVec4(0.318f, 0.067f, 0.835f, 1.f);
+    ImVec4 ImpostorColor = ImVec4(0.898f, 0.118f, 0.267f, 1.f);
+    ImVec4 ShapeshifterColor = ImVec4(0.839f, 0.60f, 0.227f, 1.f);
+    ImVec4 ImpostorGhostColor = ImVec4(0.671f, 0.384f, 0.553f, 0.5f);
+    ImVec4 NoisemakerColor = ImVec4(0.212f, 0.898f, 0.180f, 1.f);
+    ImVec4 TrackerColor = ImVec4(0.737f, 0.235f, 0.863f, 1.f);
+    ImVec4 PhantomColor = ImVec4(0.443f, 0.235f, 0.075f, 1.f);
+    ImVec4 DetectiveColor = ImVec4(0.718f, 0.678f, 0.980f, 1.f);
+    ImVec4 ViperColor = ImVec4(1.0f, 0.937f, 0.455f, 1.f);
+    ImVec4 JudgeColor = ImVec4(0.0f, 0.588f, 0.204f, 1.f);
 
     ImVec4 HostColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
     ImVec4 PlayerIdColor = ImVec4(1.f, 0.f, 0.f, 1.f);

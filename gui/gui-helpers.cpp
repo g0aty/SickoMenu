@@ -62,7 +62,7 @@ bool CustomListBoxInt(const char* label, int* value, const std::vector<const cha
 	return response;
 }
 
-bool CustomListBoxIntColored(const char* label, int* value, const std::vector<const char*> list, float width, ImVec4 col, ImGuiComboFlags flags, const char* visualLabel, const RoleColor* itemColors, size_t itemColorsCount)
+bool CustomListBoxIntColored(const char* label, int* value, const std::vector<const char*> list, float width, ImVec4 col, ImGuiComboFlags flags, const char* visualLabel, const ColorMapping* itemColors, size_t itemColorsCount)
 {
 	auto comboLabel = "##" + std::string(label);
 	auto leftArrow = "##" + std::string(label) + "Left";
