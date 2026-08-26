@@ -23,7 +23,7 @@ Join our very own Discord server for support, bug reports, and sneak peeks!
 
 ## 📋 Table of Contents
 - [⚠️ Disclaimer](https://github.com/g0aty/SickoMenu#%EF%B8%8F-disclaimer)
-- [⁉️ Frequently Asked Questions](https://github.com/g0aty/SickoMenu#-frequently-asked-questions)
+- [⁉️ Frequently Asked Questions](https://github.com/g0aty/SickoMenu#%EF%B8%8F-frequently-asked-questions)
 - [🛑 Ethical Use Protocol](https://github.com/g0aty/SickoMenu#-ethical-use-protocol)
 - [⚙️ Features](https://github.com/g0aty/SickoMenu#%EF%B8%8F-features)
 - [📸 Screenshot](https://github.com/g0aty/SickoMenu#-screenshot)
