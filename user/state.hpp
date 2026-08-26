@@ -377,6 +377,7 @@ public:
     bool RadarBorder = false;
     int RadarExtraWidth = 0;
     int RadarExtraHeight = 0;
+    bool HoveringOverAnyWindowButRadar = false;
 
     bool ShowEsp = false;
     bool ShowEsp_Ghosts = true;

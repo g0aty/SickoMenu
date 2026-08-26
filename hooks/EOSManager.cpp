@@ -207,10 +207,10 @@ void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* 
 		TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);
 	}
 	else {
-		auto textStr = TMP_Text_get_text((TMP_Text*)__this->fields.UsernameText, NULL);
-		if (textStr != convert_to_string("")) {
+		auto textStr = convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields.UsernameText, NULL));
+		if (!textStr.empty()) {
 			std::string newFriendCode = "";
-			for (auto i : convert_from_string(textStr)) {
+			for (auto i : textStr) {
 				newFriendCode += tolower(i);
 			}
 			TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);

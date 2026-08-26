@@ -268,7 +268,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             if (State.SnipeColor && (IsInGame() || IsInLobby())) {
-                if ((IsColorAvailable(State.SelectedColorId) || !State.SafeMode) && GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId != State.SelectedColorId) {
+                auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+                if ((IsColorAvailable(State.SelectedColorId) || !State.SafeMode) && outfit != NULL &&
+                    outfit->fields.ColorId != State.SelectedColorId) {
                     std::queue<RPCInterface*>* queue = nullptr;
                     if (IsInGame())
                         queue = &State.rpcQueue;
@@ -299,16 +301,11 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
                     if (outfit != NULL) {
                         State.originalName = convert_from_string(outfit->fields.PlayerName);
-                        auto petId = outfit->fields.PetId;
-                        auto skinId = outfit->fields.SkinId;
-                        auto hatId = outfit->fields.HatId;
-                        auto visorId = outfit->fields.VisorId;
-                        auto namePlateId = outfit->fields.NamePlateId;
-                        State.originalPet = petId;
-                        State.originalSkin = skinId;
-                        State.originalHat = hatId;
-                        State.originalVisor = visorId;
-                        State.originalNamePlate = namePlateId;
+                        State.originalPet = outfit->fields.PetId;
+                        State.originalSkin = outfit->fields.SkinId;
+                        State.originalHat = outfit->fields.HatId;
+                        State.originalVisor = outfit->fields.VisorId;
+                        State.originalNamePlate = outfit->fields.NamePlateId;
                     }
                 }
 

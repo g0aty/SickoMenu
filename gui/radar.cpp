@@ -91,9 +91,19 @@ namespace Radar {
 
 		if (State.LockRadar || (IsInGame() && State.ShowRadar_ShiftLeftClickClosesRoomDoor &&
 			ImGui::IsKeyDown(VK_SHIFT)))
-			ImGui::Begin("Radar", &State.ShowRadar, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+			ImGui::Begin("Radar", &State.ShowRadar, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMouseInputs);
 		else
 			ImGui::Begin("Radar", &State.ShowRadar, ImGuiWindowFlags_NoDecoration);
+
+		ImVec2 windowMin = ImGui::GetWindowPos();
+		ImVec2 windowMax = windowMin + ImGui::GetWindowSize();
+		ImGuiIO& io = ImGui::GetIO();
+		bool mouseOverRadar = io.MousePos.x >= windowMin.x && io.MousePos.x <= windowMax.x &&
+			io.MousePos.y >= windowMin.y && io.MousePos.y <= windowMax.y;
+		State.HoveringOverAnyWindowButRadar = ImGui::GetIO().WantCaptureMouse && !mouseOverRadar;
+
+		// unfortunately, this solution does not cover the case when the radar is over other menus,
+		// thus allowing you to click through the overlapping area
 
 		ImVec2 winpos = ImGui::GetWindowPos();
 
