@@ -506,7 +506,6 @@ DO_APP_FUNC(void, PlayerVoteArea_SetCosmetics, (PlayerVoteArea* __this, Networke
 DO_APP_FUNC(void, PlayerControl_SetKillTimer, (PlayerControl* __this, float time, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetKillTimer(System.Single)");
 DO_APP_FUNC(bool, KillOverlay_get_IsOpen, (KillOverlay* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean KillOverlay::get_IsOpen()");
 DO_APP_FUNC(void, VentilationSystem_UpdateSystem, (VentilationSystem* __this, PlayerControl* player, MessageReader* msgReader, MethodInfo* method), "Assembly-CSharp, System.Void VentilationSystem::UpdateSystem(PlayerControl, Hazel.MessageReader)");
-DO_APP_FUNC(void, ControllerManager_CloseAndResetAll, (ControllerManager* __this, MethodInfo* method), "Assembly-CSharp, System.Void ControllerManager::CloseAndResetAll()");
 
 DO_APP_FUNC(bool, Player_GetButton, (Player* __this, int32_t actionId, MethodInfo* method), "Rewired_Core, System.Boolean Rewired.Player::GetButton(System.Int32)");
 DO_APP_FUNC(void, KillButton_DoClick, (KillButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::DoClick()");
