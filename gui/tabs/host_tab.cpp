@@ -157,7 +157,7 @@ namespace HostTab {
             }; // same here
 
             ImGui::SameLine(100 * State.dpiScale);
-            ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+            ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             if (TabGroup("Utils", openUtils)) {
                 CloseOtherGroups(Groups::Utils);
@@ -184,7 +184,7 @@ namespace HostTab {
             if (openUtils) {
                 if (IsInLobby()) {
                     ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
-                    ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
+                    ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
                     if (!State.DisableRoleManager && (!hideRolesList || !State.TournamentMode)) {
                         bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
                         auto allPlayers = GetAllPlayerData();
