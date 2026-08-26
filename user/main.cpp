@@ -91,6 +91,7 @@ void Run(LPVOID lpParam) {
     hModule = (HMODULE)lpParam;
     State.lol = getModulePath(hModule).filename().string();
     init_il2cpp();
+    State.dpiChanged = true;
     State.Load();
     ScopedThreadAttacher managedThreadAttached;
     {
