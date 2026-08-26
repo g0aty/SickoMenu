@@ -301,6 +301,7 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerControl_Die);
 	HOOKFUNC(PlayerVoteArea_SetCosmetics);
 	HOOKFUNC(PlayerControl_SetKillTimer);
+	HOOKFUNC(VentilationSystem_UpdateSystem);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -513,6 +514,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerControl_Die);
 	UNHOOKFUNC(PlayerVoteArea_SetCosmetics);
 	UNHOOKFUNC(PlayerControl_SetKillTimer);
+	UNHOOKFUNC(VentilationSystem_UpdateSystem);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

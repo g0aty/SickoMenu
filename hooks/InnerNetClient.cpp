@@ -749,7 +749,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                     LOG_DEBUG("Task Enforcer: kicking " + playerName + " (" + std::to_string(pct) + "% tasks)");
                                     InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
                                     if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
-                                        Sprite* spriteBackup = notifier->fields.playerDisconnectSprite;
+                                        auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
                                         Color colorBackup = notifier->fields.disconnectColor;
                                         notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
                                         notifier->fields.disconnectColor = Color(1.0f, 0.5f, 0.0f, 1.0f);

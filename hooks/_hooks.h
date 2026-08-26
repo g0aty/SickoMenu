@@ -215,6 +215,7 @@ void dPlayerControl_Die(PlayerControl* __this, int32_t reason, bool assignGhostR
 void dPlayerVoteArea_SetCosmetics(PlayerVoteArea* __this, NetworkedPlayerInfo* playerInfo, MethodInfo* method);
 void dPlayerPhysics_RpcBootFromVent(PlayerPhysics* __this, int32_t ventId, MethodInfo* method);
 void dPlayerControl_SetKillTimer(PlayerControl* __this, float time, MethodInfo* method);
+void dVentilationSystem_UpdateSystem(VentilationSystem* __this, PlayerControl* player, MessageReader* msgReader, MethodInfo* method);
 
 // defined in LobbyBehaviour.cpp
 void ApplyHostPreset(const Settings::HostPreset& p);

@@ -225,6 +225,7 @@ DO_APP_FUNC(float, MessageReader_ReadSingle, (MessageReader* __this, MethodInfo*
 DO_APP_FUNC(String*, MessageReader_ReadString, (MessageReader* __this, MethodInfo* method), "Hazel, System.String Hazel.MessageReader::ReadString()");
 DO_APP_FUNC(Byte__Array*, MessageReader_ReadBytesAndSize, (MessageReader* __this, MethodInfo* method), "Hazel, System.Byte[] Hazel.MessageReader::ReadBytesAndSize()");
 DO_APP_FUNC(Byte__Array*, MessageReader_ReadBytes, (MessageReader* __this, int32_t length, MethodInfo* method), "Hazel, System.Byte[] Hazel.MessageReader::ReadBytes(System.Int32)");
+DO_APP_FUNC(uint16_t, MessageReader_ReadUInt16, (MessageReader* __this, MethodInfo* method), "Hazel, System.UInt16 Hazel.MessageReader::ReadUInt16()");
 DO_APP_FUNC(int32_t, MessageReader_get_BytesRemaining, (MessageReader* __this, MethodInfo* method), "Hazel, System.Int32 Hazel.MessageReader::get_BytesRemaining()");
 DO_APP_FUNC(void, MessageWriter_WriteBoolean, (MessageWriter* __this, bool value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Boolean)");
 DO_APP_FUNC(void, MessageWriter_WriteByte, (MessageWriter* __this, uint8_t value, MethodInfo* method), "Hazel, System.Void Hazel.MessageWriter::Write(System.Byte)");
@@ -502,6 +503,7 @@ DO_APP_FUNC(bool, MatchInfoGuide_get_IsActive, (MatchInfoGuide* __this, MethodIn
 DO_APP_FUNC(void, PlayerVoteArea_SetCosmetics, (PlayerVoteArea* __this, NetworkedPlayerInfo* playerInfo, MethodInfo* method), "Assembly-CSharp, System.Void PlayerVoteArea::SetCosmetics(NetworkedPlayerInfo)");
 DO_APP_FUNC(void, PlayerControl_SetKillTimer, (PlayerControl* __this, float time, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetKillTimer(System.Single)");
 DO_APP_FUNC(bool, KillOverlay_get_IsOpen, (KillOverlay* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean KillOverlay::get_IsOpen()");
+DO_APP_FUNC(void, VentilationSystem_UpdateSystem, (VentilationSystem* __this, PlayerControl* player, MessageReader* msgReader, MethodInfo* method), "Assembly-CSharp, System.Void VentilationSystem::UpdateSystem(PlayerControl, Hazel.MessageReader)");
 
 DO_APP_FUNC(bool, Player_GetButton, (Player* __this, int32_t actionId, MethodInfo* method), "Rewired_Core, System.Boolean Rewired.Player::GetButton(System.Int32)");
 DO_APP_FUNC(void, KillButton_DoClick, (KillButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::DoClick()");
