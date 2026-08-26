@@ -18,7 +18,7 @@ namespace ConsoleGui
 
 	bool init = false;
 	void Init() {
-		ImGui::SetNextWindowSize(ImVec2(520, 320) * State.dpiScale, ImGuiCond_None);
+		ImGui::SetNextWindowSize(ImVec2(520, 400) * State.dpiScale, ImGuiCond_None);
 		ImGui::SetNextWindowBgAlpha(State.MenuThemeColor.w);
 
 		if (!init)
@@ -64,8 +64,7 @@ namespace ConsoleGui
 			}
 		}
 		ImGui::EndChild();
-		ImGui::Separator();
-		ImGui::BeginChild("console#scroll", ImVec2(511, 270) * State.dpiScale, true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoBackground);
+		ImGui::BeginChild("console#scroll", ImVec2(511, 331) * State.dpiScale, true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoBackground);
 
 		// pre-processing of filters
 		bool isUsingEventFilter = false, isUsingPlayerFilter = false;

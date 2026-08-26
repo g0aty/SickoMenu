@@ -589,11 +589,10 @@ namespace SelfTab {
                     State.Save();
             }*/
 
-            if (State.InMeeting && AnimatedButton("Move in Meeting"))
+            if (State.InMeeting && AnimatedButton("Exit Meeting"))
             {
                 if (IsHost()) State.rpcQueue.push(new RpcEndMeeting());
                 else State.rpcQueue.push(new EndMeeting());
-                State.InMeeting = false;
             }
         }
 

@@ -42,7 +42,7 @@ void dEOSManager_BeginLoginFlowWithDeviceID(EOSManager* __this, MethodInfo* meth
 		return;
 	}
 	EOSManager_StartTempAccountFlow(__this, method);
-	//isGuestAccount = true;
+	isGuestAccount = true;
 	EOSManager_CloseStartupWaitScreen(__this, method);
 }
 
