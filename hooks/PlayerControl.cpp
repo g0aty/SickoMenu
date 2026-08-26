@@ -798,7 +798,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
                         auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
                         if (notifier) {
-                            Sprite spriteBackup = *notifier->fields.playerDisconnectSprite;
+                            auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
                             Color colorBackup = notifier->fields.disconnectColor;
 
                             notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
@@ -806,7 +806,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
                             NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(warning), nullptr);
 
-                            notifier->fields.playerDisconnectSprite = &spriteBackup;
+                            notifier->fields.playerDisconnectSprite = spriteBackup;
                             notifier->fields.disconnectColor = colorBackup;
                         }
                     }
@@ -905,7 +905,7 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 
                 auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
                 if (notifier) {
-                    Sprite spriteBackup = *notifier->fields.playerDisconnectSprite;
+                    auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
                     Color colorBackup = notifier->fields.disconnectColor;
 
                     notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
@@ -913,7 +913,7 @@ void dPlayerControl_MurderPlayer(PlayerControl* __this, PlayerControl* target, M
 
                     NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(killNotif), nullptr);
 
-                    notifier->fields.playerDisconnectSprite = &spriteBackup;
+                    notifier->fields.playerDisconnectSprite = spriteBackup;
                     notifier->fields.disconnectColor = colorBackup;
                 }
 

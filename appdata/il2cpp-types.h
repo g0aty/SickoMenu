@@ -11869,4 +11869,5 @@ namespace app {
     typedef Il2CppObject MapNames__Enum;
     typedef Il2CppObject DetectiveRole;
     typedef Il2CppObject JudgeRole;
+    typedef Il2CppObject VentilationSystem;
 }

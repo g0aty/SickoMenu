@@ -924,20 +924,17 @@ namespace SelfTab {
                 ImGui::TextColored(State.GuardianAngelColor, "Guardian Angel");
                 if (ToggleButton("No Protect Cooldown", &State.GuardianAngel_NoProtectCooldown)) State.Save();
                 ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-
-                ImGui::TextColored(State.ImpostorColor, "Impostor");
-                if (ToggleButton("No Kill Cooldown", &State.Impostor_NoKillCooldown)) State.Save();
-                ImGui::SameLine();
-                if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) State.Save();
-                ImGui::SameLine();
-                if (ToggleButton("Kill Reach", &State.InfiniteKillRange)) State.Save();
-                
-
-                if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) {
-                    State.Save();
-                }
-                ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             }
+
+            ImGui::TextColored(State.ImpostorColor, "Impostor");
+            if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Kill Reach", &State.InfiniteKillRange)) State.Save();
+            ImGui::SameLine();
+            if (ToggleButton("Do Tasks as Impostor", &State.DoTasksAsImpostor)) State.Save();
+
+            if (IsHost() && ToggleButton("No Kill Cooldown", &State.Impostor_NoKillCooldown)) State.Save();
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
             ImGui::TextColored(State.ShapeshifterColor, "Shapeshifter");
             if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) State.Save();

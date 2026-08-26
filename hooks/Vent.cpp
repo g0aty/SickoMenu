@@ -77,8 +77,43 @@ bool dVent_TryMoveToVent(Vent* __this, Vent* otherVent, String** error, MethodIn
 }
 
 void dVentilationSystem_Update(VentilationSystem_Operation__Enum op, int32_t ventId, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dVentilationSystem_Update executed", false);
 	if (!State.PanicMode && State.KillImmunity && op == VentilationSystem_Operation__Enum::Exit) return;
 	VentilationSystem_Update(op, ventId, method);
 	/*if (State.FlipSkeld && IsHost() && op == VentilationSystem_Operation__Enum::Exit && *Game::pLocalPlayer != NULL)
 		(*Game::pLocalPlayer)->fields.inVent = false;*/ // Fix venting on Dleks
+}
+
+void dVentilationSystem_UpdateSystem(VentilationSystem* __this, PlayerControl* player, MessageReader* msgReader, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dVentilationSystem_UpdateSystem executed", false);
+
+	if (!IsHost()) {
+		int32_t pos = msgReader->fields._position, head = msgReader->fields.readHead;
+
+		MessageReader_ReadUInt16(msgReader, NULL); // handle operation ID
+		auto ventOp = (VentilationSystem_Operation__Enum)MessageReader_ReadByte(msgReader, NULL);
+
+		msgReader->fields._position = pos;
+		msgReader->fields.readHead = head;
+
+		if (!State.PanicMode && ventOp == VentilationSystem_Operation__Enum::BootImpostors) {
+			auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
+			if (notifier) {
+				auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
+				Color colorBackup = notifier->fields.disconnectColor;
+
+				notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
+				notifier->fields.disconnectColor = Color(1.f, 0.f, 0.f, 1.f);
+
+				std::string killNotif = std::format("<#f00>{} attempted to ban you, but failed!</color>",
+					convert_from_string(GetPlayerOutfit(GetPlayerData(player))->fields.PlayerName));
+				NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(killNotif), nullptr);
+
+				notifier->fields.playerDisconnectSprite = spriteBackup;
+				notifier->fields.disconnectColor = colorBackup;
+			}
+		}
+		return;
+	}
+	VentilationSystem_UpdateSystem(__this, player, msgReader, method);
 }

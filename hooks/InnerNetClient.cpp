@@ -749,7 +749,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                     LOG_DEBUG("Task Enforcer: kicking " + playerName + " (" + std::to_string(pct) + "% tasks)");
                                     InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
                                     if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
-                                        Sprite* spriteBackup = notifier->fields.playerDisconnectSprite;
+                                        auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
                                         Color colorBackup = notifier->fields.disconnectColor;
                                         notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
                                         notifier->fields.disconnectColor = Color(1.0f, 0.5f, 0.0f, 1.0f);
@@ -1248,6 +1248,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
                         State.vipers_amount = (int)GetRoleCount(RoleType::Viper);
                         State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
+                        State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
                         if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
                             if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount >= GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
                                 State.assignedRoles[index] = RoleType::Random;

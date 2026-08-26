@@ -227,6 +227,7 @@ namespace HostTab {
                                 State.phantoms_amount = (int)GetRoleCount(RoleType::Phantom);
                                 State.vipers_amount = (int)GetRoleCount(RoleType::Viper);
                                 State.impostors_amount = (int)GetRoleCount(RoleType::Impostor);
+                                State.crewmates_amount = (int)GetRoleCount(RoleType::Crewmate);
                                 if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount > maxImpostorAmount)
                                 {
                                     if (State.assignedRoles[index] == RoleType::Impostor)
