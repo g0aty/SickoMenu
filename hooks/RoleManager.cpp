@@ -213,6 +213,9 @@ bool dRoleBehaviour_get_CommsSabotaged(RoleBehaviour* __this, MethodInfo* method
 	if ((__this->fields.Role == RoleTypes__Enum::Engineer && State.UnlockVents) ||
 		State.RolesBypassCommsSabotage) return false;
 
+	if (__this->fields.Role == RoleTypes__Enum::Judge && State.InMeeting &&
+		State.RolesBypassCommsSabotage) return false;
+
 	return ret;
 }
 

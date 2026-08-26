@@ -1565,17 +1565,17 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
             auto playerInfo = GetPlayerData(data->fields.Character);
 
             if (reason == DisconnectReasons__Enum::Banned)
-                Log.Debug(ToString(data->fields.Character) + " has been banned by host (" + GetHostUsername() + ").");
+                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been banned by host (" + GetHostUsername() + ").");
             else if (reason == DisconnectReasons__Enum::Kicked)
-                Log.Debug(ToString(data->fields.Character) + " has been kicked by host (" + GetHostUsername() + ").");
+                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been kicked by host (" + GetHostUsername() + ").");
             else if (reason == DisconnectReasons__Enum::Hacking)
-                Log.Debug(ToString(data->fields.Character) + " has been banned for hacking.");
+                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been banned for hacking.");
             else if (reason == DisconnectReasons__Enum::Error)
-                Log.Debug(ToString(data->fields.Character) + " has been disconnected due to error.");
+                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been disconnected due to error.");
             else if (reason == DisconnectReasons__Enum::Sanctions)
-                Log.Debug(ToString(data->fields.Character) + " has been sanction-banned.");
+                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been sanction-banned.");
             else
-                Log.Debug(ToString(data->fields.Character) + " has left the game.");
+                Log.Debug(convert_from_string(data->fields.PlayerName) + " has left the game.");
 
             uint8_t playerId = data->fields.Character->fields.PlayerId;
 

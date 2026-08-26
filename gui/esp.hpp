@@ -21,8 +21,9 @@ static float GetScaleFromValue(float value)
 	// We offset from 1080 since the w2s scale is defaulted to that.
 	float scale = DirectX::GetWindowSize().y / 1080.0f;
 
-	// If we enable zoom then we scale but otherwise don't
-	float cameraHeight = (State.EnableZoom && !State.InMeeting) ? State.CameraHeight : 1.0f;
+	// Scale according to the camera height due to smooth zoom
+	float cameraHeight = State.FollowerCam != nullptr ?
+		Camera_get_orthographicSize(State.FollowerCam, nullptr) / 3.0f : 1.0f;
 	return (value * scale) / cameraHeight;
 }
 
@@ -34,8 +35,8 @@ static ImVec2 WorldToScreen(const Vector2& pos)
 	const Vector2& localPos = PlayerControl_GetTruePosition(*Game::pLocalPlayer, nullptr);
 
 	// Calculation to compensate for Camera movement
-	cameraPosition.x = localPos.x - (localPos.x - cameraPosition.x);
-	cameraPosition.y = localPos.y - (localPos.y - cameraPosition.y);
+	/*cameraPosition.x = localPos.x - (localPos.x - cameraPosition.x);
+	cameraPosition.y = localPos.y - (localPos.y - cameraPosition.y);*/
 
 	// The value 180 is specific for 1920x1080 so we need to scale it for other resolutions.
 	// Scaling from the x axis would probably also work but now we scale from the y axis.

@@ -759,6 +759,8 @@ std::optional<EVENT_PLAYER> GetEventPlayer(NetworkedPlayerInfo* playerInfo)
 
 std::optional<EVENT_PLAYER> GetEventPlayerControl(PlayerControl* player)
 {
+    if (!player) return std::nullopt;
+
     NetworkedPlayerInfo* playerInfo = GetPlayerData(player);
 
     if (!playerInfo) return std::nullopt;

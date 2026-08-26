@@ -348,6 +348,7 @@ RpcEndMeeting::RpcEndMeeting() {
 void RpcEndMeeting::Process()
 {
     MeetingHud_RpcClose(MeetingHud__TypeInfo->static_fields->Instance, NULL);
+    State.InMeeting = false;
 }
 
 EndMeeting::EndMeeting() {
@@ -356,7 +357,44 @@ EndMeeting::EndMeeting() {
 
 void EndMeeting::Process()
 {
-    MeetingHud_Close(MeetingHud__TypeInfo->static_fields->Instance, NULL);
+    // reference (CloseMeetingCheat): https://github.com/scp222thj/MalumMenu/blob/main/src/Cheats/MalumCheats.cs
+
+    if (State.InMeeting && MeetingHud__TypeInfo->static_fields->Instance != NULL) {
+        State.InMeeting = false;
+        auto meetingHud = MeetingHud__TypeInfo->static_fields->Instance;
+        // MeetingHud_Close(MeetingHud__TypeInfo->static_fields->Instance, NULL);
+        ((InnerNetObject*)meetingHud)->fields.DespawnOnDestroy = false;
+
+        auto meetingGameObj = Component_get_gameObject((Component_1*)meetingHud, NULL);
+        Object_Destroy((Object_1*)meetingGameObj, NULL);
+
+        auto hud = Game::HudManager.GetInstance();
+        auto hudGameObj = Component_get_gameObject((Component_1*)hud->fields.FullScreen, NULL);
+        GameObject_SetActive(hudGameObj, false, NULL);
+
+        for (auto pc : GetAllPlayerControl()) {
+            if (auto player = PlayerSelection(pc).validate();
+                player.has_value() && !player.is_LocalPlayer() && !player.is_Disconnected()) {
+                if (auto role = player.get_PlayerData()->fields.Role;
+                    role != nullptr && role->fields.CanUseKillButton && !player.get_PlayerData()->fields.IsDead) {
+                    pc->fields.killTimer = (std::max)(GameOptions().GetKillCooldown(), 0.f);
+                    //STREAM_DEBUG("Player " << ToString(pc) << " KillTimer " << pc->fields.killTimer);
+                }
+            }
+        }
+
+        (*Game::pShipStatus)->fields.EmergencyCooldown = (float)GameOptions().GetInt(Int32OptionNames__Enum::EmergencyCooldown);
+
+        static std::string followerCamTypeName = translate_type_name("FollowerCamera, Assembly-CSharp");
+        Type* followerCamType = app::Type_GetType(convert_to_string(followerCamTypeName), NULL);
+        auto followerCam = (FollowerCamera*)Component_GetComponent((Component_1*)State.FollowerCam, followerCamType, NULL);
+        followerCam->fields.Locked = false;
+
+        HudManager_SetMapAndInfoButtonsEnabled(hud, true, NULL);
+        if (!State.DisableHud) HudManager_SetHudActive(hud, true, NULL);
+
+        // ControllerManager_CloseAndResetAll(ControllerManager__TypeInfo->static_fields->Instance, NULL);
+    }
 }
 
 DestroyMap::DestroyMap() {

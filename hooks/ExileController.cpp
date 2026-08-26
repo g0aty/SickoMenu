@@ -17,7 +17,7 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
                 player.has_value() && !player.is_LocalPlayer() && !player.is_Disconnected()) {
                 if (auto role = player.get_PlayerData()->fields.Role;
                     role != nullptr && role->fields.CanUseKillButton && !player.get_PlayerData()->fields.IsDead) {
-                    pc->fields.killTimer = (std::max)(GameOptions().GetKillCooldown(), 0.f);;
+                    pc->fields.killTimer = (std::max)(GameOptions().GetKillCooldown(), 0.f);
                     //STREAM_DEBUG("Player " << ToString(pc) << " KillTimer " << pc->fields.killTimer);
                 }
             }

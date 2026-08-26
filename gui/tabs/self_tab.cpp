@@ -404,8 +404,8 @@ namespace SelfTab {
                 if (ToggleButton("Enable Prefix and Suffix", &State.UsePrefixAndSuffix)) State.Save();
                 if (ToggleButton("New Lines for Prefix and Suffix", &State.PrefixAndSuffixNewLines)) State.Save();
 
-                if (InputString("Name Prefix", &State.NamePrefix)) State.Save();
-                if (InputString("Name Suffix", &State.NameSuffix)) State.Save();
+                InputString("Name Prefix", &State.NamePrefix);
+                InputString("Name Suffix", &State.NameSuffix);
                 if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: Prefix and/or suffix will be cleared from the ends of the name if it contains them."));
                 if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("This is done to prevent name overflowing."));
 
@@ -589,11 +589,10 @@ namespace SelfTab {
                     State.Save();
             }*/
 
-            if (State.InMeeting && AnimatedButton("Move in Meeting"))
+            if (State.InMeeting && AnimatedButton("Exit Meeting"))
             {
                 if (IsHost()) State.rpcQueue.push(new RpcEndMeeting());
                 else State.rpcQueue.push(new EndMeeting());
-                State.InMeeting = false;
             }
         }
 
