@@ -5,20 +5,14 @@
 <h1 align="center">👺 SickoMenu</h1>
 
 <p align="center">
-  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat&color=brightgreen" alt="Latest Release"></a>
-  <a href="https://github.com/g0aty/SickoMenu/stargazers"><img src="https://img.shields.io/github/stars/g0aty/SickoMenu?style=flat&color=red" alt="Stars"></a>
-  <a href="https://github.com/g0aty/SickoMenu/network/members"><img src="https://img.shields.io/github/forks/g0aty/SickoMenu?style=flat&color=red" alt="Forks"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/g0aty/SickoMenu?style=flat&color=orange" alt="License"></a>
-  <a href="https://discord.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat&logo=discord&logoColor=blue" alt="Discord"></a>
+  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/v/release/g0aty/SickoMenu?style=flat-square&label=Version&color=brightgreen"></a>
+  <a href="https://github.com/g0aty/SickoMenu/releases/latest"><img src="https://img.shields.io/github/downloads/g0aty/SickoMenu/total?style=flat-square&label=Downloads&color=deeppink"></a>
+  <a href="https://dsc.gg/sickos"><img src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat-square&logoColor=white&color=mediumslateblue" alt="Discord"></a>
 </p>
 
 A powerful utility for Among Us designed to enrich your game experience with custom features!
 
 **Intended for educational and experimental use only.**
-
-Join our very own Discord server for support, bug reports, and sneak peeks!
-### Vanity Invite: https://discord.gg/sickos  
-### Permanent invite: https://dsc.gg/sickos 
 ---
 
 ## 📋 Table of Contents
