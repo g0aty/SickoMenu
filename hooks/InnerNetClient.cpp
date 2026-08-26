@@ -268,7 +268,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             }
 
             if (State.SnipeColor && (IsInGame() || IsInLobby())) {
-                if ((IsColorAvailable(State.SelectedColorId) || !State.SafeMode) && GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId != State.SelectedColorId) {
+                auto localOutfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
+                if (localOutfit != NULL && (IsColorAvailable(State.SelectedColorId) || !State.SafeMode) && localOutfit->fields.ColorId != State.SelectedColorId) {
                     std::queue<RPCInterface*>* queue = nullptr;
                     if (IsInGame())
                         queue = &State.rpcQueue;

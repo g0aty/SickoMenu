@@ -442,10 +442,9 @@ PlayerControl* GetPlayerControlById(Game::PlayerId id) {
 
 bool IsColorAvailable(int colorId) {
     for (auto player : GetAllPlayerData()) {
-        if (GetPlayerOutfit(player)->fields.ColorId == colorId) { //aw hell nah, i made a classic mistake: forgetting another =
-            return false;
-            break;
-        }
+        auto outfit = GetPlayerOutfit(player);
+        if (outfit == NULL) continue;
+        if (outfit->fields.ColorId == colorId) return false;
     }
     return true;
 }
@@ -459,7 +458,7 @@ std::string GenerateRandomString(bool completelyRandom) {
         std::string outputString = "";
 
         for (int i = 0; i < outputLength; ++i) {
-            randomIndex = rand() % (allowedChars.length() - 1);
+            randomIndex = rand() % allowedChars.length();
             outputString += allowedChars[randomIndex];
         }
         return outputString;
@@ -1067,8 +1066,8 @@ std::string GetGradientUsername(std::string str, ImVec4 color1, ImVec4 color2, i
     if (State.StrikethroughName) opener += "<s>";
 
     std::string closer = "";
-    if (State.UnderlineName) closer += "</s>";
-    if (State.StrikethroughName) closer += "</u>";
+    if (State.StrikethroughName) closer += "</s>";
+    if (State.UnderlineName) closer += "</u>";
 
     if (hex1 == hex2) //if user doesn't want gradients, don't cause extra lag
         return std::format("<#{:02x}{:02x}{:02x}{:02x}>{}{}{}</color>", hex1[0], hex1[1], hex1[2], hex2[3], opener, str, closer);

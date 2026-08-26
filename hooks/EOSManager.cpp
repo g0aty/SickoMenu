@@ -208,7 +208,7 @@ void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* 
 	}
 	else {
 		auto textStr = TMP_Text_get_text((TMP_Text*)__this->fields.UsernameText, NULL);
-		if (textStr != convert_to_string("")) {
+		if (!convert_from_string(textStr).empty()) {
 			std::string newFriendCode = "";
 			for (auto i : convert_from_string(textStr)) {
 				newFriendCode += tolower(i);

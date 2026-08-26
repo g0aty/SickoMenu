@@ -414,7 +414,7 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 					}
 					else {
 						auto targetPd = GetPlayerData(target);
-						std::string targetName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(targetPd, nullptr));
+						std::string targetName = (targetPd != NULL) ? convert_from_string(NetworkedPlayerInfo_get_PlayerName(targetPd, nullptr)) : "";
 						std::string targetFc = (targetPd != NULL && targetPd->fields.FriendCode != NULL) ? convert_from_string(targetPd->fields.FriendCode) : "";
 						if (targetFc.empty()) {
 							localWarn("<#ff0000><size=-0.24><font=\"Barlow-Regular Masked\"><b>That player has no friend code available.</b></font></color>");
@@ -455,7 +455,7 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 					}
 					else {
 						auto targetPd = GetPlayerData(target);
-						std::string targetName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(targetPd, nullptr));
+						std::string targetName = (targetPd != NULL) ? convert_from_string(NetworkedPlayerInfo_get_PlayerName(targetPd, nullptr)) : "";
 						std::string fc = (targetPd != NULL && targetPd->fields.FriendCode != NULL) ? convert_from_string(targetPd->fields.FriendCode) : "";
 						auto it = State.WarnReasons.find(fc);
 						if (fc.empty() || it == State.WarnReasons.end() || reasonIndex >= (int)it->second.size()) {
