@@ -407,6 +407,15 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     State.LobbyHistory.front().HostName = RemoveHtmlTags(host);
             }
 
+            if (State.VotekickRejoinPending) {
+                State.VotekickRejoinDelay -= Time_get_deltaTime(NULL);
+                if (State.VotekickRejoinDelay <= 0.f) {
+                    State.VotekickRejoinPending = false;
+                    State.JoinLobbyCode = State.VotekickRejoinLobbyCode;
+                    State.JoinLobby = true;
+                }
+            }
+
             // static int joinDelay = 0;
             // if (joinDelay > 0) joinDelay--;
             if (State.JoinLobby/* && joinDelay <= 0*/) {
@@ -1542,6 +1551,11 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
             State.assignedRolesPlayer.fill(nullptr);
             State.assignedRoles.fill(RoleType::Random);
 
+            if (!State.PendingRejoinTargetFC.empty())
+                State.PendingRejoinReady = true;
+            else
+                State.VotekickRejoinCount.clear();
+
             /*if (!State.PanicMode) {
                 State.PanicMode = true;
                 State.TempPanicMode = true;
@@ -1861,6 +1875,28 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
             }
             if (State.DisableAllVotekicks) return;
         }
+
+        if (State.AutoRejoinOnKick && !IsHost() && IsInLobby()
+            && sourcePlayer == *Game::pLocalPlayer
+            && !State.LastLobbyJoined.empty()) {
+            int& count = State.VotekickRejoinCount[clientId];
+            count++;
+            if (count <= 2) {
+                auto affectedData = GetPlayerData(affectedPlayer);
+                if (affectedData != nullptr) {
+                    std::string fc = convert_from_string(affectedData->fields.FriendCode);
+                    State.PendingRejoinTargetFC = fc.empty()
+                        ? convert_from_string(NetworkedPlayerInfo_get_PlayerName(affectedData, nullptr))
+                        : fc;
+                }
+                else
+                    State.PendingRejoinTargetFC = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(affectedPlayer), nullptr));
+                State.VotekickRejoinLobbyCode = State.LastLobbyJoined;
+                State.VotekickRejoinPending = true;
+                State.VotekickRejoinDelay = 0.25f; // a small delay to let the votekick go through.
+            }
+        }
+
         std::string sourceplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
         std::string affectedplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(affectedPlayer), nullptr));
         LOG_DEBUG(sourceplayerName + " attempted to votekick " + affectedplayerName);

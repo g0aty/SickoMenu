@@ -139,6 +139,13 @@ public:
     int ChatSpamMode = 0;
     int CrashChatSpamMode = 1;
     bool AutoJoinLobby = false;
+    bool AutoRejoinOnKick = false;
+    std::string PendingRejoinTargetFC = "";
+    bool PendingRejoinReady = false;
+    std::unordered_map<int32_t, int> VotekickRejoinCount;
+    bool VotekickRejoinPending = false;
+    float VotekickRejoinDelay = 0.f;
+    std::string VotekickRejoinLobbyCode = "";
     std::string AutoJoinLobbyCode = "";
     bool JoinLobby = false;
     std::string JoinLobbyCode = "";

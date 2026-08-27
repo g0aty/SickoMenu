@@ -235,6 +235,7 @@ void Settings::Load() {
         JSON_TRYGET("DisableMeetings", this->DisableMeetings);
         JSON_TRYGET("DisableSabotages", this->DisableSabotages);
         JSON_TRYGET("DisableAllVotekicks", this->DisableAllVotekicks);
+        JSON_TRYGET("AutoRejoinOnKick", this->AutoRejoinOnKick);
         JSON_TRYGET("DisableRoleManager", this->DisableRoleManager);
 
         JSON_TRYGET("ShowRadar", this->ShowRadar);
@@ -836,6 +837,7 @@ void Settings::Save() {
                 { "DisableMeetings", this->DisableMeetings },
                 { "DisableSabotages", this->DisableSabotages },
                 { "DisableAllVotekicks", this->DisableAllVotekicks },
+                { "AutoRejoinOnKick", this->AutoRejoinOnKick },
                 { "DisableRoleManager", this->DisableRoleManager },
 
                 { "ShowRadar", this->ShowRadar },
