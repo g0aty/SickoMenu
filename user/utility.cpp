@@ -1941,6 +1941,7 @@ static const std::vector<std::pair<std::string, std::vector<std::string>>> SMAC_
     { "Abnormal Friendcode", { "Abnormal Friendcode" } },
     { "Blocked Words", { "Bad Word: " } },
     { "Blocked Start Words", { "Start Word: " } },
+    { "Blacklisted Players", { "<#f00>Blacklisted!</color>" } },
 };
 
 static std::string SMAC_GetReasonCategory(const std::string& reason) {
@@ -1975,8 +1976,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     if (fc != "" && State.SMAC_IgnoreWhitelist && it != State.WhitelistFriendCodes.end()) return;
     if (fc != "" && State.SMAC_AddToBlacklist) {
         if (it != State.WhitelistFriendCodes.end()) State.WhitelistFriendCodes.erase(it);
-        State.BlacklistFriendCodes.push_back(fc);
-        State.Save();
+        AddToBlacklist(fc); 
     }
 
     std::string smacCategory = SMAC_GetReasonCategory(reason);

@@ -736,7 +736,7 @@ namespace GameTab {
                     "Setting Tasks", "Abnormal Murders", "Abnormal Shapeshift", "Abnormal Vanish",
                     "Abnormal Meetings/Body Reports", "Abnormal Venting", "Abnormal Chat",
                     "Abnormal Task Completion", "Abnormal Sabotages", "Abnormal Player Levels",
-                    "Abnormal Friendcode", "Blocked Words", "Blocked Start Words",
+                    "Abnormal Friendcode", "Blocked Words", "Blocked Start Words","Blacklisted Players",
                 };
                 static int selectedCategory = 0;
 
