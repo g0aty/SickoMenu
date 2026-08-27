@@ -157,7 +157,12 @@ namespace HostTab {
             }; // same here
 
             ImGui::SameLine(100 * State.dpiScale);
-            ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+            if (openUtils)
+                ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+            else
+                ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             if (TabGroup("Utils", openUtils)) {
                 CloseOtherGroups(Groups::Utils);
