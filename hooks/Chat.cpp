@@ -613,10 +613,31 @@ void dChatController_AddChat(ChatController* __this, PlayerControl* sourcePlayer
 			}
 			if (State.SMAC_CheckBadWords) {
 				std::string lowerMessage = strToLower(message);
-				for (auto word : State.SMAC_BadWords) {
-					std::string lowerWord = strToLower(word);
-					if (lowerMessage.find(lowerWord) != std::string::npos) {
-						SMAC_OnCheatDetected(sourcePlayer, "Bad Word: " + word);
+				std::string firstWordBad = lowerMessage.substr(0, lowerMessage.find(' '));
+				for (auto& wordEntry : State.SMAC_BadWords) {
+					std::string lowerWord = strToLower(wordEntry.first);
+					if (lowerWord.empty()) continue;
+					bool matched = wordEntry.second ? (lowerMessage.find(lowerWord) != std::string::npos) : (firstWordBad == lowerWord);
+					if (matched) {
+						SMAC_OnCheatDetected(sourcePlayer, "Bad Word: " + wordEntry.first);
+						break;
+					}
+				}
+			}
+
+			if (State.SMAC_CheckStartWords && !IsInGame()) {
+				std::string lowerMessage = strToLower(message);
+				std::string firstWordStart = lowerMessage.substr(0, lowerMessage.find(' '));
+				uint8_t chatterId = sourcePlayer->fields.PlayerId;
+				for (auto& wordEntry : State.SMAC_StartWords) {
+					std::string lowerWord = strToLower(wordEntry.first);
+					if (lowerWord.empty()) continue;
+					bool matched = wordEntry.second ? (lowerMessage.find(lowerWord) != std::string::npos) : (firstWordStart == lowerWord);
+					if (matched) {
+						if (++State.SMAC_StartWordsCount[chatterId] >= State.SMAC_StartWordsThreshold) {
+							SMAC_OnCheatDetected(sourcePlayer, "Start Word: " + wordEntry.first);
+							State.SMAC_StartWordsCount[chatterId] = 0;
+						}
 						break;
 					}
 				}

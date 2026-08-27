@@ -436,6 +436,7 @@ void Settings::Load() {
         JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
         JSON_TRYGET("SMAC_HostPunishment", this->SMAC_HostPunishment);
+        JSON_TRYGET("SMAC_ReasonPunishmentOverride", this->SMAC_ReasonPunishmentOverride);
         JSON_TRYGET("SMAC_AddToBlacklist", this->SMAC_AddToBlacklist);
         JSON_TRYGET("SMAC_PunishBlacklist", this->SMAC_PunishBlacklist);
         JSON_TRYGET("SMAC_IgnoreWhitelist", this->SMAC_IgnoreWhitelist);
@@ -1103,6 +1104,7 @@ void Settings::Save() {
                 { "Enable_SMAC", this->Enable_SMAC },
                 { "SMAC_Punishment", this->SMAC_Punishment },
                 { "SMAC_HostPunishment", this->SMAC_HostPunishment },
+                { "SMAC_ReasonPunishmentOverride", this->SMAC_ReasonPunishmentOverride },
                 { "SMAC_AddToBlacklist", this->SMAC_AddToBlacklist },
                 { "SMAC_PunishBlacklist", this->SMAC_PunishBlacklist },
                 { "SMAC_IgnoreWhitelist", this->SMAC_IgnoreWhitelist },

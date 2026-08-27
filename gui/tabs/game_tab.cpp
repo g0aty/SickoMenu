@@ -721,9 +721,42 @@ namespace GameTab {
 
         if (openAnticheat) {
             if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
-            if (IsHost()) CustomListBoxInt("Host Punishment ", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
-            else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+            ImGui::Dummy(ImVec2(0, 1)* State.dpiScale);
+            if (ImGui::CollapsingHeader("Action on Detection##smacoverride")) {
+                ImGui::TextDisabled("Default action taken when a detection isn't specifically overridden below.");
+                if (IsHost()) CustomListBoxInt("Host Punishment ", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+                else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
+                ImGui::Dummy(ImVec2(0, 1) * State.dpiScale);
+                ImGui::TextDisabled("Override the action for a specific detection.");
+
+                static const std::vector<const char*> SMAC_CATEGORIES = {
+                    "Known Cheat Usage", "SickoMenu Usage", "Abnormal Names", "Abnormal Set Color",
+                    "Abnormal Set Cosmetics", "Abnormal Chat Note", "Abnormal Scanner", "Abnormal Animation",
+                    "Setting Tasks", "Abnormal Murders", "Abnormal Shapeshift", "Abnormal Vanish",
+                    "Abnormal Meetings/Body Reports", "Abnormal Venting", "Abnormal Chat",
+                    "Abnormal Task Completion", "Abnormal Sabotages", "Abnormal Player Levels",
+                    "Abnormal Friendcode", "Blocked Words", "Blocked Start Words",
+                };
+                static int selectedCategory = 0;
+
+                std::string catKey = SMAC_CATEGORIES[selectedCategory];
+                auto& overrides = State.SMAC_ReasonPunishmentOverride;
+                if (overrides.find(catKey) == overrides.end())
+                    overrides[catKey] = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
+                int currentMaxIndex = IsHost() ? (int)SMAC_HOST_PUNISHMENTS.size() - 1 : (int)SMAC_PUNISHMENTS.size() - 1;
+                overrides[catKey] = std::clamp(overrides[catKey], 0, currentMaxIndex);
+
+                ImGui::SetNextItemWidth(150.0f * State.dpiScale);
+                CustomListBoxInt("Category", &selectedCategory, SMAC_CATEGORIES, 150.0f * State.dpiScale);
+                ImGui::SameLine();
+
+                bool changed;
+                if (IsHost()) changed = CustomListBoxInt("Punishment##smacoverridelevel", &overrides[catKey], SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+                else changed = CustomListBoxInt("Punishment##smacoverridelevel", &overrides[catKey], SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+                if (changed) State.Save();
+            }
+            ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Punish Blacklist", &State.SMAC_PunishBlacklist)) State.Save();
@@ -842,24 +875,38 @@ namespace GameTab {
             }
             if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
             if (State.SMAC_CheckBadWords) {
+                static const std::vector<const char*> SMAC_DETECTION_MODES = { "Default Detection", "Strict Detection" };
                 if (State.SMAC_BadWords.empty())
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No bad words added!");
                 static std::string newWord = "";
                 InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
                 if (AnimatedButton("Add Word")) {
-                    State.SMAC_BadWords.push_back(newWord);
-                    State.Save();
-                    newWord = "";
+                    std::string newWordLower = strToLower(newWord);
+                    bool alreadyExists = std::any_of(State.SMAC_BadWords.begin(), State.SMAC_BadWords.end(),
+                        [&](auto& w) { return strToLower(w.first) == newWordLower; });
+                    if (!newWord.empty() && !alreadyExists) {
+                        State.SMAC_BadWords.push_back({ newWord, false });
+                        State.Save();
+                        newWord = "";
+                    }
                 }
                 if (!State.SMAC_BadWords.empty()) {
                     static int selectedWordIndex = 0;
                     selectedWordIndex = std::clamp(selectedWordIndex, 0, (int)State.SMAC_BadWords.size() - 1);
-                    std::vector<const char*> wordVector(State.SMAC_BadWords.size(), nullptr);
-                    for (size_t i = 0; i < State.SMAC_BadWords.size(); i++) {
-                        wordVector[i] = State.SMAC_BadWords[i].c_str();
-                    }
+                    std::vector<std::string> wordDisplayStrings;
+                    for (auto& w : State.SMAC_BadWords)
+                        wordDisplayStrings.push_back(w.first + (w.second ? " [Strict]" : " [Default]"));
+                    std::vector<const char*> wordVector(wordDisplayStrings.size(), nullptr);
+                    for (size_t i = 0; i < wordDisplayStrings.size(); i++)
+                        wordVector[i] = wordDisplayStrings[i].c_str();
                     CustomListBoxInt("Word to Remove", &selectedWordIndex, wordVector);
+                    ImGui::SameLine();
+                    int badWordMode = State.SMAC_BadWords[selectedWordIndex].second ? 1 : 0;
+                    if (CustomListBoxInt("Detection Mode##badwords", &badWordMode, SMAC_DETECTION_MODES, 130.0f * State.dpiScale)) {
+                        State.SMAC_BadWords[selectedWordIndex].second = (badWordMode == 1);
+                        State.Save();
+                    }
                     ImGui::SameLine();
                     if (AnimatedButton("Remove"))
                         State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
@@ -868,12 +915,10 @@ namespace GameTab {
 
             if (ToggleButton("Blocked Start Words", &State.SMAC_CheckStartWords)) State.Save();
             if (State.SMAC_CheckStartWords) {
-                ImGui::SameLine();
-                if (ToggleButton("Strict Detection", &State.SMAC_StartWordsStrict)) State.Save();
-                ImGui::SameLine();
-                ImGui::SetNextItemWidth(80.0f * State.dpiScale);
+                static const std::vector<const char*> SMAC_DETECTION_MODES = { "Default Detection", "Strict Detection" };
+                ImGui::SetNextItemWidth(70.0f * State.dpiScale);
                 if (ImGui::InputInt("Violations Before Action", &State.SMAC_StartWordsThreshold)) {
-                    if (State.SMAC_StartWordsThreshold < 1) State.SMAC_StartWordsThreshold = 1;
+                    State.SMAC_StartWordsThreshold = std::clamp(State.SMAC_StartWordsThreshold, 1, 10);
                     State.Save();
                 }
                 if (State.SMAC_StartWords.empty())
@@ -882,18 +927,31 @@ namespace GameTab {
                 InputString("New W\u043Erd", &newStartWord, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
                 if (AnimatedButton("Add Word##StartWord")) {
-                    State.SMAC_StartWords.push_back(newStartWord);
-                    State.Save();
-                    newStartWord = "";
+                    std::string newStartWordLower = strToLower(newStartWord);
+                    bool alreadyExists = std::any_of(State.SMAC_StartWords.begin(), State.SMAC_StartWords.end(),
+                        [&](auto& w) { return strToLower(w.first) == newStartWordLower; });
+                    if (!newStartWord.empty() && !alreadyExists) {
+                        State.SMAC_StartWords.push_back({ newStartWord, false });
+                        State.Save();
+                        newStartWord = "";
+                    }
                 }
                 if (!State.SMAC_StartWords.empty()) {
                     static int selectedStartWordIndex = 0;
                     selectedStartWordIndex = std::clamp(selectedStartWordIndex, 0, (int)State.SMAC_StartWords.size() - 1);
-                    std::vector<const char*> startWordVector(State.SMAC_StartWords.size(), nullptr);
-                    for (size_t i = 0; i < State.SMAC_StartWords.size(); i++) {
-                        startWordVector[i] = State.SMAC_StartWords[i].c_str();
-                    }
+                    std::vector<std::string> startWordDisplayStrings;
+                    for (auto& w : State.SMAC_StartWords)
+                        startWordDisplayStrings.push_back(w.first + (w.second ? " [Strict]" : " [Default]"));
+                    std::vector<const char*> startWordVector(startWordDisplayStrings.size(), nullptr);
+                    for (size_t i = 0; i < startWordDisplayStrings.size(); i++)
+                        startWordVector[i] = startWordDisplayStrings[i].c_str();
                     CustomListBoxInt("Start Word to Remove", &selectedStartWordIndex, startWordVector);
+                    ImGui::SameLine();
+                    int startWordMode = State.SMAC_StartWords[selectedStartWordIndex].second ? 1 : 0;
+                    if (CustomListBoxInt("Detection Mode##startwords", &startWordMode, SMAC_DETECTION_MODES, 130.0f * State.dpiScale)) {
+                        State.SMAC_StartWords[selectedStartWordIndex].second = (startWordMode == 1);
+                        State.Save();
+                    }
                     ImGui::SameLine();
                     if (AnimatedButton("Remove##StartWord")) {
                         State.SMAC_StartWords.erase(State.SMAC_StartWords.begin() + selectedStartWordIndex);

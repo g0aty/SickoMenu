@@ -1919,6 +1919,39 @@ void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
     State.tournamentPoints[friendCode] += points;
 }
 
+static const std::vector<std::pair<std::string, std::vector<std::string>>> SMAC_REASON_CATEGORIES = {
+    { "Known Cheat Usage", { "AmongUsMenu User", "ChocooMenu User", "KillNetwork User", "SlopMenuCrew User" } },
+    { "SickoMenu Usage", { "SickoMenu User" } },
+    { "Abnormal Names", { "Abnormal Name" } },
+    { "Abnormal Set Color", { "Abnormal Change Color" } },
+    { "Abnormal Set Cosmetics", { "Abnormal Change Cosmetics" } },
+    { "Abnormal Chat Note", { "Abnormal Chat Note" } },
+    { "Abnormal Scanner", { "Abnormal MedBay Scan" } },
+    { "Abnormal Animation", { "Abnormal Animation" } },
+    { "Setting Tasks", { "Abnormal Set Tasks" } },
+    { "Abnormal Murders", { "Abnormal Murder Player" } },
+    { "Abnormal Shapeshift", { "Abnormal Shapeshift" } },
+    { "Abnormal Vanish", { "Abnormal Vanish/Appear" } },
+    { "Abnormal Meetings/Body Reports", { "Abnormal Meeting", "Abnormal Report Body" } },
+    { "Abnormal Venting", { "Abnormal Venting" } },
+    { "Abnormal Chat", { "Abnormal Chat" } },
+    { "Abnormal Task Completion", { "Abnormal Task Completion" } },
+    { "Abnormal Sabotages", { "Bad Sabotage" } },
+    { "Abnormal Player Levels", { "Abnormal Level" } },
+    { "Abnormal Friendcode", { "Abnormal Friendcode" } },
+    { "Blocked Words", { "Bad Word: " } },
+    { "Blocked Start Words", { "Start Word: " } },
+};
+
+static std::string SMAC_GetReasonCategory(const std::string& reason) {
+    for (auto& [category, prefixes] : SMAC_REASON_CATEGORIES) {
+        for (auto& prefix : prefixes) {
+            if (reason.rfind(prefix, 0) == 0) return category;
+        }
+    }
+    return "";
+}
+
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     if (!State.Enable_SMAC) return;
     if (reason == "Overloading" && !(IsHost() && State.SMAC_HostPunishment >= 2)) return; // Don't spam logs for overloading, that causes overload as well
@@ -1946,8 +1979,19 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
         State.Save();
     }
 
+    std::string smacCategory = SMAC_GetReasonCategory(reason);
+    int punishmentLevel = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
+    if (!smacCategory.empty()) {
+        auto overrideIt = State.SMAC_ReasonPunishmentOverride.find(smacCategory);
+        if (overrideIt != State.SMAC_ReasonPunishmentOverride.end())
+            punishmentLevel = overrideIt->second;
+    }
+
+    int maxPunishmentLevel = IsHost() ? 3 : 1;
+    punishmentLevel = std::clamp(punishmentLevel, 0, maxPunishmentLevel);
+
     if (IsHost()) {
-        switch (State.SMAC_HostPunishment) {
+        switch (punishmentLevel) {
         case 0:
             LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
             break;
@@ -1985,7 +2029,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
         }
     }
     else {
-        switch (State.SMAC_Punishment) {
+        switch (punishmentLevel) {
         case 0:
             LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
             break;

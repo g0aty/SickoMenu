@@ -732,6 +732,7 @@ public:
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
     int SMAC_HostPunishment = 0;
+    std::unordered_map<std::string, int> SMAC_ReasonPunishmentOverride;
     bool SMAC_AddToBlacklist = false;
     bool SMAC_IgnoreWhitelist = false;
     bool SMAC_PunishBlacklist = false;
@@ -759,12 +760,11 @@ public:
     int SMAC_LowLevel = 0;
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
     bool SMAC_CheckBadWords = true;
-    std::vector<std::string> SMAC_BadWords = {};
+    std::vector<std::pair<std::string, bool>> SMAC_BadWords = {}; 
     bool SMAC_CheckFriendcode = true;
     bool SMAC_CheckStartWords = false;
-    bool SMAC_StartWordsStrict = true;
     int SMAC_StartWordsThreshold = 1;
-    std::vector<std::string> SMAC_StartWords = {};
+    std::vector<std::pair<std::string, bool>> SMAC_StartWords = {}; 
     std::map<uint8_t, int> SMAC_StartWordsCount;
 
     struct ChatPreset {
