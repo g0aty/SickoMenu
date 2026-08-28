@@ -966,7 +966,7 @@ namespace HostTab {
                             State.Mod_RoleNames.push_back(newRoleName);
                             State.Mod_RoleMembers.push_back({});
                             State.Mod_RolePermissions.push_back({});
-                            State.Mod_RoleRank.push_back(0);
+                            State.Mod_RoleRank.push_back(1); 
                             selectedRole = (int)State.Mod_RoleNames.size() - 1;
                             newRoleName = "";
                             State.Save();
@@ -1057,21 +1057,8 @@ namespace HostTab {
                                 ImGui::SameLine();
                                 if (AnimatedButton("Add (friendcode)##RoleMember")) {
                                     if (!newMemberCode.empty()) {
-                                        State.Mod_RoleMembers[selectedRole].push_back(newMemberCode);
+                                        SetFriendCodeInRole(newMemberCode, selectedRole, true); 
                                         newMemberCode = "";
-                                        State.Save();
-                                    }
-                                }
-                                auto& members = State.Mod_RoleMembers[selectedRole];
-                                if (!members.empty()) {
-                                    selectedMemberIndex = std::clamp(selectedMemberIndex, 0, (int)members.size() - 1);
-                                    std::vector<const char*> memberVector(members.size(), nullptr);
-                                    for (size_t i = 0; i < members.size(); i++) memberVector[i] = members[i].c_str();
-                                    CustomListBoxInt("##RemoveRoleMember", &selectedMemberIndex, memberVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
-                                    ImGui::SameLine();
-                                    if (AnimatedButton("Remove##RoleMember")) {
-                                        members.erase(members.begin() + selectedMemberIndex);
-                                        State.Save();
                                     }
                                 }
                             }

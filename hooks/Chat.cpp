@@ -353,7 +353,14 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 	if (cmd == "/cw") cmd = "/checkwarns";
 
 
-	if (cmd != "/preset") {
+	static const std::set<std::string> KNOWN_COMMANDS = {
+	"/color", "/colour", "/preset", "/sicko",
+	"/kick", "/kickc", "/ban", "/banc",
+	"/warn", "/warnc", "/unwarn", "/unwarnc", "/checkwarns",
+	"/callmeeting", "/endmeeting", "/start", "/end",
+	};
+
+	if (!KNOWN_COMMANDS.count(cmd) && cmd != "/preset") {
 		std::string shorthandName = cmd.substr(1); // strip leading '/'
 		const Settings::ChatPreset* shorthandPreset = FindChatPresetByName(shorthandName);
 		if (shorthandPreset != nullptr) {
@@ -362,12 +369,6 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 		}
 	}
 
-	static const std::set<std::string> KNOWN_COMMANDS = {
-		"/color", "/colour", "/preset", "/sicko",
-		"/kick", "/kickc", "/ban", "/banc",
-		"/warn", "/warnc", "/unwarn", "/unwarnc", "/checkwarns",
-		"/callmeeting", "/endmeeting", "/start", "/end",
-	};
 	if (!KNOWN_COMMANDS.count(cmd)) return false;
 
 	auto localWarn = [&](const std::string& text) {
