@@ -1982,16 +1982,11 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     std::string smacCategory = SMAC_GetReasonCategory(reason);
     int punishmentLevel = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
     if (!smacCategory.empty()) {
-        if (IsHost()) {
-            auto overrideIt = State.SMAC_ReasonPunishmentOverrideHost.find(smacCategory);
-            if (overrideIt != State.SMAC_ReasonPunishmentOverrideHost.end())
-                punishmentLevel = overrideIt->second;
-        }
-        else {
-            auto overrideIt = State.SMAC_ReasonPunishmentOverride.find(smacCategory);
-            if (overrideIt != State.SMAC_ReasonPunishmentOverride.end())
-                punishmentLevel = overrideIt->second;
-        }
+        auto override = IsHost() ? State.SMAC_ReasonPunishmentOverrideHost : State.SMAC_ReasonPunishmentOverride;
+        
+        auto overrideIt = override.find(smacCategory);
+        if (overrideIt != override.end())
+            punishmentLevel = overrideIt->second;
     }
 
     int maxPunishmentLevel = IsHost() ? 3 : 1;
