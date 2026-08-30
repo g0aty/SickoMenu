@@ -545,37 +545,218 @@ namespace GameTab {
                     { State.SafeMode ? "With Message (Self-Spam ONLY)" : "With Message", "Blank Chat", State.SafeMode ? "Self Message + Blank Chat" : "Message + Blank Chat" })) State.Save();
             }
 
-            if (std::find(State.ChatPresets.begin(), State.ChatPresets.end(), State.chatMessage) == State.ChatPresets.end() && AnimatedButton("Add Message as Preset")) {
-                State.ChatPresets.push_back(State.chatMessage);
-                State.Save();
-            }
             if (!(IsHost() || !State.SafeMode) && State.chatMessage.size() > 120) {
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Message will be detected by anticheat.");
             }
-            if (!State.ChatPresets.empty()) {
-                static int selectedPresetIndex = 0;
-                selectedPresetIndex = std::clamp(selectedPresetIndex, 0, (int)State.ChatPresets.size() - 1);
-                std::vector<const char*> presetVector(State.ChatPresets.size(), nullptr);
-                for (size_t i = 0; i < State.ChatPresets.size(); i++) {
-                    presetVector[i] = State.ChatPresets[i].c_str();
+
+            ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+            if (ImGui::CollapsingHeader("Chat Presets", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
+                static std::string newChatPresetName = "MyPreset";
+                static int lastRenameIndex = -1;
+                auto chatPresetNameTaken = [](const std::string& name, int excludeIndex) {
+                    for (size_t i = 0; i < State.ChatPresets.size(); i++) {
+                        if ((int)i == excludeIndex) continue;
+                        if (State.ChatPresets[i].Name == name) return true;
+                    }
+                    return false;
+                    };
+
+                if (!State.ChatPresets.empty()) {
+                    std::vector<const char*> presetNames;
+                    for (auto& p : State.ChatPresets) presetNames.push_back(p.Name.c_str());
+                    State.SelectedChatPreset = std::clamp(State.SelectedChatPreset, 0, (int)State.ChatPresets.size() - 1);
+                    CustomListBoxInt("##chatpresetselect", &State.SelectedChatPreset, presetNames, 200.0f * State.dpiScale, ImVec4(0, 0, 0, 0), 0, "Preset");
+                    auto& selected = State.ChatPresets[State.SelectedChatPreset];
+
+                    if (lastRenameIndex != State.SelectedChatPreset) {
+                        newChatPresetName = selected.Name;
+                        lastRenameIndex = State.SelectedChatPreset;
+                    }
+
+                    ImGui::SameLine();
+                    if (AnimatedButton("Apply##chatpreset")) {
+                        State.chatMessage = selected.Messages.empty() ? "" : selected.Messages[0];
+                    }
+                    ImGui::SameLine();
+                    if (AnimatedButton("Update##chatpreset")) {
+                        selected.Messages = { State.chatMessage };
+                        State.Save();
+                    }
+                    ImGui::SameLine();
+                    if (AnimatedButton("Delete##chatpreset")) {
+                        State.ChatPresets.erase(State.ChatPresets.begin() + State.SelectedChatPreset);
+                        if (!State.ChatPresets.empty())
+                            State.SelectedChatPreset = std::clamp(State.SelectedChatPreset, 0, (int)State.ChatPresets.size() - 1);
+                        lastRenameIndex = -1;
+                        State.Save();
+                    }
                 }
-                CustomListBoxInt("Message to Send/Remove", &selectedPresetIndex, presetVector);
-                auto msg = State.ChatPresets[selectedPresetIndex];
-                if (AnimatedButton("Set as Chat Message"))
-                {
-                    State.chatMessage = msg;
+                else {
+                    ImGui::TextDisabled("No presets saved.");
                 }
+
+                ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+
+                ImGui::SetNextItemWidth(160 * State.dpiScale);
+                InputString("##PresetNameInput", &newChatPresetName);
                 ImGui::SameLine();
-                if (AnimatedButton("Remove"))
-                    State.ChatPresets.erase(State.ChatPresets.begin() + selectedPresetIndex);
+                ImGui::TextUnformatted("Preset Name");
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Preset names can't contain spaces to be usable with /cmd (e.g. /rules).");
+                ImGui::SameLine();
+                if (AnimatedButton("Save Current##chatpreset")) {
+                    std::string sanitizedName = newChatPresetName;
+                    sanitizedName.erase(std::remove(sanitizedName.begin(), sanitizedName.end(), ' '), sanitizedName.end());
+                    if (sanitizedName.empty()) sanitizedName = "Preset";
+                    if (chatPresetNameTaken(sanitizedName, -1)) {
+                        ImGui::OpenPopup("ChatPresetNameTaken");
+                    }
+                    else {
+                        Settings::ChatPreset p;
+                        p.Name = sanitizedName;
+                        p.Messages = { State.chatMessage };
+                        State.ChatPresets.push_back(p);
+                        State.SelectedChatPreset = (int)State.ChatPresets.size() - 1;
+                        lastRenameIndex = State.SelectedChatPreset;
+                        State.Save();
+                    }
+                }
+                if (ImGui::BeginPopup("ChatPresetNameTaken")) {
+                    ImGui::Text("A preset with that name already exists.");
+                    ImGui::EndPopup();
+                }
+                if (!State.ChatPresets.empty()) {
+                    ImGui::SameLine();
+                    if (AnimatedButton("Rename##chatpreset")) {
+                        std::string sanitizedName = newChatPresetName;
+                        sanitizedName.erase(std::remove(sanitizedName.begin(), sanitizedName.end(), ' '), sanitizedName.end());
+                        if (!sanitizedName.empty()) {
+                            if (chatPresetNameTaken(sanitizedName, State.SelectedChatPreset)) {
+                                ImGui::OpenPopup("ChatPresetNameTaken");
+                            }
+                            else {
+                                State.ChatPresets[State.SelectedChatPreset].Name = sanitizedName;
+                                State.Save();
+                            }
+                        }
+                    }
+                }
+
+                ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+
+                // Only single message presets can be included, to prevent the already combined presets from piling up.
+                std::vector<int> combinableIndices;
+                for (int i = 0; i < (int)State.ChatPresets.size(); i++) {
+                    if (State.ChatPresets[i].Messages.size() <= 1) combinableIndices.push_back(i);
+                }
+
+                if (combinableIndices.size() >= 2 && ImGui::CollapsingHeader("Combine Presets")) {
+                    ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
+                    static std::vector<std::pair<const char*, bool>> combineList;
+                    static std::vector<std::string> combineNamesCache;
+                    static size_t lastCombinableCount = 0;
+                    static std::vector<bool> prevCombineChecked;
+                    static std::vector<int> combineSelectionOrder; // saves into combineList in the order the user checked them
+                    if (combineList.size() != combinableIndices.size()) {
+                        combineNamesCache.clear();
+                        for (int idx : combinableIndices) combineNamesCache.push_back(State.ChatPresets[idx].Name);
+                        combineList.clear();
+                        for (auto& n : combineNamesCache) combineList.push_back({ n.c_str(), false });
+                        lastCombinableCount = combinableIndices.size();
+                        prevCombineChecked.assign(combineList.size(), false);
+                        combineSelectionOrder.clear();
+                    }
+
+                    CustomListBoxIntMultiple("Presets to Combine", &combineList, 220.0f * State.dpiScale);
+
+                    if (prevCombineChecked.size() != combineList.size())
+                        prevCombineChecked.assign(combineList.size(), false);
+                    for (size_t i = 0; i < combineList.size(); i++) {
+                        bool nowChecked = combineList[i].second;
+                        bool wasChecked = prevCombineChecked[i];
+                        if (nowChecked && !wasChecked) {
+                            combineSelectionOrder.push_back((int)i);
+                        }
+                        else if (!nowChecked && wasChecked) {
+                            combineSelectionOrder.erase(std::remove(combineSelectionOrder.begin(), combineSelectionOrder.end(), (int)i), combineSelectionOrder.end());
+                        }
+                        prevCombineChecked[i] = nowChecked;
+                    }
+
+                    ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
+                    static std::string combinedPresetName = "CombinedPreset";
+                    ImGui::SetNextItemWidth(160 * State.dpiScale);
+                    InputString("Combined Preset Name", &combinedPresetName);
+                    ImGui::SameLine();
+                    if (AnimatedButton("Combine as New Preset") && combineSelectionOrder.size() >= 2) {
+                        std::string sanitizedName = combinedPresetName;
+                        sanitizedName.erase(std::remove(sanitizedName.begin(), sanitizedName.end(), ' '), sanitizedName.end());
+                        if (sanitizedName.empty()) sanitizedName = "CombinedPreset";
+                        if (chatPresetNameTaken(sanitizedName, -1)) {
+                            ImGui::OpenPopup("ChatPresetNameTaken");
+                        }
+                        else {
+                            Settings::ChatPreset combined;
+                            combined.Name = sanitizedName;
+                            combined.Messages.clear();
+                            for (int i : combineSelectionOrder) {
+                                if (i >= 0 && i < (int)combinableIndices.size()) {
+                                    for (auto& m : State.ChatPresets[combinableIndices[i]].Messages) combined.Messages.push_back(m);
+                                }
+                            }
+                            if (!combined.Messages.empty()) {
+                                State.ChatPresets.push_back(combined);
+                                State.SelectedChatPreset = (int)State.ChatPresets.size() - 1;
+                                combineList.clear();
+                                prevCombineChecked.clear();
+                                combineSelectionOrder.clear();
+                                State.Save();
+                            }
+                        }
+                    }
+                }
             }
         }
 
         if (openAnticheat) {
             if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
-            if (IsHost()) CustomListBoxInt("Host Punishment ", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
-            else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+            ImGui::Dummy(ImVec2(0, 1)* State.dpiScale);
+            if (ImGui::CollapsingHeader("Action on Detection##smacoverride")) {
+                ImGui::TextDisabled("Default action taken when a detection isn't specifically overridden below.");
+                if (IsHost()) CustomListBoxInt("Host Punishment ", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+                else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
+                ImGui::Dummy(ImVec2(0, 1) * State.dpiScale);
+                ImGui::TextDisabled("Override the action for a specific detection.");
+
+                static const std::vector<const char*> SMAC_CATEGORIES = {
+                    "Known Cheat Usage", "SickoMenu Usage", "Abnormal Names", "Abnormal Set Color",
+                    "Abnormal Set Cosmetics", "Abnormal Chat Note", "Abnormal Scanner", "Abnormal Animation",
+                    "Setting Tasks", "Abnormal Murders", "Abnormal Shapeshift", "Abnormal Vanish",
+                    "Abnormal Meetings/Body Reports", "Abnormal Venting", "Abnormal Chat",
+                    "Abnormal Task Completion", "Abnormal Sabotages", "Abnormal Player Levels",
+                    "Abnormal Friendcode", "Blocked Words", "Blocked Start Words","Blacklisted Players",
+                };
+                static int selectedCategory = 0;
+
+                std::string catKey = SMAC_CATEGORIES[selectedCategory];
+                auto& overrides = State.SMAC_ReasonPunishmentOverride;
+                if (overrides.find(catKey) == overrides.end())
+                    overrides[catKey] = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
+                int currentMaxIndex = IsHost() ? (int)SMAC_HOST_PUNISHMENTS.size() - 1 : (int)SMAC_PUNISHMENTS.size() - 1;
+                overrides[catKey] = std::clamp(overrides[catKey], 0, currentMaxIndex);
+
+                ImGui::SetNextItemWidth(150.0f * State.dpiScale);
+                CustomListBoxInt("Category", &selectedCategory, SMAC_CATEGORIES, 150.0f * State.dpiScale);
+                ImGui::SameLine();
+
+                bool changed;
+                if (IsHost()) changed = CustomListBoxInt("Punishment##smacoverridelevel", &overrides[catKey], SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+                else changed = CustomListBoxInt("Punishment##smacoverridelevel", &overrides[catKey], SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+                if (changed) State.Save();
+            }
+            ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
             if (ToggleButton("Add Cheaters to Blacklist", &State.SMAC_AddToBlacklist)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Punish Blacklist", &State.SMAC_PunishBlacklist)) State.Save();
@@ -694,24 +875,38 @@ namespace GameTab {
             }
             if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
             if (State.SMAC_CheckBadWords) {
+                static const std::vector<const char*> SMAC_DETECTION_MODES = { "Default Detection", "Strict Detection" };
                 if (State.SMAC_BadWords.empty())
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No bad words added!");
                 static std::string newWord = "";
                 InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
                 if (AnimatedButton("Add Word")) {
-                    State.SMAC_BadWords.push_back(newWord);
-                    State.Save();
-                    newWord = "";
+                    std::string newWordLower = strToLower(newWord);
+                    bool alreadyExists = std::any_of(State.SMAC_BadWords.begin(), State.SMAC_BadWords.end(),
+                        [&](auto& w) { return strToLower(w.first) == newWordLower; });
+                    if (!newWord.empty() && !alreadyExists) {
+                        State.SMAC_BadWords.push_back({ newWord, false });
+                        State.Save();
+                        newWord = "";
+                    }
                 }
                 if (!State.SMAC_BadWords.empty()) {
                     static int selectedWordIndex = 0;
                     selectedWordIndex = std::clamp(selectedWordIndex, 0, (int)State.SMAC_BadWords.size() - 1);
-                    std::vector<const char*> wordVector(State.SMAC_BadWords.size(), nullptr);
-                    for (size_t i = 0; i < State.SMAC_BadWords.size(); i++) {
-                        wordVector[i] = State.SMAC_BadWords[i].c_str();
-                    }
+                    std::vector<std::string> wordDisplayStrings;
+                    for (auto& w : State.SMAC_BadWords)
+                        wordDisplayStrings.push_back(w.first + (w.second ? " [Strict]" : " [Default]"));
+                    std::vector<const char*> wordVector(wordDisplayStrings.size(), nullptr);
+                    for (size_t i = 0; i < wordDisplayStrings.size(); i++)
+                        wordVector[i] = wordDisplayStrings[i].c_str();
                     CustomListBoxInt("Word to Remove", &selectedWordIndex, wordVector);
+                    ImGui::SameLine();
+                    int badWordMode = State.SMAC_BadWords[selectedWordIndex].second ? 1 : 0;
+                    if (CustomListBoxInt("Detection Mode##badwords", &badWordMode, SMAC_DETECTION_MODES, 130.0f * State.dpiScale)) {
+                        State.SMAC_BadWords[selectedWordIndex].second = (badWordMode == 1);
+                        State.Save();
+                    }
                     ImGui::SameLine();
                     if (AnimatedButton("Remove"))
                         State.SMAC_BadWords.erase(State.SMAC_BadWords.begin() + selectedWordIndex);
@@ -720,12 +915,10 @@ namespace GameTab {
 
             if (ToggleButton("Blocked Start Words", &State.SMAC_CheckStartWords)) State.Save();
             if (State.SMAC_CheckStartWords) {
-                ImGui::SameLine();
-                if (ToggleButton("Strict Detection", &State.SMAC_StartWordsStrict)) State.Save();
-                ImGui::SameLine();
-                ImGui::SetNextItemWidth(80.0f * State.dpiScale);
+                static const std::vector<const char*> SMAC_DETECTION_MODES = { "Default Detection", "Strict Detection" };
+                ImGui::SetNextItemWidth(70.0f * State.dpiScale);
                 if (ImGui::InputInt("Violations Before Action", &State.SMAC_StartWordsThreshold)) {
-                    if (State.SMAC_StartWordsThreshold < 1) State.SMAC_StartWordsThreshold = 1;
+                    State.SMAC_StartWordsThreshold = std::clamp(State.SMAC_StartWordsThreshold, 1, 10);
                     State.Save();
                 }
                 if (State.SMAC_StartWords.empty())
@@ -734,18 +927,31 @@ namespace GameTab {
                 InputString("New W\u043Erd", &newStartWord, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
                 if (AnimatedButton("Add Word##StartWord")) {
-                    State.SMAC_StartWords.push_back(newStartWord);
-                    State.Save();
-                    newStartWord = "";
+                    std::string newStartWordLower = strToLower(newStartWord);
+                    bool alreadyExists = std::any_of(State.SMAC_StartWords.begin(), State.SMAC_StartWords.end(),
+                        [&](auto& w) { return strToLower(w.first) == newStartWordLower; });
+                    if (!newStartWord.empty() && !alreadyExists) {
+                        State.SMAC_StartWords.push_back({ newStartWord, false });
+                        State.Save();
+                        newStartWord = "";
+                    }
                 }
                 if (!State.SMAC_StartWords.empty()) {
                     static int selectedStartWordIndex = 0;
                     selectedStartWordIndex = std::clamp(selectedStartWordIndex, 0, (int)State.SMAC_StartWords.size() - 1);
-                    std::vector<const char*> startWordVector(State.SMAC_StartWords.size(), nullptr);
-                    for (size_t i = 0; i < State.SMAC_StartWords.size(); i++) {
-                        startWordVector[i] = State.SMAC_StartWords[i].c_str();
-                    }
+                    std::vector<std::string> startWordDisplayStrings;
+                    for (auto& w : State.SMAC_StartWords)
+                        startWordDisplayStrings.push_back(w.first + (w.second ? " [Strict]" : " [Default]"));
+                    std::vector<const char*> startWordVector(startWordDisplayStrings.size(), nullptr);
+                    for (size_t i = 0; i < startWordDisplayStrings.size(); i++)
+                        startWordVector[i] = startWordDisplayStrings[i].c_str();
                     CustomListBoxInt("Start Word to Remove", &selectedStartWordIndex, startWordVector);
+                    ImGui::SameLine();
+                    int startWordMode = State.SMAC_StartWords[selectedStartWordIndex].second ? 1 : 0;
+                    if (CustomListBoxInt("Detection Mode##startwords", &startWordMode, SMAC_DETECTION_MODES, 130.0f * State.dpiScale)) {
+                        State.SMAC_StartWords[selectedStartWordIndex].second = (startWordMode == 1);
+                        State.Save();
+                    }
                     ImGui::SameLine();
                     if (AnimatedButton("Remove##StartWord")) {
                         State.SMAC_StartWords.erase(State.SMAC_StartWords.begin() + selectedStartWordIndex);

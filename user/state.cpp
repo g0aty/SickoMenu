@@ -235,6 +235,7 @@ void Settings::Load() {
         JSON_TRYGET("DisableMeetings", this->DisableMeetings);
         JSON_TRYGET("DisableSabotages", this->DisableSabotages);
         JSON_TRYGET("DisableAllVotekicks", this->DisableAllVotekicks);
+        JSON_TRYGET("AutoRejoinOnKick", this->AutoRejoinOnKick);
         JSON_TRYGET("DisableRoleManager", this->DisableRoleManager);
 
         JSON_TRYGET("ShowRadar", this->ShowRadar);
@@ -436,6 +437,7 @@ void Settings::Load() {
         JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
         JSON_TRYGET("SMAC_HostPunishment", this->SMAC_HostPunishment);
+        JSON_TRYGET("SMAC_ReasonPunishmentOverride", this->SMAC_ReasonPunishmentOverride);
         JSON_TRYGET("SMAC_AddToBlacklist", this->SMAC_AddToBlacklist);
         JSON_TRYGET("SMAC_PunishBlacklist", this->SMAC_PunishBlacklist);
         JSON_TRYGET("SMAC_IgnoreWhitelist", this->SMAC_IgnoreWhitelist);
@@ -463,7 +465,24 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckBadWords", this->SMAC_CheckBadWords);
         JSON_TRYGET("SMAC_BadWords", this->SMAC_BadWords);
         JSON_TRYGET("SMAC_CheckFriendcode", this->SMAC_CheckFriendcode);
-        JSON_TRYGET("ChatPresets", this->ChatPresets);
+        if (j.contains("ChatPresets") && j["ChatPresets"].is_array()) {
+            this->ChatPresets.clear();
+            for (auto& p : j["ChatPresets"]) {
+                Settings::ChatPreset cp;
+                if (p.is_string()) {
+                    cp.Name = "Preset";
+                    cp.Messages = { p.get<std::string>() };
+                }
+                else {
+                    if (p.contains("Name")) cp.Name = p["Name"].get<std::string>();
+                    if (p.contains("Messages") && p["Messages"].is_array()) {
+                        cp.Messages.clear();
+                        for (auto& m : p["Messages"]) cp.Messages.push_back(m.get<std::string>());
+                    }
+                }
+                this->ChatPresets.push_back(cp);
+            }
+        }
 
         JSON_TRYGET("Mod_EnableModeration", this->Mod_EnableModeration);
         JSON_TRYGET("Mod_SickoSocials", this->Mod_SickoSocials);
@@ -471,6 +490,13 @@ void Settings::Load() {
         JSON_TRYGET("Mod_RoleMembers", this->Mod_RoleMembers);
         JSON_TRYGET("Mod_RolePermissions", this->Mod_RolePermissions);
         JSON_TRYGET("Mod_RoleRank", this->Mod_RoleRank);
+
+        if (this->Mod_RoleNames.empty() || this->Mod_RoleNames[0] != "Everyone") {
+            this->Mod_RoleNames.insert(this->Mod_RoleNames.begin(), "Everyone");
+            this->Mod_RoleMembers.insert(this->Mod_RoleMembers.begin(), {});
+            this->Mod_RolePermissions.insert(this->Mod_RolePermissions.begin(), {});
+            this->Mod_RoleRank.insert(this->Mod_RoleRank.begin(), 0);
+        }
         JSON_TRYGET("SMAC_CheckStartWords", this->SMAC_CheckStartWords);
         JSON_TRYGET("SMAC_StartWordsThreshold", this->SMAC_StartWordsThreshold);
         JSON_TRYGET("SMAC_StartWords", this->SMAC_StartWords);
@@ -811,6 +837,7 @@ void Settings::Save() {
                 { "DisableMeetings", this->DisableMeetings },
                 { "DisableSabotages", this->DisableSabotages },
                 { "DisableAllVotekicks", this->DisableAllVotekicks },
+                { "AutoRejoinOnKick", this->AutoRejoinOnKick },
                 { "DisableRoleManager", this->DisableRoleManager },
 
                 { "ShowRadar", this->ShowRadar },
@@ -1079,6 +1106,7 @@ void Settings::Save() {
                 { "Enable_SMAC", this->Enable_SMAC },
                 { "SMAC_Punishment", this->SMAC_Punishment },
                 { "SMAC_HostPunishment", this->SMAC_HostPunishment },
+                { "SMAC_ReasonPunishmentOverride", this->SMAC_ReasonPunishmentOverride },
                 { "SMAC_AddToBlacklist", this->SMAC_AddToBlacklist },
                 { "SMAC_PunishBlacklist", this->SMAC_PunishBlacklist },
                 { "SMAC_IgnoreWhitelist", this->SMAC_IgnoreWhitelist },
@@ -1106,7 +1134,13 @@ void Settings::Save() {
                 { "SMAC_CheckBadWords", this->SMAC_CheckBadWords },
                 { "SMAC_BadWords", this->SMAC_BadWords },
                 { "SMAC_CheckFriendcode", this->SMAC_CheckFriendcode },
-                { "ChatPresets", this->ChatPresets },
+                { "ChatPresets", [&]() {
+                    nlohmann::json arr = nlohmann::json::array();
+                    for (auto& p : this->ChatPresets) {
+                        arr.push_back({ { "Name", p.Name }, { "Messages", p.Messages } });
+                    }
+                    return arr;
+                    }() },
 
                 { "Mod_EnableModeration", this->Mod_EnableModeration },
                 { "Mod_SickoSocials", this->Mod_SickoSocials },

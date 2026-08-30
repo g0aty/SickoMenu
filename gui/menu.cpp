@@ -481,7 +481,7 @@ namespace Menu {
 			if (openEsp) EspTab::Render();
 			if (openPlayers) {
 				if (IsInGame() || IsInLobby()) PlayersTab::Render();
-				else {
+				else if (!State.VotekickRejoinPending && State.PendingRejoinTargetFC.empty()) {
 					CloseAllOtherTabs(Tabs::Game);
 					GameTab::Render();
 				}

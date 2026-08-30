@@ -1313,8 +1313,12 @@ bool FriendCodeHasPermission(const std::string& friendCode, const std::string& c
     if (friendCode.empty()) return false;
     for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) {
         if (i >= State.Mod_RoleMembers.size() || i >= State.Mod_RolePermissions.size()) continue;
-        auto& members = State.Mod_RoleMembers[i];
-        if (std::find(members.begin(), members.end(), friendCode) == members.end()) continue;
+        bool isMember = i == 0; 
+        if (!isMember) {
+            auto& members = State.Mod_RoleMembers[i];
+            isMember = std::find(members.begin(), members.end(), friendCode) != members.end();
+        }
+        if (!isMember) continue;
         auto it = State.Mod_RolePermissions[i].find(commandKey);
         if (it != State.Mod_RolePermissions[i].end() && it->second) return true;
     }
@@ -1363,7 +1367,7 @@ PlayerControl* ResolveTargetByColor(int colorId) {
 std::vector<int> GetFriendCodeRoleIndices(const std::string& friendCode) {
     std::vector<int> result;
     if (friendCode.empty()) return result;
-    for (size_t i = 0; i < State.Mod_RoleMembers.size(); i++) {
+    for (size_t i = 1; i < State.Mod_RoleMembers.size(); i++) { 
         auto& members = State.Mod_RoleMembers[i];
         if (std::find(members.begin(), members.end(), friendCode) != members.end()) result.push_back((int)i);
     }
@@ -1380,12 +1384,16 @@ void SetFriendCodeInRole(const std::string& friendCode, int roleIndex, bool memb
 }
 
 int GetFriendCodeMaxRank(const std::string& friendCode) {
-    int maxRank = -1; //-1 = holds no roles at all, always outranked by any real role
+    int maxRank = 0; 
     if (friendCode.empty()) return maxRank;
     for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) {
         if (i >= State.Mod_RoleMembers.size() || i >= State.Mod_RoleRank.size()) continue;
-        auto& members = State.Mod_RoleMembers[i];
-        if (std::find(members.begin(), members.end(), friendCode) == members.end()) continue;
+        bool isMember = i == 0; 
+        if (!isMember) {
+            auto& members = State.Mod_RoleMembers[i];
+            isMember = std::find(members.begin(), members.end(), friendCode) != members.end();
+        }
+        if (!isMember) continue;
         if (State.Mod_RoleRank[i] > maxRank) maxRank = State.Mod_RoleRank[i];
     }
     return maxRank;
@@ -1911,6 +1919,40 @@ void UpdatePoints(NetworkedPlayerInfo* playerData, float points) {
     State.tournamentPoints[friendCode] += points;
 }
 
+static const std::vector<std::pair<std::string, std::vector<std::string>>> SMAC_REASON_CATEGORIES = {
+    { "Known Cheat Usage", { "AmongUsMenu User", "ChocooMenu User", "KillNetwork User", "SlopMenuCrew User" } },
+    { "SickoMenu Usage", { "SickoMenu User" } },
+    { "Abnormal Names", { "Abnormal Name" } },
+    { "Abnormal Set Color", { "Abnormal Change Color" } },
+    { "Abnormal Set Cosmetics", { "Abnormal Change Cosmetics" } },
+    { "Abnormal Chat Note", { "Abnormal Chat Note" } },
+    { "Abnormal Scanner", { "Abnormal MedBay Scan" } },
+    { "Abnormal Animation", { "Abnormal Animation" } },
+    { "Setting Tasks", { "Abnormal Set Tasks" } },
+    { "Abnormal Murders", { "Abnormal Murder Player" } },
+    { "Abnormal Shapeshift", { "Abnormal Shapeshift" } },
+    { "Abnormal Vanish", { "Abnormal Vanish/Appear" } },
+    { "Abnormal Meetings/Body Reports", { "Abnormal Meeting", "Abnormal Report Body" } },
+    { "Abnormal Venting", { "Abnormal Venting" } },
+    { "Abnormal Chat", { "Abnormal Chat" } },
+    { "Abnormal Task Completion", { "Abnormal Task Completion" } },
+    { "Abnormal Sabotages", { "Bad Sabotage" } },
+    { "Abnormal Player Levels", { "Abnormal Level" } },
+    { "Abnormal Friendcode", { "Abnormal Friendcode" } },
+    { "Blocked Words", { "Bad Word: " } },
+    { "Blocked Start Words", { "Start Word: " } },
+    { "Blacklisted Players", { "<#f00>Blacklisted!</color>" } },
+};
+
+static std::string SMAC_GetReasonCategory(const std::string& reason) {
+    for (auto& [category, prefixes] : SMAC_REASON_CATEGORIES) {
+        for (auto& prefix : prefixes) {
+            if (reason.rfind(prefix, 0) == 0) return category;
+        }
+    }
+    return "";
+}
+
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     if (!State.Enable_SMAC) return;
     if (reason == "Overloading" && !(IsHost() && State.SMAC_HostPunishment >= 2)) return; // Don't spam logs for overloading, that causes overload as well
@@ -1934,12 +1976,22 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     if (fc != "" && State.SMAC_IgnoreWhitelist && it != State.WhitelistFriendCodes.end()) return;
     if (fc != "" && State.SMAC_AddToBlacklist) {
         if (it != State.WhitelistFriendCodes.end()) State.WhitelistFriendCodes.erase(it);
-        State.BlacklistFriendCodes.push_back(fc);
-        State.Save();
+        AddToBlacklist(fc); 
     }
 
+    std::string smacCategory = SMAC_GetReasonCategory(reason);
+    int punishmentLevel = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
+    if (!smacCategory.empty()) {
+        auto overrideIt = State.SMAC_ReasonPunishmentOverride.find(smacCategory);
+        if (overrideIt != State.SMAC_ReasonPunishmentOverride.end())
+            punishmentLevel = overrideIt->second;
+    }
+
+    int maxPunishmentLevel = IsHost() ? 3 : 1;
+    punishmentLevel = std::clamp(punishmentLevel, 0, maxPunishmentLevel);
+
     if (IsHost()) {
-        switch (State.SMAC_HostPunishment) {
+        switch (punishmentLevel) {
         case 0:
             LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
             break;
@@ -1977,7 +2029,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
         }
     }
     else {
-        switch (State.SMAC_Punishment) {
+        switch (punishmentLevel) {
         case 0:
             LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
             break;

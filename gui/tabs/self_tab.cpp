@@ -660,6 +660,10 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine();
+            if (ToggleButton("Auto-Rejoin on Votekick", &State.AutoRejoinOnKick)) {
+                State.Save();
+            }
+
             if (ToggleButton("Disable Shush Animation", &State.DisableShushAnimation)) {
                 State.Save();
             }

@@ -139,6 +139,13 @@ public:
     int ChatSpamMode = 0;
     int CrashChatSpamMode = 1;
     bool AutoJoinLobby = false;
+    bool AutoRejoinOnKick = false;
+    std::string PendingRejoinTargetFC = "";
+    bool PendingRejoinReady = false;
+    std::unordered_map<int32_t, int> VotekickRejoinCount;
+    bool VotekickRejoinPending = false;
+    float VotekickRejoinDelay = 0.f;
+    std::string VotekickRejoinLobbyCode = "";
     std::string AutoJoinLobbyCode = "";
     bool JoinLobby = false;
     std::string JoinLobbyCode = "";
@@ -732,6 +739,7 @@ public:
     bool Enable_SMAC = false;
     int SMAC_Punishment = 0;
     int SMAC_HostPunishment = 0;
+    std::unordered_map<std::string, int> SMAC_ReasonPunishmentOverride;
     bool SMAC_AddToBlacklist = false;
     bool SMAC_IgnoreWhitelist = false;
     bool SMAC_PunishBlacklist = false;
@@ -759,15 +767,19 @@ public:
     int SMAC_LowLevel = 0;
     std::vector<uint8_t> SMAC_AttemptBanLobby = {};
     bool SMAC_CheckBadWords = true;
-    std::vector<std::string> SMAC_BadWords = {};
+    std::vector<std::pair<std::string, bool>> SMAC_BadWords = {}; 
     bool SMAC_CheckFriendcode = true;
     bool SMAC_CheckStartWords = false;
-    bool SMAC_StartWordsStrict = true;
     int SMAC_StartWordsThreshold = 1;
-    std::vector<std::string> SMAC_StartWords = {};
+    std::vector<std::pair<std::string, bool>> SMAC_StartWords = {}; 
     std::map<uint8_t, int> SMAC_StartWordsCount;
 
-    std::vector<std::string> ChatPresets = {};
+    struct ChatPreset {
+        std::string Name = "Preset";
+        std::vector<std::string> Messages = { "" }; 
+    };
+    std::vector<ChatPreset> ChatPresets = {};
+    int SelectedChatPreset = 0;
 
     std::vector<std::string> WhitelistFriendCodes = {};
     std::vector<std::string> BlacklistFriendCodes = {};

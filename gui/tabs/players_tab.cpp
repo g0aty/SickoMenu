@@ -135,6 +135,23 @@ namespace PlayersTab {
                 State.selectedPlayer = {};
             }
 
+            if (!State.PendingRejoinTargetFC.empty() && State.PendingRejoinReady) {
+                for (auto pc : GetAllPlayerControl()) {
+                    if (pc == nullptr) continue;
+                    auto pd = GetPlayerData(pc);
+                    if (pd == nullptr || pd->fields.Disconnected) continue;
+                    std::string fc = convert_from_string(pd->fields.FriendCode);
+                    std::string name = convert_from_string(NetworkedPlayerInfo_get_PlayerName(pd, nullptr));
+                    if (fc == State.PendingRejoinTargetFC || name == State.PendingRejoinTargetFC) {
+                        State.selectedPlayer = PlayerSelection(pc);
+                        State.selectedPlayers = { pd->fields.PlayerId };
+                        State.PendingRejoinTargetFC = "";
+                        State.PendingRejoinReady = false;
+                        break;
+                    }
+                }
+            }
+
             auto selectedPlayer = State.selectedPlayer.validate();
             bool shouldEndListBox = ImGui::ListBoxHeader("###players#list", ImVec2(200, 230) * State.dpiScale);
             auto localData = GetPlayerData(*Game::pLocalPlayer);
@@ -1762,21 +1779,22 @@ namespace PlayersTab {
                     if (targetFC.empty()) {
                         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No friend code available for this player.");
                     }
-                    else if (State.Mod_RoleNames.empty()) {
+                    else if (State.Mod_RoleNames.size() <= 1) { 
                         ImGui::TextDisabled("No roles created yet - add some in the Host tab.");
                     }
                     else {
-                        static int addRoleIndex = 0;
-                        addRoleIndex = std::clamp(addRoleIndex, 0, (int)State.Mod_RoleNames.size() - 1);
-                        std::vector<const char*> roleVector(State.Mod_RoleNames.size(), nullptr);
-                        for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) roleVector[i] = State.Mod_RoleNames[i].c_str();
+                        static int addRoleIndex = 0; // index into the assignable roles only (excludes "Everyone")
+                        int assignableCount = (int)State.Mod_RoleNames.size() - 1;
+                        addRoleIndex = std::clamp(addRoleIndex, 0, assignableCount - 1);
+                        std::vector<const char*> roleVector(assignableCount, nullptr);
+                        for (int i = 0; i < assignableCount; i++) roleVector[i] = State.Mod_RoleNames[i + 1].c_str();
 
                         ImGui::Text("Add Role:");
                         ImGui::SameLine();
                         CustomListBoxInt("AddPlayerRole", &addRoleIndex, roleVector, 130.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
                         ImGui::SameLine();
                         if (AnimatedButton("Add##PlayerRole")) {
-                            SetFriendCodeInRole(targetFC, addRoleIndex, true);
+                            SetFriendCodeInRole(targetFC, addRoleIndex + 1, true);
                         }
 
                         auto currentRoles = GetFriendCodeRoleIndices(targetFC);
