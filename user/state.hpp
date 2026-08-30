@@ -740,6 +740,7 @@ public:
     int SMAC_Punishment = 0;
     int SMAC_HostPunishment = 0;
     std::unordered_map<std::string, int> SMAC_ReasonPunishmentOverride;
+    std::unordered_map<std::string, int> SMAC_ReasonPunishmentOverrideHost;
     bool SMAC_AddToBlacklist = false;
     bool SMAC_IgnoreWhitelist = false;
     bool SMAC_PunishBlacklist = false;

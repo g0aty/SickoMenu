@@ -723,9 +723,12 @@ namespace GameTab {
             if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
             ImGui::Dummy(ImVec2(0, 1)* State.dpiScale);
             if (ImGui::CollapsingHeader("Action on Detection##smacoverride")) {
+                bool changed = false;
+
                 ImGui::TextDisabled("Default action taken when a detection isn't specifically overridden below.");
-                if (IsHost()) CustomListBoxInt("Host Punishment ", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
-                else CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+                changed = changed || CustomListBoxInt("Host Punishment", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+                ImGui::SameLine();
+                changed = changed || CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
                 ImGui::Dummy(ImVec2(0, 1) * State.dpiScale);
                 ImGui::TextDisabled("Override the action for a specific detection.");
@@ -741,19 +744,24 @@ namespace GameTab {
                 static int selectedCategory = 0;
 
                 std::string catKey = SMAC_CATEGORIES[selectedCategory];
+
+                auto& hostOverrides = State.SMAC_ReasonPunishmentOverrideHost;
+                if (hostOverrides.find(catKey) == hostOverrides.end())
+                    hostOverrides[catKey] = State.SMAC_HostPunishment;
+
                 auto& overrides = State.SMAC_ReasonPunishmentOverride;
                 if (overrides.find(catKey) == overrides.end())
-                    overrides[catKey] = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
-                int currentMaxIndex = IsHost() ? (int)SMAC_HOST_PUNISHMENTS.size() - 1 : (int)SMAC_PUNISHMENTS.size() - 1;
-                overrides[catKey] = std::clamp(overrides[catKey], 0, currentMaxIndex);
+                    overrides[catKey] = State.SMAC_Punishment;
+
+                hostOverrides[catKey] = std::clamp(hostOverrides[catKey], 0, (int)SMAC_HOST_PUNISHMENTS.size() - 1);
+                overrides[catKey] = std::clamp(overrides[catKey], 0, (int)SMAC_PUNISHMENTS.size() - 1);
 
                 ImGui::SetNextItemWidth(150.0f * State.dpiScale);
                 CustomListBoxInt("Category", &selectedCategory, SMAC_CATEGORIES, 150.0f * State.dpiScale);
-                ImGui::SameLine();
 
-                bool changed;
-                if (IsHost()) changed = CustomListBoxInt("Punishment##smacoverridelevel", &overrides[catKey], SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
-                else changed = CustomListBoxInt("Punishment##smacoverridelevel", &overrides[catKey], SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+                changed = changed || CustomListBoxInt("Host Override", &hostOverrides[catKey], SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+                ImGui::SameLine();
+                changed = changed || CustomListBoxInt("Regular Override", &overrides[catKey], SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
                 if (changed) State.Save();
             }
             ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);

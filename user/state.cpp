@@ -9,6 +9,12 @@
 
 Settings State;
 
+static std::string CleanChatPresetName(std::string cpName) {
+    cpName.erase(std::remove(cpName.begin(), cpName.end(), ' '), cpName.end());
+    cpName.erase(std::remove(cpName.begin(), cpName.end(), '\n'), cpName.end());
+    return cpName;
+}
+
 void Settings::Load() {
     this->SickoVersion = "v5.0.3";
 
@@ -438,6 +444,7 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
         JSON_TRYGET("SMAC_HostPunishment", this->SMAC_HostPunishment);
         JSON_TRYGET("SMAC_ReasonPunishmentOverride", this->SMAC_ReasonPunishmentOverride);
+        JSON_TRYGET("SMAC_ReasonPunishmentOverrideHost", this->SMAC_ReasonPunishmentOverrideHost);
         JSON_TRYGET("SMAC_AddToBlacklist", this->SMAC_AddToBlacklist);
         JSON_TRYGET("SMAC_PunishBlacklist", this->SMAC_PunishBlacklist);
         JSON_TRYGET("SMAC_IgnoreWhitelist", this->SMAC_IgnoreWhitelist);
@@ -470,11 +477,11 @@ void Settings::Load() {
             for (auto& p : j["ChatPresets"]) {
                 Settings::ChatPreset cp;
                 if (p.is_string()) {
-                    cp.Name = "Preset";
+                    cp.Name = CleanChatPresetName(p.get<std::string>());
                     cp.Messages = { p.get<std::string>() };
                 }
                 else {
-                    if (p.contains("Name")) cp.Name = p["Name"].get<std::string>();
+                    if (p.contains("Name")) cp.Name = CleanChatPresetName(p["Name"].get<std::string>());
                     if (p.contains("Messages") && p["Messages"].is_array()) {
                         cp.Messages.clear();
                         for (auto& m : p["Messages"]) cp.Messages.push_back(m.get<std::string>());
@@ -1107,6 +1114,7 @@ void Settings::Save() {
                 { "SMAC_Punishment", this->SMAC_Punishment },
                 { "SMAC_HostPunishment", this->SMAC_HostPunishment },
                 { "SMAC_ReasonPunishmentOverride", this->SMAC_ReasonPunishmentOverride },
+                { "SMAC_ReasonPunishmentOverrideHost", this->SMAC_ReasonPunishmentOverrideHost },
                 { "SMAC_AddToBlacklist", this->SMAC_AddToBlacklist },
                 { "SMAC_PunishBlacklist", this->SMAC_PunishBlacklist },
                 { "SMAC_IgnoreWhitelist", this->SMAC_IgnoreWhitelist },
