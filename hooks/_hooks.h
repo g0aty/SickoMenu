@@ -221,3 +221,6 @@ void dVentilationSystem_UpdateSystem(VentilationSystem* __this, PlayerControl* p
 void ApplyHostPreset(const Settings::HostPreset& p);
 void RequestApplyHostPreset(int idx);
 void ApplyCosmeticPreset(const Settings::CosmeticPreset& p);
+
+void dInnerNetClient_SetEndpoint(InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method);
+void dNotificationPopper_AddDisconnectMessage(NotificationPopper* __this, String* item, MethodInfo* method);
