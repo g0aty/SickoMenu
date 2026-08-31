@@ -1432,7 +1432,7 @@ PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo*
     if (State.ShowHookLogs) Log.HookDebug("Hook dImpostorRole_FindClosestTarget executed", false);
     if (IsInLobby()) return nullptr;
     auto result = ImpostorRole_FindClosestTarget(__this, method);
-    if (!State.PanicMode && result == nullptr && (State.InfiniteKillRange || (State.KillInVanish && IsHost() || !State.SafeMode))) {
+    if (!State.PanicMode && (State.KillImpostors || result == nullptr) && (State.KillImpostors || State.InfiniteKillRange || (State.KillInVanish && IsHost() || !State.SafeMode))) {
         PlayerControl* new_result = nullptr;
         float defaultKillDist = 2.5f;
         auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
