@@ -726,6 +726,8 @@ public:
     bool AutoHostRole = false;
     RoleType HostRoleToSet = RoleType::Impostor;
 
+    bool AllowPreferedColor = false;
+
     bool murderLoop = false;
     bool suicideLoop = false;
     bool farmLoop = false;
