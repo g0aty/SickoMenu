@@ -510,3 +510,5 @@ DO_APP_FUNC(void, VentilationSystem_UpdateSystem, (VentilationSystem* __this, Pl
 DO_APP_FUNC(bool, Player_GetButton, (Player* __this, int32_t actionId, MethodInfo* method), "Rewired_Core, System.Boolean Rewired.Player::GetButton(System.Int32)");
 DO_APP_FUNC(void, KillButton_DoClick, (KillButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::DoClick()");
 DO_APP_FUNC(void, VentButton_DoClick, (VentButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void VentButton::DoClick()");
+
+DO_APP_FUNC(void, InnerNetClient_SetEndpoint, (InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::SetEndpoint(System.String, System.UInt16, System.Boolean)");
