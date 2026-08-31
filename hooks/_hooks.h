@@ -224,3 +224,4 @@ void ApplyCosmeticPreset(const Settings::CosmeticPreset& p);
 
 void dInnerNetClient_SetEndpoint(InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method);
 void dNotificationPopper_AddDisconnectMessage(NotificationPopper* __this, String* item, MethodInfo* method);
+void dPlayerControl_CheckColor(PlayerControl* __this, uint8_t bodyColor, MethodInfo* method);
