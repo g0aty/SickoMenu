@@ -101,6 +101,13 @@ void Settings::Load() {
         JSON_TRYGET("FakePsnId", this->FakePsnId);
         JSON_TRYGET("SpoofXboxId", this->SpoofXboxId);
         JSON_TRYGET("FakeXboxId", this->FakeXboxId);
+        JSON_TRYGET("SpoofPlName", this->SpoofPlName);
+        JSON_TRYGET("FakePlName", this->FakePlName);
+        JSON_TRYGET("UseCustomServer", this->UseCustomServer);
+        JSON_TRYGET("FakePlName", this->FakePlName);
+        JSON_TRYGET("CustomServerIp", this->CustomServerIp);
+        JSON_TRYGET("CustomServerPort", this->CustomServerPort);
+        JSON_TRYGET("ForceDTLS", this->ForceDTLS);
         JSON_TRYGET("SpoofGuestAccount", this->SpoofGuestAccount);
         // JSON_TRYGET("SpoofAUVersion_", this->SpoofAUVersion); // putting an underscore to reset version spoofing, remove to reset again
         // JSON_TRYGET("FakeAUVersion_", this->FakeAUVersion);
@@ -371,6 +378,7 @@ void Settings::Load() {
         JSON_TRYGET("BetterChatNotifications", this->BetterChatNotifications);
         JSON_TRYGET("BetterLobbyCodeInput", this->BetterLobbyCodeInput);
         JSON_TRYGET("BetterMessageSounds", this->BetterMessageSounds);
+        JSON_TRYGET("ExtendedNotifications", this->ExtendedNotifications);
         JSON_TRYGET("NoClip", this->NoClip);
         JSON_TRYGET("KillInLobbies", this->KillInLobbies);
         JSON_TRYGET("KillInVanish", this->KillInVanish);
@@ -777,6 +785,13 @@ void Settings::Save() {
                 { "FakePsnId", this->FakePsnId },
                 { "SpoofXboxId", this->SpoofXboxId },
                 { "FakeXboxId", this->FakeXboxId },
+                { "SpoofPlName", this->SpoofPlName},
+                { "FakePlName", this->FakePlName},
+                { "UseCustomServer", this->UseCustomServer},
+                { "CustomServerIp", this->CustomServerIp},
+                { "CustomServerPort", this->CustomServerPort},
+                { "ForceDTLS", this->ForceDTLS},
+
                 { "SpoofGuestAccount", this->SpoofGuestAccount },
                 // { "SpoofAUVersion_", this->SpoofAUVersion }, // putting an underscore to reset version spoofing, remove to reset again
                 // { "FakeAUVersion_", this->FakeAUVersion },
@@ -1044,6 +1059,7 @@ void Settings::Save() {
                 { "BetterChatNotifications", this->BetterChatNotifications },
                 { "BetterLobbyCodeInput", this->BetterLobbyCodeInput },
                 { "BetterMessageSounds", this->BetterMessageSounds },
+                { "ExtendedNotifications", this->ExtendedNotifications },
                 { "NoClip", this->NoClip },
                 { "KillInLobbies", this->KillInLobbies },
                 { "KillInVanish", this->KillInVanish },
