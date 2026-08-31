@@ -304,6 +304,7 @@ void DetourInitilization() {
 	HOOKFUNC(VentilationSystem_UpdateSystem);
 	HOOKFUNC(InnerNetClient_SetEndpoint);
 	HOOKFUNC(NotificationPopper_AddDisconnectMessage);
+	HOOKFUNC(PlayerControl_CheckColor);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -519,6 +520,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(VentilationSystem_UpdateSystem);
 	UNHOOKFUNC(InnerNetClient_SetEndpoint);
 	UNHOOKFUNC(NotificationPopper_AddDisconnectMessage);
+	UNHOOKFUNC(PlayerControl_CheckColor);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 
