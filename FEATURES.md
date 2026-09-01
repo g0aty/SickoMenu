@@ -287,6 +287,8 @@
 - Protect
 - Vote Immunity
 - Teleport to Vent
+- Spam Teleport to Vent
+- Spam Teleport to Random Vents
 - Warn
 
 ### Trolling
