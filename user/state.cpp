@@ -18,7 +18,7 @@ static std::string CleanChatPresetName(std::string cpName) {
 void Settings::Load() {
     this->SickoVersion = "v5.0.3";
 
-    auto path = getModulePath(hModule);
+    auto path = getModulePath(NULL);
     auto configPath = path.parent_path() / "SickoMenu" / "sicko-selected-config.json";
 
     if (!std::filesystem::exists(configPath)) {
@@ -688,7 +688,7 @@ void Settings::Load() {
 }
 
 void Settings::SaveConfig() {
-    auto path = getModulePath(hModule);
+    auto path = getModulePath(NULL);
     std::filesystem::create_directory(path.parent_path() / "SickoMenu" / "sicko-config");
 
     if (std::filesystem::exists(path / "sicko-selected-config.json")) {
@@ -713,7 +713,7 @@ void Settings::SaveConfig() {
 }
 
 void Settings::Save() {
-    auto path = getModulePath(hModule);
+    auto path = getModulePath(NULL);
 
     std::filesystem::create_directories(path.parent_path() / "SickoMenu" / "sicko-config");
 
@@ -1356,7 +1356,7 @@ void Settings::Save() {
 }
 
 void Settings::Delete() {
-    auto path = getModulePath(hModule);
+    auto path = getModulePath(NULL);
 
     auto configPath = path.parent_path() / "SickoMenu" / "sicko-config" / std::format("{}.json", this->selectedConfig);
 

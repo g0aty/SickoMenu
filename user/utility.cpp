@@ -1895,7 +1895,7 @@ std::string GetCustomName(std::string name, bool forceUnique, uint8_t id, int of
 std::vector<std::string> GetAllConfigs() {
     std::vector<std::string> files;
 
-    auto path = getModulePath(hModule);
+    auto path = getModulePath(NULL);
     auto configsPath = path.parent_path() / "SickoMenu" / "sicko-config";
 
     for (const auto& f : std::filesystem::directory_iterator(configsPath)) {

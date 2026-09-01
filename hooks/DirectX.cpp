@@ -18,7 +18,6 @@
 #include "logger.h"
 #include "resource_data.h"
 #include "game.h"
-#include "main.h"
 #include "console.hpp"
 #include "profiler.h"
 

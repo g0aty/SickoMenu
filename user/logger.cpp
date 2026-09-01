@@ -3,13 +3,12 @@
 #include <sstream>
 #include <iostream>
 #include "utility.h"
-#include "main.h"
 
 SickoLogger Log;
 
 void SickoLogger::Create()
 {
-	const auto path = getModulePath(hModule);
+	const auto path = getModulePath(NULL);
 	const auto logPath = path.parent_path() / "SickoMenu" / "sicko-log.txt";
 	const auto prevLogPath = path.parent_path() / "SickoMenu" / "sicko-prev-log.txt";
 
