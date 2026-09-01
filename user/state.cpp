@@ -526,7 +526,7 @@ void Settings::Load() {
         JSON_TRYGET("AutoHostRole", this->AutoHostRole);
         JSON_TRYGET("HostRoleToSet", this->HostRoleToSet);
 
-		JSON_TRYGET("AllowPreferedColor", this->AllowPreferedColor);
+		JSON_TRYGET("AllowPreferredColor", this->AllowPreferredColor);
 
         JSON_TRYGET("WhitelistFriendCodes", this->WhitelistFriendCodes);
         JSON_TRYGET("BlacklistFriendCodes", this->BlacklistFriendCodes);
@@ -1187,7 +1187,7 @@ void Settings::Save() {
                 { "AutoHostRole", this->AutoHostRole },
                 { "HostRoleToSet", this->HostRoleToSet },
 
-				{ "AllowPreferedColor", this->AllowPreferedColor},
+				{ "AllowPreferredColor", this->AllowPreferredColor},
 
                 { "WhitelistFriendCodes", this->WhitelistFriendCodes },
                 { "BlacklistFriendCodes", this->BlacklistFriendCodes },
