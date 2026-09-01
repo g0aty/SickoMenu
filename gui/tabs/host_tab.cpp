@@ -414,7 +414,7 @@ namespace HostTab {
                 if (ToggleButton("Modify Start Countdown", &State.ModifyStartCountdown))
                     State.Save();
 
-                if (State.ModifyStartCountdown && ImGui::InputInt("Countdown Time", &State.StartCountdown)) {
+                if (State.ModifyStartCountdown && ImGui::InputInt("Time", &State.StartCountdown)) {
                     State.StartCountdown = std::clamp(State.StartCountdown, 1, !State.SafeMode ? 127 : 5);
                     State.Save();
                 }
@@ -529,7 +529,7 @@ namespace HostTab {
                     State.Save();
                 }
 
-				if (ToggleButton("Allow Join with Preferred Color", &State.AllowPreferredColor)) {
+				if (ToggleButton("Allow Players Joining with Preferred Colors", &State.AllowPreferredColor)) {
                     State.Save();
                 }
 

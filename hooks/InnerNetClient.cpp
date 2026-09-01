@@ -1612,7 +1612,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                 }
             }
 
-            if (State.ExtendedNotifications) {
+            if (!State.PanicMode && State.ExtendedNotifications) {
                 const bool smacPunished = State.SMAC_PunishedPlayers.find(playerId) != State.SMAC_PunishedPlayers.end();
 
                 if (smacPunished) {
@@ -1644,9 +1644,12 @@ void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, Meth
     if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnPlayerJoined executed", false);
     State.BlinkPlayersTab = true;
 
-    if (!data) return;
+    if (!data) {
+        AmongUsClient_OnPlayerJoined(__this, data, method);
+        return;
+    }
 
-    if (State.ExtendedNotifications) {
+    if (!State.PanicMode && State.ExtendedNotifications) {
         std::string name = data->fields.PlayerName != nullptr ? convert_from_string(data->fields.PlayerName) : "<N/A>";
         std::string friendCode = data->fields.FriendCode != nullptr ? convert_from_string(data->fields.FriendCode) : "<N/A>";
 
@@ -1977,18 +1980,21 @@ bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reas
 
 void dInnerNetClient_SetEndpoint(InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_SetEndpoint executed", false);
-    try {
-        if (State.UseCustomServer && !State.CustomServerIp.empty()) {
-            addr = convert_to_string(State.CustomServerIp);
-            port = State.CustomServerPort;
-        }
 
-        if (State.ForceDTLS) {
-            dtls = true;
+    if (!State.PanicMode) {
+        try {
+            if (State.UseCustomServer && !State.CustomServerIp.empty()) {
+                addr = convert_to_string(State.CustomServerIp);
+                port = State.CustomServerPort;
+            }
+
+            if (State.ForceDTLS) {
+                dtls = true;
+            }
         }
-    }
-    catch (...) {
-        LOG_ERROR("Exception in dInnerNetClient_SetEndpoint");
+        catch (...) {
+            LOG_ERROR("Exception in dInnerNetClient_SetEndpoint");
+        }
     }
 
     InnerNetClient_SetEndpoint(__this, addr, port, dtls, method);
