@@ -18,6 +18,7 @@
 #include "logger.h"
 #include "resource_data.h"
 #include "game.h"
+#include "main.h"
 #include "console.hpp"
 #include "profiler.h"
 
@@ -206,6 +207,7 @@ bool ImGuiInitialization(IDXGISwapChain* pSwapChain) {
 
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
+        io.IniFilename = "SickoMenu/imgui.ini";
         io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
         ImGui_ImplWin32_Init(DirectX::window);
         ImGui_ImplDX11_Init(pDevice, pContext);

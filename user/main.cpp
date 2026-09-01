@@ -81,6 +81,7 @@ void Run(LPVOID lpParam) {
 #if _DEBUG
     new_console();
 #endif
+    hModule = (HMODULE)lpParam;
     Log.Create();
     if (!GameVersionCheck()) {
         fclose(stdout);
@@ -88,7 +89,6 @@ void Run(LPVOID lpParam) {
         FreeLibraryAndExitThread((HMODULE)lpParam, 0);
         return;
     }
-    hModule = (HMODULE)lpParam;
     State.lol = getModulePath(hModule).filename().string();
     init_il2cpp();
     State.dpiChanged = true;

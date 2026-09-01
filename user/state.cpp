@@ -19,7 +19,7 @@ void Settings::Load() {
     this->SickoVersion = "v5.0.3";
 
     auto path = getModulePath(hModule);
-    auto configPath = path.parent_path() / "sicko-selected-config.json";
+    auto configPath = path.parent_path() / "SickoMenu" / "sicko-selected-config.json";
 
     if (!std::filesystem::exists(configPath)) {
         Save();
@@ -42,7 +42,7 @@ void Settings::Load() {
         //Log.Info("Unable to load sicko-selected-config.json");
     }
 
-    auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
+    auto settingsPath = path.parent_path() / "SickoMenu" / "sicko-config" / std::format("{}.json", this->selectedConfig);
     if (!std::filesystem::exists(settingsPath))
         return;
 
@@ -689,9 +689,13 @@ void Settings::Load() {
 
 void Settings::SaveConfig() {
     auto path = getModulePath(hModule);
-    std::filesystem::create_directory(path.parent_path() / "sicko-config");
+    std::filesystem::create_directory(path.parent_path() / "SickoMenu" / "sicko-config");
 
-    auto configPath = path.parent_path() / "sicko-selected-config.json";
+    if (std::filesystem::exists(path / "sicko-selected-config.json")) {
+        std::filesystem::rename(path / "sicko-selected-config.json", path / "SickoMenu" / "sicko-selected-config.json");
+    }
+
+    auto configPath = path.parent_path() / "SickoMenu" / "sicko-selected-config.json";
 
     if (this->selectedConfig != "") {
         try {
@@ -710,9 +714,10 @@ void Settings::SaveConfig() {
 
 void Settings::Save() {
     auto path = getModulePath(hModule);
-    std::filesystem::create_directory(path.parent_path() / "sicko-config");
 
-    auto configPath = path.parent_path() / "sicko-selected-config.json";
+    std::filesystem::create_directories(path.parent_path() / "SickoMenu" / "sicko-config");
+
+    auto configPath = path.parent_path() / "SickoMenu" / "sicko-selected-config.json";
 
     if (this->selectedConfig != "") {
         try {
@@ -726,8 +731,8 @@ void Settings::Save() {
         catch (...) {
             //Log.Info("Unable to save sicko-selected-config.json");
         }
-        auto settingsPath = path.parent_path() /
-            std::format("sicko-config/{}.json", GetAllConfigs().size() != 0 ? this->selectedConfig : "default");
+        auto settingsPath = path.parent_path() / "SickoMenu" / "sicko-config" /
+            std::format("{}.json", GetAllConfigs().size() != 0 ? this->selectedConfig : "default");
 
         try {
             nlohmann::ordered_json j = nlohmann::ordered_json{
@@ -1353,7 +1358,7 @@ void Settings::Save() {
 void Settings::Delete() {
     auto path = getModulePath(hModule);
 
-    auto configPath = path.parent_path() / std::format("sicko-config/{}.json", this->selectedConfig);
+    auto configPath = path.parent_path() / "SickoMenu" / "sicko-config" / std::format("{}.json", this->selectedConfig);
 
     std::filesystem::remove(configPath);
 }

@@ -1896,7 +1896,7 @@ std::vector<std::string> GetAllConfigs() {
     std::vector<std::string> files;
 
     auto path = getModulePath(hModule);
-    auto configsPath = path.parent_path() / "sicko-config";
+    auto configsPath = path.parent_path() / "SickoMenu" / "sicko-config";
 
     for (const auto& f : std::filesystem::directory_iterator(configsPath)) {
         if (std::filesystem::is_regular_file(f) && f.path().extension() == ".json") {
@@ -1909,7 +1909,7 @@ std::vector<std::string> GetAllConfigs() {
 
 bool CheckConfigExists(std::string configName) {
     auto path = getModulePath(hModule);
-    auto settingsPath = path.parent_path() / std::format("sicko-config/{}.json", State.selectedConfig);
+    auto settingsPath = path.parent_path() / "SickoMenu" / "sicko-config" / std::format("{}.json", State.selectedConfig);
     return std::filesystem::exists(settingsPath);
 }
 
