@@ -572,7 +572,8 @@ namespace PlayersTab {
 
                 if (IsInGame() && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
                     && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ((*Game::pLocalPlayer)->fields.killTimer <= 0.0f)
-                    && !State.InMeeting)
+                    && !State.InMeeting &&
+                    !State.selectedPlayer.validate().get_PlayerData()->fields.IsDead)
                 {
                     if (AnimatedButton("Kill"))
                     {
@@ -598,7 +599,8 @@ namespace PlayersTab {
                 }
                 if (IsInGame() && PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer))
                     && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && ((*Game::pLocalPlayer)->fields.killTimer <= 0.0f)
-                    && !State.InMeeting)
+                    && !State.InMeeting &&
+                    !State.selectedPlayer.validate().get_PlayerData()->fields.IsDead)
                 {
                     ImGui::SameLine();
                     if (AnimatedButton("Telekill"))

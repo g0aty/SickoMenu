@@ -233,16 +233,6 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                         LOG_ERROR("Exception occured while fetching whether player is impostor or not.");
                     }
 
-                    for (auto player : GetAllPlayerControl())
-                    {
-                        auto playerInfo = GetPlayerData(player);
-                        if (!playerInfo) break; //This happens sometimes during loading
-
-                        if ((!IsInLobby()) && !State.PanicMode && State.KillImpostors && !playerInfo->fields.IsDead && amImpostor)
-                            playerInfo->fields.Role->fields.CanBeKilled = true;
-                        else if (PlayerIsImpostor(playerInfo))
-                            playerInfo->fields.Role->fields.CanBeKilled = false;
-                    }
                     GameObject* KillButton = app::Component_get_gameObject((Component_1*)__this->fields.KillButton, NULL);
                     if (KillButton != NULL && (IsInGame())) {
                         if (amImpostor || (!State.PanicMode && State.UnlockKillButton && (IsHost() || !State.SafeMode) && !localData->fields.IsDead)) {

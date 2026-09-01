@@ -1827,18 +1827,7 @@ void dKillOverlay_ShowKillAnimation_1(KillOverlay* __this, NetworkedPlayerInfo* 
 
 float dLogicOptions_GetKillDistance(LogicOptions* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dLogicOptions_GetKillDistance executed", false);
-    try {
-        if (!State.PanicMode) {
-            State.GameKillDistance = LogicOptions_GetKillDistance(__this, method);
-            if (State.InfiniteKillRange)
-                return FLT_MAX;
-            if (State.ModifyKillDistance)
-                return State.KillDistance;
-        }
-    }
-    catch (...) {
-        LOG_ERROR("Exception occurred in LogicOptions_GetKillDistance (InnerNetClient)");
-    }
+
     return LogicOptions_GetKillDistance(__this, method);
 }
 

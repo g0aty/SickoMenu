@@ -1355,67 +1355,59 @@ void dPlayerControl_RemoveProtection(PlayerControl* __this, MethodInfo* method) 
     PlayerControl_RemoveProtection(__this, method);
 }
 
-void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.HookDebug("Hook dKillButton_SetTarget executed", false);
-    if (!State.PanicMode && IsInGame() && (*Game::pLocalPlayer) != NULL &&
-        !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) {
-        try {
-            auto result = target;
-            bool amImpostor = PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer));
-            if (State.UnlockKillButton && (IsHost() || !State.SafeMode) && (!amImpostor)) {
-                if (!State.PanicMode && result == nullptr) {
-                    PlayerControl* new_result = nullptr;
-                    float defaultKillDist = 2.5f;
-                    auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
-                    switch (killDistSetting) {
-                    case 0:
-                        defaultKillDist = 1.f;
-                        break; //short
-                    case 1:
-                        defaultKillDist = 1.8f;
-                        break; //medium
-                    case 2:
-                        defaultKillDist = 2.5f;
-                        break; //long
-                    }
-                    float max_dist = State.InfiniteKillRange ? FLT_MAX : defaultKillDist; //medium kill distance is 1.8
-                    auto localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
-                    for (auto p : GetAllPlayerControl()) {
-                        if (p == *Game::pLocalPlayer || p == NULL) continue; //we don't want to kill ourselves
-                        auto pData = GetPlayerData(p);
-                        if (PlayerIsImpostor(pData) && !(State.KillImpostors || (IsHost() && State.BattleRoyale))) continue; //neither impostors
-                        if (pData->fields.IsDead) continue; //nor ghosts
-                        float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
-                        if (currentDist < max_dist) {
-                            new_result = p;
-                            max_dist = currentDist;
-                        }
-                    }
-                    result = new_result;
-                }
+PlayerControl* getValidKillTarget() {
+    if (*Game::pLocalPlayer == NULL || IsInLobby()) return NULL;
 
-                if (!State.PanicMode && result != nullptr && (State.AutoKill && (IsInLobby() ? State.KillInLobbies : true)) && (State.AlwaysMove || dPlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
-                    std::queue<RPCInterface*>* queue = nullptr;
-                    if (IsInGame())
-                        queue = &State.rpcQueue;
-                    else if (IsInLobby())
-                        queue = &State.lobbyRpcQueue;
+    bool amImpostor = PlayerIsImpostor(GetPlayerData(*Game::pLocalPlayer));
+    bool amDead = GetPlayerData(*Game::pLocalPlayer)->fields.IsDead;
 
-                    if (IsHost() || !State.SafeMode) queue->push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
-                    else queue->push(new CmdCheckMurder(PlayerSelection(result)));
-                }
-                KillButton_SetTarget(__this, result, NULL);
-                return;
-            }
-            if (IsInLobby()) result = NULL;
-            else if (amImpostor) KillButton_SetTarget(__this, result, NULL);
-            else KillButton_SetTarget(__this, NULL, NULL);
-        }
-        catch (...) {
-            LOG_ERROR("Exception occurred in KillButton_SetTarget (PlayerControl)");
+    if (State.PanicMode && !amImpostor) return NULL;
+    if (amDead) return NULL;
+    if (!(State.UnlockKillButton && (IsHost() || !State.SafeMode)) && !amImpostor) return NULL;
+
+    PlayerControl* result = NULL;
+
+    float defaultKillDist = 2.5f;
+    if (!State.PanicMode && State.ModifyKillDistance) defaultKillDist = State.KillDistance;
+    else {
+        auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
+        switch (killDistSetting) {
+        case 0:
+            defaultKillDist = 1.f;
+            break; //short
+        case 1:
+            defaultKillDist = 1.8f;
+            break; //medium
+        case 2:
+            defaultKillDist = 2.5f;
+            break; //long
         }
     }
-    KillButton_SetTarget(__this, target, method);
+    float maxDist = (!State.PanicMode && State.InfiniteKillRange) ? FLT_MAX : defaultKillDist; //medium kill distance is 1.8
+    auto localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
+
+    for (auto pc : GetAllPlayerControl()) {
+        if (pc == NULL || pc == *Game::pLocalPlayer) continue; // don't kill yourself
+
+        auto pData = GetPlayerData(pc);
+        if (pc->fields.inVent && !(IsHost() || !State.SafeMode)) continue; // don't kill people in vents
+        if (pData->fields.IsDead) continue; // don't kill ghosts
+        if (PlayerIsImpostor(pData) && (State.PanicMode || !State.KillImpostors)) continue; // don't kill impostors
+
+        float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(pc), localPos);
+        if (currentDist < maxDist) {
+            result = pc;
+            maxDist = currentDist;
+        }
+    }
+
+    return result;
+}
+
+void dKillButton_SetTarget(KillButton* __this, PlayerControl* target, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dKillButton_SetTarget executed", false);
+    auto result = getValidKillTarget();
+    KillButton_SetTarget(__this, result, method);
 }
 
 void dKillButton_DoClick(KillButton* __this, MethodInfo* method) {
@@ -1430,51 +1422,8 @@ void dKillButton_DoClick(KillButton* __this, MethodInfo* method) {
 
 PlayerControl* dImpostorRole_FindClosestTarget(ImpostorRole* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dImpostorRole_FindClosestTarget executed", false);
-    if (IsInLobby()) return nullptr;
-    auto result = ImpostorRole_FindClosestTarget(__this, method);
-    if (!State.PanicMode && result == nullptr && (State.InfiniteKillRange || (State.KillInVanish && IsHost() || !State.SafeMode))) {
-        PlayerControl* new_result = nullptr;
-        float defaultKillDist = 2.5f;
-        auto killDistSetting = GameOptions().GetInt(Int32OptionNames__Enum::KillDistance);
-        switch (killDistSetting) {
-        case 0:
-            defaultKillDist = 1.f;
-            break; //short
-        case 1:
-            defaultKillDist = 1.8f;
-            break; //medium
-        case 2:
-            defaultKillDist = 2.5f;
-            break; //long
-        }
-        float max_dist = State.InfiniteKillRange ? FLT_MAX : defaultKillDist; //medium kill distance is 1.8
-        auto localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
-        for (auto p : GetAllPlayerControl()) {
-            if (p == *Game::pLocalPlayer || p == NULL) continue; //we don't want to kill ourselves
-            auto pData = GetPlayerData(p);
-            if (PlayerIsImpostor(pData) && !(State.KillImpostors || (IsHost() && State.BattleRoyale))) continue; //neither impostors
-            if (pData->fields.IsDead) continue; //nor ghosts
-            if (pData == NULL) continue; //nor null
-            float currentDist = GetDistanceBetweenPoints_Unity(GetTrueAdjustedPosition(p), localPos);
-            if (currentDist < max_dist) {
-                new_result = p;
-                max_dist = currentDist;
-            }
-        }
-        result = new_result;
-    }
 
-    if (!State.PanicMode && result != nullptr && (State.AutoKill && (IsInLobby() ? State.KillInLobbies : true)) && (State.AlwaysMove || dPlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) && (*Game::pLocalPlayer)->fields.killTimer <= 0.f) {
-        std::queue<RPCInterface*>* queue = nullptr;
-        if (IsInGame())
-            queue = &State.rpcQueue;
-        else if (IsInLobby())
-            queue = &State.lobbyRpcQueue;
-
-        if (IsHost() || !State.SafeMode) queue->push(new RpcMurderPlayer(*Game::pLocalPlayer, result));
-        else queue->push(new CmdCheckMurder(PlayerSelection(result)));
-    }
-    return result;
+    return ImpostorRole_FindClosestTarget(__this, method);
 }
 
 float dConsole_CanUse(Console* __this, NetworkedPlayerInfo* pc, bool* canUse, bool* couldUse, MethodInfo* method) {
