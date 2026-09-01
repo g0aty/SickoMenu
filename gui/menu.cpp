@@ -162,6 +162,7 @@ namespace Menu {
 			{"Blacklist", "Player"}, {"Whitelist", "Player"},
 			{"Shift", "Player"}, {"Protect", "Player"},
 			{"Vote Immunity", "Player"}, {"Teleport to Vent", "Player"},
+			{"Spam Teleport to Vent", "Player"}, {"Spam Teleport to Random Vents", "Player"},
 			{"Warn", "Player"},
 			{"Send Blank Chat As", "Trolling"}, {"Force Meeting By", "Trolling"},
 			{"Self-Report", "Trolling"}, {"Copy Outfit", "Trolling"},
@@ -335,7 +336,6 @@ namespace Menu {
 					if (IsTabUsable(selectedTab)) {
 						CloseAllOtherTabs(selectedTab);
 						OpenTabSubGroup(tabName, subGroup);
-						State.searchQuery = "";
 					}
 				}
 			}
@@ -362,11 +362,11 @@ namespace Menu {
 				else ImGui::TextColored(DiddyCol, IsChatCensored() || IsStreamerMode() ? " [F***son Mode]" : " [Fuckson Mode]");
 			}*/
 			ImGui::SameLine(ImGui::GetWindowWidth() - 19 * State.dpiScale);
-			if (AnimatedButton("-")) State.ShowMenu = false; //minimize button
+			if (AnimatedButton("-", false)) State.ShowMenu = false; //minimize button
 			//ImGui::BeginTabBar("AmongUs#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 			// Search field
-			ImGui::SetNextItemWidth(90 * State.dpiScale); // Adjust the width of the input box
+			ImGui::SetNextItemWidth(70 * State.dpiScale); // Adjust the width of the input box
 			if (InputStringWithHint("##Search", "Search...", &State.searchQuery)/* && State.AprilFoolsMode*/) {
 				/*if (ToLower(searchQuery) == StrRev("nosduh")) {
 					State.AprilFoolsMode = !State.AprilFoolsMode;
@@ -376,6 +376,11 @@ namespace Menu {
 					State.DiddyPartyMode = !State.DiddyPartyMode;
 				}*/
 			}
+			ImGui::SameLine(0.f, 2.f);
+			if (ColoredButton(ImVec4(1.f, 0.f, 0.f, 1.f), "\u00D7")) {
+				State.searchQuery = "";
+			}
+
 			if (ImGui::Selectable("About", openAbout)) {
 				CloseAllOtherTabs(Tabs::About);
 			}
