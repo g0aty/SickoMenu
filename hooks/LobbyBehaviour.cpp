@@ -155,7 +155,7 @@ void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
         (ip >> 24) & 0xFF
     );
     uint16_t port = gameListing.Port;
-    std::string ipPortDisplay = std::format("\n<#0fb>IP: {}:{}</color>", ipAddress, port);
+    std::string ipPortDisplay = State.UseCustomServer ? std::format("\n<#0fb>IP: {}:{}</color>", ipAddress, port) : "";
 
     auto platform = gameListing.Platform;
     std::string platformId = "Unknown";
@@ -196,7 +196,6 @@ void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
     }
     std::string lobbyCode = IsStreamerMode() ? "******" : convert_from_string(InnerNet_GameCode_IntToGameName(gameListing.GameId, NULL));
     int LobbyTime = (std::max)(0, int(gameListing.Age));
-    std::string lobbyTimeDisplay = "";
 
     std::string ageCol = getHexCodeFromImVec4(State.AgeColor);
     std::string daterCol = getHexCodeFromImVec4(State.DaterNamesColor);
@@ -205,9 +204,7 @@ void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
     std::string platformCol = getHexCodeFromImVec4(State.PlatformColor);
     std::string hostCol = getHexCodeFromImVec4(State.HostColor);
 
-    if (State.ShowLobbyTimer) {
-        lobbyTimeDisplay = std::format("\n{}Age: {}:{}{}</color>", ageCol, int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
-    }
+    std::string lobbyTimeDisplay = std::format("\n{}Age: {}:{}{}</color>", ageCol, int(LobbyTime / 60), LobbyTime % 60 < 10 ? "0" : "", LobbyTime % 60);
     std::string playerCountCol = "<#0f0>";
     if (gameListing.PlayerCount == 4) playerCountCol = "<#ff0>";
     if (gameListing.PlayerCount < 4) playerCountCol = "<#f00>";
@@ -217,8 +214,11 @@ void dGameContainer_SetupGameInfo(GameContainer* __this, MethodInfo* method) {
     const std::unordered_set<std::string> BannedNamesSet(State.LockedNames.begin(), State.LockedNames.end());
     if (BannedNamesSet.find(trueHostName) != BannedNamesSet.end()) trueHostName = nameCheckerCol + trueHostName + "</color>"; // Yellow color for banned names
     std::string separator = "<#0000>000000000000000</color>"; // The crewmate icon gets aligned properly with this
-    std::string playerCountDisplay = std::format("<size=40%>{}\n{}{}</color>\n{}\n{}{}</color>\n{}{}</color>{}{}\n{}</size>",
-        separator, hostCol, trueHostName, playerCount, lobbyCodeCol, lobbyCode, platformCol, platformId, ipPortDisplay, lobbyTimeDisplay, separator);
+
+    std::string size = State.UseCustomServer ? "<size=35%>" : "<size=40%>";
+
+    std::string playerCountDisplay = std::format("{}{}\n{}{}</color>\n{}\n{}{}</color>\n{}{}</color>{}{}\n{}</size>",
+        size, separator, hostCol, trueHostName, playerCount, lobbyCodeCol, lobbyCode, platformCol, platformId, ipPortDisplay, lobbyTimeDisplay, separator);
     TMP_Text_set_text((TMP_Text*)__this->fields.capacity, convert_to_string(playerCountDisplay), NULL);
 }
 
