@@ -529,7 +529,7 @@ namespace HostTab {
                     State.Save();
                 }
 
-				if (ToggleButton("Allow Join with Prefered Color", &State.AllowPreferedColor)) {
+				if (ToggleButton("Allow Join with Preferred Color", &State.AllowPreferredColor)) {
                     State.Save();
                 }
 
