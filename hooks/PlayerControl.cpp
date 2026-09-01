@@ -1870,7 +1870,7 @@ void dPlayerControl_SetKillTimer(PlayerControl* __this, float time, MethodInfo* 
 void dPlayerControl_CheckColor(PlayerControl* __this, uint8_t bodyColor, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_CheckColor executed", false);
 
-    if (!State.AllowPreferedColor) {
+    if (!State.AllowPreferredColor) {
         PlayerControl_CheckColor(__this, bodyColor, method);
         return;
     }
