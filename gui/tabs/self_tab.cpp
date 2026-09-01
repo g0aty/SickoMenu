@@ -655,6 +655,10 @@ namespace SelfTab {
             if (ToggleButton("Better Message Sounds", &State.BetterMessageSounds)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("Extended Notifications", &State.ExtendedNotifications)) {
+                State.Save();
+            }
 
             if (ToggleButton("Auto Rejoin After Game Ending", &State.AutoRejoin)) {
                 State.Save();

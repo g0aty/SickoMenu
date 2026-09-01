@@ -76,6 +76,12 @@ public:
     int FakePlatform = 0;
     uint64_t FakePsnId = 0;
     uint64_t FakeXboxId = 0;
+    bool SpoofPlName = false;
+    std::string FakePlName = "TESTNAME";
+    bool UseCustomServer = false;
+    std::string CustomServerIp = "";
+    uint16_t CustomServerPort = 22023;
+    bool ForceDTLS = false;
     bool SpoofGuestAccount = false;
     bool SpoofModdedHost = false;
     bool SpoofAUVersion = false;
@@ -364,6 +370,7 @@ public:
     bool BetterChatNotifications = false;
     bool BetterLobbyCodeInput = false;
     bool BetterMessageSounds = false;
+    bool ExtendedNotifications = false;
     AudioClip* MessageSound = NULL;
 
     PlayerSelection selectedPlayer;
@@ -719,6 +726,8 @@ public:
     bool AutoHostRole = false;
     RoleType HostRoleToSet = RoleType::Impostor;
 
+    bool AllowPreferredColor = false;
+
     bool murderLoop = false;
     bool suicideLoop = false;
     bool farmLoop = false;
@@ -786,6 +795,8 @@ public:
     std::vector<std::string> BlacklistFriendCodes = {};
 
     std::vector<std::string> LockedNames = {};
+
+    std::unordered_set<uint8_t> SMAC_PunishedPlayers;
 
     std::string lol = "";
     bool ProGamer = false;
@@ -920,6 +931,8 @@ public:
     {"Playstation (Console)", true},
     {"Unknown", true}
     };
+
+    bool IgnoreOriginalInit_NotificationPopper = true;
 
     void Load();
     void Save();

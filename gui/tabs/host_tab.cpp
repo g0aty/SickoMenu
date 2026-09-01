@@ -529,6 +529,10 @@ namespace HostTab {
                     State.Save();
                 }
 
+				if (ToggleButton("Allow Join with Preferred Color", &State.AllowPreferredColor)) {
+                    State.Save();
+                }
+
                 if (!State.SafeMode) {
                     if (ToggleButton("Force Name for Everyone", &State.ForceNameForEveryone)) {
                         State.Save();

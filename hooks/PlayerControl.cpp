@@ -1512,11 +1512,16 @@ void dNetworkedPlayerInfo_Serialize(NetworkedPlayerInfo* __this, MessageWriter* 
 
 void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader* reader, bool initialState, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dNetworkedPlayerInfo_Deserialize executed", false);
+
     std::string friendCode = convert_from_string(__this->fields.FriendCode);
     uint8_t id = __this->fields.PlayerId;
+
     if (std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), friendCode) != State.BlacklistFriendCodes.end()) {
         if (State.Enable_SMAC) {
             std::string name = RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(__this, NULL)));
+            auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
+            float spacingBackup = notifier->fields.spacingY;
+
             switch (IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment) {
             case 0:
                 break;
@@ -1525,27 +1530,38 @@ void dNetworkedPlayerInfo_Deserialize(NetworkedPlayerInfo* __this, MessageReader
                 ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, GetPlayerControlById(id), convert_to_string(message), false, NULL);
                 break;
             }
-            case 2:
-            {
+            case 2: {
                 String* newName = convert_to_string(name + " has been kicked by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
                 if (IsHost()) {
-                    PlayerControl_CmdCheckName(GetPlayerControlById(id), newName, NULL);
-                    InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(id)->fields._.OwnerId, false, NULL);
+                    notifier->fields.spacingY = spacingBackup += 0.05f;
+                    NotificationPopper_AddDisconnectMessage(notifier, newName, nullptr);
+                    notifier->fields.spacingY = spacingBackup;
+
+                    State.SMAC_PunishedPlayers.insert(__this->fields.PlayerId);
+
+                    State.IgnoreOriginalInit_NotificationPopper = true;
+                    InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.OwnerId, false, NULL);
                 }
                 break;
             }
-            case 3:
-            {
+            case 3: {
                 String* newName = convert_to_string(name + " has been banned by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: Blacklisted<size=0>");
                 if (IsHost()) {
-                    PlayerControl_CmdCheckName(GetPlayerControlById(id), newName, NULL);
-                    InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), GetPlayerControlById(id)->fields._.OwnerId, true, NULL);
+                    notifier->fields.spacingY = spacingBackup += 0.05f;
+                    NotificationPopper_AddDisconnectMessage(notifier, newName, nullptr);
+                    notifier->fields.spacingY = spacingBackup;
+
+                    State.SMAC_PunishedPlayers.insert(__this->fields.PlayerId);
+
+                    State.IgnoreOriginalInit_NotificationPopper = true;
+                    InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), __this->fields._.OwnerId, false, NULL);
                 }
                 break;
             }
             }
         }
     }
+
     NetworkedPlayerInfo_Deserialize(__this, reader, initialState, NULL);
 }
 
@@ -1798,4 +1814,15 @@ void dPlayerControl_SetKillTimer(PlayerControl* __this, float time, MethodInfo* 
         time = 0.f;
 
     PlayerControl_SetKillTimer(__this, time, method);
+}
+
+void dPlayerControl_CheckColor(PlayerControl* __this, uint8_t bodyColor, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_CheckColor executed", false);
+
+    if (!State.AllowPreferredColor) {
+        PlayerControl_CheckColor(__this, bodyColor, method);
+        return;
+    }
+
+    PlayerControl_RpcSetColor(__this, bodyColor, NULL);
 }

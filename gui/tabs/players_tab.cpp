@@ -42,6 +42,7 @@ namespace PlayersTab {
         std::string nameClean;
         std::string friendCode;
         std::string puid;
+        std::string platform;
         std::string platformName;
         uint64_t psnId = 0;
         uint64_t xboxId = 0;
@@ -66,13 +67,16 @@ namespace PlayersTab {
         g_PlayerCache.clear();
     }
 
-    std::string GetPlatformString(PlayerControl* playerCtrl, app::ClientData* client, uint64_t& outPsn, uint64_t& outXbox) {
+    std::string GetPlatformString(PlayerControl* playerCtrl, app::ClientData* client, uint64_t& outPsn, uint64_t& outXbox, std::string& platformName) {
         if (client == NULL || client->fields.PlatformData == NULL || playerCtrl->fields._.OwnerId != client->fields.Id) {
             return "Unknown";
         }
 
         outPsn = client->fields.PlatformData->fields.PsnPlatformId;
         outXbox = client->fields.PlatformData->fields.XboxPlatformId;
+
+        // By default, all players have "TESTNAME", except Switch/PlayStation/XBOX (using account names)
+        platformName = convert_from_string(client->fields.PlatformData->fields.PlatformName);
 
         switch (client->fields.PlatformData->fields.Platform) {
         case Platforms__Enum::StandaloneEpicPC:
@@ -191,7 +195,7 @@ namespace PlayersTab {
                         cache.puid = convert_from_string(playerData->fields.Puid);
 
                         app::ClientData* client = (app::ClientData*)app::InnerNetClient_GetClientFromCharacter((app::InnerNetClient*)(*Game::pAmongUsClient), playerCtrl, NULL);
-                        cache.platformName = GetPlatformString(playerCtrl, client, cache.psnId, cache.xboxId);
+                        cache.platform = GetPlatformString(playerCtrl, client, cache.psnId, cache.xboxId, cache.platformName);
 
                         if (!cache.isCached) {
                             cache.selectableId = "##" + ToString(pid);
@@ -461,7 +465,8 @@ namespace PlayersTab {
                         uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
                         ImGui::Text("Level: %d", playerLevel);
 
-                        ImGui::Text("Platform: %s", cachedDetails.platformName.c_str());
+                        ImGui::Text("Platform: %s", cachedDetails.platform.c_str());
+                        ImGui::Text("Platform Name: %s", cachedDetails.platformName.c_str());
 
                         std::string friendCode = cachedDetails.friendCode;
                         bool isWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end();

@@ -302,6 +302,9 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerVoteArea_SetCosmetics);
 	HOOKFUNC(PlayerControl_SetKillTimer);
 	HOOKFUNC(VentilationSystem_UpdateSystem);
+	HOOKFUNC(InnerNetClient_SetEndpoint);
+	HOOKFUNC(NotificationPopper_AddDisconnectMessage);
+	HOOKFUNC(PlayerControl_CheckColor);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -515,6 +518,9 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerVoteArea_SetCosmetics);
 	UNHOOKFUNC(PlayerControl_SetKillTimer);
 	UNHOOKFUNC(VentilationSystem_UpdateSystem);
+	UNHOOKFUNC(InnerNetClient_SetEndpoint);
+	UNHOOKFUNC(NotificationPopper_AddDisconnectMessage);
+	UNHOOKFUNC(PlayerControl_CheckColor);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

@@ -1575,18 +1575,10 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
         if (data->fields.Character) { // Don't use Object_1_IsNotNull().
             auto playerInfo = GetPlayerData(data->fields.Character);
 
-            if (reason == DisconnectReasons__Enum::Banned)
-                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been banned by host (" + GetHostUsername() + ").");
-            else if (reason == DisconnectReasons__Enum::Kicked)
-                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been kicked by host (" + GetHostUsername() + ").");
-            else if (reason == DisconnectReasons__Enum::Hacking)
-                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been banned for hacking.");
-            else if (reason == DisconnectReasons__Enum::Error)
-                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been disconnected due to error.");
-            else if (reason == DisconnectReasons__Enum::Sanctions)
-                Log.Debug(convert_from_string(data->fields.PlayerName) + " has been sanction-banned.");
-            else
-                Log.Debug(convert_from_string(data->fields.PlayerName) + " has left the game.");
+            const std::string playerName = convert_from_string(data->fields.PlayerName);
+            const std::string stringReason = GetDisconnectReasonString(reason);
+
+            Log.Debug(playerName + " left by reason: " + stringReason);
 
             uint8_t playerId = data->fields.Character->fields.PlayerId;
 
@@ -1619,6 +1611,22 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                     State.liveConsoleEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
                 }
             }
+
+            if (State.ExtendedNotifications) {
+                const bool smacPunished = State.SMAC_PunishedPlayers.find(playerId) != State.SMAC_PunishedPlayers.end();
+
+                if (smacPunished) {
+                    State.SMAC_PunishedPlayers.erase(playerId);
+                }
+
+                if (!smacPunished) {
+                    if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
+                        std::string notifyText = "Left: " + convert_from_string(data->fields.PlayerName) + " by reason: " + stringReason;
+                        NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(notifyText), nullptr);
+                        State.IgnoreOriginalInit_NotificationPopper = true;
+                    }
+                }
+            }
         }
         else {
             //Found this happens on game ending occasionally
@@ -1635,6 +1643,30 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
 void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnPlayerJoined executed", false);
     State.BlinkPlayersTab = true;
+
+    if (!data) return;
+
+    if (State.ExtendedNotifications) {
+        std::string name = data->fields.PlayerName != nullptr ? convert_from_string(data->fields.PlayerName) : "<N/A>";
+        std::string friendCode = data->fields.FriendCode != nullptr ? convert_from_string(data->fields.FriendCode) : "<N/A>";
+
+        if (friendCode.empty()) friendCode = "N/A";
+
+        if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
+            AudioClip* soundBackup = notifier->fields.playerDisconnectSound;
+            Color colorBackup = notifier->fields.disconnectColor;
+
+            notifier->fields.disconnectColor = Color(0.0f, 1.0f, 0.0f, 1.0f);
+            notifier->fields.playerDisconnectSound = nullptr;
+
+            std::string notifyText = std::format("Joined: <noparse>{}</noparse> | <noparse>{}</noparse>", name, friendCode);
+            NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(notifyText), nullptr);
+
+            notifier->fields.playerDisconnectSound = soundBackup;
+            notifier->fields.disconnectColor = colorBackup;
+        }
+    }
+
     AmongUsClient_OnPlayerJoined(__this, data, method);
 }
 
@@ -1941,4 +1973,35 @@ void dDisconnectPopup_DoShow(DisconnectPopup* __this, MethodInfo* method) {
 bool dGameManager_DidImpostorsWin(GameManager* __this, GameOverReason__Enum reason, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dGameManager_DidImpostorsWin executed", false);
     return GameManager_DidImpostorsWin(__this, reason, method);
+}
+
+void dInnerNetClient_SetEndpoint(InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_SetEndpoint executed", false);
+    try {
+        if (State.UseCustomServer && !State.CustomServerIp.empty()) {
+            addr = convert_to_string(State.CustomServerIp);
+            port = State.CustomServerPort;
+        }
+
+        if (State.ForceDTLS) {
+            dtls = true;
+        }
+    }
+    catch (...) {
+        LOG_ERROR("Exception in dInnerNetClient_SetEndpoint");
+    }
+
+    InnerNetClient_SetEndpoint(__this, addr, port, dtls, method);
+}
+
+// Ignores the original NotificationPopper initialization method
+void dNotificationPopper_AddDisconnectMessage(NotificationPopper* __this, String* item, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dNotificationPopper_AddDisconnectMessage executed", false);
+
+    if (State.IgnoreOriginalInit_NotificationPopper) {
+        State.IgnoreOriginalInit_NotificationPopper = false;
+        return;
+    }
+
+    NotificationPopper_AddDisconnectMessage(__this, item, method);
 }

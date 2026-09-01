@@ -1,4 +1,4 @@
-﻿#include "pch-il2cpp.h"
+#include "pch-il2cpp.h"
 #include "utility.h"
 #include "state.hpp"
 #include "game.h"
@@ -1955,102 +1955,86 @@ static std::string SMAC_GetReasonCategory(const std::string& reason) {
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     if (!State.Enable_SMAC) return;
-    if (reason == "Overloading" && !(IsHost() && State.SMAC_HostPunishment >= 2)) return; // Don't spam logs for overloading, that causes overload as well
-    if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return; // Avoid detecting yourself and practice mode dummies
-    if (reason == "Bad Sabotage" && !IsHost()) return; // Without host, we cannot detect who sent UpdateSystem rpc properly
+    if (reason == "Overloading" && !(IsHost() && State.SMAC_HostPunishment >= 2)) return; // Don't spam logs for overloading
+    if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return;
+    if (reason == "Bad Sabotage" && !IsHost()) return;
 
     static std::unordered_map<std::string, std::chrono::steady_clock::time_point> smacLastFlagTime;
     std::string smacFlagKey = std::to_string(pCtrl->fields.PlayerId) + "|" + reason;
     auto smacNow = std::chrono::steady_clock::now();
     auto smacFlagIt = smacLastFlagTime.find(smacFlagKey);
-    if (smacFlagIt != smacLastFlagTime.end() && std::chrono::duration<float>(smacNow - smacFlagIt->second).count() < 3.0f) return; // Don't re-flag the same player for the same reason more than once every 3s
+    if (smacFlagIt != smacLastFlagTime.end() && std::chrono::duration<float>(smacNow - smacFlagIt->second).count() < 3.0f) return;
     smacLastFlagTime[smacFlagKey] = smacNow;
 
     auto pData = GetPlayerData(pCtrl);
-    std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName));
-    if (name == "") name = convert_from_string(InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), pCtrl, NULL)->fields.PlayerName);
-    if (name == "") name = "<#b0f>[Unknown]</color>";
+    std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(pData)->fields.PlayerName));
+    if (name.empty()) name = convert_from_string(InnerNetClient_GetClientFromCharacter((InnerNetClient*)(*Game::pAmongUsClient), pCtrl, NULL)->fields.PlayerName);
+    if (name.empty()) name = "<#b0f>[Unknown]</color>";
 
     std::string fc = convert_from_string(pData->fields.FriendCode);
     auto it = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), fc);
-    if (fc != "" && State.SMAC_IgnoreWhitelist && it != State.WhitelistFriendCodes.end()) return;
-    if (fc != "" && State.SMAC_AddToBlacklist) {
+    if (!fc.empty() && State.SMAC_IgnoreWhitelist && it != State.WhitelistFriendCodes.end()) return;
+    if (!fc.empty() && State.SMAC_AddToBlacklist) {
         if (it != State.WhitelistFriendCodes.end()) State.WhitelistFriendCodes.erase(it);
-        AddToBlacklist(fc); 
+        State.BlacklistFriendCodes.push_back(fc);
+        State.Save();
     }
 
-    std::string smacCategory = SMAC_GetReasonCategory(reason);
-    int punishmentLevel = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
-    if (!smacCategory.empty()) {
-        auto override = IsHost() ? State.SMAC_ReasonPunishmentOverrideHost : State.SMAC_ReasonPunishmentOverride;
-        
-        auto overrideIt = override.find(smacCategory);
-        if (overrideIt != override.end())
-            punishmentLevel = overrideIt->second;
-    }
+    auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
+    float spacingBackup = notifier->fields.spacingY;
 
-    int maxPunishmentLevel = IsHost() ? 3 : 1;
-    punishmentLevel = std::clamp(punishmentLevel, 0, maxPunishmentLevel);
+    int punishment = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
 
-    if (IsHost()) {
-        switch (punishmentLevel) {
-        case 0:
-            LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
-            break;
-        case 1: {
-            auto realOutfit = GetPlayerOutfit(pData);
-            Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
-            const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
-            std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
-                int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
-                State.DarkMode ? "<#fff>" : "<#000>";
-            std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
-                colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
-                IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
-                    " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
-            //ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
-            ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
-            break;
-        }
-        case 2:
-        {
-            String* newName = convert_to_string(name + " <#fff>has been kicked by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
-            if (name.find(" by SickoMenu Anticheat! Reason: ") == std::string::npos)
-                GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName = newName; // Set name for yourself as it doesn't show up fast enough for others
-            InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
-            break;
-        }
-        case 3:
-        {
-            String* newName = convert_to_string(name + " <#fff>has been banned by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
-            if (name.find(" by SickoMenu Anticheat! Reason: ") == std::string::npos)
-                GetPlayerOutfit(GetPlayerData(pCtrl))->fields.PlayerName = newName; // Set name for yourself as it doesn't show up fast enough for others
-            InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
-            break;
-        }
-        }
+    switch (punishment) {
+    case 0:
+        LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
+        break;
+    case 1:
+    {
+        auto realOutfit = GetPlayerOutfit(pData);
+        Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
+        const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
+
+        std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
+            int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
+            State.DarkMode ? "<#fff>" : "<#000>";
+
+        std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
+            colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
+            IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
+                " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
+
+        ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
+        break;
     }
-    else {
-        switch (punishmentLevel) {
-        case 0:
-            LOG_INFO((name + " has been detected by SickoMenu Anticheat! Reason: " + reason).c_str());
-            break;
-        case 1: {
-            auto realOutfit = GetPlayerOutfit(pData);
-            Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
-            const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
-            std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
-                int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
-                State.DarkMode ? "<#fff>" : "<#000>";
-            std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
-                colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
-                IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
-                    " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
-            //ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, pCtrl, convert_to_string(cheaterMessage), false, NULL);
-            ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
-            break;
-        }
-        }
+    case 2:
+    {
+        String* newName = convert_to_string(name + " <#fff>has been kicked by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
+
+        notifier->fields.spacingY = spacingBackup += 0.05f;
+        NotificationPopper_AddDisconnectMessage(notifier, newName, nullptr);
+        notifier->fields.spacingY = spacingBackup;
+
+        State.SMAC_PunishedPlayers.insert(pCtrl->fields.PlayerId);
+
+        State.IgnoreOriginalInit_NotificationPopper = true;
+        InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
+        break;
+    }
+    case 3:
+    {
+        String* newName = convert_to_string(name + " <#fff>has been banned by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
+
+        notifier->fields.spacingY = spacingBackup += 0.05f;
+        NotificationPopper_AddDisconnectMessage(notifier, newName, nullptr);
+        notifier->fields.spacingY = spacingBackup;
+
+        State.SMAC_PunishedPlayers.insert(pCtrl->fields.PlayerId);
+
+        State.IgnoreOriginalInit_NotificationPopper = true;
+        InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
+        break;
+    }
     }
 }
 
@@ -2907,5 +2891,148 @@ void GeneratePlatformId() {
         State.FakePsnId = GeneratePsnId();
         State.SpoofPsnId = true;
         State.Save();
+    }
+}
+
+std::string GetDisconnectReasonString(DisconnectReasons__Enum reason) {
+    switch (reason) {
+    case DisconnectReasons__Enum::ExitGame:
+        return "ExitGame";
+
+    case DisconnectReasons__Enum::GameFull:
+        return "GameFull";
+
+    case DisconnectReasons__Enum::GameStarted:
+        return "GameStarted";
+
+    case DisconnectReasons__Enum::GameNotFound:
+        return "GameNotFound";
+
+    case DisconnectReasons__Enum::IncorrectVersion:
+        return "IncorrectVersion";
+
+    case DisconnectReasons__Enum::Banned:
+        return "Banned";
+
+    case DisconnectReasons__Enum::Kicked:
+        return "Kicked";
+
+    case DisconnectReasons__Enum::Custom:
+        return "Custom";
+
+    case DisconnectReasons__Enum::InvalidName:
+        return "InvalidName";
+
+    case DisconnectReasons__Enum::Hacking:
+        return "Hacking";
+
+    case DisconnectReasons__Enum::NotAuthorized:
+        return "NotAuthorized";
+
+    case DisconnectReasons__Enum::ConnectionLimit:
+        return "ConnectionLimit";
+
+    case DisconnectReasons__Enum::Destroy:
+        return "Destroy";
+
+    case DisconnectReasons__Enum::Error:
+        return "Error";
+
+    case DisconnectReasons__Enum::IncorrectGame:
+        return "IncorrectGame";
+
+    case DisconnectReasons__Enum::ServerRequest:
+        return "ServerRequest";
+
+    case DisconnectReasons__Enum::ServerFull:
+        return "ServerFull";
+
+    case DisconnectReasons__Enum::MismatchedVersion:
+        return "MismatchedVersion";
+
+    case DisconnectReasons__Enum::InternalPlayerMissing:
+        return "InternalPlayerMissing";
+
+    case DisconnectReasons__Enum::InternalNonceFailure:
+        return "InternalNonceFailure";
+
+    case DisconnectReasons__Enum::InternalConnectionToken:
+        return "InternalConnectionToken";
+
+    case DisconnectReasons__Enum::PlatformLock:
+        return "PlatformLock";
+
+    case DisconnectReasons__Enum::LobbyInactivity:
+        return "LobbyInactivity";
+
+    case DisconnectReasons__Enum::MatchmakerInactivity:
+        return "MatchmakerInactivity";
+
+    case DisconnectReasons__Enum::InvalidGameOptions:
+        return "InvalidGameOptions";
+
+    case DisconnectReasons__Enum::NoServersAvailable:
+        return "NoServersAvailable";
+
+    case DisconnectReasons__Enum::QuickmatchDisabled:
+        return "QuickmatchDisabled";
+
+    case DisconnectReasons__Enum::TooManyGames:
+        return "TooManyGames";
+
+    case DisconnectReasons__Enum::QuickchatLock:
+        return "QuickchatLock";
+
+    case DisconnectReasons__Enum::MatchmakerFull:
+        return "MatchmakerFull";
+
+    case DisconnectReasons__Enum::Sanctions:
+        return "Sanctions";
+
+    case DisconnectReasons__Enum::ServerError:
+        return "ServerError";
+
+    case DisconnectReasons__Enum::SelfPlatformLock:
+        return "SelfPlatformLock";
+
+    case DisconnectReasons__Enum::DuplicateConnectionDetected:
+        return "DuplicateConnectionDetected";
+
+    case DisconnectReasons__Enum::TooManyRequests:
+        return "TooManyRequests";
+
+    case DisconnectReasons__Enum::FocusLostBackground:
+        return "FocusLostBackground";
+
+    case DisconnectReasons__Enum::IntentionalLeaving:
+        return "IntentionalLeaving";
+
+    case DisconnectReasons__Enum::FocusLost:
+        return "FocusLost";
+
+    case DisconnectReasons__Enum::NewConnection:
+        return "NewConnection";
+
+    case DisconnectReasons__Enum::PlatformParentalControlsBlock:
+        return "PlatformParentalControlsBlock";
+
+    case DisconnectReasons__Enum::PlatformUserBlock:
+        return "PlatformUserBlock";
+
+    case DisconnectReasons__Enum::PlatformFailedToGetUserBlock:
+        return "PlatformFailedToGetUserBlock";
+
+    case DisconnectReasons__Enum::ServerNotFound:
+        return "ServerNotFound";
+
+    case DisconnectReasons__Enum::ClientTimeout:
+        return "ClientTimeout";
+
+    case DisconnectReasons__Enum::ErrorAuthNonceFailure:
+        return "ErrorAuthNonceFailure";
+
+    case DisconnectReasons__Enum::Unknown:
+    default:
+        return "Unknown";
     }
 }

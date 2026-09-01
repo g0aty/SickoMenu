@@ -394,6 +394,16 @@ namespace SettingsTab {
 				}
 			}
 
+			if (ToggleButton("Spoof Platform Name", &State.SpoofPlName)) {
+				State.Save();
+			}
+			if (State.SpoofPlName)
+			{
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(150 * State.dpiScale);
+				InputString("Platform Name", &State.FakePlName);
+			}
+
 			static bool dhaWarnState = false;
 
 			if (!dhaWarnState && ToggleButton("Reduce Anticheat While Hosting (+25 Mode)", &State.DisableHostAnticheat)) {
@@ -430,6 +440,70 @@ namespace SettingsTab {
 				if (ColoredButton(ImVec4(1.f, 0.f, 0.f, 1.f), "No")) {
 					dhaWarnState = false;
 				}
+			}
+
+			static bool cssWarnState = false;
+
+			if (!cssWarnState && ToggleButton("Custom Server Settings", &State.UseCustomServer)) {
+				if (State.UseCustomServer) {
+					cssWarnState = true;
+					State.UseCustomServer = false;
+				}
+				else {
+					State.Save();
+				}
+			}
+
+			if (cssWarnState) {
+				BoldText("Warning", ImVec4(1.f, 0.f, 0.f, 1.f));
+				ImGui::Text("\"Custom Server Settings\" feature forces all newly created lobbies");
+				ImGui::Text("to use specified Innersloth IP address and port of the server.");
+				ImGui::Text(" ");
+				ImGui::Text("Last 4 letters of the lobby code are automatically generated");
+				ImGui::Text("based on the IP address and port you set.");
+				ImGui::Text(" ");
+				ImGui::Text("While active, you cannot join other servers or use the");
+				ImGui::Text("\"Reduce Anticheat While Hosting (+25 Mode)\" feature.");
+				ImGui::Text(" ");
+				ImGui::Text("To find the required IP and port, enable \"Show Lobby Info\"");
+				ImGui::Text("and check lobbies in Matchmaking.");
+				ImGui::Text(" ");
+				ImGui::Text("Are you sure you want to enable this?");
+
+				if (ColoredButton(ImVec4(0.f, 1.f, 0.f, 1.f), "Yes")) {
+					cssWarnState = false;
+					State.UseCustomServer = true;
+					State.Save();
+				}
+				ImGui::SameLine();
+				if (ColoredButton(ImVec4(1.f, 0.f, 0.f, 1.f), "No")) {
+					cssWarnState = false;
+				}
+			}
+
+			if (State.UseCustomServer) {
+				static char ipBuffer[128] = "";
+
+				if (ipBuffer[0] == '\0' && !State.CustomServerIp.empty()) {
+					strncpy_s(ipBuffer, State.CustomServerIp.c_str(), sizeof(ipBuffer));
+				}
+
+				if (ImGui::InputText("Server IP", ipBuffer, sizeof(ipBuffer))) {
+					State.CustomServerIp = ipBuffer;
+				}
+
+				int port = static_cast<int>(State.CustomServerPort);
+				if (ImGui::InputInt("Server Port", &port, 1, 100)) {
+					if (port < 1) port = 1;
+					if (port > 65535) port = 65535;
+					State.CustomServerPort = static_cast<uint16_t>(port);
+				}
+			}
+
+			ImGui::Spacing();
+
+			if (ToggleButton("Force DTLS", &State.ForceDTLS)) {
+				State.Save();
 			}
 			/*if (State.DisableHostAnticheat) {
 				BoldText("Warning (+25 Mode)", ImVec4(1.f, 0.f, 0.f, 1.f));
