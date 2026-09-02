@@ -366,6 +366,12 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                     }
                 }
             }
+            else if (PlayerIsImpostor(playerData) && PlayerIsImpostor(localData)) {
+                Color32&& roleColor = Color32_op_Implicit(Palette__TypeInfo->static_fields->ImpostorRed, NULL);
+                playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
+                    roleColor.r, roleColor.g, roleColor.b,
+                    roleColor.a, playerName);
+            }
 
             if (IsInGame() && playerData->fields.Role && PlayerIsImpostor(playerData) && !playerData->fields.IsDead) {
                 playerData->fields.Role->fields.CanUseKillButton = true;
