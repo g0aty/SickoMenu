@@ -418,7 +418,7 @@ namespace HostTab {
                     static int countdownBuf = State.StartCountdown;
                     static bool countdownEditing = false;
                     if (!countdownEditing) countdownBuf = State.StartCountdown;
-                    ImGui::InputInt("Countdown Time", &countdownBuf);
+                    ImGui::InputInt("Time", &countdownBuf);
                     countdownEditing = ImGui::IsItemActive();
                     if (ImGui::IsItemDeactivatedAfterEdit()) {
                         int clamped = std::clamp(countdownBuf, 1, !State.SafeMode ? 127 : 5);
