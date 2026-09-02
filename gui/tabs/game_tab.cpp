@@ -875,11 +875,9 @@ namespace GameTab {
             if (ToggleButton("Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Abnormal Friendcode", &State.SMAC_CheckFriendcode)) State.Save();
-            if (State.SMAC_CheckLevel && ImGui::InputInt("Level >=", &State.SMAC_HighLevel)) {
-                State.Save();
-            }
-            if (State.SMAC_CheckLevel && ImGui::InputInt("Level <=", &State.SMAC_LowLevel)) {
-                State.Save();
+            if (State.SMAC_CheckLevel) {
+                ImGui::InputInt("Level >=", &State.SMAC_HighLevel);
+                ImGui::InputInt("Level <=", &State.SMAC_LowLevel);
             }
             if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
             if (State.SMAC_CheckBadWords) {
@@ -927,7 +925,6 @@ namespace GameTab {
                 ImGui::SetNextItemWidth(70.0f * State.dpiScale);
                 if (ImGui::InputInt("Violations Before Action", &State.SMAC_StartWordsThreshold)) {
                     State.SMAC_StartWordsThreshold = std::clamp(State.SMAC_StartWordsThreshold, 1, 10);
-                    State.Save();
                 }
                 if (State.SMAC_StartWords.empty())
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No start words added!");
@@ -1017,9 +1014,7 @@ namespace GameTab {
                 if (ToggleButton("Kick Everyone", &State.KickEveryone)) {
                     State.Save();
                 }
-                if (SteppedSliderFloat("Kick/Ban Delay", &State.AutoPunishDelay, 0.f, 10.f, 0.1f, "%.1f", ImGuiSliderFlags_NoInput)) {
-                    State.Save();
-                }
+                SteppedSliderFloat("Kick/Ban Delay", &State.AutoPunishDelay, 0.f, 10.f, 0.1f, "%.1f", ImGuiSliderFlags_NoInput);
                 ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
                 const char* buttonLabel = IsInGame() ? "Kick AFK Players" : "Kick AFK Players [GAME ONLY]";
                 if (ToggleButton(buttonLabel, &State.KickAFK)) {
@@ -1039,17 +1034,13 @@ namespace GameTab {
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (State.KickAFK && ImGui::CollapsingHeader(header.c_str()))
                 {
-                    if (SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
+                    SteppedSliderFloat("Time Before Kick", &State.TimerAFK, 40.f, 350.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput);
+                    if (State.SecondChance) {
+                        SteppedSliderFloat("Extra Time", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput);
+                        SteppedSliderFloat("Min Time Before Adding", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput);
                     }
-                    if (State.SecondChance && SteppedSliderFloat("Extra Time", &State.AddExtraTime, 15.f, 120.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
-                    }
-                    if (State.SecondChance && SteppedSliderFloat("Min Time Before Adding", &State.ExtraTimeThreshold, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
-                    }
-                    if (State.NotificationsAFK && SteppedSliderFloat("Warn-AFK Notifications Time", &State.NotificationTimeWarn, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
+                    if (State.NotificationsAFK) {
+                        SteppedSliderFloat("Warn-AFK Notifications Time", &State.NotificationTimeWarn, 5.f, 60.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput);
                     }
                 }
                 ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
@@ -1069,9 +1060,7 @@ namespace GameTab {
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (ImGui::CollapsingHeader("BA-RP ~ Advanced Options"))
                 {
-                    if (SteppedSliderFloat("Maximum Rejoins", &State.LeaveCount, 1.f, 15.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput)) {
-                        State.Save();
-                    }
+                    SteppedSliderFloat("Maximum Rejoins", &State.LeaveCount, 1.f, 15.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput);
                     ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                     if (ToggleButton("Blacklist Auto-Rejoin Players", &State.BL_AutoLeavers)) {
                         State.Save();
@@ -1666,8 +1655,7 @@ namespace GameTab {
                     ImGui::TextDisabled("No lobbies visited yet.");
                 }
                 else {
-                    if (SliderIntV2("Lobbies to Show", &State.LobbyHistoryLimit, 1, 50, "%d", ImGuiSliderFlags_NoInput))
-                        State.Save();
+                    SliderIntV2("Lobbies to Show", &State.LobbyHistoryLimit, 1, 50, "%d", ImGuiSliderFlags_NoInput);
                     int displayCount = (int)State.LobbyHistory.size() < State.LobbyHistoryLimit ? (int)State.LobbyHistory.size() : State.LobbyHistoryLimit;
                     ImGui::Text("Last %d/%d lobbies:", displayCount, State.LobbyHistoryLimit);
                     ImGui::Columns(3, "lobbyHistoryCols", false);

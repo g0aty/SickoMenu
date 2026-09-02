@@ -433,53 +433,35 @@ namespace SelfTab {
                 }
 
                 ImGui::SameLine();
-                if (ImGui::InputFloat("Name Size", &State.NameSize)) {
-                    State.Save();
-                }
+                ImGui::InputFloat("Name Size", &State.NameSize);
 
                 if (ToggleButton("Indent", &State.IndentName)) {
                     State.Save();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::InputFloat("Name Indent", &State.NameIndent)) {
-                    State.Save();
-                }
+                ImGui::InputFloat("Name Indent", &State.NameIndent);
 
-                if (ToggleButton("Cspace", &State.CspaceName)) {
-                    State.Save();
-                }
+                ToggleButton("Cspace", &State.CspaceName);
 
                 ImGui::SameLine();
-                if (ImGui::InputFloat("Name Cspace", &State.NameCspace)) {
-                    State.Save();
-                }
+                ImGui::InputFloat("Name Cspace", &State.NameCspace);
 
-                if (ToggleButton("Mspace", &State.MspaceName)) {
-                    State.Save();
-                }
+                ToggleButton("Mspace", &State.MspaceName);
 
                 ImGui::SameLine();
-                if (ImGui::InputFloat("Name Mspace", &State.NameMspace)) {
-                    State.Save();
-                }
+                ImGui::InputFloat("Name Mspace", &State.NameMspace);
 
-                if (ToggleButton("Voffset", &State.VoffsetName)) {
-                    State.Save();
-                }
+                ToggleButton("Voffset", &State.VoffsetName);
 
                 ImGui::SameLine();
-                if (ImGui::InputFloat("Name Voffset", &State.NameVoffset)) {
-                    State.Save();
-                }
+                ImGui::InputFloat("Name Voffset", &State.NameVoffset);
                 if (ToggleButton("Rotate", &State.RotateName)) {
                     State.Save();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::InputFloat("Rotation Angle", &State.NameRotate)) {
-                    State.Save();
-                }
+                ImGui::InputFloat("Rotation Angle", &State.NameRotate);
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
             }
 
@@ -711,17 +693,11 @@ namespace SelfTab {
             if (!State.SafeMode && State.RotateEveryone && ToggleButton("Server-sided Rotation", &State.RotateServerSide)) {
                 State.Save();
             }
-            if (ImGui::InputFloat("Rotation Radius", &State.RotateRadius, 0.0f, 0.0f, "%.2f m")) {
-                State.Save();
-            }
+            ImGui::InputFloat("Rotation Radius", &State.RotateRadius, 0.0f, 0.0f, "%.2f m");
 
-            if (ImGui::InputFloat("X Coordinate", &State.xCoordinate, 0.0f, 0.0f, "%.4f X")) {
-                State.Save();
-            }
+            ImGui::InputFloat("X Coordinate", &State.xCoordinate, 0.0f, 0.0f, "%.4f X");
 
-            if (ImGui::InputFloat("Y Coordinate", &State.yCoordinate, 0.0f, 0.0f, "%.4f Y")) {
-                State.Save();
-            }
+            ImGui::InputFloat("Y Coordinate", &State.yCoordinate, 0.0f, 0.0f, "%.4f Y");
 
             if (ToggleButton("Relative Teleport", &State.RelativeTeleport)) {
                 State.Save();
@@ -1226,47 +1202,27 @@ namespace SelfTab {
             ImGui::SameLine();
             if (AnimatedButton("Copy")) ClipboardHelper_PutClipboardString(convert_to_string(editedText), NULL);
 
-            if (ToggleButton("Italics", &italicName)) {
-                State.Save();
-            }
+            ToggleButton("Italics", &italicName);
             ImGui::SameLine();
-            if (ToggleButton("Underline", &underlineName)) {
-                State.Save();
-            }
+            ToggleButton("Underline", &underlineName);
             ImGui::SameLine();
-            if (ToggleButton("Strikethrough", &strikethroughName)) {
-                State.Save();
-            }
+            ToggleButton("Strikethrough", &strikethroughName);
             ImGui::SameLine();
-            if (ToggleButton("Bold", &boldName)) {
-                State.Save();
-            }
+            ToggleButton("Bold", &boldName);
             ImGui::SameLine();
-            if (ToggleButton("Nobr", &nobrName)) {
-                State.Save();
-            }
+            ToggleButton("Nobr", &nobrName);
 
-            if (ImGui::ColorEdit4("Starting Gradient Color", (float*)&nameColor1, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
-                State.Save();
-            }
+            ImGui::ColorEdit4("Starting Gradient Color", (float*)&nameColor1, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
             ImGui::SameLine();
-            if (ImGui::ColorEdit4("Ending Gradient Color", (float*)&nameColor2, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
-                State.Save();
-            }
+            ImGui::ColorEdit4("Ending Gradient Color", (float*)&nameColor2, ImGuiColorEditFlags__OptionsDefault | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview);
             ImGui::SameLine();
-            if (ToggleButton("Colored", &coloredName)) {
-                State.Save();
-            }
+            ToggleButton("Colored", &coloredName);
 
             ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
 
-            if (ToggleButton("Font", &font)) {
-                State.Save();
-            }
+            ToggleButton("Font", &font);
             ImGui::SameLine();
-            if (CustomListBoxInt(" ", &fontType, FONTS, 160.f * State.dpiScale)) {
-                State.Save();
-            }
+            CustomListBoxInt(" ", &fontType, FONTS, 160.f * State.dpiScale);
             ImGui::Dummy(ImVec2(-5, -5) * State.dpiScale);
             if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: The white nickname will not be visible in the chat"));
 
@@ -1281,64 +1237,40 @@ namespace SelfTab {
             }*/
 
             ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
-            if (ToggleButton("Size", &resizeName)) {
-                State.Save();
-            }
+            ToggleButton("Size", &resizeName);
 
             ImGui::SameLine();
-            if (ImGui::InputFloat("Name Size", &nameSize)) {
-                State.Save();
-            }
+            ImGui::InputFloat("Name Size", &nameSize);
 
             ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            if (ToggleButton("Indent", &indentName)) {
-                State.Save();
-            }
+            ToggleButton("Indent", &indentName);
 
             ImGui::SameLine();
-            if (ImGui::InputFloat("Name Indent", &indentLevel)) {
-                State.Save();
-            }
+            ImGui::InputFloat("Name Indent", &indentLevel);
 
             ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            if (ToggleButton("Cspace", &cspaceName)) {
-                State.Save();
-            }
+            ToggleButton("Cspace", &cspaceName);
 
             ImGui::SameLine();
-            if (ImGui::InputFloat("Name Cspace", &cspaceLevel)) {
-                State.Save();
-            }
+            ImGui::InputFloat("Name Cspace", &cspaceLevel);
 
             ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            if (ToggleButton("Mspace", &mspaceName)) {
-                State.Save();
-            }
+            ToggleButton("Mspace", &mspaceName);
 
             ImGui::SameLine();
-            if (ImGui::InputFloat("Name Mspace", &mspaceLevel)) {
-                State.Save();
-            }
+            ImGui::InputFloat("Name Mspace", &mspaceLevel);
 
             ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            if (ToggleButton("Voffset", &voffsetName)) {
-                State.Save();
-            }
+            ToggleButton("Voffset", &voffsetName);
 
             ImGui::SameLine();
-            if (ImGui::InputFloat("Name Voffset", &voffsetLevel)) {
-                State.Save();
-            }
+            ImGui::InputFloat("Name Voffset", &voffsetLevel);
 
             ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            if (ToggleButton("Rotate", &rotateName)) {
-                State.Save();
-            }
+            ToggleButton("Rotate", &rotateName);
 
             ImGui::SameLine();
-            if (ImGui::InputFloat("Rotation Angle", &rotateAngle)) {
-                State.Save();
-            }
+            ImGui::InputFloat("Rotation Angle", &rotateAngle);
         }
         ImGui::EndChild();
     }

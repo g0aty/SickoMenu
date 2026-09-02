@@ -180,8 +180,7 @@ namespace SettingsTab {
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			if (ImGui::InputInt("FPS", &State.GameFPS)) {
-				State.GameFPS = std::clamp(State.GameFPS, 1, 2147483647);
-				State.Save();
+				State.GameFPS = std::clamp(State.GameFPS, 10, 100000);
 			}
 
 			ImGui::Dummy(ImVec2(1, 1) * State.dpiScale);
@@ -343,9 +342,8 @@ namespace SettingsTab {
 			}
 			if (State.SpoofLevel) {
 				ImGui::SameLine();
-				if (ImGui::InputInt("Level", &State.FakeLevel, 0, 1)) {
-					State.Save();
-				}
+				ImGui::SetNextItemWidth(120.f * State.dpiScale);
+				ImGui::InputInt("Level", &State.FakeLevel);
 
 				if (State.SafeMode && (State.FakeLevel <= 0 || State.FakeLevel > 100001))
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Level will be detected by anticheat, your level will be between 0 and 100001.");
@@ -626,7 +624,6 @@ namespace SettingsTab {
 					hours = std::clamp(hours, 0, 23);
 					State.TimeOffsetMinutes = hours * 60 + minutes;
 					hours = State.TimeOffsetMinutes / 60, minutes = State.TimeOffsetMinutes % 60;
-					State.Save();
 				}
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(60 * State.dpiScale);
@@ -634,7 +631,6 @@ namespace SettingsTab {
 					minutes = std::clamp(minutes, 0, 59);
 					State.TimeOffsetMinutes = hours * 60 + minutes;
 					hours = State.TimeOffsetMinutes / 60, minutes = State.TimeOffsetMinutes % 60;
-					State.Save();
 				}
 			}
 
@@ -668,13 +664,11 @@ namespace SettingsTab {
 				if (ImGui::InputFloat("Menu Scale", &State.dpiScale)) {
 					State.dpiScale = std::clamp(State.dpiScale, 0.5f, 3.f);
 					State.dpiChanged = true;
-					State.Save();
 				}
 				if (ToggleButton("Disable Animations", &State.DisableAnimations))
 					State.Save();
 				if (ImGui::InputFloat("Animation Speed", &State.AnimationSpeed)) {
 					if (State.AnimationSpeed <= 0) State.AnimationSpeed = 1.f;
-					State.Save();
 				}
 				SteppedSliderFloat("Rounding Radius Multiplier", &State.RoundingRadiusMultiplier, 0.f, 2.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 			}

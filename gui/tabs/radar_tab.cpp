@@ -63,11 +63,9 @@ namespace RadarTab {
 		}
 		if (ImGui::InputInt("Extra Width", &State.RadarExtraWidth)) {
 			State.RadarExtraWidth = abs(State.RadarExtraWidth); //prevent negatives
-			State.Save();
 		}
 		if (ImGui::InputInt("Extra Height", &State.RadarExtraHeight)) {
 			State.RadarExtraHeight = abs(State.RadarExtraHeight); //prevent negatives
-			State.Save();
 		}
 
 		ImGui::EndChild();

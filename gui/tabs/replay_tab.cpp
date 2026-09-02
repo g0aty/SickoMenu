@@ -17,10 +17,7 @@ namespace ReplayTab {
 			State.Save();
 		}
 		ImGui::SameLine();
-		if (SliderIntV2("Seconds", &State.Replay_LastSecondsValue, 1, 1200, "%d", ImGuiSliderFlags_AlwaysClamp))
-		{
-			State.Save();
-		}
+		SliderIntV2("Seconds", &State.Replay_LastSecondsValue, 1, 1200, "%d", ImGuiSliderFlags_AlwaysClamp);
 
 		if (ToggleButton("Clear After Meeting", &State.Replay_ClearAfterMeeting))
 		{

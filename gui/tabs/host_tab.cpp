@@ -378,8 +378,9 @@ namespace HostTab {
                     if (ToggleButton("Custom Impostor Amount", &State.CustomImpostorAmount))
                         State.Save();
                     State.ImpostorCount = std::clamp(State.ImpostorCount, 0, int(Game::MAX_PLAYERS));
-                    if (State.CustomImpostorAmount && ImGui::InputInt("Impostor Count", &State.ImpostorCount))
-                        State.Save();
+                    if (State.CustomImpostorAmount) {
+                        ImGui::InputInt("Impostor Count", &State.ImpostorCount);
+                    }
                 }
 
                 const int32_t currentMaxPlayers = options.GetMaxPlayers();
@@ -416,7 +417,6 @@ namespace HostTab {
 
                 if (State.ModifyStartCountdown && ImGui::InputInt("Time", &State.StartCountdown)) {
                     State.StartCountdown = std::clamp(State.StartCountdown, 1, !State.SafeMode ? 127 : 5);
-                    State.Save();
                 }
 
                 if (ToggleButton("Disable Meetings", &State.DisableMeetings))
@@ -443,7 +443,6 @@ namespace HostTab {
                         ImGui::SetNextItemWidth(100 * State.dpiScale);
                         if (ImGui::InputInt("Game Duration", &State.GameModeDuration)) {
                             State.GameModeDuration = std::clamp(State.GameModeDuration, 100, 500);
-                            State.Save();
                         }
                     }
                 }
@@ -460,8 +459,7 @@ namespace HostTab {
                 if (State.AutoStartGame) {
                     ImGui::Text("Start After");
                     ImGui::SameLine();
-                    if (ImGui::InputInt("sec", &State.AutoStartTimer))
-                        State.Save();
+                    ImGui::InputInt("sec", &State.AutoStartTimer);
                 }
 
                 /*if (ToggleButton("Auto Start Game (By Player Count)", &State.AutoStartGamePlayers))
