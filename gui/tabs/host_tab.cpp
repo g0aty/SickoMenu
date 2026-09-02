@@ -414,9 +414,20 @@ namespace HostTab {
                 if (ToggleButton("Modify Start Countdown", &State.ModifyStartCountdown))
                     State.Save();
 
-                if (State.ModifyStartCountdown && ImGui::InputInt("Time", &State.StartCountdown)) {
-                    State.StartCountdown = std::clamp(State.StartCountdown, 1, !State.SafeMode ? 127 : 5);
-                    State.Save();
+                if (State.ModifyStartCountdown) {
+                    static int countdownBuf = State.StartCountdown;
+                    static bool countdownEditing = false;
+                    if (!countdownEditing) countdownBuf = State.StartCountdown;
+                    ImGui::InputInt("Countdown Time", &countdownBuf);
+                    countdownEditing = ImGui::IsItemActive();
+                    if (ImGui::IsItemDeactivatedAfterEdit()) {
+                        int clamped = std::clamp(countdownBuf, 1, !State.SafeMode ? 127 : 5);
+                        if (clamped != State.StartCountdown) {
+                            State.StartCountdown = clamped;
+                            State.Save();
+                        }
+                        countdownBuf = State.StartCountdown;
+                    }
                 }
 
                 if (ToggleButton("Disable Meetings", &State.DisableMeetings))
