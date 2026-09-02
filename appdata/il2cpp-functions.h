@@ -43,6 +43,7 @@ DO_APP_FUNC(float, Camera_get_orthographicSize, (Camera* __this, MethodInfo* met
 DO_APP_FUNC(float, Camera_get_aspect, (Camera* __this, MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Camera::get_aspect()");
 DO_APP_FUNC(Color, SpriteRenderer_get_color, (SpriteRenderer* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Color UnityEngine.SpriteRenderer::get_color()");
 DO_APP_FUNC(void, SpriteRenderer_set_color, (SpriteRenderer* __this, Color value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.SpriteRenderer::set_color(UnityEngine.Color)");
+DO_APP_FUNC(void, SpriteRenderer_set_flipX, (SpriteRenderer* __this, bool value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.SpriteRenderer::set_flipX(System.Boolean)");
 DO_APP_FUNC(float, Time_get_deltaTime, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_deltaTime()");
 DO_APP_FUNC(float, Time_get_fixedDeltaTime, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_fixedDeltaTime()");
 DO_APP_FUNC(float, Time_get_realtimeSinceStartup, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_realtimeSinceStartup()");
@@ -291,6 +292,7 @@ DO_APP_FUNC(void, PlayerPhysics_FixedUpdate, (PlayerPhysics* __this, MethodInfo*
 DO_APP_FUNC(void, PlayerPhysics_RpcEnterVent, (PlayerPhysics* __this, int32_t id, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcEnterVent(System.Int32)");
 DO_APP_FUNC(void, PlayerPhysics_RpcExitVent, (PlayerPhysics* __this, int32_t id, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcExitVent(System.Int32)");
 DO_APP_FUNC(void, PlayerPhysics_RpcBootFromVent, (PlayerPhysics* __this, int32_t ventId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcBootFromVent(System.Int32)");
+DO_APP_FUNC(void, PlayerPhysics_HandleRpc, (PlayerPhysics* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::HandleRpc(System.Byte, Hazel.MessageReader)");
 
 DO_APP_FUNC(void, PlayerControl_TurnOnProtection, (PlayerControl* __this, bool visible, int32_t colorId, int32_t guardianPlayerId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::TurnOnProtection(System.Boolean, System.Int32, System.Int32)");
 DO_APP_FUNC(void, PlayerControl_RemoveProtection, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RemoveProtection()");
@@ -507,6 +509,7 @@ DO_APP_FUNC(void, PlayerVoteArea_SetCosmetics, (PlayerVoteArea* __this, Networke
 DO_APP_FUNC(void, PlayerControl_SetKillTimer, (PlayerControl* __this, float time, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::SetKillTimer(System.Single)");
 DO_APP_FUNC(bool, KillOverlay_get_IsOpen, (KillOverlay* __this, MethodInfo* method), "Assembly-CSharp, System.Boolean KillOverlay::get_IsOpen()");
 DO_APP_FUNC(void, VentilationSystem_UpdateSystem, (VentilationSystem* __this, PlayerControl* player, MessageReader* msgReader, MethodInfo* method), "Assembly-CSharp, System.Void VentilationSystem::UpdateSystem(PlayerControl, Hazel.MessageReader)");
+DO_APP_FUNC(void, LobbyNotificationMessage_SetUp, (LobbyNotificationMessage* __this, String* item, Sprite* icon, Color textColor, void* onDestroy, MethodInfo* method), "Assembly-CSharp, System.Void LobbyNotificationMessage::SetUp(System.String, UnityEngine.Sprite, UnityEngine.Color, System.Action)");
 
 DO_APP_FUNC(bool, Player_GetButton, (Player* __this, int32_t actionId, MethodInfo* method), "Rewired_Core, System.Boolean Rewired.Player::GetButton(System.Int32)");
 DO_APP_FUNC(void, KillButton_DoClick, (KillButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void KillButton::DoClick()");

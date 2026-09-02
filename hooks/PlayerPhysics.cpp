@@ -88,3 +88,9 @@ void dPlayerPhysics_RpcBootFromVent(PlayerPhysics* __this, int32_t ventId, Metho
 	if (!IsHost() && State.SafeMode) return;
 	PlayerPhysics_RpcBootFromVent(__this, ventId, method);
 }
+
+void dPlayerPhysics_HandleRpc(PlayerPhysics* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
+	if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerPhysics_FixedUpdate executed", false);
+
+	PlayerPhysics_HandleRpc(__this, callId, reader, method);
+}

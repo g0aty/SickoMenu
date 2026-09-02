@@ -216,12 +216,13 @@ void dPlayerVoteArea_SetCosmetics(PlayerVoteArea* __this, NetworkedPlayerInfo* p
 void dPlayerPhysics_RpcBootFromVent(PlayerPhysics* __this, int32_t ventId, MethodInfo* method);
 void dPlayerControl_SetKillTimer(PlayerControl* __this, float time, MethodInfo* method);
 void dVentilationSystem_UpdateSystem(VentilationSystem* __this, PlayerControl* player, MessageReader* msgReader, MethodInfo* method);
+void dInnerNetClient_SetEndpoint(InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method);
+void dNotificationPopper_AddDisconnectMessage(NotificationPopper* __this, String* item, MethodInfo* method);
+void dPlayerControl_CheckColor(PlayerControl* __this, uint8_t bodyColor, MethodInfo* method);
+void dPlayerPhysics_HandleRpc(PlayerPhysics* __this, uint8_t callId, MessageReader* reader, MethodInfo* method);
+void dLobbyNotificationMessage_SetUp(LobbyNotificationMessage* __this, String* item, Sprite* icon, Color textColor, void* onDestroy, MethodInfo* method);
 
 // defined in LobbyBehaviour.cpp
 void ApplyHostPreset(const Settings::HostPreset& p);
 void RequestApplyHostPreset(int idx);
 void ApplyCosmeticPreset(const Settings::CosmeticPreset& p);
-
-void dInnerNetClient_SetEndpoint(InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method);
-void dNotificationPopper_AddDisconnectMessage(NotificationPopper* __this, String* item, MethodInfo* method);
-void dPlayerControl_CheckColor(PlayerControl* __this, uint8_t bodyColor, MethodInfo* method);

@@ -305,6 +305,8 @@ void DetourInitilization() {
 	HOOKFUNC(InnerNetClient_SetEndpoint);
 	HOOKFUNC(NotificationPopper_AddDisconnectMessage);
 	HOOKFUNC(PlayerControl_CheckColor);
+	HOOKFUNC(PlayerPhysics_HandleRpc);
+	HOOKFUNC(LobbyNotificationMessage_SetUp);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -521,6 +523,8 @@ void DetourUninitialization()
 	UNHOOKFUNC(InnerNetClient_SetEndpoint);
 	UNHOOKFUNC(NotificationPopper_AddDisconnectMessage);
 	UNHOOKFUNC(PlayerControl_CheckColor);
+	UNHOOKFUNC(PlayerPhysics_HandleRpc);
+	UNHOOKFUNC(LobbyNotificationMessage_SetUp);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

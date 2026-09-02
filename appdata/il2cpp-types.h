@@ -11842,6 +11842,45 @@ namespace app {
     };
 #pragma endregion
 
+#pragma region LobbyNotificationMessage
+    struct LobbyNotificationMessage__Fields {
+        struct MonoBehaviour__Fields _;
+        struct SpriteRenderer* Icon;
+        struct TextMeshPro* Text;
+        float alphaTimer;
+        float showDuration;
+        float fadeDuration;
+        void* onDestroy;
+        struct Color textColor;
+        struct List_1_SupportedLangs_* languagesToBold;
+    };
+
+    struct LobbyNotificationMessage {
+        struct LobbyNotificationMessage__Class* klass;
+        MonitorData* monitor;
+        struct LobbyNotificationMessage__Fields fields;
+    };
+
+    struct LobbyNotificationMessage__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct LobbyNotificationMessage__StaticFields {
+    };
+
+    struct LobbyNotificationMessage__Class {
+        Il2CppClass_0 _0;
+        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
+        struct LobbyNotificationMessage__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct LobbyNotificationMessage__VTable vtable;
+    };
+#pragma endregion
+
     typedef Il2CppReflectionMethod MonoMethod;
 
     typedef Il2CppObject ImpostorRole;

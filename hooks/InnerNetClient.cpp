@@ -1621,7 +1621,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
 
                 if (!smacPunished) {
                     if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
-                        std::string notifyText = "Left: " + convert_from_string(data->fields.PlayerName) + " by reason: " + stringReason;
+                        std::string notifyText = "Left: " + convert_from_string(data->fields.PlayerName) + " | Reason: " + stringReason;
                         NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(notifyText), nullptr);
                         State.IgnoreOriginalInit_NotificationPopper = true;
                     }
@@ -1659,7 +1659,7 @@ void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, Meth
             AudioClip* soundBackup = notifier->fields.playerDisconnectSound;
             Color colorBackup = notifier->fields.disconnectColor;
 
-            notifier->fields.disconnectColor = Color(0.0f, 1.0f, 0.0f, 1.0f);
+            notifier->fields.disconnectColor = Color(0.278f, 1.0f, 0.278f, 1.0f);
             notifier->fields.playerDisconnectSound = nullptr;
 
             std::string notifyText = std::format("Joined: <noparse>{}</noparse> | <noparse>{}</noparse>", name, friendCode);
@@ -1673,6 +1673,15 @@ void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, Meth
     AmongUsClient_OnPlayerJoined(__this, data, method);
 }
 
+void dLobbyNotificationMessage_SetUp(LobbyNotificationMessage* __this, String* item, Sprite* icon, Color textColor, void* onDestroy, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnPlayerJoined executed", false);
+    LobbyNotificationMessage_SetUp(__this, item, icon, textColor, onDestroy, method);
+
+    if (textColor.r == 0.278f && textColor.g == 1.0f && textColor.b == 0.278f && textColor.a == 1.0f) {
+        // check for the color being green to flip the sprite when needed
+        SpriteRenderer_set_flipX(__this->fields.Icon, true, NULL);
+    }
+}
 
 bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
 {
