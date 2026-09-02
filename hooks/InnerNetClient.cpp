@@ -1715,38 +1715,81 @@ bool bogusTransformSnap(PlayerSelection& _player, Vector2 newPosition)
     return true; //We have ruled out all possible scenarios.  Off with his head!
 }
 
-void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.HookDebug("Hook dCustomNetworkTransform_SnapTo executed", false);
-    /*try {//Leave this out until we fix it.
-        if (!State.PanicMode) {
-            if (!IsInGame()) {
-                CustomNetworkTransform_SnapTo(__this, position, minSid, method);
-                return;
-            }
-
-            for (auto p : GetAllPlayerControl()) {
-                if (p->fields.NetTransform == __this) {
-                    PlayerSelection pSel = PlayerSelection(p);
-                    if (bogusTransformSnap(pSel, position))
-                    {
-                        synchronized(Replay::replayEventMutex) {
-                            State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(GetEventPlayer(GetPlayerData(p)).value(), CHEAT_ACTIONS::CHEAT_TELEPORT));
-                        }
+void dCustomNetworkTransform_HandleRpc(CustomNetworkTransform* __this, uint8_t callId, MessageReader* reader, MethodInfo* method)
+{
+    if (State.ShowHookLogs) Log.HookDebug("Hook dCustomNetworkTransform_HandleRpc executed", false);
+    if (__this && __this->fields.myPlayer && State.SMAC_CheckTeleports && callId == 21)
+    {
+        PlayerControl* player = __this->fields.myPlayer;
+        if (!State.InMeeting && !player->fields.inVent)
+        {
+            try
+            {
+                const uint8_t playerId = player->fields.PlayerId;
+                if (State.mapType == Settings::MapType::Airship && State.SMAC_AirshipSpawnWhitelistedPlayers.erase(playerId) > 0) {
+                    Log.Debug(std::format("SMAC: ignored Airship spawn SnapTo for player {}", static_cast<int>(playerId)));
+                }
+                else if (IsInLobby()) {
+                    synchronized(Replay::replayEventMutex) {
+                        EVENT_PLAYER eventPlayer(GetPlayerData(player));
+                        State.liveReplayEvents.emplace_back( std::make_unique<CheatDetectedEvent>(eventPlayer, CHEAT_ACTIONS::CHEAT_TELEPORT));
+                        State.liveConsoleEvents.emplace_back(std::make_unique<CheatDetectedEvent>(eventPlayer, CHEAT_ACTIONS::CHEAT_TELEPORT));
                     }
-                    break;
+
+                    SMAC_OnCheatDetected(player, "Teleporting");
+                }
+                else {
+                    int32_t& count = State.SMAC_SnapToCount[playerId];
+                    ++count;
+
+                    if (count > 1) {
+                        synchronized(Replay::replayEventMutex) {
+                            EVENT_PLAYER eventPlayer(GetPlayerData(player));
+                            State.liveReplayEvents.emplace_back(std::make_unique<CheatDetectedEvent>(eventPlayer, CHEAT_ACTIONS::CHEAT_TELEPORT));
+                            State.liveConsoleEvents.emplace_back(std::make_unique<CheatDetectedEvent>(eventPlayer, CHEAT_ACTIONS::CHEAT_TELEPORT));
+                        }
+
+                        SMAC_OnCheatDetected(player, "Teleporting");
+                    }
+                }
+            }
+            catch (...) {
+                LOG_ERROR("Exception occurred in CustomNetworkTransform_HandleRpc");
+            }
+        }
+    }
+
+    CustomNetworkTransform_HandleRpc(__this, callId, reader, method);
+}
+
+void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method)
+{
+    if (State.ShowHookLogs) Log.HookDebug("Hook dCustomNetworkTransform_SnapTo executed", false);
+    try {
+        if (__this && __this->fields.myPlayer && State.SMAC_CheckTeleports && State.mapType == Settings::MapType::Airship) {
+            PlayerControl* player = __this->fields.myPlayer;
+            uint8_t playerId = player->fields.PlayerId;
+
+            if (IsAirshipSpawnPosition(position)) {
+                if (State.SMAC_AirshipSpawnWhitelistedPlayers.insert(playerId).second) {
+                    Log.Debug(std::format("SMAC: allowed Airship spawn teleport for player {} at ({:.2f}, {:.2f})", static_cast<int>(playerId), position.x, position.y));
                 }
             }
         }
     }
     catch (...) {
         LOG_ERROR("Exception occurred in CustomNetworkTransform_SnapTo (InnerNetClient)");
-    }*/
+    }
+
     CustomNetworkTransform_SnapTo(__this, position, minSid, method);
 }
 
 void dAmongUsClient_OnGameEnd(AmongUsClient* __this, EndGameResult* endGameResult, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dAmongUsClient_OnGameEnd executed", false);
     try {
+        State.SMAC_SnapToCount.clear();
+        State.SMAC_AirshipSpawnWhitelistedPlayers.clear();
+        
         if (*Game::pLocalPlayer != NULL && GetPlayerData(*Game::pLocalPlayer)->fields.RoleType == RoleTypes__Enum::Shapeshifter)
             RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
         //fixes game crashing on ending with shapeshifter
