@@ -813,11 +813,6 @@ Vector2 GetSpawnLocation(Game::PlayerId playerId, int32_t numPlayer, bool initia
     return { (spawncenter.x + 1) * (float)(playerId - 5), spawncenter.y * (float)(playerId - 5) };
 }
 
-bool IsAirshipSpawnLocation(const Vector2& vec)
-{
-    return (State.mapType == Settings::MapType::Airship);
-}
-
 Vector2 Rotate(const Vector2& vec, float degrees)
 {
     float f = 0.017453292f * degrees;
