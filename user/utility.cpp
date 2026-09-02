@@ -3036,3 +3036,25 @@ std::string GetDisconnectReasonString(DisconnectReasons__Enum reason) {
         return "Unknown";
     }
 }
+
+bool IsAirshipSpawnPosition(Vector2 position) {
+    constexpr float tolerance = 1.0f;
+
+    const Vector2 airshipSpawns[] = {
+        { -7.0f, -11.0f }, // Kitchen
+        { -0.7f,   8.5f }, // Brig
+        { 20.0f,  10.5f }, // Archive
+        { -0.7f,  -1.0f }, // Engines
+        { 15.5f,   0.0f }, // Main Hall
+        { 33.5f,  -1.5f }  // Storage
+    };
+
+    for (const auto& spawn : airshipSpawns) {
+        const float dx = position.x - spawn.x;
+        const float dy = position.y - spawn.y;
+
+        if ((dx * dx + dy * dy) <= tolerance * tolerance) return true;
+    }
+
+    return false;
+}
