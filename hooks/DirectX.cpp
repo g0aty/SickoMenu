@@ -160,7 +160,7 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     if ((IsInGame() || IsInLobby()) && Game::HudManager.GetInstance()->fields.Chat != NULL && shouldKeybindsActivate) {
         auto chatState = Game::HudManager.GetInstance()->fields.Chat->fields.state;
         bool chatOpen = chatState == ChatControllerState__Enum::Open || chatState == ChatControllerState__Enum::Opening || chatState == ChatControllerState__Enum::Closing;
-        bool isScrollModifierAllowed = !chatOpen && !State.InMeeting && State.EnableZoom_ScrollZoom;
+        bool isScrollModifierAllowed = !chatOpen && !State.InMeeting && !State.ShowMenu && State.EnableZoom_ScrollZoom;
         bool isShifted = ImGui::IsKeyDown(VK_SHIFT) || ImGui::IsKeyDown(VK_LSHIFT) || ImGui::IsKeyDown(VK_RSHIFT);
 
         if (!isShifted && isScrollModifierAllowed && State.EnableZoom && (IsInGame() || IsInLobby())) {
