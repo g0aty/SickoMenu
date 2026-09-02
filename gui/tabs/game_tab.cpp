@@ -739,7 +739,7 @@ namespace GameTab {
                     "Setting Tasks", "Abnormal Murders", "Abnormal Shapeshift", "Abnormal Vanish",
                     "Abnormal Meetings/Body Reports", "Abnormal Venting", "Abnormal Chat",
                     "Abnormal Task Completion", "Abnormal Sabotages", "Abnormal Player Levels",
-                    "Abnormal Friendcode", "Blocked Words", "Blocked Start Words","Blacklisted Players",
+                    "Abnormal Friendcode", "Abnormal Movements",  "Blocked Words", "Blocked Start Words", "Blacklisted Players",
                 };
                 static int selectedCategory = 0;
 
@@ -879,6 +879,7 @@ namespace GameTab {
                 ImGui::InputInt("Level >=", &State.SMAC_HighLevel);
                 ImGui::InputInt("Level <=", &State.SMAC_LowLevel);
             }
+            if (ToggleButton("Abnormal Movements", &State.SMAC_CheckTeleports)) State.Save();
             if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
             if (State.SMAC_CheckBadWords) {
                 static const std::vector<const char*> SMAC_DETECTION_MODES = { "Default Detection", "Strict Detection" };
