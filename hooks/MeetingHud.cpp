@@ -355,6 +355,12 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
                         roleColor.r, roleColor.g, roleColor.b,
                         roleColor.a, playerName);
                 }
+                else if (PlayerIsImpostor(playerData) && PlayerIsImpostor(localData)) {
+                    Color32&& roleColor = Color32_op_Implicit(Palette__TypeInfo->static_fields->ImpostorRed, NULL);
+                    playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
+                        roleColor.r, roleColor.g, roleColor.b,
+                        roleColor.a, playerName);
+                }
 
                 String* playerNameStr = convert_to_string(playerName);
                 TMP_Text_set_text((app::TMP_Text*)playerNameTMP, playerNameStr, NULL);
