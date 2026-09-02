@@ -480,6 +480,7 @@ void Settings::Load() {
         JSON_TRYGET("SMAC_CheckBadWords", this->SMAC_CheckBadWords);
         JSON_TRYGET("SMAC_BadWords", this->SMAC_BadWords);
         JSON_TRYGET("SMAC_CheckFriendcode", this->SMAC_CheckFriendcode);
+		JSON_TRYGET("SMAC_CheckTeleports", this->SMAC_CheckTeleports);
         if (j.contains("ChatPresets") && j["ChatPresets"].is_array()) {
             this->ChatPresets.clear();
             for (auto& p : j["ChatPresets"]) {
@@ -1165,6 +1166,7 @@ void Settings::Save() {
                 { "SMAC_CheckBadWords", this->SMAC_CheckBadWords },
                 { "SMAC_BadWords", this->SMAC_BadWords },
                 { "SMAC_CheckFriendcode", this->SMAC_CheckFriendcode },
+				{ "SMAC_CheckTeleports", this->SMAC_CheckTeleports },
                 { "ChatPresets", [&]() {
                     nlohmann::json arr = nlohmann::json::array();
                     for (auto& p : this->ChatPresets) {

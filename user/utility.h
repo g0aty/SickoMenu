@@ -248,7 +248,7 @@ il2cpp::List<List_1_InnerNet_ClientData_> GetAllClients();
 Vector2 GetSpawnLocation(Game::PlayerId playerId, int numPlayer, bool initialSpawn);
 void GeneratePlatformId();
 std::string GetDisconnectReasonString(DisconnectReasons__Enum reason);
-bool IsAirshipSpawnLocation(const Vector2& vec);
+bool IsAirshipSpawnPosition(Vector2 position);
 Vector2 Rotate(const Vector2& vec, float degrees);
 bool Equals(const Vector2& vec1, const Vector2& vec2);
 std::string ToString(Object* object);
