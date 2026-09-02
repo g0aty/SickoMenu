@@ -516,3 +516,5 @@ DO_APP_FUNC(void, KillButton_DoClick, (KillButton* __this, MethodInfo* method), 
 DO_APP_FUNC(void, VentButton_DoClick, (VentButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void VentButton::DoClick()");
 
 DO_APP_FUNC(void, InnerNetClient_SetEndpoint, (InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::SetEndpoint(System.String, System.UInt16, System.Boolean)");
+
+DO_APP_FUNC(void, CustomNetworkTransform_HandleRpc, (CustomNetworkTransform* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void CustomNetworkTransform::HandleRpc(System.Byte, Hazel.MessageReader)");
