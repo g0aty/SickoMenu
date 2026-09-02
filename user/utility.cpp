@@ -1954,11 +1954,13 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return;
     if (reason == "Bad Sabotage" && !IsHost()) return;
 
+    // Teleport detection could be work bad with 3.0f flag cooldown. Removing it = solving issue
+    // I didn't notice any difference in DEBUG between 3.0f and without cooldown with 15/15 players
     static std::unordered_map<std::string, std::chrono::steady_clock::time_point> smacLastFlagTime;
     std::string smacFlagKey = std::to_string(pCtrl->fields.PlayerId) + "|" + reason;
     auto smacNow = std::chrono::steady_clock::now();
     auto smacFlagIt = smacLastFlagTime.find(smacFlagKey);
-    if (smacFlagIt != smacLastFlagTime.end() && std::chrono::duration<float>(smacNow - smacFlagIt->second).count() < 3.0f) return;
+    if (smacFlagIt != smacLastFlagTime.end() && std::chrono::duration<float>(smacNow - smacFlagIt->second).count() < 0.0f) return; // 0.0 FOR ANTI-TELEPORT
     smacLastFlagTime[smacFlagKey] = smacNow;
 
     auto pData = GetPlayerData(pCtrl);
