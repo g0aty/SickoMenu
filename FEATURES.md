@@ -67,6 +67,7 @@
 - Show/Hide Radar
 - Show/Hide Replay
 - Toggle Always Show Chat Button
+- Open/Close Chat (Default: F2)
 - Read Ghost Messages
 - Panic Mode
 - Leave Game

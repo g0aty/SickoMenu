@@ -30,13 +30,15 @@ public:
         0x00, // close current room door
         VK_END, // toggle replay
         0x00, //toggle chat always active
+        VK_F2, //toggle chat
         0x00, //toggle read ghost messages
         0x00, //toggle HUD
         0x00, //reset appearance
         0x00, //save appearance
         0x00, //complete tasks
         VK_PAUSE, //toggle SickoMenu
-        0x00 //cancel start
+        0x00, //cancel start
+        0x00 //leave game
     };
 
     std::string selectedConfig = "default";
