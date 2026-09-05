@@ -206,6 +206,7 @@ void KeyBinds::to_json(nlohmann::ordered_json& j, KeyBinds::Config value)
         {"Close_Current_Room_Door", value.Close_Current_Room_Door},
         {"Toggle_Replay", value.Toggle_Replay},
         {"Toggle_ChatAlwaysActive", value.Toggle_ChatAlwaysActive},
+        {"Toggle_Chat", value.Toggle_Chat},
         {"Toggle_ReadGhostMessages", value.Toggle_ReadGhostMessages},
         {"Toggle_Hud", value.Toggle_Hud},
         {"Reset_Appearance", value.Reset_Appearance},
@@ -231,6 +232,7 @@ void KeyBinds::from_json(const nlohmann::ordered_json& j, KeyBinds::Config& valu
     j.at("Close_Current_Room_Door").get_to(value.Close_Current_Room_Door);
     j.at("Toggle_Replay").get_to(value.Toggle_Replay);
     j.at("Toggle_ChatAlwaysActive").get_to(value.Toggle_ChatAlwaysActive);
+    try { j.at("Toggle_Chat").get_to(value.Toggle_Chat); } catch (nlohmann::detail::out_of_range&) { value.Toggle_Chat = VK_F2; }
     j.at("Toggle_ReadGhostMessages").get_to(value.Toggle_ReadGhostMessages);
     j.at("Toggle_Hud").get_to(value.Toggle_Hud);
     j.at("Reset_Appearance").get_to(value.Reset_Appearance);
