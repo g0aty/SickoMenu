@@ -37,7 +37,8 @@ public:
         0x00, //save appearance
         0x00, //complete tasks
         VK_PAUSE, //toggle SickoMenu
-        0x00 //cancel start
+        0x00, //cancel start
+        0x00 //leave game
     };
 
     std::string selectedConfig = "default";
