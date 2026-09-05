@@ -114,6 +114,10 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
     bool shouldKeybindsActivate = !State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/;
 
+    if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Chat) && (IsInGame() || IsInLobby()) && Game::HudManager.GetInstance()->fields.Chat != NULL) {
+        ChatController_Toggle(Game::HudManager.GetInstance()->fields.Chat, NULL);
+    }
+
     if (shouldKeybindsActivate) {
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Menu)) State.ShowMenu = !State.ShowMenu;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Radar)) State.ShowRadar = !State.ShowRadar;
