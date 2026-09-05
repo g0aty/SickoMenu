@@ -791,6 +791,12 @@ namespace SettingsTab {
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
+			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Chat));
+			ImGui::SameLine(100 * State.dpiScale);
+			ImGui::Text("Open/Close Chat");
+
+			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_ReadGhostMessages));
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Read Ghost Messages");
