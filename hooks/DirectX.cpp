@@ -115,7 +115,26 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     bool shouldKeybindsActivate = !State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/;
 
     if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Chat) && (IsInGame() || IsInLobby()) && Game::HudManager.GetInstance()->fields.Chat != NULL) {
-        ChatController_Toggle(Game::HudManager.GetInstance()->fields.Chat, NULL);
+        auto hud = Game::HudManager.GetInstance();
+        auto chat = hud->fields.Chat;
+        auto chatState = chat->fields.state;
+        bool chatOpen = chatState == ChatControllerState__Enum::Open ||
+            chatState == ChatControllerState__Enum::Opening ||
+            chatState == ChatControllerState__Enum::Closing;
+
+        // Chat UI is shown immediately by the toggle, while the camera normally
+        // gets reset during the next InnerNetClient update. Reset it here too
+        // so the chat never appears at a zoomed camera height.
+        if (!chatOpen && State.FollowerCam != NULL) {
+            Camera_set_orthographicSize(State.FollowerCam, 3.f, NULL);
+            if (State.shadowCollab != NULL)
+                Camera_set_orthographicSize(State.shadowCollab->fields.ShadowCamera, 3.f, NULL);
+            if (hud->fields.UICamera != NULL)
+                Camera_set_orthographicSize(hud->fields.UICamera, 3.f, NULL);
+            State.HasRefreshedUI = false;
+        }
+
+        ChatController_Toggle(chat, NULL);
     }
 
     if (shouldKeybindsActivate) {
