@@ -462,22 +462,24 @@ namespace HostTab {
                     ImGui::InputInt("sec", &State.AutoStartTimer);
                 }
 
-                /*if (ToggleButton("Auto Start Game (By Player Count)", &State.AutoStartGamePlayers))
+                if (ToggleButton("Auto Start Game (By Player Count)", &State.AutoStartGamePlayers))
                     State.Save();
+
                 if (State.AutoStartGamePlayers) {
                     ImGui::Text("Start at");
                     ImGui::SameLine();
                     ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
-                    editingAutoStartPlayerCount = ImGui::IsItemActive();
+
                     if (ImGui::InputInt("players##autostart", &State.AutoStartPlayerCount, 1, 100, flags)) {
-                    State.AutoStartPlayerCount = std::clamp(State.AutoStartPlayerCount, 1, 15);
-                    State.Save();
+                        State.AutoStartPlayerCount = std::clamp(State.AutoStartPlayerCount, 1, 15);
+                        State.Save();
                     }
+
                     editingAutoStartPlayerCount = ImGui::IsItemActive();
                 }
 
-                if (ToggleButton("Ignore RPCs", &State.IgnoreRPCs))
-                    State.Save();*/
+                //if (ToggleButton("Ignore RPCs", &State.IgnoreRPCs))
+                //    State.Save();
 
                     //if (State.DisableKills) ImGui::Text("Note: Cheaters can still bypass this feature!");
 

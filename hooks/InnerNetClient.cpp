@@ -838,17 +838,29 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     else ventTpDelay -= Time_get_deltaTime(NULL);
                 }
 
-                /*if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount && !autoStartedGame) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
-                    int playerCount = 0;
-                    for (auto p : GetAllPlayerControl()) {
-                        if (!p->fields.isNew) playerCount++;
+                static float autoStartTimer = 0.0f;
+
+                if (IsInLobby() && IsHost() && State.AutoStartGamePlayers) {
+                    auto players = GetAllPlayerData();
+
+                    if (players.size() >= static_cast<size_t>(State.AutoStartPlayerCount) && !autoStartedGame) {
+                        autoStartTimer += Time_get_deltaTime(NULL);
+
+                        if (autoStartTimer >= 1.0f) {
+                            autoStartedGame = true;
+                            autoStartTimer = 0.0f;
+
+                            app::AmongUsClient_KickNotJoinedPlayers(*Game::pAmongUsClient, NULL);
+                            app::InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
+                        }
                     }
-                    if (playerCount >= State.AutoStartPlayerCount) {
-                        autoStartedGame = true;
-                        AmongUsClient_KickNotJoinedPlayers(*Game::pAmongUsClient, NULL);
-                        InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
+                    else {
+                        autoStartTimer = 0.0f;
                     }
-                }*/
+                }
+                else {
+                    autoStartTimer = 0.0f;
+                }
 
                 static int sabotageDelay = 0;
                 static bool fixSabotage = false;
