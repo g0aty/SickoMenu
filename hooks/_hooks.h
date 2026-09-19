@@ -11,6 +11,7 @@ void dAmongUsClient_OnGameJoined(AmongUsClient* __this, String* gameIdString, Me
 void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method);
 void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, DisconnectReasons__Enum reason, MethodInfo* method);
 void dAmongUsClient_OnPlayerJoined(AmongUsClient* __this, ClientData* data, MethodInfo* method);
+void dCustomNetworkTransform_HandleRpc(CustomNetworkTransform* __this, uint8_t callId, MessageReader* reader, MethodInfo* method);
 void dCustomNetworkTransform_SnapTo(CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method);
 //bool dPlayerBanData_get_IsBanned(PlayerBanData* __this, MethodInfo* method);
 float dShipStatus_CalculateLightRadius(ShipStatus* __this, NetworkedPlayerInfo* player, MethodInfo* method);

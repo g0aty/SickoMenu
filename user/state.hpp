@@ -779,6 +779,7 @@ public:
     bool SMAC_CheckBadWords = true;
     std::vector<std::pair<std::string, bool>> SMAC_BadWords = {}; 
     bool SMAC_CheckFriendcode = true;
+    bool SMAC_CheckTeleports = false;
     bool SMAC_CheckStartWords = false;
     int SMAC_StartWordsThreshold = 1;
     std::vector<std::pair<std::string, bool>> SMAC_StartWords = {}; 
@@ -797,6 +798,8 @@ public:
     std::vector<std::string> LockedNames = {};
 
     std::unordered_set<uint8_t> SMAC_PunishedPlayers;
+    std::unordered_map<uint8_t, int32_t> SMAC_SnapToCount;
+    std::unordered_set<uint8_t> SMAC_AirshipSpawnWhitelistedPlayers;
 
     std::string lol = "";
     bool ProGamer = false;

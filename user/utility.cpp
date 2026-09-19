@@ -813,11 +813,6 @@ Vector2 GetSpawnLocation(Game::PlayerId playerId, int32_t numPlayer, bool initia
     return { (spawncenter.x + 1) * (float)(playerId - 5), spawncenter.y * (float)(playerId - 5) };
 }
 
-bool IsAirshipSpawnLocation(const Vector2& vec)
-{
-    return (State.mapType == Settings::MapType::Airship);
-}
-
 Vector2 Rotate(const Vector2& vec, float degrees)
 {
     float f = 0.017453292f * degrees;
@@ -1959,11 +1954,13 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     if (pCtrl == *Game::pLocalPlayer || (!IsInLobby() && !IsInMultiplayerGame())) return;
     if (reason == "Bad Sabotage" && !IsHost()) return;
 
+    // Teleport detection could be work bad with 3.0f flag cooldown. Removing it = solving issue
+    // I didn't notice any difference in DEBUG between 3.0f and without cooldown with 15/15 players
     static std::unordered_map<std::string, std::chrono::steady_clock::time_point> smacLastFlagTime;
     std::string smacFlagKey = std::to_string(pCtrl->fields.PlayerId) + "|" + reason;
     auto smacNow = std::chrono::steady_clock::now();
     auto smacFlagIt = smacLastFlagTime.find(smacFlagKey);
-    if (smacFlagIt != smacLastFlagTime.end() && std::chrono::duration<float>(smacNow - smacFlagIt->second).count() < 3.0f) return;
+    if (smacFlagIt != smacLastFlagTime.end() && std::chrono::duration<float>(smacNow - smacFlagIt->second).count() < 0.0f) return; // 0.0 FOR ANTI-TELEPORT
     smacLastFlagTime[smacFlagKey] = smacNow;
 
     auto pData = GetPlayerData(pCtrl);
@@ -3035,4 +3032,26 @@ std::string GetDisconnectReasonString(DisconnectReasons__Enum reason) {
     default:
         return "Unknown";
     }
+}
+
+bool IsAirshipSpawnPosition(Vector2 position) {
+    constexpr float tolerance = 1.0f;
+
+    const Vector2 airshipSpawns[] = {
+        { -7.0f, -11.0f }, // Kitchen
+        { -0.7f,   8.5f }, // Brig
+        { 20.0f,  10.5f }, // Archive
+        { -0.7f,  -1.0f }, // Engines
+        { 15.5f,   0.0f }, // Main Hall
+        { 33.5f,  -1.5f }  // Storage
+    };
+
+    for (const auto& spawn : airshipSpawns) {
+        const float dx = position.x - spawn.x;
+        const float dy = position.y - spawn.y;
+
+        if ((dx * dx + dy * dy) <= tolerance * tolerance) return true;
+    }
+
+    return false;
 }

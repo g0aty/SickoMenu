@@ -307,6 +307,7 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerControl_CheckColor);
 	HOOKFUNC(PlayerPhysics_HandleRpc);
 	HOOKFUNC(LobbyNotificationMessage_SetUp);
+	HOOKFUNC(CustomNetworkTransform_HandleRpc);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -525,6 +526,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerControl_CheckColor);
 	UNHOOKFUNC(PlayerPhysics_HandleRpc);
 	UNHOOKFUNC(LobbyNotificationMessage_SetUp);
+	UNHOOKFUNC(CustomNetworkTransform_HandleRpc);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 
