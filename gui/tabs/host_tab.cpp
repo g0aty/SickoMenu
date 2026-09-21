@@ -6,6 +6,7 @@
 #include "gui-helpers.hpp"
 #include "_hooks.h"
 #include "sabotage_tab.h"
+#include "translations.hpp"
 
 bool editingAutoStartPlayerCount = false;
 
@@ -191,7 +192,7 @@ namespace HostTab {
                     ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
                     ImGui::BeginChild("host#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
                     if (!State.DisableRoleManager && (!hideRolesList || !State.TournamentMode)) {
-                        bool shouldEndListBox = ImGui::ListBoxHeader("Choose Roles", ImVec2(200, 290) * State.dpiScale);
+                        bool shouldEndListBox = ImGui::ListBoxHeader(T_("Choose Roles"), ImVec2(200, 290) * State.dpiScale);
                         auto allPlayers = GetAllPlayerData();
                         auto playerAmount = allPlayers.size();
                         auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount);
@@ -379,7 +380,7 @@ namespace HostTab {
                         State.Save();
                     State.ImpostorCount = std::clamp(State.ImpostorCount, 0, int(Game::MAX_PLAYERS));
                     if (State.CustomImpostorAmount) {
-                        ImGui::InputInt("Impostor Count", &State.ImpostorCount);
+                        ImGui::InputInt(T_("Impostor Count"), &State.ImpostorCount);
                     }
                 }
 
@@ -387,7 +388,7 @@ namespace HostTab {
                 const int32_t minPlayers = 4, maxAllowedPlayers = static_cast<int32_t>(Game::MAX_PLAYERS);
                 int32_t newMaxPlayers = std::clamp(currentMaxPlayers, minPlayers, maxAllowedPlayers);
 #define LocalInLobby (((*Game::pAmongUsClient)->fields._.NetworkMode == NetworkModes__Enum::LocalGame) && ((*Game::pAmongUsClient)->fields._.GameState == InnerNetClient_GameStates__Enum::Joined))
-                if ((LocalInLobby || !State.SafeMode) && IsInLobby() && ImGui::InputInt("Max Players", &newMaxPlayers)) {
+                if ((LocalInLobby || !State.SafeMode) && IsInLobby() && ImGui::InputInt(T_("Max Players"), &newMaxPlayers)) {
                     newMaxPlayers = std::clamp(newMaxPlayers, minPlayers, maxAllowedPlayers);
                     GameOptions().SetInt(app::Int32OptionNames__Enum::MaxPlayers, newMaxPlayers);
                     SyncAllSettings();
@@ -415,7 +416,7 @@ namespace HostTab {
                 if (ToggleButton("Modify Start Countdown", &State.ModifyStartCountdown))
                     State.Save();
 
-                if (State.ModifyStartCountdown && ImGui::InputInt("Time", &State.StartCountdown)) {
+                if (State.ModifyStartCountdown && ImGui::InputInt(T_("Time"), &State.StartCountdown)) {
                     State.StartCountdown = std::clamp(State.StartCountdown, 1, !State.SafeMode ? 127 : 5);
                 }
 
@@ -441,7 +442,7 @@ namespace HostTab {
 
                     if (State.GameMode != 0) {
                         ImGui::SetNextItemWidth(100 * State.dpiScale);
-                        if (ImGui::InputInt("Game Duration", &State.GameModeDuration)) {
+                        if (ImGui::InputInt(T_("Game Duration"), &State.GameModeDuration)) {
                             State.GameModeDuration = std::clamp(State.GameModeDuration, 100, 500);
                         }
                     }
@@ -457,15 +458,15 @@ namespace HostTab {
                     State.Save();
 
                 if (State.AutoStartGame) {
-                    ImGui::Text("Start After");
+                    ImGui::Text(T_("Start After"));
                     ImGui::SameLine();
-                    ImGui::InputInt("sec", &State.AutoStartTimer);
+                    ImGui::InputInt(T_("sec"), &State.AutoStartTimer);
                 }
 
                 /*if (ToggleButton("Auto Start Game (By Player Count)", &State.AutoStartGamePlayers))
                     State.Save();
                 if (State.AutoStartGamePlayers) {
-                    ImGui::Text("Start at");
+                    ImGui::Text(T_("Start at"));
                     ImGui::SameLine();
                     ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
                     editingAutoStartPlayerCount = ImGui::IsItemActive();
@@ -579,7 +580,7 @@ namespace HostTab {
                         State.rpcQueue.push(new SetRole(RoleTypes__Enum::Impostor));
                         State.rpcQueue.push(new RpcEndGame(GameOverReason__Enum::ImpostorsByKill));
                     }
-                    if (State.farmLoop) ImGui::Text(std::format("({} Kills)", 50000 - 10 * State.farmCount).c_str());
+                    if (State.farmLoop) ImGui::Text(std::format(T_("({} Kills)"), 50000 - 10 * State.farmCount).c_str());
                 }*/
 
                 ImGui::EndChild();
@@ -587,11 +588,11 @@ namespace HostTab {
 
             if (openSettings) {
                 ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-                if (ImGui::CollapsingHeader("Disable Sabotages", ImGuiTreeNodeFlags_DefaultOpen)) {
+                if (ImGui::CollapsingHeader(T_("Disable Sabotages"), ImGuiTreeNodeFlags_DefaultOpen)) {
                     SabotageTab::RenderDisableSabotages();
                 }
                 ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-                if (ImGui::CollapsingHeader("Host Presets", ImGuiTreeNodeFlags_DefaultOpen)) {
+                if (ImGui::CollapsingHeader(T_("Host Presets"), ImGuiTreeNodeFlags_DefaultOpen)) {
                     ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
                     if (ToggleButton("Auto Apply on Host", &State.AutoApplyHostPreset))
                         State.Save();
@@ -625,7 +626,7 @@ namespace HostTab {
                         }
                     }
                     else {
-                        ImGui::TextDisabled("No presets saved.");
+                        ImGui::TextDisabled(T_("No presets saved."));
                     }
 
                     ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
@@ -709,12 +710,12 @@ namespace HostTab {
                     MakeBool("Confirm Ejects", ejects, BoolOptionNames__Enum::ConfirmImpostor);
                     MakeInt("# Emergency Meetings", emergencyMeetings, Int32OptionNames__Enum::NumEmergencyMeetings);
                     MakeBool("Anonymous Votes", anonVotes, BoolOptionNames__Enum::AnonymousVotes);
-                    MakeInt("Emergency Cooldown", emergencyCooldown, Int32OptionNames__Enum::EmergencyCooldown);
-                    MakeInt("Discussion Time", discussionTime, Int32OptionNames__Enum::DiscussionTime);
-                    MakeInt("Voting Time", votingTime, Int32OptionNames__Enum::VotingTime);
+                    MakeInt(T_("Emergency Cooldown"), emergencyCooldown, Int32OptionNames__Enum::EmergencyCooldown);
+                    MakeInt(T_("Discussion Time"), discussionTime, Int32OptionNames__Enum::DiscussionTime);
+                    MakeInt(T_("Voting Time"), votingTime, Int32OptionNames__Enum::VotingTime);
                     // MakeFloat("Player Speed", playerSpeed, FloatOptionNames__Enum::PlayerSpeedMod);
                     // player speed can be between 0 (not included) and 3 (included) in classic mode due to the anticheat, so we separate this float input
-                    if (ImGui::InputFloat("Player Speed", &playerSpeed)) {
+                    if (ImGui::InputFloat(T_("Player Speed"), &playerSpeed)) {
                         if (State.SafeMode) {
                             if (playerSpeed <= 0.f) playerSpeed = 0.000001f;
                             if (playerSpeed > 3.f) playerSpeed = 3.f;
@@ -728,23 +729,23 @@ namespace HostTab {
                     if (taskBarMode >= 0 && taskBarMode <= 2) {
                         switch (taskBarMode) {
                         case 0:
-                            taskBarInfo = " (Always)";
+                            taskBarInfo = T_(" (Always)");
                             break;
                         case 1:
-                            taskBarInfo = " (Meetings)";
+                            taskBarInfo = T_(" (Meetings)");
                             break;
                         case 2:
-                            taskBarInfo = " (Never)";
+                            taskBarInfo = T_(" (Never)");
                             break;
                         }
                     }
-                    MakeInt(("Task Bar Updates" + taskBarInfo).c_str(), taskBarMode, Int32OptionNames__Enum::TaskBarMode);
+                    MakeInt((T_("Task Bar Updates") + taskBarInfo).c_str(), taskBarMode, Int32OptionNames__Enum::TaskBarMode);
                     MakeBool("Visual Tasks", visualTasks, BoolOptionNames__Enum::VisualTasks);
-                    MakeFloat("Crewmate Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
-                    MakeFloat("Impostor Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
+                    MakeFloat(T_("Crewmate Vision"), crewVision, FloatOptionNames__Enum::CrewLightMod);
+                    MakeFloat(T_("Impostor Vision"), impVision, FloatOptionNames__Enum::ImpostorLightMod);
                     // MakeFloat("Kill Cooldown", killCooldown, FloatOptionNames__Enum::KillCooldown);
                     // 0 or lesser kill cooldown leads to the impostors not being able to kill
-                    if (ImGui::InputFloat("Kill Cooldown", &killCooldown)) {
+                    if (ImGui::InputFloat(T_("Kill Cooldown"), &killCooldown)) {
                         if (killCooldown <= 0.f) killCooldown = 0.000001f;
                         options.SetFloat(FloatOptionNames__Enum::KillCooldown, killCooldown);
                         SyncAllSettings();
@@ -754,101 +755,101 @@ namespace HostTab {
                     if (killDistance >= 0 && killDistance <= 2) {
                         switch (killDistance) {
                         case 0:
-                            killDistInfo = " (Short)";
+                            killDistInfo = T_(" (Short)");
                             break;
                         case 1:
-                            killDistInfo = " (Medium)";
+                            killDistInfo = T_(" (Medium)");
                             break;
                         case 2:
-                            killDistInfo = " (Long)";
+                            killDistInfo = T_(" (Long)");
                             break;
                         }
                     }
 
-                    if (ImGui::InputInt(("Kill Distance" + killDistInfo).c_str(), &killDistance)) {
+                    if (ImGui::InputInt((T_("Kill Distance") + killDistInfo).c_str(), &killDistance)) {
                         if (State.SafeMode) killDistance = std::clamp(killDistance, 0, 2);
                         options.SetInt(Int32OptionNames__Enum::KillDistance, killDistance);
                         SyncAllSettings();
                     }
                     else killDistance = options.GetInt(Int32OptionNames__Enum::KillDistance);
 
-                    // MakeInt(("Kill Distance" + killDistInfo).c_str(), killDistance, Int32OptionNames__Enum::KillDistance);
+                    // MakeInt((T_("Kill Distance") + killDistInfo).c_str(), killDistance, Int32OptionNames__Enum::KillDistance);
                     MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
                     MakeInt("# Common Tasks", commonTasks, Int32OptionNames__Enum::NumCommonTasks);
                     MakeInt("# Long Tasks", longTasks, Int32OptionNames__Enum::NumLongTasks);
 #pragma endregion
 #pragma region Scientist
-                    ImGui::Text("Scientist");
+                    ImGui::Text(T_("Scientist"));
                     static float vitalsCooldown = 1.f, batteryDuration = 1.f;
 
-                    MakeFloat("Vitals Display Cooldown", vitalsCooldown, FloatOptionNames__Enum::ScientistCooldown);
-                    MakeFloat("Battery Duration", batteryDuration, FloatOptionNames__Enum::ScientistBatteryCharge);
+                    MakeFloat(T_("Vitals Display Cooldown"), vitalsCooldown, FloatOptionNames__Enum::ScientistCooldown);
+                    MakeFloat(T_("Battery Duration"), batteryDuration, FloatOptionNames__Enum::ScientistBatteryCharge);
 #pragma endregion
 #pragma region Engineer
-                    ImGui::Text("Engineer");
+                    ImGui::Text(T_("Engineer"));
                     static float ventCooldown = 1.f, ventDuration = 1.f;
 
-                    MakeFloat("Vent Use Cooldown", ventCooldown, FloatOptionNames__Enum::EngineerCooldown);
-                    MakeFloat("Max Time in Vents", ventDuration, FloatOptionNames__Enum::EngineerInVentMaxTime);
+                    MakeFloat(T_("Vent Use Cooldown"), ventCooldown, FloatOptionNames__Enum::EngineerCooldown);
+                    MakeFloat(T_("Max Time in Vents"), ventDuration, FloatOptionNames__Enum::EngineerInVentMaxTime);
 #pragma endregion
 #pragma region Guardian Angel
-                    ImGui::Text("Guardian Angel");
+                    ImGui::Text(T_("Guardian Angel"));
                     static float protectCooldown = 1.f, protectDuration = 1.f;
                     static bool protectVisible = false;
 
-                    MakeFloat("Protect Cooldown", protectCooldown, FloatOptionNames__Enum::GuardianAngelCooldown);
-                    MakeFloat("Protection Duration", protectDuration, FloatOptionNames__Enum::ProtectionDurationSeconds);
+                    MakeFloat(T_("Protect Cooldown"), protectCooldown, FloatOptionNames__Enum::GuardianAngelCooldown);
+                    MakeFloat(T_("Protection Duration"), protectDuration, FloatOptionNames__Enum::ProtectionDurationSeconds);
                     MakeBool("Protect Visible to Impostors", protectVisible, BoolOptionNames__Enum::ImpostorsCanSeeProtect);
 #pragma endregion
 #pragma region Shapeshifter
-                    ImGui::Text("Shapeshifter");
+                    ImGui::Text(T_("Shapeshifter"));
                     static float shapeshiftDuration = 1.f, shapeshiftCooldown = 1.f;
                     static bool shapeshiftEvidence = false;
 
-                    MakeFloat("Shapeshift Duration", shapeshiftDuration, FloatOptionNames__Enum::ShapeshifterDuration);
-                    MakeFloat("Shapeshift Cooldown", shapeshiftCooldown, FloatOptionNames__Enum::ShapeshifterCooldown);
+                    MakeFloat(T_("Shapeshift Duration"), shapeshiftDuration, FloatOptionNames__Enum::ShapeshifterDuration);
+                    MakeFloat(T_("Shapeshift Cooldown"), shapeshiftCooldown, FloatOptionNames__Enum::ShapeshifterCooldown);
                     MakeBool("Leave Shapeshifting Evidence", shapeshiftEvidence, BoolOptionNames__Enum::ShapeshifterLeaveSkin);
 #pragma endregion
 #pragma region Noisemaker
-                    ImGui::Text("Noisemaker");
+                    ImGui::Text(T_("Noisemaker"));
                     static float alertDuration = 1.f;
                     static bool alertImps = false;
 
-                    MakeFloat("Alert Duration", alertDuration, FloatOptionNames__Enum::NoisemakerAlertDuration);
+                    MakeFloat(T_("Alert Duration"), alertDuration, FloatOptionNames__Enum::NoisemakerAlertDuration);
                     MakeBool("Noisemakers Alert Impostors", alertImps, BoolOptionNames__Enum::NoisemakerImpostorAlert);
 #pragma endregion
 #pragma region Tracker
-                    ImGui::Text("Tracker");
+                    ImGui::Text(T_("Tracker"));
                     static float trackerDuration = 1.f, trackerCooldown = 1.f, trackerDelay = 1.f;
 
-                    MakeFloat("Tracker Duration", trackerDuration, FloatOptionNames__Enum::TrackerDuration);
-                    MakeFloat("Tracker Cooldown", trackerCooldown, FloatOptionNames__Enum::TrackerCooldown);
-                    MakeFloat("Tracker Delay", trackerDelay, FloatOptionNames__Enum::TrackerDelay);
+                    MakeFloat(T_("Tracker Duration"), trackerDuration, FloatOptionNames__Enum::TrackerDuration);
+                    MakeFloat(T_("Tracker Cooldown"), trackerCooldown, FloatOptionNames__Enum::TrackerCooldown);
+                    MakeFloat(T_("Tracker Delay"), trackerDelay, FloatOptionNames__Enum::TrackerDelay);
 #pragma endregion
 #pragma region Phantom
-                    ImGui::Text("Phantom");
+                    ImGui::Text(T_("Phantom"));
                     static float phantomDuration = 1.f, phantomCooldown = 1.f;
 
-                    MakeFloat("Phantom Duration", phantomDuration, FloatOptionNames__Enum::PhantomDuration);
-                    MakeFloat("Phantom Cooldown", phantomCooldown, FloatOptionNames__Enum::PhantomCooldown);
+                    MakeFloat(T_("Phantom Duration"), phantomDuration, FloatOptionNames__Enum::PhantomDuration);
+                    MakeFloat(T_("Phantom Cooldown"), phantomCooldown, FloatOptionNames__Enum::PhantomCooldown);
 #pragma endregion
 #pragma region Detective
-                    ImGui::Text("Detective");
+                    ImGui::Text(T_("Detective"));
                     static float detectiveSuspectLimit = 1.f;
 
-                    MakeFloat("Detective Suspect Limit", detectiveSuspectLimit, FloatOptionNames__Enum::DetectiveSuspectLimit);
+                    MakeFloat(T_("Detective Suspect Limit"), detectiveSuspectLimit, FloatOptionNames__Enum::DetectiveSuspectLimit);
 #pragma endregion
 #pragma region Viper
-                    ImGui::Text("Viper");
+                    ImGui::Text(T_("Viper"));
                     static float viperDissolveTime = 1.f;
 
-                    MakeFloat("Viper Dissolve Time", viperDissolveTime, FloatOptionNames__Enum::ViperDissolveTime);
+                    MakeFloat(T_("Viper Dissolve Time"), viperDissolveTime, FloatOptionNames__Enum::ViperDissolveTime);
 #pragma endregion
 #pragma region Viper
-                    ImGui::Text("Judge");
+                    ImGui::Text(T_("Judge"));
                     static float judgeTaskRequirement = 50.f;
 
-                    MakeFloat("Tasks Required %", judgeTaskRequirement, FloatOptionNames__Enum::JudgeTaskRequirementPercentage);
+                    MakeFloat(T_("Tasks Required %"), judgeTaskRequirement, FloatOptionNames__Enum::JudgeTaskRequirementPercentage);
 #pragma endregion
                 }
 #pragma region Hide and Seek
@@ -861,9 +862,9 @@ namespace HostTab {
 
                     static bool flashlight = false, seekMap = false, hidePings = false, showNames = false;
 
-                    MakeFloat("Hider Vision", crewVision, FloatOptionNames__Enum::CrewLightMod);
-                    MakeFloat("Seeker Vision", impVision, FloatOptionNames__Enum::ImpostorLightMod);
-                    if (ImGui::InputFloat("Kill Cooldown", &killCooldown)) {
+                    MakeFloat(T_("Hider Vision"), crewVision, FloatOptionNames__Enum::CrewLightMod);
+                    MakeFloat(T_("Seeker Vision"), impVision, FloatOptionNames__Enum::ImpostorLightMod);
+                    if (ImGui::InputFloat(T_("Kill Cooldown"), &killCooldown)) {
                         if (killCooldown <= 0.f) killCooldown = 0.000001f;
                         options.SetFloat(FloatOptionNames__Enum::KillCooldown, killCooldown);
                         SyncAllSettings();
@@ -874,33 +875,33 @@ namespace HostTab {
                     if (killDistance >= 0 && killDistance <= 2) {
                         switch (killDistance) {
                         case 0:
-                            killDistInfo = " (Short)";
+                            killDistInfo = T_(" (Short)");
                             break;
                         case 1:
-                            killDistInfo = " (Medium)";
+                            killDistInfo = T_(" (Medium)");
                             break;
                         case 2:
-                            killDistInfo = " (Long)";
+                            killDistInfo = T_(" (Long)");
                             break;
                         }
                     }
 
-                    MakeInt(("Kill Distance" + killDistInfo).c_str(), killDistance, Int32OptionNames__Enum::KillDistance);
+                    MakeInt((T_("Kill Distance") + killDistInfo).c_str(), killDistance, Int32OptionNames__Enum::KillDistance);
                     MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
                     MakeInt("# Common Tasks", commonTasks, Int32OptionNames__Enum::NumCommonTasks);
                     MakeInt("# Long Tasks", longTasks, Int32OptionNames__Enum::NumLongTasks);
-                    MakeFloat("Player Speed", playerSpeed, FloatOptionNames__Enum::PlayerSpeedMod);
-                    MakeFloat("Hiding Time", hidingTime, FloatOptionNames__Enum::EscapeTime);
-                    MakeFloat("Final Hide Time", finalHideTime, FloatOptionNames__Enum::FinalEscapeTime);
-                    MakeInt("Max Vent Uses", maxVents, Int32OptionNames__Enum::CrewmateVentUses);
-                    MakeFloat("Max Time in Vent", ventTime, FloatOptionNames__Enum::CrewmateTimeInVent);
+                    MakeFloat(T_("Player Speed"), playerSpeed, FloatOptionNames__Enum::PlayerSpeedMod);
+                    MakeFloat(T_("Hiding Time"), hidingTime, FloatOptionNames__Enum::EscapeTime);
+                    MakeFloat(T_("Final Hide Time"), finalHideTime, FloatOptionNames__Enum::FinalEscapeTime);
+                    MakeInt(T_("Max Vent Uses"), maxVents, Int32OptionNames__Enum::CrewmateVentUses);
+                    MakeFloat(T_("Max Time in Vent"), ventTime, FloatOptionNames__Enum::CrewmateTimeInVent);
                     MakeBool("Flashlight Mode", flashlight, BoolOptionNames__Enum::UseFlashlight);
-                    MakeFloat("Hider Flashlight Size", crewLight, FloatOptionNames__Enum::CrewmateFlashlightSize);
-                    MakeFloat("Seeker Flashlight Size", impLight, FloatOptionNames__Enum::ImpostorFlashlightSize);
-                    MakeFloat("Final Hide Seeker Speed", finalImpSpeed, FloatOptionNames__Enum::SeekerFinalSpeed);
+                    MakeFloat(T_("Hider Flashlight Size"), crewLight, FloatOptionNames__Enum::CrewmateFlashlightSize);
+                    MakeFloat(T_("Seeker Flashlight Size"), impLight, FloatOptionNames__Enum::ImpostorFlashlightSize);
+                    MakeFloat(T_("Final Hide Seeker Speed"), finalImpSpeed, FloatOptionNames__Enum::SeekerFinalSpeed);
                     MakeBool("Final Hide Seeker Map", seekMap, BoolOptionNames__Enum::SeekerFinalMap);
                     MakeBool("Final Hide Pings", hidePings, BoolOptionNames__Enum::SeekerPings);
-                    MakeFloat("Ping Interval", pingInterval, FloatOptionNames__Enum::MaxPingTime);
+                    MakeFloat(T_("Ping Interval"), pingInterval, FloatOptionNames__Enum::MaxPingTime);
                     MakeBool("Show Names", showNames, BoolOptionNames__Enum::ShowCrewmateNames);
                 }
 #pragma endregion
@@ -942,7 +943,7 @@ namespace HostTab {
             }
             if (openModeration) {
                 ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
-                if (ImGui::CollapsingHeader("Roles", ImGuiTreeNodeFlags_DefaultOpen)) {
+                if (ImGui::CollapsingHeader(T_("Roles"), ImGuiTreeNodeFlags_DefaultOpen)) {
                     ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
                     static const std::vector<std::pair<const char*, const char*>> ROLE_COMMANDS = {
         { "/color", "color" }, { "/preset", "preset" },
@@ -958,7 +959,7 @@ namespace HostTab {
                     static bool isRoleDeleted = false;
 
                     if (isRoleDeleted) isRoleDeleted = false;
-                    ImGui::Text("Create Role:");
+                    ImGui::Text(T_("Create Role:"));
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(140.0f * State.dpiScale);
                     InputString("##NewRoleName", &newRoleName, ImGuiInputTextFlags_EnterReturnsTrue);
@@ -985,7 +986,7 @@ namespace HostTab {
                         selectedRole = std::clamp(selectedRole, 0, (int)State.Mod_RoleNames.size() - 1);
                         std::vector<const char*> roleVector(State.Mod_RoleNames.size(), nullptr);
                         for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) roleVector[i] = State.Mod_RoleNames[i].c_str();
-                        ImGui::Text("Select Role:");
+                        ImGui::Text(T_("Select Role:"));
                         ImGui::SameLine();
                         CustomListBoxInt("SelectedRole", &selectedRole, roleVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
                         if (selectedRole != 0) {
@@ -1001,7 +1002,7 @@ namespace HostTab {
                         }
                     }
                     else {
-                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No roles created yet.");
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("No roles created yet."));
                     }
 
                     if (!State.Mod_RoleNames.empty()) {
@@ -1030,7 +1031,7 @@ namespace HostTab {
 
                         if (!isRoleDeleted) {
                             ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
-                            ImGui::Text("Permissions for %s:", State.Mod_RoleNames[selectedRole].c_str());
+                            ImGui::Text(T_("Permissions for %s:"), State.Mod_RoleNames[selectedRole].c_str());
                             ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
                             ImVec4 themeColDark = ImVec4(themeCol.x * 0.7f, themeCol.y * 0.7f, themeCol.z * 0.7f, themeCol.w);
                             ImVec4 themeColDarker = ImVec4(themeCol.x * 0.5f, themeCol.y * 0.5f, themeCol.z * 0.5f, themeCol.w);
@@ -1050,10 +1051,10 @@ namespace HostTab {
                             ImGui::Columns(1);
                             ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
                             if (selectedRole == 0) {
-                                ImGui::TextDisabled("Applies to every player automatically - no members needed.");
+                                ImGui::TextDisabled(T_("Applies to every player automatically - no members needed."));
                             }
                             else {
-                                ImGui::Text("Members:");
+                                ImGui::Text(T_("Members:"));
                                 ImGui::SetNextItemWidth(150.0f * State.dpiScale);
                                 InputString("##NewMemberCode", &newMemberCode, ImGuiInputTextFlags_EnterReturnsTrue);
                                 ImGui::SameLine();

@@ -7,6 +7,7 @@
 #include <future>
 #include <_hooks.h>
 #include <unordered_map>
+#include "translations.hpp"
 
 namespace PlayersTab {
     int framesPassed = -1;
@@ -449,12 +450,12 @@ namespace PlayersTab {
 
                     if (!selectedPlayer.get_PlayerControl()->fields.notRealPlayer && selectedPlayer.get_PlayerData() != NULL) {
                         bool isUsingMod = (selectedPlayer.is_LocalPlayer() && State.ModDetection) || State.modUsers.count(selectedPid);
-                        ImGui::Text("Is using Modified Client: %s", isUsingMod ? "Yes" : "No");
-                        if (isUsingMod) ImGui::Text("Mod Name: %s", selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPid)[0]).c_str());
+                        ImGui::Text(T_("Is using Modified Client: %s"), isUsingMod ? T_("Yes") : T_("No"));
+                        if (isUsingMod) ImGui::Text(T_("Mod Name: %s"), selectedPlayer.is_LocalPlayer() ? "SickoMenu" : RemoveHtmlTags(State.modUsers.at(selectedPid)[0]).c_str());
                         if (isUsingMod && ((selectedPlayer.is_LocalPlayer() && State.ModDetection) || !State.modUsers.at(selectedPid)[1].empty()))
-                            ImGui::Text("Mod Version: %s", selectedPlayer.is_LocalPlayer() ? State.SickoVersion.c_str() : RemoveHtmlTags(State.modUsers.at(selectedPid)[1]).c_str());
+                            ImGui::Text(T_("Mod Version: %s"), selectedPlayer.is_LocalPlayer() ? State.SickoVersion.c_str() : RemoveHtmlTags(State.modUsers.at(selectedPid)[1]).c_str());
 
-                        ImGui::Text("Player ID: %d", selectedPid);
+                        ImGui::Text(T_("Player ID: %d"), selectedPid);
 
                         /*std::string puid = cachedDetails.puid;
                         std::string puidText = std::format("PUID:\n{}", (!IsStreamerMode()) ? puid : ((puid != "") ? puid.substr(0, 1) + "..." : ""));
@@ -463,10 +464,10 @@ namespace PlayersTab {
                         }*/
 
                         uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
-                        ImGui::Text("Level: %d", playerLevel);
+                        ImGui::Text(T_("Level: %d"), playerLevel);
 
-                        ImGui::Text("Platform: %s", cachedDetails.platform.c_str());
-                        ImGui::Text("Platform Name: %s", cachedDetails.platformName.c_str());
+                        ImGui::Text(T_("Platform: %s"), cachedDetails.platform.c_str());
+                        ImGui::Text(T_("Platform Name: %s"), cachedDetails.platformName.c_str());
 
                         std::string friendCode = cachedDetails.friendCode;
                         bool isWhitelisted = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), friendCode) != State.WhitelistFriendCodes.end();
@@ -477,22 +478,23 @@ namespace PlayersTab {
                         }
 
                         if (!shouldTryHidingInfo || showHiddenInfo) {
-                            std::string friendCodeText = std::format("Friend Code: {}", (!IsStreamerMode()) ? friendCode : ((friendCode != "") ? friendCode.substr(0, 1) + "..." : ""));
+                            std::string fc = (!IsStreamerMode()) ? friendCode : ((friendCode != "") ? friendCode.substr(0, 1) + "..." : "");
+                            std::string friendCodeText = std::vformat(T_("Friend Code: {}"), std::make_format_args(fc));
                             if (friendCode != "") {
                                 ImGui::Text(const_cast<char*>(friendCodeText.c_str()));
                             }
 
                             if (cachedDetails.psnId != 0)
-                                ImGui::Text("PSN Platform ID: %llu", cachedDetails.psnId);
+                                ImGui::Text(T_("PSN Platform ID: %llu"), cachedDetails.psnId);
                             if (cachedDetails.xboxId != 0)
-                                ImGui::Text("Xbox Platform ID: %llu", cachedDetails.xboxId);
+                                ImGui::Text(T_("Xbox Platform ID: %llu"), cachedDetails.xboxId);
                         }
                     }
                     else {
-                        ImGui::Text("Is using Modified Client: No");
-                        ImGui::Text("Player ID: %d", selectedPid);
+                        ImGui::Text(T_("Is using Modified Client: No"));
+                        ImGui::Text(T_("Player ID: %d"), selectedPid);
                         uint32_t playerLevel = selectedPlayer.get_PlayerData()->fields.PlayerLevel + 1;
-                        ImGui::Text("Level: %d", playerLevel);
+                        ImGui::Text(T_("Level: %d"), playerLevel);
                     }
                 }
             }
@@ -516,7 +518,7 @@ namespace PlayersTab {
                     CloseOtherGroups(Groups::Info);
                 }
             }
-            if (State.DisableMeetings && IsHost()) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Meetings have been disabled.");
+            if (State.DisableMeetings && IsHost()) ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Meetings have been disabled."));
             GameOptions options;
             if (IsInGame() && !GetPlayerData(*Game::pLocalPlayer)->fields.IsDead && (!State.DisableMeetings || !IsHost())) { //Player selection doesn't matter
                 if (!State.InMeeting) {
@@ -868,7 +870,7 @@ namespace PlayersTab {
 
                         std::vector<const char*> candidateNamesRaw;
                         for (auto& n : candidateNames) candidateNamesRaw.push_back(n.c_str());
-                        ImGui::Text("Redirect Votes To:");
+                        ImGui::Text(T_("Redirect Votes To:"));
                         if (CustomListBoxInt("Redirect Votes To", &curIndex, candidateNamesRaw))
                             State.VoteRedirectTargets[pid] = candidates[curIndex];
                     }
@@ -997,18 +999,18 @@ namespace PlayersTab {
 
                         if (State.RevealRoles && PlayerIsImpostor(selectedPlayer.get_PlayerData()))
                         {
-                            ImGui::TextColored(ImVec4(0.8F, 0.2F, 0.0F, 1.0F), "Fake Tasks:");
+                            ImGui::TextColored(ImVec4(0.8F, 0.2F, 0.0F, 1.0F), T_("Fake Tasks:"));
                         }
                         else
                         {
-                            ImGui::Text("Tasks:");
+                            ImGui::Text(T_("Tasks:"));
                         }
 
                         bool shouldEndListBox = ImGui::ListBoxHeader("###tasks#list"/*, ImVec2(181, 94) * State.dpiScale*/);
 
                         if (selectedPlayer.get_PlayerControl()->fields.myTasks == nullptr)
                         {
-                            ImGui::Text("ERROR: Could not load tasks.");
+                            ImGui::Text(T_("ERROR: Could not load tasks."));
                         }
                         else
                         {
@@ -1043,12 +1045,12 @@ namespace PlayersTab {
                     bool cooldownActive = (State.NotifyWarned && (currentTime - State.LastWarnTime < 3.0));
 
                     ImVec2 buttonSize = ImVec2(0, 0);
-                    buttonSize = ImGui::CalcTextSize("Add Warn");
+                    buttonSize = ImGui::CalcTextSize(T_("Add Warn"));
                     buttonSize.x += ImGui::GetStyle().FramePadding.x * 2;
                     buttonSize.y += ImGui::GetStyle().FramePadding.y * 2;
 
                     if (!cooldownActive) {
-                        if (ImGui::Button("Add Warn")) {
+                        if (ImGui::Button(T_("Add Warn"))) {
                             if (strlen(warnReasonBuf) > 0) {
                                 std::string reasonStr = warnReasonBuf;
                                 State.WarnedFriendCodes[WarnedfriendCode] = warnCount + 1;
@@ -1079,16 +1081,16 @@ namespace PlayersTab {
                     }
 
                     ImGui::SameLine();
-                    ImGui::Text("Total Warns: %d", warnCount);
+                    ImGui::Text(T_("Total Warns: %d"), warnCount);
 
-                    ImGui::InputText("Warn Reason", warnReasonBuf, IM_ARRAYSIZE(warnReasonBuf));
-                    ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Requirement: Enter Warn Reason.");
+                    ImGui::InputText(T_("Warn Reason"), warnReasonBuf, IM_ARRAYSIZE(warnReasonBuf));
+                    ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), T_("Requirement: Enter Warn Reason."));
 
                     ImGui::NewLine();
 
                     auto& warnReasons = State.WarnReasons[WarnedfriendCode];
                     if (!warnReasons.empty()) {
-                        ImGui::Text("Warn Reasons:");
+                        ImGui::Text(T_("Warn Reasons:"));
 
                         static int selectedReason = 0;
                         selectedReason = std::clamp(selectedReason, 0, (int)warnReasons.size() - 1);
@@ -1107,7 +1109,7 @@ namespace PlayersTab {
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        if (ImGui::Button("Delete")) {
+                        if (ImGui::Button(T_("Delete"))) {
                             if (selectedReason >= 0 && selectedReason < (int)warnReasons.size()) {
                                 warnReasons.erase(warnReasons.begin() + selectedReason);
                                 selectedReason = 0;
@@ -1208,7 +1210,7 @@ namespace PlayersTab {
                             }
                         }
                         ImGui::SetNextItemWidth(300 * State.dpiScale);
-                        if (ImGui::CollapsingHeader("Cosmetics Stealer")) {
+                        if (ImGui::CollapsingHeader(T_("Cosmetics Stealer"))) {
                             if (!State.SafeMode) {
                                 if (AnimatedButton("Name"))
                                     ImpersonateName(selectedPlayer.get_PlayerData());
@@ -1236,7 +1238,7 @@ namespace PlayersTab {
                         }
 
                         ImGui::SetNextItemWidth(300 * State.dpiScale);
-                        if (ImGui::CollapsingHeader("Cosmetics Resetter")) {
+                        if (ImGui::CollapsingHeader(T_("Cosmetics Resetter"))) {
                             ResetOriginalAppearance();
                             if (!State.SafeMode) {
                                 if (AnimatedButton("Name") && queue != nullptr)
@@ -1310,11 +1312,10 @@ namespace PlayersTab {
                         if (p.has_value() && p.validate().is_LocalPlayer()) State.NoClip = true;
                         else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 1, true));
                         if (selectedPlayers.size() == 1) {
-                            ShowHudNotification(std::format("Allowed {} to NoClip!",
-                                convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL))));
-                        }
-                        else {
-                            ShowHudNotification(std::format("Allowed {} players to NoClip!", selectedPlayers.size()));
+{ std::string nm = convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL)); ShowHudNotification(std::vformat(T_("Allowed {} to NoClip!"), std::make_format_args(nm))); }
+						}
+						else {
+							{ size_t pcount = selectedPlayers.size(); ShowHudNotification(std::vformat(T_("Allowed {} players to NoClip!"), std::make_format_args(pcount))); }
                         }
                     }
                 }
@@ -1368,7 +1369,7 @@ namespace PlayersTab {
                         State.suicideLoop = false;
                     }
                     ImGui::SameLine();
-                    ImGui::Text(std::format("Stop Suicide Loop ({})", 800 - State.suicideCount * 4).c_str());
+                    { int suicideCount = 800 - State.suicideCount * 4; ImGui::Text(std::vformat(T_("Stop Suicide Loop ({})"), std::make_format_args(suicideCount)).c_str()); }
                 }
 
                 if (!State.SafeMode && selectedPlayers.size() == 1 && IsInGame()) {
@@ -1643,7 +1644,7 @@ namespace PlayersTab {
                             State.ColorCycledPlayers.push_back(pid);
                     }
 
-                    ImGui::Text("Change cycling interval in Self > Randomizers!");
+                    ImGui::Text(T_("Change cycling interval in Self > Randomizers!"));
                 }
 
                 if (IsHost() && (IsInGame() || IsInLobby()) && !selectedPlayer.is_LocalPlayer() && selectedPlayers.size() == 1) {
@@ -1728,7 +1729,7 @@ namespace PlayersTab {
                     if (IsInLobby()) State.lobbyRpcQueue.push(new ReportPlayer(selectedPlayer.get_PlayerControl(), (ReportReasons__Enum)reportReason));
                 }
 
-                ImGui::Text("Reason");
+                ImGui::Text(T_("Reason"));
 
                 const std::vector<const char*> REPORTREASONS = { "Inappropriate Name", "Inappropriate Chat", "Cheating/Hacking", "Harassment/Misconduct" };
 
@@ -1740,13 +1741,13 @@ namespace PlayersTab {
                     static int banDays = 0, banHours = 0, banMinutes = 0, banSeconds = 0;
 
                     ImGui::PushItemWidth(200);
-                    ImGui::InputInt("Days", &banDays);     banDays = std::max<int>(0, banDays);
-                    ImGui::InputInt("Hours", &banHours);   banHours = std::clamp(banHours, 0, 23);
-                    ImGui::InputInt("Minutes", &banMinutes); banMinutes = std::clamp(banMinutes, 0, 59);
-                    ImGui::InputInt("Seconds", &banSeconds); banSeconds = std::clamp(banSeconds, 0, 59);
+                    ImGui::InputInt(T_("Days"), &banDays);     banDays = std::max<int>(0, banDays);
+                    ImGui::InputInt(T_("Hours"), &banHours);   banHours = std::clamp(banHours, 0, 23);
+                    ImGui::InputInt(T_("Minutes"), &banMinutes); banMinutes = std::clamp(banMinutes, 0, 59);
+                    ImGui::InputInt(T_("Seconds"), &banSeconds); banSeconds = std::clamp(banSeconds, 0, 59);
                     ImGui::PopItemWidth();
 
-                    if (ImGui::Button("Confirm TempBan")) {
+                    if (ImGui::Button(T_("Confirm TempBan"))) {
                         std::string targetFC = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
                         std::string selfFC = convert_from_string((*Game::pLocalPlayer)->fields.FriendCode);
                         if (!targetFC.empty() && targetFC != selfFC) {
@@ -1784,10 +1785,10 @@ namespace PlayersTab {
                     ImGui::Dummy(ImVec2(0, 8) * State.dpiScale);
                     std::string targetFC = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
                     if (targetFC.empty()) {
-                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No friend code available for this player.");
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("No friend code available for this player."));
                     }
                     else if (State.Mod_RoleNames.size() <= 1) { 
-                        ImGui::TextDisabled("No roles created yet - add some in the Host tab.");
+                        ImGui::TextDisabled(T_("No roles created yet - add some in the Host tab."));
                     }
                     else {
                         static int addRoleIndex = 0; // index into the assignable roles only (excludes "Everyone")
@@ -1796,7 +1797,7 @@ namespace PlayersTab {
                         std::vector<const char*> roleVector(assignableCount, nullptr);
                         for (int i = 0; i < assignableCount; i++) roleVector[i] = State.Mod_RoleNames[i + 1].c_str();
 
-                        ImGui::Text("Add Role:");
+                        ImGui::Text(T_("Add Role:"));
                         ImGui::SameLine();
                         CustomListBoxInt("AddPlayerRole", &addRoleIndex, roleVector, 130.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
                         ImGui::SameLine();
@@ -1806,7 +1807,7 @@ namespace PlayersTab {
 
                         auto currentRoles = GetFriendCodeRoleIndices(targetFC);
                         if (!currentRoles.empty()) {
-                            ImGui::Text("Current Roles:");
+                            ImGui::Text(T_("Current Roles:"));
                             ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
                             for (int roleIdx : currentRoles) {
                                 if (roleIdx < 0 || roleIdx >= (int)State.Mod_RoleNames.size()) continue;
@@ -1840,7 +1841,7 @@ namespace PlayersTab {
 
                     if (!State.SafeMode && (IsInGame() || IsInLobby())) {
                         static int level = 0;
-                        ImGui::InputInt("Level", &level);
+                        ImGui::InputInt(T_("Level"), &level);
                         if (AnimatedButton("Force Level")) {
                             if (IsInGame())
                                 State.rpcQueue.push(new RpcSetLevel(selectedPlayer.get_PlayerControl(), level));

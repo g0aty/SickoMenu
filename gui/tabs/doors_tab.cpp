@@ -6,6 +6,7 @@
 #include "state.hpp"
 #include "utility.h"
 #include "gui-helpers.hpp"
+#include "translations.hpp"
 
 using namespace std::string_view_literals;
 
@@ -61,8 +62,8 @@ namespace DoorsTab {
 			ImGui::BeginChild("doors#options", ImVec2(300, 0) * State.dpiScale, false, ImGuiWindowFlags_NoBackground);
 
 			if (IsHost() && State.DisableSabotages) {
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Sabotages have been disabled.");
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Nothing can be sabotaged.");
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Sabotages have been disabled."));
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Nothing can be sabotaged."));
 			}
 
 			if (AnimatedButton("Close All Doors"))

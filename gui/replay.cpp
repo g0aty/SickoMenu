@@ -6,6 +6,7 @@
 #include "profiler.h"
 #include "logger.h"
 #include "utility.h"
+#include "translations.hpp"
 #include <sstream>
 #include <chrono>
 
@@ -505,17 +506,17 @@ namespace Replay
 		else
 			titleCol = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 		titleCol.w = 1.f;
-		ImGui::TextColored(titleCol, "Replay");
+		ImGui::TextColored(titleCol, T_("Replay"));
 		ImGui::SameLine(ImGui::GetWindowWidth() - 20 * State.dpiScale);
 		if (AnimatedButton("-")) State.ShowReplay = false; //minimize button
 
 		ImGui::BeginChild("replay#filter", ImVec2(0, 20) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-		ImGui::Text("Event Filter: ");
+		ImGui::Text(T_("Event Filter: "));
 		ImGui::SameLine();
 		CustomListBoxIntMultiple("Event Types", &Replay::event_filter, 100.f * State.dpiScale);
 		if (IsInGame()) {
 			ImGui::SameLine(0.f * State.dpiScale, 5.f * State.dpiScale);
-			ImGui::Text("Player Filter: ");
+			ImGui::Text(T_("Player Filter: "));
 			ImGui::SameLine();
 			CustomListBoxPlayerSelectionMultiple("Players", &Replay::player_filter, 150.f * State.dpiScale);
 		}

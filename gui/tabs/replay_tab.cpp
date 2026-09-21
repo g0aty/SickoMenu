@@ -3,6 +3,7 @@
 #include "gui-helpers.hpp"
 #include "state.hpp"
 #include <chrono>
+#include "translations.hpp"
 
 namespace ReplayTab {
 	void Render() {
@@ -29,7 +30,7 @@ namespace ReplayTab {
 			State.Save();
 		}
 
-		if (ImGui::ColorEdit4("Replay Map Color",
+		if (ImGui::ColorEdit4(T_("Replay Map Color"),
 			(float*)&State.SelectedReplayMapColor,
 			ImGuiColorEditFlags__OptionsDefault
 			| ImGuiColorEditFlags_NoInputs

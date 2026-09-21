@@ -4,6 +4,7 @@
 #include "state.hpp"
 #include "utility.h"
 #include "gui-helpers.hpp"
+#include "translations.hpp"
 
 namespace EspTab {
 

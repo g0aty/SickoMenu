@@ -274,6 +274,22 @@ static void RebuildFont() {
     io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 14 * State.dpiScale, nullptr,
         GetAllGlyphRanges(io));
 
+    static const char* japaneseFonts[] = {
+        "C:\\Windows\\Fonts\\YuGothR.ttc",
+        "C:\\Windows\\Fonts\\YuGothM.ttc",
+        "C:\\Windows\\Fonts\\meiryo.ttc",
+        "C:\\Windows\\Fonts\\msgothic.ttc",
+    };
+    for (const char* jpFont : japaneseFonts) {
+        if (GetFileAttributesA(jpFont) != INVALID_FILE_ATTRIBUTES) {
+            ImFontConfig jpCfg;
+            jpCfg.MergeMode = true;
+            jpCfg.FontNo = 0;
+            io.Fonts->AddFontFromFileTTF(jpFont, 14 * State.dpiScale, &jpCfg, GetAllGlyphRanges(io));
+            break;
+        }
+    }
+
     io.Fonts->Build();
 }
 

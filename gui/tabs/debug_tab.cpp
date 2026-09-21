@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include "gui-helpers.hpp"
+#include "translations.hpp"
 
 namespace DebugTab {
 
@@ -47,9 +48,9 @@ namespace DebugTab {
 
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-		if (ImGui::CollapsingHeader("Experiments##debug")) {
-			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "These features are in development and can break at any time.");
-			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Use these at your own risk.");
+		if (ImGui::CollapsingHeader(T_("Experiments##debug"))) {
+			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), T_("These features are in development and can break at any time."));
+			ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), T_("Use these at your own risk."));
 			if (ToggleButton("Point System (Only for Hosting)", &State.TournamentMode)) State.Save();
 			if (ToggleButton("April Fools' Mode", &State.AprilFoolsMode)) State.Save();
 			/*static float timer = 0.0f;
@@ -67,16 +68,16 @@ namespace DebugTab {
 
 			if (safeModeWarnState) {
 				BoldText("Warning", ImVec4(1.f, 0.f, 0.f, 1.f));
-				ImGui::Text("By turning off Safe Mode, you can unlock functions");
-				ImGui::Text("that are usually detected by the anticheat.");
-				ImGui::Text(" ");
-				ImGui::Text("However, you NEED to ensure that the lobby host has a reduced");
-				ImGui::Text("anticheat (host authority), so the other functions work.");
-				ImGui::Text(" ");
-				ImGui::Text("Otherwise, you will get banned from the lobby by the anticheat!");
-				ImGui::Text("NOTE: The developers will NOT be held responsible for this.");
-				ImGui::Text(" ");
-				ImGui::Text("Are you sure that you want to turn it off?");
+				ImGui::Text(T_("By turning off Safe Mode, you can unlock functions"));
+				ImGui::Text(T_("that are usually detected by the anticheat."));
+				ImGui::Text(T_(" "));
+				ImGui::Text(T_("However, you NEED to ensure that the lobby host has a reduced"));
+				ImGui::Text(T_("anticheat (host authority), so the other functions work."));
+				ImGui::Text(T_(" "));
+				ImGui::Text(T_("Otherwise, you will get banned from the lobby by the anticheat!"));
+				ImGui::Text(T_("NOTE: The developers will NOT be held responsible for this."));
+				ImGui::Text(T_(" "));
+				ImGui::Text(T_("Are you sure that you want to turn it off?"));
 
 				if (ColoredButton(ImVec4(0.f, 1.f, 0.f, 1.f), "Yes")) {
 					safeModeWarnState = false;
@@ -108,23 +109,23 @@ namespace DebugTab {
 
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-		if (ImGui::CollapsingHeader("Replay##debug"))
+		if (ImGui::CollapsingHeader(T_("Replay##debug")))
 		{
 			synchronized(Replay::replayEventMutex) {
 				size_t numWalkPoints = 0;
 				for (const auto& pair : State.replayWalkPolylineByPlayer) {
 					numWalkPoints += pair.second.pendingPoints.size() + pair.second.simplifiedPoints.size();
 				}
-				ImGui::Text("Num Walk Points: %d", numWalkPoints);
-				ImGui::Text("Num Live Replay Events: %d", State.liveReplayEvents.size());
-				ImGui::Text("Num Live Console Events: %d", State.liveConsoleEvents.size());
+				ImGui::Text(T_("Num Walk Points: %d"), numWalkPoints);
+				ImGui::Text(T_("Num Live Replay Events: %d"), State.liveReplayEvents.size());
+				ImGui::Text(T_("Num Live Console Events: %d"), State.liveConsoleEvents.size());
 			}
 
-			ImGui::Text("ReplayMatchStart: %s", std::format("{:%OH:%OM:%OS}", State.MatchStart).c_str());
-			ImGui::Text("ReplayMatchCurrent: %s", std::format("{:%OH:%OM:%OS}", State.MatchCurrent).c_str());
-			ImGui::Text("ReplayMatchLive: %s", std::format("{:%OH:%OM:%OS}", std::chrono::system_clock::now()).c_str());
-			ImGui::Text("ReplayIsLive: %s", (State.Replay_IsLive) ? "True" : "False");
-			ImGui::Text("ReplayIsPlaying: %s", (State.Replay_IsPlaying) ? "True" : "False");
+			ImGui::Text(T_("ReplayMatchStart: %s"), std::format("{:%OH:%OM:%OS}", State.MatchStart).c_str());
+			ImGui::Text(T_("ReplayMatchCurrent: %s"), std::format("{:%OH:%OM:%OS}", State.MatchCurrent).c_str());
+			ImGui::Text(T_("ReplayMatchLive: %s"), std::format("{:%OH:%OM:%OS}", std::chrono::system_clock::now()).c_str());
+			ImGui::Text(T_("ReplayIsLive: %s"), (State.Replay_IsLive) ? "True" : "False");
+			ImGui::Text(T_("ReplayIsPlaying: %s"), (State.Replay_IsPlaying) ? "True" : "False");
 
 			if (AnimatedButton("Re-simplify polylines (check console)"))
 			{
@@ -141,7 +142,7 @@ namespace DebugTab {
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Colors##debug"))
+		if (ImGui::CollapsingHeader(T_("Colors##debug")))
 		{
 			il2cpp::Array colArr = app::Palette__TypeInfo->static_fields->PlayerColors;
 			auto colArr_raw = colArr.begin();
@@ -155,7 +156,7 @@ namespace DebugTab {
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Profiler##debug"))
+		if (ImGui::CollapsingHeader(T_("Profiler##debug")))
 		{
 			if (AnimatedButton("Clear Stats"))
 			{
@@ -176,9 +177,9 @@ namespace DebugTab {
 			ImGui::TextUnformatted(statStream.str().c_str());
 		}
 
-		ImGui::Text(std::format("Active Scene: {}", State.CurrentScene).c_str());
+		{ std::string activeScene = State.CurrentScene; ImGui::Text(std::vformat(T_("Active Scene: {}"), std::make_format_args(activeScene)).c_str()); }
 
-		ImGui::Text(std::format("Current FPS: {}", GetFps()).c_str());
+		{ int fps = GetFps(); ImGui::Text(std::vformat(T_("Current FPS: {}"), std::make_format_args(fps)).c_str()); }
 
 		ImGui::EndChild();
 	}
