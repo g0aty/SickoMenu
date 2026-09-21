@@ -6,6 +6,7 @@
 #include "game.h"
 #include "logger.h"
 #include "DirectX.h"
+#include "translations.hpp"
 
 using namespace ImGui;
 
@@ -17,12 +18,12 @@ bool CustomListBoxInt(const char* label, int* value, const std::vector<const cha
 	ImGuiStyle& style = GetStyle();
 	float spacing = style.ItemInnerSpacing.x;
 	PushItemWidth(width);
-	bool response = BeginCombo(comboLabel.c_str(), (*value >= 0 ? list.at(*value) : nullptr), ImGuiComboFlags_NoArrowButton | flags);
+	bool response = BeginCombo(comboLabel.c_str(), (*value >= 0 ? T_(list.at(*value)) : nullptr), ImGuiComboFlags_NoArrowButton | flags);
 	if (response) {
 		response = false;
 		for (size_t i = 0; i < list.size(); i++) {
 			bool is_selected = (*value == i);
-			if (Selectable(list.at(i), is_selected)) {
+			if (Selectable(T_(list.at(i)), is_selected)) {
 				*value = (int)i;
 				response = true;
 			}
@@ -53,11 +54,11 @@ bool CustomListBoxInt(const char* label, int* value, const std::vector<const cha
 	if (col.x == 0 && col.y == 0 && col.z == 0 && col.w == 0) {
 		std::string trueLabel = visualLabel == "" ? label : visualLabel;
 		if (State.searchQuery == "" || trueLabel.find(strToLower(State.searchQuery)))
-			Text(trueLabel.c_str());
+			Text(T_(trueLabel));
 		else
-			TextDisabled(trueLabel.c_str());
+			TextDisabled(T_(trueLabel));
 	}
-	else TextColored(col, visualLabel == "" ? label : visualLabel);
+	else TextColored(col, visualLabel == "" ? T_(label) : T_(visualLabel));
 
 	return response;
 }
@@ -72,7 +73,7 @@ bool CustomListBoxIntColored(const char* label, int* value, const std::vector<co
 	float spacing = style.ItemInnerSpacing.x;
 	PushItemWidth(width);
 	PushStyleColor(ImGuiCol_Text, itemColors[*value].color);
-	bool response = BeginCombo(comboLabel.c_str(), (*value >= 0 ? list.at(*value) : nullptr), ImGuiComboFlags_NoArrowButton | flags);
+	bool response = BeginCombo(comboLabel.c_str(), (*value >= 0 ? T_(list.at(*value)) : nullptr), ImGuiComboFlags_NoArrowButton | flags);
 	PopStyleColor();
 	if (response) {
 		response = false;
@@ -82,7 +83,7 @@ bool CustomListBoxIntColored(const char* label, int* value, const std::vector<co
 				PushStyleColor(ImGuiCol_Text, itemColors[i].color);
 
 			bool is_selected = (*value == i);
-			if (Selectable(list.at(i), is_selected)) {
+			if (Selectable(T_(list.at(i)), is_selected)) {
 				*value = (int)i;
 				response = true;
 			}
@@ -113,15 +114,15 @@ bool CustomListBoxIntColored(const char* label, int* value, const std::vector<co
 	}
 	SameLine(0, spacing);
 	//noobuild by gdjkhp
-	if (col.x == 0 && col.y == 0 && col.z == 0 && col.w == 0) Text(visualLabel == "" ? label : visualLabel);
-	else TextColored(col, visualLabel == "" ? label : visualLabel);
+	if (col.x == 0 && col.y == 0 && col.z == 0 && col.w == 0) Text(visualLabel == "" ? T_(label) : T_(visualLabel));
+	else TextColored(col, visualLabel == "" ? T_(label) : T_(visualLabel));
 
 	return response;
 }
 
 bool CustomListBoxIntMultiple(const char* label, std::vector<std::pair<const char*, bool>>* list, float width, bool resetButton, ImGuiComboFlags flags) {
 	auto comboLabel = "##" + std::string(label);
-	auto buttonLabel = "Reset##" + std::string(label);
+	auto buttonLabel = std::string(T_("Reset")) + "##" + std::string(label);
 	ImGuiStyle& style = GetStyle();
 	float spacing = style.ItemInnerSpacing.x;
 	PushItemWidth(width);
@@ -134,18 +135,18 @@ bool CustomListBoxIntMultiple(const char* label, std::vector<std::pair<const cha
 	std::string preview;
 	if (countSelected > 0) {
 		char buf[32] = { 0 };
-		sprintf_s(buf, "%zu item(s) selected", countSelected);
+		sprintf_s(buf, T_("%zu item(s) selected"), countSelected);
 		preview = buf;
 	}
 	else
-		preview = label;
+		preview = T_(label);
 	bool response = BeginCombo(comboLabel.c_str(), preview.c_str(), flags);
 	if (response) {
 		response = false;
 		for (auto& pair : *list) {
 			if (strcmp(pair.first, "") == 0) // ignore all entries with empty labels so we can create padding
 				continue;
-			if (Selectable(pair.first, pair.second)) {
+			if (Selectable(T_(pair.first), pair.second)) {
 				pair.second ^= 1;
 				response = true;
 			}
@@ -175,7 +176,7 @@ bool CustomListBoxPlayerSelectionMultiple(const char* label, std::array<std::pai
 	if (!IsInGame()) return false; // works only ingame
 
 	auto comboLabel = "##" + std::string(label);
-	auto buttonLabel = "Reset##" + std::string(label);
+	auto buttonLabel = std::string(T_("Reset")) + "##" + std::string(label);
 	ImGuiStyle& style = GetStyle();
 	float spacing = style.ItemInnerSpacing.x;
 	PushItemWidth(width);
@@ -188,11 +189,11 @@ bool CustomListBoxPlayerSelectionMultiple(const char* label, std::array<std::pai
 	std::string preview;
 	if (countSelected > 0) {
 		char buf[32] = { 0 };
-		sprintf_s(buf, "%zu player(s) selected", countSelected);
+		sprintf_s(buf, T_("%zu player(s) selected"), countSelected);
 		preview = buf;
 	}
 	else
-		preview = label;
+		preview = T_(label);
 	bool response = BeginCombo(comboLabel.c_str(), preview.c_str(), flags);
 	if (response) {
 		response = false;
@@ -386,7 +387,7 @@ bool SliderChrono(const char* label, void* p_data, const void* p_min, const void
 	RenderTextClipped(frame_bb.Min, frame_bb.Max, format.data(), format.data() + format.length(), NULL, ImVec2(0.5f, 0.5f));
 
 	if (label_size.x > 0.0f)
-		RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
+		RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), T_(label));
 
 	SameLine(0.0f * State.dpiScale, 10.0f * State.dpiScale);
 
@@ -399,7 +400,7 @@ bool SliderChrono(const char* label, void* p_data, const void* p_min, const void
 		liveColor,
 		radius * State.RoundingRadiusMultiplier);
 	SameLine(0.0f * State.dpiScale, 18.f * State.dpiScale);
-	Text("Live");
+	Text(T_("Live"));
 
 
 	IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags);
@@ -411,7 +412,7 @@ bool HotKey(uint8_t& key)
 {
 	Text("[ %s ]", KeyBinds::ToString(key));
 
-	if (IsItemHovered()) SetTooltip("Press any key while clicking on the keybind to change it, ESC to reset");
+	if (IsItemHovered()) SetTooltip(T_("Press any key while clicking on the keybind to change it, ESC to reset"));
 
 	if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) || !IsItemHovered())
 		return false;
@@ -574,7 +575,7 @@ bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags,
 	cb_user_data.Str = str;
 	cb_user_data.ChainCallback = callback;
 	cb_user_data.ChainCallbackUserData = user_data;
-	return InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+	return InputText(T_(label), (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
 }
 
 bool InputStringMultiline(const char* label, std::string* str, const ImVec2& size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
@@ -586,7 +587,7 @@ bool InputStringMultiline(const char* label, std::string* str, const ImVec2& siz
 	cb_user_data.Str = str;
 	cb_user_data.ChainCallback = callback;
 	cb_user_data.ChainCallbackUserData = user_data;
-	return InputTextMultiline(label, (char*)str->c_str(), str->capacity() + 1, size, flags, InputTextCallback, &cb_user_data);
+	return InputTextMultiline(T_(label), (char*)str->c_str(), str->capacity() + 1, size, flags, InputTextCallback, &cb_user_data);
 }
 
 bool InputStringWithHint(const char* label, const char* hint, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
@@ -598,7 +599,7 @@ bool InputStringWithHint(const char* label, const char* hint, std::string* str, 
 	cb_user_data.Str = str;
 	cb_user_data.ChainCallback = callback;
 	cb_user_data.ChainCallbackUserData = user_data;
-	return InputTextWithHint(label, hint, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+	return InputTextWithHint(T_(label), T_(hint), (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
 }
 
 bool ToggleButton(const char* str_id, bool* v) {
@@ -637,13 +638,13 @@ bool ToggleButton(const char* str_id, bool* v) {
 
 		SameLine();
 
-		if (State.searchQuery == "" ||
-			strToLower((std::string)str_id).find(strToLower(State.searchQuery)) != std::string::npos)
-			Text(str_id);
-		else
-			TextDisabled(str_id);
+if (State.searchQuery == "" ||
+		strToLower((std::string)T_(str_id)).find(strToLower(State.searchQuery)) != std::string::npos)
+		Text(T_(str_id));
+	else
+		TextDisabled(T_(str_id));
 
-		return result;
+	return result;
 	}
 	ImVec4* colors = ImGui::GetStyle().Colors;
 	ImVec2 p = ImGui::GetCursorScreenPos();
@@ -695,10 +696,10 @@ bool ToggleButton(const char* str_id, bool* v) {
 	SameLine();
 
 	if (State.searchQuery == "" ||
-		strToLower((std::string)str_id).find(strToLower(State.searchQuery)) != std::string::npos)
-		Text(str_id);
+		strToLower((std::string)T_(str_id)).find(strToLower(State.searchQuery)) != std::string::npos)
+		Text(T_(str_id));
 	else
-		TextDisabled(str_id);
+		TextDisabled(T_(str_id));
 
 	return clicked;
 }
@@ -740,8 +741,8 @@ void BoldText(const char* text, ImVec4 col) {
 	std::vector<std::pair<uint8_t, uint8_t>> vec = { {1, 1}, {1, 0}, {0, 1}, {0, 0} };
 	for (std::pair<uint8_t, uint8_t> i : vec) {
 		SetCursorScreenPos(ImVec2(pos.x + i.first, pos.y + i.second));
-		if (col.x == 0.f && col.y == 0.f && col.z == 0.f && col.w == 0.f) Text(text);
-		else TextColored(col, text);
+		if (col.x == 0.f && col.y == 0.f && col.z == 0.f && col.w == 0.f) Text(T_(text));
+		else TextColored(col, T_(text));
 	}
 }
 
@@ -861,7 +862,7 @@ bool SliderScalarV2(const char* label, ImGuiDataType data_type, void* p_data, co
 	RenderTextClipped(frame_bb.Min, frame_bb.Max, value_buf, value_buf_end, NULL, ImVec2(0.5f, 0.5f));
 
 	if (label_size.x > 0.0f)
-		RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
+		RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), T_(label));
 
 	IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags);
 	return value_changed;
@@ -891,15 +892,16 @@ struct PulseAnimState {
 };
 
 bool AnimatedButton(const char* label, bool isAffectedBySearch, const ImVec2& size) {
-	if (State.DisableAnimations) return ImGui::Button(label, size);
+	const char* dlabel = T_(label);
+	if (State.DisableAnimations) return ImGui::Button(dlabel, size);
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	if (window->SkipItems)
 		return false;
 
 	ImGuiID id = ImGui::GetID(label);
 	ImVec2 pos = ImGui::GetCursorScreenPos();
-	const char* label_end = ImGui::FindRenderedTextEnd(label);
-	float text_width = ImGui::CalcTextSize(label, label_end).x;
+	const char* label_end = ImGui::FindRenderedTextEnd(dlabel);
+	float text_width = ImGui::CalcTextSize(dlabel, label_end).x;
 	ImVec2 button_size = ImGui::CalcItemSize(size, text_width + ImGui::GetStyle().FramePadding.x * 2.0f, ImGui::GetFrameHeight());
 	ImRect bb(pos, pos + button_size);
 
@@ -940,7 +942,7 @@ bool AnimatedButton(const char* label, bool isAffectedBySearch, const ImVec2& si
 	}
 	
 	// Label
-	ImVec2 text_size = ImGui::CalcTextSize(label, label_end);
+	ImVec2 text_size = ImGui::CalcTextSize(dlabel, label_end);
 	ImVec2 text_pos = ImVec2(
 		bb.Min.x + (button_size.x - text_size.x) * 0.5f,
 		bb.Min.y + (button_size.y - text_size.y) * 0.5f
@@ -950,12 +952,12 @@ bool AnimatedButton(const char* label, bool isAffectedBySearch, const ImVec2& si
 
 	if (!isAffectedBySearch || State.searchQuery == "" ||
 		strToLower((std::string)label).find(strToLower(State.searchQuery)) != std::string::npos) {
-		RenderText(text_pos, label, label_end);
+		RenderText(text_pos, dlabel, label_end);
 	}
 	else {
 		auto col = State.LightMode ? ImVec4(0.2f, 0.2f, 0.2f, 0.4f * State.MenuThemeColor.w) : ImVec4(1.f, 1.f, 1.f, 0.4f * State.MenuThemeColor.w);
 		PushStyleColor(ImGuiCol_Text, col);
-		RenderText(text_pos, label, label_end);
+		RenderText(text_pos, dlabel, label_end);
 		PopStyleColor(1);
 	}
 
@@ -993,10 +995,10 @@ bool SelectableV2(const char* label, bool selected, float pulse_duration = 0.6f)
 	draw_list->AddRectFilled(pos, pos + size, col, ImGui::GetStyle().FrameRounding);
 
 	// Text
-	ImVec2 text_size = ImGui::CalcTextSize(label);
+	ImVec2 text_size = ImGui::CalcTextSize(T_(label));
 	ImVec2 text_pos = ImVec2(pos.x + ImGui::GetStyle().FramePadding.x, pos.y + (size.y - text_size.y) * 0.5f);
 	ImU32 text_col = ImGui::GetColorU32(ImGuiCol_Text);
-	draw_list->AddText(text_pos, text_col, label);
+	draw_list->AddText(text_pos, text_col, T_(label));
 
 	return clicked;
 }

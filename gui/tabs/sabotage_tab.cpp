@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include "translations.hpp"
 
 namespace SabotageTab {
     // Begone, garbage code.
@@ -113,7 +114,7 @@ namespace SabotageTab {
 
         ImGui::NewLine();
         if (State.DisableSabotages)
-            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Sabotages have been disabled. Nothing can be sabotaged.");
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Sabotages have been disabled. Nothing can be sabotaged."));
         //i skidded some code from https://github.com/scp222thj/MalumMenu/
 
         if (AnimatedButton("Sabotage All")) {

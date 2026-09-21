@@ -18,6 +18,7 @@
 #endif
 #include "state.hpp"
 #include "gui-helpers.hpp"
+#include "translations.hpp"
 
 namespace Menu {
 	static bool openAbout = false;
@@ -319,18 +320,21 @@ namespace Menu {
 
 		for (const auto& category : categories) {
 			for (const auto& entry : category.second) {
-				if (ToLower(entry.Name).find(lowerQuery) != std::string::npos) {
+				std::string lowerNameEn = ToLower(entry.Name);
+				std::string lowerNameJa = ToLower(T_(entry.Name));
+				if (lowerNameEn.find(lowerQuery) != std::string::npos ||
+					lowerNameJa.find(lowerQuery) != std::string::npos) {
 					searchResults.push_back({ category.first, entry.SubGroup });
 					break;
 				}
 			}
 		}
 		ImGui::TextColored(ImVec4(0.f, 0.f, 0.f, 0.f), "space");
-		if (searchResults.size() == 0) BoldText("No results.");
+		if (searchResults.size() == 0) BoldText(T_("No results."));
 		else {
-			BoldText(("Search Result" + std::string(searchResults.size() == 1 ? "" : "s")).c_str());
+			BoldText(T_(searchResults.size() == 1 ? "Search Result" : "Search Results"));
 			for (auto& [tabName, subGroup] : searchResults) {
-				std::string label = /*subGroup.empty() ? */tabName/* : (tabName + " > " + subGroup)*/;
+				std::string label = T_(tabName);
 				if (ImGui::Selectable((label + "##searchresult").c_str())) {
 					Tabs selectedTab = CategoryNameToTab(tabName);
 					if (IsTabUsable(selectedTab)) {
@@ -381,44 +385,44 @@ namespace Menu {
 				State.searchQuery = "";
 			}
 
-			if (ImGui::Selectable("About", openAbout)) {
+			if (ImGui::Selectable(T_("About"), openAbout)) {
 				CloseAllOtherTabs(Tabs::About);
 			}
-			if (ImGui::Selectable("Settings", openSettings)) {
+			if (ImGui::Selectable(T_("Settings"), openSettings)) {
 				CloseAllOtherTabs(Tabs::Settings);
 			}
-			if (ImGui::Selectable("Game", openGame)) {
+			if (ImGui::Selectable(T_("Game"), openGame)) {
 				CloseAllOtherTabs(Tabs::Game);
 			}
-			if (ImGui::Selectable("Self", openSelf)) {
+			if (ImGui::Selectable(T_("Self"), openSelf)) {
 				CloseAllOtherTabs(Tabs::Self);
 			}
-			if (ImGui::Selectable("Radar", openRadar)) {
+			if (ImGui::Selectable(T_("Radar"), openRadar)) {
 				CloseAllOtherTabs(Tabs::Radar);
 			}
-			if (ImGui::Selectable("Replay", openReplay)) {
+			if (ImGui::Selectable(T_("Replay"), openReplay)) {
 				CloseAllOtherTabs(Tabs::Replay);
 			}
-			if (ImGui::Selectable("ESP", openEsp)) {
+			if (ImGui::Selectable(T_("ESP"), openEsp)) {
 				CloseAllOtherTabs(Tabs::Esp);
 			}
-			if ((IsInGame() || IsInLobby()) && ImGui::Selectable("Players", openPlayers)) {
+			if ((IsInGame() || IsInLobby()) && ImGui::Selectable(T_("Players"), openPlayers)) {
 				CloseAllOtherTabs(Tabs::Players);
 			}
-			if (((IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) || (IsInLobby() && IsHost())) && ImGui::Selectable("Tasks", openTasks)) {
+			if (((IsInGame() && GetPlayerData(*Game::pLocalPlayer)->fields.Tasks != NULL) || (IsInLobby() && IsHost())) && ImGui::Selectable(T_("Tasks"), openTasks)) {
 				CloseAllOtherTabs(Tabs::Tasks);
 			}
-			if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance != NULL && ImGui::Selectable("Sabotage", openSabotage)) {
+			if (IsInGame() && ShipStatus__TypeInfo->static_fields->Instance != NULL && ImGui::Selectable(T_("Sabotage"), openSabotage)) {
 				CloseAllOtherTabs(Tabs::Sabotage);
 			}
-			if ((IsInGame() && !State.mapDoors.empty()) && ImGui::Selectable("Doors", openDoors)) {
+			if ((IsInGame() && !State.mapDoors.empty()) && ImGui::Selectable(T_("Doors"), openDoors)) {
 				CloseAllOtherTabs(Tabs::Doors);
 			}
-			if (IsHost() && ImGui::Selectable("Host", openHost)) {
+			if (IsHost() && ImGui::Selectable(T_("Host"), openHost)) {
 				CloseAllOtherTabs(Tabs::Host);
 			}
 #ifdef _DEBUG
-			if (State.showDebugTab && ImGui::Selectable("Debug", openDebug)) {
+			if (State.showDebugTab && ImGui::Selectable(T_("Debug"), openDebug)) {
 				CloseAllOtherTabs(Tabs::Debug);
 			}
 #endif
@@ -447,14 +451,14 @@ namespace Menu {
 				ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 90 * State.dpiScale,
 					ImGui::GetWindowHeight() - 65 * State.dpiScale));
 				if (!panicKeybind) {
-					ImGui::TextColored(PanicCol, "No Panic");
-					ImGui::TextColored(PanicCol, "Keybind!");
+					ImGui::TextColored(PanicCol, T_("No Panic"));
+					ImGui::TextColored(PanicCol, T_("Keybind!"));
 				}
 				else {
-					ImGui::TextColored(PanicCol, ("Press " + (std::string)KeyBinds::ToString(State.KeyBinds.Toggle_Sicko)).c_str());
+					ImGui::TextColored(PanicCol, (std::string(T_("Press ")) + (std::string)KeyBinds::ToString(State.KeyBinds.Toggle_Sicko)).c_str());
 					ImGui::TextColored(PanicCol, ("to re-enable!"));
 				}
-				ImGui::TextColored(PanicCol, "Continue?");
+				ImGui::TextColored(PanicCol, T_("Continue?"));
 				if (ColoredButton(PanicCol, "Yes")) {
 					isPanicWarning = false;
 					State.PanicMode = true;

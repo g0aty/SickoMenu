@@ -118,6 +118,7 @@ void Settings::Load() {
         JSON_TRYGET("ShowUiBorders", this->ShowUiBorders);
         JSON_TRYGET("RoundingRadiusMultiplier", this->RoundingRadiusMultiplier);
         this->RoundingRadiusMultiplier = std::clamp(this->RoundingRadiusMultiplier, 0.f, 2.f);
+        JSON_TRYGET("Language", this->Language);
         JSON_TRYGET("ExtraCommands", this->ExtraCommands);
 
         // JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
@@ -808,6 +809,7 @@ void Settings::Save() {
                 { "AnimationSpeed", this->AnimationSpeed },
                 { "ShowUiBorders", this->ShowUiBorders },
                 { "RoundingRadiusMultiplier", this->RoundingRadiusMultiplier },
+                { "Language", this->Language },
                 { "ExtraCommands", this->ExtraCommands },
 
                 // { "NoAbilityCD", this->NoAbilityCD },

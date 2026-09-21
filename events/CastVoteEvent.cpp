@@ -1,6 +1,7 @@
 #include "pch-il2cpp.h"
 #include "_events.h"
 #include "utility.h"
+#include "translations.hpp"
 
 CastVoteEvent::CastVoteEvent(const EVENT_PLAYER& source, const std::optional<EVENT_PLAYER>& target) : EventInterface(source, EVENT_TYPES::EVENT_VOTE) {
 	this->target = target;
@@ -12,15 +13,15 @@ void CastVoteEvent::Output() {
 	ImGui::Text(">");
 	ImGui::SameLine();
 	if (target.has_value()) ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(target->colorId)), target->playerName.c_str());
-	else ImGui::Text("Skipped");
+	else ImGui::Text(T_("Skipped"));
 	ImGui::SameLine();
-	ImGui::Text("[%s ago]", std::format("{:%OM:%OS}", (std::chrono::system_clock::now() - this->timestamp)).c_str());
+	ImGui::Text(T_("[%s ago]"), std::format("{:%OM:%OS}", (std::chrono::system_clock::now() - this->timestamp)).c_str());
 }
 
 void CastVoteEvent::ColoredEventOutput() {
 	ImGui::Text("[");
 	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(0.3f, 0.4f, 1.f, 1.f), "VOTE");
+	ImGui::TextColored(ImVec4(0.3f, 0.4f, 1.f, 1.f), T_("VOTE"));
 	ImGui::SameLine();
 	ImGui::Text("]");
 }

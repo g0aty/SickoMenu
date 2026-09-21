@@ -4,6 +4,7 @@
 #include "utility.h"
 #include "state.hpp"
 #include "gui-helpers.hpp"
+#include "translations.hpp"
 
 namespace Radar {
 	ImU32 GetRadarPlayerColor(NetworkedPlayerInfo* playerData) {
@@ -91,9 +92,9 @@ namespace Radar {
 
 		if (State.LockRadar || (IsInGame() && State.ShowRadar_ShiftLeftClickClosesRoomDoor &&
 			ImGui::IsKeyDown(VK_SHIFT)))
-			ImGui::Begin("Radar", &State.ShowRadar, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMouseInputs);
+			ImGui::Begin(T_("Radar"), &State.ShowRadar, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMouseInputs);
 		else
-			ImGui::Begin("Radar", &State.ShowRadar, ImGuiWindowFlags_NoDecoration);
+			ImGui::Begin(T_("Radar"), &State.ShowRadar, ImGuiWindowFlags_NoDecoration);
 
 		ImVec2 windowMin = ImGui::GetWindowPos();
 		ImVec2 windowMax = windowMin + ImGui::GetWindowSize();

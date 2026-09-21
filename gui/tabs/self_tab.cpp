@@ -6,6 +6,7 @@
 #include "state.hpp"
 #include "logger.h"
 #include "_hooks.h"
+#include "translations.hpp"
 
 extern void RevealAnonymousVotes(); // in MeetingHud.cpp
 
@@ -330,7 +331,7 @@ namespace SelfTab {
             if (ToggleButton("Read and Send SickoChat", &State.ReadAndSendSickoChat)) {
                 State.Save();
             }
-            if (State.ReadAndSendSickoChat) ImGui::Text("Send SickoChat messages in regular chat by typing \"/sc [message]\"!");
+            if (State.ReadAndSendSickoChat) ImGui::Text(T_("Send SickoChat messages in regular chat by typing \"/sc [message]\"!"));
             /*static int framesPassed = 0;
             if (AnimatedButton("Refresh Chat Button")) {
                 State.RefreshChatButton = true;
@@ -341,7 +342,7 @@ namespace SelfTab {
             else framesPassed--;*/
 
             if (/*!IsHost() && */State.SafeMode) {
-                ImGui::Text("Custom names are purely CLIENT-SIDED!");
+                ImGui::Text(T_("Custom names are purely CLIENT-SIDED!"));
             }
             if (ToggleButton("Custom Name", &State.CustomName)) {
                 State.Save();
@@ -357,7 +358,7 @@ namespace SelfTab {
                 }
             }
 
-            if (State.CustomName && ImGui::CollapsingHeader("Custom Name Options"))
+            if (State.CustomName && ImGui::CollapsingHeader(T_("Custom Name Options")))
             {
                 if (ToggleButton("Italics", &State.ItalicName)) {
                     State.Save();
@@ -406,8 +407,8 @@ namespace SelfTab {
 
                 InputString("Name Prefix", &State.NamePrefix);
                 InputString("Name Suffix", &State.NameSuffix);
-                if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: Prefix and/or suffix will be cleared from the ends of the name if it contains them."));
-                if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("This is done to prevent name overflowing."));
+                if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), T_("Note: Prefix and/or suffix will be cleared from the ends of the name if it contains them."));
+                if (State.UsePrefixAndSuffix) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), T_("This is done to prevent name overflowing."));
 
                 if (ToggleButton("Font", &State.Font)) {
                     State.Save();
@@ -418,7 +419,7 @@ namespace SelfTab {
                         State.Save();
                     }
                 }
-                if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: The white nickname will not be visible in the chat"));
+if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), T_("Note: The white nickname will not be visible in the chat"));
 
                 /*if (ToggleButton("Material", &State.Material)) {
                     State.Save();
@@ -766,7 +767,7 @@ namespace SelfTab {
                 State.Save();
             }
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text("Select Role");
+            ImGui::Text(T_("Select Role"));
             ImGui::SameLine();
             if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && AnimatedButton("Set Role")) {
                 // State.FakeRole = std::clamp(State.FakeRole, 0, 10);
@@ -875,29 +876,29 @@ namespace SelfTab {
             if (ToggleButton("No Ladder/Zipline Cooldown", &State.NoLadderZiplineCooldown)) State.Save();
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-            ImGui::TextColored(State.EngineerColor, "Engineer");
+            ImGui::TextColored(State.EngineerColor, T_("Engineer"));
             if (ToggleButton("No Vent Cooldown", &State.Engineer_NoVentCooldown)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Infinite Vent Time", &State.Engineer_InfiniteVentTime)) State.Save();
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-            ImGui::TextColored(State.ScientistColor, "Scientist");
+            ImGui::TextColored(State.ScientistColor, T_("Scientist"));
             if (ToggleButton("No Vitals Cooldown", &State.Scientist_NoVitalsCooldown)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Infinite Battery", &State.Scientist_InfiniteBattery)) State.Save();
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-            ImGui::TextColored(State.TrackerColor, "Tracker");
+            ImGui::TextColored(State.TrackerColor, T_("Tracker"));
             if (ToggleButton("No Tracking Cooldown", &State.Tracker_NoTrackingCooldown)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Infinite Tracking", &State.Tracker_InfiniteTracking)) State.Save();
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-            ImGui::TextColored(State.DetectiveColor, "Detective");
+            ImGui::TextColored(State.DetectiveColor, T_("Detective"));
             if (ToggleButton("No Interrogate Cooldown", &State.Detective_NoInterrogateCooldown)) State.Save();
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-            ImGui::TextColored(State.JudgeColor, "Judge");
+            ImGui::TextColored(State.JudgeColor, T_("Judge"));
             if (ToggleButton("No Task Requirement", &State.Judge_NoTaskRequirement)) State.Save();
             if (!State.SafeMode) {
                 ImGui::SameLine();
@@ -906,12 +907,12 @@ namespace SelfTab {
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
             if (IsHost() || !State.SafeMode) {
-                ImGui::TextColored(State.GuardianAngelColor, "Guardian Angel");
+                ImGui::TextColored(State.GuardianAngelColor, T_("Guardian Angel"));
                 if (ToggleButton("No Protect Cooldown", &State.GuardianAngel_NoProtectCooldown)) State.Save();
                 ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             }
 
-            ImGui::TextColored(State.ImpostorColor, "Impostor");
+            ImGui::TextColored(State.ImpostorColor, T_("Impostor"));
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Kill Reach", &State.InfiniteKillRange)) State.Save();
@@ -921,7 +922,7 @@ namespace SelfTab {
             if (IsHost() && ToggleButton("No Kill Cooldown", &State.Impostor_NoKillCooldown)) State.Save();
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
-            ImGui::TextColored(State.ShapeshifterColor, "Shapeshifter");
+            ImGui::TextColored(State.ShapeshifterColor, T_("Shapeshifter"));
             if (ToggleButton("No Shapeshift Animation", &State.AnimationlessShapeshift)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Infinite Shapeshift Duration", &State.Shapeshifter_InfiniteShapeshiftDuration)) State.Save();
@@ -948,7 +949,7 @@ namespace SelfTab {
             }
 
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-            if (ImGui::CollapsingHeader("Cycler Options")) {
+            if (ImGui::CollapsingHeader(T_("Cycler Options"))) {
                 ImGui::Dummy(ImVec2(4, 2)* State.dpiScale);
                 if (!State.SafeMode) {
                     if (ToggleButton("Cycle Name", &State.CycleName)) {
@@ -992,13 +993,13 @@ namespace SelfTab {
 
             ImGui::Dummy(ImVec2(4, 4)* State.dpiScale);
 
-            if (!State.SafeMode && ImGui::CollapsingHeader("Cycler Name Options")) {
+            if (!State.SafeMode && ImGui::CollapsingHeader(T_("Cycler Name Options"))) {
                 if (CustomListBoxInt("Cycler Name Generation", &State.cyclerNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
                     State.Save();
                 }
                 if (State.cyclerNameGeneration == 2) {
                     if (State.cyclerUserNames.empty())
-                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username generation will fall back to word combo as you have no names in the cycler.");
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Username generation will fall back to word combo as you have no names in the cycler."));
                     static std::string newName = "";
                     InputString("New Name", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     ImGui::SameLine();
@@ -1008,7 +1009,7 @@ namespace SelfTab {
                         newName = "";
                     }
                     if (!(IsHost() || !State.SafeMode) && !IsNameValid(newName)) {
-                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username will be detected by anticheat. This name will be ignored.");
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Username will be detected by anticheat. This name will be ignored."));
                     }
                     if (!State.cyclerUserNames.empty()) {
                         static int selectedNameIndex = 0;
@@ -1025,7 +1026,7 @@ namespace SelfTab {
                 }
             }
 
-            if (ImGui::CollapsingHeader("Confuser", ImGuiTreeNodeFlags_DefaultOpen)) {
+            if (ImGui::CollapsingHeader(T_("Confuser"), ImGuiTreeNodeFlags_DefaultOpen)) {
                 ImGui::Dummy(ImVec2(4, 2) * State.dpiScale);
                 if (ToggleButton("Confuser (Randomize Appearance at Will)", &State.confuser)) {
                     State.Save();
@@ -1073,7 +1074,7 @@ namespace SelfTab {
                     }
                 }
 
-                ImGui::Text("Confuse when:");
+                ImGui::Text(T_("Confuse when:"));
                 if (ToggleButton("Joining Lobby", &State.confuseOnJoin)) {
                     State.Save();
                 }
@@ -1094,13 +1095,13 @@ namespace SelfTab {
                     State.Save();
                 }
             }
-            if (!State.SafeMode && ImGui::CollapsingHeader("Confuser Name Options")) {
+            if (!State.SafeMode && ImGui::CollapsingHeader(T_("Confuser Name Options"))) {
                 if (CustomListBoxInt("Confuser Name Generation", &State.confuserNameGeneration, NAMEGENERATION, 75 * State.dpiScale)) {
                     State.Save();
                 }
                 if (State.confuserNameGeneration == 2) {
                     if (State.cyclerUserNames.empty())
-                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username generation will fall back to word combo as you have no names in the cycler.");
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Username generation will fall back to word combo as you have no names in the cycler."));
                     static std::string newName = "";
                     InputString("New Name ", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     ImGui::SameLine();
@@ -1110,7 +1111,7 @@ namespace SelfTab {
                         newName = "";
                     }
                     if (!(IsHost() || !State.SafeMode) && !IsNameValid(newName)) {
-                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Username will be detected by anticheat. This name will be ignored.");
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Username will be detected by anticheat. This name will be ignored."));
                     }
                     if (!State.cyclerUserNames.empty()) {
                         static int selectedNameIndex = 0;
@@ -1128,7 +1129,7 @@ namespace SelfTab {
             }
             ImGui::Dummy(ImVec2(4, 2)* State.dpiScale);
             bool isPresetDeleted = false;
-            if (ImGui::CollapsingHeader("Cosmetic Presets", ImGuiTreeNodeFlags_DefaultOpen)) {
+            if (ImGui::CollapsingHeader(T_("Cosmetic Presets"), ImGuiTreeNodeFlags_DefaultOpen)) {
                 ImGui::Dummy(ImVec2(4, 2) * State.dpiScale);
                 if (ToggleButton("Auto Apply on Join", &State.AutoApplyCosmeticPreset))
                     State.Save();
@@ -1167,7 +1168,7 @@ namespace SelfTab {
                     }
                 }
                 else {
-                    ImGui::TextDisabled("No cosmetic presets saved.");
+                    ImGui::TextDisabled(T_("No cosmetic presets saved."));
                 }
 
                 if (!isPresetDeleted) {
@@ -1224,7 +1225,7 @@ namespace SelfTab {
             ImGui::SameLine();
             CustomListBoxInt(" ", &fontType, FONTS, 160.f * State.dpiScale);
             ImGui::Dummy(ImVec2(-5, -5) * State.dpiScale);
-            if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("Note: The white nickname will not be visible in the chat"));
+            if (State.Font) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), T_("Note: The white nickname will not be visible in the chat"));
 
             ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
 

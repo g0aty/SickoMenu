@@ -5,6 +5,7 @@
 #include "utility.h"
 #include "state.hpp"
 #include "logger.h"
+#include "translations.hpp"
 /*#include <hunspell/hunspell.hxx>
 #include <sstream>
 #include <string>
@@ -194,8 +195,8 @@ namespace GameTab {
 
         static int selectedWarnView = 0;
         const char* warnViewModes[WarnView_COUNT] = {
-            "List View",
-            "Manual Warn"
+            T_("List View"),
+            T_("Manual Warn")
         };
 
         if (openGeneral) {
@@ -307,7 +308,7 @@ namespace GameTab {
                     if (p != *Game::pLocalPlayer) State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p, 1, true));
                 }
                 State.NoClip = true;
-                ShowHudNotification("Allowed everyone to NoClip!");
+                ShowHudNotification(T_("Allowed everyone to NoClip!"));
             }
             /*if (IsHost() && (IsInGame() || IsInLobby()) && AnimatedButton("Spawn Dummy")) {
                 auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
@@ -546,11 +547,11 @@ namespace GameTab {
             }
 
             if (!(IsHost() || !State.SafeMode) && State.chatMessage.size() > 120) {
-                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Message will be detected by anticheat.");
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Message will be detected by anticheat."));
             }
 
             ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
-            if (ImGui::CollapsingHeader("Chat Presets", ImGuiTreeNodeFlags_DefaultOpen)) {
+            if (ImGui::CollapsingHeader(T_("Chat Presets"), ImGuiTreeNodeFlags_DefaultOpen)) {
                 ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
                 static std::string newChatPresetName = "MyPreset";
                 static int lastRenameIndex = -1;
@@ -593,7 +594,7 @@ namespace GameTab {
                     }
                 }
                 else {
-                    ImGui::TextDisabled("No presets saved.");
+                    ImGui::TextDisabled(T_("No presets saved."));
                 }
 
                 ImGui::Dummy(ImVec2(0, 4) * State.dpiScale);
@@ -603,7 +604,7 @@ namespace GameTab {
                 ImGui::SameLine();
                 ImGui::TextUnformatted("Preset Name");
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip("Preset names can't contain spaces to be usable with /cmd (e.g. /rules).");
+                    ImGui::SetTooltip(T_("Preset names can't contain spaces to be usable with /cmd (e.g. /rules)."));
                 ImGui::SameLine();
                 if (AnimatedButton("Save Current##chatpreset")) {
                     std::string sanitizedName = newChatPresetName;
@@ -623,7 +624,7 @@ namespace GameTab {
                     }
                 }
                 if (ImGui::BeginPopup("ChatPresetNameTaken")) {
-                    ImGui::Text("A preset with that name already exists.");
+                    ImGui::Text(T_("A preset with that name already exists."));
                     ImGui::EndPopup();
                 }
                 if (!State.ChatPresets.empty()) {
@@ -651,7 +652,7 @@ namespace GameTab {
                     if (State.ChatPresets[i].Messages.size() <= 1) combinableIndices.push_back(i);
                 }
 
-                if (combinableIndices.size() >= 2 && ImGui::CollapsingHeader("Combine Presets")) {
+                if (combinableIndices.size() >= 2 && ImGui::CollapsingHeader(T_("Combine Presets"))) {
                     ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
                     static std::vector<std::pair<const char*, bool>> combineList;
                     static std::vector<std::string> combineNamesCache;
@@ -722,16 +723,16 @@ namespace GameTab {
         if (openAnticheat) {
             if (ToggleButton("Enable Anticheat (SMAC)", &State.Enable_SMAC)) State.Save();
             ImGui::Dummy(ImVec2(0, 1)* State.dpiScale);
-            if (ImGui::CollapsingHeader("Action on Detection##smacoverride")) {
+            if (ImGui::CollapsingHeader(T_("Action on Detection##smacoverride"))) {
                 bool changed = false;
 
-                ImGui::TextDisabled("Default action taken when a detection isn't specifically overridden below.");
+                ImGui::TextDisabled(T_("Default action taken when a detection isn't specifically overridden below."));
                 changed = changed || CustomListBoxInt("Host Punishment", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
                 ImGui::SameLine();
                 changed = changed || CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
 
                 ImGui::Dummy(ImVec2(0, 1) * State.dpiScale);
-                ImGui::TextDisabled("Override the action for a specific detection.");
+                ImGui::TextDisabled(T_("Override the action for a specific detection."));
 
                 static const std::vector<const char*> SMAC_CATEGORIES = {
                     "Known Cheat Usage", "SickoMenu Usage", "Abnormal Names", "Abnormal Set Color",
@@ -771,18 +772,18 @@ namespace GameTab {
             ImGui::SameLine();
             if (ToggleButton("Ignore Whitelist", &State.SMAC_IgnoreWhitelist)) State.Save();
             if (State.SMAC_PunishBlacklist) {
-                ImGui::Text("Blacklist");
+                ImGui::Text(T_("Blacklist"));
                 if (State.BlacklistFriendCodes.empty())
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in blacklist!");
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("No users in blacklist!"));
                 else {
                     ImGui::SameLine(0.f, 0.f);
-                    ImGui::Text(" (%d Users Blacklisted)", State.BlacklistFriendCodes.size());
+                    ImGui::Text(T_(" (%d Users Blacklisted)"), State.BlacklistFriendCodes.size());
                 }
                 static std::string newBFriendCode = "";
                 bool isInBlacklistAlready = std::find(State.BlacklistFriendCodes.begin(), State.BlacklistFriendCodes.end(), newBFriendCode) != State.BlacklistFriendCodes.end();
                 InputString("New Friend Code", &newBFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
                 if (isInBlacklistAlready)
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user is already blacklisted!");
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("This user is already blacklisted!"));
                 if (newBFriendCode != "" && !isInBlacklistAlready) ImGui::SameLine();
                 if (newBFriendCode != "" && !isInBlacklistAlready && AnimatedButton("Add")) {
                     State.BlacklistFriendCodes.push_back(newBFriendCode);
@@ -804,18 +805,18 @@ namespace GameTab {
                 }
             }
             if (State.SMAC_IgnoreWhitelist) {
-                ImGui::Text("Whitelist");
+                ImGui::Text(T_("Whitelist"));
                 if (State.WhitelistFriendCodes.empty())
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in whitelist!");
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("No users in whitelist!"));
                 else {
                     ImGui::SameLine(0.f, 0.f);
-                    ImGui::Text(" (%d Users Whitelisted)", State.WhitelistFriendCodes.size());
+                    ImGui::Text(T_(" (%d Users Whitelisted)"), State.WhitelistFriendCodes.size());
                 }
                 static std::string newWFriendCode = "";
                 static bool isInWhitelistAlready = std::find(State.WhitelistFriendCodes.begin(), State.WhitelistFriendCodes.end(), newWFriendCode) != State.WhitelistFriendCodes.end();
                 InputString("New Friend Code\n", &newWFriendCode, ImGuiInputTextFlags_EnterReturnsTrue);
                 if (isInWhitelistAlready)
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user is already whitelisted!");
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("This user is already whitelisted!"));
                 if (newWFriendCode != "" && !isInWhitelistAlready) ImGui::SameLine();
                 if (newWFriendCode != "" && !isInWhitelistAlready && AnimatedButton("Add\n")) {
                     State.WhitelistFriendCodes.push_back(newWFriendCode);
@@ -836,7 +837,7 @@ namespace GameTab {
                         State.WhitelistFriendCodes.erase(State.WhitelistFriendCodes.begin() + selectedWCodeIndex);
                 }
             }
-            ImGui::Text("Detect Actions:");
+            ImGui::Text(T_("Detect Actions:"));
             if (ToggleButton("Known Cheat Usage", &State.SMAC_CheckOtherCheats)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("SickoMenu Usage", &State.SMAC_CheckSicko)) State.Save();
@@ -883,7 +884,7 @@ namespace GameTab {
             if (State.SMAC_CheckBadWords) {
                 static const std::vector<const char*> SMAC_DETECTION_MODES = { "Default Detection", "Strict Detection" };
                 if (State.SMAC_BadWords.empty())
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No bad words added!");
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("No bad words added!"));
                 static std::string newWord = "";
                 InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
@@ -927,7 +928,7 @@ namespace GameTab {
                     State.SMAC_StartWordsThreshold = std::clamp(State.SMAC_StartWordsThreshold, 1, 10);
                 }
                 if (State.SMAC_StartWords.empty())
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No start words added!");
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("No start words added!"));
                 static std::string newStartWord = "";
                 InputString("New W\u043Erd", &newStartWord, ImGuiInputTextFlags_EnterReturnsTrue);
                 ImGui::SameLine();
@@ -978,7 +979,7 @@ namespace GameTab {
                 State.Save();
             }
 
-            if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
+            if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), (T_("When the game starts, the lobby is destroyed")));
 
             /*if (!IsInGame() && !IsInLobby()) {
                 if (ToggleButton("Overflow", &State.Overflow)) {
@@ -989,7 +990,7 @@ namespace GameTab {
             }*/
 
             if (State.AprilFoolsMode) {
-                ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? "Diddy Party Mode" : (IsChatCensored() || IsStreamerMode() ? "F***son Mode" : "Fuckson Mode"));
+                ImGui::TextColored(ImVec4(0.79f, 0.03f, 1.f, 1.f), State.DiddyPartyMode ? T_("Diddy Party Mode") : (IsChatCensored() || IsStreamerMode() ? T_("F***son Mode") : T_("Fuckson Mode")));
                 if (ToggleButton("Mog Everyone [Sigma]", &State.BrainrotEveryone)) {
                     if (State.ChatSpam) State.ChatSpam = false;
                     if (State.RizzUpEveryone) State.RizzUpEveryone = false;
@@ -1027,9 +1028,9 @@ namespace GameTab {
                 if (State.KickAFK && ToggleButton("AFK - Second Chance", &State.SecondChance)) {
                     State.Save();
                 }
-                std::string header = "Anti AFK ~ Advanced Options";
+                std::string header = T_("Anti AFK ~ Advanced Options");
                 if (!IsInGame()) {
-                    header += " [GAME-MATCH]";
+                    header += T_(" [GAME-MATCH]");
                 }
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
                 if (State.KickAFK && ImGui::CollapsingHeader(header.c_str()))
@@ -1058,7 +1059,7 @@ namespace GameTab {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-                if (ImGui::CollapsingHeader("BA-RP ~ Advanced Options"))
+                if (ImGui::CollapsingHeader(T_("BA-RP ~ Advanced Options")))
                 {
                     SteppedSliderFloat("Maximum Rejoins", &State.LeaveCount, 1.f, 15.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput);
                     ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
@@ -1077,9 +1078,9 @@ namespace GameTab {
                     State.Save();
                 }
                 if (State.KickByLockedName) {
-                    ImGui::Text("Blocked Names");
+                    ImGui::Text(T_("Blocked Names"));
                     if (State.LockedNames.empty())
-                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No users in Name-Checker!");
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("No users in Name-Checker!"));
                     static std::string newName = "";
                     InputString("New Nickname", &newName, ImGuiInputTextFlags_EnterReturnsTrue);
                     if (newName != "") ImGui::SameLine();
@@ -1128,13 +1129,13 @@ namespace GameTab {
             ImGui::BeginGroup();
             ImGui::PushItemWidth(150);
             if (!IsHost()) ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-            ImGui::Combo("Warn View Mode", &selectedWarnView, warnViewModes, WarnView_COUNT);
+            ImGui::Combo(T_("Warn View Mode"), &selectedWarnView, warnViewModes, WarnView_COUNT);
             ImGui::PopItemWidth();
 
 
             if (selectedWarnView == WarnView_List) {
                 if (!State.WarnedFriendCodes.empty()) {
-                    ImGui::Text("Warned Players");
+                    ImGui::Text(T_("Warned Players"));
 
                     std::string localFC = "";
                     if (Game::pLocalPlayer && *Game::pLocalPlayer) {
@@ -1164,7 +1165,7 @@ namespace GameTab {
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        if (ImGui::Button("Remove")) {
+                        if (ImGui::Button(T_("Remove"))) {
                             if (selectedWarned >= 0 && selectedWarned < (int)fcKeys.size()) {
                                 std::string fc = fcKeys[selectedWarned];
                                 State.WarnedFriendCodes.erase(fc);
@@ -1178,7 +1179,7 @@ namespace GameTab {
                         auto& warnReasons = State.WarnReasons[selectedFc];
 
                         if (!warnReasons.empty()) {
-                            ImGui::Text("Warn Reasons:");
+                            ImGui::Text(T_("Warn Reasons:"));
 
                             static int selectedReason = 0;
                             selectedReason = std::clamp(selectedReason, 0, (int)warnReasons.size() - 1);
@@ -1197,7 +1198,7 @@ namespace GameTab {
                             ImGui::PopItemWidth();
 
                             ImGui::SameLine();
-                            if (ImGui::Button("Delete")) {
+                            if (ImGui::Button(T_("Delete"))) {
                                 if (selectedReason >= 0 && selectedReason < (int)warnReasons.size()) {
                                     warnReasons.erase(warnReasons.begin() + selectedReason);
                                     selectedReason = 0;
@@ -1214,7 +1215,7 @@ namespace GameTab {
                         }
                     }
                     else {
-                        ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "No warned players.");
+                        ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), T_("No warned players."));
                     }
                 }
             }
@@ -1227,7 +1228,7 @@ namespace GameTab {
                 InputString("Reason", &warnReason);
                 ImGui::PopItemWidth();
 
-                if (ImGui::Button("Submit Warn") && !friendCodeToWarn.empty() && !warnReason.empty()) {
+                if (ImGui::Button(T_("Submit Warn")) && !friendCodeToWarn.empty() && !warnReason.empty()) {
                     State.WarnedFriendCodes[friendCodeToWarn]++;
                     State.WarnReasons[friendCodeToWarn].push_back(warnReason);
                     State.Save();
@@ -1246,7 +1247,7 @@ namespace GameTab {
             if (ToggleButton("Enable Temp-Ban System", &State.TempBanEnabled)) {
                 State.Save();
             }
-            if (State.TempBanEnabled && ImGui::CollapsingHeader("Temp-Ban System")) {
+            if (State.TempBanEnabled && ImGui::CollapsingHeader(T_("Temp-Ban System"))) {
                 static std::string friendCodeToTempBan;
                 static int banDays = 0, banHours = 0, banMinutes = 0, banSeconds = 0;
 
@@ -1260,7 +1261,7 @@ namespace GameTab {
                 ImGui::InputInt("Seconds", &banSeconds); banSeconds = std::clamp(banSeconds, 0, 59);
                 ImGui::PopItemWidth();
 
-                if (!friendCodeToTempBan.empty() && ImGui::Button("Submit Temp-Ban")) {
+                if (!friendCodeToTempBan.empty() && ImGui::Button(T_("Submit Temp-Ban"))) {
                     std::string selfFC;
                     if (Game::pLocalPlayer && *Game::pLocalPlayer) {
                         selfFC = convert_from_string((*Game::pLocalPlayer)->fields.FriendCode);
@@ -1304,11 +1305,11 @@ namespace GameTab {
                 ImGui::SameLine();
 
                 ImGui::BeginGroup();
-                ImGui::Text("Temp-Banned Players:");
+                ImGui::Text(T_("Temp-Banned Players:"));
 
                 auto now = std::chrono::system_clock::now();
                 if (State.TempBannedFCs.empty()) {
-                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "No players are temporarily banned.");
+                    ImGui::TextColored(ImVec4(1, 0, 0, 1), T_("No players are temporarily banned."));
                 }
                 else {
                     static int selectedTempBanIndex = 0;
@@ -1336,7 +1337,7 @@ namespace GameTab {
                     selectedTempBanIndex = std::clamp(selectedTempBanIndex, 0, (int)displayCStrs.size() - 1);
                     CustomListBoxInt("Select TempBan", &selectedTempBanIndex, displayCStrs);
 
-                    if (ImGui::Button("Unban")) {
+                    if (ImGui::Button(T_("Unban"))) {
                         if (selectedTempBanIndex >= 0 && selectedTempBanIndex < (int)friendCodeList.size()) {
                             std::string targetFC = friendCodeList[selectedTempBanIndex];
                             State.TempBannedFCs.erase(targetFC);
@@ -1346,23 +1347,23 @@ namespace GameTab {
                 }
 
                 ImGui::Dummy(ImVec2(10, 10) * State.dpiScale);
-                ImGui::TextColored(ImVec4(1, 0, 0, 1), "Note: Temporary Ban Features\nWorks as Host Only!");
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), T_("Note: Temporary Ban Features\nWorks as Host Only!"));
                 ImGui::EndGroup();
             }
         }
 
         if (openHistory) {
             ImGui::Dummy(ImVec2(0, 3)* State.dpiScale);
-            if (ImGui::CollapsingHeader("Player History", ImGuiTreeNodeFlags_DefaultOpen)) {
-                ImGui::Text("Last 100 players:");
+            if (ImGui::CollapsingHeader(T_("Player History"), ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Text(T_("Last 100 players:"));
 
             static std::string historySearchBuf = "";
             ImGui::SetNextItemWidth(200);
             InputString("##HistorySearch", &historySearchBuf);
             ImGui::SameLine();
-            ImGui::TextDisabled("Search");
+            ImGui::TextDisabled(T_("Search"));
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Filter by name, friend code, or PUID");
+                ImGui::SetTooltip(T_("Filter by name, friend code, or PUID"));
 
             static int selectedIndex = -1;
 
@@ -1439,14 +1440,14 @@ namespace GameTab {
                     ImGui::SameLine();
                     ImGui::BeginGroup();
 
-                    ImGui::Text("Is using Modified Client: %s", p.IsModded ? "Yes" : "No");
-                    if (p.IsModded && !p.ModClient.empty()) ImGui::Text("Client Name: %s", p.ModClient.c_str());
+                    ImGui::Text(T_("Is using Modified Client: %s"), p.IsModded ? T_("Yes") : T_("No"));
+                    if (p.IsModded && !p.ModClient.empty()) ImGui::Text(T_("Client Name: %s"), p.ModClient.c_str());
                     ImGui::NewLine();
-                    ImGui::Text("Friend Code: %s", p.FriendCode.c_str());
-                    ImGui::Text("PUID: %s", p.Puid.c_str());
-                    ImGui::Text("Level: %d", p.Level);
-                    ImGui::Text("Platform: %s", p.Platform.c_str());
-                    ImGui::Text("Name-Checker: %s", p.NameCheck ? "Yes" : "None");
+                    ImGui::Text(T_("Friend Code: %s"), p.FriendCode.c_str());
+                    ImGui::Text(T_("PUID: %s"), p.Puid.c_str());
+                    ImGui::Text(T_("Level: %d"), p.Level);
+                    ImGui::Text(T_("Platform: %s"), p.Platform.c_str());
+                    ImGui::Text(T_("Name-Checker: %s"), p.NameCheck ? T_("Yes") : T_("None"));
                     ImGui::NewLine();
 
                     if (AnimatedButton("Copy Info"))
@@ -1538,7 +1539,7 @@ namespace GameTab {
             ImGui::Separator();
             ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
 
-            if (ImGui::Button("Clear History"))
+            if (ImGui::Button(T_("Clear History")))
             {
                 for (auto& pp : State.PlayerHistory) State.RemovedPlayers.insert(pp.FriendCode);
                 State.PlayerHistory.clear();
@@ -1546,7 +1547,7 @@ namespace GameTab {
                 State.Save();
             }
             ImGui::SameLine(0, 20);
-            if (ImGui::Button("Update Player History"))
+            if (ImGui::Button(T_("Update Player History")))
             {
                 bool changed = false;
                 for (auto pctrl : GetAllPlayerControl())
@@ -1632,7 +1633,7 @@ namespace GameTab {
 
             ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
 
-            if (ImGui::CollapsingHeader("Platform Filters"))
+            if (ImGui::CollapsingHeader(T_("Platform Filters")))
             {
                 ImGui::Columns(2, NULL, false);
 
@@ -1650,21 +1651,21 @@ namespace GameTab {
             ImGui::Dummy(ImVec2(5, 5)* State.dpiScale);
             }
 
-            if (ImGui::CollapsingHeader("Lobby History", ImGuiTreeNodeFlags_DefaultOpen)) {
+            if (ImGui::CollapsingHeader(T_("Lobby History"), ImGuiTreeNodeFlags_DefaultOpen)) {
                 if (State.LobbyHistory.empty()) {
-                    ImGui::TextDisabled("No lobbies visited yet.");
+                    ImGui::TextDisabled(T_("No lobbies visited yet."));
                 }
                 else {
                     SliderIntV2("Lobbies to Show", &State.LobbyHistoryLimit, 1, 50, "%d", ImGuiSliderFlags_NoInput);
                     int displayCount = (int)State.LobbyHistory.size() < State.LobbyHistoryLimit ? (int)State.LobbyHistory.size() : State.LobbyHistoryLimit;
-                    ImGui::Text("Last %d/%d lobbies:", displayCount, State.LobbyHistoryLimit);
+                    ImGui::Text(T_("Last %d/%d lobbies:"), displayCount, State.LobbyHistoryLimit);
                     ImGui::Columns(3, "lobbyHistoryCols", false);
                     ImGui::SetColumnWidth(0, 80 * State.dpiScale);
                     ImGui::SetColumnWidth(1, 120 * State.dpiScale);
                     ImGui::SetColumnWidth(2, 160 * State.dpiScale);
 
-                    ImGui::TextDisabled("Code"); ImGui::NextColumn();
-                    ImGui::TextDisabled("Host"); ImGui::NextColumn();
+                    ImGui::TextDisabled(T_("Code")); ImGui::NextColumn();
+                    ImGui::TextDisabled(T_("Host")); ImGui::NextColumn();
                     ImGui::NextColumn();
                     ImGui::Separator();
 
@@ -1674,7 +1675,7 @@ namespace GameTab {
                         lobbyCount++;
                         ImGui::Text("%s", lobby.Code.c_str());
                         ImGui::NextColumn();
-                        ImGui::Text("%s", lobby.HostName.empty() ? "Unknown" : lobby.HostName.c_str());
+                        ImGui::Text("%s", lobby.HostName.empty() ? T_("Unknown") : lobby.HostName.c_str());
                         ImGui::NextColumn();
                         if (AnimatedButton(("Copy##" + lobby.Code).c_str()))
                             ImGui::SetClipboardText(lobby.Code.c_str());
@@ -1711,34 +1712,34 @@ namespace GameTab {
                     auto allPlayers = GetAllPlayerControl();
                     RoleRates roleRates = RoleRates(options, (int)allPlayers.size());
                     // this should be all the major ones. if people want more they're simple enough to add.
-                    ImGui::Text("Visual Tasks: %s", (options.GetBool(app::BoolOptionNames__Enum::VisualTasks) ? "On" : "Off"));
+                    ImGui::Text(T_("Visual Tasks: %s"), (options.GetBool(app::BoolOptionNames__Enum::VisualTasks) ? T_("On") : T_("Off")));
                     switch (options.GetInt(app::Int32OptionNames__Enum::TaskBarMode)) {
                     case 0:
-                        ImGui::Text("Task Bar Updates: Always");
+                        ImGui::Text(T_("Task Bar Updates: Always"));
                         break;
                     case 1:
-                        ImGui::Text("Task Bar Updates: Meetings");
+                        ImGui::Text(T_("Task Bar Updates: Meetings"));
                         break;
                     case 2:
-                        ImGui::Text("Task Bar Updates: Never");
+                        ImGui::Text(T_("Task Bar Updates: Never"));
                         break;
                     default:
-                        ImGui::Text("Task Bar Updates: Other");
+                        ImGui::Text(T_("Task Bar Updates: Other"));
                         break;
                     }
-                    ImGui::Text("Confirm Ejects: %s", (options.GetBool(app::BoolOptionNames__Enum::ConfirmImpostor) ? "On" : "Off"));
+                    ImGui::Text(T_("Confirm Ejects: %s"), (options.GetBool(app::BoolOptionNames__Enum::ConfirmImpostor) ? T_("On") : T_("Off")));
                     switch (options.GetInt(app::Int32OptionNames__Enum::KillDistance)) {
                     case 0:
-                        ImGui::Text("Kill Distance: Short");
+                        ImGui::Text(T_("Kill Distance: Short"));
                         break;
                     case 1:
-                        ImGui::Text("Kill Distance: Medium");
+                        ImGui::Text(T_("Kill Distance: Medium"));
                         break;
                     case 2:
-                        ImGui::Text("Kill Distance: Long");
+                        ImGui::Text(T_("Kill Distance: Long"));
                         break;
                     default:
-                        ImGui::Text("Kill Distance: Other");
+                        ImGui::Text(T_("Kill Distance: Other"));
                         break;
                     }
 
@@ -1746,118 +1747,117 @@ namespace GameTab {
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Engineers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Engineer));
-                    ImGui::Text("Engineer Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Engineer));
-                    ImGui::Text("Engineer Vent Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::EngineerCooldown, 1.0F));
-                    ImGui::Text("Engineer Duration in Vent: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, 1.0F));
+                    ImGui::Text(T_("Max Engineers: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::Engineer));
+                    ImGui::Text(T_("Engineer Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Engineer));
+                    ImGui::Text(T_("Engineer Vent Cooldown: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::EngineerCooldown, 1.0F));
+                    ImGui::Text(T_("Engineer Duration in Vent: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::EngineerInVentMaxTime, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Scientists: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Scientist));
-                    ImGui::Text("Scientist Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Scientist));
-                    ImGui::Text("Scientist Vitals Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ScientistCooldown, 1.0F));
-                    ImGui::Text("Scientist Battery Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ScientistBatteryCharge, 1.0F));
+                    ImGui::Text(T_("Max Scientists: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::Scientist));
+                    ImGui::Text(T_("Scientist Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Scientist));
+                    ImGui::Text(T_("Scientist Vitals Cooldown: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::ScientistCooldown, 1.0F));
+                    ImGui::Text(T_("Scientist Battery Duration: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::ScientistBatteryCharge, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Guardian Angels: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::GuardianAngel));
-                    ImGui::Text("Guardian Angel Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::GuardianAngel));
-                    ImGui::Text("Guardian Angel Protect Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F));
-                    ImGui::Text("Guardian Angel Protection Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, 1.0F));
+                    ImGui::Text(T_("Max Guardian Angels: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::GuardianAngel));
+                    ImGui::Text(T_("Guardian Angel Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::GuardianAngel));
+                    ImGui::Text(T_("Guardian Angel Protect Cooldown: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F));
+                    ImGui::Text(T_("Guardian Angel Protection Duration: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Noisemakers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Noisemaker));
-                    ImGui::Text("Noisemaker Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Noisemaker));
-                    ImGui::Text("Noisemaker Alert Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::NoisemakerAlertDuration, 1.0F));
+                    ImGui::Text(T_("Max Noisemakers: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::Noisemaker));
+                    ImGui::Text(T_("Noisemaker Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Noisemaker));
+                    ImGui::Text(T_("Noisemaker Alert Duration: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::NoisemakerAlertDuration, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Trackers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Tracker));
-                    ImGui::Text("Tracker Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Tracker));
-                    ImGui::Text("Tracking Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::TrackerDuration, 1.0F));
-                    ImGui::Text("Tracking Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::TrackerCooldown, 1.0F));
-                    ImGui::Text("Tracking Delay: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::TrackerDelay, 1.0F));
+                    ImGui::Text(T_("Max Trackers: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::Tracker));
+                    ImGui::Text(T_("Tracker Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Tracker));
+                    ImGui::Text(T_("Tracking Cooldown: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::TrackerDuration, 1.0F));
+                    ImGui::Text(T_("Tracking Duration: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::TrackerCooldown, 1.0F));
+                    ImGui::Text(T_("Tracking Delay: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::TrackerDelay, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Detectives: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Detective));
-                    ImGui::Text("Detective Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Detective));
-                    ImGui::Text("Detective Suspect Limit: %.2f", options.GetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit, 1.0F));
+                    ImGui::Text(T_("Max Detectives: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::Detective));
+                    ImGui::Text(T_("Detective Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Detective));
+                    ImGui::Text(T_("Detective Suspect Limit: %.2f"), options.GetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
 
-                    ImGui::Text("Max Shapeshifters: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Shapeshifter));
-                    ImGui::Text("Shapeshifter Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Shapeshifter));
-                    ImGui::Text("Shapeshifter Shift Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 1.0F));
-                    ImGui::Text("Shapeshifter Shift Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F));
+                    ImGui::Text(T_("Max Shapeshifters: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::Shapeshifter));
+                    ImGui::Text(T_("Shapeshifter Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Shapeshifter));
+                    ImGui::Text(T_("Shapeshifter Shift Cooldown: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterCooldown, 1.0F));
+                    ImGui::Text(T_("Shapeshifter Shift Duration: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::ShapeshifterDuration, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Phantoms: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Phantom));
-                    ImGui::Text("Phantom Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Phantom));
-                    ImGui::Text("Phantom Vanish Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 1.0F));
-                    ImGui::Text("Phantom Vanish Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::PhantomDuration, 1.0F));
+                    ImGui::Text(T_("Max Phantoms: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::Phantom));
+                    ImGui::Text(T_("Phantom Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Phantom));
+                    ImGui::Text(T_("Phantom Vanish Cooldown: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::PhantomCooldown, 1.0F));
+                    ImGui::Text(T_("Phantom Vanish Duration: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::PhantomDuration, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Vipers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Viper));
-                    ImGui::Text("Viper Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Viper));
-                    ImGui::Text("Viper Dissolve Time: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ViperDissolveTime, 1.0F));
+                    ImGui::Text(T_("Max Vipers: %d"), roleRates.GetRoleCount(app::RoleTypes__Enum::Viper));
+                    ImGui::Text(T_("Viper Chance: %d%"), options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Viper));
+                    ImGui::Text(T_("Viper Dissolve Time: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::ViperDissolveTime, 1.0F));
                 }
                 else if (options.GetGameMode() == GameModes__Enum::HideNSeek) {
 
                     int ImpostorId = options.GetInt(app::Int32OptionNames__Enum::ImpostorPlayerID);
                     if (ImpostorId < 0) {
-                        ImGui::Text("Impostor: Round-robin");
+                        ImGui::Text(T_("Impostor: Round-robin"));
                     }
                     else {
-                        std::string ImpostorName = std::format("Selected Impostor: {}", convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerDataById(ImpostorId), nullptr)));
-                        ImGui::Text(const_cast<char*>(ImpostorName.c_str()));
+                        { std::string nameString = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerDataById(ImpostorId), nullptr)); std::string ImpostorName = std::vformat(T_("Selected Impostor: {}"), std::make_format_args(nameString)); ImGui::Text(const_cast<char*>(ImpostorName.c_str())); }
                     }
-                    ImGui::Text("Flashlight Mode: %s", (options.GetBool(app::BoolOptionNames__Enum::UseFlashlight) ? "On" : "Off"));
-                    ImGui::Text("Show Names: %s", (options.GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) ? "On" : "Off"));
+                    ImGui::Text(T_("Flashlight Mode: %s"), (options.GetBool(app::BoolOptionNames__Enum::UseFlashlight) ? T_("On") : T_("Off")));
+                    ImGui::Text(T_("Show Names: %s"), (options.GetBool(app::BoolOptionNames__Enum::ShowCrewmateNames) ? T_("On") : T_("Off")));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Vent Uses: %d", options.GetInt(app::Int32OptionNames__Enum::CrewmateVentUses));
-                    ImGui::Text("Duration in Vent: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::CrewmateTimeInVent, 1.0F));
+                    ImGui::Text(T_("Max Vent Uses: %d"), options.GetInt(app::Int32OptionNames__Enum::CrewmateVentUses));
+                    ImGui::Text(T_("Duration in Vent: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::CrewmateTimeInVent, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Hiding Time: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::EscapeTime, 1.0F));
-                    ImGui::Text("Final Hiding Time: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::FinalEscapeTime, 1.0F));
-                    ImGui::Text("Final Seeker Speed: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::SeekerFinalSpeed, 1.0F));
+                    ImGui::Text(T_("Hiding Time: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::EscapeTime, 1.0F));
+                    ImGui::Text(T_("Final Hiding Time: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::FinalEscapeTime, 1.0F));
+                    ImGui::Text(T_("Final Seeker Speed: %.2f s"), options.GetFloat(app::FloatOptionNames__Enum::SeekerFinalSpeed, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
 
-                    ImGui::Text("Hider Flashlight Size: % .2fx", options.GetFloat(app::FloatOptionNames__Enum::CrewmateFlashlightSize, 1.0F));
-                    ImGui::Text("Seeker Flashlight Size: % .2fx", options.GetFloat(app::FloatOptionNames__Enum::ImpostorFlashlightSize, 1.0F));
-                    ImGui::Text("Final Hide Seeker Map: %s", (options.GetBool(app::BoolOptionNames__Enum::SeekerFinalMap) ? "On" : "Off"));
-                    ImGui::Text("Final Hide Pings: %s", (options.GetBool(app::BoolOptionNames__Enum::SeekerPings) ? "On" : "Off"));
-                    ImGui::Text("Ping Interval: % .2f s", options.GetFloat(app::FloatOptionNames__Enum::MaxPingTime, 1.0F));
+                    ImGui::Text(T_("Hider Flashlight Size: % .2fx"), options.GetFloat(app::FloatOptionNames__Enum::CrewmateFlashlightSize, 1.0F));
+                    ImGui::Text(T_("Seeker Flashlight Size: % .2fx"), options.GetFloat(app::FloatOptionNames__Enum::ImpostorFlashlightSize, 1.0F));
+                    ImGui::Text(T_("Final Hide Seeker Map: %s"), (options.GetBool(app::BoolOptionNames__Enum::SeekerFinalMap) ? T_("On") : T_("Off")));
+                    ImGui::Text(T_("Final Hide Pings: %s"), (options.GetBool(app::BoolOptionNames__Enum::SeekerPings) ? T_("On") : T_("Off")));
+                    ImGui::Text(T_("Ping Interval: % .2f s"), options.GetFloat(app::FloatOptionNames__Enum::MaxPingTime, 1.0F));
                 }
             }
             else CloseOtherGroups(Groups::General);

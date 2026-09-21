@@ -91,6 +91,7 @@ public:
     bool ShowUiBorders = true;
     float AnimationSpeed = 1.f;
     float RoundingRadiusMultiplier = 1.f;
+    int Language = 0;
 
     bool AdjustByDPI = true;
     float dpiScale = 1.f;

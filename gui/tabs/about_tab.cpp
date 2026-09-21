@@ -9,6 +9,7 @@
 #include "imgui/imgui_impl_win32.h" // ImGui_ImplWin32_GetDpiScaleForHwnd
 #include "theme.hpp" // ApplyTheme
 #include <cstdlib>
+#include "translations.hpp"
 
 namespace AboutTab {
     enum Groups {
@@ -45,7 +46,7 @@ namespace AboutTab {
         }
 
         if (openWelcome) {
-            ImGui::Text(std::format("Welcome {}to ", State.HasOpenedMenuBefore ? "back " : "").c_str());
+            { const char* welcomeBack = State.HasOpenedMenuBefore ? T_("back ") : ""; ImGui::Text(std::vformat(T_("Welcome {}to "), std::make_format_args(welcomeBack)).c_str()); }
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
@@ -54,17 +55,17 @@ namespace AboutTab {
             else
                 ImGui::TextColored(GoldCol, std::format(" {}", State.SickoVersion).c_str());
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(" by ");
+            ImGui::Text(T_(" by "));
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(GoatCol, "g0aty");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text("!");
+            ImGui::Text(T_("!"));
 
             ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(" is a powerful utility for Among Us.");
-            ImGui::Text("It aims to improve the game experience for all players!");
-            ImGui::Text("Use the \"Check for Updates\" button to download the latest release!");
+            ImGui::Text(T_(" is a powerful utility for Among Us."));
+            ImGui::Text(T_("It aims to improve the game experience for all players!"));
+            ImGui::Text(T_("Use the \"Check for Updates\" button to download the latest release!"));
             if (ColoredButton(DevCol, "GitHub")) {
                 OpenLink("https://github.com/g0aty/SickoMenu");
             }
@@ -76,23 +77,23 @@ namespace AboutTab {
             if (ColoredButton(State.RgbColor, "Donate")) {
                 OpenLink("https://ko-fi.com/g0aty");
             }
-            ImGui::Text("Join the Discord server for support, bug reports, and sneak peeks!");
+            ImGui::Text(T_("Join the Discord server for support, bug reports, and sneak peeks!"));
             if (ColoredButton(ContributorCol, "Join our Discord!")) {
                 OpenLink("https://dsc.gg/sickos"); //SickoMenu discord invite
             }
 
             ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(" is free and open-source software.");
+            ImGui::Text(T_(" is free and open-source software."));
 
             if (State.SickoVersion.find("pr") != std::string::npos || State.SickoVersion.find("rc") != std::string::npos) {
-                if (State.SickoVersion.find("pr") != std::string::npos) ImGui::TextColored(State.RgbColor, "You have access to pre-releases, enjoy!");
-                else ImGui::TextColored(State.RgbColor, "You have access to the release candidate, enjoy!");
+                if (State.SickoVersion.find("pr") != std::string::npos) ImGui::TextColored(State.RgbColor, T_("You have access to pre-releases, enjoy!"));
+                else ImGui::TextColored(State.RgbColor, T_("You have access to the release candidate, enjoy!"));
                 BoldText("If you don't have access to the pre-release builds channel on our Discord and haven't self", ImVec4(0.f, 1.f, 0.f, 1.f));
                 BoldText("compiled, please report it to our support staff by making a ticket on our Discord server!", ImVec4(0.f, 1.f, 0.f, 1.f));
             }
             else {
-                ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "If you've paid for this menu, demand a refund immediately.");
+                ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), T_("If you've paid for this menu, demand a refund immediately."));
                 BoldText("Make sure you have downloaded the latest version of SickoMenu from GitHub or our", ImVec4(0.f, 1.f, 0.f, 1.f));
                 BoldText("official Discord!", ImVec4(0.f, 1.f, 0.f, 1.f));
             }
@@ -108,22 +109,29 @@ namespace AboutTab {
                     if (State.RizzUpEveryone) State.RizzUpEveryone = false;
                     State.Save();
                 }*/
-                ImGui::TextColored(DiddyCol, "Happy April Fools'!");
-                ImGui::TextColored(DiddyCol, "This is NOT a real update as the official release is not yet ready.");
-                ImGui::TextColored(DiddyCol, "Please wait for the official release to support the latest versions of Among Us!");
+                ImGui::TextColored(DiddyCol, T_("Happy April Fools'!"));
+                ImGui::TextColored(DiddyCol, T_("This is NOT a real update as the official release is not yet ready."));
+                ImGui::TextColored(DiddyCol, T_("Please wait for the official release to support the latest versions of Among Us!"));
             }
+
+            ImGui::Separator();
+            ImGui::Text(T_("Language:"));
+            ImGui::SameLine();
+            static const char* languages[] = { "English", "日本語" };
+            if (ImGui::Combo("##Language", &State.Language, languages, 2))
+                State.Save();
         }
 
         if (openCredits) {
             ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(" is a fork of");
+            ImGui::Text(T_(" is a fork of"));
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(AumCol, " AmongUsMenu");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::TextColored(RedCol, " (archived)");
+            ImGui::TextColored(RedCol, T_(" (archived)"));
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(", go check it out!");
+            ImGui::Text(T_(", go check it out!"));
 
             if (ColoredButton(AumCol, "AmongUsMenu")) {
                 OpenLink("https://github.com/BitCrackers/AmongUsMenu");
@@ -184,44 +192,44 @@ namespace AboutTab {
                 OpenLink("https://github.com/KulaGGin");
             }
             ImGui::SameLine();
-            ImGui::Text("(Helped with some ImGui code for replay system)");
+            ImGui::Text(T_("(Helped with some ImGui code for replay system)"));
 
             if (ColoredButton(AumCol, "tomsa000")) {
                 OpenLink("https://github.com/tomsa000");
             }
             ImGui::SameLine();
-            ImGui::Text("(Helped with fixing memory leaks and smart pointers)");
+            ImGui::Text(T_("(Helped with fixing memory leaks and smart pointers)"));
 
             if (ColoredButton(AumCol, "cddjr")) {
                 OpenLink("https://github.com/cddjr");
             }
             ImGui::SameLine();
-            ImGui::Text("(Helped in updating to the Fungle release)");
+            ImGui::Text(T_("(Helped in updating to the Fungle release)"));
 
-            ImGui::Text("Thanks to");
+            ImGui::Text(T_("Thanks to"));
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(AumCol, " v0idp");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(" for originally creating");
+            ImGui::Text(T_(" for originally creating"));
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(AumCol, " AmongUsMenu");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text("!");
+            ImGui::Text(T_("!"));
             if (ColoredButton(AumCol, "v0idp")) {
                 OpenLink("https://github.com/v0idp");
             }
 
-            ImGui::Text("Everyone else who contributed to");
+            ImGui::Text(T_("Everyone else who contributed to"));
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(AumCol, " AUM");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(" and I couldn't list here.");
+            ImGui::Text(T_(" and I couldn't list here."));
 
-            ImGui::Text("Thank you for making ");
+            ImGui::Text(T_("Thank you for making "));
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::TextColored(SickoCol, "SickoMenu");
             ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Text(" possible!");
+            ImGui::Text(T_(" possible!"));
         }
         ImGui::EndChild();
     }

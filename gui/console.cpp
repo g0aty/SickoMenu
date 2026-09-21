@@ -4,6 +4,7 @@
 #include "gui-helpers.hpp"
 #include "state.hpp"
 #include "logger.h"
+#include "translations.hpp"
 
 namespace ConsoleGui
 {
@@ -45,16 +46,16 @@ namespace ConsoleGui
 		else
 			titleCol = State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor;
 		titleCol.w = 1.f;
-		ImGui::TextColored(titleCol, "Console");
+		ImGui::TextColored(titleCol, T_("Console"));
 		ImGui::SameLine(ImGui::GetWindowWidth() - 20 * State.dpiScale);
 		if (AnimatedButton("-")) State.ShowConsole = false; //minimize button
 		ImGui::BeginChild("console#filter", ImVec2(520, 40) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
-		ImGui::Text("Event Filter: ");
+		ImGui::Text(T_("Event Filter: "));
 		ImGui::SameLine();
 		CustomListBoxIntMultiple("Event Types", &ConsoleGui::event_filter, 100.f * State.dpiScale);
 		if (IsInGame()) {
 			ImGui::SameLine(0.f * State.dpiScale, 5.f * State.dpiScale);
-			ImGui::Text("Player Filter: ");
+			ImGui::Text(T_("Player Filter: "));
 			ImGui::SameLine();
 			CustomListBoxPlayerSelectionMultiple("Players", &ConsoleGui::player_filter, 150.f * State.dpiScale);
 		}

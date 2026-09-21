@@ -4,6 +4,7 @@
 #include "state.hpp"
 #include "utility.h"
 #include "gui-helpers.hpp"
+#include "translations.hpp"
 
 namespace TasksTab {
 	using TaskList = std::vector<TaskTypes__Enum>;
@@ -57,22 +58,22 @@ namespace TasksTab {
 	};
 
 	static void RenderTaskEnforcer() {
-		if (ImGui::CollapsingHeader("Task Enforcer", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (ImGui::CollapsingHeader(T_("Task Enforcer"), ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
 			if (ToggleButton("Auto Kick Slackers", &State.AutoKickSlackers))
 				State.Save();
 			ImGui::SameLine();
 			if (ToggleButton("Ignore Whitelisted Players", &State.AutoKickSlackersIgnoreWhitelist))
 				State.Save();
-			ImGui::Text("Kicks players below task threshold after grace period.");
+			ImGui::Text(T_("Kicks players below task threshold after grace period."));
 			SliderIntV2("Task Threshold %", &State.AutoKickSlackersThreshold, 1, 100, "%d%%", ImGuiSliderFlags_NoInput);
 			SliderIntV2("Grace Period (sec)", &State.AutoKickSlackersGrace, 50, 500, "%ds", ImGuiSliderFlags_NoInput);
 		}
 	}
 
 	static void RenderDisableTasks() {
-		if (ImGui::CollapsingHeader("Disable Tasks", ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::TextDisabled("Disabled tasks won't be assigned next game.");
+		if (ImGui::CollapsingHeader(T_("Disable Tasks"), ImGuiTreeNodeFlags_DefaultOpen)) {
+			ImGui::TextDisabled(T_("Disabled tasks won't be assigned next game."));
 			ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 			if (AnimatedButton("Clear All##disabletasks"))
 				State.DisabledTaskTypes.clear();
@@ -89,7 +90,7 @@ namespace TasksTab {
 			default: break;
 			}
 
-			ImGui::TextDisabled("Map: %s", mapName);
+			ImGui::TextDisabled(T_("Map: %s"), mapName);
 			ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 			ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
 			ImVec4 themeColDark = ImVec4(themeCol.x * 0.7f, themeCol.y * 0.7f, themeCol.z * 0.7f, themeCol.w);
@@ -236,11 +237,11 @@ namespace TasksTab {
 				State.Save();
 
 			if (!State.BypassVisualTasks && options.GetGameMode() == GameModes__Enum::Normal && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks, false)) {
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Visual tasks are turned OFF in this lobby.");
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Any animations (other than cameras) are client-sided only!");
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Visual tasks are turned OFF in this lobby."));
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Any animations (other than cameras) are client-sided only!"));
 			}
 			else if (!State.BypassVisualTasks && options.GetGameMode() == GameModes__Enum::HideNSeek)
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Animations other than cameras are client-sided only in Hide n Seek!");
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), T_("Animations other than cameras are client-sided only in Hide n Seek!"));
 
 			if (State.mapType == Settings::MapType::Ship) {
 				if (!State.BypassVisualTasks && !options.GetBool(app::BoolOptionNames__Enum::VisualTasks, false)) {
@@ -321,7 +322,7 @@ namespace TasksTab {
 
 			if (IsInMultiplayerGame() && IsInGame()) {
 				float taskPercentage = (*Game::pGameData)->fields.TotalTasks == 0 ? 1.f : (float)(*Game::pGameData)->fields.CompletedTasks / (float)(*Game::pGameData)->fields.TotalTasks;
-				ImGui::TextColored(ImVec4(1.0f - taskPercentage, 1.0f, 1.0f - taskPercentage, 1.0f), "%.2f%% Total Tasks Completed", taskPercentage * 100);
+				ImGui::TextColored(ImVec4(1.0f - taskPercentage, 1.0f, 1.0f - taskPercentage, 1.0f), T_("%.2f%% Total Tasks Completed"), taskPercentage * 100);
 			}
 		}
 

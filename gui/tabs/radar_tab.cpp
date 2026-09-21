@@ -3,6 +3,7 @@
 #include "gui-helpers.hpp"
 #include "state.hpp"
 #include "utility.h"
+#include "translations.hpp"
 
 namespace RadarTab {
 	void Render() {
@@ -53,7 +54,7 @@ namespace RadarTab {
 		if (ToggleButton("Show Border", &State.RadarBorder)) {
 			State.Save();
 		}
-		if (ImGui::ColorEdit4("Radar Color",
+		if (ImGui::ColorEdit4(T_("Radar Color"),
 			(float*)&State.SelectedColor,
 			ImGuiColorEditFlags__OptionsDefault
 			| ImGuiColorEditFlags_NoInputs
@@ -61,10 +62,10 @@ namespace RadarTab {
 			| ImGuiColorEditFlags_AlphaPreview)) {
 			State.Save();
 		}
-		if (ImGui::InputInt("Extra Width", &State.RadarExtraWidth)) {
+		if (ImGui::InputInt(T_("Extra Width"), &State.RadarExtraWidth)) {
 			State.RadarExtraWidth = abs(State.RadarExtraWidth); //prevent negatives
 		}
-		if (ImGui::InputInt("Extra Height", &State.RadarExtraHeight)) {
+		if (ImGui::InputInt(T_("Extra Height"), &State.RadarExtraHeight)) {
 			State.RadarExtraHeight = abs(State.RadarExtraHeight); //prevent negatives
 		}
 
