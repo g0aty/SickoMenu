@@ -16,7 +16,7 @@ static std::string CleanChatPresetName(std::string cpName) {
 }
 
 void Settings::Load() {
-    this->SickoVersion = "v5.0.3";
+    this->SickoVersion = "v5.1_pr1";
 
     auto path = getModulePath(NULL);
     auto configPath = path.parent_path() / "SickoMenu" / "sicko-selected-config.json";
@@ -309,6 +309,7 @@ void Settings::Load() {
         JSON_TRYGET("ChatAlwaysActive", this->ChatAlwaysActive);
         JSON_TRYGET("ReadGhostMessages", this->ReadGhostMessages);
         JSON_TRYGET("ReadAndSendSickoChat", this->ReadAndSendSickoChat);
+        JSON_TRYGET("MoveMatchInfoGuide", this->MoveMatchInfoGuide);
         JSON_TRYGET("CustomName", this->CustomName);
         JSON_TRYGET("RgbName", this->RgbName);
         JSON_TRYGET("RgbMethod", this->RgbMethod);
@@ -405,6 +406,7 @@ void Settings::Load() {
         JSON_TRYGET("RotateRadius", this->RotateRadius);
         JSON_TRYGET("RelativeTeleport", this->RelativeTeleport);
         JSON_TRYGET("IgnoreVentTpSelf", this->IgnoreVentTpSelf);
+        JSON_TRYGET("IgnoreZiplineSelf", this->IgnoreZiplineSelf);
         JSON_TRYGET("ShowKillCD", this->ShowKillCD);
 
         JSON_TRYGET("Confuser", this->confuser);
@@ -413,6 +415,14 @@ void Settings::Load() {
         JSON_TRYGET("ConfuseOnKill", this->confuseOnKill);
         JSON_TRYGET("ConfuseOnVent", this->confuseOnVent);
         JSON_TRYGET("ConfuseOnMeeting", this->confuseOnMeeting);
+
+        JSON_TRYGET("AntiExploit_DisconnectPenalties", this->AntiExploit_DisconnectPenalties);
+        JSON_TRYGET("AntiExploit_UnauthorizedSabotages", this->AntiExploit_UnauthorizedSabotages);
+        JSON_TRYGET("AntiExploit_UnauthorizedTeleports", this->AntiExploit_UnauthorizedTeleports);
+        JSON_TRYGET("AntiExploit_UnauthorizedZiplines", this->AntiExploit_UnauthorizedZiplines);
+        JSON_TRYGET("AntiExploit_AttemptToBan", this->AntiExploit_AttemptToBan);
+        JSON_TRYGET("AntiExploit_VotekicksAgainstSelfHost", this->AntiExploit_VotekicksAgainstSelfHost);
+        JSON_TRYGET("AntiExploit_CrashLobbyHost", this->AntiExploit_CrashLobbyHost);
 
         JSON_TRYGET("InfiniteMeetings", this->InfiniteMeetings);
         JSON_TRYGET("NoLadderZiplineCooldown", this->NoLadderZiplineCooldown);
@@ -994,6 +1004,7 @@ void Settings::Save() {
                 { "ChatAlwaysActive", this->ChatAlwaysActive },
                 { "ReadGhostMessages", this->ReadGhostMessages },
                 { "ReadAndSendSickoChat", this->ReadAndSendSickoChat },
+                { "MoveMatchInfoGuide", this->MoveMatchInfoGuide },
                 { "CustomName", this->CustomName },
                 { "RgbName", this->RgbName },
                 { "RgbMethod", this->RgbMethod },
@@ -1091,6 +1102,7 @@ void Settings::Save() {
                 { "RotateRadius", this->RotateRadius },
                 { "RelativeTeleport", this->RelativeTeleport },
                 { "IgnoreVentTpSelf", this->IgnoreVentTpSelf },
+                { "IgnoreZiplineSelf", this->IgnoreZiplineSelf },
                 { "ShowKillCD", this->ShowKillCD },
 
                 { "Confuser", this->confuser },
@@ -1099,6 +1111,14 @@ void Settings::Save() {
                 { "ConfuseOnKill", this->confuseOnKill },
                 { "ConfuseOnVent", this->confuseOnVent },
                 { "ConfuseOnMeeting", this->confuseOnMeeting },
+
+                { "AntiExploit_DisconnectPenalties", this->AntiExploit_DisconnectPenalties },
+                { "AntiExploit_UnauthorizedSabotages", this->AntiExploit_UnauthorizedSabotages },
+                { "AntiExploit_UnauthorizedTeleports", this->AntiExploit_UnauthorizedTeleports },
+                { "AntiExploit_UnauthorizedZiplines", this->AntiExploit_UnauthorizedZiplines },
+                { "AntiExploit_AttemptToBan", this->AntiExploit_AttemptToBan },
+                { "AntiExploit_VotekicksAgainstSelfHost", this->AntiExploit_VotekicksAgainstSelfHost },
+                { "AntiExploit_CrashLobbyHost", this->AntiExploit_CrashLobbyHost },
 
                 { "InfiniteMeetings", this->InfiniteMeetings },
                 { "NoLadderZiplineCooldown", this->NoLadderZiplineCooldown },

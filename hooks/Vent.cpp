@@ -96,7 +96,7 @@ void dVentilationSystem_UpdateSystem(VentilationSystem* __this, PlayerControl* p
 		msgReader->fields._position = pos;
 		msgReader->fields.readHead = head;
 
-		if (!State.PanicMode && ventOp == VentilationSystem_Operation__Enum::BootImpostors) {
+		if (!State.PanicMode && State.AntiExploit_AttemptToBan && ventOp == VentilationSystem_Operation__Enum::BootImpostors) {
 			auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
 			if (notifier) {
 				auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
@@ -113,7 +113,7 @@ void dVentilationSystem_UpdateSystem(VentilationSystem* __this, PlayerControl* p
 				notifier->fields.disconnectColor = colorBackup;
 			}
 		}
-		return;
+		if (!State.PanicMode && State.AntiExploit_UnauthorizedSabotages) return;
 	}
 	VentilationSystem_UpdateSystem(__this, player, msgReader, method);
 }

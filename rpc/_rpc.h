@@ -290,6 +290,13 @@ public:
 	virtual void Process() override;
 };
 
+class RpcOverrulePlayer : public RPCInterface {
+	PlayerControl* target;
+public:
+	RpcOverrulePlayer(PlayerControl* target);
+	virtual void Process() override;
+};
+
 class RpcVoteKick : public RPCInterface {
 	PlayerControl* target;
 	bool exploit;
@@ -505,6 +512,14 @@ public:
 	virtual void Process() override;
 };
 
+class RpcClimbZipline : public RPCInterface {
+	PlayerControl* Player;
+	bool isTop;
+public:
+	RpcClimbZipline(PlayerControl* Player, bool isTop);
+	virtual void Process() override;
+};
+
 class AttemptToBan : public RPCInterface {
 	PlayerControl* Player;
 public:
@@ -535,9 +550,9 @@ public:
 	virtual void Process() override;
 };
 
-class RpcRainbowPlayer : public RPCInterface {
-	PlayerControl* Player;
+class SpamBanMinutes : public RPCInterface {
+	int minutesToBan;
 public:
-	RpcRainbowPlayer(PlayerControl* Player);
+	SpamBanMinutes(int minutesToBan);
 	virtual void Process() override;
 };

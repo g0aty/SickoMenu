@@ -41,5 +41,5 @@ namespace DirectX {
 	extern HWND window;
 	extern HANDLE hRenderSemaphore;
 	void Shutdown();
-	ImVec2 GetWindowSize();
+	ImVec2 GetWindowSize(bool fullScreenCheck = false);
 }

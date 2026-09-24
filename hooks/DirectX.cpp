@@ -46,14 +46,20 @@ typedef struct Cache
 
 static cache_t s_Cache;
 
-ImVec2 DirectX::GetWindowSize()
+ImVec2 DirectX::GetWindowSize(bool fullScreenCheck)
 {
     if (Screen_get_fullScreen(nullptr))
     {
         RECT rect;
         GetWindowRect(window, &rect);
+        ImVec2 vec = { (float)(rect.right - rect.left),  (float)(rect.bottom - rect.top) };
 
-        return { (float)(rect.right - rect.left),  (float)(rect.bottom - rect.top) };
+        if (fullScreenCheck) return vec;
+        else {
+            float width = (float)Screen_get_width(nullptr), height = (float)Screen_get_height(nullptr);
+            float factor = (std::min)(vec.x / width, vec.y / height);
+            return { width * factor, height * factor };
+        }
     }
 
     return { (float)Screen_get_width(nullptr), (float)Screen_get_height(nullptr) };
@@ -145,12 +151,14 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Reset_Appearance) && (IsInGame() || IsInLobby())) ControlAppearance(false);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Randomize_Appearance)) ControlAppearance(true);
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Complete_Tasks) && IsInGame()) CompleteAllTasks();
-        if (KeyBinds::IsKeyPressed(State.KeyBinds.Leave_Game) && (IsInGame() || IsInLobby()) && !State.PanicMode)
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Leave_Game) && (IsInGame() || IsInLobby()))
             app::AmongUsClient_ExitGame((*Game::pAmongUsClient), DisconnectReasons__Enum::ExitGame, NULL);
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Cancel_Start) && (IsInGame() || IsInLobby())) State.CancelingStartGame = true;
     }
     if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Sicko)) {
         State.PanicMode = !State.PanicMode;
         State.MIG_ThemeChanged = true;
+        if (State.ControlPet) State.DisableControlPetHand = true;
         ReloadCurrentSceneIfNeeded();
     }
 
@@ -362,7 +370,9 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
             s_Cache.Window = ImGui::GetCurrentWindow();
 
             //Set window properties
-            ImGui::SetWindowPos({ 0, 0 }, ImGuiCond_Always);
+            float xOffset = (DirectX::GetWindowSize(true).x - DirectX::GetWindowSize(false).x) / 2.f;
+            float yOffset = (DirectX::GetWindowSize(true).y - DirectX::GetWindowSize(false).y) / 2.f;
+            ImGui::SetWindowPos({ xOffset, yOffset }, ImGuiCond_Always);
             ImGui::SetWindowSize(s_Cache.Winsize, ImGuiCond_Always);
 
             Esp::Render();

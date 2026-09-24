@@ -10,7 +10,7 @@
 
 static bool IsWithinScreenBounds(const Vector2& pos)
 {
-	return pos.x < (float)Screen_get_width(nullptr) && pos.y < (float)Screen_get_height(nullptr);
+	return pos.x < (float)DirectX::GetWindowSize().x && pos.y < (float)DirectX::GetWindowSize().y;
 }
 
 static float GetScaleFromValue(float value)
@@ -41,7 +41,7 @@ static ImVec2 WorldToScreen(const Vector2& pos)
 	// The value 180 is specific for 1920x1080 so we need to scale it for other resolutions.
 	// Scaling from the x axis would probably also work but now we scale from the y axis.
 	float view = GetScaleFromValue(180.0f);
-	const ImVec2 winsize = DirectX::GetWindowSize();
+	const ImVec2 winsize = DirectX::GetWindowSize(true);
 
 	// Here we transform the world position to the screen position
 	ImVec2 value;

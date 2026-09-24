@@ -365,6 +365,9 @@ public:
     bool PreventSelfReport = true;
     bool AutoRejoin = false;
     bool DisableShushAnimation = false;
+    bool ControlPet = false;
+    bool ControlHand = false;
+    bool DisableControlPetHand = false;
     bool OldStylePingText = false;
     bool NoSeekerAnim = false;
     bool BetterChatNotifications = false;
@@ -413,6 +416,7 @@ public:
     bool ChatActiveOriginalState = false;
     bool ReadGhostMessages = false;
     bool ReadAndSendSickoChat = false;
+    bool MoveMatchInfoGuide = false;
     bool ShiftRightClickTP = false;
     bool TeleportEveryone = false;
     bool RotateEveryone = false;
@@ -429,8 +433,11 @@ public:
     bool SpamVentTpEveryone = false;
     bool SpamVentTpEveryoneRandom = false;
     bool IgnoreVentTpSelf = false;
+    bool SpamZiplineEveryone = false;
+    bool IgnoreZiplineSelf = false;
     int SelectedVentId = 0;
     std::vector<Game::PlayerId> spamRandomVentTpPlayers = {};
+    std::vector<Game::PlayerId> spamZiplinePlayers = {};
     std::map<Game::PlayerId, int> spamVentTpPlayers = {};
     float RotateRadius = 1.f;
     float xCoordinate = 0.f;
@@ -442,6 +449,17 @@ public:
     bool confuseOnKill = false;
     bool confuseOnVent = false;
     bool confuseOnMeeting = false;
+
+    bool AntiExploit_DisconnectPenalties = true;
+    bool AntiExploit_UnauthorizedSabotages = true;
+    bool AntiExploit_UnauthorizedTeleports = true;
+    bool AntiExploit_UnauthorizedZiplines = true;
+    bool AntiExploit_AttemptToBan = true;
+    bool AntiExploit_VotekicksAgainstSelfHost = true;
+    bool AntiExploit_CrashLobbyHost = true;
+
+    bool AntiExploit_IsTeleportingSelf = false; // flag for when we vent TP ourselves
+    bool AntiExploit_IsClimbingZipline = false; // flag for when we climb a zipline
 
     bool InfiniteMeetings = false;
     bool NoLadderZiplineCooldown = false;
@@ -458,7 +476,7 @@ public:
     bool Impostor_NoKillCooldown = false;
     bool Shapeshifter_InfiniteShapeshiftDuration = false;
 
-    SystemTypes__Enum selectedDoor = SystemTypes__Enum::Hallway;
+    std::vector<SystemTypes__Enum> selectedDoors;
     std::vector<SystemTypes__Enum> mapDoors;
     std::vector<SystemTypes__Enum> pinnedDoors;
     bool CloseAllDoors = false;
@@ -606,6 +624,7 @@ public:
 
     Vector3 camPos = { NULL, NULL, NULL };
     Vector3 prevCamPos = { NULL, NULL, NULL };
+    Vector2 petPos = { NULL, NULL };
 
     bool FlipSkeld = false;
     bool CustomImpostorAmount = false;

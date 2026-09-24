@@ -37,13 +37,14 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_OnEnable executed", false);
     try {
         State.BlinkPlayersTab = false;
+        State.SpamZiplineEveryone = false;
 
         Replay::Reset();
 
         State.MatchStart = std::chrono::system_clock::now();
         State.MatchCurrent = State.MatchStart;
 
-        State.selectedDoor = SystemTypes__Enum::Hallway;
+        State.selectedDoors.clear();
         State.mapDoors.clear();
         State.pinnedDoors.clear();
 
@@ -123,9 +124,15 @@ void dShipStatus_RpcCloseDoorsOfType(ShipStatus* __this, SystemTypes__Enum type,
 
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_HandleRpc executed", false);
+
     if (callId != 27 && callId != 35) return;
     int32_t pos = reader->fields._position, head = reader->fields.readHead;
     auto systemType = (SystemTypes__Enum)MessageReader_ReadByte(reader, NULL);
+
+    if (!State.PanicMode && !IsHost() && State.AntiExploit_UnauthorizedSabotages && systemType != SystemTypes__Enum::Ventilation)
+        return;
+    // VentilationSystem is handled separately
+
     reader->fields._position = pos;
     reader->fields.readHead = head;
     if (systemType == SystemTypes__Enum::Ventilation ||
@@ -141,6 +148,7 @@ void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* re
         return;
     if (!State.PanicMode && State.DisabledSabotageTypes.count((int)systemType))
         return;
+
     ShipStatus_HandleRpc(__this, callId, reader, method);
 }
 

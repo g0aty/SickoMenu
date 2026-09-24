@@ -300,6 +300,7 @@ void DetourInitilization() {
 	HOOKFUNC(GameManager_ReviveEveryoneFreeplay);
 	HOOKFUNC(PlayerControl_Die);
 	HOOKFUNC(PlayerVoteArea_SetCosmetics);
+	HOOKFUNC(PlayerPhysics_BootFromVent);
 	HOOKFUNC(PlayerControl_SetKillTimer);
 	HOOKFUNC(VentilationSystem_UpdateSystem);
 	HOOKFUNC(InnerNetClient_SetEndpoint);
@@ -307,6 +308,10 @@ void DetourInitilization() {
 	HOOKFUNC(PlayerControl_CheckColor);
 	HOOKFUNC(PlayerPhysics_HandleRpc);
 	HOOKFUNC(LobbyNotificationMessage_SetUp);
+	HOOKFUNC(NetworkedPlayerInfo_UpdateNamePlate);
+	HOOKFUNC(GameStartManager_ResetStartState);
+	HOOKFUNC(CustomNetworkTransform_HandleRpc);
+	HOOKFUNC(PlayerControl_CmdCheckUseZipline);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -518,6 +523,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(GameManager_ReviveEveryoneFreeplay);
 	UNHOOKFUNC(PlayerControl_Die);
 	UNHOOKFUNC(PlayerVoteArea_SetCosmetics);
+	UNHOOKFUNC(PlayerPhysics_BootFromVent);
 	UNHOOKFUNC(PlayerControl_SetKillTimer);
 	UNHOOKFUNC(VentilationSystem_UpdateSystem);
 	UNHOOKFUNC(InnerNetClient_SetEndpoint);
@@ -525,6 +531,10 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlayerControl_CheckColor);
 	UNHOOKFUNC(PlayerPhysics_HandleRpc);
 	UNHOOKFUNC(LobbyNotificationMessage_SetUp);
+	UNHOOKFUNC(NetworkedPlayerInfo_UpdateNamePlate);
+	UNHOOKFUNC(GameStartManager_ResetStartState);
+	UNHOOKFUNC(CustomNetworkTransform_HandleRpc);
+	UNHOOKFUNC(PlayerControl_CmdCheckUseZipline);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

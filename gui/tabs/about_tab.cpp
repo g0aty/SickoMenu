@@ -35,7 +35,7 @@ namespace AboutTab {
 
     void Render() {
         ImGui::SameLine(100 * State.dpiScale);
-        ImGui::BeginChild("###About", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+        ImGui::BeginChild("###AboutButtons", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
         if (TabGroup("Welcome", openWelcome)) {
             CloseOtherGroups(Groups::Welcome);
         }
@@ -44,6 +44,7 @@ namespace AboutTab {
             CloseOtherGroups(Groups::Credits);
         }
 
+        ImGui::BeginChild("###About", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
         if (openWelcome) {
             ImGui::Text(std::format("Welcome {}to ", State.HasOpenedMenuBefore ? "back " : "").c_str());
             ImGui::SameLine(0.0f, 0.0f);
@@ -223,6 +224,7 @@ namespace AboutTab {
             ImGui::SameLine(0.0f, 0.0f);
             ImGui::Text(" possible!");
         }
+        ImGui::EndChild();
         ImGui::EndChild();
     }
 }

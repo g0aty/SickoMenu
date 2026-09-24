@@ -238,4 +238,5 @@ void KeyBinds::from_json(const nlohmann::ordered_json& j, KeyBinds::Config& valu
     j.at("Complete_Tasks").get_to(value.Complete_Tasks);
     j.at("Toggle_Sicko").get_to(value.Toggle_Sicko);
     j.at("Leave_Game").get_to(value.Leave_Game);
+    j.at("Cancel_Start").get_to(value.Cancel_Start);
 }

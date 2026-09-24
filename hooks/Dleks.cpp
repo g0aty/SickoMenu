@@ -47,7 +47,7 @@ AsyncOperationHandle_1_UnityEngine_GameObject_ InstantiateAssetAsync(
     bool instantiateInWorldSpace,
     MethodInfo* method)
 {
-    LOG_DEBUG(std::format("AssetReference_InstantiateAsync executed with scene {}", State.CurrentScene).c_str());
+    // LOG_DEBUG(std::format("AssetReference_InstantiateAsync executed with scene {}", State.CurrentScene).c_str());
 
     if (!assetRef) {
         LOG_ERROR("AssetReference is null!");

@@ -30,8 +30,11 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method) {
         }
     }
 
-    if (!State.JoinedLobby) {
+    if (!State.JoinedLobby && IsInLobby()) {
         State.JoinedLobby = true;
+
+        ResetOriginalAppearance();
+
         if (!State.PanicMode && State.AutoApplyCosmeticPreset && !State.CosmeticPresets.empty()) {
             s_pendingCosmeticApply = true;
         }
@@ -56,7 +59,7 @@ void dLobbyBehaviour_Update(LobbyBehaviour* __this, MethodInfo* method) {
     }
     else if (!hasStarted) {
         hasStarted = true;
-        LobbyBehaviour_Start(__this, method); //restart lobby music
+        SoundManager_PlaySound(SoundManager__TypeInfo->static_fields->instance, (AudioClip*)__this->fields.MapTheme, false, 0.07f, NULL, NULL);
     }
     /*if (GameOptions().GetByte(app::ByteOptionNames__Enum::MapId) == 3) {
         GameOptions().SetByte(app::ByteOptionNames__Enum::MapId, 0);
@@ -300,7 +303,7 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
     }
     State.IsStartCountdownActive = __this->fields.startState == GameStartManager_StartingStates__Enum::Countdown;
     if (IsHost() && State.IsStartCountdownActive && State.CancelingStartGame) {
-        GameStartManager_ResetStartState(__this, NULL);
+        if (!State.PanicMode) dGameStartManager_ResetStartState(__this, NULL);
     }
     State.CancelingStartGame = false;
     bool buttonCheck = __this->fields.LastPlayerCount >= __this->fields.MinPlayers;
@@ -321,6 +324,13 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
         (float)(__this->fields.LastPlayerCount >= __this->fields.MinPlayers), 0.f, 1.f), NULL);
 }
 
+void dGameStartManager_ResetStartState(GameStartManager* __this, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dGameStartManager_Update executed", false);
+    GameStartManager_ResetStartState(__this, method);
+    SoundManager_StopSound(SoundManager__TypeInfo->static_fields->instance, __this->fields.gameStartSound, NULL);
+    // fix an in-game bug that left the start sound playing even after canceling starting
+}
+
 static int findGameOffset = 0;
 
 void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method) {
@@ -330,7 +340,7 @@ void dFindAGameManager_Update(FindAGameManager* __this, MethodInfo* method) {
 
 void dGameStartManager_ReallyBegin(GameStartManager* __this, bool neverShow, MethodInfo* method) {
     GameStartManager_ReallyBegin(__this, neverShow, method);
-    if (IsHost() && State.ModifyStartCountdown) {
+    if (IsHost() && State.ModifyStartCountdown && !State.PanicMode) {
         State.StartCountdown = std::clamp(State.StartCountdown, 1, !State.SafeMode ? 127 : 5);
         __this->fields.countDownTimer = State.StartCountdown + 0.0001f;
         // The game adds 0.0001f to the countdown timer, so we add it here too to keep it consistent

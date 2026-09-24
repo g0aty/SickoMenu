@@ -41,7 +41,7 @@ namespace SettingsTab {
 
 	void Render() {
 		ImGui::SameLine(100 * State.dpiScale);
-		ImGui::BeginChild("###Settings", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+		ImGui::BeginChild("###SettingsButtons", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 		if (TabGroup("General", openGeneral)) {
 			CloseOtherGroups(Groups::General);
 		}
@@ -57,6 +57,8 @@ namespace SettingsTab {
 		if (TabGroup("Keybinds", openKeybinds)) {
 			CloseOtherGroups(Groups::Keybinds);
 		}
+
+		ImGui::BeginChild("###Settings", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 		if (openGeneral) {
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 			if (ToggleButton("Show Keybinds", &State.ShowKeybinds)) {
@@ -223,7 +225,7 @@ namespace SettingsTab {
 
 			// you can only join a lobby if you have the same name as what your requested name is, when trying to join it
 			if (IsNameValid(State.userName) && (!State.SafeMode ||
-				State.CurrentScene == "MatchMaking" || State.CurrentScene == "MainMenu" || State.CurrentScene == "Tutorial")) {
+				State.CurrentScene == "MatchMaking" || State.CurrentScene == "MainMenu" || State.CurrentScene == "Tutorial" || State.CurrentScene == "HowToPlay")) {
 				if (AnimatedButton("Set as Account Name")) {
 					SetPlayerName(State.userName);
 					LOG_INFO("Successfully set account name to \"" + State.userName + "\"");
@@ -330,12 +332,9 @@ namespace SettingsTab {
 				InputString("Friend Code (For New/Guest Account ONLY)", &State.NewFriendCode);
 				if (!isFriendCodeValid) ImGui::PopStyleColor();
 
-				auto friendCodeValidText = "This new friend code should be <= 10 characters long and cannot have spaces.";
-
-				if (isFriendCodeValid)
-					ImGui::Text(friendCodeValidText);
-				else
-					ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), friendCodeValidText);
+				auto friendCodeValidText = "This new friend code should be <= 10 characters long and cannot have spaces.\nLeave this blank to generate a random friend code.";
+				if (isFriendCodeValid) ImGui::Text(friendCodeValidText);
+				else ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), friendCodeValidText);
 			}
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
@@ -356,8 +355,6 @@ namespace SettingsTab {
 				ImGui::SameLine();
 				if (CustomListBoxIntColored("Platform", &State.FakePlatform, PLATFORMS, 225.0F, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ", PLATFORM_NAMES_COLOR, IM_ARRAYSIZE(PLATFORM_NAMES_COLOR)))
 					State.Save();
-				ImGui::SameLine(0.0f, 0.0f);
-				ImGui::Text("Platform");
 			}
 
 			if (State.FakePlatform == 9) {
@@ -879,6 +876,7 @@ namespace SettingsTab {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("Cancel Start Game");
 		}
+		ImGui::EndChild();
 		ImGui::EndChild();
 	}
 }

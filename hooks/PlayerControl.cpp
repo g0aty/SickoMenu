@@ -366,8 +366,12 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                     }
                 }
             }
-            else if (PlayerIsImpostor(playerData) && PlayerIsImpostor(localData)) {
-                Color32&& roleColor = Color32_op_Implicit(Palette__TypeInfo->static_fields->ImpostorRed, NULL);
+            else {
+                bool shouldSeeImpostor = PlayerIsImpostor(playerData) && PlayerIsImpostor(localData);
+                Color32&& roleColor = app::Color32_op_Implicit(shouldSeeImpostor ?
+                    Palette__TypeInfo->static_fields->ImpostorRed :
+                    Palette__TypeInfo->static_fields->White, NULL);
+
                 playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
                     roleColor.r, roleColor.g, roleColor.b,
                     roleColor.a, playerName);
@@ -375,6 +379,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
             if (IsInGame() && playerData->fields.Role && PlayerIsImpostor(playerData) && !playerData->fields.IsDead) {
                 playerData->fields.Role->fields.CanUseKillButton = true;
+                playerData->fields.Role->fields.TeamType = RoleTeamTypes__Enum::Impostor;
                 // AU v18 somehow doesn't recognize the value as true for other players
                 // leading to ShowKillCD not working as intended
             }
@@ -412,8 +417,8 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                 && !State.PanicMode) {
                 ImVec2 mouse = ImGui::GetMousePos();
                 Vector2 target = {
-                    (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
-                    ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
+                    (mouse.x - DirectX::GetWindowSize(true).x / 2) + DirectX::GetWindowSize(true).x / 2,
+                    ((mouse.y - DirectX::GetWindowSize(true).y / 2) - DirectX::GetWindowSize(true).y / 2) * -1.0f
                 };
                 for (auto player : GetAllPlayerControl())
                     State.rpcQueue.push(new RpcForceSnapTo(player, ScreenToWorld(target)));
@@ -424,9 +429,11 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                 && (ImGui::IsKeyPressed(0x12) || ImGui::IsKeyDown(0x12)) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)
                 && !State.PanicMode) {
                 ImVec2 mouse = ImGui::GetMousePos();
+                float xOffset = (DirectX::GetWindowSize(true).x - DirectX::GetWindowSize(false).x) / 2.f;
+                float yOffset = (DirectX::GetWindowSize(true).y - DirectX::GetWindowSize(false).y) / 2.f;
                 Vector2 target = {
-                    (mouse.x - DirectX::GetWindowSize().x / 2) + DirectX::GetWindowSize().x / 2,
-                    ((mouse.y - DirectX::GetWindowSize().y / 2) - DirectX::GetWindowSize().y / 2) * -1.0f
+                    mouse.x + xOffset,
+                    (mouse.y + yOffset - DirectX::GetWindowSize(true).y) * -1.0f
                 };
                 for (auto player : GetAllPlayerControl())
                     State.lobbyRpcQueue.push(new RpcForceSnapTo(player, ScreenToWorld(target)));
@@ -620,7 +627,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                 }
             }
 
-            if (!State.FreeCam && __this == *Game::pLocalPlayer && State.prevCamPos.x != NULL) {
+            if (!State.FreeCam && !State.ControlPet && __this == *Game::pLocalPlayer && State.prevCamPos.x != NULL) {
                 auto mainCamera = Camera_get_main(NULL);
 
                 Transform* cameraTransform = Component_get_transform((Component_1*)mainCamera, NULL);
@@ -635,10 +642,25 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
         auto playerData = GetPlayerData(__this);
         // We should have this in a scope so that the lock guard only locks the right things
         {
-            Vector2 localPos = PlayerControl_GetTruePosition(*Game::pLocalPlayer, nullptr);
+            Vector2 localPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
+            if (!State.PanicMode) {
+                if (State.FreeCam) {
+                    auto mainCamera = Camera_get_main(NULL);
+                    Transform* cameraTransform = Component_get_transform((Component_1*)mainCamera, NULL);
+                    Vector3 cameraVector3 = Transform_get_position(cameraTransform, NULL);
+                    localPos = { cameraVector3.x, cameraVector3.y };
+                }
+                else if (auto playerToFollow = State.playerToFollow.validate(); playerToFollow.has_value()) {
+                    localPos = GetTrueAdjustedPosition(playerToFollow.get_PlayerControl());
+                }
+                else if (State.ControlPet) {
+                    localPos = State.petPos;
+                }
+            }
+
             ImVec2 localScreenPosition = WorldToScreen(localPos);
 
-            Vector2 playerPos = PlayerControl_GetTruePosition(__this, nullptr);
+            Vector2 playerPos = GetTrueAdjustedPosition(__this);
 
             Vector2 prevPlayerPos;
             synchronized(Replay::replayEventMutex) {
@@ -875,8 +897,14 @@ void dPlayerControl_OnGameStart(PlayerControl* __this, MethodInfo* method) {
             PlayerControl_RpcSetNamePlate(__this, convert_to_string(State.OverflowCachedNamePlate), NULL);
         }
 
-        if (__this == *Game::pLocalPlayer && !State.PanicMode && State.KillImmunity) {
-            SendKillImmuneToggle(true);
+        if (__this == *Game::pLocalPlayer && !State.PanicMode) {
+            if (State.KillImmunity) {
+                SendKillImmuneToggle(true);
+            }
+
+            if (State.ControlPet) {
+                State.petPos = PlayerControl_GetTruePosition(*Game::pLocalPlayer, NULL);
+            }
         }
 
         if (IsHost() && State.BattleRoyale) {
@@ -1176,12 +1204,19 @@ void dPlayerControl_HandleRpc(PlayerControl* __this, uint8_t callId, MessageRead
         if (IsHost() && !State.PanicMode && callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType &&
             State.DisabledSabotageTypes.count((int)SystemTypes__Enum::Doors))
             return;
-        if (!State.GameLoaded && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting))
+        if (!State.GameLoaded && (callId == (uint8_t)RpcCalls__Enum::ReportDeadBody || callId == (uint8_t)RpcCalls__Enum::StartMeeting) &&
+            !State.PanicMode && State.AntiExploit_CrashLobbyHost)
             return;
         if (!State.PanicMode && State.DisableKills && callId == (uint8_t)RpcCalls__Enum::CheckMurder) {
             //PlayerControl* target = MessageExtensions_ReadNetObject_1(reader, NULL);
             //PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, target, GetPlayerOutfit(GetPlayerData(target))->fields.ColorId, NULL);
         }
+
+        if (__this == *Game::pLocalPlayer && callId == (uint8_t)RpcCalls__Enum::UseZipline) {
+            if (State.AntiExploit_IsClimbingZipline) State.AntiExploit_IsClimbingZipline = false;
+            else if (!State.PanicMode && State.AntiExploit_UnauthorizedZiplines) return;
+        }
+
         int crew = 0, imp = 0;
         for (auto p : GetAllPlayerData()) {
             if (p->fields.IsDead) continue;
@@ -1831,4 +1866,12 @@ void dPlayerControl_CheckColor(PlayerControl* __this, uint8_t bodyColor, MethodI
     }
 
     PlayerControl_RpcSetColor(__this, bodyColor, NULL);
+}
+
+void dPlayerControl_CmdCheckUseZipline(PlayerControl* __this, PlayerControl* target, ZiplineBehaviour* ziplineBehaviour, bool fromTop, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_CmdCheckUseZipline executed", false);
+    PlayerControl_CmdCheckUseZipline(__this, target, ziplineBehaviour, fromTop, method);
+
+    if (__this == *Game::pLocalPlayer && target == *Game::pLocalPlayer)
+        State.AntiExploit_IsClimbingZipline = true;
 }

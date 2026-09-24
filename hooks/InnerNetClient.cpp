@@ -70,6 +70,7 @@ static void onGameEnd() {
         State.SpamVentTpEveryoneRandom = false;
         State.SpamVentTpEveryone = false;
         State.spamRandomVentTpPlayers.clear();
+        State.spamZiplinePlayers.clear();
         State.spamVentTpPlayers.clear();
         State.VoteKicks = 0;
         State.OutfitCooldown = GetFps();
@@ -84,6 +85,10 @@ static void onGameEnd() {
         State.ChatFocused = false;
         State.MIG_ThemeChanged = true;
         State.DisableHud = false;
+        State.ControlPet = false;
+        State.petPos = { NULL, NULL };
+        State.playerToAttach = {};
+        State.DisableControlPetHand = false;
         State.ChatSpamMode = 0;
 
         State.VoteOffPlayerId = Game::HasNotVoted;
@@ -102,6 +107,10 @@ static void onGameEnd() {
         State.tournamentCorrectCallers.clear();
         State.tournamentAllTasksCompleted.clear();
         State.SpeedrunOver = false;
+        State.JoinedLobby = false;
+        State.SpamZiplineEveryone = false;
+        State.AntiExploit_IsTeleportingSelf = false;
+        State.AntiExploit_IsClimbingZipline = false;
 
         State.ColorCycledPlayers.clear();
         State.VoteImmunePlayers.clear();
@@ -116,8 +125,7 @@ static void onGameEnd() {
     }
 }
 
-void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
-{
+void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_Update executed", false);
     try {
         if (State.unlockAllAchievements) {
@@ -139,7 +147,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             if (!IsInLobby()) {
                 State.LobbyTimer = 600.f;
                 State.JoinedAsHost = false;
-                State.JoinedLobby = false;
             }
 
             if (!IsInGame()) {
@@ -530,7 +537,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
                 if (State.Cycler && changeCycleDelay <= 0 && !State.activeImpersonation && (State.RandomHat || State.RandomSkin || State.RandomVisor || State.RandomPet || State.RandomNamePlate)) {
                     if (State.RandomHat) {
-                        std::vector availableHats = { "hat_NoHat", "hat_AbominalHat", "hat_anchor", "hat_antenna", "hat_Antenna_Black", "hat_arrowhead", "hat_Astronaut-Blue", "hat_Astronaut-Cyan", "hat_Astronaut-Orange", "hat_astronaut", "hat_axe", "hat_babybean", "hat_Baguette", "hat_BananaGreen", "hat_BananaPurple", "hat_bandanaWBY", "hat_Bandana_Blue", "hat_Bandana_Green", "hat_Bandana_Pink", "hat_Bandana_Red", "hat_Bandana_White", "hat_Bandana_Yellow", "hat_baseball_Black", "hat_baseball_Green", "hat_baseball_Lightblue", "hat_baseball_LightGreen", "hat_baseball_Lilac", "hat_baseball_Orange", "hat_baseball_Pink", "hat_baseball_Purple", "hat_baseball_Red", "hat_baseball_White", "hat_baseball_Yellow", "hat_Basketball", "hat_bat_crewcolor", "hat_bat_green", "hat_bat_ice", "hat_beachball", "hat_Beanie_Black", "hat_Beanie_Blue", "hat_Beanie_Green", "hat_Beanie_Lightblue", "hat_Beanie_LightGreen", "hat_Beanie_LightPurple", "hat_Beanie_Pink", "hat_Beanie_Purple", "hat_Beanie_White", "hat_Beanie_Yellow", "hat_bearyCold", "hat_bone", "hat_Bowlingball", "hat_brainslug", "hat_BreadLoaf", "hat_bucket", "hat_bucketHat", "hat_bushhat", "hat_Butter", "hat_caiatl", "hat_caitlin", "hat_candycorn", "hat_captain", "hat_cashHat", "hat_cat_grey", "hat_cat_orange", "hat_cat_pink", "hat_cat_snow", "hat_chalice", "hat_cheeseBleu", "hat_cheeseMoldy", "hat_cheeseSwiss", "hat_ChefWhiteBlue", "hat_cherryOrange", "hat_cherryPink", "hat_Chocolate", "hat_chocolateCandy", "hat_chocolateMatcha", "hat_chocolateVanillaStrawb", "hat_clagger", "hat_clown_purple", "hat_comper", "hat_croissant", "hat_crownBean", "hat_crownDouble", "hat_crownTall", "hat_CuppaJoe", "hat_Deitied", "hat_devilhorns_black", "hat_devilhorns_crewcolor", "hat_devilhorns_green", "hat_devilhorns_murky", "hat_devilhorns_white", "hat_devilhorns_yellow", "hat_Doc_black", "hat_Doc_Orange", "hat_Doc_Purple", "hat_Doc_Red", "hat_Doc_White", "hat_Dodgeball", "hat_Dorag_Black", "hat_Dorag_Desert", "hat_Dorag_Jungle", "hat_Dorag_Purple", "hat_Dorag_Sky", "hat_Dorag_Snow", "hat_Dorag_Yellow", "hat_doubletophat", "hat_DrillMetal", "hat_DrillStone", "hat_DrillWood", "hat_EarmuffGreen", "hat_EarmuffsPink", "hat_EarmuffsYellow", "hat_EarnmuffBlue", "hat_eggGreen", "hat_eggYellow", "hat_enforcer", "hat_erisMorn", "hat_fairywings", "hat_fishCap", "hat_fishhed", "hat_fishingHat", "hat_flowerpot", "hat_frankenbolts", "hat_frankenbride", "hat_fungleFlower", "hat_geoff", "hat_glowstick", "hat_glowstickCyan", "hat_glowstickOrange", "hat_glowstickPink", "hat_glowstickPurple", "hat_glowstickYellow", "hat_goggles", "hat_Goggles_Black", "hat_Goggles_Chrome", "hat_GovtDesert", "hat_GovtHeadset", "hat_halospartan", "hat_hardhat", "hat_Hardhat_black", "hat_Hardhat_Blue", "hat_Hardhat_Green", "hat_Hardhat_Orange", "hat_Hardhat_Pink", "hat_Hardhat_Purple", "hat_Hardhat_Red", "hat_Hardhat_White", "hat_HardtopHat", "hat_headslug_Purple", "hat_headslug_Red", "hat_headslug_White", "hat_headslug_Yellow", "hat_Heart", "hat_heim", "hat_Herohood_Black", "hat_Herohood_Blue", "hat_Herohood_Pink", "hat_Herohood_Purple", "hat_Herohood_Red", "hat_Herohood_Yellow", "hat_hl_fubuki", "hat_hl_gura", "hat_hl_korone", "hat_hl_marine", "hat_hl_mio", "hat_hl_moona", "hat_hl_okayu", "hat_hl_pekora", "hat_hl_risu", "hat_hl_watson", "hat_hunter", "hat_IceCreamMatcha", "hat_IceCreamMint", "hat_IceCreamNeo", "hat_IceCreamStrawberry", "hat_IceCreamUbe", "hat_IceCreamVanilla", "hat_Igloo", "hat_Janitor", "hat_jayce", "hat_jinx", "hat_killerplant", "hat_lilShroom", "hat_maraSov", "hat_mareLwyd", "hat_military", "hat_MilitaryWinter", "hat_MinerBlack", "hat_MinerYellow", "hat_mira_bush", "hat_mira_case", "hat_mira_cloud", "hat_mira_flower", "hat_mira_flower_red", "hat_mira_gem", "hat_mira_headset_blue", "hat_mira_headset_pink", "hat_mira_headset_yellow", "hat_mira_leaf", "hat_mira_milk", "hat_mira_sign_blue", "hat_mohawk_bubblegum", "hat_mohawk_bumblebee", "hat_mohawk_purple_green", "hat_mohawk_rainbow", "hat_mummy", "hat_mushbuns", "hat_mushroomBeret", "hat_mysteryBones", "hat_NewYear2023", "hat_OrangeHat", "hat_osiris", "hat_pack01_Astronaut0001", "hat_pack02_Tengallon0001", "hat_pack02_Tengallon0002", "hat_pack03_Stickynote0004", "hat_pack04_Geoffmask0001", "hat_pack06holiday_candycane0001", "hat_PancakeStack", "hat_paperhat", "hat_Paperhat_Black", "hat_Paperhat_Blue", "hat_Paperhat_Cyan", "hat_Paperhat_Lightblue", "hat_Paperhat_Pink", "hat_Paperhat_Yellow", "hat_papermask", "hat_partyhat", "hat_pickaxe", "hat_Pineapple", "hat_PizzaSliceHat", "hat_pk01_BaseballCap", "hat_pk02_Crown", "hat_pk02_Eyebrows", "hat_pk02_HaloHat", "hat_pk02_HeroCap", "hat_pk02_PipCap", "hat_pk02_PlungerHat", "hat_pk02_ScubaHat", "hat_pk02_StickminHat", "hat_pk02_StrawHat", "hat_pk02_TenGallonHat", "hat_pk02_ThirdEyeHat", "hat_pk02_ToiletPaperHat", "hat_pk02_Toppat", "hat_pk03_Fedora", "hat_pk03_Goggles", "hat_pk03_Headphones", "hat_pk03_Security1", "hat_pk03_StrapHat", "hat_pk03_Traffic", "hat_pk04_Antenna", "hat_pk04_Archae", "hat_pk04_Balloon", "hat_pk04_Banana", "hat_pk04_Bandana", "hat_pk04_Beanie", "hat_pk04_Bear", "hat_pk04_BirdNest", "hat_pk04_CCC", "hat_pk04_Chef", "hat_pk04_DoRag", "hat_pk04_Fez", "hat_pk04_GeneralHat", "hat_pk04_HunterCap", "hat_pk04_JungleHat", "hat_pk04_MinerCap", "hat_pk04_MiniCrewmate", "hat_pk04_Pompadour", "hat_pk04_RamHorns", "hat_pk04_Slippery", "hat_pk04_Snowman", "hat_pk04_Vagabond", "hat_pk04_WinterHat", "hat_pk05_Burthat", "hat_pk05_Cheese", "hat_pk05_cheesetoppat", "hat_pk05_Cherry", "hat_pk05_davehat", "hat_pk05_Egg", "hat_pk05_Ellie", "hat_pk05_EllieToppat", "hat_pk05_Ellryhat", "hat_pk05_Fedora", "hat_pk05_Flamingo", "hat_pk05_FlowerPin", "hat_pk05_GeoffreyToppat", "hat_pk05_Helmet", "hat_pk05_HenryToppat", "hat_pk05_Macbethhat", "hat_pk05_Plant", "hat_pk05_RHM", "hat_pk05_Svenhat", "hat_pk05_Wizardhat", "hat_pk06_Candycanes", "hat_pk06_ElfHat", "hat_pk06_Lights", "hat_pk06_Present", "hat_pk06_Reindeer", "hat_pk06_Santa", "hat_pk06_Snowman", "hat_pk06_tree", "hat_pkHW01_BatWings", "hat_pkHW01_CatEyes", "hat_pkHW01_Horns", "hat_pkHW01_Machete", "hat_pkHW01_Mohawk", "hat_pkHW01_Pirate", "hat_pkHW01_PlagueHat", "hat_pkHW01_Pumpkin", "hat_pkHW01_ScaryBag", "hat_pkHW01_Witch", "hat_pkHW01_Wolf", "hat_Plunger_Blue", "hat_Plunger_Yellow", "hat_police", "hat_Ponytail", "hat_Pot", "hat_Present", "hat_Prototype", "hat_pusheenGreyHat", "hat_PusheenicornHat", "hat_pusheenMintHat", "hat_pusheenPinkHat", "hat_pusheenPurpleHat", "hat_pusheenSitHat", "hat_pusheenSleepHat", "hat_pyramid", "hat_rabbitEars", "hat_Ramhorn_Black", "hat_Ramhorn_Red", "hat_Ramhorn_White", "hat_ratchet", "hat_Records", "hat_RockIce", "hat_RockLava", "hat_Rubberglove", "hat_Rupert", "hat_russian", "hat_saint14", "hat_sausage", "hat_savathun", "hat_schnapp", "hat_screamghostface", "hat_Scrudge", "hat_sharkfin", "hat_shaxx", "hat_shovel", "hat_SlothHat", "hat_SnowbeanieGreen", "hat_SnowbeanieOrange", "hat_SnowBeaniePurple", "hat_SnowbeanieRed", "hat_Snowman", "hat_Soccer", "hat_Sorry", "hat_starBalloon", "hat_starhorse", "hat_Starless", "hat_StarTopper", "hat_stethescope", "hat_StrawberryLeavesHat", "hat_TenGallon_Black", "hat_TenGallon_White", "hat_ThomasC", "hat_tinFoil", "hat_titan", "hat_ToastButterHat", "hat_tombstone", "hat_tophat", "hat_ToppatHair", "hat_towelwizard", "hat_Traffic_Blue", "hat_traffic_purple", "hat_Traffic_Red", "hat_Traffic_Yellow", "hat_Unicorn", "hat_vi", "hat_viking", "hat_Visor", "hat_Voleyball", "hat_w21_candycane_blue", "hat_w21_candycane_bubble", "hat_w21_candycane_chocolate", "hat_w21_candycane_mint", "hat_w21_elf_pink", "hat_w21_elf_swe", "hat_w21_gingerbread", "hat_w21_holly", "hat_w21_krampus", "hat_w21_lights_white", "hat_w21_lights_yellow", "hat_w21_log", "hat_w21_mistletoe", "hat_w21_mittens", "hat_w21_nutcracker", "hat_w21_pinecone", "hat_w21_present_evil", "hat_w21_present_greenyellow", "hat_w21_present_redwhite", "hat_w21_present_whiteblue", "hat_w21_santa_evil", "hat_w21_santa_green", "hat_w21_santa_mint", "hat_w21_santa_pink", "hat_w21_santa_white", "hat_w21_santa_yellow", "hat_w21_snowflake", "hat_w21_snowman", "hat_w21_snowman_evil", "hat_w21_snowman_greenred", "hat_w21_snowman_redgreen", "hat_w21_snowman_swe", "hat_w21_winterpuff", "hat_wallcap", "hat_warlock", "hat_whitetophat", "hat_wigJudge", "hat_wigTall", "hat_WilfordIV", "hat_Winston", "hat_WinterGreen", "hat_WinterHelmet", "hat_WinterRed", "hat_WinterYellow", "hat_witch_green", "hat_witch_murky", "hat_witch_pink", "hat_witch_white", "hat_wolf_grey", "hat_wolf_murky", "hat_Zipper" };
+                        std::vector availableHats = { "hat_NoHat", "hat_bday_guard", "hat_cosmic_alienAntenna", "hat_cosmic_hood", "hat_cosmic_lure", "hat_cosmic_cosmonaut", "hat_cosmic_meteor", "hat_cosmic_moon", "hat_cosmic_rings", "hat_cosmic_crash", "hat_cosmic_rocket", "hat_cosmic_satellite", "hat_cosmic_starAntenna", "hat_cosmic_star", "hat_cosmic_sun", "hat_cosmic_telescope", "hat_parasite_Blue", "hat_parasite_Cyan", "hat_parasite_Green", "hat_parasite_Lime", "hat_parasite_Purple", "hat_parasite_Red", "hat_parasite_Cook", "hat_hanami_blossom", "hat_hanami_pigtails", "hat_hanami_dango", "hat_hanami_crown", "hat_hanami_hachimaki", "hat_hanami_matcha", "hat_hanami_mochi", "hat_phoenix_wright", "hat_2026nye", "hat_stardew_abigail", "hat_stardew_grandpa", "hat_stardew_lewis", "hat_stardew_linus", "hat_stardew_mrqi", "hat_stardew_sebastian", "hat_stardew_straw", "hat_stardew_shorts", "hat_stardew_melon", "hat_stardew_parsnip", "hat_stardew_chickenWhite", "hat_stardew_chickenBlue", "hat_stardew_chickenVoid", "hat_stardew_egg", "hat_Paimon", "hat_racing_fungle", "hat_racing_skeld", "hat_racing_mira", "hat_racing_polus", "hat_racing_airship", "hat_racing_bald", "hat_bsb2_watermelon", "hat_bsb2_beretBlack", "hat_bsb2_beretBlue", "hat_bsb2_beretPink", "hat_bsb2_bowPink", "hat_bsb2_bowRed", "hat_bday_cake", "hat_kamurocho_cinderella", "hat_kamurocho_ichiban", "hat_kamurocho_kazuma", "hat_kamurocho_majima", "hat_kamurocho_helmet", "hat_kamurocho_pirate", "hat_kamurocho_ono", "hat_NewYear2025", "hat_paws_panda", "hat_claws_spaceDog", "hat_claws_frog", "hat_paws_spaceDog", "hat_paws_fish", "hat_claws_moose", "hat_claws_dragonRed", "hat_paws_raccoon", "hat_claws_bullHorns", "hat_paws_turtle", "hat_paws_foxGrey", "hat_claws_foxOrange", "hat_paws_antlers", "hat_claws_squid", "hat_claws_kuduHorns", "hat_paws_opossum", "hat_claws_buffaloHorns", "hat_claws_hippo", "hat_Edgeworth", "hat_artagan", "hat_chetney", "hat_fcg", "hat_fearne", "hat_jester", "hat_laudna", "hat_molly", "hat_nott", "hat_orthax", "hat_scanlan", "hat_sprinkle", "hat_vax", "hat_fluffyHat", "hat_topHatMinimate", "hat_triplePartyHat", "hat_bb1_bucketHatBee", "hat_bb1_bucketHatBlack", "hat_bb1_bucketHatCamo", "hat_bb1_bucketHatFlowers", "hat_bb1_bucketHatWhite", "hat_bb1_bunnyBlack", "hat_bb1_sunHatGreen", "hat_bb1_sunHatYellow", "hat_bb1_lilShroomRed", "hat_bb1_lilShroomBlue", "hat_bb1_lilShroomGlowing", "hat_lny_dancerTail", "hat_lny_dancerBody", "hat_lny_dancerHead", "hat_lny_lantern", "hat_lny_soupSpoon", "hat_lny_cat", "hat_lny_dog", "hat_lny_dragon", "hat_lny_goat", "hat_lny_horse", "hat_lny_monkey", "hat_lny_ox", "hat_lny_pig", "hat_lny_rabbit", "hat_lny_rat", "hat_lny_rooster", "hat_lny_tiger", "hat_NewYear2024", "hat_bowkid", "hat_conductor", "hat_hatkid", "hat_mustachegirl", "hat_alienHominid", "hat_castleCrasher", "hat_hattyHattington", "hat_king", "hat_badeline", "hat_bird", "hat_madeline", "hat_theohair", "hat_cadence", "hat_nocturna", "hat_shopkeeper", "hat_skull", "hat_boneUndertale", "hat_duck", "hat_floweyBad", "hat_floweyGood", "hat_spear", "hat_undyne", "hat_bell", "hat_gardener", "hat_goosefloaty", "hat_mushmuffsHat", "hat_shiitakeHat", "hat_shrapnelHat", "hat_anchor", "hat_antenna", "hat_beachball", "hat_bucket", "hat_bucketHat", "hat_fishingHat", "hat_fungleFlower", "hat_killerplant", "hat_lilShroom", "hat_mushbuns", "hat_mushroomBeret", "hat_mysteryBones", "hat_pickaxe", "hat_sharkfin", "hat_shovel", "hat_bearyCold", "hat_pusheenGreyHat", "hat_pusheenMintHat", "hat_pusheenPinkHat", "hat_pusheenPurpleHat", "hat_PusheenicornHat", "hat_pusheenSitHat", "hat_pusheenSleepHat", "hat_SlothHat", "hat_starBalloon", "hat_bandanaWBY", "hat_fishCap", "hat_rabbitEars", "hat_caiatl", "hat_chalice", "hat_erisMorn", "hat_hunter", "hat_maraSov", "hat_osiris", "hat_pyramid", "hat_saint14", "hat_savathun", "hat_shaxx", "hat_starhorse", "hat_titan", "hat_warlock", "hat_NewYear2023", "hat_Igloo", "hat_Present", "hat_Scrudge", "hat_Snowman", "hat_StarTopper", "hat_babybean", "hat_cashHat", "hat_crownBean", "hat_crownDouble", "hat_crownTall", "hat_mareLwyd", "hat_schnapp", "hat_Sorry", "hat_tinFoil", "hat_wigJudge", "hat_wigTall", "hat_hl_fubuki", "hat_hl_gura", "hat_hl_korone", "hat_hl_marine", "hat_hl_mio", "hat_hl_moona", "hat_hl_okayu", "hat_hl_pekora", "hat_hl_risu", "hat_hl_watson", "hat_Baguette", "hat_BreadLoaf", "hat_Butter", "hat_OrangeHat", "hat_PancakeStack", "hat_Pineapple", "hat_PizzaSliceHat", "hat_StrawberryLeavesHat", "hat_ToastButterHat", "hat_croissant", "hat_IceCreamVanilla", "hat_IceCreamUbe", "hat_IceCreamMatcha", "hat_IceCreamMint", "hat_IceCreamNeo", "hat_IceCreamStrawberry", "hat_sausage", "hat_screamghostface", "hat_halospartan", "hat_ratchet", "hat_w21_gingerbread", "hat_w21_holly", "hat_w21_krampus", "hat_w21_log", "hat_w21_mistletoe", "hat_w21_mittens", "hat_w21_nutcracker", "hat_w21_pinecone", "hat_w21_snowflake", "hat_w21_snowman", "hat_w21_winterpuff", "hat_caitlin", "hat_clagger", "hat_comper", "hat_enforcer", "hat_heim", "hat_jayce", "hat_jinx", "hat_vi", "hat_arrowhead", "hat_axe", "hat_bone", "hat_candycorn", "hat_clown_purple", "hat_fairywings", "hat_fishhed", "hat_frankenbolts", "hat_frankenbride", "hat_glowstick", "hat_glowstickCyan", "hat_glowstickOrange", "hat_glowstickPink", "hat_glowstickPurple", "hat_glowstickYellow", "hat_tombstone", "hat_mummy", "hat_Basketball", "hat_Bowlingball", "hat_Dodgeball", "hat_Voleyball", "hat_Soccer", "hat_Deitied", "hat_DrillMetal", "hat_DrillStone", "hat_DrillWood", "hat_Janitor", "hat_Pot", "hat_CuppaJoe", "hat_HardtopHat", "hat_Prototype", "hat_Records", "hat_Rupert", "hat_ThomasC", "hat_ToppatHair", "hat_WilfordIV", "hat_Winston", "hat_pk05_Burthat", "hat_pk05_cheesetoppat", "hat_pk05_davehat", "hat_pk05_Ellie", "hat_pk05_Ellryhat", "hat_pk05_GeoffreyToppat", "hat_pk05_HenryToppat", "hat_pk05_EllieToppat", "hat_pk05_Macbethhat", "hat_pk05_RHM", "hat_pk05_Svenhat", "hat_mira_bush", "hat_mira_case", "hat_mira_cloud", "hat_mira_flower", "hat_mira_flower_red", "hat_mira_gem", "hat_mira_leaf", "hat_mira_milk", "hat_pk03_Headphones", "hat_GovtHeadset", "hat_mira_headset_blue", "hat_mira_headset_pink", "hat_mira_headset_yellow", "hat_pk03_Security1", "hat_AbominalHat", "hat_EarmuffGreen", "hat_EarmuffsPink", "hat_EarmuffsYellow", "hat_EarnmuffBlue", "hat_RockLava", "hat_RockIce", "hat_SnowbeanieRed", "hat_SnowBeaniePurple", "hat_SnowbeanieGreen", "hat_SnowbeanieOrange", "hat_WinterHelmet", "hat_pk04_Archae", "hat_pk04_MinerCap", "hat_MinerYellow", "hat_MinerBlack", "hat_pk04_WinterHat", "hat_WinterYellow", "hat_WinterRed", "hat_WinterGreen", "hat_pkHW01_BatWings", "hat_bat_crewcolor", "hat_bat_green", "hat_bat_ice", "hat_pkHW01_CatEyes", "hat_cat_grey", "hat_cat_orange", "hat_cat_pink", "hat_cat_snow", "hat_pkHW01_Horns", "hat_devilhorns_yellow", "hat_devilhorns_black", "hat_devilhorns_crewcolor", "hat_devilhorns_green", "hat_devilhorns_murky", "hat_devilhorns_white", "hat_pkHW01_Machete", "hat_pkHW01_Mohawk", "hat_mohawk_rainbow", "hat_mohawk_bubblegum", "hat_mohawk_bumblebee", "hat_mohawk_purple_green", "hat_pkHW01_Pirate", "hat_pkHW01_PlagueHat", "hat_pkHW01_Pumpkin", "hat_pkHW01_ScaryBag", "hat_papermask", "hat_pkHW01_Witch", "hat_witch_white", "hat_witch_green", "hat_witch_murky", "hat_witch_pink", "hat_pkHW01_Wolf", "hat_wolf_grey", "hat_wolf_murky", "hat_pk06_Candycanes", "hat_w21_candycane_mint", "hat_w21_candycane_blue", "hat_w21_candycane_bubble", "hat_w21_candycane_chocolate", "hat_pk06_ElfHat", "hat_w21_elf_swe", "hat_w21_elf_pink", "hat_pk06_Lights", "hat_w21_lights_white", "hat_w21_lights_yellow", "hat_pk06_Present", "hat_w21_present_whiteblue", "hat_w21_present_evil", "hat_w21_present_greenyellow", "hat_w21_present_redwhite", "hat_pk06_Reindeer", "hat_pk06_Santa", "hat_w21_santa_yellow", "hat_w21_santa_evil", "hat_w21_santa_green", "hat_w21_santa_mint", "hat_w21_santa_pink", "hat_w21_santa_white", "hat_pk06_Snowman", "hat_w21_snowman_swe", "hat_w21_snowman_evil", "hat_w21_snowman_greenred", "hat_w21_snowman_redgreen", "hat_pk06_tree", "hat_astronaut", "hat_Astronaut-Blue", "hat_Astronaut-Cyan", "hat_Astronaut-Orange", "hat_brainslug", "hat_headslug_White", "hat_headslug_Yellow", "hat_headslug_Red", "hat_headslug_Purple", "hat_bushhat", "hat_Chocolate", "hat_chocolateVanillaStrawb", "hat_chocolateCandy", "hat_chocolateMatcha", "hat_doubletophat", "hat_flowerpot", "hat_goggles", "hat_Goggles_Chrome", "hat_Goggles_Black", "hat_hardhat", "hat_Hardhat_White", "hat_Hardhat_black", "hat_Hardhat_Blue", "hat_Hardhat_Green", "hat_Hardhat_Orange", "hat_Hardhat_Pink", "hat_Hardhat_Purple", "hat_Hardhat_Red", "hat_Heart", "hat_military", "hat_MilitaryWinter", "hat_GovtDesert", "hat_police", "hat_paperhat", "hat_Paperhat_Pink", "hat_Paperhat_Yellow", "hat_Paperhat_Lightblue", "hat_Paperhat_Cyan", "hat_Paperhat_Blue", "hat_Paperhat_Black", "hat_partyhat", "hats_newyears2018", "hat_pk01_BaseballCap", "hat_baseball_White", "hat_baseball_Yellow", "hat_baseball_Red", "hat_baseball_Purple", "hat_baseball_Pink", "hat_baseball_Orange", "hat_baseball_Lilac", "hat_baseball_LightGreen", "hat_baseball_Lightblue", "hat_baseball_Green", "hat_baseball_Black", "hat_pk02_Crown", "hat_pk02_Eyebrows", "hat_pk02_HaloHat", "hat_pk02_HeroCap", "hat_Herohood_Yellow", "hat_Herohood_Black", "hat_Herohood_Blue", "hat_Herohood_Pink", "hat_Herohood_Purple", "hat_Herohood_Red", "hat_pk05_Wizardhat", "hat_pk02_PipCap", "hat_pk02_PlungerHat", "hat_Plunger_Blue", "hat_Plunger_Yellow", "hat_pk02_ScubaHat", "hat_pk02_StickminHat", "hat_pk02_StrawHat", "hat_pk02_TenGallonHat", "hat_TenGallon_Black", "hat_TenGallon_White", "hat_pk02_ThirdEyeHat", "hat_pk02_ToiletPaperHat", "hat_pk02_Toppat", "hat_pk03_Fedora", "hat_pk03_Goggles", "hat_pk03_StrapHat", "hat_pk03_Traffic", "hat_traffic_purple", "hat_Traffic_Blue", "hat_Traffic_Red", "hat_Traffic_Yellow", "hat_pk04_Antenna", "hat_Antenna_Black", "hat_pk04_Balloon", "hat_pk04_Banana", "hat_BananaGreen", "hat_BananaPurple", "hat_pk04_Bandana", "hat_Bandana_White", "hat_Bandana_Yellow", "hat_Bandana_Red", "hat_Bandana_Pink", "hat_Bandana_Green", "hat_Bandana_Blue", "hat_pk04_Beanie", "hat_Beanie_Black", "hat_Beanie_Blue", "hat_Beanie_Green", "hat_Beanie_Lightblue", "hat_Beanie_LightGreen", "hat_Beanie_LightPurple", "hat_Beanie_Pink", "hat_Beanie_Purple", "hat_Beanie_White", "hat_Beanie_Yellow", "hat_pk04_Bear", "hat_pk04_BirdNest", "hat_pk04_Chef", "hat_ChefWhiteBlue", "hat_pk04_DoRag", "hat_Dorag_Yellow", "hat_Dorag_Black", "hat_Dorag_Desert", "hat_Dorag_Jungle", "hat_Dorag_Purple", "hat_Dorag_Sky", "hat_Dorag_Snow", "hat_pk04_Fez", "hat_pk04_GeneralHat", "hat_captain", "hat_pk04_HunterCap", "hat_pk04_JungleHat", "hat_pk04_MiniCrewmate", "hat_pk04_Pompadour", "hat_pk04_RamHorns", "hat_Ramhorn_Black", "hat_Ramhorn_Red", "hat_Ramhorn_White", "hat_pk04_Slippery", "hat_mira_sign_blue", "hat_pk04_Snowman", "hat_pk04_Vagabond", "hat_pk05_Cheese", "hat_cheeseSwiss", "hat_cheeseBleu", "hat_cheeseMoldy", "hat_pk05_Cherry", "hat_cherryPink", "hat_cherryOrange", "hat_pk05_Egg", "hat_eggYellow", "hat_eggGreen", "hat_pk05_Fedora", "hat_pk05_Flamingo", "hat_pk05_FlowerPin", "hat_pk05_Helmet", "hat_pk05_Plant", "hat_Ponytail", "hat_Rubberglove", "hat_russian", "hat_stethescope", "hat_Doc_White", "hat_Doc_black", "hat_Doc_Orange", "hat_Doc_Purple", "hat_Doc_Red", "hat_tophat", "hat_towelwizard", "hat_Unicorn", "hat_viking", "hat_Visor", "hat_wallcap", "hat_pk04_CCC", "hat_whitetophat", "hat_Zipper", "hat_Starless" };
                         if (!State.SafeMode && State.CycleForEveryone) {
                             for (auto p : GetAllPlayerControl()) {
                                 PlayerControl_RpcSetHat(p, convert_to_string(availableHats[randi(0, (int)availableHats.size() - 1)]), NULL);
@@ -539,7 +546,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         else PlayerControl_RpcSetHat(*Game::pLocalPlayer, convert_to_string(availableHats[randi(0, (int)availableHats.size() - 1)]), NULL);
                     }
                     if (State.RandomSkin) {
-                        std::vector availableSkins = { "skin_None", "skin_Abominalskin", "skin_ApronGreen", "skin_Archae", "skin_Astro", "skin_Astronaut-Blueskin", "skin_Astronaut-Cyanskin", "skin_Astronaut-Orangeskin", "skin_Bananaskin", "skin_benoit", "skin_Bling", "skin_BlueApronskin", "skin_BlueSuspskin", "skin_Box1skin", "skin_BubbleWrapskin", "skin_Burlapskin", "skin_BushSign1skin", "skin_Bushskin", "skin_BusinessFem-Aquaskin", "skin_BusinessFem-Tanskin", "skin_BusinessFemskin", "skin_caitlin", "skin_Capt", "skin_CCC", "skin_ChefBlackskin", "skin_ChefBlue", "skin_ChefRed", "skin_clown", "skin_D2Cskin", "skin_D2Hunter", "skin_D2Osiris", "skin_D2Saint14", "skin_D2Shaxx", "skin_D2Titan", "skin_D2Warlock", "skin_enforcer", "skin_fairy", "skin_FishingSkinskin", "skin_fishmonger", "skin_FishSkinskin", "skin_General", "skin_greedygrampaskin", "skin_halospartan", "skin_Hazmat-Blackskin", "skin_Hazmat-Blueskin", "skin_Hazmat-Greenskin", "skin_Hazmat-Pinkskin", "skin_Hazmat-Redskin", "skin_Hazmat-Whiteskin", "skin_Hazmat", "skin_heim", "skin_hl_fubuki", "skin_hl_gura", "skin_hl_korone", "skin_hl_marine", "skin_hl_mio", "skin_hl_moona", "skin_hl_okayu", "skin_hl_pekora", "skin_hl_risu", "skin_hl_watson", "skin_Horse1skin", "skin_Hotdogskin", "skin_InnerTubeSkinskin", "skin_JacketGreenskin", "skin_JacketPurpleskin", "skin_JacketYellowskin", "skin_Janitorskin", "skin_jayce", "skin_jinx", "skin_LifeVestSkinskin", "skin_Mech", "skin_MechanicRed", "skin_Military", "skin_MilitaryDesert", "skin_MilitarySnowskin", "skin_Miner", "skin_MinerBlackskin", "skin_mummy", "skin_OrangeSuspskin", "skin_PinkApronskin", "skin_PinkSuspskin", "skin_Police", "skin_presentskin", "skin_prisoner", "skin_PrisonerBlue", "skin_PrisonerTanskin", "skin_pumpkin", "skin_PusheenGreyskin", "skin_Pusheenicornskin", "skin_PusheenMintskin", "skin_PusheenPinkskin", "skin_PusheenPurpleskin", "skin_ratchet", "skin_rhm", "skin_RockIceskin", "skin_RockLavaskin", "skin_Sack1skin", "skin_scarfskin", "skin_Science", "skin_Scientist-Blueskin", "skin_Scientist-Darkskin", "skin_screamghostface", "skin_Security", "skin_Skin_SuitRedskin", "skin_Slothskin", "skin_SportsBlueskin", "skin_SportsRedskin", "skin_SuitB", "skin_SuitW", "skin_SweaterBlueskin", "skin_SweaterPinkskin", "skin_Sweaterskin", "skin_SweaterYellowskin", "skin_Tarmac", "skin_ToppatSuitFem", "skin_ToppatVest", "skin_uglysweaterskin", "skin_vampire", "skin_vi", "skin_w21_deer", "skin_w21_elf", "skin_w21_msclaus", "skin_w21_nutcracker", "skin_w21_santa", "skin_w21_snowmate", "skin_w21_tree", "skin_Wall", "skin_Winter", "skin_witch", "skin_YellowApronskin", "skin_YellowSuspskin" };
+                        std::vector availableSkins = { "skin_None", "skin_cosmic_rocket", "skin_parasite_Black", "skin_parasite_Blue", "skin_parasite_Brown", "skin_parasite_Cyan", "skin_parasite_Green", "skin_parasite_Lime", "skin_parasite_Orange", "skin_parasite_Purple", "skin_parasite_Red", "skin_parasite_White", "skin_parasite_Yellow", "skin_hanami_cardigan", "skin_hanami_kimono", "skin_hanami_matsuri", "skin_phoenix_wright", "skin_stardew_abigail", "skin_stardew_lewis", "skin_stardew_linus", "skin_stardew_mrqi", "skin_stardew_sebastian", "skin_stardew_overalls", "skin_Genshin_Skin_Paimon", "skin_racing_fungle", "skin_racing_skeld", "skin_racing_mira", "skin_racing_polus", "skin_racing_airship", "skin_racing_jim", "skin_bsb2_pompous", "skin_bsb2_powdered", "skin_bsb2_scarfYellowGreen", "skin_bsb2_scarfSepia", "skin_kamurocho_cinderella", "skin_kamurocho_akiyama", "skin_kamurocho_tropical", "skin_kamurocho_ichiban", "skin_kamurocho_kazuma", "skin_kamurocho_pirate", "skin_kamurocho_majima", "skin_kamurocho_saejima", "skin_kamurocho_zhao", "skin_paws_opossum", "skin_paws_parrot", "skin_paws_raccoon", "skin_claws_stripes", "skin_paws_foxGrey", "skin_claws_squid", "skin_claws_dragonRed", "skin_claws_frogSuit", "skin_claws_hoofed", "skin_claws_foxOrange", "skin_Edgeworth", "skin_artagan", "skin_Chetney", "skin_Fearne", "skin_Jester", "skin_Laudna", "skin_Molly", "skin_Nott", "skin_Vax", "skin_bb1_rainbowTube", "skin_bb1_fungleDress", "skin_lny_dragonDancer", "skin_BowKidskin", "skin_Conductorskin", "skin_HatKidSkinskin", "skin_MoustacheKidSkinskin", "skin_CrusaderSkinskin", "skin_HattySkinskin", "skin_KingSkinskin", "skin_BadelineSkinskin", "skin_MadelineSkinskin", "skin_Theoskin", "skin_CadenceSkinskin", "skin_FrederickSkinskin", "skin_Nocturnaskin", "skin_Papyrusskin", "skin_Sanskin", "skin_Undyneskin", "skin_GardenerSkin1skin", "skin_Wimpskin", "skin_Skins14_5skin", "skin_FishingSkinskin", "skin_FishSkinskin", "skin_InnerTubeSkinskin", "skin_LifeVestSkinskin", "skin_PusheenGreyskin", "skin_PusheenMintskin", "skin_PusheenPinkskin", "skin_PusheenPurpleskin", "skin_Pusheenicornskin", "skin_Slothskin", "skin_D2Hunter", "skin_D2Osiris", "skin_D2Saint14", "skin_D2Shaxx", "skin_D2Titan", "skin_D2Warlock", "skin_greedygrampaskin", "skin_presentskin", "skin_scarfskin", "skin_uglysweaterskin", "skin_benoit", "skin_Box1skin", "skin_BubbleWrapskin", "skin_Burlapskin", "skin_BushSign1skin", "skin_Horse1skin", "skin_Sack1skin", "skin_hl_fubuki", "skin_hl_gura", "skin_hl_korone", "skin_hl_marine", "skin_hl_mio", "skin_hl_moona", "skin_hl_okayu", "skin_hl_pekora", "skin_hl_risu", "skin_hl_watson", "skin_Bananaskin", "skin_BlueApronskin", "skin_ApronGreen", "skin_PinkApronskin", "skin_YellowApronskin", "skin_BlueSuspskin", "skin_OrangeSuspskin", "skin_PinkSuspskin", "skin_YellowSuspskin", "skin_ChefBlackskin", "skin_ChefBlue", "skin_ChefRed", "skin_Hotdogskin", "skin_screamghostface", "skin_halospartan", "skin_ratchet", "skin_w21_deer", "skin_w21_elf", "skin_w21_msclaus", "skin_w21_nutcracker", "skin_w21_santa", "skin_w21_snowmate", "skin_w21_tree", "skin_caitlin", "skin_enforcer", "skin_heim", "skin_jayce", "skin_jinx", "skin_vi", "skin_clown", "skin_fairy", "skin_fishmonger", "skin_pumpkin", "skin_vampire", "skin_witch", "skin_mummy", "skin_D2Cskin", "skin_Janitorskin", "skin_SportsBlueskin", "skin_SportsRedskin", "skin_Bling", "skin_General", "skin_ToppatSuitFem", "skin_ToppatVest", "skin_CCC", "skin_prisoner", "skin_PrisonerTanskin", "skin_PrisonerBlue", "skin_rhm", "skin_Bushskin", "skin_BusinessFemskin", "skin_BusinessFem-Tanskin", "skin_BusinessFem-Aquaskin", "skin_Hazmat", "skin_Hazmat-Blackskin", "skin_Hazmat-Blueskin", "skin_Hazmat-Greenskin", "skin_Hazmat-Pinkskin", "skin_Hazmat-Redskin", "skin_Hazmat-Whiteskin", "skin_Security", "skin_Tarmac", "skin_Abominalskin", "skin_RockLavaskin", "skin_RockIceskin", "skin_Sweaterskin", "skin_SweaterPinkskin", "skin_SweaterBlueskin", "skin_SweaterYellowskin", "skin_Archae", "skin_Miner", "skin_MinerBlackskin", "skin_Winter", "skin_JacketYellowskin", "skin_JacketGreenskin", "skin_JacketPurpleskin", "skin_Astro", "skin_Astronaut-Blueskin", "skin_Astronaut-Cyanskin", "skin_Astronaut-Orangeskin", "skin_Capt", "skin_Mech", "skin_MechanicRed", "skin_Military", "skin_MilitaryDesert", "skin_MilitarySnowskin", "skin_Police", "skin_Science", "skin_Scientist-Blueskin", "skin_Scientist-Darkskin", "skin_SuitB", "skin_SuitW", "skin_Skin_SuitRedskin", "skin_Wall" };
                         if (!State.SafeMode && State.CycleForEveryone) {
                             for (auto p : GetAllPlayerControl()) {
                                 PlayerControl_RpcSetSkin(p, convert_to_string(availableSkins[randi(0, (int)availableSkins.size() - 1)]), NULL);
@@ -548,7 +555,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         else PlayerControl_RpcSetSkin(*Game::pLocalPlayer, convert_to_string(availableSkins[randi(0, (int)availableSkins.size() - 1)]), NULL);
                     }
                     if (State.RandomVisor) {
-                        std::vector availableVisors = { "visor_EmptyVisor", "visor_anime", "visor_BaconVisor", "visor_BananaVisor", "visor_beautyMark", "visor_BillyG", "visor_Blush", "visor_Bomba", "visor_BubbleBumVisor", "visor_Candycane", "visor_Carrot", "visor_chimkin", "visor_clownnose", "visor_Crack", "visor_CucumberVisor", "visor_D2CGoggles", "visor_Dirty", "visor_Dotdot", "visor_doubleeyepatch", "visor_eliksni", "visor_erisBandage", "visor_eyeball", "visor_EyepatchL", "visor_EyepatchR", "visor_fishhook", "visor_Galeforce", "visor_heim", "visor_hl_ah", "visor_hl_bored", "visor_hl_hmph", "visor_hl_marine", "visor_hl_nothoughts", "visor_hl_nudge", "visor_hl_smug", "visor_hl_sweepy", "visor_hl_teehee", "visor_hl_wrong", "visor_IceBeard", "visor_IceCreamChocolateVisor", "visor_IceCreamMintVisor", "visor_IceCreamStrawberryVisor", "visor_IceCreamUbeVisor", "visor_is_beard", "visor_JanitorStache", "visor_jinx", "visor_Krieghaus", "visor_Lava", "visor_LolliBlue", "visor_LolliBrown", "visor_LolliOrange", "visor_lollipopCrew", "visor_lollipopLemon", "visor_lollipopLime", "visor_LolliRed", "visor_marshmallow", "visor_masque_blue", "visor_masque_green", "visor_masque_red", "visor_masque_white", "visor_mira_card_blue", "visor_mira_card_red", "visor_mira_glasses", "visor_mira_mask_black", "visor_mira_mask_blue", "visor_mira_mask_green", "visor_mira_mask_purple", "visor_mira_mask_red", "visor_mira_mask_white", "visor_Mouth", "visor_mummy", "visor_PiercingL", "visor_PiercingR", "visor_PizzaVisor", "visor_pk01_AngeryVisor", "visor_pk01_DumStickerVisor", "visor_pk01_FredVisor", "visor_pk01_HazmatVisor", "visor_pk01_MonoclesVisor", "visor_pk01_PaperMaskVisor", "visor_pk01_PlagueVisor", "visor_pk01_RHMVisor", "visor_pk01_Security1Visor", "visor_Plsno", "visor_polus_ice", "visor_pusheenGorgeousVisor", "visor_pusheenKissyVisor", "visor_pusheenKoolKatVisor", "visor_pusheenOmNomNomVisor", "visor_pusheenSmileVisor", "visor_pusheenYaaaaaayVisor", "visor_Reginald", "visor_Rudolph", "visor_savathun", "visor_Scar", "visor_SciGoggles", "visor_shopglasses", "visor_shuttershadesBlue", "visor_shuttershadesLime", "visor_shuttershadesPink", "visor_shuttershadesPurple", "visor_shuttershadesWhite", "visor_shuttershadesYellow", "visor_SkiGoggleBlack", "visor_SKiGogglesOrange", "visor_SkiGogglesWhite", "visor_SmallGlasses", "visor_SmallGlassesBlue", "visor_SmallGlassesRed", "visor_starfish", "visor_Stealthgoggles", "visor_Stickynote_Cyan", "visor_Stickynote_Green", "visor_Stickynote_Orange", "visor_Stickynote_Pink", "visor_Stickynote_Purple", "visor_Straw", "visor_sunscreenv", "visor_teary", "visor_ToastVisor", "visor_tvColorTest", "visor_vr_Vr-Black", "visor_vr_Vr-White", "visor_w21_carrot", "visor_w21_nutstache", "visor_w21_nye", "visor_w21_santabeard", "visor_wash", "visor_WinstonStache" };
+                        std::vector availableVisors = { "visor_EmptyVisor", "visor_cosmic_alien", "visor_cosmic_infinity", "visor_cosmic_nebula", "visor_cosmic_stars", "visor_cosmic_sunglasses", "visor_cosmic_threeEyes", "visor_parasite_Black", "visor_parasite_Lime", "visor_hanami_petal", "visor_stardew_grandpa", "visor_stardew_lewis", "visor_stardew_linus", "visor_stardew_mrqi", "visor_racing_goggles", "visor_bsb2_bandage", "visor_bsb2_noteSad", "visor_bsb2_noteSmile", "visor_bsb2_heartGlassesRed", "visor_bsb2_starGlassesPurple", "visor_kamurocho_eyepatch", "visor_kamurocho_glasses", "visor_slothMask", "visor_paws_sacabambaspis", "visor_paws_parrotBeak", "visor_paws_bone", "visor_paws_carrot", "visor_paws_raccoon", "visor_claws_knife", "visor_claws_smallMuzzle", "visor_claws_whiskers", "visor_claws_bullRing", "visor_artagan", "visor_chetney", "visor_nott", "visor_happyMouthNote", "visor_henry", "visor_thatFace", "visor_lny_dragon", "visor_lny_pig", "visor_lny_rat", "visor_lny_snake", "visor_lny_tiger", "visor_mustachegirl", "visor_alienHominid", "visor_hattyHattington", "visor_king", "visor_theobeard", "visor_shopkeeper", "visor_gardenernose", "visor_goose", "visor_wimpglasses", "visor_animesunglassesVisor", "visor_heartsunglassesgoldVisor", "visor_mushroomeyesVisor", "visor_starsunglassesmintVisor", "visor_doubleeyepatch", "visor_fishhook", "visor_marshmallow", "visor_starfish", "visor_sunscreenv", "visor_pusheenGorgeousVisor", "visor_pusheenKissyVisor", "visor_pusheenKoolKatVisor", "visor_pusheenOmNomNomVisor", "visor_pusheenSmileVisor", "visor_pusheenYaaaaaayVisor", "visor_shuttershadesBlue", "visor_shuttershadesLime", "visor_shuttershadesPink", "visor_shuttershadesPurple", "visor_shuttershadesWhite", "visor_shuttershadesYellow", "visor_chimkin", "visor_eliksni", "visor_erisBandage", "visor_savathun", "visor_Candycane", "visor_IceBeard", "visor_Rudolph", "visor_anime", "visor_beautyMark", "visor_Plsno", "visor_Stealthgoggles", "visor_teary", "visor_tvColorTest", "visor_wash", "visor_vr_Vr-Black", "visor_vr_Vr-White", "visor_hl_ah", "visor_hl_bored", "visor_hl_hmph", "visor_hl_marine", "visor_hl_nothoughts", "visor_hl_nudge", "visor_hl_smug", "visor_hl_sweepy", "visor_hl_teehee", "visor_hl_wrong", "visor_BaconVisor", "visor_BananaVisor", "visor_BubbleBumVisor", "visor_CucumberVisor", "visor_IceCreamChocolateVisor", "visor_IceCreamMintVisor", "visor_IceCreamStrawberryVisor", "visor_IceCreamUbeVisor", "visor_PizzaVisor", "visor_ToastVisor", "visor_w21_carrot", "visor_w21_nutstache", "visor_w21_santabeard", "visor_w21_nye", "visor_heim", "visor_jinx", "visor_clownnose", "visor_eyeball", "visor_masque_blue", "visor_masque_white", "visor_masque_red", "visor_masque_green", "visor_mummy", "visor_D2CGoggles", "visor_is_beard", "visor_JanitorStache", "visor_Mouth", "visor_shopglasses", "visor_BillyG", "visor_Krieghaus", "visor_Reginald", "visor_Scar", "visor_WinstonStache", "visor_pk01_MonoclesVisor", "visor_pk01_RHMVisor", "visor_Galeforce", "visor_mira_card_blue", "visor_mira_card_red", "visor_mira_glasses", "visor_pk01_HazmatVisor", "visor_mira_mask_red", "visor_mira_mask_white", "visor_mira_mask_purple", "visor_mira_mask_green", "visor_mira_mask_blue", "visor_mira_mask_black", "visor_pk01_Security1Visor", "visor_Lava", "visor_polus_ice", "visor_SkiGoggleBlack", "visor_SKiGogglesOrange", "visor_SkiGogglesWhite", "visor_pk01_FredVisor", "visor_pk01_PaperMaskVisor", "visor_pk01_PlagueVisor", "hat_geoff", "visor_Blush", "visor_Bomba", "visor_Carrot", "visor_Crack", "visor_Dirty", "visor_Dotdot", "visor_EyepatchL", "visor_EyepatchR", "visor_LolliRed", "visor_LolliBlue", "visor_LolliOrange", "visor_LolliBrown", "visor_lollipopLemon", "visor_lollipopLime", "visor_lollipopCrew", "visor_PiercingL", "visor_PiercingR", "visor_pk01_AngeryVisor", "visor_pk01_DumStickerVisor", "visor_Stickynote_Purple", "visor_Stickynote_Cyan", "visor_Stickynote_Green", "visor_Stickynote_Orange", "visor_Stickynote_Pink", "visor_SciGoggles", "visor_SmallGlasses", "visor_SmallGlassesBlue", "visor_SmallGlassesRed", "visor_Straw" };
                         if (!State.SafeMode && State.CycleForEveryone) {
                             for (auto p : GetAllPlayerControl()) {
                                 PlayerControl_RpcSetVisor(p, convert_to_string(availableVisors[randi(0, (int)availableVisors.size() - 1)]), NULL);
@@ -557,7 +564,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         else PlayerControl_RpcSetVisor(*Game::pLocalPlayer, convert_to_string(availableVisors[randi(0, (int)availableVisors.size() - 1)]), NULL);
                     }
                     if (State.RandomPet) {
-                        std::vector availablePets = { "pet_EmptyPet", "pet_Alien", "pet_Bedcrab", "pet_BredPet", "pet_Bush", "pet_Charles", "pet_Charles_Red", "pet_ChewiePet", "pet_clank", "pet_coaltonpet", "pet_Creb", "pet_Crewmate", "pet_Cube", "pet_D2GhostPet", "pet_D2PoukaPet", "pet_D2WormPet", "pet_Doggy", "pet_Ellie", "pet_frankendog", "pet_GuiltySpark", "pet_HamPet", "pet_Hamster", "pet_HolidayHamPet", "pet_Lava", "pet_nuggetPet", "pet_Pip", "pet_poro", "pet_Pusheen", "pet_Robot", "pet_Snow", "pet_Squig", "pet_Stickmin", "pet_Stormy", "pet_test", "pet_UFO", "pet_YuleGoatPet" };
+                        std::vector availablePets = { "pet_EmptyPet", "pet_cosmic_cat", "pet_parasite_Stressball", "pet_stardew_junimo", "pet_stardew_krobus", "pet_racing_beanCar", "pet_kamurocho_nancy", "pet_kamurocho_car", "pet_claws_spaceCat", "pet_Pate", "pet_Mister", "pet_lny_dragon", "pet_Crow", "pet_Rammy", "pet_Strawb", "pet_DancingSkeletonPet", "pet_napstamate", "pet_GoosePet", "pet_Creb", "pet_Pip", "pet_Pusheen", "pet_Stormy", "pet_D2GhostPet", "pet_D2PoukaPet", "pet_D2WormPet", "pet_coaltonpet", "pet_HolidayHamPet", "pet_nuggetPet", "pet_YuleGoatPet", "pet_BredPet", "pet_HamPet", "pet_GuiltySpark", "pet_clank", "pet_poro", "pet_Cube", "pet_Charles", "pet_Charles_Red", "pet_Bush", "pet_Lava", "pet_Snow", "pet_Alien", "pet_UFO", "pet_Bedcrab", "pet_Squig", "pet_Crewmate", "pet_ChewiePet", "pet_Robot", "pet_Doggy", "pet_frankendog", "pet_Hamster", "pet_Stickmin", "pet_Ellie", "pet_test" };
                         if (!State.SafeMode && State.CycleForEveryone) {
                             for (auto p : GetAllPlayerControl()) {
                                 PlayerControl_RpcSetPet(p, convert_to_string(availablePets[randi(0, (int)availablePets.size() - 1)]), NULL);
@@ -566,7 +573,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                         else PlayerControl_RpcSetPet(*Game::pLocalPlayer, convert_to_string(availablePets[randi(0, (int)availablePets.size() - 1)]), NULL);
                     }
                     if (State.RandomNamePlate) {
-                        std::vector availableNamePlates = { "nameplate_NoPlate", "nameplate_airship_Toppat", "nameplate_airship_CCC", "nameplate_airship_Diamond", "nameplate_airship_Emerald", "nameplate_airship_Gems", "nameplate_airship_government", "nameplate_Airship_Hull", "nameplate_airship_Ruby", "nameplate_airship_Sky", "nameplate_Polus-Skyline", "nameplate_Polus-Snowmates", "nameplate_Polus_Colors", "nameplate_Polus_DVD", "nameplate_Polus_Ground", "nameplate_Polus_Lava", "nameplate_Polus_Planet", "nameplate_Polus_Snow", "nameplate_Polus_SpecimenBlue", "nameplate_Polus_SpecimenGreen", "nameplate_Polus_SpecimenPurple", "nameplate_is_yard", "nameplate_is_dig", "nameplate_is_game", "nameplate_is_ghost", "nameplate_is_green", "nameplate_is_sand", "nameplate_is_trees", "nameplate_Mira_Cafeteria", "nameplate_Mira_Glass", "nameplate_Mira_Tiles", "nameplate_Mira_Vines", "nameplate_Mira_Wood", "nameplate_hw_candy", "nameplate_hw_woods", "nameplate_hw_pumpkin" };
+                        std::vector availableNamePlates = { "nameplate_NoPlate", "nameplate_cosmic_launch", "nameplate_cosmic_nebula", "nameplate_cosmic_rings", "nameplate_parasite_Impostor", "nameplate_hanami_viewing", "nameplate_hanami_furoshiki", "nameplate_stardew_jellies", "nameplate_stardew_night", "nameplate_stardew_title", "nameplate_paimonstars", "nameplate_racing_beanCar", "nameplate_bsb2_error", "nameplate_bsb2_frame", "nameplate_bsb2_breach", "nameplate_bsb2_notes", "nameplate_kamurocho_hero", "nameplate_kamurocho_dragon", "nameplate_kamurocho_welcome", "nameplate_kamurocho_shimano", "nameplate_kamurocho_neon", "nameplate_kamurocho_nights", "nameplate_paws_fur", "nameplate_paws_jaguar", "nameplate_paws_feathers", "nameplate_claws_spaceCat", "nameplate_paws_scales", "nameplate_claws_spaceDog", "nameplate_claws_tigerPrint", "nameplate_claws_lilypad", "nameplate_cupcake", "nameplate_eyes", "nameplate_moons", "nameplate_tea", "nameplate_crewmatesBlue", "nameplate_crewmatesRed", "nameplate_horseHeaven", "nameplate_horsemateField", "nameplate_bb1_disco", "nameplate_bb1_hackerman", "nameplate_bb1_ram", "nameplate_bb1_rave", "nameplate_bb1_zen", "nameplate_lny_boar", "nameplate_lny_cat", "nameplate_lny_dog", "nameplate_lny_dragon", "nameplate_lny_goat", "nameplate_lny_horse", "nameplate_lny_monkey", "nameplate_lny_ox", "nameplate_lny_rabbit", "nameplate_lny_rat", "nameplate_lny_rooster", "nameplate_lny_snake", "nameplate_lny_tiger", "nameplate_lny_beanDragon", "nameplate_lny_clouds", "nameplate_lny_incense", "nameplate_lny_lanterns", "nameplate_lny_redPackets", "nameplate_lny_goldCrewmate", "nameplate_lny_goldImpostor", "nameplate_hourglass", "nameplate_shadows", "nameplate_battlefield", "nameplate_hominid", "nameplate_Celeste", "nameplate_flyingStrawberry", "nameplate_dungeonFloor", "nameplate_torch", "nameplate_fight", "nameplate_flowers", "nameplate_honk", "nameplate_knife", "nameplate_binocularsNameplate", "nameplate_DeadSunsetNameplate", "nameplate_cliffs", "nameplate_grill", "nameplate_plant", "nameplate_sandcastle", "nameplate_zipline", "nameplate_pusheen_01", "nameplate_pusheen_02", "nameplate_pusheen_03", "nameplate_pusheen_04", "nameplate_flagAro", "nameplate_flagMlm", "nameplate_hunter", "nameplate_lightfall", "nameplate_titan", "nameplate_warlock", "nameplate_candyCanePlate", "nameplate_SnowmiesPlate", "nameplate_winterForestPlate", "nameplate_WrappingPaperPlate", "nameplate_ballPit", "nameplate_cafeteria", "nameplate_deadbodyfound", "nameplate_ejected", "nameplate_flagAce", "nameplate_flagAgend", "nameplate_flagBi", "nameplate_flagGendF", "nameplate_flagGendQ", "nameplate_flagLesbian", "nameplate_flagNonbinary", "nameplate_flagPan", "nameplate_flagPride", "nameplate_flagRainbow", "nameplate_flagTrans", "nameplate_flashlight", "nameplate_impostor", "nameplate_ninjas", "nameplate_polus", "nameplate_reactor", "nameplate_ripple", "nameplate_seeker", "nameplate_shhh", "nameplate_BlimeyPlate", "nameplate_BreadPlate", "nameplate_EggPlate", "nameplate_PinkPlate", "nameplate_PizzaPlate", "nameplate_PlatePlate", "nameplate_Croissant", "nameplate_Lemon", "nameplate_Orange", "nameplate_w21_fireplace", "nameplate_w21_snow", "nameplate_w21_tree", "nameplate_hw_candy", "nameplate_hw_pumpkin", "nameplate_hw_woods", "nameplate_is_dig", "nameplate_is_game", "nameplate_is_ghost", "nameplate_is_green", "nameplate_is_sand", "nameplate_is_trees", "nameplate_is_yard", "nameplate_airship_CCC", "nameplate_airship_Diamond", "nameplate_airship_Emerald", "nameplate_airship_Gems", "nameplate_airship_government", "nameplate_Airship_Hull", "nameplate_airship_Ruby", "nameplate_airship_Sky", "nameplate_airship_Toppat", "nameplate_Mira_Cafeteria", "nameplate_Mira_Glass", "nameplate_Mira_Tiles", "nameplate_Mira_Vines", "nameplate_Mira_Wood", "nameplate_Polus_Colors", "nameplate_Polus_DVD", "nameplate_Polus_Ground", "nameplate_Polus_Lava", "nameplate_Polus_Planet", "nameplate_Polus_Snow", "nameplate_Polus_SpecimenBlue", "nameplate_Polus_SpecimenGreen", "nameplate_Polus_SpecimenPurple", "nameplate_Polus-Skyline", "nameplate_Polus-Snowmates" };
                         if (!State.SafeMode && State.CycleForEveryone) {
                             for (auto p : GetAllPlayerControl()) {
                                 PlayerControl_RpcSetNamePlate(p, convert_to_string(availableNamePlates[randi(0, (int)availableNamePlates.size() - 1)]), NULL);
@@ -669,18 +676,28 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
 
             if ((IsInGame() || IsInLobby()) && !State.InMeeting && State.ShiftRightClickTP) {
                 ImVec2 mouse = ImGui::GetMousePos();
-                Vector2 target = { mouse.x, (DirectX::GetWindowSize().y - mouse.y) };
+                float xOffset = (DirectX::GetWindowSize(true).x - DirectX::GetWindowSize(false).x) / 2.f;
+                float yOffset = (DirectX::GetWindowSize(true).y - DirectX::GetWindowSize(false).y) / 2.f;
+                Vector2 target = { mouse.x + xOffset, (DirectX::GetWindowSize(true).y - mouse.y - yOffset) };
                 bool isValid = target.x != 0.f && target.y != 0.f; // Prevent teleporting to origin
                 if (isValid && ImGui::IsKeyDown(VK_SHIFT) && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-                    if (IsInGame()) State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
-                    if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                    if (State.ControlPet) {
+                        State.petPos = ScreenToWorld(target);
+                    }
+                    else {
+                        if (IsInGame()) State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                        if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                    }
                 }
                 else if (isValid && ImGui::IsKeyDown(VK_CONTROL) && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
                     if (ctrlRightClickDelay <= 0) {
-                        ImVec2 mouse = ImGui::GetMousePos();
-                        Vector2 target = { mouse.x, (DirectX::GetWindowSize().y - mouse.y) };
-                        if (IsInGame()) State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
-                        if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                        if (State.ControlPet) {
+                            State.petPos = ScreenToWorld(target);
+                        }
+                        else {
+                            if (IsInGame()) State.rpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                            if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSnapTo(ScreenToWorld(target)));
+                        }
                         ctrlRightClickDelay = int(0.1 * GetFps());
                     }
                     else ctrlRightClickDelay--;
@@ -814,11 +831,14 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                     PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, ventId, NULL);
                                 else
                                     SendBootVentNonHost(p, ventId);
+
+                                if (p == *Game::pLocalPlayer) State.AntiExploit_IsTeleportingSelf = true;
                             }
                         }
 
-                        else if (State.SpamVentTpEveryone || State.spamVentTpPlayers.size() != 0) {
+                        else if (State.SpamVentTpEveryone || !State.spamVentTpPlayers.empty()) {
                             for (auto p : GetAllPlayerControl()) {
+                                if (p == NULL) continue;
                                 if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
 
                                 bool isSpamVentedSeparately = State.spamVentTpPlayers.find(p->fields.PlayerId) != State.spamVentTpPlayers.end();
@@ -831,11 +851,41 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                                     PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, ventId, NULL);
                                 else
                                     SendBootVentNonHost(p, ventId);
+
+                                if (p == *Game::pLocalPlayer) State.AntiExploit_IsTeleportingSelf = true;
                             }
                         }
                         ventTpDelay = 0.75f;
                     }
                     else ventTpDelay -= Time_get_deltaTime(NULL);
+                }
+
+                if (IsInGame() && *Game::pShipStatus != NULL && State.mapType == Settings::MapType::Fungle) {
+                    static float ziplineClimbDelay = 0.f;
+                    static bool ziplineTop = false;
+
+                    if (State.SpamZiplineEveryone || !State.spamZiplinePlayers.empty()) {
+                        if (ziplineClimbDelay <= 0.f) {
+                            for (auto p : GetAllPlayerControl()) {
+                                if (p == NULL) continue;
+                                if (State.IgnoreZiplineSelf && p == *Game::pLocalPlayer) continue;
+                                
+                                if (!State.SpamZiplineEveryone) {
+                                    auto it = std::find(State.spamZiplinePlayers.begin(), State.spamZiplinePlayers.end(), p->fields.PlayerId);
+                                    if (it == State.spamZiplinePlayers.end()) continue;
+                                }
+
+                                auto ziplineBehaviour = (ZiplineBehaviour*)((FungleShipStatus*)(*Game::pShipStatus))->fields._Zipline_k__BackingField;
+                                if (ziplineBehaviour == NULL) continue;
+
+                                PlayerControl_RpcUseZipline(p, p, ziplineBehaviour, ziplineTop, NULL);
+                            }
+                            ziplineTop = !ziplineTop;
+                            ziplineClimbDelay = 2.5f;
+                        }
+                        else ziplineClimbDelay -= Time_get_deltaTime(NULL);
+                    }
+                    else ziplineClimbDelay = 0.f;
                 }
 
                 /*if (IsHost() && State.AutoStartGamePlayers && IsInLobby() && !editingAutoStartPlayerCount && !autoStartedGame) {  //this makes sure they dont start the game by mistake, if they are typing a 2 digit number eg 12
@@ -1311,11 +1361,13 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                     MessageWriter_StartMessage(writer, gameDataTag, NULL);
                     MessageWriter_WriteInt32(writer, (*Game::pAmongUsClient)->fields._.GameId, NULL);
 
-                    for (int i = 0; i < 10; ++i) {
+                    int maxPackedRpcs = 10 + GameOptions().GetInt(Int32OptionNames__Enum::MaxPlayers) * 2;
+
+                    for (int i = 0; i < maxPackedRpcs; ++i) {
                         MessageWriter_StartMessage(writer, rpcFlag, NULL);
                         MessageWriter_WritePacked(writer, (*Game::pLocalPlayer)->fields._.NetId, NULL);
                         MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::MurderPlayer, NULL);
-                        MessageWriter_WriteInt32(writer, 0, NULL);
+                        MessageExtensions_WriteNetObject(writer, (InnerNetObject*)(*Game::pLocalPlayer), NULL);
                         MessageWriter_WriteInt32(writer, (int32_t)MurderResultFlags__Enum::Succeeded, NULL);
                         MessageWriter_EndMessage(writer, NULL);
                     }
@@ -1330,9 +1382,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
                 else {
                     State.farmLoop = false;
                     State.farmCount = 0;
-                    PlayerControl_RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor, true, NULL);
-                    RoleManager_SetRole(Game::RoleManager.GetInstance(), *Game::pLocalPlayer, RoleTypes__Enum::Impostor, NULL);
-                    GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorsByKill, false, NULL);
                 }
             }
             else State.farmDelay--;
@@ -1461,49 +1510,150 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method)
             Transform_set_position(cameraTransform, { cameraVector3.x, cameraVector3.y, 100 }, NULL);
     }
 
-    if (State.FreeCam && !State.PanicMode) {
-        auto mainCamera = Camera_get_main(NULL);
+    if (!State.PanicMode && (IsInGame() || IsInLobby())) {
+        if (State.FreeCam) {
+            auto mainCamera = Camera_get_main(NULL);
 
-        Transform* cameraTransform = Component_get_transform((Component_1*)mainCamera, NULL);
-        Vector3 cameraVector3 = Transform_get_position(cameraTransform, NULL);
+            Transform* cameraTransform = Component_get_transform((Component_1*)mainCamera, NULL);
+            Vector3 cameraVector3 = Transform_get_position(cameraTransform, NULL);
 
-        if (State.camPos.x == NULL) {
-            State.camPos = cameraVector3;
-        }
-        if (State.prevCamPos.x == NULL) {
-            State.prevCamPos = cameraVector3;
-        }
-
-        auto kbjPlayer = (Player*)KeyboardJoystick__TypeInfo->static_fields->player;
-        // BYTE arr[256];
-        if (/*GetKeyboardState(arr) && */kbjPlayer != NULL && !State.ChatFocused)
-        {
-            // adhere to the game's keybinds, which can be changed in game
-
-            float xOffset = 0, yOffset = 0;
-            if (Player_GetButton(kbjPlayer, 44, NULL) /*(arr[0x57] & 0x80) != 0*/) {
-                yOffset = 1;
+            if (State.camPos.x == NULL) {
+                State.camPos = cameraVector3;
             }
-            if (Player_GetButton(kbjPlayer, 39, NULL) /*(arr[0x41] & 0x80) != 0*/) {
-                xOffset = -1;
+            if (State.prevCamPos.x == NULL) {
+                State.prevCamPos = cameraVector3;
             }
-            if (Player_GetButton(kbjPlayer, 42, NULL) /*(arr[0x53] & 0x80) != 0*/) {
-                yOffset = -1;
-            }
-            if (Player_GetButton(kbjPlayer, 40, NULL) /*(arr[0x44] & 0x80) != 0*/)
+
+            auto kbjPlayer = (Player*)KeyboardJoystick__TypeInfo->static_fields->player;
+            // BYTE arr[256];
+            if (/*GetKeyboardState(arr) && */kbjPlayer != NULL && !State.ChatFocused)
             {
-                xOffset = 1;
+                // adhere to the game's keybinds, which can be changed in game
+
+                float xOffset = 0, yOffset = 0;
+                if (Player_GetButton(kbjPlayer, 44, NULL) /*(arr[0x57] & 0x80) != 0*/) {
+                    yOffset = 1;
+                }
+                if (Player_GetButton(kbjPlayer, 39, NULL) /*(arr[0x41] & 0x80) != 0*/) {
+                    xOffset = -1;
+                }
+                if (Player_GetButton(kbjPlayer, 42, NULL) /*(arr[0x53] & 0x80) != 0*/) {
+                    yOffset = -1;
+                }
+                if (Player_GetButton(kbjPlayer, 40, NULL) /*(arr[0x44] & 0x80) != 0*/)
+                {
+                    xOffset = 1;
+                }
+                float magnitude = (xOffset == 0 && yOffset == 0) ? 1 : sqrt(xOffset * xOffset + yOffset * yOffset);
+
+                float del = Time_get_deltaTime(NULL); // in seconds
+                //check for zero and prevent you from moving ~1.414 times faster diagonally
+                State.camPos.x += float(del * State.FreeCamSpeed * 3.f * xOffset / magnitude);
+                State.camPos.y += float(del * State.FreeCamSpeed * 3.f * yOffset / magnitude);
+                // 3 is multiplied because that is 1x speed as the ghost
             }
-            float magnitude = (xOffset == 0 && yOffset == 0) ? 1 : sqrt(xOffset * xOffset + yOffset * yOffset);
-            
-            float del = Time_get_deltaTime(NULL); // in seconds
-            //check for zero and prevent you from moving ~1.414 times faster diagonally
-            State.camPos.x += float(del * State.FreeCamSpeed * 3.f * xOffset / magnitude);
-            State.camPos.y += float(del * State.FreeCamSpeed * 3.f * yOffset / magnitude);
-            // 3 is multiplied because that is 1x speed as the ghost
+
+            Transform_set_position(cameraTransform, { State.camPos.x, State.camPos.y }, NULL);
         }
 
-        Transform_set_position(cameraTransform, { State.camPos.x, State.camPos.y }, NULL);
+        static float petRpcDelay = 0.f;
+        if (State.ControlPet && *Game::pLocalPlayer != nullptr && (IsInGame() || IsInLobby())) {
+            // reference: https://github.com/MrDiamond64/Hydra/blob/main/src/routines/PetPlayer.cs
+
+            auto local = *Game::pLocalPlayer;
+            if (State.petPos.x == NULL) {
+                State.petPos = GetTrueAdjustedPosition(*Game::pLocalPlayer);
+            }
+
+            auto kbjPlayer = (Player*)KeyboardJoystick__TypeInfo->static_fields->player;
+            // BYTE arr[256];
+            if (/*GetKeyboardState(arr) && */kbjPlayer != NULL && !State.ChatFocused)
+            {
+                float xOffset = 0, yOffset = 0;
+                if (Player_GetButton(kbjPlayer, 44, NULL) /*(arr[0x57] & 0x80) != 0*/) {
+                    yOffset = 1;
+                }
+                if (Player_GetButton(kbjPlayer, 39, NULL) /*(arr[0x41] & 0x80) != 0*/) {
+                    xOffset = -1;
+                }
+                if (Player_GetButton(kbjPlayer, 42, NULL) /*(arr[0x53] & 0x80) != 0*/) {
+                    yOffset = -1;
+                }
+                if (Player_GetButton(kbjPlayer, 40, NULL) /*(arr[0x44] & 0x80) != 0*/)
+                {
+                    xOffset = 1;
+                }
+                float magnitude = (xOffset == 0 && yOffset == 0) ? 1 : sqrt(xOffset * xOffset + yOffset * yOffset);
+
+                float del = Time_get_deltaTime(NULL); // in seconds
+                //check for zero and prevent you from moving ~1.414 times faster diagonally
+
+                if (!State.FreeCam) {
+                    State.petPos.x += float(del * 5.f * xOffset / magnitude);
+                    State.petPos.y += float(del * 5.f * yOffset / magnitude);
+                }
+            }
+
+            auto mainCamera = Camera_get_main(NULL);
+            Transform* cameraTransform = Component_get_transform((Component_1*)mainCamera, NULL);
+            Vector3 cameraVector3 = Transform_get_position(cameraTransform, NULL);
+
+            if (!State.FreeCam) {
+                Transform_set_position(cameraTransform, { State.petPos.x, State.petPos.y }, NULL);
+            }
+
+            if (State.prevCamPos.x == NULL) {
+                State.prevCamPos = cameraVector3;
+            }
+
+            if (petRpcDelay <= 0.f && local->fields.MyPhysics != NULL) {
+                auto currentPet = local->fields.cosmetics->fields.currentPet;
+                PetBehaviour_SetGettingPet(currentPet, true, State.petPos, NULL);
+
+                // auto pettingHand = CosmeticsLayer_get_PettingHand(local->fields.cosmetics, NULL);
+                // PlayerPettingHand_StartPet(pettingHand, currentPet, NULL);
+                // else PlayerPettingHand_StopPetting(pettingHand, NULL);
+
+                auto inc = (InnerNetClient*)(*Game::pAmongUsClient);
+                Vector2 localPos = { 10000.f * std::cos(Time_get_time(NULL)), 10000.f * std::sin(Time_get_time(NULL)) };
+
+                auto writer = InnerNetClient_StartRpcImmediately(inc,
+                    local->fields.MyPhysics->fields._.NetId, (uint8_t)RpcCalls__Enum::Pet,
+                    SendOption__Enum::Reliable, -1, NULL);
+                NetHelpers_WriteVector2(localPos, writer, NULL);
+                NetHelpers_WriteVector2(State.petPos, writer, NULL);
+                InnerNetClient_FinishRpcImmediately(inc, writer, NULL);
+
+                petRpcDelay = (1.f / 30.f);
+            }
+            else petRpcDelay -= Time_get_deltaTime(NULL);
+        }
+        else petRpcDelay = 0.f;
+    }
+
+    if (State.DisableControlPetHand) {
+        auto inc = (InnerNetClient*)(*Game::pAmongUsClient);
+        auto local = *Game::pLocalPlayer;
+
+        if (local != NULL) {
+            auto writer = InnerNetClient_StartRpcImmediately(inc,
+                local->fields.MyPhysics->fields._.NetId, (uint8_t)RpcCalls__Enum::Pet,
+                SendOption__Enum::Reliable, -1, NULL);
+            NetHelpers_WriteVector2(PlayerControl_GetTruePosition(local, NULL), writer, NULL);
+            NetHelpers_WriteVector2(State.petPos, writer, NULL);
+            InnerNetClient_FinishRpcImmediately(inc, writer, NULL);
+            // move hand back to local player to not leave a lingering pet for others
+
+            auto writer2 = InnerNetClient_StartRpcImmediately(inc,
+                local->fields.MyPhysics->fields._.NetId, (uint8_t)RpcCalls__Enum::CancelPet,
+                SendOption__Enum::Reliable, -1, NULL);
+            InnerNetClient_FinishRpcImmediately(inc, writer2, NULL);
+
+            PlayerPhysics_CancelPet(local->fields.MyPhysics, NULL);
+        }
+
+        State.petPos = { NULL, NULL };
+        State.DisableControlPetHand = false;
     }
 
     if (State.OverflowTimer > 0.f) {
@@ -1582,6 +1732,9 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
 
             uint8_t playerId = data->fields.Character->fields.PlayerId;
 
+            if (State.playerToAttach.get_PlayerId() == playerId)
+                State.playerToAttach = {};
+
             if (State.modUsers.find(playerId) != State.modUsers.end())
                 State.modUsers.erase(playerId);
 
@@ -1591,6 +1744,10 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
             auto it = std::find(State.spamRandomVentTpPlayers.begin(), State.spamRandomVentTpPlayers.end(), playerId);
             if (it != State.spamRandomVentTpPlayers.end())
                 State.spamRandomVentTpPlayers.erase(it);
+
+            auto it2 = std::find(State.spamZiplinePlayers.begin(), State.spamZiplinePlayers.end(), playerId);
+            if (it2 != State.spamZiplinePlayers.end())
+                State.spamZiplinePlayers.erase(it2);
 
             auto colorCycleIt = std::find(State.ColorCycledPlayers.begin(), State.ColorCycledPlayers.end(), playerId);
             if (colorCycleIt != State.ColorCycledPlayers.end()) {
@@ -1901,7 +2058,8 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
             if (p->fields._.OwnerId == clientId) affectedPlayer = p;
         }
         if (IsHost()) {
-            if (affectedPlayer == *Game::pLocalPlayer) return; //anti kick as host
+            if (affectedPlayer == *Game::pLocalPlayer && !State.PanicMode && State.AntiExploit_VotekicksAgainstSelfHost)
+                return; // anti kick as host
             if (sourcePlayer == *Game::pLocalPlayer) {
                 InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), clientId, false, NULL);
                 return;
@@ -2019,4 +2177,13 @@ void dNotificationPopper_AddDisconnectMessage(NotificationPopper* __this, String
     }
 
     NotificationPopper_AddDisconnectMessage(__this, item, method);
+}
+
+void dCustomNetworkTransform_HandleRpc(CustomNetworkTransform* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dCustomNetworkTransform_HandleRpc executed", false);
+
+    if (!State.PanicMode && callId == (uint8_t)RpcCalls__Enum::SnapTo &&
+        __this->fields.myPlayer == *Game::pLocalPlayer && State.AntiExploit_UnauthorizedTeleports) return;
+
+    CustomNetworkTransform_HandleRpc(__this, callId, reader, method);
 }

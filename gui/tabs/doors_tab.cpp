@@ -16,11 +16,11 @@ namespace DoorsTab {
 			ImGui::BeginChild("doors#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 			bool shouldEndListBox = ImGui::ListBoxHeader("###doors#list", ImVec2(200, 150) * State.dpiScale);
 			for (auto systemType : State.mapDoors) {
-				if (systemType == SystemTypes__Enum::Decontamination
+				/*/if (systemType == SystemTypes__Enum::Decontamination
 					|| systemType == SystemTypes__Enum::Decontamination2
 					|| systemType == SystemTypes__Enum::Decontamination3) {
 					continue;
-				}
+				}*/
 				bool isOpen;
 				auto openableDoor = GetOpenableDoorByRoom(systemType);
 				if ("PlainDoor"sv == openableDoor->klass->parent->name
@@ -33,25 +33,39 @@ namespace DoorsTab {
 				else {
 					continue;
 				}
-				if (!(std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), systemType) == State.pinnedDoors.end()))
-				{
-					ImGui::PushStyleColor(ImGuiCol_Text, { 1.f, 0.f, 0.f, 1.f });
-					if (ImGui::Selectable(TranslateSystemTypes(systemType), State.selectedDoor == systemType))
-						State.selectedDoor = systemType;
-					ImGui::PopStyleColor(1);
+				bool isPinned = std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), systemType) != State.pinnedDoors.end();
+
+				bool isSelected = std::find(State.selectedDoors.begin(), State.selectedDoors.end(), systemType) == State.selectedDoors.end();
+
+				ImVec4 selectableColor = isPinned ? ImVec4(1.f, 0.f, 0.f, 1.f) :
+					(State.RgbMenuTheme ? State.RgbColor : State.MenuThemeColor);
+
+				if (isPinned || !isOpen) ImGui::PushStyleColor(ImGuiCol_Text, selectableColor);
+
+				if (ImGui::Selectable(TranslateSystemTypes(systemType), !isSelected)) {
+					bool isCtrl = ImGui::IsKeyDown(0x11) || ImGui::IsKeyDown(0xA2) || ImGui::IsKeyDown(0xA3);
+					bool isShifted = ImGui::IsKeyDown(0x10);
+
+					if (isCtrl) {
+						if (isShifted) {
+							State.selectedDoors.clear();
+						}
+						else {
+							auto it_sel = std::find(State.selectedDoors.begin(), State.selectedDoors.end(), systemType);
+							if (it_sel != State.selectedDoors.end()) {
+								State.selectedDoors.erase(it_sel);
+							}
+							else {
+								State.selectedDoors.push_back(systemType);
+							}
+						}
+					}
+					else {
+						State.selectedDoors = { systemType };
+					}
 				}
-				else if (!isOpen)
-				{
-					ImGui::PushStyleColor(ImGuiCol_Text, State.RgbMenuTheme ? State.RgbColor : State.MenuThemeColor);
-					if (ImGui::Selectable(TranslateSystemTypes(systemType), State.selectedDoor == systemType))
-						State.selectedDoor = systemType;
-					ImGui::PopStyleColor(1);
-				}
-				else
-				{
-					if (ImGui::Selectable(TranslateSystemTypes(systemType), State.selectedDoor == systemType))
-						State.selectedDoor = systemType;
-				}
+
+				if (isPinned || !isOpen) ImGui::PopStyleColor(1);
 			}
 			if (shouldEndListBox)
 				ImGui::ListBoxFooter();
@@ -99,8 +113,8 @@ namespace DoorsTab {
 				{
 					if (std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), door) == State.pinnedDoors.end())
 					{
-						if (door != SystemTypes__Enum::Decontamination && door != SystemTypes__Enum::Decontamination2 && door != SystemTypes__Enum::Decontamination3)
-							State.rpcQueue.push(new RpcCloseDoorsOfType(door, true));
+						/*if (door != SystemTypes__Enum::Decontamination && door != SystemTypes__Enum::Decontamination2 && door != SystemTypes__Enum::Decontamination3)
+							*/State.rpcQueue.push(new RpcCloseDoorsOfType(door, true));
 					}
 				}
 			}
@@ -110,27 +124,30 @@ namespace DoorsTab {
 			}
 
 			ImGui::NewLine();
-			if (State.selectedDoor != SystemTypes__Enum::Hallway) {
-				auto plainDoor = GetPlainDoorByRoom(State.selectedDoor);
-
-				if (AnimatedButton("Close Door")) {
-					State.rpcQueue.push(new RpcCloseDoorsOfType(State.selectedDoor, false));
+			if (!State.selectedDoors.empty()) {
+				if (AnimatedButton(State.selectedDoors.size() == 1 ? "Close Door" : "Close Doors")) {
+					for (auto door : State.selectedDoors)
+						State.rpcQueue.push(new RpcCloseDoorsOfType(door, false));
 				}
 
-				if (std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), State.selectedDoor) == State.pinnedDoors.end()) {
-					if (AnimatedButton("Pin Door")) {
-						State.rpcQueue.push(new RpcCloseDoorsOfType(State.selectedDoor, true));
+				if (AnimatedButton(State.selectedDoors.size() == 1 ? "Pin Door" : "Pin Doors")) {
+					for (auto door : State.selectedDoors) {
+						bool isPinned = std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), door) != State.pinnedDoors.end();
+						if (!isPinned) State.rpcQueue.push(new RpcCloseDoorsOfType(door, true));
 					}
 				}
-				else {
-					if (AnimatedButton("Unpin Door")) {
-						State.pinnedDoors.erase(std::remove(State.pinnedDoors.begin(), State.pinnedDoors.end(), State.selectedDoor), State.pinnedDoors.end());
+				if (AnimatedButton(State.selectedDoors.size() == 1 ? "Unpin Door" : "Unpin Doors")) {
+					for (auto door : State.selectedDoors) {
+						bool isPinned = std::find(State.pinnedDoors.begin(), State.pinnedDoors.end(), door) != State.pinnedDoors.end();
+						if (isPinned) State.pinnedDoors.erase(std::remove(State.pinnedDoors.begin(), State.pinnedDoors.end(), door), State.pinnedDoors.end());
 					}
 				}
 
-				if ((State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle) && AnimatedButton("Open Door"))
+				if ((State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle) &&
+					AnimatedButton(State.selectedDoors.size() == 1 ? "Open Door" : "Open Doors"))
 				{
-					State.rpcQueue.push(new RpcOpenDoorsOfType(State.selectedDoor));
+					for (auto door : State.selectedDoors)
+						State.rpcQueue.push(new RpcOpenDoorsOfType(door));
 				}
 			}
 			if (State.mapType == Settings::MapType::Pb || State.mapType == Settings::MapType::Airship || State.mapType == Settings::MapType::Fungle)

@@ -13,8 +13,8 @@ RpcCloseDoorsOfType::RpcCloseDoorsOfType(SystemTypes__Enum selectedSystem, bool 
 
 void RpcCloseDoorsOfType::Process()
 {
-	if (selectedSystem == SystemTypes__Enum::Decontamination || selectedSystem == SystemTypes__Enum::Decontamination2 || selectedSystem == SystemTypes__Enum::Decontamination3)
-		return;
+	/*if (selectedSystem == SystemTypes__Enum::Decontamination || selectedSystem == SystemTypes__Enum::Decontamination2 || selectedSystem == SystemTypes__Enum::Decontamination3)
+		return;*/
 	app::ShipStatus_RpcCloseDoorsOfType(*Game::pShipStatus, this->selectedSystem, NULL);
 	if (this->pinDoor)
 		State.pinnedDoors.push_back(this->selectedSystem);
@@ -27,8 +27,8 @@ RpcOpenDoorsOfType::RpcOpenDoorsOfType(SystemTypes__Enum selectedSystem)
 
 void RpcOpenDoorsOfType::Process()
 {
-	if (selectedSystem == SystemTypes__Enum::Decontamination || selectedSystem == SystemTypes__Enum::Decontamination2 || selectedSystem == SystemTypes__Enum::Decontamination3)
-		return;
+	/*if (selectedSystem == SystemTypes__Enum::Decontamination || selectedSystem == SystemTypes__Enum::Decontamination2 || selectedSystem == SystemTypes__Enum::Decontamination3)
+		return;*/
 	for (auto door : il2cpp::Array((*Game::pShipStatus)->fields.AllDoors))
 	{
 		if (door->fields.Room == selectedSystem)
@@ -38,5 +38,4 @@ void RpcOpenDoorsOfType::Process()
 			else if ("MushroomWallDoor"sv == door->klass->name) app::MushroomWallDoor_SetDoorway(reinterpret_cast<MushroomWallDoor*>(door), true, {});
 		}
 	}
-
 }

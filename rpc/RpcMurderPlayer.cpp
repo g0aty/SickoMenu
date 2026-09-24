@@ -284,11 +284,28 @@ RpcVotePlayer::RpcVotePlayer(PlayerControl* Player, PlayerControl* target, bool 
 void RpcVotePlayer::Process()
 {
     if (!PlayerSelection(Player).has_value() || !PlayerSelection(target).has_value()) return;
+    if (MeetingHud__TypeInfo->static_fields->Instance == nullptr) return;
 
     if (skip)
         MeetingHud_CmdCastVote(MeetingHud__TypeInfo->static_fields->Instance, Player->fields.PlayerId, 253, NULL);
     else
         MeetingHud_CmdCastVote(MeetingHud__TypeInfo->static_fields->Instance, Player->fields.PlayerId, target->fields.PlayerId, NULL);
+}
+
+RpcOverrulePlayer::RpcOverrulePlayer(PlayerControl* target)
+{
+    this->target = target;
+}
+
+void RpcOverrulePlayer::Process()
+{
+    if (!PlayerSelection(target).has_value()) return;
+
+    auto meetingHud = MeetingHud__TypeInfo->static_fields->Instance;
+
+    if (meetingHud == nullptr) return;
+
+    MeetingHud_RpcVotingComplete(meetingHud, {}, GetPlayerData(target), false, true, 67, NULL);
 }
 
 RpcVoteKick::RpcVoteKick(PlayerControl* target, bool exploit)
@@ -348,7 +365,6 @@ RpcEndMeeting::RpcEndMeeting() {
 void RpcEndMeeting::Process()
 {
     MeetingHud_RpcClose(MeetingHud__TypeInfo->static_fields->Instance, NULL);
-    State.InMeeting = false;
 }
 
 EndMeeting::EndMeeting() {
@@ -606,6 +622,7 @@ void RpcBootFromVent::Process()
 {
     if (!PlayerSelection(Player).has_value()) return;
 
+    if (Player == *Game::pLocalPlayer) State.AntiExploit_IsTeleportingSelf = true;
     PlayerPhysics_RpcBootFromVent(Player->fields.MyPhysics, ventId, NULL);
 }
 
@@ -619,7 +636,23 @@ void RpcBootFromVentNonHost::Process()
 {
     if (!PlayerSelection(Player).has_value()) return;
 
+    if (Player == *Game::pLocalPlayer) State.AntiExploit_IsTeleportingSelf = true;
     SendBootVentNonHost(Player, ventId);
+}
+
+RpcClimbZipline::RpcClimbZipline(PlayerControl* Player, bool isTop)
+{
+    this->Player = Player;
+    this->isTop = isTop;
+}
+
+void RpcClimbZipline::Process()
+{
+    if (!PlayerSelection(Player).has_value()) return;
+    if (*Game::pShipStatus == NULL || State.mapType != Settings::MapType::Fungle) return;
+
+    auto ziplineBehaviour = (ZiplineBehaviour*)((FungleShipStatus*)(*Game::pShipStatus))->fields._Zipline_k__BackingField;
+    PlayerControl_RpcUseZipline(Player, Player, ziplineBehaviour, isTop, NULL);
 }
 
 AttemptToBan::AttemptToBan(PlayerControl* Player)
@@ -717,4 +750,28 @@ void PunishPlayer::Process() {
     }
 
     app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.OwnerId, isBan, nullptr);
+}
+
+SpamBanMinutes::SpamBanMinutes(int minutesToBan)
+{
+    this->minutesToBan = minutesToBan;
+}
+
+void SpamBanMinutes::Process() {
+    if (!IsHost()) return;
+
+    if (*Game::pLobbyBehaviour != NULL) {
+        InnerNetObject_Despawn((InnerNetObject*)(*Game::pLobbyBehaviour), NULL);
+    }
+
+    int banPoints = (int)(minutesToBan / 5) + 2;
+    // banMinutes are calculated as (banPoints - 2) * 5
+
+    auto writer = MessageWriter_Get(SendOption__Enum::None, NULL);
+
+    uint8_t startGameFlag = 2;
+
+    for (int i = 0; i < banPoints; ++i) {
+        InnerNetClient_SendStartGame((InnerNetClient*)(*Game::pAmongUsClient), NULL);
+    }
 }

@@ -5,113 +5,6 @@
 #include "utility.h"
 #include "state.hpp"
 #include "logger.h"
-/*#include <hunspell/hunspell.hxx>
-#include <sstream>
-#include <string>
-#include <vector>
-#include "imgui.h"
-
-class SpellChecker {
-public:
-    SpellChecker(const std::string& affPath, const std::string& dicPath) {
-        if (!Hunspell::isAvailable()) {
-            throw std::runtime_error("Hunspell is not available.");
-        }
-        spell = new Hunspell(affPath.c_str(), dicPath.c_str());
-        if (!spell->load()) {
-            delete spell;
-            throw std::runtime_error("Failed to load Hunspell dictionary.");
-        }
-    }
-
-    ~SpellChecker() {
-        delete spell;
-    }
-
-    bool isCorrect(const std::string& word) const {
-        return spell->spell(word.c_str());
-    }
-
-private:
-    Hunspell* spell;
-};
-
-void HighlightMisspelledWords(SpellChecker& checker, const std::string& text) {
-    std::istringstream iss(text);
-    std::string word;
-
-    while (iss >> word) {
-
-        bool isCorrect = checker.isCorrect(word);
-
-        if (!isCorrect) {
-
-            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", word.c_str());
-        } else {
-
-            ImGui::Text("%s ", word.c_str());
-        }
-    }
-}
-
-void RenderMenu() {
-    try {
-        SpellChecker spellChecker("en_US.aff", "en_US.dic");
-
-        std::string chatMessage = "Ths is a smaple text with sme misspelled wrds.";
-
-        if (ToggleButton("Blocked Words", &State.SMAC_CheckBadWords)) State.Save();
-        if (State.SMAC_CheckBadWords) {
-            HighlightMisspelledWords(spellChecker, chatMessage);
-
-            static std::string newWord = "";
-            InputString("New Word", &newWord, ImGuiInputTextFlags_EnterReturnsTrue);
-            ImGui::SameLine();
-            if (AnimatedButton("Add Word")) {
-                State.SMAC_BadWords.push_back(newWord);
-                State.Save();
-                newWord = "";
-            }
-
-
-        }
-    } catch (const std::exception& e) {
-
-        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Error: %s", e.what());
-    }
-}
-
-
-bool ToggleButton(const char* label, bool* p_value) {
-    return ImGui::Checkbox(label, p_value);
-}
-
-void InputString(const char* label, std::string* str, int flags = 0) {
-    ImGui::InputText(label, &(*str)[0], str->capacity() + 1, flags);
-}
-
-
-struct State {
-    bool SMAC_CheckBadWords;
-    void Save() {}
-    static std::vector<std::string> SMAC_BadWords;
-};
-
-std::vector<std::string> State::SMAC_BadWords;
-
-int main() {
-
-
-    while (true) {
-        RenderMenu();
-
-
-    }
-
-    return 0;
-}
-
-*/
 
 static std::string strToLower(std::string str) {
     std::string new_str = "";
@@ -135,7 +28,7 @@ namespace GameTab {
     static bool openChat = false;
     static bool openAnticheat = false;
     static bool openUtils = false;
-        static bool openHistory = false;
+    static bool openHistory = false;
     static bool openOptions = false;
 
     void CloseOtherGroups(Groups group) {
@@ -158,7 +51,7 @@ namespace GameTab {
 
     void Render() {
         ImGui::SameLine(100 * State.dpiScale);
-        ImGui::BeginChild("###Game", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+        ImGui::BeginChild("###GameButtons", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
         if (TabGroup("General", openGeneral)) {
             CloseOtherGroups(Groups::General);
         }
@@ -198,6 +91,7 @@ namespace GameTab {
             "Manual Warn"
         };
 
+        ImGui::BeginChild("###Game", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
         if (openGeneral) {
             ImGui::Dummy(ImVec2(2, 2) * State.dpiScale);
             if (SteppedSliderFloat("Player Speed Multiplier", &State.PlayerSpeed, 0.f, 10.f, 0.05f, "%.2fx", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput)) {
@@ -363,7 +257,7 @@ namespace GameTab {
 
                 ImGui::SetNextItemWidth(100 * State.dpiScale);
                 CustomListBoxInt("Vent", &State.SelectedVentId, allVents);
-                ImGui::SameLine();
+                
                 if (AnimatedButton("Teleport All to Vent")) {
                     for (auto p : GetAllPlayerControl()) {
                         if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
@@ -373,6 +267,20 @@ namespace GameTab {
                             State.rpcQueue.push(new RpcBootFromVentNonHost(p, (State.mapType == Settings::MapType::Hq) ? State.SelectedVentId + 1 : State.SelectedVentId)); //MiraHQ vents start from 1 instead of 0
                     }
                 }
+                ImGui::SameLine();
+                if (AnimatedButton("Teleport All to Random Vents")) {
+                    for (auto p : GetAllPlayerControl()) {
+                        if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
+                        bool isHq = State.mapType == Settings::MapType::Hq;
+                        int randomVentId = randi((int)isHq, (int)allVents.size() - (int)(!isHq));
+
+                        if (IsHost() || !State.SafeMode)
+                            State.rpcQueue.push(new RpcBootFromVent(p, randomVentId));
+                        else
+                            State.rpcQueue.push(new RpcBootFromVentNonHost(p, randomVentId));
+                    }
+                }
+
                 if (ToggleButton("Spam TP All to Vent", &State.SpamVentTpEveryone)) {
                     if (State.SpamVentTpEveryone) State.SpamVentTpEveryoneRandom = false;
                 }
@@ -381,11 +289,30 @@ namespace GameTab {
                     if (State.SpamVentTpEveryoneRandom) State.SpamVentTpEveryone = false;
                 }
 
-                if (ToggleButton("Ignore Self", &State.IgnoreVentTpSelf)) {
-                    State.Save();
-                }
+                if (ToggleButton("Ignore Self (Vent TP)", &State.IgnoreVentTpSelf)) State.Save();
+
                 if (IsInMultiplayerGame() && AnimatedButton("Attempt to Ban Everyone")) {
                     State.rpcQueue.push(new AttemptToBan(NULL));
+                }
+
+                if (State.mapType == Settings::MapType::Fungle) {
+                    if (AnimatedButton("Make All Climb Zipline (Bottom to Top)")) {
+                        for (auto p : GetAllPlayerControl()) {
+                            if (State.IgnoreZiplineSelf && p == *Game::pLocalPlayer) continue;
+                            State.rpcQueue.push(new RpcClimbZipline(p, false));
+                        }
+                    }
+                    ImGui::SameLine();
+                    if (AnimatedButton("Make All Climb Zipline (Top to Bottom)")) {
+                        for (auto p : GetAllPlayerControl()) {
+                            if (State.IgnoreZiplineSelf && p == *Game::pLocalPlayer) continue;
+                            State.rpcQueue.push(new RpcClimbZipline(p, true));
+                        }
+                    }
+
+                    ToggleButton("Spam Climb Zipline for Everyone", &State.SpamZiplineEveryone);
+                    ImGui::SameLine();
+                    if (ToggleButton("Ignore Self (Zipline)", &State.IgnoreZiplineSelf)) State.Save();
                 }
             }
 
@@ -505,27 +432,29 @@ namespace GameTab {
             InputStringMultiline("\n\n\n\n\nChat Message", &State.chatMessage);
             if (!msgAllowed) ImGui::PopStyleColor();
 
-            if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && IsChatValid(State.chatMessage)) {
-                ImGui::SameLine();
-                if (AnimatedButton("Send"))
+            if (!State.chatMessage.empty()) {
+                if ((IsInGame() || IsInLobby()) && State.ChatCooldown >= 3.f && IsChatValid(State.chatMessage)) {
+                    ImGui::SameLine();
+                    if (AnimatedButton("Send"))
+                    {
+                        auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
+                            State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
+                        if (IsInGame()) State.rpcQueue.push(new RpcSendChat(player, State.chatMessage));
+                        else if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChat(player, State.chatMessage));
+                        State.MessageSent = true;
+                    }
+                }
+                if ((IsInGame() || IsInLobby()) && State.ReadAndSendSickoChat) ImGui::SameLine();
+                if (State.ReadAndSendSickoChat && (IsInGame() || IsInLobby()) && AnimatedButton("Send SickoChat"))
                 {
                     auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
                         State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-                    if (IsInGame()) State.rpcQueue.push(new RpcSendChat(player, State.chatMessage));
-                    else if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSendChat(player, State.chatMessage));
-                    State.MessageSent = true;
-                }
-            }
-            if ((IsInGame() || IsInLobby()) && State.ReadAndSendSickoChat) ImGui::SameLine();
-            if (State.ReadAndSendSickoChat && (IsInGame() || IsInLobby()) && AnimatedButton("Send SickoChat"))
-            {
-                auto player = (!State.SafeMode && State.playerToChatAs.has_value()) ?
-                    State.playerToChatAs.validate().get_PlayerControl() : *Game::pLocalPlayer;
-                if (IsInGame()) {
-                    State.rpcQueue.push(new RpcForceSickoChat(PlayerSelection(player), State.chatMessage, true));
-                }
-                else if (IsInLobby()) {
-                    State.lobbyRpcQueue.push(new RpcForceSickoChat(PlayerSelection(player), State.chatMessage, true));
+                    if (IsInGame()) {
+                        State.rpcQueue.push(new RpcForceSickoChat(PlayerSelection(player), State.chatMessage, true));
+                    }
+                    else if (IsInLobby()) {
+                        State.lobbyRpcQueue.push(new RpcForceSickoChat(PlayerSelection(player), State.chatMessage, true));
+                    }
                 }
             }
 
@@ -566,7 +495,7 @@ namespace GameTab {
                     std::vector<const char*> presetNames;
                     for (auto& p : State.ChatPresets) presetNames.push_back(p.Name.c_str());
                     State.SelectedChatPreset = std::clamp(State.SelectedChatPreset, 0, (int)State.ChatPresets.size() - 1);
-                    CustomListBoxInt("##chatpresetselect", &State.SelectedChatPreset, presetNames, 200.0f * State.dpiScale, ImVec4(0, 0, 0, 0), 0, "Preset");
+                    CustomListBoxInt("Preset", &State.SelectedChatPreset, presetNames, 200.0f * State.dpiScale, ImVec4(0, 0, 0, 0), 0);
                     auto& selected = State.ChatPresets[State.SelectedChatPreset];
 
                     if (lastRenameIndex != State.SelectedChatPreset) {
@@ -726,9 +655,13 @@ namespace GameTab {
                 bool changed = false;
 
                 ImGui::TextDisabled("Default action taken when a detection isn't specifically overridden below.");
-                changed = changed || CustomListBoxInt("Host Punishment", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+                changed = changed || CustomListBoxInt("", &State.SMAC_HostPunishment, SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
                 ImGui::SameLine();
-                changed = changed || CustomListBoxInt("Regular Punishment", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+                ImGui::Text("Host Action");
+                ImGui::SameLine();
+                changed = changed || CustomListBoxInt("  ", &State.SMAC_Punishment, SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+                ImGui::SameLine();
+                ImGui::Text("Regular Action");
 
                 ImGui::Dummy(ImVec2(0, 1) * State.dpiScale);
                 ImGui::TextDisabled("Override the action for a specific detection.");
@@ -759,9 +692,13 @@ namespace GameTab {
                 ImGui::SetNextItemWidth(150.0f * State.dpiScale);
                 CustomListBoxInt("Category", &selectedCategory, SMAC_CATEGORIES, 150.0f * State.dpiScale);
 
-                changed = changed || CustomListBoxInt("Host Override", &hostOverrides[catKey], SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
+                changed = changed || CustomListBoxInt(" ", &hostOverrides[catKey], SMAC_HOST_PUNISHMENTS, 85.0f * State.dpiScale);
                 ImGui::SameLine();
-                changed = changed || CustomListBoxInt("Regular Override", &overrides[catKey], SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+                ImGui::Text("Host Override");
+                ImGui::SameLine();
+                changed = changed || CustomListBoxInt("   ", &overrides[catKey], SMAC_PUNISHMENTS, 85.0f * State.dpiScale);
+                ImGui::SameLine();
+                ImGui::Text("Regular Override");
                 if (changed) State.Save();
             }
             ImGui::Dummy(ImVec2(0, 2)* State.dpiScale);
@@ -1862,6 +1799,7 @@ namespace GameTab {
             }
             else CloseOtherGroups(Groups::General);
         }
+        ImGui::EndChild();
         ImGui::EndChild();
     }
 }

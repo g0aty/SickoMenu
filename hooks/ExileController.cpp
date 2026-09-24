@@ -22,8 +22,11 @@ void dExileController_ReEnableGameplay(ExileController* __this, MethodInfo* meth
                 }
             }
         }
-        if (State.GodMode && ((IsHost() && IsInGame()) || !State.SafeMode)) {
+        if (!State.PanicMode && State.GodMode && ((IsHost() && IsInGame()) || !State.SafeMode)) {
             PlayerControl_RpcProtectPlayer(*Game::pLocalPlayer, *Game::pLocalPlayer, GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer))->fields.ColorId, NULL);
+        }
+        if (!State.PanicMode && State.ControlPet) {
+            State.petPos = PlayerControl_GetTruePosition(*Game::pLocalPlayer, NULL);
         }
     }
     catch (...) {

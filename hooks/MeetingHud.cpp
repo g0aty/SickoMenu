@@ -14,9 +14,16 @@ void RecolorVoteArea(PlayerVoteArea* voteArea, NetworkedPlayerInfo* pData = NULL
         GetPlayerOutfit(pData);
     if (outfit == NULL) return;
 
-    std::string namePlate = convert_from_string(outfit->fields.NamePlateId);
+    auto voteAreaSprite = SpriteRenderer_get_sprite(voteArea->fields.Background, NULL);
+    std::string spriteName = voteAreaSprite == NULL ? "" :
+        convert_from_string(Object_1_get_name((Object_1*)voteAreaSprite, NULL));
+
+    /*std::string namePlate = convert_from_string(outfit->fields.NamePlateId);
     std::unordered_set<std::string> noPlateSet = { "", "nameplate_NoPlate", "nameplate_Transparent" };
-    if (!noPlateSet.contains(namePlate)) return;
+    if (!noPlateSet.contains(namePlate)) return;*/
+
+    if (!spriteName.empty() && spriteName != "votePlayerBase") return;
+
     if (!State.PanicMode && State.CustomGameTheme) {
         auto bg = Color(State.GameBgColor.x, State.GameBgColor.y, State.GameBgColor.z, State.GameBgColor.w);
         SpriteRenderer_set_color(voteArea->fields.Background, bg, NULL);
@@ -355,8 +362,12 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
                         roleColor.r, roleColor.g, roleColor.b,
                         roleColor.a, playerName);
                 }
-                else if (PlayerIsImpostor(playerData) && PlayerIsImpostor(localData)) {
-                    Color32&& roleColor = Color32_op_Implicit(Palette__TypeInfo->static_fields->ImpostorRed, NULL);
+                else {
+                    bool shouldSeeImpostor = PlayerIsImpostor(playerData) && PlayerIsImpostor(localData);
+                    Color32&& roleColor = app::Color32_op_Implicit(shouldSeeImpostor ?
+                        Palette__TypeInfo->static_fields->ImpostorRed :
+                        Palette__TypeInfo->static_fields->White, NULL);
+
                     playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
                         roleColor.r, roleColor.g, roleColor.b,
                         roleColor.a, playerName);
@@ -446,7 +457,7 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
                         break;
                     }
                 }
-                app::GameObject_SetActive(__this->fields.SkippedVoting, showSkipped, nullptr);
+                GameObject_SetActive(__this->fields.SkippedVoting, showSkipped, nullptr);
             }
         }
         il2cpp::Array playerStates2(__this->fields.playerStates);
@@ -492,6 +503,11 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
     
     if (State.GodMode) {
         for (auto playerState : playerStates) {
+            if (GetPlayerDataById(playerState->fields._PlayerId_k__BackingField.Value)->fields.IsDead) {
+                playerState->fields._VotedForId_k__BackingField.Value = Game::HasNotVoted;
+                continue;
+            }
+
             if (playerState->fields._VotedForId_k__BackingField.Value == (*Game::pLocalPlayer)->fields.PlayerId)
                 playerState->fields._VotedForId_k__BackingField.Value = Game::SkippedVote;
         }
@@ -502,11 +518,12 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
 
 bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dLogicOptions_GetAnonymousVotes executed", false);
-    return LogicOptions_GetAnonymousVotes(__this, method);
+    return (!State.PanicMode && State.RevealAnonymousVotes && State.InMeeting) ||
+        LogicOptions_GetAnonymousVotes(__this, method);
 }
 
 void dMeetingHud_CastVote(MeetingHud* __this, PlayerId playerId, PlayerId suspectIdx, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.HookDebug("Hook dLogicOptions_GetAnonymousVotes executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_CastVote executed", false);
     if (!State.PanicMode && IsHost() && !State.VoteImmunePlayers.empty()) {
         if (std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), suspectIdx.Value) != State.VoteImmunePlayers.end()) {
             auto it = State.VoteRedirectTargets.find(suspectIdx.Value);
@@ -516,8 +533,22 @@ void dMeetingHud_CastVote(MeetingHud* __this, PlayerId playerId, PlayerId suspec
     MeetingHud_CastVote(__this, playerId, suspectIdx, method);
 }
 
+void dNetworkedPlayerInfo_UpdateNamePlate(NetworkedPlayerInfo* __this, String* namePlate, MethodInfo* method) {
+    if (State.ShowHookLogs) Log.HookDebug("Hook dNetworkedPlayerInfo_UpdateNamePlate executed", false);
+    NetworkedPlayerInfo_UpdateNamePlate(__this, namePlate, method);
+
+    if (*Game::pShipStatus != NULL &&
+        (*Game::pShipStatus)->fields._CosmeticsCache_k__BackingField != NULL) {
+        auto routine = CosmeticsCache_CoAddNameplate((CosmeticsCache*)((*Game::pShipStatus)->fields._CosmeticsCache_k__BackingField),
+            namePlate, NULL);
+        if (routine != NULL) MonoBehaviour_StartCoroutine((MonoBehaviour*)(*Game::pAmongUsClient), routine, NULL);
+
+        // prevent CosmeticsCache not storing changed nameplates
+    }
+}
+
 void dPlayerVoteArea_SetCosmetics(PlayerVoteArea* __this, NetworkedPlayerInfo* playerInfo, MethodInfo* method) {
-    if (State.ShowHookLogs) Log.HookDebug("Hook dLogicOptions_GetAnonymousVotes executed", false);
+    if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerVoteArea_SetCosmetics executed", false);
     PlayerVoteArea_SetCosmetics(__this, playerInfo, method);
 
     RecolorVoteArea(__this, playerInfo);

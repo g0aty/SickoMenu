@@ -113,7 +113,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
             bChatAlwaysActivePrevious = State.ChatAlwaysActive;
         }
         if (__this->fields.PlayerCam)
-            __this->fields.PlayerCam->fields.Locked = State.FreeCam && !State.PanicMode;
+            __this->fields.PlayerCam->fields.Locked = (State.FreeCam || State.ControlPet) && !State.PanicMode;
 
 
         static bool DisableActivation = false; //so a ghost seek button doesn't show up
@@ -144,7 +144,7 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
             GameObject* shadowLayerObject = Component_get_gameObject((Component_1*)__this->fields.ShadowQuad, NULL);
             float camHeight = State.FollowerCam == NULL ? 3.f : Camera_get_orthographicSize(State.FollowerCam, NULL);
             bool hideZoomShadows = State.EnableZoom && !State.EnableZoom_ShowShadows;
-            bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || hideZoomShadows || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby())))
+            bool shouldShowShadowQuad = (State.PanicMode || !(State.IsRevived || State.FreeCam || State.ControlPet || hideZoomShadows || State.playerToFollow.has_value() || State.Wallhack || (State.MaxVision && IsInLobby())))
                 && (localData != NULL && !localData->fields.IsDead);
             if (shadowLayerObject != NULL)
                 GameObject_SetActive(shadowLayerObject, shouldShowShadowQuad, NULL);
@@ -215,12 +215,18 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                         app::GameObject_SetActive(ImpostorVentButton, forceShowVentButton || (PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal), nullptr);
                     }
 
+                    static bool isVentKeybindTriggeredAlready = false;
+
                     if (kbjPlayer != NULL && forceShowVentButton &&
                         !(PlayerIsImpostor(localData) && GameOptions().GetGameMode() == GameModes__Enum::Normal) &&
-                        Player_GetButton(kbjPlayer, 50, NULL) &&
                         (PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL) || (*Game::pLocalPlayer)->fields.inVent)) {
                         // 50 is the ID for the in-game vent keybind
-                        VentButton_DoClick((VentButton*)__this->fields.ImpostorVentButton, NULL);
+                        if (Player_GetButton(kbjPlayer, 50, NULL)) {
+                            if (!isVentKeybindTriggeredAlready)
+                                VentButton_DoClick((VentButton*)__this->fields.ImpostorVentButton, NULL);
+                            isVentKeybindTriggeredAlready = true;
+                        }
+                        else isVentKeybindTriggeredAlready = false;
                     }
                 }
 
@@ -239,13 +245,19 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                             app::GameObject_SetActive(KillButton, true, nullptr);
                             playerRole->fields.CanUseKillButton = true;
 
+                            static bool isKillKeybindTriggeredAlready = false;
+
                             if (kbjPlayer != NULL && !amImpostor &&
-                                Player_GetButton(kbjPlayer, 8, NULL) &&
                                 PlayerControl_get_CanMove(*Game::pLocalPlayer, NULL)) {
                                 // allow killing as crewmate
                                 __this->fields.KillButton->fields._.isCoolingDown = false;
                                 // 8 is the ID for the in-game kill keybind
-                                KillButton_DoClick(__this->fields.KillButton, NULL);
+                                if (Player_GetButton(kbjPlayer, 8, NULL)) {
+                                    if (!isKillKeybindTriggeredAlready)
+                                        KillButton_DoClick(__this->fields.KillButton, NULL);
+                                    isKillKeybindTriggeredAlready = true;
+                                }
+                                else isKillKeybindTriggeredAlready = false;
                             }
                         }
                         else {
@@ -683,6 +695,8 @@ void dMatchInfoHudButton_Update(MatchInfoHudButton* __this, MethodInfo* method) 
 
     auto distanceFromEdge = GameObject_GetActive(chatGameObject, NULL) ?
         Vector3(2.75f, 0.505f, -400.f) : Vector3(2.15f, 0.505f, -400.f);
+
+    if (!State.PanicMode && State.MoveMatchInfoGuide) distanceFromEdge = Vector3(0.44f, 1.315f, -400.f);
 
     // these are the vectors that the game uses
 

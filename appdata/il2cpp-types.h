@@ -4669,7 +4669,6 @@ namespace app {
 
     struct PlayerId__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PlayerId__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -6537,6 +6536,8 @@ namespace app {
 #pragma endregion
 
 #pragma region PlayerPhysics
+    typedef Il2CppObject PlayerAnimations;
+
     struct PlayerPhysics__Fields {
         struct InnerNetObject__Fields _;
         struct AudioClip* ImpostorDiscoveredSound;
@@ -6586,6 +6587,55 @@ namespace app {
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
         struct PlayerPhysics__VTable vtable;
+    };
+#pragma endregion
+
+#pragma region PetBehaviour
+    struct PetBehaviour__Fields {
+        struct MonoBehaviour__Fields _;
+        struct PetData* data;
+        struct SpriteAnim* animator;
+        struct Rigidbody2D* rigidbody;
+        struct Collider2D* collider;
+        float yOffset;
+        struct Transform* pettingHandPosition;
+        struct AnimationClip* idleClip;
+        struct AnimationClip* sadClip;
+        struct AnimationClip* scaredClip;
+        struct AnimationClip* walkClip;
+        struct AnimationClip* petClip;
+        struct SpriteRenderer__Array* renderers;
+        struct SpriteRenderer__Array* shadows;
+        struct PlayerControl* targetPlayer;
+        bool visible;
+        bool flipX;
+        bool beingPet;
+        bool manualMoving;
+        bool viewOnly;
+    };
+
+    struct PetBehaviour {
+        struct PetBehaviour__Class* klass;
+        MonitorData* monitor;
+        struct PetBehaviour__Fields fields;
+    };
+
+    struct PetBehaviour__VTable {
+        VirtualInvokeData Equals;
+        VirtualInvokeData Finalize;
+        VirtualInvokeData GetHashCode;
+        VirtualInvokeData ToString;
+    };
+
+    struct PetBehaviour__StaticFields {
+    };
+
+    struct PetBehaviour__Class {
+        Il2CppClass_0 _0;
+        struct PetBehaviour__StaticFields* static_fields;
+        const Il2CppRGCTXData* rgctx_data;
+        Il2CppClass_1 _1;
+        struct PetBehaviour__VTable vtable;
     };
 #pragma endregion
 
@@ -7771,6 +7821,8 @@ namespace app {
 #pragma endregion
 
 #pragma region FungleShipStatus
+    typedef Il2CppObject ZiplineBehaviour;
+
     struct FungleShipStatus__Fields {
         struct ShipStatus__Fields _;
         struct Dictionary_2_System_Int32_Mushroom_* sporeMushrooms;
@@ -9148,7 +9200,6 @@ namespace app {
 
     struct AchievementManager__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct AchievementManager__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -9907,6 +9958,7 @@ namespace app {
         StartVanish = 0x3f,
         CheckAppear = 0x40,
         StartAppear = 0x41,
+        QueueOverruleVotes = 0x42,
     };
 
 #else
@@ -9972,6 +10024,7 @@ namespace app {
         RpcCalls__Enum_StartVanish = 0x3f,
         RpcCalls__Enum_CheckAppear = 0x40,
         RpcCalls__Enum_StartAppear = 0x41,
+        RpcCalls__Enum_QueueOverruleVotes = 0x42,
     };
 
 #endif
@@ -11735,7 +11788,6 @@ namespace app {
 
     struct MatchInfoHudButton__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct MatchInfoHudButton__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11790,7 +11842,6 @@ namespace app {
 
     struct MatchInfoGuide__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct MatchInfoGuide__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11834,7 +11885,6 @@ namespace app {
 
     struct PlayerIdentifierButton__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct PlayerIdentifierButton__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11873,7 +11923,6 @@ namespace app {
 
     struct LobbyNotificationMessage__Class {
         Il2CppClass_0 _0;
-        Il2CppRuntimeInterfaceOffsetPair* interfaceOffsets;
         struct LobbyNotificationMessage__StaticFields* static_fields;
         const Il2CppRGCTXData* rgctx_data;
         Il2CppClass_1 _1;
@@ -11909,4 +11958,5 @@ namespace app {
     typedef Il2CppObject DetectiveRole;
     typedef Il2CppObject JudgeRole;
     typedef Il2CppObject VentilationSystem;
+    typedef Il2CppObject PlayerPettingHand;
 }

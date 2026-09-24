@@ -2,6 +2,7 @@
 #include "_hooks.h"
 #include "logger.h"
 #include "state.hpp"
+#include <regex>
 
 static bool isGuestAccount = false;
 
@@ -18,6 +19,40 @@ void fakeSuccessfulLogin(EOSManager* eosManager)
 	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->klass, "loginStatus");
 	auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
 	il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
+}
+
+void setUsernameEAU(EditAccountUsername* eau) {
+	bool isFriendCodeValid = !State.NewFriendCode.empty() && State.NewFriendCode.find(" ") == std::string::npos && State.NewFriendCode.length() <= 10;
+	auto tmpText = (TMP_Text*)eau->fields.UsernameText;
+
+	if (State.UseNewFriendCode && isFriendCodeValid) {
+		std::string newFriendCode = "";
+		for (auto i : State.NewFriendCode) {
+			if (newFriendCode.ends_with(" ")) {
+				break;
+			}
+			newFriendCode += tolower(i);
+		}
+		TMP_Text_set_text(tmpText, convert_to_string(newFriendCode), NULL);
+	}
+	else {
+		auto textStr = convert_from_string(TMP_Text_get_text(tmpText, NULL));
+		if (!textStr.empty()) {
+			std::string newFriendCode = "";
+			for (auto i : textStr) {
+				newFriendCode += tolower(i);
+			}
+			TMP_Text_set_text(tmpText, convert_to_string(newFriendCode), NULL);
+		}
+		else {
+			std::string newFriendCode = "";
+			std::string randomString = GenerateRandomString();
+			for (auto i : randomString) {
+				newFriendCode += tolower(i);
+			}
+			TMP_Text_set_text(tmpText, convert_to_string(newFriendCode), NULL);
+		}
+	}
 }
 
 /*void dEOSManager_StartInitialLoginFlow(EOSManager* __this, MethodInfo* method) {
@@ -126,22 +161,17 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		hasDeletedDeviceId = true;
 	}*/
 
+	auto player = app::DataManager_get_Player(nullptr);
+	static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "account");
+	LOG_ASSERT(field != nullptr);
+	auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
+	//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
+	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->klass, "loginStatus");
+	bool loggedIn = (int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) == (int)EOSManager_AccountLoginStatus__Enum::LoggedIn;
+	bool loggedOut = (int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) == (int)EOSManager_AccountLoginStatus__Enum::Offline;
+
 	if (State.ForceLoginAsGuest) {
-		auto player = app::DataManager_get_Player(nullptr);
-		static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "account");
-		LOG_ASSERT(field != nullptr);
-		auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
-		//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
-		static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->klass, "loginStatus");
-		auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
-		auto loggedOut = EOSManager_AccountLoginStatus__Enum::Offline;
-		if ((int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) != (int)loggedOut)
-			il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
-		/*if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
-			auto username = __this->fields.editAccountUsername;
-			TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
-			//EditAccountUsername_SaveUsername(username, NULL);
-		}*/
+		if (loggedOut) il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
 		State.ForceLoginAsGuest = false; //button behavior
 	}
 
@@ -178,33 +208,6 @@ void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter
 
 void dEditAccountUsername_SaveUsername(EditAccountUsername* __this, MethodInfo* method) {
 	if (State.ShowHookLogs) Log.HookDebug("Hook dEditAccountUsername_SaveUsername executed", false);
-	if (State.UseNewFriendCode && State.NewFriendCode != "") {
-		std::string newFriendCode = "";
-		for (auto i : State.NewFriendCode) {
-			if (newFriendCode.ends_with(" ")) {
-				break;
-			}
-			newFriendCode += tolower(i);
-		}
-		TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);
-	}
-	else {
-		auto textStr = convert_from_string(TMP_Text_get_text((TMP_Text*)__this->fields.UsernameText, NULL));
-		if (!textStr.empty()) {
-			std::string newFriendCode = "";
-			for (auto i : textStr) {
-				newFriendCode += tolower(i);
-			}
-			TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);
-		}
-		else {
-			std::string newFriendCode = "";
-			std::string randomString = GenerateRandomString();
-			for (auto i : randomString) {
-				newFriendCode += tolower(i);
-			}
-			TMP_Text_set_text((TMP_Text*)__this->fields.UsernameText, convert_to_string(newFriendCode), NULL);
-		}
-	}
+	setUsernameEAU(__this);
 	EditAccountUsername_SaveUsername(__this, method);
 }

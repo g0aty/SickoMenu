@@ -10,5 +10,7 @@ void dSceneManager_Internal_ActiveSceneChanged(Scene previousActiveScene, Scene 
 		State.MainMenuLoaded = true;
 		State.IsFreePlay = false;
 	}
+	if (State.CurrentScene == "Tutorial")
+		ResetOriginalAppearance(); // since we don't join a lobby beforehand
 	app::SceneManager_Internal_ActiveSceneChanged(previousActiveScene, newActiveScene, method);
 }

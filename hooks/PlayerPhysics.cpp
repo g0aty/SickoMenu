@@ -71,6 +71,20 @@ void dPlayerPhysics_FixedUpdate(PlayerPhysics* __this, MethodInfo* method)
 				PlayerControl_set_Visible(player, shouldSeeGhost, NULL);
 			}
 		}
+
+		if (__this->fields.myPlayer == *Game::pLocalPlayer && !(*Game::pLocalPlayer)->fields.shapeshifting) {
+			// "fix" a vanilla bug that turns the local player tiny if you shift into yourself with the animation
+			// https://github.com/scp222thj/MalumMenu/commit/c6b9717d1e08b281eaff95f9433af5cb896093e3
+
+			auto local = (*Game::pLocalPlayer);
+			auto localTransform = Component_get_transform((Component_1*)local, NULL);
+			if (Transform_get_localScale(localTransform, NULL).x != local->fields.defaultCosmeticsScale.x) {
+				Vector3 defaultPlayerScale = PlayerAnimations_get_DefaultPlayerScale((PlayerAnimations*)__this->fields.Animations, NULL);
+				Vector3 defaultCosmeticsScale = local->fields.defaultCosmeticsScale;
+				CosmeticsLayer_SetScale(local->fields.cosmetics, defaultPlayerScale, defaultCosmeticsScale, NULL);
+			}
+		}
+
 		app::PlayerPhysics_FixedUpdate(__this, method);
 	}
 	catch (...) {
@@ -83,14 +97,26 @@ void dPlayerPhysics_RpcExitVent(PlayerPhysics* __this, int32_t id, MethodInfo* m
 	PlayerPhysics_RpcExitVent(__this, id, method);
 }
 
-void dPlayerPhysics_RpcBootFromVent(PlayerPhysics* __this, int32_t ventId, MethodInfo* method) {
+void dPlayerPhysics_BootFromVent(PlayerPhysics* __this, int32_t ventId, MethodInfo* method) {
 	if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerPhysics_FixedUpdate executed", false);
-	if (!IsHost() && State.SafeMode) return;
-	PlayerPhysics_RpcBootFromVent(__this, ventId, method);
+
+	bool isLocal = __this->fields.myPlayer == *Game::pLocalPlayer;
+
+	if (isLocal && State.AntiExploit_IsTeleportingSelf) {
+		PlayerPhysics_BootFromVent(__this, ventId, method);
+		State.AntiExploit_IsTeleportingSelf = false;
+		return;
+	}
+
+	if (isLocal && !State.PanicMode && State.AntiExploit_UnauthorizedTeleports && !(*Game::pLocalPlayer)->fields.inVent)
+		return;
+	// we allowed to be booted out only while we are in a vent
+	// this is to prevent desyncing when someone cleans a vent that we are in
+
+	PlayerPhysics_BootFromVent(__this, ventId, method);
 }
 
 void dPlayerPhysics_HandleRpc(PlayerPhysics* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
-	if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerPhysics_FixedUpdate executed", false);
-
+	if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerPhysics_HandleRpc executed", false);
 	PlayerPhysics_HandleRpc(__this, callId, reader, method);
 }

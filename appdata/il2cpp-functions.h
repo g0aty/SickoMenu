@@ -43,6 +43,7 @@ DO_APP_FUNC(float, Camera_get_orthographicSize, (Camera* __this, MethodInfo* met
 DO_APP_FUNC(float, Camera_get_aspect, (Camera* __this, MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Camera::get_aspect()");
 DO_APP_FUNC(Color, SpriteRenderer_get_color, (SpriteRenderer* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Color UnityEngine.SpriteRenderer::get_color()");
 DO_APP_FUNC(void, SpriteRenderer_set_color, (SpriteRenderer* __this, Color value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.SpriteRenderer::set_color(UnityEngine.Color)");
+DO_APP_FUNC(Sprite*, SpriteRenderer_get_sprite, (SpriteRenderer* __this, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Sprite UnityEngine.SpriteRenderer::get_sprite()");
 DO_APP_FUNC(void, SpriteRenderer_set_flipX, (SpriteRenderer* __this, bool value, MethodInfo* method), "UnityEngine.CoreModule, System.Void UnityEngine.SpriteRenderer::set_flipX(System.Boolean)");
 DO_APP_FUNC(float, Time_get_deltaTime, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_deltaTime()");
 DO_APP_FUNC(float, Time_get_fixedDeltaTime, (MethodInfo* method), "UnityEngine.CoreModule, System.Single UnityEngine.Time::get_fixedDeltaTime()");
@@ -65,6 +66,7 @@ DO_APP_FUNC(bool, AutoOpenDoor_DoUpdate, (AutoOpenDoor* __this, float dt, Method
 DO_APP_FUNC(void, NoShadowBehaviour_SetMaskFunction, (NoShadowBehaviour* __this, int32_t func, MethodInfo* method), "Assembly-CSharp, System.Void NoShadowBehaviour::SetMaskFunction(System.Int32)");
 
 DO_APP_FUNC(Vector3, Camera_ScreenToWorldPoint, (Camera* __this, Vector3 position, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Vector3 UnityEngine.Camera::ScreenToWorldPoint(UnityEngine.Vector3)");
+DO_APP_FUNC(Vector3, Camera_WorldToScreenPoint, (Camera* __this, Vector3 position, MethodInfo* method), "UnityEngine.CoreModule, UnityEngine.Vector3 UnityEngine.Camera::WorldToScreenPoint(UnityEngine.Vector3)");
 
 DO_APP_FUNC(void, CustomNetworkTransform_RpcSnapTo, (CustomNetworkTransform* __this, Vector2 position, MethodInfo* method), "Assembly-CSharp, System.Void CustomNetworkTransform::RpcSnapTo(UnityEngine.Vector2)");
 DO_APP_FUNC(void, CustomNetworkTransform_SnapTo, (CustomNetworkTransform* __this, Vector2 position, uint16_t minSid, MethodInfo* method), "Assembly-CSharp, System.Void CustomNetworkTransform::SnapTo(UnityEngine.Vector2, System.UInt16)");
@@ -291,8 +293,10 @@ DO_APP_FUNC(void, InnerNetClient_DisconnectInternal, (InnerNetClient* __this, Di
 DO_APP_FUNC(void, PlayerPhysics_FixedUpdate, (PlayerPhysics* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::FixedUpdate()");
 DO_APP_FUNC(void, PlayerPhysics_RpcEnterVent, (PlayerPhysics* __this, int32_t id, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcEnterVent(System.Int32)");
 DO_APP_FUNC(void, PlayerPhysics_RpcExitVent, (PlayerPhysics* __this, int32_t id, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcExitVent(System.Int32)");
+DO_APP_FUNC(void, PlayerPhysics_BootFromVent, (PlayerPhysics* __this, int32_t ventId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::BootFromVent(System.Int32)");
 DO_APP_FUNC(void, PlayerPhysics_RpcBootFromVent, (PlayerPhysics* __this, int32_t ventId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcBootFromVent(System.Int32)");
 DO_APP_FUNC(void, PlayerPhysics_HandleRpc, (PlayerPhysics* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::HandleRpc(System.Byte, Hazel.MessageReader)");
+DO_APP_FUNC(void, PlayerPhysics_RpcPet, (PlayerPhysics* __this, Vector2 pos, Vector2 petPos, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::RpcPet(UnityEngine.Vector2, UnityEngine.Vector2)");
 
 DO_APP_FUNC(void, PlayerControl_TurnOnProtection, (PlayerControl* __this, bool visible, int32_t colorId, int32_t guardianPlayerId, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::TurnOnProtection(System.Boolean, System.Int32, System.Int32)");
 DO_APP_FUNC(void, PlayerControl_RemoveProtection, (PlayerControl* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RemoveProtection()");
@@ -391,6 +395,7 @@ DO_APP_FUNC(int32_t, GameCode_GameNameToInt, (String* gameId, MethodInfo* method
 DO_APP_FUNC(PlayerStatsData*, PlayerData_get_Stats, (PlayerData* __this, MethodInfo* method), "Assembly-CSharp, AmongUs.Data.Player.PlayerStatsData AmongUs.Data.Player.PlayerData::get_Stats()");
 DO_APP_FUNC(void, AbstractSaveData_Save, (AbstractSaveData* __this, MethodInfo* method), "Assembly-CSharp, System.Void AmongUs.Data.AbstractSaveData::Save()");
 DO_APP_FUNC(void, ShipStatus_HandleRpc, (ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void ShipStatus::HandleRpc(System.Byte, Hazel.MessageReader)");
+DO_APP_FUNC(void, CustomNetworkTransform_HandleRpc, (CustomNetworkTransform* __this, uint8_t callId, MessageReader* reader, MethodInfo* method), "Assembly-CSharp, System.Void CustomNetworkTransform::HandleRpc(System.Byte, Hazel.MessageReader)");
 DO_APP_FUNC(Color, TMP_Text_get_color, (TMP_Text* __this, MethodInfo* method), "Unity.TextMeshPro, UnityEngine.Color TMPro.TMP_Text::get_color()");
 DO_APP_FUNC(void, TMP_Text_set_color, (TMP_Text* __this, Color value, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TMP_Text::set_color(UnityEngine.Color)");
 DO_APP_FUNC(void, TMP_Text_set_outlineColor, (TMP_Text* __this, Color32 value, MethodInfo* method), "Unity.TextMeshPro, System.Void TMPro.TMP_Text::set_outlineColor(UnityEngine.Color32)");
@@ -516,3 +521,19 @@ DO_APP_FUNC(void, KillButton_DoClick, (KillButton* __this, MethodInfo* method), 
 DO_APP_FUNC(void, VentButton_DoClick, (VentButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void VentButton::DoClick()");
 
 DO_APP_FUNC(void, InnerNetClient_SetEndpoint, (InnerNetClient* __this, String* addr, uint16_t port, bool dtls, MethodInfo* method), "Assembly-CSharp, System.Void InnerNet.InnerNetClient::SetEndpoint(System.String, System.UInt16, System.Boolean)");
+
+DO_APP_FUNC(void, PetBehaviour_SetGettingPet, (PetBehaviour* __this, bool petting, Vector2 petPos, MethodInfo* method), "Assembly-CSharp, System.Void PetBehaviour::SetGettingPet(System.Boolean, UnityEngine.Vector2)");
+DO_APP_FUNC(PlayerPettingHand*, CosmeticsLayer_get_PettingHand, (CosmeticsLayer* __this, MethodInfo* method), "Assembly-CSharp, PlayerPettingHand CosmeticsLayer::get_PettingHand()");
+DO_APP_FUNC(void, PlayerPettingHand_StartPet, (PlayerPettingHand* __this, PetBehaviour* pet, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPettingHand::StartPet(PetBehaviour)");
+DO_APP_FUNC(void, PlayerPettingHand_StopPetting, (PlayerPettingHand* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPettingHand::StopPetting()");
+DO_APP_FUNC(void, PlayerPhysics_CancelPet, (PlayerPhysics* __this, MethodInfo* method), "Assembly-CSharp, System.Void PlayerPhysics::CancelPet()");
+
+DO_APP_FUNC(void, CosmeticsLayer_SetScale, (CosmeticsLayer* __this, Vector3 playerScale, Vector3 cosmeticsScale, MethodInfo* method), "Assembly-CSharp, System.Void CosmeticsLayer::SetScale(UnityEngine.Vector3, UnityEngine.Vector3)");
+DO_APP_FUNC(Vector3, PlayerAnimations_get_DefaultPlayerScale, (PlayerAnimations* __this, MethodInfo* method), "Assembly-CSharp, UnityEngine.Vector3 PlayerAnimations::get_DefaultPlayerScale()");
+
+DO_APP_FUNC(void*, CosmeticsCache_CoAddNameplate, (CosmeticsCache* __this, String* namePlateId, MethodInfo* method), "Assembly-CSharp, System.Collections.IEnumerator CosmeticsCache::CoAddNameplate(System.String)");
+DO_APP_FUNC(void, NetworkedPlayerInfo_UpdateNamePlate, (NetworkedPlayerInfo* __this, String* namePlate, MethodInfo* method), "Assembly-CSharp, System.Void NetworkedPlayerInfo::UpdateNamePlate(System.String)");
+DO_APP_FUNC(String*, CosmeticsLayer_GetColorBlindText, (CosmeticsLayer* __this, MethodInfo* method), "Assembly-CSharp, System.String CosmeticsLayer::GetColorBlindText()");
+
+DO_APP_FUNC(void, PlayerControl_RpcUseZipline, (PlayerControl* __this, PlayerControl* target, ZiplineBehaviour* ziplineBehaviour, bool fromTop, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcUseZipline(PlayerControl, ZiplineBehaviour, System.Boolean)");
+DO_APP_FUNC(void, PlayerControl_CmdCheckUseZipline, (PlayerControl* __this, PlayerControl* target, ZiplineBehaviour* ziplineBehaviour, bool fromTop, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdCheckUseZipline(PlayerControl, ZiplineBehaviour, System.Boolean)");

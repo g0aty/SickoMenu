@@ -10,7 +10,7 @@ ImGuiWindow* CurrentWindow = nullptr;
 
 static void RenderText(std::string_view text, const ImVec2& pos, const ImVec4& color, const bool outlined = true, const bool centered = true)
 {
-	if (text.empty() || State.PanicMode) return;
+	if (text.empty() || State.PanicMode || color.w == 0.f) return;
 	ImVec2 ImScreen = pos;
 	if (centered)
 	{
@@ -143,9 +143,10 @@ void Esp::Render()
 				{
 					float width = GetScaleFromValue(35.0f);
 					float height = GetScaleFromValue(120.0f);
+					float yOffset = GetScaleFromValue(65.f);
 
-					ImVec2 top{ it.Position.x + width, it.Position.y };
-					ImVec2 bottom{ it.Position.x - width, it.Position.y - height };
+					ImVec2 top{ it.Position.x + width, it.Position.y + yOffset };
+					ImVec2 bottom{ it.Position.x - width, it.Position.y - height + yOffset };
 
 					RenderBox(top, bottom, height, width, it.Color);
 				}
@@ -158,16 +159,35 @@ void Esp::Render()
 					// logic and calculation
 					ImVec2 position = { it.Position.x, it.Position.y + 15.0f * State.dpiScale };
 					ImVec2 position2 = { it.Position.x, it.Position.y + 30.0f * State.dpiScale };
+					ImVec2 localPosition = instance.LocalPosition;
 
 					// infamous trash codes
-					float minX = 40.0f, minY = 0.0f,
-						maxX = DirectX::GetWindowSize().x - 46.0f, // 1320
-						maxY = DirectX::GetWindowSize().y - 38.0f; // 730
+					float xOffset = (DirectX::GetWindowSize(true).x - DirectX::GetWindowSize().x) / 2.f;
+					float yOffset = (DirectX::GetWindowSize(true).y - DirectX::GetWindowSize().y) / 2.f;
+
+					float minX = 40.0f + xOffset, minY = yOffset,
+						maxX = DirectX::GetWindowSize().x - 46.0f + xOffset, // 1320
+						maxY = DirectX::GetWindowSize().y - 38.0f + yOffset; // 730
 
 					float x = it.Position.x, y = it.Position.y;
 					float offset = 15.0f * State.dpiScale;
 
-					if (x < minX) {
+					float delX = x - localPosition.x, delY = y - localPosition.y;
+					float dist = (std::sqrt)(delX * delX + delY * delY);
+					if (dist < 1e-3f) dist = 1.f; // avoid zero division
+
+					float dirX = delX / dist, dirY = delY / dist;
+
+					float maxDist = dist;
+					if (dirX > 0) maxDist = (std::min)(maxDist, (maxX - localPosition.x) / dirX);
+					if (dirX < 0) maxDist = (std::min)(maxDist, (minX - localPosition.x) / dirX);
+					if (dirY > 0) maxDist = (std::min)(maxDist, (maxY - localPosition.y) / dirY);
+					if (dirY < 0) maxDist = (std::min)(maxDist, (minY - localPosition.y) / dirY);
+
+					x = localPosition.x + dirX * maxDist;
+					y = localPosition.y + dirY * maxDist;
+
+					/*if (x < minX) {
 						x = minX;
 					}
 					else if (x > maxX) {
@@ -179,7 +199,7 @@ void Esp::Render()
 					}
 					else if (y > maxY) {
 						y = maxY;
-					}
+					}*/
 
 					position = { x, y + offset };
 					position2 = { x, y + 2 * offset };

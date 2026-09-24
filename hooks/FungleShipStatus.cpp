@@ -11,13 +11,14 @@ void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 
 	try {
 		State.BlinkPlayersTab = false;
+		State.SpamZiplineEveryone = false;
 
 		Replay::Reset();
 
 		State.MatchStart = std::chrono::system_clock::now();
 		State.MatchCurrent = State.MatchStart;
 
-		State.selectedDoor = SystemTypes__Enum::Hallway;
+		State.selectedDoors.clear();
 		State.mapDoors.clear();
 		State.pinnedDoors.clear();
 

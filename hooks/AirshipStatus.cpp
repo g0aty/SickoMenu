@@ -13,13 +13,14 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 		State.SpeedrunTimer += Time_get_deltaTime(NULL);
 	try {
 		State.BlinkPlayersTab = false;
+		State.SpamZiplineEveryone = false;
 
 		Replay::Reset();
 
 		State.MatchStart = std::chrono::system_clock::now();
 		State.MatchCurrent = State.MatchStart;
 
-		State.selectedDoor = SystemTypes__Enum::Hallway;
+		State.selectedDoors.clear();
 		State.mapDoors.clear();
 		State.pinnedDoors.clear();
 

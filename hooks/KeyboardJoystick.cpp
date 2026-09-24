@@ -35,7 +35,7 @@ void dKeyboardJoystick_Update(KeyboardJoystick* __this, MethodInfo* method) {
         return;
     }
 
-    if ((!State.FreeCam && !State.playerToAttach.has_value()) || State.PanicMode) {
+    if ((!State.FreeCam && !State.playerToAttach.has_value() && !State.ControlPet) || State.PanicMode) {
         app::KeyboardJoystick_Update(__this, method);
     }
     else

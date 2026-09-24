@@ -281,7 +281,7 @@ void ShowChatNotification(ChatNotification* chatNotification, PlayerControl* sen
 	std::string colorCode = std::format("<#{:02x}{:02x}{:02x}{:02x}>",
 		playerTextColor.r, playerTextColor.g, playerTextColor.b, playerTextColor.a);
 	std::string playerName = convert_from_string(GetPlayerOutfit(pData)->fields.PlayerName);
-	std::string colorBlindName = convert_from_string(PoolablePlayer_get_ColorBlindName(chatNotification->fields.player, NULL));
+	std::string colorBlindName = convert_from_string(CosmeticsLayer_GetColorBlindText(sender->fields.cosmetics, NULL));
 	if (State.IsProcessingSickoChat) colorBlindName += " <b><#fb0>[<#ff006c>SickoChat</color>]</color></b>";
 
 	ChatNotification_SetCosmetics(chatNotification, pData, NULL);

@@ -159,9 +159,9 @@ namespace HostTab {
             ImGui::SameLine(100 * State.dpiScale);
 
             if (openUtils)
-                ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+                ImGui::BeginChild("###HostButtons", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
             else
-                ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
+                ImGui::BeginChild("###HostButtons", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 
             ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             if (TabGroup("Utils", openUtils)) {
@@ -186,6 +186,7 @@ namespace HostTab {
                 }
             }
             GameOptions options;
+            ImGui::BeginChild("###Host", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
             if (openUtils) {
                 if (IsInLobby()) {
                     ImGui::Dummy(ImVec2(0, 2) * State.dpiScale);
@@ -372,7 +373,7 @@ namespace HostTab {
                     ImGui::EndChild();
                 }
                 if (IsInLobby()) ImGui::SameLine();
-                ImGui::BeginChild("host#actions", ImVec2(300, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
+                ImGui::BeginChild("host#actions", ImVec2(IsInGame() ? 500.f : 300.f, 0.f) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 
                 if (!State.DisableRoleManager && IsInLobby()) {
                     if (ToggleButton("Custom Impostor Amount", &State.CustomImpostorAmount))
@@ -521,10 +522,30 @@ namespace HostTab {
                     }
                 }
 
-                CustomListBoxIntColored(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
+                CustomListBoxIntColored("  ", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
 
                 if (ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
                     State.Save();
+                }
+
+                if (IsInGame() || IsInLobby()) {
+                    if (AnimatedButton("Set Color for Everyone")) {
+                        for (auto p : GetAllPlayerControl()) {
+                            if (IsInGame())
+                                State.rpcQueue.push(new RpcForceColor(p, State.HostSelectedColorId));
+                            else if (IsInLobby())
+                                State.lobbyRpcQueue.push(new RpcForceColor(p, State.HostSelectedColorId));
+                        }
+                    }
+
+                    if (AnimatedButton("Randomize Colors for Everyone")) {
+                        for (auto p : GetAllPlayerControl()) {
+                            if (IsInGame())
+                                State.rpcQueue.push(new RpcForceColor(p, GetRandomColorId()));
+                            else if (IsInLobby())
+                                State.lobbyRpcQueue.push(new RpcForceColor(p, GetRandomColorId()));
+                        }
+                    }
                 }
 
 				if (ToggleButton("Allow Players Joining with Preferred Colors", &State.AllowPreferredColor)) {
@@ -566,21 +587,47 @@ namespace HostTab {
                     State.Save();
                 }
 
-                /*if (GetAllPlayerControl().size() == 1 && IsInGame()) { \
-                    if (!State.farmLoop && AnimatedButton("Level Farm (50000 Kills)")) {
+                /*if (IsInLobby()) {
+                    static int banMinutes = 240;
+
+                    if (ImGui::Button("Give Disconnect Penalty for Everyone")) {
+                        State.lobbyRpcQueue.push(new SpamBanMinutes(banMinutes));
+                    }
+
+                    ImGui::SetNextItemWidth(150.f * State.dpiScale);
+                    if (ImGui::InputInt("Penalty Time", &banMinutes, 5, 60)) {
+                        banMinutes = std::clamp((int)(banMinutes / 5) * 5, 5, 1380);
+                    }
+                }*/
+
+                int maxPackedRpcs = 10 + GameOptions().GetInt(Int32OptionNames__Enum::MaxPlayers) * 2;
+
+                if (GetAllPlayerControl().size() == 1 && IsInGame()) { \
+                    if (!State.farmLoop && AnimatedButton(std::format("Level Farm ({} Kills)", 5000 * maxPackedRpcs).c_str())) {
                         State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::ImpostorGhost));
                         State.farmCount = 5000; //controls how many times the player is to be murdered
                         State.farmLoop = true;
                     }
-                    if (State.farmLoop && AnimatedButton("Stop Level Farm (End Game by Impostor Kill Win)")) {
+                    if (State.farmLoop && AnimatedButton("Stop Level Farm")) {
                         State.farmLoop = false;
                         State.farmCount = 0;
-                        State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
+                        /*State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
                         State.rpcQueue.push(new SetRole(RoleTypes__Enum::Impostor));
-                        State.rpcQueue.push(new RpcEndGame(GameOverReason__Enum::ImpostorsByKill));
+                        State.rpcQueue.push(new RpcEndGame(GameOverReason__Enum::ImpostorsByKill));*/
                     }
-                    if (State.farmLoop) ImGui::Text(std::format("({} Kills)", 50000 - 10 * State.farmCount).c_str());
-                }*/
+                    if (State.farmLoop) ImGui::Text("(%d Kills)", (5000 - State.farmCount) * maxPackedRpcs);
+                    else {
+                        ImGui::SameLine();
+                        if (AnimatedButton("Set Impostor Role")) {
+                            State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::Impostor));
+                            State.rpcQueue.push(new SetRole(RoleTypes__Enum::Impostor));
+                        }
+                        ImGui::SameLine();
+                        if (AnimatedButton("End Game (Impostor Win)")) {
+                            State.rpcQueue.push(new RpcEndGame(GameOverReason__Enum::ImpostorsByKill));
+                        }
+                    }
+                }
 
                 ImGui::EndChild();
             }
@@ -602,7 +649,7 @@ namespace HostTab {
                     if (!State.HostPresets.empty()) {
                         std::vector<const char*> presetNames;
                         for (auto& p : State.HostPresets) presetNames.push_back(p.Name.c_str());
-                        CustomListBoxInt("##presetselect", &State.SelectedHostPreset, presetNames, 200.0f * State.dpiScale, ImVec4(0, 0, 0, 0), 0, "Preset");
+                        CustomListBoxInt("##presetselect", &State.SelectedHostPreset, presetNames, 200.0f * State.dpiScale, ImVec4(0, 0, 0, 0), 0);
                         ImGui::SameLine();
                         if (AnimatedButton("Apply")) {
                             int idx = std::clamp(State.SelectedHostPreset, 0, (int)State.HostPresets.size() - 1);
@@ -987,7 +1034,7 @@ namespace HostTab {
                         for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) roleVector[i] = State.Mod_RoleNames[i].c_str();
                         ImGui::Text("Select Role:");
                         ImGui::SameLine();
-                        CustomListBoxInt("SelectedRole", &selectedRole, roleVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
+                        CustomListBoxInt(" ", &selectedRole, roleVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None);
                         if (selectedRole != 0) {
                             ImGui::SameLine();
                             ImGui::SetNextItemWidth(60.0f * State.dpiScale);
@@ -1069,7 +1116,7 @@ namespace HostTab {
                                 selectedMemberIndex = std::clamp(selectedMemberIndex, 0, (int)members.size() - 1);
                                 std::vector<const char*> memberVector(members.size(), nullptr);
                                 for (size_t i = 0; i < members.size(); i++) memberVector[i] = members[i].c_str();
-                                CustomListBoxInt("##RemoveRoleMember", &selectedMemberIndex, memberVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None, " ");
+                                CustomListBoxInt("  ", &selectedMemberIndex, memberVector, 150.0f * State.dpiScale, ImVec4(0, 0, 0, 0), ImGuiComboFlags_None);
                                 ImGui::SameLine();
                                 if (AnimatedButton("Remove##RoleMember")) {
                                     members.erase(members.begin() + selectedMemberIndex);
@@ -1080,6 +1127,7 @@ namespace HostTab {
                     }
                 }
             }
+            ImGui::EndChild();
             ImGui::EndChild();
         }
     }

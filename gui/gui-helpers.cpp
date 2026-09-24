@@ -895,7 +895,7 @@ bool AnimatedButton(const char* label, bool isAffectedBySearch, const ImVec2& si
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	if (window->SkipItems)
 		return false;
-
+	
 	ImGuiID id = ImGui::GetID(label);
 	ImVec2 pos = ImGui::GetCursorScreenPos();
 	const char* label_end = ImGui::FindRenderedTextEnd(label);
