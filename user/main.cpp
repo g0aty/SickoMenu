@@ -34,28 +34,6 @@ std::string GetCRC32(std::filesystem::path filePath) {
     return crc32.getHash();
 }
 
-bool GameVersionCheck() {
-    auto modulePath = getModulePath(NULL);
-    auto gameAssembly = modulePath.parent_path() / "GameAssembly.dll";
-    auto steamApi = modulePath.parent_path() / "Among Us_Data" / "Plugins" / "x86" / "steam_api.dll";
-
-    /*if (!IsWindows10OrGreater()) {
-        Log.Error("Version of windows not supported exiting!");
-        MessageBox(NULL, L"This version of Windows is not supported!", L"SickoMenu", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
-        return false;
-    }*/
-
-    if (!std::filesystem::exists(gameAssembly)) {
-        Log.Error("GameAssembly.dll was not found");
-        MessageBox(NULL, L"Unable to locate GameAssembly.dll", L"SickoMenu", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
-        return false;
-    }
-
-    std::string gameAssemblyCRC = GetCRC32(gameAssembly); //We won't use this, but it will log it
-
-    return true;
-}
-
 #define ToString(s) stringify(s)
 #define stringify(s) #s
 
@@ -83,12 +61,6 @@ void Run(LPVOID lpParam) {
 #endif
     hModule = (HMODULE)lpParam;
     Log.Create();
-    if (!GameVersionCheck()) {
-        fclose(stdout);
-        FreeConsole();
-        FreeLibraryAndExitThread((HMODULE)lpParam, 0);
-        return;
-    }
     State.lol = getModulePath(hModule).filename().string();
     init_il2cpp();
     State.dpiChanged = true;
@@ -133,7 +105,6 @@ void Run(LPVOID lpParam) {
     LOG_DEBUG(std::format("Game::RoleManager is {}", static_cast<void*>(Game::RoleManager.GetInstance())));
     State.userName = GetPlayerName();
 
-    Game::scanGameFunctions();
     DetourInitilization();
     State.PanicMode = true;
     State.TempPanicMode = true;

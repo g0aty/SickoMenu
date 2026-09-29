@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Natvis Include="NatvisFile.natvis" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="framework\dllmain.cpp">
       <Filter>framework</Filter>
     </ClCompile>
@@ -184,6 +181,9 @@
     <ClCompile Include="gui\theme.cpp">
       <Filter>gui</Filter>
     </ClCompile>
+    <ClCompile Include="gui\toasts.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
     <ClCompile Include="user\keybinds.cpp">
       <Filter>user</Filter>
     </ClCompile>
@@ -247,7 +247,16 @@
     <ClCompile Include="events\KillEvent.cpp">
       <Filter>events</Filter>
     </ClCompile>
+    <ClCompile Include="events\ModerationEvent.cpp">
+      <Filter>events</Filter>
+    </ClCompile>
+    <ClCompile Include="events\PhantomEvent.cpp">
+      <Filter>events</Filter>
+    </ClCompile>
     <ClCompile Include="events\ReportDeadBodyEvent.cpp">
+      <Filter>events</Filter>
+    </ClCompile>
+    <ClCompile Include="events\SabotageEvent.cpp">
       <Filter>events</Filter>
     </ClCompile>
     <ClCompile Include="events\TaskCompletedEvent.cpp">
@@ -313,9 +322,6 @@
     <ClCompile Include="rpc\CmdCheckMurder.cpp">
       <Filter>rpc</Filter>
     </ClCompile>
-    <ClCompile Include="appdata\il2cpp-functions.cpp">
-      <Filter>appdata</Filter>
-    </ClCompile>
     <ClCompile Include="hooks\PlayerBanData.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
@@ -358,6 +364,9 @@
       <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="gui\theme.hpp">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\toasts.hpp">
       <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="gui\tabs\settings_tab.h">

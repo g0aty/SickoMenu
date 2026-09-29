@@ -92,6 +92,11 @@ public:
     float AnimationSpeed = 1.f;
     float RoundingRadiusMultiplier = 1.f;
 
+    bool ToastsOnTop = false;
+    int ToastPositionX = 0; // for alignment; 0: left, 1: middle, 2: right
+    int MaxToasts = 6;
+    float ToastMaxDuration = 5.f;
+
     bool AdjustByDPI = true;
     float dpiScale = 1.f;
     bool dpiChanged = false;
@@ -124,6 +129,7 @@ public:
     bool PauseVentBlockingWhileVenting = false;
     bool SpamReport = false;
     bool CrashSpamReport = false;
+    bool RandomSpawns = false;
     bool Overflow = false;
     bool DisableMeetings = false;
     bool DisableSabotages = false;
@@ -397,7 +403,12 @@ public:
     bool HoveringOverAnyWindowButRadar = false;
 
     bool ShowEsp = false;
-    bool ShowEsp_Ghosts = true;
+    bool ShowEsp_Players = true;
+    bool ShowEsp_Ghosts = false;
+    bool ShowEsp_DeadBodies = false;
+    bool ShowEsp_LineTextShadows = false;
+    float ShowEsp_LineThickness = 3.f;
+    float ShowEsp_TextSize = 1.5f;
     bool ShowEsp_Box = true;
     bool ShowEsp_Tracers = true;
     bool ShowEsp_Distance = true;
@@ -483,6 +494,7 @@ public:
 
     bool ShowConsole = false;
     bool ShowReplay = false;
+    bool ShowConsoleEventsAsToasts = false;
     bool Replay_ShowOnlyLastSeconds = false;
     int Replay_LastSecondsValue = 1;
     bool Replay_ClearAfterMeeting = false;
@@ -508,6 +520,7 @@ public:
     //std::vector<Game::PlayerId> sickoUsers;
     std::vector<Game::PlayerId> vanishedPlayers;
     std::vector<Game::PlayerId> validDeadBodyIds;
+    std::vector<Game::PlayerId> checkedPlayerIds;
     std::map<Game::PlayerId, int> ventTpSeqIds;
     std::map<Game::PlayerId, std::vector<std::string>> modUsers;
     int32_t rpcCooldown = 15;
@@ -798,6 +811,7 @@ public:
     bool SMAC_CheckBadWords = true;
     std::vector<std::pair<std::string, bool>> SMAC_BadWords = {}; 
     bool SMAC_CheckFriendcode = true;
+    bool SMAC_CheckPlatformSpoof = true;
     bool SMAC_CheckStartWords = false;
     int SMAC_StartWordsThreshold = 1;
     std::vector<std::pair<std::string, bool>> SMAC_StartWords = {}; 

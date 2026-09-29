@@ -10,6 +10,10 @@ TaskCompletedEvent::TaskCompletedEvent(const EVENT_PLAYER& source, const std::op
 
 void TaskCompletedEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
+	if (IsColorBlindMode()) {
+		ImGui::SameLine();
+		ImGui::Text(("(" + GetColorName(source.colorId) + ")").c_str());
+	}
 	ImGui::SameLine();
 	ImGui::Text("> %s (%s)", (taskType.has_value()) ? TranslateTaskTypes(*taskType) : "UNKNOWN" , TranslateSystemTypes(systemType));
 	ImGui::SameLine();

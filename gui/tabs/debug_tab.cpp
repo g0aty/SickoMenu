@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include "gui-helpers.hpp"
+#include "toasts.hpp"
 
 namespace DebugTab {
 
@@ -44,6 +45,17 @@ namespace DebugTab {
 
 		if (ToggleButton("Log Unity Debug Messages", &State.ShowUnityLogs)) State.Save();
 		if (ToggleButton("Log Hook Debug Messages", &State.ShowHookLogs)) State.Save();
+
+		static int toastCount = 0;
+		if (AnimatedButton("Show Example Toast")) {
+			Toasts::AddToast("SickoMenu", std::format("Hello from a toast! ({})", toastCount).c_str());
+			toastCount++;
+		}
+		ImGui::SameLine();
+		if (AnimatedButton("Show Example Toast (Long Message)")) {
+			Toasts::AddToast("SickoMenu", std::format("Software is made to be used. It very often comes with some form of user interface. You, as a user, are meant to explore this user interface to familiarize yourself with the software you've installed on your computer... hint: it will likely be a menu named 'exclusions' or 'whitelist'... ({})", toastCount).c_str());
+			toastCount++;
+		}
 
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 

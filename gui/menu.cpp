@@ -55,8 +55,9 @@ namespace Menu {
 			{"Spoof Platform", "Spoofing"}, {"Spoof PSN Platform ID", "Spoofing"},
 			{"Spoof Platform Name", "Spoofing"}, {"Custom Server Settings", "Spoofing"}, {"Force DTLS", "Spoofing"},
 			{"Spoof Xbox Platform ID", "Spoofing"}, {"Reduce Anticheat While Hosting (+25 Mode)", "Spoofing"},
-			{"Hide Watermark", "Customization"}, {"Hide Mod Stamp", "Customization"}, {"Menu Theme Color", "Customization"},
-			{"Gradient Theme", "Customization"}, {"Gradient Theme", "Customization"}, {"Match Background with Theme", "Customization"},
+			{"Hide Watermark", "Customization"}, {"Hide Mod Stamp", "Customization"},
+			{"Menu Theme Color", "Customization"}, {"Gradient Theme", "Customization"},
+			{"Gradient Theme", "Customization"}, {"Match Background with Theme", "Customization"},
 			{"RGB Menu Theme", "Customization"}, {"Reset Menu Theme", "Customization"},
 			{"Opacity", "Customization"}, {"Dark Game Theme", "Customization"},
 			{"Custom Game Theme", "Customization"}, {"Change Chat Font", "Customization"},
@@ -64,6 +65,7 @@ namespace Menu {
 			{"Light Mode", "Customization"}, {"Show UI Borders", "Customization"},
 			{"Menu Scale", "Customization"}, {"Disable Animations", "Customization"},
 			{"Animation Speed", "Customization"}, {"Rounding Radius Multiplier", "Customization"},
+			{"Toast Notification Alignment", "Customization"}, {"Max Toasts to Show at Once", "Customization"},
 			{"Role Colors", "Customization"}, {"Other Colors", "Customization"},
 			{"Show/Hide Menu", "Keybinds"}, {"Show/Hide Console", "Keybinds"},
 			{"Show/Hide Radar", "Keybinds"}, {"Show/Hide Replay", "Keybinds"},
@@ -90,7 +92,8 @@ namespace Menu {
 			{"Kill All Impostors", "General"}, {"Kick Everyone From Vents", "General"},
 			{"End Meeting", "General"},
 			{"Chat Message", "Chat"}, {"Send", "Chat"}, {"Send SickoChat", "Chat"}, {"Spam", "Chat"},
-			{"Chat Presets", "Chat"}, {"Ignore Whitelisted Players [Ban/Kick]", "Utils"}, {"Attempt to Crash", "Utils"},
+			{"Chat Presets", "Chat"}, {"Ignore Whitelisted Players [Ban/Kick]", "Utils"},
+			{"Attempt to Crash Lobby", "Utils"}, {"Make Players Spawn at Random Vents", "Utils"},
 			{"Enable Anticheat (SMAC)", "Anticheat"},
 			{"Whitelist", "Anticheat"}, {"Blacklist", "Anticheat"},
 			{"Remove Lobby", "Utils"}, {"Remove Map", "Utils"},
@@ -105,7 +108,7 @@ namespace Menu {
 		}},
 		{"Self", {
 			{"Max Vision", "Visuals"}, {"Wallhack", "Visuals"}, {"Disable HUD", "Visuals"}, {"Freecam", "Visuals"},
-			{"Zoom", "Visuals"}, 
+			{"Zoom", "Visuals"},
 			{"Scroll to Zoom / Shift + Scroll to Change Freecam Speed", "Visuals"}, {"Smooth Zoom", "Visuals"}, {"Show Shadows While Zoomed", "Visuals"},
 			{"Always show Chat Button", "Visuals"}, {"Allow Ctrl+(C/V) in Chat", "Visuals"},
 			{"Read Messages by Ghosts", "Visuals"}, {"Read and Send SickoChat", "Visuals"},
@@ -157,8 +160,13 @@ namespace Menu {
 			{"Draw Player Icons", ""}, {"Replay Map Color", ""}
 		}},
 		{"ESP", {
-			{"Show ESP", ""}, {"Show Ghosts", ""}, {"Hide During Meetings", ""}, {"Show Boxes", ""},
-			{"Show Tracers", ""}, {"Show Distances", ""}, {"Role-based", ""}
+			{"Show ESP", ""}, {"Show Players", ""},
+			{"Show Ghosts", ""}, {"Show Dead Bodies", ""},
+			{"Show Tracer & Text Shadows", ""}, {"Tracer Thickness", ""}, {"Text Size", ""},
+			{"Hide During Meetings", ""}, {"Show Boxes", ""},
+			{"Show Tracers", ""}, {"Show Distances", ""},
+			{"Use Role Colors Instead of Player Colors", ""},
+			{"Show Crewmates", ""}, {"Show Impostors", ""},
 		}},
 		{"Players", {
 			{"Call Meeting", "Player"}, {"Skip Vote by All", "Player"},
@@ -225,6 +233,7 @@ namespace Menu {
 		{"Debug", {
 			{"Enable Occlusion Culling", ""}, {"Force Load Settings", ""}, {"Force Save Settings", ""}, {"Clear RPC Queues", ""},
 			{"Log Unity Debug Messages", ""}, {"Log Hook Debug Messages", ""},
+			{"Show Example Toast", ""}, {"Show Example Toast (Long Message)", ""},
 			{"Replay", ""}, {"Colors", ""}, {"Profiler", ""},
 			{"Experiments", ""}, {"Enable Anticheat (SMAC)", ""}, {"Point System (Only for Hosting)", ""}
 		}},
@@ -331,6 +340,9 @@ namespace Menu {
 
 		for (const auto& category : categories) {
 			for (const auto& entry : category.second) {
+#ifdef _DEBUG
+				if (category.first == "Debug" && !State.showDebugTab) continue;
+#endif
 				if (ToLower(entry.Name).find(lowerQuery) != std::string::npos) {
 					searchResults.push_back({ category.first, entry.SubGroup });
 					break;
@@ -374,7 +386,7 @@ namespace Menu {
 				else ImGui::TextColored(DiddyCol, IsChatCensored() || IsStreamerMode() ? " [F***son Mode]" : " [Fuckson Mode]");
 			}*/
 			ImGui::SameLine(ImGui::GetWindowWidth() - 19 * State.dpiScale);
-			if (AnimatedButton("-", false)) State.ShowMenu = false; //minimize button
+			if (ImGui::Button("-", false)) State.ShowMenu = false; //minimize button
 			//ImGui::BeginTabBar("AmongUs#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 			// Search field
@@ -501,7 +513,7 @@ namespace Menu {
 			if (openEsp) EspTab::Render();
 			if (openPlayers) {
 				if (IsInGame() || IsInLobby()) PlayersTab::Render();
-				else if (!State.VotekickRejoinPending && State.PendingRejoinTargetFC.empty()) {
+				else {
 					CloseAllOtherTabs(Tabs::Game);
 					GameTab::Render();
 				}

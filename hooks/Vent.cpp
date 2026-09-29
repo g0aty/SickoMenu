@@ -1,6 +1,8 @@
 #include "pch-il2cpp.h"
 #include "_hooks.h"
 #include "state.hpp"
+#include "toasts.hpp"
+#include "console.hpp"
 #include "logger.h"
 #include <memory>
 
@@ -39,11 +41,23 @@ void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo * method) {
 		auto ventVector = app::Transform_get_position(app::Component_get_transform((Component_1*)__this, NULL), NULL);
 		app::Vector2 ventVector2D = { ventVector.x, ventVector.y };
 		synchronized(Replay::replayEventMutex) {
-			State.liveReplayEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_ENTER));
-			State.liveConsoleEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_ENTER));
+			auto source = GetEventPlayerControl(pc).value();
+			State.liveReplayEvents.emplace_back(std::make_unique<VentEvent>(source, ventVector2D, VENT_ACTIONS::VENT_ENTER));
+			State.liveConsoleEvents.emplace_back(std::make_unique<VentEvent>(source, ventVector2D, VENT_ACTIONS::VENT_ENTER));
+
+			if (State.ShowConsoleEventsAsToasts &&
+				ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_VENT) &&
+				ConsoleGui::IsPlayerFiltered(pc->fields.PlayerId)) {
+				std::string toastContent = std::format("{} ({}) entered a vent in {}!",
+					source.playerName, GetColorName(source.colorId),
+					TranslateSystemTypes(GetSystemTypes(ventVector2D)));
+				Toasts::AddToast("Player Vented", toastContent, ImVec4(0.f, 1.f, 0.f, 1.f));
+			}
 		}
-		if (State.confuser && State.confuseOnVent && pc == *Game::pLocalPlayer)
+		if (State.confuser && State.confuseOnVent && pc == *Game::pLocalPlayer) {
 			ControlAppearance(true);
+			Toasts::AddToast("Confuser", "Randomized your outfit as you entered a vent!", ImVec4(0.f, 1.f, 1.f, 1.f));
+		}
 	}
 	Vent_EnterVent(__this, pc, method);
 }
@@ -54,8 +68,18 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 		auto ventVector = app::Transform_get_position(app::Component_get_transform((Component_1*)__this, NULL), NULL);
 		app::Vector2 ventVector2D = { ventVector.x, ventVector.y };
 		synchronized(Replay::replayEventMutex) {
-			State.liveReplayEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_EXIT));
-			State.liveConsoleEvents.emplace_back(std::make_unique<VentEvent>(GetEventPlayerControl(pc).value(), ventVector2D, VENT_ACTIONS::VENT_EXIT));
+			auto source = GetEventPlayerControl(pc).value();
+			State.liveReplayEvents.emplace_back(std::make_unique<VentEvent>(source, ventVector2D, VENT_ACTIONS::VENT_EXIT));
+			State.liveConsoleEvents.emplace_back(std::make_unique<VentEvent>(source, ventVector2D, VENT_ACTIONS::VENT_EXIT));
+
+			if (State.ShowConsoleEventsAsToasts &&
+				ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_VENT) &&
+				ConsoleGui::IsPlayerFiltered(pc->fields.PlayerId)) {
+				std::string toastContent = std::format("{} ({}) exited a vent in {}!",
+					source.playerName, GetColorName(source.colorId),
+					TranslateSystemTypes(GetSystemTypes(ventVector2D)));
+				Toasts::AddToast("Player Exited Vent", toastContent, ImVec4(1.f, 0.f, 0.f, 1.f));
+			}
 		}
 	}
 
@@ -97,21 +121,10 @@ void dVentilationSystem_UpdateSystem(VentilationSystem* __this, PlayerControl* p
 		msgReader->fields.readHead = head;
 
 		if (!State.PanicMode && State.AntiExploit_AttemptToBan && ventOp == VentilationSystem_Operation__Enum::BootImpostors) {
-			auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
-			if (notifier) {
-				auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
-				Color colorBackup = notifier->fields.disconnectColor;
-
-				notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
-				notifier->fields.disconnectColor = Color(1.f, 0.f, 0.f, 1.f);
-
-				std::string killNotif = std::format("<#f00>{} attempted to ban you, but failed!</color>",
-					convert_from_string(GetPlayerOutfit(GetPlayerData(player))->fields.PlayerName));
-				NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(killNotif), nullptr);
-
-				notifier->fields.playerDisconnectSprite = spriteBackup;
-				notifier->fields.disconnectColor = colorBackup;
-			}
+			std::string killNotif = std::format("{} attempted to ban you, but failed!",
+				convert_from_string(GetPlayerOutfit(GetPlayerData(player))->fields.PlayerName));
+			
+			Toasts::AddToast("Anti-Exploit", killNotif, ImVec4(1.f, 0.f, 0.f, 1.f));
 		}
 		if (!State.PanicMode && State.AntiExploit_UnauthorizedSabotages) return;
 	}

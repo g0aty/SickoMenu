@@ -35,13 +35,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="appdata\il2cpp-functions.cpp" />
     <ClCompile Include="events\CastVoteEvent.cpp" />
     <ClCompile Include="events\CheatDetectedEvent.cpp" />
     <ClCompile Include="events\DisconnectEvent.cpp" />
     <ClCompile Include="events\KillEvent.cpp" />
     <ClCompile Include="events\ProtectPlayerEvent.cpp" />
+    <ClCompile Include="events\PhantomEvent.cpp" />
     <ClCompile Include="events\ReportDeadBodyEvent.cpp" />
+    <ClCompile Include="events\SabotageEvent.cpp" />
     <ClCompile Include="events\ShapeShiftEvent.cpp" />
     <ClCompile Include="events\TaskCompletedEvent.cpp" />
     <ClCompile Include="events\VentEvent.cpp" />
@@ -278,6 +279,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Version|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="gui\theme.cpp" />
+    <ClCompile Include="gui\toasts.cpp" />
     <ClCompile Include="rpc\RpcCompleteTask.cpp" />
     <ClCompile Include="rpc\RpcCloseDoorsOfType.cpp" />
     <ClCompile Include="framework\dllmain.cpp">
@@ -576,6 +578,7 @@
     <ClInclude Include="gui\menu.hpp" />
     <ClInclude Include="gui\radar.hpp" />
     <ClInclude Include="gui\theme.hpp" />
+    <ClInclude Include="gui\toasts.hpp" />
     <ClInclude Include="includes\stb_image.h" />
     <ClInclude Include="includes\imgui\imconfig.h" />
     <ClInclude Include="includes\imgui\imgui.h" />
@@ -589,9 +592,6 @@
     <ClInclude Include="user\game.h" />
     <ClInclude Include="user\main.h" />
     <ClInclude Include="framework\version.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="NatvisFile.natvis" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\airship.png" />

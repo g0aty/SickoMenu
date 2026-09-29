@@ -8,10 +8,18 @@ ProtectPlayerEvent::ProtectPlayerEvent(const EVENT_PLAYER& source, const EVENT_P
 
 void ProtectPlayerEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
+	if (IsColorBlindMode()) {
+		ImGui::SameLine();
+		ImGui::Text(("(" + GetColorName(source.colorId) + ")").c_str());
+	}
 	ImGui::SameLine();
 	ImGui::Text(">");
 	ImGui::SameLine();
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(target.colorId)), target.playerName.c_str());
+	if (IsColorBlindMode()) {
+		ImGui::SameLine();
+		ImGui::Text(("(" + GetColorName(target.colorId) + ")").c_str());
+	}
 	ImGui::SameLine();
 	ImGui::Text("[%s ago]", std::format("{:%OM:%OS}", (std::chrono::system_clock::now() - this->timestamp)).c_str());
 }

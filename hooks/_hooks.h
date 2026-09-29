@@ -119,7 +119,6 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method);
 int32_t dConstants_1_GetBroadcastVersion(MethodInfo* method);
 bool dConstants_1_IsVersionModded(MethodInfo* method);
-void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method);
 bool dLogicGameFlowNormal_IsGameOverDueToDeath(LogicGameFlowNormal* __this, MethodInfo* method);
 bool dLogicGameFlowHnS_IsGameOverDueToDeath(LogicGameFlowHnS* __this, MethodInfo* method);
 void* dPlayerControl_CoSetRole(PlayerControl* __this, RoleTypes__Enum role, bool canOverride, MethodInfo* method);

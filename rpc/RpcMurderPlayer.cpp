@@ -636,7 +636,6 @@ void RpcBootFromVentNonHost::Process()
 {
     if (!PlayerSelection(Player).has_value()) return;
 
-    if (Player == *Game::pLocalPlayer) State.AntiExploit_IsTeleportingSelf = true;
     SendBootVentNonHost(Player, ventId);
 }
 

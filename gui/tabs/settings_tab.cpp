@@ -589,7 +589,7 @@ namespace SettingsTab {
 			}
 			if (State.ChatFont) {
 				ImGui::SameLine();
-				if (CustomListBoxInt(" ", &State.ChatFontType, FONTS, 160.f * State.dpiScale)) {
+				if (CustomListBoxInt("", &State.ChatFontType, FONTS, 160.f * State.dpiScale)) {
 					State.Save();
 				}
 			}
@@ -668,6 +668,25 @@ namespace SettingsTab {
 					if (State.AnimationSpeed <= 0) State.AnimationSpeed = 1.f;
 				}
 				SteppedSliderFloat("Rounding Radius Multiplier", &State.RoundingRadiusMultiplier, 0.f, 2.f, 0.01f, "%.2f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+
+				ImGui::Text("Toast Notification Alignment:");
+				ImGui::SameLine();
+				static int toastsOnTopSelector = (int)State.ToastsOnTop;
+				if (CustomListBoxInt(" ", &toastsOnTopSelector, { "Bottom", "Top" }, 50.f * State.dpiScale)) {
+					State.ToastsOnTop = (bool)toastsOnTopSelector;
+					State.Save();
+				}
+				ImGui::SameLine();
+				if (CustomListBoxInt("  ", &toastsOnTopSelector, { "Left", "Center", "Right" }, 50.f * State.dpiScale)) {
+					State.Save();
+				}
+
+				ImGui::SetNextItemWidth(60.f * State.dpiScale);
+				if (ImGui::InputInt("Max Toasts to Show at Once", &State.MaxToasts)) {
+					State.MaxToasts = std::clamp(State.MaxToasts, 1, 6);
+				}
+
+				SteppedSliderFloat("Time to Show Toasts For", &State.ToastMaxDuration, 0.5f, 10.0f, 0.5f, "%.1f s", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
 			}
 
 			if (ImGui::CollapsingHeader("Role Colors")) {

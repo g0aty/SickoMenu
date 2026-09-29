@@ -2,6 +2,7 @@
 #include "_rpc.h"
 #include "game.h"
 #include "state.hpp"
+#include "toasts.hpp"
 #include "logger.h"
 #include "utility.h"
 
@@ -40,19 +41,9 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 					State.Rpc101OverloadTimestamps[playerId] = now;
 
 					std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(player))->fields.PlayerName));
-					std::string actionMessage = std::format("<b>Player <#FFF>\"{}\"</color> has exceeded the rate-limit of SickoChat!</b>", name);
+					std::string actionMessage = std::format("{} has exceeded the rate-limit of SickoChat!", name);
 
-					auto notifier = (NotificationPopper*)(Game::HudManager.GetInstance()->fields.Notifier);
-					if (notifier != NULL) {
-						auto disconnectSprite = new Sprite(*notifier->fields.playerDisconnectSprite);
-						notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
-						notifier->fields.playerDisconnectSound;
-						auto color = notifier->fields.disconnectColor;
-						notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
-						NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(actionMessage), NULL);
-						notifier->fields.playerDisconnectSprite = disconnectSprite;
-						notifier->fields.disconnectColor = color;
-					}
+					Toasts::AddToast("SickoChat Rate-Limit", actionMessage, ImVec4(1.f, 0.f, 0.f, 1.f));
 				}
 			}
 			return;
@@ -163,6 +154,8 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 			State.modUsers.insert({ playerId, { "<#7c0>SlopMenuCrew</color>", aiSlopVersion } });
 			STREAM_DEBUG("RPC Received for a SlopMenuCrew user from " << ToString((Game::PlayerId)playerId) << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 			if (State.SMAC_CheckOtherCheats) SMAC_OnCheatDetected(player, "SlopMenuCrew User");
+			else if (IsHost()) InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), player->fields._.OwnerId, true, NULL);
+			// :trolley_irl:
 		}
 	}
 	break;

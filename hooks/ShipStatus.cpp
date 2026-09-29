@@ -1,6 +1,8 @@
 #include "pch-il2cpp.h"
 #include "_hooks.h"
 #include "state.hpp"
+#include "toasts.hpp"
+#include "console.hpp"
 #include "logger.h"
 #include "utility.h"
 #include "replay.hpp"
@@ -56,9 +58,6 @@ void dShipStatus_OnEnable(ShipStatus* __this, MethodInfo* method) {
         }
 
         std::sort(State.mapDoors.begin(), State.mapDoors.end());
-
-        if (!State.PanicMode && State.confuser && State.confuseOnStart)
-            ControlAppearance(true);
 
         if (State.AutoFakeRole) {
             if (!State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
@@ -142,8 +141,8 @@ void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* re
         systemType == SystemTypes__Enum::Decontamination3 ||
         (callId == 35 && systemType == SystemTypes__Enum::MedBay))
         return ShipStatus_HandleRpc(__this, callId, reader, method);
-    if (!State.PanicMode && State.DisableSabotages) return;
-    if (!State.PanicMode && callId == 27 &&
+    if (!State.PanicMode && State.DisableSabotages && IsHost()) return;
+    if (!State.PanicMode && callId == (uint8_t)RpcCalls__Enum::CloseDoorsOfType &&
         State.DisabledSabotageTypes.count((int)SystemTypes__Enum::Doors))
         return;
     if (!State.PanicMode && State.DisabledSabotageTypes.count((int)systemType))
@@ -158,44 +157,44 @@ bool DetectCheatSabotageResult(PlayerControl* player, bool result) {
 }
 
 bool DetectCheatSabotage(SystemTypes__Enum systemType, PlayerControl* player, uint8_t amount) {
-    /*uint8_t mapId = (uint8_t)State.mapType;
+    Settings::MapType mapId = State.mapType;
     if (systemType == SystemTypes__Enum::Sabotage && PlayerIsImpostor(GetPlayerData(player)))
         return false;
     else if (systemType == SystemTypes__Enum::LifeSupp &&
-        (mapId == 0 || mapId == 1) && (amount == 64 || amount == 65))
+        (mapId == Settings::MapType::Ship || mapId == Settings::MapType::Hq) && (amount == 64 || amount == 65))
         return false;
     // Only Skeld and Mira have oxygen sabotage
     else if (systemType == SystemTypes__Enum::Comms) {
-        if (amount == 0 && mapId != 1 && mapId != 4) return false;
+        if (amount == 0 && mapId != Settings::MapType::Hq && mapId != Settings::MapType::Fungle) return false;
         if ((amount == 64 || amount == 65 || amount == 32 || amount == 33 || amount == 16 || amount == 17)
-            && (mapId == 1 || mapId == 5)) return false;
+            && (mapId == Settings::MapType::Hq || mapId == Settings::MapType::Fungle)) return false;
     }
     else if (systemType == SystemTypes__Enum::Electrical) {
-        if (mapId != 4 && amount < 5) return false;
+        if (mapId != Settings::MapType::Fungle && amount < 5) return false;
         else if (amount >= 5 && !(State.DisableSabotages && IsHost())) {
             return DetectCheatSabotageResult(player, false);
         }
     }
     else if (systemType == SystemTypes__Enum::Laboratory &&
-        mapId == 2 && (amount == 64 || amount == 65 || amount == 32 || amount == 33))
+        mapId == Settings::MapType::Pb && (amount == 64 || amount == 65 || amount == 32 || amount == 33))
         return false;
     else if (systemType == SystemTypes__Enum::Reactor &&
-        mapId != 2 && mapId != 3 && (amount == 64 || amount == 65 || amount == 32 || amount == 33))
+        mapId != Settings::MapType::Pb && mapId != Settings::MapType::Airship && (amount == 64 || amount == 65 || amount == 32 || amount == 33))
         return false;
     else if (systemType == SystemTypes__Enum::HeliSabotage &&
-        mapId == 3 && (amount == 64 || amount == 65 || amount == 16 || amount == 17 || amount == 32 || amount == 33))
+        mapId == Settings::MapType::Airship && (amount == 64 || amount == 65 || amount == 16 || amount == 17 || amount == 32 || amount == 33))
         return false;
     else if (systemType == SystemTypes__Enum::MushroomMixupSabotage) {
-        if (mapId == 4 && !(State.DisableSabotages && IsHost())) {
+        if (mapId == Settings::MapType::Fungle && !(State.DisableSabotages && IsHost())) {
             return DetectCheatSabotageResult(player, false);
         }
     }
-    else if (State.InMeeting && MeetingHud__TypeInfo->static_fields->Instance->fields.state != MeetingHud_VoteStates__Enum::Animating) {
+    else if (State.InMeeting) {
         if (!(State.DisableSabotages && IsHost())) {
             return DetectCheatSabotageResult(player, false);
         }
     }
-    return DetectCheatSabotageResult(player, true);*/
+    return DetectCheatSabotageResult(player, true);
     return false;
 }
 
@@ -209,7 +208,7 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
         systemType == SystemTypes__Enum::Decontamination3 ||
         systemType == SystemTypes__Enum::MedBay)
         return ShipStatus_UpdateSystem(__this, systemType, player, amount, method);
-    if (!State.PanicMode && State.DisableSabotages) return;
+    if (!State.PanicMode && State.DisableSabotages && IsHost()) return;
 
     if (!State.PanicMode && IsHost() && IsSabotageTriggerAmount(systemType, amount)) {
         if (State.DisabledSabotageTypes.count((int)systemType)) {
@@ -226,7 +225,19 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
             bool isSabotage = amount >= 128;
             SABOTAGE_ACTIONS action = isSabotage ? SABOTAGE_ACTIONS::SABOTAGE_CALL : SABOTAGE_ACTIONS::SABOTAGE_FIX;
             synchronized(Replay::replayEventMutex) {
-                State.liveConsoleEvents.emplace_back(std::make_unique<SabotageEvent>(evtPlayer.value(), systemType, action));
+                auto source = evtPlayer.value();
+                State.liveConsoleEvents.emplace_back(std::make_unique<SabotageEvent>(source, systemType, action));
+
+                if (State.ShowConsoleEventsAsToasts &&
+                    ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_SABOTAGE) &&
+                    ConsoleGui::IsPlayerFiltered(player->fields.PlayerId)) {
+                    std::string toastContent = std::format("{} ({}) {} {}!",
+                        source.playerName, GetColorName(source.colorId),
+                        isSabotage ? "sabotaged" : "repaired",
+                        TranslateSystemTypes(systemType));
+                    Toasts::AddToast(isSabotage ? "Player Sabotaged" : "Player Fixed Sabotage", toastContent,
+                        isSabotage ? ImVec4(1.f, 0.f, 0.f, 1.f) : ImVec4(0.f, 1.f, 0.f, 1.f));
+                }
             }
         }
     }

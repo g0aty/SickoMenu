@@ -19,7 +19,7 @@ using namespace app;
 	ADD_EVENT (DISCONNECT, "Disconnect"), \
 	ADD_EVENT (SHAPESHIFT, "Shapeshift"), \
 	ADD_EVENT (PROTECTPLAYER, "Protect"), \
-	ADD_EVENT (PHANTOM, "Vanish/Appear"), \
+	ADD_EVENT (PHANTOM, "Phantom"), \
 	ADD_EVENT (SABOTAGE, "Sabotage"), \
 	ADD_EVENT (WALK, "Walk"), \
 	ADD_EVENT (MODERATION, "Moderation")

@@ -1,5 +1,4 @@
-// Generated C++ file by Il2CppInspectorPro - http://www.djkaty.com - https://github.com/djkaty
-// Modified by Jadis0x - https://github.com/jadis0x
+// Generated C++ file by Il2CppInspector - http://www.djkaty.com - https://github.com/djkaty
 // Target Unity version: 2021.3.0 - 2023.1.99
 
 #ifndef DO_API_NO_RETURN

@@ -208,7 +208,6 @@ void DetourInitilization() {
 	HOOKFUNC(PlatformSpecificData_Serialize);
 	HOOKFUNC(Constants_1_GetBroadcastVersion);
 	HOOKFUNC(Constants_1_IsVersionModded);
-	HOOKFUNC(PlatformSpecificData_Serialize);
 	HOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
 	HOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
 	HOOKFUNC(PlayerControl_CoSetRole);
@@ -434,7 +433,6 @@ void DetourUninitialization()
 	UNHOOKFUNC(PlatformSpecificData_Serialize);
 	UNHOOKFUNC(Constants_1_GetBroadcastVersion);
 	UNHOOKFUNC(Constants_1_IsVersionModded);
-	UNHOOKFUNC(PlatformSpecificData_Serialize);
 	UNHOOKFUNC(LogicGameFlowNormal_IsGameOverDueToDeath);
 	UNHOOKFUNC(LogicGameFlowHnS_IsGameOverDueToDeath);
 	UNHOOKFUNC(PlayerControl_CoSetRole);

@@ -63,14 +63,11 @@ void load_version() {
 	strcat_s(systemPath, "\\version.dll");
 	version_dll = LoadLibraryA(systemPath);	
 
-#if _DEBUG
 	if (!version_dll) {
 		std::string message = "Unable to load " + std::string(systemPath);
 		MessageBoxA(NULL, message.c_str(), "SickoMenu", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+		return;
 	}
-#endif
-
-	if (!version_dll) return;
 
 	WRAPPER_FUNC(GetFileVersionInfoA);
 	WRAPPER_FUNC(GetFileVersionInfoByHandle);

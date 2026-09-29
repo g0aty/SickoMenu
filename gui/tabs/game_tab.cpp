@@ -159,6 +159,10 @@ namespace GameTab {
             if (ToggleButton("Console", &State.ShowConsole)) {
                 State.Save();
             }
+            ImGui::SameLine();
+            if (ToggleButton("Show Console Events as Toasts", &State.ShowConsoleEventsAsToasts)) {
+                State.Save();
+            }
 
             /*if (ToggleButton("Auto-Join", &State.AutoJoinLobby))
                 State.Save();
@@ -172,7 +176,7 @@ namespace GameTab {
                     NULL);
             }*/
 
-            if (IsInGame() || IsInLobby()) ImGui::SameLine();
+
             if ((IsInGame() || IsInLobby()) && AnimatedButton("Reset Appearance"))
             {
                 ControlAppearance(false);
@@ -269,9 +273,9 @@ namespace GameTab {
                 }
                 ImGui::SameLine();
                 if (AnimatedButton("Teleport All to Random Vents")) {
+                    bool isHq = State.mapType == Settings::MapType::Hq;
                     for (auto p : GetAllPlayerControl()) {
                         if (State.IgnoreVentTpSelf && p == *Game::pLocalPlayer) continue;
-                        bool isHq = State.mapType == Settings::MapType::Hq;
                         int randomVentId = randi((int)isHq, (int)allVents.size() - (int)(!isHq));
 
                         if (IsHost() || !State.SafeMode)
@@ -672,7 +676,7 @@ namespace GameTab {
                     "Setting Tasks", "Abnormal Murders", "Abnormal Shapeshift", "Abnormal Vanish",
                     "Abnormal Meetings/Body Reports", "Abnormal Venting", "Abnormal Chat",
                     "Abnormal Task Completion", "Abnormal Sabotages", "Abnormal Player Levels",
-                    "Abnormal Friendcode", "Blocked Words", "Blocked Start Words","Blacklisted Players",
+                    "Abnormal Friend Code", "Abnormal Platform", "Blocked Words", "Blocked Start Words","Blacklisted Players",
                 };
                 static int selectedCategory = 0;
 
@@ -809,9 +813,13 @@ namespace GameTab {
             if (ToggleButton("Abnormal Task Completion", &State.SMAC_CheckTaskCompletion)) State.Save();
             ImGui::SameLine();
             if (ToggleButton("Abnormal Sabotages", &State.SMAC_CheckSabotage)) State.Save();
-            if (ToggleButton("Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
+            
+            if (ToggleButton("Abnormal Friend Code", &State.SMAC_CheckFriendcode)) State.Save();
             ImGui::SameLine();
-            if (ToggleButton("Abnormal Friendcode", &State.SMAC_CheckFriendcode)) State.Save();
+            if (ToggleButton("Platform Spoofing", &State.SMAC_CheckPlatformSpoof)) State.Save();
+
+            if (ToggleButton("Abnormal Player Levels (0 to ignore)", &State.SMAC_CheckLevel)) State.Save();
+
             if (State.SMAC_CheckLevel) {
                 ImGui::InputInt("Level >=", &State.SMAC_HighLevel);
                 ImGui::InputInt("Level <=", &State.SMAC_LowLevel);
@@ -915,6 +923,10 @@ namespace GameTab {
                 State.Save();
             }
 
+            if (ToggleButton("Make Players Spawn at Random Vents", &State.RandomSpawns)) {
+                State.Save();
+            }
+
             if (State.CrashSpamReport) ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ("When the game starts, the lobby is destroyed"));
 
             /*if (!IsInGame() && !IsInLobby()) {
@@ -995,11 +1007,11 @@ namespace GameTab {
                     State.Save();
                 }
                 ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-                if (ImGui::CollapsingHeader("BA-RP ~ Advanced Options"))
+                if (ImGui::CollapsingHeader("BRRP ~ Advanced Options"))
                 {
                     SteppedSliderFloat("Maximum Rejoins", &State.LeaveCount, 1.f, 15.f, 1.f, "%.0f", ImGuiSliderFlags_NoInput);
                     ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
-                    if (ToggleButton("Blacklist Auto-Rejoin Players", &State.BL_AutoLeavers)) {
+                    if (ToggleButton("Blacklist Repeatedly Rejoining Players", &State.BL_AutoLeavers)) {
                         State.Save();
                     }
                 }

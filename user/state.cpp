@@ -16,7 +16,7 @@ static std::string CleanChatPresetName(std::string cpName) {
 }
 
 void Settings::Load() {
-    this->SickoVersion = "v5.1_pr1";
+    this->SickoVersion = "v5.1_pr2";
 
     auto path = getModulePath(NULL);
     auto configPath = path.parent_path() / "SickoMenu" / "sicko-selected-config.json";
@@ -120,6 +120,11 @@ void Settings::Load() {
         this->RoundingRadiusMultiplier = std::clamp(this->RoundingRadiusMultiplier, 0.f, 2.f);
         JSON_TRYGET("ExtraCommands", this->ExtraCommands);
 
+        JSON_TRYGET("ToastsOnTop", this->ToastsOnTop);
+        JSON_TRYGET("ToastPositionX", this->ToastPositionX);
+        JSON_TRYGET("MaxToasts", this->MaxToasts);
+        JSON_TRYGET("ToastMaxDuration", this->ToastMaxDuration);
+
         // JSON_TRYGET("NoAbilityCD", this->NoAbilityCD);
         JSON_TRYGET("DarkMode", this->DarkMode);
         JSON_TRYGET("CustomGameTheme", this->CustomGameTheme);
@@ -170,6 +175,7 @@ void Settings::Load() {
         JSON_TRYGET("FakeRoleId", this->FakeRoleId);
         JSON_TRYGET("AutoFakeRole", this->AutoFakeRole);
         JSON_TRYGET("PauseVentBlockingWhileVenting", this->PauseVentBlockingWhileVenting);
+        JSON_TRYGET("RandomSpawns", this->RandomSpawns);
 
         JSON_TRYGET("AutoApplyHostPreset", this->AutoApplyHostPreset);
         if (j.contains("HostPresets") && j["HostPresets"].is_array()) {
@@ -278,7 +284,12 @@ void Settings::Load() {
         JSON_TRYGET("ReplayClearAfterMeeting", this->Replay_ClearAfterMeeting);
 
         JSON_TRYGET("ShowEsp", this->ShowEsp);
+        JSON_TRYGET("ShowEsp_Players", this->ShowEsp_Players);
         JSON_TRYGET("ShowEsp_Ghosts", this->ShowEsp_Ghosts);
+        JSON_TRYGET("ShowEsp_DeadBodies", this->ShowEsp_DeadBodies);
+        JSON_TRYGET("ShowEsp_LineTextShadows", this->ShowEsp_LineTextShadows);
+        JSON_TRYGET("ShowEsp_LineThickness", this->ShowEsp_LineThickness);
+        JSON_TRYGET("ShowEsp_TextSize", this->ShowEsp_TextSize);
         JSON_TRYGET("ShowEsp_Box", this->ShowEsp_Box);
         JSON_TRYGET("ShowEsp_Tracers", this->ShowEsp_Tracers);
         JSON_TRYGET("ShowEsp_Distance", this->ShowEsp_Distance);
@@ -347,6 +358,7 @@ void Settings::Load() {
         JSON_TRYGET("NameColor2_G", this->NameColor2.y);
         JSON_TRYGET("NameColor2_B", this->NameColor2.z);
         JSON_TRYGET("NameColor2_A", this->NameColor2.w);
+        JSON_TRYGET("AutoStartTimer", this->AutoStartTimer);
         JSON_TRYGET("AutoOpenDoors", this->AutoOpenDoors);
         JSON_TRYGET("MoveInVentAndShapeshift", this->MoveInVentAndShapeshift);
         JSON_TRYGET("AlwaysMove", this->AlwaysMove);
@@ -394,6 +406,7 @@ void Settings::Load() {
         JSON_TRYGET("ImpostorCount", this->ImpostorCount);
 
         if (this->ShowMenuOnStartup) JSON_TRYGET("ShowConsole", this->ShowConsole);
+        JSON_TRYGET("ShowConsoleEventsAsToasts", this->ShowConsoleEventsAsToasts);
         JSON_TRYGET("ShowUnityLogs", this->ShowUnityLogs);
         //JSON_TRYGET("ShowHookLogs", this->ShowHookLogs);
 
@@ -820,6 +833,11 @@ void Settings::Save() {
                 { "RoundingRadiusMultiplier", this->RoundingRadiusMultiplier },
                 { "ExtraCommands", this->ExtraCommands },
 
+                { "ToastsOnTop", this->ToastsOnTop },
+                { "ToastPositionX", this->ToastPositionX },
+                { "MaxToasts", this->MaxToasts },
+                { "ToastMaxDuration", this->ToastMaxDuration },
+
                 // { "NoAbilityCD", this->NoAbilityCD },
                 { "DarkMode", this->DarkMode },
                 { "CustomGameTheme", this->CustomGameTheme },
@@ -871,6 +889,7 @@ void Settings::Save() {
                 { "FakeRoleId", this->FakeRoleId },
                 { "AutoFakeRole", this->AutoFakeRole },
                 { "PauseVentBlockingWhileVenting", this->PauseVentBlockingWhileVenting },
+                { "RandomSpawns", this->RandomSpawns },
 
                 { "NoGameEnd", this->NoGameEnd },
                 { "DisableMeetings", this->DisableMeetings },
@@ -973,7 +992,12 @@ void Settings::Save() {
                     return arr;
                 }() },
                 { "ShowEsp", this->ShowEsp },
+                { "ShowEsp_Players", this->ShowEsp_Players },
                 { "ShowEsp_Ghosts", this->ShowEsp_Ghosts },
+                { "ShowEsp_DeadBodies", this->ShowEsp_DeadBodies },
+                { "ShowEsp_LineTextShadows", this->ShowEsp_LineTextShadows },
+                { "ShowEsp_LineThickness", this->ShowEsp_LineThickness },
+                { "ShowEsp_TextSize", this->ShowEsp_TextSize },
                 { "ShowEsp_Box", this->ShowEsp_Box },
                 { "ShowEsp_Tracers", this->ShowEsp_Tracers },
                 { "ShowEsp_Distance", this->ShowEsp_Distance },
@@ -1045,6 +1069,7 @@ void Settings::Save() {
                 { "NameColor2_G", this->NameColor2.y },
                 { "NameColor2_B", this->NameColor2.z },
                 { "NameColor2_A", this->NameColor2.w },
+                { "AutoStartTimer", this->AutoStartTimer },
                 { "AutoOpenDoors", this->AutoOpenDoors },
                 { "MoveInVentAndShapeshift", this->MoveInVentAndShapeshift },
                 { "AlwaysMove", this->AlwaysMove },
@@ -1095,6 +1120,7 @@ void Settings::Save() {
                 { "ImpostorCount", this->ImpostorCount },
 
                 { "ShowConsole", this->ShowConsole },
+                { "ShowConsoleEventsAsToasts", this->ShowConsoleEventsAsToasts },
                 { "ShowUnityLogs", this->ShowUnityLogs },
                 //{ "ShowHookLogs", this->ShowHookLogs },
 

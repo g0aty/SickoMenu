@@ -1,6 +1,7 @@
 #include "pch-il2cpp.h"
 #include "_hooks.h"
 #include "state.hpp"
+#include "toasts.hpp"
 #include "logger.h"
 #include "utility.h"
 
@@ -32,9 +33,6 @@ void dAirshipStatus_OnEnable(AirshipStatus* __this, MethodInfo* method)
 		}
 
 		std::sort(State.mapDoors.begin(), State.mapDoors.end());
-
-		if (!State.PanicMode && State.confuser && State.confuseOnStart)
-			ControlAppearance(true);
 
 		if (State.AutoFakeRole) {
 			if (!State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));

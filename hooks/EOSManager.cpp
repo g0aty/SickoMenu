@@ -8,7 +8,6 @@ static bool isGuestAccount = false;
 
 void fakeSuccessfulLogin(EOSManager* eosManager)
 {
-	EOSManager_DeleteDeviceID(eosManager, NULL, NULL);
 	/*eosManager->fields.loginFlowFinished = true;
 	EOSManager_HasFinishedLoginFlow(eosManager, NULL);*/
 	auto player = app::DataManager_get_Player(nullptr);
@@ -138,41 +137,8 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	EOSManager_Update(__this, method);
 	//EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
 	if (State.SpoofGuestAccount) {
-		auto player = app::DataManager_get_Player(nullptr);
-		static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "account");
-		LOG_ASSERT(field != nullptr);
-		auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
-		//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
-		static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->klass, "loginStatus");
-		auto loggedIn = EOSManager_AccountLoginStatus__Enum::LoggedIn;
-		auto loggedOut = EOSManager_AccountLoginStatus__Enum::Offline;
-		if ((int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) != (int)loggedOut)
-			il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
-		/*if (State.UseGuestFriendCode && State.GuestFriendCode != "") {
-			auto username = __this->fields.editAccountUsername;
-			TMP_Text_set_text((TMP_Text*)username->fields.UsernameText, convert_to_string(State.GuestFriendCode), NULL);
-			//EditAccountUsername_SaveUsername(username, NULL);
-		}*/
-	}
-
-	/*if (__this->fields.hasRunLoginFlow && !hasDeletedDeviceId) {
 		EOSManager_DeleteDeviceID(__this, NULL, NULL);
-		LOG_DEBUG("Successfully deleted device ID!");
-		hasDeletedDeviceId = true;
-	}*/
-
-	auto player = app::DataManager_get_Player(nullptr);
-	static FieldInfo* field = il2cpp_class_get_field_from_name(player->klass, "account");
-	LOG_ASSERT(field != nullptr);
-	auto account = (PlayerAccountData*)il2cpp_field_get_value_object(field, player);
-	//PlayerAccountData_set_LoginStatus(account, EOSManager_AccountLoginStatus__Enum::LoggedIn, NULL);
-	static FieldInfo* field1 = il2cpp_class_get_field_from_name(account->klass, "loginStatus");
-	bool loggedIn = (int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) == (int)EOSManager_AccountLoginStatus__Enum::LoggedIn;
-	bool loggedOut = (int)il2cpp_field_get_value_object(field1, (Il2CppObject*)account) == (int)EOSManager_AccountLoginStatus__Enum::Offline;
-
-	if (State.ForceLoginAsGuest) {
-		if (loggedOut) il2cpp_field_set_value((Il2CppObject*)account, field1, &loggedIn);
-		State.ForceLoginAsGuest = false; //button behavior
+		fakeSuccessfulLogin(__this);
 	}
 
 	if (State.SpoofLevel) {
@@ -182,11 +148,6 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 		stats->fields.level = fakeLevel - 1;
 		AbstractSaveData_Save((AbstractSaveData*)player, NULL);
 	}
-
-	/*if (State.EndLoginFlowFlag && State.CurrentScene == "MainMenu") { // wait until main menu to end login flow so we don't get null references
-		EOSManager_EndMergeGuestAccountFlow(__this, method);
-		State.EndLoginFlowFlag = false;
-	}*/
 }
 
 String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {
@@ -199,10 +160,14 @@ String* dEOSManager_get_ProductUserId(EOSManager* __this, MethodInfo* method) {
 
 void dPlatformSpecificData_Serialize(PlatformSpecificData* __this, MessageWriter* writer, MethodInfo* method) {
 	if (State.ShowHookLogs) Log.HookDebug("Hook dPlatformSpecificData_Serialize executed", false);
-	if (State.SpoofPlatform) __this->fields.Platform = Platforms__Enum(State.FakePlatform + 1);
-	if (State.FakePlatform == 8) __this->fields.XboxPlatformId = State.FakeXboxId;
-	if (State.FakePlatform == 9) __this->fields.PsnPlatformId = State.FakePsnId;
-	if (State.SpoofPlName) __this->fields.PlatformName = convert_to_string(State.FakePlName);
+	if (!State.PanicMode) {
+		if (State.SpoofPlatform) __this->fields.Platform = Platforms__Enum(State.FakePlatform + 1);
+		if (State.FakePlatform == (int)Platforms__Enum::Xbox)
+			__this->fields.XboxPlatformId = State.FakeXboxId;
+		if (State.FakePlatform == (int)Platforms__Enum::Playstation)
+			__this->fields.PsnPlatformId = State.FakePsnId;
+		if (State.SpoofPlName) __this->fields.PlatformName = convert_to_string(State.FakePlName);
+	}
 	PlatformSpecificData_Serialize(__this, writer, method);
 }
 

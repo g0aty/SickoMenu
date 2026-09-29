@@ -6,6 +6,10 @@ DisconnectEvent::DisconnectEvent(const EVENT_PLAYER& source) : EventInterface(so
 
 void DisconnectEvent::Output() {
 	ImGui::TextColored(AmongUsColorToImVec4(GetPlayerColor(source.colorId)), source.playerName.c_str());
+	if (IsColorBlindMode()) {
+		ImGui::SameLine();
+		ImGui::Text(("(" + GetColorName(source.colorId) + ")").c_str());
+	}
 	ImGui::SameLine();
 	ImGui::Text("has left the game");
 	ImGui::SameLine();

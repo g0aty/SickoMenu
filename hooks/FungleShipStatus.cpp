@@ -1,6 +1,7 @@
 #include "pch-il2cpp.h"
 #include "_hooks.h"
 #include "state.hpp"
+#include "toasts.hpp"
 #include "logger.h"
 #include "utility.h"
 
@@ -31,9 +32,6 @@ void dFungleShipStatus_OnEnable(FungleShipStatus* __this, MethodInfo* method)
 
 		std::sort(State.mapDoors.begin(), State.mapDoors.end());
 
-		if (!State.PanicMode && State.confuser && State.confuseOnStart)
-			ControlAppearance(true);
-
 		if (State.AutoFakeRole) {
 			if (!State.SafeMode) State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, (RoleTypes__Enum)State.FakeRole));
 		}
@@ -52,7 +50,7 @@ void dZiplineConsole_Update(ZiplineConsole* __this, MethodInfo* method) {
 }
 
 void dMushroom_FixedUpdate(Mushroom* __this, MethodInfo* method) {
-	if (State.ShowHookLogs) Log.HookDebug("Hook dZiplineConsole_Update executed", false);
+	if (State.ShowHookLogs) Log.HookDebug("Hook dMushroom_FixedUpdate executed", false);
 	Mushroom_FixedUpdate(__this, method);
 	
 	// the following code is used as __this->fields.sporeMask throws null reference errors when directly used

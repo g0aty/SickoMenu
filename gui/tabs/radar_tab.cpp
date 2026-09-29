@@ -61,9 +61,13 @@ namespace RadarTab {
 			| ImGuiColorEditFlags_AlphaPreview)) {
 			State.Save();
 		}
+
+		ImGui::SetNextItemWidth(100.f * State.dpiScale);
 		if (ImGui::InputInt("Extra Width", &State.RadarExtraWidth)) {
 			State.RadarExtraWidth = abs(State.RadarExtraWidth); //prevent negatives
 		}
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(100.f * State.dpiScale);
 		if (ImGui::InputInt("Extra Height", &State.RadarExtraHeight)) {
 			State.RadarExtraHeight = abs(State.RadarExtraHeight); //prevent negatives
 		}

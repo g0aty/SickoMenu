@@ -12,13 +12,4 @@ namespace Game {
 	DestroyableSingleton<app::RoleManager*> RoleManager { "Assembly-CSharp, RoleManager" };
 	DestroyableSingleton<app::HudManager*> HudManager { "Assembly-CSharp, HudManager" };
 	DestroyableSingleton<app::AccountManager*> AccountManager { "Assembly-CSharp, AccountManager" };
-
-	//STEAMUSERSTATS_SETACHIEVEMENT* SteamUserStats_SetAchievement = nullptr;
-	//STEAMUSERSTATS_STORESTATS* SteamUserStats_StoreStats = nullptr;
-
-	void scanGameFunctions()
-	{
-		//SteamUserStats_SetAchievement = SignatureScan<STEAMUSERSTATS_SETACHIEVEMENT*>("E8 ? ? ? ? 6A 00 E8 ? ? ? ? 83 C4 0C 5D C3 A1 ? ? ? ? F6 80 ? ? ? ? ? 74 0F 83 78 74 00 75 09 50 E8 ? ? ? ? 83 C4 04 6A 00 FF 35 ? ? ? ? E8 ? ? ? ? 83 C4 08 5D C3 CC", GetModuleHandleA("GameAssembly.dll")).ResolveCall();
-		//SteamUserStats_StoreStats = SignatureScan<STEAMUSERSTATS_STORESTATS*>("E8 ? ? ? ? 83 C4 0C 5D C3 A1 ? ? ? ? F6 80 ? ? ? ? ? 74 0F 83 78 74 00 75 09 50 E8 ? ? ? ? 83 C4 04 6A 00 FF 35 ? ? ? ? E8 ? ? ? ? 83 C4 08 5D C3 CC", GetModuleHandleA("GameAssembly.dll")).ResolveCall();
-	}
 }

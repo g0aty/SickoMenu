@@ -2,6 +2,7 @@
 #include "players_tab.h"
 #include "game.h"
 #include "state.hpp"
+#include "toasts.hpp"
 #include "utility.h"
 #include "gui-helpers.hpp"
 #include <future>
@@ -1490,11 +1491,12 @@ namespace PlayersTab {
                             if (p.has_value() && p.validate().is_LocalPlayer()) State.NoClip = true;
                             else State.lobbyRpcQueue.push(new RpcMurderLoop(*Game::pLocalPlayer, p.validate().get_PlayerControl(), 1, true));
                             if (selectedPlayers.size() == 1) {
-                                ShowHudNotification(std::format("Allowed {} to NoClip!",
-                                    convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL))));
+                                Toasts::AddToast("Allow Player to NoClip", std::format("Allowed {} to NoClip!",
+                                    convert_from_string(NetworkedPlayerInfo_get_PlayerName(p.validate().get_PlayerData(), NULL))), ImVec4(0.f, 1.f, 1.f, 1.f));
                             }
                             else {
-                                ShowHudNotification(std::format("Allowed {} players to NoClip!", selectedPlayers.size()));
+                                Toasts::AddToast("Allow Player to NoClip", std::format("Allowed {} players to NoClip!", selectedPlayers.size()),
+                                    ImVec4(0.f, 1.f, 1.f, 1.f));
                             }
                         }
                     }

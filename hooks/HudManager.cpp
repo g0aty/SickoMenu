@@ -1,6 +1,7 @@
 #include "pch-il2cpp.h"
 #include "_hooks.h"
 #include "state.hpp"
+#include "toasts.hpp"
 #include "utility.h"
 #include "game.h"
 
@@ -159,8 +160,10 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
                     State.PanicMode = false;
                     State.TempPanicMode = false;
                 }
-                if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin)
+                if (!State.CanChangeOutfit && IsInLobby() && !State.PanicMode && State.confuser && State.confuseOnJoin) {
                     ControlAppearance(true);
+                    Toasts::AddToast("Confuser", "Randomized your outfit as you joined the lobby!", ImVec4(0.f, 1.f, 1.f, 1.f));
+                }
                 State.CanChangeOutfit = true;
                 if (State.ProGamer) {
                     std::string rofl = "sesaeler/uneMokciS/yta0g/moc.buhtig//:sptth morf unem eht dedaolnwod ev'uoy erus ekaM\n.uneMokciS fo noisrev dezirohtuanu na gnisu ma I";
@@ -532,13 +535,53 @@ void dEndGameManager_ShowButtons(EndGameManager* __this, MethodInfo* method) {
 
 void* dShhhBehaviour_PlayAnimation(ShhhBehaviour* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dShhhBehaviour_Update executed", false);
-    if (!State.PanicMode && State.DisableShushAnimation) {
-        auto shhhEmblemObject = app::Component_get_gameObject((Component_1*)Game::HudManager.GetInstance()->fields.shhhEmblem, NULL);
-        if (shhhEmblemObject != NULL) {
-            GameObject_SetActive(shhhEmblemObject, false, NULL);
+    if (!State.PanicMode) {
+        if (State.confuser && State.confuseOnStart) {
+            ControlAppearance(true);
+            Toasts::AddToast("Confuser", "Randomized your outfit as the game started!", ImVec4(0.f, 1.f, 1.f, 1.f));
         }
-        return nullptr;
+
+        if (State.RandomSpawns) {
+            uint8_t ventCount = 1;
+            switch (State.mapType) {
+            case Settings::MapType::Ship:
+                ventCount = 14;
+                break;
+            case Settings::MapType::Hq:
+                ventCount = 11;
+                break;
+            case Settings::MapType::Pb:
+            case Settings::MapType::Airship:
+                ventCount = 12;
+                break;
+            case Settings::MapType::Fungle:
+                ventCount = 10;
+                break;
+            }
+            bool isHq = State.mapType == Settings::MapType::Hq;
+
+            for (auto p : GetAllPlayerControl()) {
+                int randomVentId = randi((int)isHq, ventCount - (int)(!isHq));
+
+                if (IsHost() || !State.SafeMode) {
+                    PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, randomVentId, NULL);
+                }
+                else {
+                    if (p == *Game::pLocalPlayer) State.AntiExploit_IsTeleportingSelf = true;
+                    SendBootVentNonHost(p, randomVentId);
+                }
+            }
+        }
+
+        if (State.DisableShushAnimation) {
+            auto shhhEmblemObject = app::Component_get_gameObject((Component_1*)Game::HudManager.GetInstance()->fields.shhhEmblem, NULL);
+            if (shhhEmblemObject != NULL) {
+                GameObject_SetActive(shhhEmblemObject, false, NULL);
+            }
+            return nullptr;
+        }
     }
+
     return ShhhBehaviour_PlayAnimation(__this, NULL);
 }
 

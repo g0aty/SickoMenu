@@ -1,6 +1,8 @@
 #include "pch-il2cpp.h"
 #include "_hooks.h"
 #include "state.hpp"
+#include "toasts.hpp"
+#include "console.hpp"
 #include "game.h"
 #include "logger.h"
 #include <chrono>
@@ -106,8 +108,10 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
         Camera_set_orthographicSize(Game::HudManager.GetInstance()->fields.UICamera, 3.f, NULL);
         static std::string strVoteSpreaderType = translate_type_name("VoteSpreader, Assembly-CSharp");
         voteSpreaderType = app::Type_GetType(convert_to_string(strVoteSpreaderType), nullptr);
-        if (State.confuser && State.confuseOnMeeting && !State.PanicMode)
+        if (State.confuser && State.confuseOnMeeting && !State.PanicMode) {
             ControlAppearance(true);
+            Toasts::AddToast("Confuser", "Randomized your outfit as a meeting was called!", ImVec4(0.f, 1.f, 1.f, 1.f));
+        }
 
         UpdateJudgeRoleAbilities();
     }
@@ -133,6 +137,38 @@ void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
             }
             State.MatchStart = std::chrono::system_clock::now();
             State.MatchCurrent = State.MatchStart;
+        }
+
+        if (!State.PanicMode && State.RandomSpawns) {
+            uint8_t ventCount = 1;
+            switch (State.mapType) {
+            case Settings::MapType::Ship:
+                ventCount = 14;
+                break;
+            case Settings::MapType::Hq:
+                ventCount = 11;
+                break;
+            case Settings::MapType::Pb:
+            case Settings::MapType::Airship:
+                ventCount = 12;
+                break;
+            case Settings::MapType::Fungle:
+                ventCount = 10;
+                break;
+            }
+            bool isHq = State.mapType == Settings::MapType::Hq;
+
+            for (auto p : GetAllPlayerControl()) {
+                int randomVentId = randi((int)isHq, ventCount - (int)(!isHq));
+
+                if (IsHost() || !State.SafeMode) {
+                    PlayerPhysics_RpcBootFromVent(p->fields.MyPhysics, randomVentId, NULL);
+                }
+                else {
+                    if (p == *Game::pLocalPlayer) State.AntiExploit_IsTeleportingSelf = true;
+                    SendBootVentNonHost(p, randomVentId);
+                }
+            }
         }
 
         if (!State.PanicMode && State.KillImmunity) SendKillImmuneToggle(true);
@@ -390,8 +426,21 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
                     && State.voteMonitor.find(playerData->fields.PlayerId) == State.voteMonitor.end())
                 {
                     synchronized(Replay::replayEventMutex) {
-                        State.liveReplayEvents.emplace_back(std::make_unique<CastVoteEvent>(GetEventPlayer(playerData).value(), GetEventPlayer(GetPlayerDataById(playerVoteArea->fields._VotedForId_k__BackingField.Value))));
-                        State.liveConsoleEvents.emplace_back(std::make_unique<CastVoteEvent>(GetEventPlayer(playerData).value(), GetEventPlayer(GetPlayerDataById(playerVoteArea->fields._VotedForId_k__BackingField.Value))));
+                        auto source = GetEventPlayer(playerData).value();
+                        auto target = GetEventPlayer(GetPlayerDataById(playerVoteArea->fields._VotedForId_k__BackingField.Value));
+
+                        State.liveReplayEvents.emplace_back(std::make_unique<CastVoteEvent>(source, target));
+                        State.liveConsoleEvents.emplace_back(std::make_unique<CastVoteEvent>(source, target));
+
+                        if (State.ShowConsoleEventsAsToasts &&
+                            ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_VOTE) &&
+                            ConsoleGui::IsPlayerFiltered(playerData->fields.PlayerId)) {
+                            std::string toastContent = std::format("{} ({}) {}!",
+                                source.playerName, GetColorName(source.colorId),
+                                target.has_value() ? "voted for " + target->playerName + " (" + GetColorName(target->colorId) + ")" :
+                                "skipped the vote");
+                            Toasts::AddToast(target.has_value() ? "Player Voted" : "Player Skipped Vote", toastContent, ImVec4(0.3f, 0.4f, 1.f, 1.f));
+                        }
                     }
                     State.voteMonitor[playerData->fields.PlayerId] = playerVoteArea->fields._VotedForId_k__BackingField.Value;
                     STREAM_DEBUG(ToString(playerData) << " voted for " << ToString(playerVoteArea->fields._VotedForId_k__BackingField.Value));

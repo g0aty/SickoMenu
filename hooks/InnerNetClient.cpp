@@ -9,6 +9,8 @@
 #include "profiler.h"
 #include <sstream>
 #include "esp.hpp"
+#include "toasts.hpp"
+#include "console.hpp"
 #include <chrono>
 #include "achievements.hpp"
 
@@ -106,6 +108,7 @@ static void onGameEnd() {
         State.tournamentCalledOut.clear();
         State.tournamentCorrectCallers.clear();
         State.tournamentAllTasksCompleted.clear();
+        State.checkedPlayerIds.clear();
         State.SpeedrunOver = false;
         State.JoinedLobby = false;
         State.SpamZiplineEveryone = false;
@@ -207,6 +210,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                 State.CloseAllDoors = false;
                 State.SpamReport = false;
                 State.DisableVents = false;
+                State.SpamMovingPlatform = false;
 
                 if (!IsInLobby()) {
                     State.selectedPlayers = {};
@@ -770,17 +774,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                                 if (!whitelisted || !State.AutoKickSlackersIgnoreWhitelist) {
                                     std::string playerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(pd, NULL));
                                     LOG_DEBUG("Task Enforcer: kicking " + playerName + " (" + std::to_string(pct) + "% tasks)");
+                                    std::string msg = std::format("{} was kicked by Task Enforcer ({}/{}% tasks)", playerName, pct, State.AutoKickSlackersThreshold);
                                     InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
-                                    if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
-                                        auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
-                                        Color colorBackup = notifier->fields.disconnectColor;
-                                        notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
-                                        notifier->fields.disconnectColor = Color(1.0f, 0.5f, 0.0f, 1.0f);
-                                        std::string msg = std::format("<#FFF><b>{}</b></color> was kicked by Task Enforcer ({}/{}% tasks)", playerName, pct, State.AutoKickSlackersThreshold);
-                                        NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(msg), NULL);
-                                        notifier->fields.playerDisconnectSprite = spriteBackup;
-                                        notifier->fields.disconnectColor = colorBackup;
-                                    }
+                                    
+                                    Toasts::AddToast("Task Enforcer", msg, ImVec4(0.f, 1.f, 0.f, 1.f));
                                 }
                             }
                         }
@@ -1044,19 +1041,8 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
 
                 app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pc->fields._.OwnerId, false, NULL);
 
-                if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
-                    auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
-                    const auto colorBackup = notifier->fields.disconnectColor;
-
-                    notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
-                    notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
-
-                    const std::string kickMsg = std::format("<#FFF><b>{}</color> detected by Name-Checker!</b>", name);
-                    NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(kickMsg), NULL);
-
-                    notifier->fields.playerDisconnectSprite = spriteBackup;
-                    notifier->fields.disconnectColor = colorBackup;
-                }
+                const std::string kickMsg = std::format("{} was detected by Name-Checker!", name);
+                Toasts::AddToast("Name-Checker", kickMsg, ImVec4(0.f, 1.f, 0.f, 1.f));
 
                 if (State.ShowPDataByNC) {
                     const std::string pdataMsg = std::format("<#ff033e><font=\"Barlow-Regular Outline\"><b>Name-Checker ~ Player Data:\n<voffset=-0.5>*</voffset> [<#FFF>{}</color>]\n\n<size=75%>Product User ID: <#FFF>{}</color>\nFriend Code: <#FFF>{}</b></font></size></color>", name, puid.empty() ? "<#F00>NONE</color>" : puid, fc.empty() ? "<#F00>NONE</color>" : fc);
@@ -1191,21 +1177,9 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
 
                     State.NotifiedWarnedPlayers.insert(friendCode);
 
-                    if (auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier) {
-
-                        auto* spriteBackup = new Sprite(*notifier->fields.playerDisconnectSprite);
-                        Color colorBackup = notifier->fields.disconnectColor;
-
-                        notifier->fields.playerDisconnectSprite = notifier->fields.settingsChangeSprite;
-                        notifier->fields.disconnectColor = Color(1.0f, 0.0118f, 0.2431f, 1.0f);
-
-                        std::string action = State.BanWarned ? "banned" : "kicked";
-                        std::string kickMsg = std::format("<#FFF><b>\"{}\" was {} for receiving {} warns</b>", friendCode, action, State.MaxWarns);
-                        NotificationPopper_AddDisconnectMessage(notifier, convert_to_string(kickMsg), NULL);
-
-                        notifier->fields.playerDisconnectSprite = spriteBackup;
-                        notifier->fields.disconnectColor = colorBackup;
-                    }
+                    std::string action = State.BanWarned ? "banned" : "kicked";
+                    std::string kickMsg = std::format("{} was {} for receiving {} warns", friendCode, action, State.MaxWarns);
+                    Toasts::AddToast(State.BanWarned ? "Ban by Warns" : "Kick by Warns", kickMsg, ImVec4(1.f, 0.f, 0.f, 1.f));
 
                     if (State.BanWarned) {
                         app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), playerControl->fields._.OwnerId, true, NULL);
@@ -1376,7 +1350,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                     InnerNetClient_SendOrDisconnect((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
                     MessageWriter_Recycle(writer, NULL);
 
-                    State.farmDelay = GetFps() / 60;
+                    State.farmDelay = GetFps() / 15;
                     State.farmCount--;
                 }
                 else {
@@ -1420,27 +1394,29 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
     Application_set_targetFrameRate(State.GameFPS > 10 ? State.GameFPS : 60, NULL);
     InnerNetClient_Update(__this, method);
 
-    static int SpamPlatformDelay = 10;
-    if (SpamPlatformDelay <= 0) {
-        if (State.SpamMovingPlatform) {
-            State.rpcQueue.push(new RpcUsePlatform());
-            SpamPlatformDelay = 10;
+    if (!State.PanicMode) {
+        static int SpamPlatformDelay = 10;
+        if (SpamPlatformDelay <= 0) {
+            if (State.SpamMovingPlatform) {
+                State.rpcQueue.push(new RpcUsePlatform());
+                SpamPlatformDelay = 10;
+            }
         }
-    }
-    else {
-        SpamPlatformDelay--;
-    }
+        else {
+            SpamPlatformDelay--;
+        }
 
 
-    static int AutoRepairSabotageDelay = 100;
-    if (AutoRepairSabotageDelay <= 0) {
-        if (State.AutoRepairSabotage) {
-            RepairSabotage(*Game::pLocalPlayer);
-            AutoRepairSabotageDelay = 100;
+        static int AutoRepairSabotageDelay = 100;
+        if (AutoRepairSabotageDelay <= 0) {
+            if (State.AutoRepairSabotage) {
+                RepairSabotage(*Game::pLocalPlayer);
+                AutoRepairSabotageDelay = 100;
+            }
         }
-    }
-    else {
-        AutoRepairSabotageDelay--;
+        else {
+            AutoRepairSabotageDelay--;
+        }
     }
 
     if (State.FollowerCam != nullptr && State.shadowCollab != nullptr) {
@@ -1451,7 +1427,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
         auto fullScreen = hud->fields.FullScreen;
         Color fullScreenCol = fullScreen != NULL ? SpriteRenderer_get_color(fullScreen, NULL) : Color(1.f, 1.f, 1.f, 0.f);
         bool isFullScreenActive = fullScreen != NULL &&
-            fullScreenCol.r == 0.f && fullScreenCol.g == 0.f && fullScreenCol.b == 0.f &&
+            ((fullScreenCol.r == 0.f && fullScreenCol.g == 0.f && fullScreenCol.b == 0.f) || fullScreenCol.a <= 0.05f) &&
             GameObject_GetActive(Component_get_gameObject((Component_1*)fullScreen, NULL), NULL);
 
         auto gameMenu = hud->fields.GameMenu;
@@ -1631,7 +1607,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
         else petRpcDelay = 0.f;
     }
 
-    if (State.DisableControlPetHand) {
+    if (State.DisableControlPetHand && (IsInGame() || IsInLobby())) {
         auto inc = (InnerNetClient*)(*Game::pAmongUsClient);
         auto local = *Game::pLocalPlayer;
 
@@ -1762,10 +1738,24 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                     State.VoteRedirectTargets.erase(playerId);
             }
 
+            auto cpiIt = std::find(State.checkedPlayerIds.begin(), State.checkedPlayerIds.end(), playerId);
+            if (cpiIt != State.checkedPlayerIds.end()) {
+                State.checkedPlayerIds.erase(cpiIt);
+            }
+
             if (auto evtPlayer = GetEventPlayer(playerInfo); evtPlayer) {
                 synchronized(Replay::replayEventMutex) {
-                    State.liveReplayEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
-                    State.liveConsoleEvents.emplace_back(std::make_unique<DisconnectEvent>(evtPlayer.value()));
+                    auto source = evtPlayer.value();
+                    State.liveReplayEvents.emplace_back(std::make_unique<DisconnectEvent>(source));
+                    State.liveConsoleEvents.emplace_back(std::make_unique<DisconnectEvent>(source));
+
+                    if (State.ShowConsoleEventsAsToasts &&
+                        ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_DISCONNECT) &&
+                        ConsoleGui::IsPlayerFiltered(playerInfo->fields.PlayerId)) {
+                        std::string toastContent = std::format("{} ({}) has left the game!",
+                            source.playerName, GetColorName(source.colorId));
+                        Toasts::AddToast("Player Disconnected", toastContent, ImVec4(1.f, 1.f, 1.f, 1.f));
+                    }
                 }
             }
 
@@ -2049,14 +2039,25 @@ void dLadder_SetDestinationCooldown(Ladder* __this, MethodInfo* method) {
 void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t clientId, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dVoteBanSystem_AddVote executed", false);
     try {
-        if (clientId == (*Game::pLocalPlayer)->fields._.OwnerId)
-            State.VoteKicks++;
         PlayerControl* sourcePlayer = *Game::pLocalPlayer;
         PlayerControl* affectedPlayer = *Game::pLocalPlayer;
+
         for (auto p : GetAllPlayerControl()) {
             if (p->fields._.OwnerId == srcClient) sourcePlayer = p;
             if (p->fields._.OwnerId == clientId) affectedPlayer = p;
         }
+        if (sourcePlayer == NULL || affectedPlayer == NULL) return;
+
+        std::string sourceplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
+        std::string affectedplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(affectedPlayer), nullptr));
+
+        if (clientId == (*Game::pLocalPlayer)->fields._.OwnerId) {
+            State.VoteKicks++;
+            if (State.ShowVoteKicks) {
+                Toasts::AddToast("Votekick Alert", RemoveHtmlTags(sourceplayerName) + " attempted to votekick you!", ImVec4(1.f, 0.f, 0.f, 1.f));
+            }
+        }
+
         if (IsHost()) {
             if (affectedPlayer == *Game::pLocalPlayer && !State.PanicMode && State.AntiExploit_VotekicksAgainstSelfHost)
                 return; // anti kick as host
@@ -2087,9 +2088,6 @@ void dVoteBanSystem_AddVote(VoteBanSystem* __this, int32_t srcClient, int32_t cl
                 State.VotekickRejoinDelay = 0.25f; // a small delay to let the votekick go through.
             }
         }
-
-        std::string sourceplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(sourcePlayer), nullptr));
-        std::string affectedplayerName = convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(affectedPlayer), nullptr));
         LOG_DEBUG(sourceplayerName + " attempted to votekick " + affectedplayerName);
     }
     catch (...) {

@@ -12,6 +12,7 @@
 #include "radar.hpp"
 #include "replay.hpp"
 #include "esp.hpp"
+#include "toasts.hpp"
 #include "state.hpp"
 #include "theme.hpp"
 #include <mutex>
@@ -68,7 +69,7 @@ ImVec2 DirectX::GetWindowSize(bool fullScreenCheck)
 
 static bool CanDrawEsp()
 {
-    return (!State.PanicMode && IsInGame() || IsInLobby()) && State.ShowEsp && (!State.InMeeting || !State.HideEsp_During_Meetings);
+    return (!State.PanicMode && IsInGame() || IsInLobby()) && State.ShowEsp && ((!State.InMeeting && !State.InExileUI) || !State.HideEsp_During_Meetings);
 }
 
 static bool CanDrawRadar()
@@ -353,6 +354,10 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
     if (!State.PanicMode && State.ShowConsole)
     {
         ImGuiRenderer::Submit([]() { ConsoleGui::Render(); });
+    }
+
+    if (!State.PanicMode) {
+        ImGuiRenderer::Submit([]() { Toasts::Render(); });
     }
 
     if (CanDrawEsp()) {

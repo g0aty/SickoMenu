@@ -4,6 +4,8 @@
 #include "utility.h"
 #include "game.h"
 #include "state.hpp"
+#include "toasts.hpp"
+#include "console.hpp"
 #include <regex>
 
 static float copyNotificationTimer = 0.f;
@@ -184,6 +186,7 @@ void ChangeChatNotificationBackground(ChatNotification* chatNotif, PlayerControl
 
 		if (State.IsProcessingSickoChat) {
 			SpriteRenderer_set_color(bgArea, Color(0.6f, 0.4f, 0.f, 1.f), NULL);
+			TMP_Text_set_color((app::TMP_Text*)textArea, Palette__TypeInfo->static_fields->White, NULL);
 		}
 	}
 }
@@ -364,7 +367,20 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 		std::string shorthandName = cmd.substr(1); // strip leading '/'
 		const Settings::ChatPreset* shorthandPreset = FindChatPresetByName(shorthandName);
 		if (shorthandPreset != nullptr) {
-			if (PlayerHasPermission(actor, "preset")) SendChatPreset(*shorthandPreset);
+			if (PlayerHasPermission(actor, "preset")) {
+				SendChatPreset(*shorthandPreset);
+				auto sourceEvt = GetEventPlayerControl(actor);
+				if (sourceEvt.has_value()) {
+					std::string msg = sourceEvt->playerName + " used preset \"" + shorthandPreset->Name + "\"";
+					State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(sourceEvt.value(), msg));
+					
+					if (State.ShowConsoleEventsAsToasts &&
+						ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_MODERATION) &&
+						ConsoleGui::IsPlayerFiltered(actor->fields.PlayerId)) {
+						Toasts::AddToast("Moderation", msg, ImVec4(1.f, 0.65f, 0.f, 1.f));
+					}
+				}
+			}
 			return true;
 		}
 	}
@@ -395,7 +411,20 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 	else if (cmd == "/preset") {
 		if (PlayerHasPermission(actor, "preset") && !rawArgs.empty()) {
 			const Settings::ChatPreset* preset = FindChatPresetByName(argsLower);
-			if (preset != nullptr) SendChatPreset(*preset);
+			if (preset != nullptr) {
+				SendChatPreset(*preset);
+				auto sourceEvt = GetEventPlayerControl(actor);
+				if (sourceEvt.has_value()) {
+					std::string msg = sourceEvt->playerName + " used preset \"" + preset->Name + "\"";
+					State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(sourceEvt.value(), msg));
+
+					if (State.ShowConsoleEventsAsToasts &&
+						ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_MODERATION) &&
+						ConsoleGui::IsPlayerFiltered(actor->fields.PlayerId)) {
+						Toasts::AddToast("Moderation", msg, ImVec4(1.f, 0.65f, 0.f, 1.f));
+					}
+				}
+			}
 		}
 	}
 	else if (cmd == "/kick" || cmd == "/kickc" || cmd == "/ban" || cmd == "/banc") {
@@ -403,13 +432,19 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 			bool byColor = (cmd == "/kickc" || cmd == "/banc");
 			bool isBan = (cmd == "/ban" || cmd == "/banc");
 			PlayerControl* target = byColor ? ResolveTargetByColor(FindColorIdByName(argsLower)) : ResolveTargetByName(argsLower);
-			if (target != NULL && GetPlayerMaxRank(actor) > GetPlayerMaxRank(target)) {
+			if (target != NULL && (IsHost() || GetPlayerMaxRank(actor) > GetPlayerMaxRank(target))) {
 				InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), target->fields._.OwnerId, isBan, NULL);
 				auto sourceEvt = GetEventPlayerControl(actor);
 				auto targetEvt = GetEventPlayerControl(target);
 				if (sourceEvt.has_value() && targetEvt.has_value()) {
-					std::string notif = sourceEvt->playerName + (isBan ? " banned " : " kicked ") + targetEvt->playerName;
-					State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(sourceEvt.value(), notif));
+					std::string msg = sourceEvt->playerName + (isBan ? " banned " : " kicked ") + targetEvt->playerName;
+					State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(sourceEvt.value(), msg));
+
+					if (State.ShowConsoleEventsAsToasts &&
+						ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_MODERATION) &&
+						ConsoleGui::IsPlayerFiltered(actor->fields.PlayerId)) {
+						Toasts::AddToast("Moderation", msg, ImVec4(1.f, 0.65f, 0.f, 1.f));
+					}
 				}
 			}
 			else {
@@ -449,6 +484,17 @@ static bool HandleChatCommand(PlayerControl* actor, const std::string& message) 
 							State.Save();
 							if (State.NotifyWarned) SendPrivateWarnMessage(target, warnReason, State.WarnedFriendCodes[targetFc]);
 							PlayerControl_RpcSendChat(*Game::pLocalPlayer, convert_to_string(targetName + " has been warned: " + warnReason), NULL);
+							auto sourceEvt = GetEventPlayerControl(actor);
+							if (sourceEvt.has_value()) {
+								std::string msg = sourceEvt->playerName + " warned " + targetName + ": " + warnReason;
+								State.liveConsoleEvents.emplace_back(std::make_unique<ModerationEvent>(sourceEvt.value(), msg));
+
+								if (State.ShowConsoleEventsAsToasts &&
+									ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_MODERATION) &&
+									ConsoleGui::IsPlayerFiltered(actor->fields.PlayerId)) {
+									Toasts::AddToast("Moderation", msg, ImVec4(1.f, 0.65f, 0.f, 1.f));
+								}
+							}
 						}
 					}
 				}
@@ -1038,6 +1084,7 @@ void dChatBubble_SetText(ChatBubble* __this, String* chatText, MethodInfo* metho
 			auto darkGold = Color(0.6f, 0.4f, 0.f, 1.f);
 			if (__this->fields.playerInfo->fields.IsDead) darkGold.a *= 0.75f;
 			SpriteRenderer_set_color(__this->fields.Background, darkGold, NULL);
+			TMP_Text_set_color((app::TMP_Text*)__this->fields.TextArea, Palette__TypeInfo->static_fields->White, NULL);
 		}
 
 		std::string fontOpener = "", fontCloser = "";

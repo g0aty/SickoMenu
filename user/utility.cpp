@@ -1,6 +1,7 @@
 #include "pch-il2cpp.h"
 #include "utility.h"
 #include "state.hpp"
+#include "toasts.hpp"
 #include "game.h"
 //#include "gitparams.h"
 #include "logger.h"
@@ -479,7 +480,8 @@ std::string GenerateRandomString(bool completelyRandom) {
 }
 
 int GetFps() {
-    return int(round(1.f / Time_get_deltaTime(NULL)));
+    float dt = Time_get_deltaTime(NULL);
+    return dt < 1e-5f ? 0 : int(round(1.f / dt));
 }
 
 void OpenLink(const char* path)
@@ -1946,7 +1948,7 @@ static const std::vector<std::pair<std::string, std::vector<std::string>>> SMAC_
     { "Abnormal Task Completion", { "Abnormal Task Completion" } },
     { "Abnormal Sabotages", { "Bad Sabotage" } },
     { "Abnormal Player Levels", { "Abnormal Level" } },
-    { "Abnormal Friendcode", { "Abnormal Friendcode" } },
+    { "Abnormal Friend Code", { "Abnormal Friend Code" } },
     { "Blocked Words", { "Bad Word: " } },
     { "Blocked Start Words", { "Start Word: " } },
     { "Blacklisted Players", { "<#f00>Blacklisted!</color>" } },
@@ -1959,6 +1961,48 @@ static std::string SMAC_GetReasonCategory(const std::string& reason) {
         }
     }
     return "";
+}
+
+static std::string GetSMACCategoryForReason(const std::string& reason) {
+    static const std::vector<std::pair<std::string, std::string>> categoryMap = {
+        { "SickoMenu User", "SickoMenu Usage" },
+        { "AmongUsMenu User", "Known Cheat Usage" },
+        { "KillNetwork User", "Known Cheat Usage" },
+        { "ChocooMenu User", "Known Cheat Usage" },
+        { "SlopMenuCrew User", "Known Cheat Usage" },
+        { "Abnormal Name", "Abnormal Names" },
+        { "Abnormal Change Color", "Abnormal Set Color" },
+        { "Abnormal Change Cosmetics", "Abnormal Set Cosmetics" },
+        { "Abnormal Chat Note", "Abnormal Chat Note" },
+        { "Abnormal MedBay Scan", "Abnormal Scanner" },
+        { "Abnormal Animation", "Abnormal Animation" },
+        { "Abnormal Set Tasks", "Setting Tasks" },
+        { "Abnormal Murder Player", "Abnormal Murders" },
+        { "Abnormal Shapeshift", "Abnormal Shapeshift" },
+        { "Abnormal Vanish", "Abnormal Vanish" },
+        { "Abnormal Meeting", "Abnormal Meetings/Body Reports" },
+        { "Abnormal Report Body", "Abnormal Meetings/Body Reports" },
+        { "Abnormal Venting", "Abnormal Venting" },
+        { "Abnormal Chat", "Abnormal Chat" },
+        { "Abnormal Task Completion", "Abnormal Task Completion" },
+        { "Bad Sabotage", "Abnormal Sabotages" },
+        { "Abnormal Level", "Abnormal Player Levels" },
+        { "Abnormal Friend Code", "Abnormal Friend Code" },
+        { "Abnormal Platform", "Abnormal Platform" },
+        { "Bad Word: ", "Blocked Words" },
+        { "Start Word: ", "Blocked Start Words" },
+    };
+    for (auto& [prefix, category] : categoryMap) {
+        if (reason.rfind(prefix, 0) == 0) return category;
+    }
+    if (reason.find("Blacklisted") != std::string::npos) return "Blacklisted Players";
+    return "";
+}
+
+std::string GetColorName(int32_t colorId) {
+    const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
+
+    return colorId >= 0 && colorId < (int32_t)COLORS.size() ? COLORS[colorId] : " Fortegreen";
 }
 
 void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
@@ -1991,7 +2035,16 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     auto* notifier = (NotificationPopper*)Game::HudManager.GetInstance()->fields.Notifier;
     float spacingBackup = notifier->fields.spacingY;
 
-    int punishment = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
+    std::string smacCategory = GetSMACCategoryForReason(reason);
+    int punishment;
+    if (!smacCategory.empty() && IsHost() && State.SMAC_ReasonPunishmentOverrideHost.count(smacCategory))
+        punishment = State.SMAC_ReasonPunishmentOverrideHost[smacCategory];
+    else if (!smacCategory.empty() && !IsHost() && State.SMAC_ReasonPunishmentOverride.count(smacCategory))
+        punishment = State.SMAC_ReasonPunishmentOverride[smacCategory];
+    else
+        punishment = IsHost() ? State.SMAC_HostPunishment : State.SMAC_Punishment;
+
+    if (reason == "SlopMenuCrew User" && IsHost()) punishment = 3; // :trolley_crazy:
 
     switch (punishment) {
     case 0:
@@ -2001,21 +2054,26 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
     {
         auto realOutfit = GetPlayerOutfit(pData);
         Color32&& nameColor = GetPlayerColor(realOutfit->fields.ColorId);
-        const std::vector<std::string> COLORS = { "Red", "Blue", "Green", "Pink", "Orange", "Yellow", "Black", "White", "Purple", "Brown", "Cyan", "Lime", "Maroon", "Rose", "Banana", "Gray", "Tan", "Coral" };
 
-        std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
+        /*std::string colorText = State.CustomGameTheme ? std::format("<#{:02x}{:02x}{:02x}>",
             int(State.GameTextColor.x * 255), int(State.GameTextColor.y * 255), int(State.GameTextColor.z * 255)) :
             State.DarkMode ? "<#fff>" : "<#000>";
 
         std::string cheaterMessage = std::format("<size=90%>{}Player <#{:02x}{:02x}{:02x}{:02x}>{}</color>{} has done an unauthorized action</color>\n<b>{}</b></size>",
             colorText, nameColor.r, nameColor.g, nameColor.b, nameColor.a, name,
             IsColorBlindMode() ? (realOutfit->fields.ColorId >= 0 && realOutfit->fields.ColorId < (int32_t)COLORS.size() ?
-                " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);
+                " (" + COLORS[realOutfit->fields.ColorId] + ")" : " (Fortegreen)") : "", reason);*/
 
-        ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
+        std::string cheaterMessage = std::format("Player {}{} has done an unauthorized action:\n{}",
+            name,
+            IsColorBlindMode() ? (" (" + GetColorName(realOutfit->fields.ColorId) + ")") : "", reason);
+
+        // ChatController_AddChatWarning(Game::HudManager.GetInstance()->fields.Chat, convert_to_string(cheaterMessage), NULL);
+        Toasts::AddToast("SMAC Detected " + name + "!", cheaterMessage, ImVec4(1.f, 0.f, 0.f, 1.f));
         break;
     }
     case 2:
+    case 3:
     {
         String* newName = convert_to_string(name + " <#fff>has been kicked by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
 
@@ -2026,21 +2084,7 @@ void SMAC_OnCheatDetected(PlayerControl* pCtrl, std::string reason) {
         State.SMAC_PunishedPlayers.insert(pCtrl->fields.PlayerId);
 
         State.IgnoreOriginalInit_NotificationPopper = true;
-        InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, false, NULL);
-        break;
-    }
-    case 3:
-    {
-        String* newName = convert_to_string(name + " <#fff>has been banned by <#ff006c>SickoMenu</color> <#9ef>Anticheat</color>! Reason: </color><#f00><b>" + reason + "</b></color><size=0>");
-
-        notifier->fields.spacingY = spacingBackup += 0.05f;
-        NotificationPopper_AddDisconnectMessage(notifier, newName, nullptr);
-        notifier->fields.spacingY = spacingBackup;
-
-        State.SMAC_PunishedPlayers.insert(pCtrl->fields.PlayerId);
-
-        State.IgnoreOriginalInit_NotificationPopper = true;
-        InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, true, NULL);
+        InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), pCtrl->fields._.OwnerId, punishment == 3, NULL);
         break;
     }
     }
@@ -2453,6 +2497,8 @@ void SendBootVentNonHost(PlayerControl* player, int ventId, int targetNetId) {
 
         MessageWriter_Recycle(enterWriter, NULL);
         MessageWriter_Recycle(bootWriter, NULL);
+
+        if (player == *Game::pLocalPlayer) State.AntiExploit_IsTeleportingSelf = true;
     }
     else if (player->fields._.OwnerId != targetNetId) {
         // https://github.com/MrDiamond64/Hydra/blob/main/src/Utilities.cs#L299

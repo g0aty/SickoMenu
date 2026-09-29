@@ -4,6 +4,7 @@
 #include "gui-helpers.hpp"
 #include "utility.h"
 #include "state.hpp"
+#include "toasts.hpp"
 #include "logger.h"
 #include "_hooks.h"
 
@@ -1054,6 +1055,7 @@ namespace SelfTab {
                 ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
                 if ((IsInGame() || IsInLobby()) && AnimatedButton("Confuse Now")) {
                     ControlAppearance(true);
+                    Toasts::AddToast("Confuser", "Randomized your outfit!", ImVec4(0.f, 1.f, 1.f, 1.f));
                 }
                 if (IsInGame() || IsInLobby()) {
                     if (IsHost() || !State.SafeMode)

@@ -78,8 +78,7 @@ bool CustomListBoxIntColored(const char* label, int* value, const std::vector<co
 		response = false;
 		for (size_t i = 0; i < list.size(); i++) {
 			const bool hasColor = itemColors != nullptr && i < itemColorsCount;
-			if (hasColor)
-				PushStyleColor(ImGuiCol_Text, itemColors[i].color);
+			if (hasColor) PushStyleColor(ImGuiCol_Text, itemColors[i].color);
 
 			bool is_selected = (*value == i);
 			if (Selectable(list.at(i), is_selected)) {
@@ -87,10 +86,8 @@ bool CustomListBoxIntColored(const char* label, int* value, const std::vector<co
 				response = true;
 			}
 
-			if (hasColor)
-				PopStyleColor();
-			if (is_selected)
-				SetItemDefaultFocus();
+			if (hasColor) PopStyleColor();
+			if (is_selected) SetItemDefaultFocus();
 		}
 		EndCombo();
 	}
