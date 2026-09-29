@@ -677,9 +677,9 @@ namespace SelfTab {
                 State.Save();
             }*/
 
-            if (ToggleButton("Autokill", &State.AutoKill)) {
+            /*if (ToggleButton("Autokill", &State.AutoKill)) {
                 State.Save();
-            }
+            }*/
 
             if (ToggleButton("Report Body on Murder", &State.ReportOnMurder)) {
                 State.Save();

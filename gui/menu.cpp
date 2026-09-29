@@ -129,7 +129,7 @@ namespace Menu {
 			{"No Seeker Animation", "Utils"}, {"Better Chat Notifications", "Utils"}, {"Better Lobby Code Input", "Utils"}, {"Extended Notifications", "Utils"},
 			{"Better Message Sounds", "Utils"}, {"Auto Rejoin After Game Ending", "Utils"},
 			{"Disable Shush Animation", "Utils"}, {"Control Pet", "Utils"},
-			{"Autokill", "Utils"}, {"Report Body on Murder", "Utils"}, {"Prevent Self-Report", "Utils"},
+			/*{"Autokill", "Utils"}, */{"Report Body on Murder", "Utils"}, {"Prevent Self-Report", "Utils"},
 			{"Fake Alive", "Utils"}, {"God Mode", "Utils"}, {"Teleport", "Utils"}, {"Rotate Everyone", "Utils"},
 			{"Select Role", "Utils"}, {"Set Role", "Utils"}, {"Set Fake Role", "Utils"}, {"Automatically Set Fake Role", "Utils"},
 			{"Infinite Emergency Meetings", "Roles"}, {"No Ladder/Zipline Cooldown", "Roles"},
