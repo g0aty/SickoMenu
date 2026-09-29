@@ -561,6 +561,97 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
                 playerState->fields._VotedForId_k__BackingField.Value = Game::SkippedVote;
         }
     }
+
+    if (IsHost() && State.VoteOffPlayerId == Game::HasNotVoted && !State.VoteImmunePlayers.empty()) {
+        std::vector<PlayerVoteArea*> voters;
+        bool votingFinished = true;
+        for (auto playerState : playerStates) {
+            if (!playerState || playerState->fields._AmDead_k__BackingField) continue;
+            auto playerData = GetPlayerDataById(playerState->fields._PlayerId_k__BackingField.Value);
+            if (!playerData || playerData->fields.Disconnected) continue;
+            voters.push_back(playerState);
+            if (playerState->fields._VotedForId_k__BackingField.Value == Game::HasNotVoted)
+                votingFinished = false;
+        }
+
+        if (votingFinished) {
+            for (size_t round = 0; round < voters.size(); ++round) {
+                std::unordered_map<Game::VotedFor, int> voteCounts;
+                for (auto voter : voters) {
+                    auto vote = voter->fields._VotedForId_k__BackingField.Value;
+                    if (vote == Game::SkippedVote || vote < Game::DeadVote)
+                        ++voteCounts[vote];
+                }
+
+                Game::VotedFor leader = Game::HasNotVoted;
+                int highestVotes = 0;
+                bool tied = false;
+                for (const auto& [target, count] : voteCounts) {
+                    if (count > highestVotes) {
+                        leader = target;
+                        highestVotes = count;
+                        tied = false;
+                    }
+                    else if (count == highestVotes) {
+                        tied = true;
+                    }
+                }
+                if (tied || std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), leader) == State.VoteImmunePlayers.end())
+                    break;
+
+                auto redirect = State.VoteRedirectTargets.find(leader);
+                Game::VotedFor target = redirect != State.VoteRedirectTargets.end() ? redirect->second : Game::SkippedVote;
+                if (target == leader || (target != Game::SkippedVote && target >= Game::DeadVote)
+                    || std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), target) != State.VoteImmunePlayers.end())
+                    target = Game::SkippedVote;
+                if (target != Game::SkippedVote) {
+                    auto targetData = GetPlayerDataById(target);
+                    if (!targetData || targetData->fields.Disconnected || targetData->fields.IsDead)
+                        target = Game::SkippedVote;
+                }
+
+                const int missedVotes = (int)std::count_if(voters.begin(), voters.end(), [](PlayerVoteArea* voter) {
+                    return voter->fields._VotedForId_k__BackingField.Value == Game::MissedVote;
+                });
+                voteCounts[Game::SkippedVote];
+                voteCounts[target];
+
+                // Keep as many votes as possible for immune players.
+                int bestRedirects = highestVotes + 1;
+                int bestSkips = missedVotes + 1;
+                for (int skips = 0; skips <= missedVotes; ++skips) {
+                    for (int redirects = 0; redirects <= highestVotes; ++redirects) {
+                        int highestOther = 0;
+                        for (const auto& [candidate, count] : voteCounts) {
+                            if (candidate == leader) continue;
+                            int adjusted = count + (candidate == Game::SkippedVote ? skips : 0)
+                                + (candidate == target ? redirects : 0);
+                            if (adjusted > highestOther) highestOther = adjusted;
+                        }
+                        if (highestVotes - redirects <= highestOther) {
+                            if (redirects < bestRedirects || (redirects == bestRedirects && skips < bestSkips)) {
+                                bestRedirects = redirects;
+                                bestSkips = skips;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                for (auto voter : voters) {
+                    auto& vote = voter->fields._VotedForId_k__BackingField.Value;
+                    if (vote == Game::MissedVote && bestSkips > 0) {
+                        vote = Game::SkippedVote;
+                        --bestSkips;
+                    }
+                    else if (vote == leader && bestRedirects > 0) {
+                        vote = target;
+                        --bestRedirects;
+                    }
+                }
+            }
+        }
+    }
     __this->fields.playerStates = playerStates.get();
     MeetingHud_CheckForEndVoting(__this, method);
 }
@@ -573,12 +664,6 @@ bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
 
 void dMeetingHud_CastVote(MeetingHud* __this, PlayerId playerId, PlayerId suspectIdx, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_CastVote executed", false);
-    if (!State.PanicMode && IsHost() && !State.VoteImmunePlayers.empty()) {
-        if (std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), suspectIdx.Value) != State.VoteImmunePlayers.end()) {
-            auto it = State.VoteRedirectTargets.find(suspectIdx.Value);
-            suspectIdx = (PlayerId)((it != State.VoteRedirectTargets.end()) ? it->second : 253);
-        }
-    }
     MeetingHud_CastVote(__this, playerId, suspectIdx, method);
 }
 
