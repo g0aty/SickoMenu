@@ -574,7 +574,9 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
                 votingFinished = false;
         }
 
+        // Waits until all player has voted/missed vote
         if (votingFinished) {
+            // recounts after each vote
             for (size_t round = 0; round < voters.size(); ++round) {
                 std::unordered_map<Game::VotedFor, int> voteCounts;
                 for (auto voter : voters) {
@@ -601,6 +603,7 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
 
                 auto redirect = State.VoteRedirectTargets.find(leader);
                 Game::VotedFor target = redirect != State.VoteRedirectTargets.end() ? redirect->second : Game::SkippedVote;
+                // fallbacks to skip
                 if (target == leader || (target != Game::SkippedVote && target >= Game::DeadVote)
                     || std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), target) != State.VoteImmunePlayers.end())
                     target = Game::SkippedVote;
@@ -616,6 +619,7 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
                 voteCounts[Game::SkippedVote];
                 voteCounts[target];
 
+                // minimizes redirects, then skips
                 int bestRedirects = highestVotes + 1;
                 int bestSkips = missedVotes + 1;
                 for (int skips = 0; skips <= missedVotes; ++skips) {
