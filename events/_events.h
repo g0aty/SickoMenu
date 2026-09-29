@@ -286,25 +286,9 @@ class ModerationEvent : public EventInterface {
 private:
 	std::string message;
 public:
-	ModerationEvent(const EVENT_PLAYER& source, const std::string& message) : EventInterface(source, EVENT_TYPES::EVENT_MODERATION) {
-		this->message = message;
-	}
-	virtual void Output() override {
-		ImGui::Text("%s", this->message.c_str());
-		ImGui::SameLine();
-		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - this->timestamp);
-		long long totalSeconds = elapsed.count();
-		long long minutes = totalSeconds / 60;
-		long long seconds = totalSeconds % 60;
-		ImGui::Text("[%02lld:%02lld ago]", minutes, seconds);
-	}
-	virtual void ColoredEventOutput() override {
-		ImGui::Text("[");
-		ImGui::SameLine();
-		ImGui::TextColored(ImVec4(1.f, 0.65f, 0.f, 1.f), "MOD");
-		ImGui::SameLine();
-		ImGui::Text("]");
-	}
+	ModerationEvent(const EVENT_PLAYER& source, const std::string& message);
+	virtual void Output() override;
+	virtual void ColoredEventOutput() override;
 };
 
 class ShapeShiftEvent : public EventInterface {

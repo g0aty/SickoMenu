@@ -250,6 +250,9 @@
     <ClCompile Include="events\ModerationEvent.cpp">
       <Filter>events</Filter>
     </ClCompile>
+    <ClCompile Include="events\ModerationEvent.cpp">
+      <Filter>events</Filter>
+    </ClCompile>
     <ClCompile Include="events\PhantomEvent.cpp">
       <Filter>events</Filter>
     </ClCompile>

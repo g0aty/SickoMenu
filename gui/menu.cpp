@@ -386,7 +386,7 @@ namespace Menu {
 				else ImGui::TextColored(DiddyCol, IsChatCensored() || IsStreamerMode() ? " [F***son Mode]" : " [Fuckson Mode]");
 			}*/
 			ImGui::SameLine(ImGui::GetWindowWidth() - 19 * State.dpiScale);
-			if (ImGui::Button("-", false)) State.ShowMenu = false; //minimize button
+			if (ImGui::Button("-")) State.ShowMenu = false; //minimize button
 			//ImGui::BeginTabBar("AmongUs#TopBar", ImGuiTabBarFlags_NoTabListScrollingButtons);
 			ImGui::BeginChild("###SickoMenu", ImVec2(90 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 			// Search field
