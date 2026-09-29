@@ -112,6 +112,7 @@ namespace HostTab {
         p.ViperDissolveTime = o.GetFloat(app::FloatOptionNames__Enum::ViperDissolveTime);
         p.DetectiveSuspectLimit = o.GetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit);
         p.JudgeTaskRequirement = o.GetFloat(app::FloatOptionNames__Enum::JudgeTaskRequirementPercentage);
+        p.InfluencerMessageCooldown = o.GetFloat(app::FloatOptionNames__Enum::SpiritGuideCooldownSeconds);
         static const app::RoleTypes__Enum roles[] = {
             app::RoleTypes__Enum::Scientist, app::RoleTypes__Enum::Engineer,
             app::RoleTypes__Enum::GuardianAngel, app::RoleTypes__Enum::Shapeshifter,
@@ -891,11 +892,17 @@ namespace HostTab {
 
                     MakeFloat("Viper Dissolve Time", viperDissolveTime, FloatOptionNames__Enum::ViperDissolveTime);
 #pragma endregion
-#pragma region Viper
+#pragma region Judge
                     ImGui::Text("Judge");
                     static float judgeTaskRequirement = 50.f;
 
                     MakeFloat("Tasks Required %", judgeTaskRequirement, FloatOptionNames__Enum::JudgeTaskRequirementPercentage);
+#pragma endregion
+#pragma region SpiritGuide
+                    ImGui::Text("Influencer");
+                    static float influencerMessageCooldown = 50.f;
+
+                    MakeFloat("Influencer Message Cooldown", influencerMessageCooldown, FloatOptionNames__Enum::SpiritGuideCooldownSeconds);
 #pragma endregion
                 }
 #pragma region Hide and Seek

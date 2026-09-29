@@ -222,6 +222,7 @@ void Settings::Load() {
                 if (p.contains("ViperDissolveTime")) preset.ViperDissolveTime = p["ViperDissolveTime"].get<float>();
                 if (p.contains("DetectiveSuspectLimit")) preset.DetectiveSuspectLimit = p["DetectiveSuspectLimit"].get<float>();
                 if (p.contains("JudgeTaskRequirement")) preset.JudgeTaskRequirement = p["JudgeTaskRequirement"].get<float>();
+                if (p.contains("InfluencerMessageCooldown")) preset.JudgeTaskRequirement = p["InfluencerMessageCooldown"].get<float>();
                 if (p.contains("RoleRates") && p["RoleRates"].is_array()) {
                     for (auto& r : p["RoleRates"]) {
                         if (r.contains("Role") && r.contains("Count") && r.contains("Chance")) {
@@ -973,6 +974,7 @@ void Settings::Save() {
                             { "ViperDissolveTime", p.ViperDissolveTime },
                             { "DetectiveSuspectLimit", p.DetectiveSuspectLimit },
                             { "JudgeTaskRequirement", p.JudgeTaskRequirement },
+                            { "InfluencerMessageCooldown", p.InfluencerMessageCooldown },
                             { "RoleRates", [&]() {
                                 nlohmann::json rarr = nlohmann::json::array();
                                 for (auto& [role, rp] : p.RoleRates) {

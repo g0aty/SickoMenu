@@ -398,7 +398,9 @@ void ApplyHostPreset(const Settings::HostPreset& p) {
         .SetFloat(app::FloatOptionNames__Enum::NoisemakerAlertDuration, p.NoisemakerAlertDuration)
         .SetBool(app::BoolOptionNames__Enum::NoisemakerImpostorAlert, p.NoisemakerImpostorAlert)
         .SetFloat(app::FloatOptionNames__Enum::ViperDissolveTime, p.ViperDissolveTime)
-        .SetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit, p.DetectiveSuspectLimit);
+        .SetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit, p.DetectiveSuspectLimit)
+        .SetFloat(app::FloatOptionNames__Enum::JudgeTaskRequirementPercentage, p.JudgeTaskRequirement)
+        .SetFloat(app::FloatOptionNames__Enum::SpiritGuideCooldownSeconds, p.InfluencerMessageCooldown);
     auto roleOpts = GameOptions().GetRoleOptions();
     for (auto& [role, rp] : p.RoleRates)
         roleOpts.SetRoleRate((app::RoleTypes__Enum)role, rp.Count, rp.Chance);

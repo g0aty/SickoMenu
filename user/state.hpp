@@ -227,6 +227,7 @@ public:
         float ViperDissolveTime = 3.f;
         float DetectiveSuspectLimit = 3.f;
         float JudgeTaskRequirement = 50.f;
+        float InfluencerMessageCooldown = 50.f;
     };
     std::vector<HostPreset> HostPresets;
     int SelectedHostPreset = 0;

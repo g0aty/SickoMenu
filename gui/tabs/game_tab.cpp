@@ -1713,15 +1713,6 @@ namespace GameTab {
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
-                    ImGui::Text("Max Guardian Angels: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::GuardianAngel));
-                    ImGui::Text("Guardian Angel Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::GuardianAngel));
-                    ImGui::Text("Guardian Angel Protect Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F));
-                    ImGui::Text("Guardian Angel Protection Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, 1.0F));
-
-                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
-                    ImGui::Separator();
-                    ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
-
                     ImGui::Text("Max Noisemakers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Noisemaker));
                     ImGui::Text("Noisemaker Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Noisemaker));
                     ImGui::Text("Noisemaker Alert Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::NoisemakerAlertDuration, 1.0F));
@@ -1743,6 +1734,23 @@ namespace GameTab {
                     ImGui::Text("Max Detectives: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::Detective));
                     ImGui::Text("Detective Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::Detective));
                     ImGui::Text("Detective Suspect Limit: %.2f", options.GetFloat(app::FloatOptionNames__Enum::DetectiveSuspectLimit, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+
+                    ImGui::Text("Max Guardian Angels: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::GuardianAngel));
+                    ImGui::Text("Guardian Angel Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::GuardianAngel));
+                    ImGui::Text("Guardian Angel Protect Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::GuardianAngelCooldown, 1.0F));
+                    ImGui::Text("Guardian Angel Protection Duration: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::ProtectionDurationSeconds, 1.0F));
+
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
+
+                    ImGui::Text("Max Influencers: %d", roleRates.GetRoleCount(app::RoleTypes__Enum::SpiritGuide));
+                    ImGui::Text("Influencer Chance: %d%", options.GetRoleOptions().GetChancePerGame(RoleTypes__Enum::SpiritGuide));
+                    ImGui::Text("Influencer Message Cooldown: %.2f s", options.GetFloat(app::FloatOptionNames__Enum::SpiritGuideCooldownSeconds, 1.0F));
 
                     ImGui::Dummy(ImVec2(3, 3)* State.dpiScale);
                     ImGui::Separator();
