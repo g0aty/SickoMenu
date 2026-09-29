@@ -3356,10 +3356,12 @@ namespace app {
         struct TextMeshPro* placeholderText;
         float pipeBlinkTimer;
         bool ClearOnFocus;
+        bool ClearOnlyPlaceholderOnFocus;
         bool ForceUppercase;
         struct Button_ButtonClickedEvent* OnEnter;
         struct Button_ButtonClickedEvent* OnChange;
         struct Button_ButtonClickedEvent* OnFocusLost;
+        struct Button_ButtonClickedEvent* OnFocus;
         struct TouchScreenKeyboard* keyboard;
         bool AllowSymbols;
         bool AllowEmail;
@@ -4993,6 +4995,8 @@ namespace app {
         float _HideCountdown_k__BackingField;
         struct CosmeticsCache* _CosmeticsCache_k__BackingField;
         struct Logger* logger;
+        struct SocialMediumFeedSystem* socialMediumFeedSystemPrefab;
+        struct SocialMediumFeedSystem* socialMediumFeedSystem;
         int32_t numScans;
     };
 
@@ -5279,7 +5283,7 @@ namespace app {
         Detective = 0x000c,
         Viper = 0x0012,
         Judge = 0x0013,
-        Influencer = 0x0014,
+        SpiritGuide = 0x0015,
     };
 #else
     enum RoleTypes__Enum {
@@ -5297,7 +5301,7 @@ namespace app {
         RoleTypes__Enum_Detective = 0x000c,
         RoleTypes__Enum_Viper = 0x0012,
         RoleTypes__Enum_Judge = 0x0013,
-        RoleTypes__Enum_Influencer = 0x0014,
+        RoleTypes__Enum_SpiritGuide = 0x0015,
     };
 
 #endif
@@ -6754,6 +6758,7 @@ namespace app {
         struct GameObject* TargetFlashlight;
         bool isDummy;
         bool notRealPlayer;
+        struct Transform* socialMediumFeedTransform;
         struct Logger* logger;
         struct List_1_IPlayerVisibleItem_* visibilityItems;
         struct Collider2D__Array* hitBuffer;
@@ -8213,6 +8218,7 @@ namespace app {
         ViperDissolveTime = 0x00000641,
         DetectiveSuspectLimit = 0x00000642,
         JudgeTaskRequirementPercentage = 0x00000654,
+        SpiritGuideCooldownSeconds = 0x00000668,
     };
 
 #else
@@ -8246,6 +8252,7 @@ namespace app {
         FloatOptionNames__Enum_ViperDissolveTime = 0x00000641,
         FloatOptionNames__Enum_DetectiveSuspectLimit = 0x00000642,
         FloatOptionNames__Enum_JudgeTaskRequirementPercentage = 0x00000654,
+        FloatOptionNames__Enum_SpiritGuideCooldownSeconds = 0x00000668,
     };
 
 #endif
@@ -8287,7 +8294,6 @@ namespace app {
         BoolOptionNames__Enum_ImpostorsCanSeeProtect = 0x0000044c,
         BoolOptionNames__Enum_NoisemakerImpostorAlert = 0x00000514,
     };
-
 #endif
 
 #if defined(_CPLUSPLUS_)
@@ -9262,6 +9268,7 @@ namespace app {
         struct Logger* logger;
         bool canInteract;
         struct Vector3 position;
+        int32_t originalAction;
     };
 
     struct ActionButton {
@@ -9896,7 +9903,6 @@ namespace app {
     };
 #pragma endregion
 
-#pragma region RpcCalls__Enum
 #if defined(_CPLUSPLUS_)
     enum class RpcCalls__Enum : uint8_t {
         PlayAnimation = 0x00,
@@ -9961,6 +9967,7 @@ namespace app {
         CheckAppear = 0x40,
         StartAppear = 0x41,
         QueueOverruleVotes = 0x42,
+        SpiritGuideMessage = 0x43,
     };
 
 #else
@@ -10027,8 +10034,8 @@ namespace app {
         RpcCalls__Enum_CheckAppear = 0x40,
         RpcCalls__Enum_StartAppear = 0x41,
         RpcCalls__Enum_QueueOverruleVotes = 0x42,
+        RpcCalls__Enum_SpiritGuideMessage = 0x43,
     };
-
 #endif
 #pragma endregion
 
@@ -11238,6 +11245,8 @@ namespace app {
         struct SpriteRenderer* screenTint;
         struct PassiveButton* freePlayButton;
         struct PassiveButton* entercodeField;
+        struct PassiveButton* redeemcodeField;
+        struct PassiveButton* redeemRewardButton;
         struct PassiveButton* playButton;
         struct PassiveButton* inventoryButton;
         struct PassiveButton* shopButton;
@@ -11254,11 +11263,14 @@ namespace app {
         struct List_1_PassiveButton_* mainButtons;
         struct GameObject* creditsScreen;
         struct CreateGameOptions* createGameScreen;
+        struct GameObject* adsMenu;
+        struct EjectMainMenu* ejectMenu;
         struct SpriteRenderer* fullScreenSprite;
         struct Transform* enterCodeContainer;
         struct GameObject* enterCodeHeader;
         struct Transform* onlineButtonsContainer;
         struct GameObject* onlineHeader;
+        struct Transform* redeemCodeContainer;
         struct UiElement* DefaultButtonSelected;
         struct List_1_UiElement_* ControllerSelectable;
         struct List_1_PassiveButton_* disableOnStartup;

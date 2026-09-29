@@ -59,7 +59,7 @@ RoleRates::RoleRates(const class GameOptions& gameOptions, int playerAmount) {
     GET_ROLE_RATE(Phantom);
     GET_ROLE_RATE(Viper);
     GET_ROLE_RATE(GuardianAngel);
-    GET_ROLE_RATE(Influencer);
+    GET_ROLE_RATE(SpiritGuide);
 #undef GET_ROLE_RATE
 }
 
@@ -87,8 +87,8 @@ int RoleRates::GetRoleCount(RoleTypes__Enum role) {
         return this->JudgeCount;
     case RoleTypes__Enum::GuardianAngel:
         return this->GuardianAngelCount;
-    case RoleTypes__Enum::Influencer:
-        return this->InfluencerCount;
+    case RoleTypes__Enum::SpiritGuide:
+        return this->SpiritGuideCount;
     case RoleTypes__Enum::Crewmate:
         return this->MaxCrewmates;
     default:
@@ -1488,7 +1488,7 @@ Color GetRoleColor(RoleBehaviour* roleBehaviour, bool gui) {
         c = GetColorFromImVec4(State.JudgeColor);
         break;
     }
-    case RoleTypes__Enum::Influencer: {
+    case RoleTypes__Enum::SpiritGuide: {
         c = GetColorFromImVec4(State.InfluencerColor);
         break;
     }
@@ -1546,7 +1546,7 @@ std::string GetRoleName(RoleBehaviour* roleBehaviour, bool abbreviated /* = fals
         return (abbreviated ? "Vip" : (localized ? fullRoleName : "Viper"));
     case RoleTypes__Enum::Judge:
         return (abbreviated ? "Jdg" : (localized ? fullRoleName : "Judge"));
-    case RoleTypes__Enum::Influencer:
+    case RoleTypes__Enum::SpiritGuide:
         return (abbreviated ? "Inf" : (localized ? fullRoleName : "Influencer"));
     default:
         // LOG_DEBUG(std::format("{}", (int)roleBehaviour->fields.Role));

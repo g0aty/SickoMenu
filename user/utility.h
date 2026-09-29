@@ -72,8 +72,8 @@ public:
 	int JudgeChance = 0;
 	int GuardianAngelCount = 0;
 	int GuardianAngelChance = 0;
-	int InfluencerCount = 0;
-	int InfluencerChance = 0;
+	int SpiritGuideCount = 0;
+	int SpiritGuideChance = 0;
 	int MaxCrewmates = Game::MAX_PLAYERS;
 	RoleRates(const class GameOptions& gameOptions, int playerAmount);
 	int GetRoleCount(RoleTypes__Enum role);
