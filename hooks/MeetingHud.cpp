@@ -616,7 +616,6 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
                 voteCounts[Game::SkippedVote];
                 voteCounts[target];
 
-                // Keep as many votes as possible for immune players.
                 int bestRedirects = highestVotes + 1;
                 int bestSkips = missedVotes + 1;
                 for (int skips = 0; skips <= missedVotes; ++skips) {
