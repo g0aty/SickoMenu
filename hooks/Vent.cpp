@@ -48,7 +48,7 @@ void dVent_EnterVent(Vent* __this, PlayerControl* pc, MethodInfo * method) {
 			if (State.ShowConsoleEventsAsToasts &&
 				ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_VENT) &&
 				ConsoleGui::IsPlayerFiltered(pc->fields.PlayerId)) {
-				std::string toastContent = std::format("{} ({}) entered a vent in {}!",
+				std::string toastContent = std::format("{} ({}) vented in {}!",
 					source.playerName, GetColorName(source.colorId),
 					TranslateSystemTypes(GetSystemTypes(ventVector2D)));
 				Toasts::AddToast("Player Vented", toastContent, ImVec4(0.f, 1.f, 0.f, 1.f));
@@ -75,7 +75,7 @@ void* dVent_ExitVent(Vent* __this, PlayerControl* pc, MethodInfo* method) {
 			if (State.ShowConsoleEventsAsToasts &&
 				ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_VENT) &&
 				ConsoleGui::IsPlayerFiltered(pc->fields.PlayerId)) {
-				std::string toastContent = std::format("{} ({}) exited a vent in {}!",
+				std::string toastContent = std::format("{} ({}) vented out in {}!",
 					source.playerName, GetColorName(source.colorId),
 					TranslateSystemTypes(GetSystemTypes(ventVector2D)));
 				Toasts::AddToast("Player Exited Vent", toastContent, ImVec4(1.f, 0.f, 0.f, 1.f));

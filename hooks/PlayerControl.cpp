@@ -46,7 +46,7 @@ void dPlayerControl_CompleteTask(PlayerControl* __this, uint32_t idx, MethodInfo
             if (State.ShowConsoleEventsAsToasts &&
                 ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_TASK) &&
                 ConsoleGui::IsPlayerFiltered(__this->fields.PlayerId)) {
-                std::string toastContent = std::format("{} ({}) completed the task {} in {}!",
+                std::string toastContent = std::format("{} ({}) completed {} in {}!",
                     source.playerName, GetColorName(source.colorId),
                     (taskType.has_value()) ? TranslateTaskTypes(*taskType) : "UNKNOWN",
                     TranslateSystemTypes(GetSystemTypes(pos)));
@@ -1447,7 +1447,7 @@ void dPlayerControl_ProtectPlayer(PlayerControl* __this, PlayerControl* target, 
             if (State.ShowConsoleEventsAsToasts &&
                 ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_PROTECTPLAYER) &&
                 ConsoleGui::IsPlayerFiltered(__this->fields.PlayerId)) {
-                std::string toastContent = std::format("{} ({}) has protected {} ({})!",
+                std::string toastContent = std::format("{} ({}) protected {} ({})!",
                     source.playerName, GetColorName(source.colorId),
                     tgt.playerName, GetColorName(tgt.colorId));
                 Toasts::AddToast("Player Protected", toastContent, ImVec4(0.1f, 0.75f, 0.75f, 1.f));
@@ -1712,7 +1712,7 @@ void dPlayerControl_SetRoleInvisibility(PlayerControl* __this, bool isActive, bo
         if (State.ShowConsoleEventsAsToasts &&
             ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_PHANTOM) &&
             ConsoleGui::IsPlayerFiltered(__this->fields.PlayerId)) {
-            std::string toastContent = std::format("{} ({}) has {}!",
+            std::string toastContent = std::format("{} ({}) {}!",
                 source.playerName, GetColorName(source.colorId),
                 isActive ? "vanished" : "appeared");
             Toasts::AddToast(isActive ? "Player Vanished" : "Player Appeared", toastContent,

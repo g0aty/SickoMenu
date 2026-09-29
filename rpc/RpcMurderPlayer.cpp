@@ -1,5 +1,6 @@
 #include "pch-il2cpp.h"
 #include "_rpc.h"
+#include "_hooks.h"
 #include "game.h"
 #include "utility.h"
 #include "state.hpp"
@@ -194,7 +195,7 @@ void RpcShapeshiftAsHost::Process()
     }
 
     // actually shapeshift the player
-    PlayerControl_Shapeshift(Player, targetPc, animate, NULL);
+    dPlayerControl_Shapeshift(Player, targetPc, animate, NULL); // use the hook to log shapeshift events
     MessageWriter_StartMessage(writer, rpcFlag, NULL);
     MessageWriter_WritePacked(writer, Player->fields._.NetId, NULL);
     MessageWriter_WriteByte(writer, (uint8_t)RpcCalls__Enum::Shapeshift, NULL);

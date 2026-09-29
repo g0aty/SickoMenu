@@ -619,6 +619,10 @@ void Settings::Load() {
         JSON_TRYGET("JudgeColor_G", this->JudgeColor.y);
         JSON_TRYGET("JudgeColor_B", this->JudgeColor.z);
         JSON_TRYGET("JudgeColor_A", this->JudgeColor.w);
+        JSON_TRYGET("InfluencerColor_R", this->InfluencerColor.x);
+        JSON_TRYGET("InfluencerColor_G", this->InfluencerColor.y);
+        JSON_TRYGET("InfluencerColor_B", this->InfluencerColor.z);
+        JSON_TRYGET("InfluencerColor_A", this->InfluencerColor.w);
 
         JSON_TRYGET("HostColor_R", this->HostColor.x);
         JSON_TRYGET("HostColor_G", this->HostColor.y);
@@ -1308,6 +1312,10 @@ void Settings::Save() {
                 { "JudgeColor_G", this->JudgeColor.y },
                 { "JudgeColor_B", this->JudgeColor.z },
                 { "JudgeColor_A", this->JudgeColor.w },
+                { "InfluencerColor_R", this->InfluencerColor.x },
+                { "InfluencerColor_G", this->InfluencerColor.y },
+                { "InfluencerColor_B", this->InfluencerColor.z },
+                { "InfluencerColor_A", this->InfluencerColor.w },
                 { "HostColor_R", this->HostColor.x },
                 { "HostColor_G", this->HostColor.y },
                 { "HostColor_B", this->HostColor.z },

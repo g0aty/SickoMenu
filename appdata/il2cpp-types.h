@@ -5279,6 +5279,7 @@ namespace app {
         Detective = 0x000c,
         Viper = 0x0012,
         Judge = 0x0013,
+        Influencer = 0x0014,
     };
 #else
     enum RoleTypes__Enum {
@@ -5296,6 +5297,7 @@ namespace app {
         RoleTypes__Enum_Detective = 0x000c,
         RoleTypes__Enum_Viper = 0x0012,
         RoleTypes__Enum_Judge = 0x0013,
+        RoleTypes__Enum_Influencer = 0x0014,
     };
 
 #endif

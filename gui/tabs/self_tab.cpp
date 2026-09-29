@@ -779,6 +779,7 @@ namespace SelfTab {
                 {"Detective",		State.DetectiveColor},
                 {"Viper",			State.ViperColor},
                 {"Judge",           State.JudgeColor},
+                {"Influencer",      State.InfluencerColor},
             }; // needs to be updated every render
 
             if (CustomListBoxIntColored("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ", FAKEROLE_NAMES_COLOR, IM_ARRAYSIZE(FAKEROLE_NAMES_COLOR))) {
@@ -813,30 +814,42 @@ namespace SelfTab {
             case (int)RoleTypes__Enum::Crewmate:
             case (int)RoleTypes__Enum::Engineer:
             case (int)RoleTypes__Enum::Scientist:
-            case (int)RoleTypes__Enum::Noisemaker:
             case (int)RoleTypes__Enum::Tracker:
             case (int)RoleTypes__Enum::Detective:
             case (int)RoleTypes__Enum::CrewmateGhost:
             case (int)RoleTypes__Enum::ImpostorGhost:
+                roleAllowed = true;
+                break;
+            case (int)RoleTypes__Enum::Noisemaker:
+                if (State.RealRole != RoleTypes__Enum::Noisemaker) {
+                    roleAllowed = false;
+                    break;
+                }
+                roleAllowed = true;
+                break;
             case (int)RoleTypes__Enum::GuardianAngel:
+                if (!IsHost() && State.SafeMode && State.RealRole != RoleTypes__Enum::GuardianAngel) {
+                    roleAllowed = false;
+                    break;
+                }
                 roleAllowed = true;
                 break;
             case (int)RoleTypes__Enum::Judge:
-                if (State.SafeMode || State.RealRole != RoleTypes__Enum::Judge) {
+                if (State.SafeMode && State.RealRole != RoleTypes__Enum::Judge) {
                     roleAllowed = false;
                     break;
                 }
                 roleAllowed = true;
                 break;
             case (int)RoleTypes__Enum::Impostor:
-                if ((!IsHost() && State.SafeMode) || State.RealRole != RoleTypes__Enum::Impostor || State.RealRole != RoleTypes__Enum::Shapeshifter || State.RealRole != RoleTypes__Enum::Phantom || State.RealRole != RoleTypes__Enum::Viper) {
+                if (!IsHost() && State.SafeMode && State.RealRole != RoleTypes__Enum::Impostor && State.RealRole != RoleTypes__Enum::Shapeshifter && State.RealRole != RoleTypes__Enum::Phantom && State.RealRole != RoleTypes__Enum::Viper) {
                     roleAllowed = false;
                     break;
                 }
                 roleAllowed = true;
                 break;
             case (int)RoleTypes__Enum::Shapeshifter:
-                if (State.SafeMode || State.RealRole != RoleTypes__Enum::Shapeshifter) {
+                if (State.SafeMode && State.RealRole != RoleTypes__Enum::Shapeshifter) {
                     roleAllowed = false;
                     break;
                 }

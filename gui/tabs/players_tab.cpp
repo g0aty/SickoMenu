@@ -149,12 +149,14 @@ namespace PlayersTab {
                 {"Detective",		State.DetectiveColor},
                 {"Viper",			State.ViperColor},
                 {"Judge",           State.JudgeColor},
+                {"Influencer",      State.InfluencerColor},
             }; // needs to be updated every render
 
             ColorMapping GHOSTROLE_NAMES_COLOR[] = {
                 {"Guardian Angel",	State.GuardianAngelColor},
                 {"Crewmate Ghost",  State.CrewmateGhostColor},
                 {"Impostor Ghost",	State.ImpostorGhostColor},
+                {"Influencer",	    State.InfluencerColor},
 
             }; // this too
 
@@ -1803,7 +1805,7 @@ namespace PlayersTab {
                     if ((IsHost() || !State.SafeMode) && (IsInGame() || IsInLobby()) && selectedPlayers.size() == 1) {
                         if (!IsInMultiplayerGame() || !selectedPlayer.get_PlayerControl()->fields.roleAssigned)
                         {
-                        if (CustomListBoxIntColored("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", FAKEROLE_NAMES_COLOR, IM_ARRAYSIZE(FAKEROLE_NAMES_COLOR))) {
+                        if (CustomListBoxIntColored("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", FAKEROLE_NAMES_COLOR, IM_ARRAYSIZE(FAKEROLE_NAMES_COLOR))) {
                                 // for some reason, detective is 12 (0x0c) instead of 11, and viper is 18 (0x12) instead of 12
                                 if (State.FakeRole >= 12) State.FakeRoleId = State.FakeRole + 6;
                                 else if (State.FakeRole == 11) State.FakeRoleId = State.FakeRole + 1;
@@ -1821,7 +1823,7 @@ namespace PlayersTab {
                         }
                         else {
                             static int ghostRole = 0;
-                        if (CustomListBoxIntColored("Select Role", &ghostRole, GHOSTROLES, 100.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", GHOSTROLE_NAMES_COLOR, IM_ARRAYSIZE(GHOSTROLE_NAMES_COLOR)))
+                            if (CustomListBoxIntColored("Select Role", &ghostRole, GHOSTROLES, 100.0f * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", GHOSTROLE_NAMES_COLOR, IM_ARRAYSIZE(GHOSTROLE_NAMES_COLOR)))
                                 State.Save();
                             ImGui::SameLine();
                             if (AnimatedButton("Set Role"))
@@ -1836,6 +1838,9 @@ namespace PlayersTab {
                                     break;
                                 case 2:
                                     roleType = RoleTypes__Enum::ImpostorGhost;
+                                    break;
+                                case 3:
+                                    roleType = RoleTypes__Enum::Influencer;
                                     break;
                                 }
                                 if (IsInGame())

@@ -595,6 +595,7 @@ public:
     ImVec4 DetectiveColor = ImVec4(0.718f, 0.678f, 0.980f, 1.f);
     ImVec4 ViperColor = ImVec4(1.0f, 0.937f, 0.455f, 1.f);
     ImVec4 JudgeColor = ImVec4(0.0f, 0.588f, 0.204f, 1.f);
+    ImVec4 InfluencerColor = ImVec4(0.486f, 0.f, 0.596f, 1.f);
 
     ImVec4 HostColor = ImVec4(1.f, 0.73f, 0.f, 1.f);
     ImVec4 PlayerIdColor = ImVec4(1.f, 0.f, 0.f, 1.f);

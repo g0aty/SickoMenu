@@ -1752,7 +1752,7 @@ void dAmongUsClient_OnPlayerLeft(AmongUsClient* __this, ClientData* data, Discon
                     if (State.ShowConsoleEventsAsToasts &&
                         ConsoleGui::IsEventFiltered(EVENT_TYPES::EVENT_DISCONNECT) &&
                         ConsoleGui::IsPlayerFiltered(playerInfo->fields.PlayerId)) {
-                        std::string toastContent = std::format("{} ({}) has left the game!",
+                        std::string toastContent = std::format("{} ({}) left the game!",
                             source.playerName, GetColorName(source.colorId));
                         Toasts::AddToast("Player Disconnected", toastContent, ImVec4(1.f, 1.f, 1.f, 1.f));
                     }
