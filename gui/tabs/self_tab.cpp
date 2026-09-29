@@ -869,6 +869,13 @@ namespace SelfTab {
                 }
                 roleAllowed = true;
                 break;
+            case (int)RoleTypes__Enum::Influencer:
+                if (State.RealRole != RoleTypes__Enum::Influencer) {
+                    roleAllowed = false;
+                    break;
+                }
+                roleAllowed = true;
+                break;
             default:
                 roleAllowed = false;
                 break;
