@@ -128,7 +128,8 @@ void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* re
     int32_t pos = reader->fields._position, head = reader->fields.readHead;
     auto systemType = (SystemTypes__Enum)MessageReader_ReadByte(reader, NULL);
 
-    if (!State.PanicMode && !IsHost() && State.AntiExploit_UnauthorizedSabotages && systemType != SystemTypes__Enum::Ventilation)
+    if (!State.PanicMode && !IsHost() && State.AntiExploit_UnauthorizedSabotages && systemType != SystemTypes__Enum::Ventilation &&
+        callId != (uint8_t)RpcCalls__Enum::SpiritGuideMessage) // haha SpiritGuideMessage is 67 OMG SIX SEVEN
         return;
     // VentilationSystem is handled separately
 

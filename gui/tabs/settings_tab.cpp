@@ -850,11 +850,11 @@ namespace SettingsTab {
 			ImGui::SameLine(100 * State.dpiScale);
 			ImGui::Text("NoClip");
 
-			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+			/*ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 
 			CheckKeybindEdit(HotKey(State.KeyBinds.Toggle_Autokill));
 			ImGui::SameLine(100 * State.dpiScale);
-			ImGui::Text("Autokill");
+			ImGui::Text("Autokill");*/
 
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
 

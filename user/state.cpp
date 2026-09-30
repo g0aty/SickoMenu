@@ -369,7 +369,7 @@ void Settings::Load() {
         JSON_TRYGET("KillInVanish", this->KillInVanish);
         JSON_TRYGET("BypassAngelProt", this->BypassAngelProt);
         JSON_TRYGET("InfiniteKillRange", this->InfiniteKillRange);
-        JSON_TRYGET("AutoKill", this->AutoKill);
+        // JSON_TRYGET("AutoKill", this->AutoKill);
         JSON_TRYGET("FakeAlive", this->FakeAlive);
         JSON_TRYGET("ShowHost", this->ShowHost);
         JSON_TRYGET("HideWatermark", this->HideWatermark);
@@ -1085,7 +1085,7 @@ void Settings::Save() {
                 { "KillInVanish", this->KillInVanish },
                 { "BypassAngelProt", this->BypassAngelProt },
                 { "InfiniteKillRange", this->InfiniteKillRange },
-                { "AutoKill", this->AutoKill },
+                // { "AutoKill", this->AutoKill },
                 { "FakeAlive", this->FakeAlive },
                 { "HideWatermark", this->HideWatermark },
                 { "HideModStamp", this->HideModStamp },
