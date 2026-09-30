@@ -39,6 +39,6 @@ namespace HostTab {
 		{"The Fungle",		ImColor::ImColor(0xFF08FD8E)},
 	};
 	void Render();
-	const ptrdiff_t GetRoleCount(RoleType role);
+	const ptrdiff_t GetRoleCount(RoleType role, bool excludeSelf = false);
 	void OpenSubGroup(const std::string& name);
 }

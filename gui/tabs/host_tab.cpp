@@ -64,8 +64,14 @@ namespace HostTab {
         if (IsInLobby()) State.lobbyRpcQueue.push(new RpcSyncSettings());
     }
 
-    const ptrdiff_t GetRoleCount(RoleType role)
+    const ptrdiff_t GetRoleCount(RoleType role, bool excludeSelf)
     {
+        if (excludeSelf) {
+            std::array<RoleType, Game::MAX_PLAYERS> assignedRolesCopy = {};
+            std::copy(std::begin(State.assignedRoles), std::end(State.assignedRoles), std::begin(assignedRolesCopy));
+            if (*Game::pLocalPlayer != NULL) assignedRolesCopy[(*Game::pLocalPlayer)->fields.PlayerId] = RoleType::Random;
+            return std::count_if(assignedRolesCopy.cbegin(), assignedRolesCopy.cend(), [role](RoleType i) {return i == role; });
+        }
         return std::count_if(State.assignedRoles.cbegin(), State.assignedRoles.cend(), [role](RoleType i) {return i == role; });
     }
 
@@ -352,23 +358,49 @@ namespace HostTab {
                         int hostRoleInt = (int)State.HostRoleToSet;
                         if (CustomListBoxIntColored("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", ROLE_NAMES_COLOR, IM_ARRAYSIZE(ROLE_NAMES_COLOR))) {
                             if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
-                                if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount + 1 > GetMaxImpostorAmount((int)GetAllPlayerData().size())) {
-                                    State.AutoHostRole = false;
-                                }
-                                else {
-                                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Impostor;
+                                if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount < GetMaxImpostorAmount((int)GetAllPlayerData().size()) - 1) {
+                                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) hostRoleInt = (int)RoleType::Impostor;
                                 }
                             }
                             else {
-                                if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.judges_amount + State.crewmates_amount + 1 >= (int)GetAllPlayerData().size()) {
-                                    State.AutoHostRole = false;
-                                }
-                                else {
-                                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) State.HostRoleToSet = RoleType::Engineer;
+                                if (State.engineers_amount + State.scientists_amount + State.trackers_amount + State.noisemakers_amount + State.detectives_amount + State.judges_amount + State.crewmates_amount < (int)GetAllPlayerData().size() - 1) {
+                                    if (options.GetGameMode() == GameModes__Enum::HideNSeek) hostRoleInt = (int)RoleType::Engineer;
                                 }
                             }
                             State.HostRoleToSet = (RoleType)hostRoleInt;
                             State.Save();
+                        }
+
+                        if (State.AutoHostRole && *Game::pLocalPlayer != NULL) {
+                            int index = (*Game::pLocalPlayer)->fields.PlayerId;
+                            auto assignedRole = State.assignedRoles[index];
+
+                            int totalEngineers = (int)GetRoleCount(RoleType::Engineer, true) + (State.HostRoleToSet == RoleType::Engineer);
+                            int totalScientists = (int)GetRoleCount(RoleType::Scientist, true) + (State.HostRoleToSet == RoleType::Scientist);
+                            int totalTrackers = (int)GetRoleCount(RoleType::Tracker, true) + (State.HostRoleToSet == RoleType::Tracker);
+                            int totalNoisemakers = (int)GetRoleCount(RoleType::Noisemaker, true) + (State.HostRoleToSet == RoleType::Noisemaker);
+                            int totalDetectives = (int)GetRoleCount(RoleType::Detective, true) + (State.HostRoleToSet == RoleType::Detective);
+                            int totalJudges = (int)GetRoleCount(RoleType::Judge, true) + (State.HostRoleToSet == RoleType::Judge);
+                            int totalShapeshifters = (int)GetRoleCount(RoleType::Shapeshifter, true) + (State.HostRoleToSet == RoleType::Shapeshifter);
+                            int totalPhantoms = (int)GetRoleCount(RoleType::Phantom, true) + (State.HostRoleToSet == RoleType::Phantom);
+                            int totalVipers = (int)GetRoleCount(RoleType::Viper, true) + (State.HostRoleToSet == RoleType::Viper);
+                            int totalImpostors = (int)GetRoleCount(RoleType::Impostor, true) + (State.HostRoleToSet == RoleType::Impostor);
+                            int totalCrewmates = (int)GetRoleCount(RoleType::Crewmate, true) + (State.HostRoleToSet == RoleType::Crewmate);
+
+                            int maxImpostors = GetMaxImpostorAmount((int)GetAllPlayerData().size());
+                            int sumOfImpostorRoles = totalImpostors + totalShapeshifters + totalPhantoms + totalVipers;
+                            int sumOfCrewmateRoles = totalEngineers + totalScientists + totalTrackers + totalNoisemakers + totalDetectives + totalJudges + totalCrewmates;
+
+                            if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
+                                if (sumOfImpostorRoles > maxImpostors) {
+                                    ImGui::TextWrapped("Role will not be assigned due to role assignment limits.");
+                                }
+                            }
+                            else {
+                                if (sumOfCrewmateRoles > (int)GetAllPlayerData().size() - maxImpostors) {
+                                    ImGui::TextWrapped("Role will not be assigned due to role assignment limits.");
+                                }
+                            }
                         }
                     }
                     ImGui::EndChild();
@@ -513,7 +545,7 @@ namespace HostTab {
                     }
 
                     if (IsInGame()) {
-                        CustomListBoxIntColored("Reason", &State.SelectedGameEndReasonId, GAMEENDREASON, 120.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", GAMEENDREASONCOLORS, IM_ARRAYSIZE(GAMEENDREASONCOLORS));
+                        CustomListBoxIntColored("Reason", &State.SelectedGameEndReasonId, GAMEENDREASON, 120.0f * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", GAMEENDREASONCOLORS, IM_ARRAYSIZE(GAMEENDREASONCOLORS));
 
                         ImGui::SameLine();
 
@@ -523,7 +555,7 @@ namespace HostTab {
                     }
                 }
 
-                CustomListBoxIntColored("  ", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
+                CustomListBoxIntColored("Select Color", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
 
                 if (ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
                     State.Save();
