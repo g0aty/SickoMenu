@@ -5369,6 +5369,7 @@ namespace app {
 #endif
         struct Sprite* RoleIconSolid;
         struct Sprite* RoleIconWhite;
+        struct Sprite* RoleIconColor;
         struct Sprite* RoleScreenshot;
         struct Color NameColor;
         bool TasksCountTowardProgress;
@@ -5419,6 +5420,7 @@ namespace app {
         VirtualInvokeData UseSecondaryAbility;
         VirtualInvokeData OnMeetingStart;
         VirtualInvokeData OnVotingComplete;
+        VirtualInvokeData OnExileComplete;
         VirtualInvokeData OnDeath;
         VirtualInvokeData OnRoleSet;
         VirtualInvokeData Initialize;
@@ -11942,6 +11944,12 @@ namespace app {
         Il2CppClass_1 _1;
         struct LobbyNotificationMessage__VTable vtable;
     };
+#pragma endregion
+
+#pragma region SpiritGuideRole
+    typedef Il2CppObject SpiritGuideRole;
+    typedef Il2CppObject SpiritGuideImageButton;
+    WRAPPER_IL2CPP_LIST(SpiritGuideImageButton, struct SpiritGuideImageButton*);
 #pragma endregion
 
     typedef Il2CppReflectionMethod MonoMethod;

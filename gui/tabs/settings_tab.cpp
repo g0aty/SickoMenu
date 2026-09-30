@@ -677,7 +677,7 @@ namespace SettingsTab {
 					State.Save();
 				}
 				ImGui::SameLine();
-				if (CustomListBoxInt("  ", &toastsOnTopSelector, { "Left", "Center", "Right" }, 50.f * State.dpiScale)) {
+				if (CustomListBoxInt("  ", &State.ToastPositionX, { "Left", "Center", "Right" }, 50.f * State.dpiScale)) {
 					State.Save();
 				}
 
@@ -735,7 +735,7 @@ namespace SettingsTab {
 					State.DetectiveColor = ImVec4(0.718f, 0.678f, 0.980f, 1.f);
 					State.ViperColor = ImVec4(1.0f, 0.937f, 0.455f, 1.f);
 					State.JudgeColor = ImVec4(0.0f, 0.588f, 0.204f, 1.f);
-					State.InfluencerColor = ImVec4(0.486f, 0.f, 0.596f, 1.f);
+					State.InfluencerColor = ImVec4(0.486f, 0.f, 0.596f, 0.5f);
 					State.Save();
 				}
 			}

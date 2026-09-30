@@ -450,6 +450,7 @@ void Settings::Load() {
         JSON_TRYGET("Judge_NoTaskRequirement", this->Judge_NoTaskRequirement);
         JSON_TRYGET("Judge_InfiniteOverrules", this->Judge_InfiniteOverrules);
         JSON_TRYGET("GuardianAngel_NoProtectCooldown", this->GuardianAngel_NoProtectCooldown);
+        JSON_TRYGET("Influencer_NoRefreshCooldown", this->Influencer_NoRefreshCooldown);
         JSON_TRYGET("Impostor_NoKillCooldown", this->Impostor_NoKillCooldown);
         JSON_TRYGET("Shapeshifter_InfiniteShapeshiftDuration", this->Shapeshifter_InfiniteShapeshiftDuration);
 
@@ -1164,6 +1165,7 @@ void Settings::Save() {
                 { "Judge_NoTaskRequirement", this->Judge_NoTaskRequirement },
                 { "Judge_InfiniteOverrules", this->Judge_InfiniteOverrules },
                 { "GuardianAngel_NoProtectCooldown", this->GuardianAngel_NoProtectCooldown },
+                { "Influencer_NoRefreshCooldown", this->Influencer_NoRefreshCooldown },
                 { "Impostor_NoKillCooldown", this->Impostor_NoKillCooldown },
                 { "Shapeshifter_InfiniteShapeshiftDuration", this->Shapeshifter_InfiniteShapeshiftDuration },
 

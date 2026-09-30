@@ -311,6 +311,7 @@ void DetourInitilization() {
 	HOOKFUNC(GameStartManager_ResetStartState);
 	HOOKFUNC(CustomNetworkTransform_HandleRpc);
 	HOOKFUNC(PlayerControl_CmdCheckUseZipline);
+	HOOKFUNC(SpiritGuideRole_FixedUpdate);
 
 	if (!HookFunction(&(PVOID&)oPresent, dPresent, "D3D_PRESENT_FUNCTION")) return;
 
@@ -533,6 +534,7 @@ void DetourUninitialization()
 	UNHOOKFUNC(GameStartManager_ResetStartState);
 	UNHOOKFUNC(CustomNetworkTransform_HandleRpc);
 	UNHOOKFUNC(PlayerControl_CmdCheckUseZipline);
+	UNHOOKFUNC(SpiritGuideRole_FixedUpdate);
 
 	if (DetourDetach(&(PVOID&)oPresent, dPresent) != 0) return;
 

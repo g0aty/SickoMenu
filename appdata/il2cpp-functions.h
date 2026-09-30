@@ -503,6 +503,7 @@ DO_APP_FUNC(void, DetectiveRole_FixedUpdate, (DetectiveRole* __this, MethodInfo*
 DO_APP_FUNC(void, JudgeRole_set_HasAnOverruleUse, (JudgeRole* __this, bool value, MethodInfo* method), "Assembly-CSharp, System.Void JudgeRole::set_HasAnOverruleUse(System.Boolean)");
 DO_APP_FUNC(void, GuardianAngelRole_FixedUpdate, (GuardianAngelRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void GuardianAngelRole::FixedUpdate()");
 DO_APP_FUNC(void, ShapeshifterRole_FixedUpdate, (ShapeshifterRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void ShapeshifterRole::FixedUpdate()");
+DO_APP_FUNC(void, SpiritGuideRole_FixedUpdate, (SpiritGuideRole* __this, MethodInfo* method), "Assembly-CSharp, System.Void SpiritGuideRole::FixedUpdate()");
 DO_APP_FUNC(void, MatchInfoHudButton_Update, (MatchInfoHudButton* __this, MethodInfo* method), "Assembly-CSharp, System.Void MatchInfoHudButton::Update()");
 DO_APP_FUNC(void, MatchInfoGuide_Update, (MatchInfoGuide* __this, MethodInfo* method), "Assembly-CSharp, System.Void MatchInfoGuide::Update()");
 DO_APP_FUNC(void, MatchInfoGuide_CreatePlayerEntries, (MatchInfoGuide* __this, MethodInfo* method), "Assembly-CSharp, System.Void MatchInfoGuide::CreatePlayerEntries()");
@@ -537,3 +538,5 @@ DO_APP_FUNC(String*, CosmeticsLayer_GetColorBlindText, (CosmeticsLayer* __this, 
 
 DO_APP_FUNC(void, PlayerControl_RpcUseZipline, (PlayerControl* __this, PlayerControl* target, ZiplineBehaviour* ziplineBehaviour, bool fromTop, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::RpcUseZipline(PlayerControl, ZiplineBehaviour, System.Boolean)");
 DO_APP_FUNC(void, PlayerControl_CmdCheckUseZipline, (PlayerControl* __this, PlayerControl* target, ZiplineBehaviour* ziplineBehaviour, bool fromTop, MethodInfo* method), "Assembly-CSharp, System.Void PlayerControl::CmdCheckUseZipline(PlayerControl, ZiplineBehaviour, System.Boolean)");
+
+DO_APP_FUNC(void, ActionButton_SetCoolDown, (ActionButton* __this, float timer, float maxTimer, MethodInfo* method), "Assembly-CSharp, System.Void ActionButton::SetCoolDown(System.Single, System.Single)");

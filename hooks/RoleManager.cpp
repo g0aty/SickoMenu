@@ -388,6 +388,26 @@ void dShapeshifterRole_FixedUpdate(ShapeshifterRole* __this, MethodInfo* method)
 	ShapeshifterRole_FixedUpdate(__this, method);
 }
 
+void dSpiritGuideRole_FixedUpdate(SpiritGuideRole* __this, MethodInfo* method) {
+	static FieldInfo* imageButtonsField = il2cpp_class_get_field_from_name(__this->klass, "selectedImageButtons");
+	auto selectedButtonsList = (List_1_SpiritGuideImageButton_*)il2cpp_field_get_value_object(imageButtonsField, __this);
+
+	static FieldInfo* panelField = il2cpp_class_get_field_from_name(__this->klass, "spiritGuidePanel");
+	auto panelObj = (GameObject*)il2cpp_field_get_value_object(panelField, __this);
+	bool isPanelActive = GameObject_GetActive(panelObj, NULL);
+
+	il2cpp::List selectedButtons(selectedButtonsList);
+
+	// check if the image selection panel is active and whether any images are selected
+	// this ensures that the cooldown is only reset to zero if the refresh button is active
+	if (!State.PanicMode && isPanelActive && selectedButtons.size() == 0 && State.Influencer_NoRefreshCooldown) {
+		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(__this->klass, "cooldownSecondsRemaining");
+		float zeroCooldown = 0.f;
+		il2cpp_field_set_value(__this, cooldownField, &zeroCooldown);
+	}
+	SpiritGuideRole_FixedUpdate(__this, method);
+}
+
 void dGameManager_ReviveEveryoneFreeplay(GameManager* __this, MethodInfo* method) {
 	GameManager_ReviveEveryoneFreeplay(__this, method);
 	State.MIG_ThemeChanged = true;

@@ -953,6 +953,10 @@ namespace SelfTab {
                 ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
             }
 
+            ImGui::TextColored(State.InfluencerColor, "Influencer");
+            if (ToggleButton("No Refresh Cooldown", &State.Influencer_NoRefreshCooldown)) State.Save();
+            ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
+
             ImGui::TextColored(State.ImpostorColor, "Impostor");
             if (ToggleButton("Kill Other Impostors", &State.KillImpostors)) State.Save();
             ImGui::SameLine();

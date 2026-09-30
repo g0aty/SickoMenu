@@ -224,6 +224,7 @@ void dNetworkedPlayerInfo_UpdateNamePlate(NetworkedPlayerInfo* __this, String* n
 void dGameStartManager_ResetStartState(GameStartManager* __this, MethodInfo* method);
 void dCustomNetworkTransform_HandleRpc(CustomNetworkTransform* __this, uint8_t callId, MessageReader* reader, MethodInfo* method);
 void dPlayerControl_CmdCheckUseZipline(PlayerControl* __this, PlayerControl* target, ZiplineBehaviour* ziplineBehaviour, bool fromTop, MethodInfo* method);
+void dSpiritGuideRole_FixedUpdate(SpiritGuideRole* __this, MethodInfo* method);
 
 // defined in LobbyBehaviour.cpp
 void ApplyHostPreset(const Settings::HostPreset& p);
