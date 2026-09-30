@@ -81,5 +81,5 @@ A: Grow a brain. SickoMenu doesn't support Among Us 3D since it's a completely d
 ## Q15: My antivirus keeps automatically deleting the file, how do I make it stop???
 A: Software is made to be used. It very often comes with some form of user interface. You, as a user, are meant to explore this user interface to familiarize yourself with the software you've installed on your computer... hint: it will likely be a menu named "exclusions" or "whitelist"... For Windows Security, use [this guide](https://www.elevenforum.com/t/add-or-remove-exclusions-for-microsoft-defender-antivirus-in-windows-11.8797/).
 
-## Q20: My game doesn't launch with SickoMenu while using version.dll, why?
+## Q16: My game doesn't launch with SickoMenu while using version.dll, why?
 A: Get rid of other mod loaders if you have them installed. For example, if you have BepInEx installed, remove `winhttp.dll`. If you still want to use SickoMenu with other mods that rely on other mod loaders, inject `SickoMenu.dll` with an injector instead. (Note that [SickoMenu does NOT guarantee compatibility with other mods](<https://github.com/g0aty/SickoMenu/blob/main/FAQ.md#q10-does-sickomenu-support-other-mods-and-is-it-planned>) either way.)
