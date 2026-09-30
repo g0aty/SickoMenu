@@ -452,13 +452,6 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                     roleColor.a, playerName);
             }
 
-            if (IsInGame() && playerData->fields.Role && PlayerIsImpostor(playerData) && !playerData->fields.IsDead) {
-                playerData->fields.Role->fields.CanUseKillButton = true;
-                playerData->fields.Role->fields.TeamType = RoleTeamTypes__Enum::Impostor;
-                // AU v18 somehow doesn't recognize the value as true for other players
-                // leading to ShowKillCD not working as intended
-            }
-
             if (IsInGame() && State.ShowKillCD
                 && !playerData->fields.IsDead
                 && playerData->fields.Role

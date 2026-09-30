@@ -398,22 +398,9 @@ void dMeetingHud_Update(MeetingHud* __this, MethodInfo* method) {
                         roleColor.r, roleColor.g, roleColor.b,
                         roleColor.a, playerName);
                 }
-                else {
-                    bool shouldSeeImpostor = PlayerIsImpostor(playerData) && PlayerIsImpostor(localData);
-                    Color32&& roleColor = app::Color32_op_Implicit(shouldSeeImpostor ?
-                        Palette__TypeInfo->static_fields->ImpostorRed :
-                        Palette__TypeInfo->static_fields->White, NULL);
-
-                    playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
-                        roleColor.r, roleColor.g, roleColor.b,
-                        roleColor.a, playerName);
-                }
 
                 String* playerNameStr = convert_to_string(playerName);
                 TMP_Text_set_text((app::TMP_Text*)playerNameTMP, playerNameStr, NULL);
-
-                TMP_Text_set_color((app::TMP_Text*)playerNameTMP, Color(1.f, 1.f, 1.f, 1.f), NULL);
-                // fix impostor colors showing up as partially transparent while you are impostor
             }
 
             if (playerData)

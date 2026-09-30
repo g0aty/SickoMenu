@@ -1315,11 +1315,8 @@ NetworkedPlayerInfo_PlayerOutfit* GetPlayerOutfit(NetworkedPlayerInfo* player, b
 
 bool PlayerIsImpostor(NetworkedPlayerInfo* player) {
     if (player->fields.Role == nullptr) return false;
-
-    // equating roles because TeamType wasn't giving the correct result
-    auto role = player->fields.RoleType;
-    return role == RoleTypes__Enum::ImpostorGhost || role == RoleTypes__Enum::Impostor || role == RoleTypes__Enum::Shapeshifter ||
-        role == RoleTypes__Enum::Phantom || role == RoleTypes__Enum::Viper;
+    
+    return player->fields.Role->fields.TeamType == RoleTeamTypes__Enum::Impostor;
 }
 
 bool FriendCodeHasPermission(const std::string& friendCode, const std::string& commandKey) {
