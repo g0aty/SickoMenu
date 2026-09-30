@@ -21,7 +21,7 @@ jobs:
             configuration: Release
             path: Release
 
-          - name: Release_Steam_Epic_MS_XboxApp_x64
+          - name: Release_x64
             platform: x64
             configuration: Release
             path: x64\Release
@@ -31,7 +31,7 @@ jobs:
             configuration: Debug
             path: Debug
 
-          - name: Debug_Steam_Epic_MS_XboxApp_x64
+          - name: Debug_x64
             platform: x64
             configuration: Debug
             path: x64\Debug
@@ -81,6 +81,6 @@ jobs:
           generate_release_notes: true
           files: |
             Release_x86_SteamItch/Release_Itch_x86.zip
-            Release_x64_EpicXboxMS/Release_Steam_Epic_MS_XboxApp_x64.zip
+            Release_x64_EpicXboxMS/Release_x64.zip
             Debug_x86_SteamItch/Debug_Itch_x86.zip
-            Debug_x64_EpicXboxMS/Debug_Steam_Epic_MS_XboxApp_x64.zip
+            Debug_x64_EpicXboxMS/Debug_x64.zip
