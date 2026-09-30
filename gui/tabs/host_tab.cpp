@@ -555,7 +555,7 @@ namespace HostTab {
                     }
                 }
 
-                CustomListBoxIntColored("Select Color", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
+                CustomListBoxIntColored("Select Color", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
 
                 if (ToggleButton("Force Color for Everyone", &State.ForceColorForEveryone)) {
                     State.Save();
@@ -635,7 +635,8 @@ namespace HostTab {
 
                 int maxPackedRpcs = 10 + GameOptions().GetInt(Int32OptionNames__Enum::MaxPlayers) * 2;
 
-                if (GetAllPlayerControl().size() == 1 && IsInGame()) { \
+#define LocalInGame (((*Game::pAmongUsClient)->fields._.NetworkMode == NetworkModes__Enum::LocalGame) && ((*Game::pAmongUsClient)->fields._.GameState == InnerNetClient_GameStates__Enum::Started))
+                if (GetAllPlayerControl().size() == 1 && IsInMultiplayerGame() && !LocalInGame) { \
                     if (!State.farmLoop && AnimatedButton(std::format("Level Farm ({} Kills)", 5000 * maxPackedRpcs).c_str())) {
                         State.rpcQueue.push(new RpcSetRole(*Game::pLocalPlayer, RoleTypes__Enum::ImpostorGhost));
                         State.farmCount = 5000; //controls how many times the player is to be murdered
@@ -648,7 +649,10 @@ namespace HostTab {
                         State.rpcQueue.push(new SetRole(RoleTypes__Enum::Impostor));
                         State.rpcQueue.push(new RpcEndGame(GameOverReason__Enum::ImpostorsByKill));*/
                     }
-                    if (State.farmLoop) ImGui::Text("(%d Kills)", (5000 - State.farmCount) * maxPackedRpcs);
+                    if (State.farmLoop) {
+                        ImGui::SameLine();
+                        ImGui::Text("(%d Kills)", (5000 - State.farmCount) * maxPackedRpcs);
+                    }
                     else {
                         ImGui::SameLine();
                         if (AnimatedButton("Set Impostor Role")) {
