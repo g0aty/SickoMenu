@@ -913,10 +913,17 @@ void dPlayerControl_RpcSyncSettings(PlayerControl* __this, Byte__Array* optionsB
 
 bool dPlayerControl_get_CanMove(PlayerControl* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dPlayerControl_get_CanMove executed", false);
+
     try {
-        if (__this == NULL || GetPlayerData(__this) == NULL) return false;
+        if (__this == NULL || GetPlayerData(__this) == NULL || __this->fields.MyPhysics == NULL) return false;
+        if (!State.HasSpawnedIn && PlayerControl_get_CanMove(__this, method) && State.CanChangeOutfit)
+            State.HasSpawnedIn = true;
+
+        auto myPhysics = __this->fields.MyPhysics;
+
         if (!State.PanicMode && __this == *Game::pLocalPlayer) {
-            if (((State.AlwaysMove) || (State.MoveInVentAndShapeshift && (((*Game::pLocalPlayer)->fields.inVent) || ((*Game::pLocalPlayer)->fields.shapeshifting)))) && !State.ChatFocused && !((*Game::pLocalPlayer)->fields.petting)) {
+            if ( (State.AlwaysMove || (State.MoveInVentAndShapeshift && (__this->fields.inVent || __this->fields.shapeshifting)) ) &&
+                !State.ChatFocused && !__this->fields.petting && !__this->fields.walkingToVent && State.HasSpawnedIn) {
                 return true;
             }
         }
@@ -1492,6 +1499,7 @@ PlayerControl* getValidKillTarget() {
     if (State.PanicMode && !amImpostor) return NULL;
     if (amDead) return NULL;
     if (!(State.UnlockKillButton && (IsHost() || !State.SafeMode)) && !amImpostor) return NULL;
+    if (!(*Game::pLocalPlayer)->fields.moveable) return NULL;
 
     PlayerControl* result = NULL;
 
@@ -1518,7 +1526,7 @@ PlayerControl* getValidKillTarget() {
         if (pc == NULL || pc == *Game::pLocalPlayer) continue; // don't kill yourself
 
         auto pData = GetPlayerData(pc);
-        if (pc->fields.inVent && !(IsHost() || !State.SafeMode)) continue; // don't kill people in vents
+        if (pc->fields.inVent && !((IsHost() || !State.SafeMode) && State.ShowPlayersInVents) ) continue; // don't kill people in vents if you can't see them
         if (pData->fields.IsDead) continue; // don't kill ghosts
         if (PlayerIsImpostor(pData) && (State.PanicMode || !State.KillImpostors)) continue; // don't kill impostors
 

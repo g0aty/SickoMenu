@@ -137,7 +137,7 @@ namespace Menu {
 			{"No Vitals Cooldown", "Roles"}, {"Infinite Battery", "Roles"},
 			{"No Tracking Cooldown", "Roles"}, {"Infinite Tracking", "Roles"},
 			{"No Interrogate Cooldown", "Roles"}, {"No Task Requirement", "Roles"},
-			{"No Protect Cooldown", "Roles"}, {"No Kill Cooldown", "Roles"},
+			{"No Protect Cooldown", "Roles"}, {"No Refresh Cooldown", "Roles"}, {"No Kill Cooldown", "Roles"},
 			{"Kill Other Impostors", "Roles"}, {"Kill Reach", "Roles"},
 			{"Do Tasks as Impostor", "Roles"}, {"No Shapeshift Animation", "Roles"}, {"Infinite Shapeshift Duration", "Roles"},
 			{"Cycler", "Randomizers"}, {"Cycle in Meeting", "Randomizers"},

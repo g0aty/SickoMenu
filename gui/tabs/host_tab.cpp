@@ -290,7 +290,7 @@ namespace HostTab {
                                 } //Assign other roles in hidenseek causes game bug.
                                 //These are organized. Do not change the order unless you find it necessary.
 
-                                if (!IsInGame()) {
+                                /*if (!IsInGame()) {
                                     if (options.GetGameMode() == GameModes__Enum::HideNSeek)
                                         SetRoleAmount(RoleTypes__Enum::Engineer, 15, options);
                                     else
@@ -305,7 +305,7 @@ namespace HostTab {
                                     SetRoleAmount(RoleTypes__Enum::Viper, State.vipers_amount, options);
                                     if (options.GetNumImpostors() <= State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount)
                                         options.SetInt(app::Int32OptionNames__Enum::NumImpostors, State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount);
-                                }
+                                }*/
                             }
                         }
                         if (shouldEndListBox)

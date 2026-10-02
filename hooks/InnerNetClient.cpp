@@ -98,6 +98,7 @@ static void onGameEnd() {
         State.playerToAttach = {};
         State.DisableControlPetHand = false;
         State.ChatSpamMode = 0;
+        State.HasSpawnedIn = false;
 
         State.VoteOffPlayerId = Game::HasNotVoted;
 
@@ -275,12 +276,18 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                 }
             }
 
-            if (IsInGame() || IsInLobby()) {
+            if ((IsInGame() || IsInLobby()) &&
+                *Game::pLocalPlayer != nullptr && (*Game::pLocalPlayer)->fields.MyPhysics != nullptr) {
                 State.versionShower = nullptr;
-                if (State.AlwaysMove && !State.ChatFocused)
+                auto local = *Game::pLocalPlayer;
+                auto pData = GetPlayerData(local);
+
+                if (State.AlwaysMove && !State.ChatFocused &&
+                    !local->fields.petting && !local->fields.walkingToVent && State.HasSpawnedIn)
                     (*Game::pLocalPlayer)->fields.moveable = true;
-                if (State.FakeAlive && GetPlayerData(*Game::pLocalPlayer)->fields.IsDead) {
-                    GetPlayerData(*Game::pLocalPlayer)->fields.IsDead = false;
+
+                if (State.FakeAlive && pData->fields.IsDead) {
+                    pData->fields.IsDead = false;
                 }
             }
 

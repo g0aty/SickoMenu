@@ -1413,6 +1413,14 @@ int GetPlayerMaxRank(PlayerControl* pc) {
     if (pc == NULL) return -1;
     auto pd = GetPlayerData(pc);
     if (pd == NULL || pd->fields.FriendCode == NULL) return -1;
+    if (pc == (InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Character)) {
+        int maxRank = 0;
+        for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) {
+            if (i >= State.Mod_RoleMembers.size() || i >= State.Mod_RoleRank.size()) continue;
+            if (State.Mod_RoleRank[i] > maxRank) maxRank = State.Mod_RoleRank[i];
+        }
+        return maxRank;
+    }
     return GetFriendCodeMaxRank(convert_from_string(pd->fields.FriendCode));
 }
 

@@ -734,6 +734,7 @@ public:
     };
 
     bool CanChangeOutfit = false;
+    bool HasSpawnedIn = false;
     float OverflowTimer = 0.f;
     std::string OverflowCachedNamePlate = "";
     bool MainMenuLoaded = false;

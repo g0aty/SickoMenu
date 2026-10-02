@@ -16,7 +16,7 @@ static std::string CleanChatPresetName(std::string cpName) {
 }
 
 void Settings::Load() {
-    this->SickoVersion = "v5.1";
+    this->SickoVersion = "v5.1.1";
 
     auto path = getModulePath(NULL);
     auto configPath = path.parent_path() / "SickoMenu" / "sicko-selected-config.json";
@@ -222,7 +222,7 @@ void Settings::Load() {
                 if (p.contains("ViperDissolveTime")) preset.ViperDissolveTime = p["ViperDissolveTime"].get<float>();
                 if (p.contains("DetectiveSuspectLimit")) preset.DetectiveSuspectLimit = p["DetectiveSuspectLimit"].get<float>();
                 if (p.contains("JudgeTaskRequirement")) preset.JudgeTaskRequirement = p["JudgeTaskRequirement"].get<float>();
-                if (p.contains("InfluencerMessageCooldown")) preset.JudgeTaskRequirement = p["InfluencerMessageCooldown"].get<float>();
+                if (p.contains("InfluencerMessageCooldown")) preset.InfluencerMessageCooldown = p["InfluencerMessageCooldown"].get<float>();
                 if (p.contains("RoleRates") && p["RoleRates"].is_array()) {
                     for (auto& r : p["RoleRates"]) {
                         if (r.contains("Role") && r.contains("Count") && r.contains("Chance")) {
