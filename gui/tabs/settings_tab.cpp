@@ -61,10 +61,6 @@ namespace SettingsTab {
 		ImGui::BeginChild("###Settings", ImVec2(500 * State.dpiScale, 0), true, ImGuiWindowFlags_NoBackground);
 		if (openGeneral) {
 			ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
-			if (ToggleButton("Show Keybinds", &State.ShowKeybinds)) {
-				State.Save();
-			}
-			ImGui::SameLine();
 			if (ToggleButton("Allow Activating Keybinds while Chatting", &State.KeybindsWhileChatting)) {
 				State.Save();
 			}
@@ -335,6 +331,9 @@ namespace SettingsTab {
 				auto friendCodeValidText = "This new friend code should be <= 10 characters long and cannot have spaces.\nLeave this blank to generate a random friend code.";
 				if (isFriendCodeValid) ImGui::Text(friendCodeValidText);
 				else ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), friendCodeValidText);
+
+				if (State.SpoofGuestAccount)
+					ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Note: Other players cannot see your guest account's friend code in game.");
 			}
 			if (ToggleButton("Spoof Level", &State.SpoofLevel)) {
 				State.Save();
