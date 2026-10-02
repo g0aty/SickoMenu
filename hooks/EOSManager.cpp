@@ -137,7 +137,6 @@ void dEOSManager_Update(EOSManager* __this, MethodInfo* method) {
 	EOSManager_Update(__this, method);
 	//EOSManager_set_FriendCode(__this, __this->fields.friendCode, NULL);
 	if (State.SpoofGuestAccount) {
-		EOSManager_DeleteDeviceID(__this, NULL, NULL);
 		fakeSuccessfulLogin(__this);
 	}
 

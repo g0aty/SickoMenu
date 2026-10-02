@@ -378,7 +378,7 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
 
                 if (client != NULL && client == host) {
                     if (friendCode == "" && !IsStreamerMode())
-                        playerName = "<size=1.4>" + hostCol + "[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color" + friendCol + "No Friend Code</color><#0000>0</color>";
+                        playerName = "<size=1.4>" + hostCol + "[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color>" + friendCol + "No Friend Code</color><#0000>0</color>";
                     else
                         playerName = "<size=1.4>" + hostCol + "[HOST]</color> " + levelText + "</size></color>\n" + playerName + "</color>\n<size=1.4><#0000>0</color>" + friendCol + friendCode + "</color><#0000>0</color>";
                 }

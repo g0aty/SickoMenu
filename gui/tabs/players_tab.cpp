@@ -1630,7 +1630,12 @@ namespace PlayersTab {
                         if (AnimatedButton(selectedPlayers.size() == 1 ? "Unshift Player" : "Unshift Players")) {
                             for (PlayerSelection ps : selectedPlayers) {
                                 auto validPlayer = ps.validate();
-                                queue->push(new RpcShapeshift(validPlayer.get_PlayerControl(), validPlayer, true));
+                                if (IsHost()) {
+                                    queue->push(new RpcShapeshiftAsHost(validPlayer.get_PlayerControl(), validPlayer, true));
+                                }
+                                else {
+                                    queue->push(new RpcShapeshift(validPlayer.get_PlayerControl(), validPlayer, true));
+                                }
                             }
                         }
 
@@ -1649,7 +1654,12 @@ namespace PlayersTab {
                         if (AnimatedButton(selectedPlayers.size() == 1 ? "Reset Player" : "Reset Players")) {
                             for (PlayerSelection ps : selectedPlayers) {
                                 auto validPlayer = ps.validate();
-                                queue->push(new RpcShapeshift(validPlayer.get_PlayerControl(), validPlayer, false));
+                                if (IsHost()) {
+                                    queue->push(new RpcShapeshiftAsHost(validPlayer.get_PlayerControl(), validPlayer, false));
+                                }
+                                else {
+                                    queue->push(new RpcShapeshift(validPlayer.get_PlayerControl(), validPlayer, false));
+                                }
                             }
                         }
 
@@ -1658,7 +1668,7 @@ namespace PlayersTab {
                         if (selectedPlayers.size() == 1 && AnimatedButton("Shift Everyone To"))
                         {
                             for (auto player : GetAllPlayerControl()) {
-                                if (IsHost() && IsInGame()) {
+                                if (IsHost()) {
                                     queue->push(new RpcShapeshiftAsHost(player, State.selectedPlayer, true));
                                 }
                                 else {
@@ -1670,7 +1680,7 @@ namespace PlayersTab {
                         if (AnimatedButton("Unshift Everyone"))
                         {
                             for (auto player : GetAllPlayerControl()) {
-                                if (IsHost() && IsInGame()) {
+                                if (IsHost()) {
                                     queue->push(new RpcShapeshiftAsHost(player, PlayerSelection(player), true));
                                 }
                                 else {
@@ -1682,7 +1692,7 @@ namespace PlayersTab {
                         if (selectedPlayers.size() == 1 && AnimatedButton("Turn Everyone Into"))
                         {
                             for (auto player : GetAllPlayerControl()) {
-                                if (IsHost() && IsInGame()) {
+                                if (IsHost()) {
                                     queue->push(new RpcShapeshiftAsHost(player, State.selectedPlayer, false));
                                 }
                                 else {
@@ -1694,7 +1704,7 @@ namespace PlayersTab {
                         if (AnimatedButton("Reset Everyone"))
                         {
                             for (auto player : GetAllPlayerControl()) {
-                                if (IsHost() && IsInGame()) {
+                                if (IsHost()) {
                                     queue->push(new RpcShapeshiftAsHost(player, PlayerSelection(player), false));
                                 }
                                 else {

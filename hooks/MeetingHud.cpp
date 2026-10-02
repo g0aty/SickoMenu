@@ -84,11 +84,10 @@ void UpdateJudgeRoleAbilities() {
 
     auto judgeRole = (JudgeRole*)playerRole;
 
-    float newTaskPercentage = 0.f; // for bypassing tasks requirement
-
-    if (!State.PanicMode && State.Judge_NoTaskRequirement) {
-        static FieldInfo* requirementField = il2cpp_class_get_field_from_name(((Il2CppObject*)judgeRole)->klass, "taskRequirementProportion");
-        if (requirementField == nullptr) return;
+    static FieldInfo* requirementField = il2cpp_class_get_field_from_name(((Il2CppObject*)judgeRole)->klass, "taskRequirementProportion");
+    if (requirementField != nullptr) {
+        float newTaskPercentage = (!State.PanicMode && State.Judge_NoTaskRequirement) ? 0.f : /* for bypassing task requirement */
+            GameOptions().GetFloat(FloatOptionNames__Enum::JudgeTaskRequirementPercentage, 50.f) / 100.f;
         il2cpp_field_set_value((Il2CppObject*)judgeRole, requirementField, &newTaskPercentage);
     }
 

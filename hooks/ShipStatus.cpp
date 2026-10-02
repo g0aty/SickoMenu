@@ -124,12 +124,17 @@ void dShipStatus_RpcCloseDoorsOfType(ShipStatus* __this, SystemTypes__Enum type,
 void dShipStatus_HandleRpc(ShipStatus* __this, uint8_t callId, MessageReader* reader, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dShipStatus_HandleRpc executed", false);
 
+    if (callId == 67) { // haha SpiritGuideMessage is 67 OMG SIX SEVEN
+        ShipStatus_HandleRpc(__this, callId, reader, method);
+        return;
+    }
+
     if (callId != 27 && callId != 35) return;
     int32_t pos = reader->fields._position, head = reader->fields.readHead;
     auto systemType = (SystemTypes__Enum)MessageReader_ReadByte(reader, NULL);
 
     if (!State.PanicMode && !IsHost() && State.AntiExploit_UnauthorizedSabotages && systemType != SystemTypes__Enum::Ventilation &&
-        callId != (uint8_t)RpcCalls__Enum::SpiritGuideMessage) // haha SpiritGuideMessage is 67 OMG SIX SEVEN
+        callId != (uint8_t)RpcCalls__Enum::SpiritGuideMessage)
         return;
     // VentilationSystem is handled separately
 
