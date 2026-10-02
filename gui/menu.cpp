@@ -44,7 +44,7 @@ namespace Menu {
 
 	std::map<std::string, std::vector<SearchEntry>> categories = {
 		{"Settings", {
-			{"Show Keybinds", "General"}, {"Allow Activating Keybinds while Chatting", "General"},
+			{"Allow Activating Keybinds while Chatting", "General"},
 			{"Allow Clicking Through Menu UIs", "General"}, {"Extra Commands", "General"},
 			{"Always Show Menu on Startup", "General"}, {"Panic Warning", "General"},
 			{"Config", "General"}, {"Auto-Exit Due To Low FPS", "General"}, {"Minimum FPS", "General"}, 
@@ -144,7 +144,7 @@ namespace Menu {
 			{"Cycle Between Players", "Randomizers"}, {"Cycle for Everyone", "Randomizers"},
 			{"Confuser (Randomize Appearance at Will)", "Randomizers"},
 			{"Cosmetic Presets", "Randomizers"}, {"No Disconnect Penalties", "Anti-Exploit"},
-			{"Resist Unauthorized Sabotages", "Anti-Exploit"}, {"Resist Unauthorized Teleports", "Anti-Exploit"},
+			{"Resist Targeted Sabotages (Non-Host)", "Anti-Exploit"}, {"Resist Unauthorized Teleports", "Anti-Exploit"},
 			{"Resist Unauthorized Ziplines", "Anti-Exploit"}, {"Resist Attempt to Ban", "Anti-Exploit"},
 			{"Resist Votekicks Against Self", "Anti-Exploit"}, {"Prevent Attempt to Crash Lobby", "Anti-Exploit"},
 			{"Text Editor", "Text Editor"}

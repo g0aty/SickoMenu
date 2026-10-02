@@ -5,11 +5,8 @@
 > [!NOTE]
 > Some features can only be shown while in game and/or in lobby, or while hosting!
 
-
 ## ⚙️ Settings
-
 ### General
-- Show Keybinds
 - Allow Activating Keybinds while Chatting
 - Allow Clicking Through Menu UIs
 - Extra Commands
@@ -34,6 +31,9 @@
 - Spoof Level
 - Spoof Platform
 - Spoof PSN Platform ID
+- Spoof Platform Name
+- Custom Server Settings
+- Force DTLS
 - Spoof Xbox Platform ID
 - Reduce Anticheat While Hosting (+25 Mode)
 
@@ -58,6 +58,8 @@
 - Disable Animations
 - Animation Speed
 - Rounding Radius Multiplier
+- Toast Notification Alignment
+- Max Toasts to Show at Once
 - Role Colors
 - Other Colors
 
@@ -83,8 +85,8 @@
 - Complete All Tasks
 - Cancel Start Game
 
-## 🎮 Game
 
+## 🎮 Game
 ### General
 - Player Speed Multiplier
 - Kill Distance
@@ -101,6 +103,12 @@
 - Pause Vent Blocking While Venting
 - Spam Report
 - Teleport All to Vent
+- Teleport All to Random Vents
+- Make All Climb Zipline (Bottom to Top)
+- Make All Climb Zipline (Top to Bottom)
+- Spam Climb Zipline for Everyone
+- Ignore Self (Vent TP)
+- Ignore Self (Zipline)
 - Spam TP All to Vent
 - Spam TP All to Random Vents
 - Attempt to Ban Everyone
@@ -118,7 +126,8 @@
 
 ### Utils
 - Ignore Whitelisted Players [Ban/Kick]
-- Attempt to Crash
+- Attempt to Crash Lobby
+- Make Players Spawn at Random Vents
 - Remove Lobby
 - Remove Map
 - Ban Everyone
@@ -145,8 +154,8 @@
 - Player History
 - Lobby History
 
-## 🤵 Self
 
+## 🤵 Self
 ### Visuals
 - Max Vision
 - Wallhack
@@ -160,6 +169,7 @@
 - Allow Ctrl+(C/V) in Chat
 - Read Messages by Ghosts
 - Read and Send SickoChat
+- Move Match Info Guide HUD Button
 - Custom Name
 - Custom Name for Everyone
 - Reveal Roles
@@ -195,10 +205,11 @@
 - No Seeker Animation
 - Better Chat Notifications
 - Better Lobby Code Input
+- Extended Notifications
 - Better Message Sounds
 - Auto Rejoin After Game Ending
 - Disable Shush Animation
-- Autokill
+- Control Pet
 - Report Body on Murder
 - Prevent Self-Report
 - Fake Alive
@@ -222,6 +233,7 @@
 - No Interrogate Cooldown
 - No Task Requirement
 - No Protect Cooldown
+- No Refresh Cooldown
 - No Kill Cooldown
 - Kill Other Impostors
 - Kill Reach
@@ -237,8 +249,18 @@
 - Confuser (Randomize Appearance at Will)
 - Cosmetic Presets
 
+### Anti-Exploit
+- No Disconnect Penalties
+- Resist Targeted Sabotages (Non-Host)
+- Resist Unauthorized Teleports
+- Resist Unauthorized Ziplines
+- Resist Attempt to Ban
+- Resist Votekicks Against Self
+- Prevent Attempt to Crash Lobby
+
 ### Text Editor
 - Text Editor
+
 
 ## 🗺️ Radar
 - Show Radar
@@ -252,6 +274,7 @@
 - Show Border
 - Radar Color
 
+
 ## ▶️ Replay
 - Show Replay
 - Show Only last Seconds
@@ -259,17 +282,25 @@
 - Draw Player Icons
 - Replay Map Color
 
+
 ## 🩻 ESP
 - Show ESP
+- Show Players
 - Show Ghosts
+- Show Dead Bodies
+- Show Tracer & Text Shadows
+- Tracer Thickness
+- Text Size
 - Hide During Meetings
 - Show Boxes
 - Show Tracers
 - Show Distances
-- Role-based
+- Use Role Colors Instead of Player Colors
+- Show Crewmates
+- Show Impostors
+
 
 ## 🤹 Players
-
 ### Player
 - Call Meeting
 - Skip Vote by All
@@ -287,6 +318,9 @@
 - Protect
 - Vote Immunity
 - Teleport to Vent
+- Teleport to Random Vent
+- Force Climb Zipline
+- Spam Climb Zipline
 - Spam Teleport to Vent
 - Spam Teleport to Random Vents
 - Warn
@@ -299,14 +333,21 @@
 - Cosmetics Stealer
 - Cosmetics Resetter
 - Murder Loop
+- Shapeshift Player To
+- Unshift Player
+- Turn Player Into
+- Reset Player
 - Shift Everyone To
 - Unshift Everyone
+- Turn Everyone Into
+- Reset Everyone
 - Vote Off
 - Teleport To
 - Attach To
 - Turn into Ghost
 - Set Role
 - Force Color
+- Randomize Color
 - Cycle Color
 - Whisper To
 - Cycle Color
@@ -319,6 +360,7 @@
 - TempBan
 - Roles
 
+
 ## ✅ Tasks
 - Drain Hide Timer
 - Complete All Tasks
@@ -330,6 +372,7 @@
 - Fake Cameras In Use
 - Task Enforcer
 - Disable Tasks
+
 
 ## 🚨 Sabotage
 - Disable Sabotages
@@ -351,6 +394,7 @@
 - Spam Sabotage Oxygen
 - Infinite Mushroom Mixup
 
+
 ## 🚪 Doors
 - Close All Doors
 - Close Room Door
@@ -358,8 +402,8 @@
 - Unpin All Doors
 - Auto Open Doors on Use
 
-## 🫅 Host
 
+## 🫅 Host
 ### Utils
 - Choose Roles
 - Disable Role Selection
@@ -381,19 +425,22 @@
 - End Meeting
 - Disable Game Ending
 - End Game
+- Allow Players Joining with Preferred Colors
 - Force Color for Everyone
+- Set Color for Everyone
+- Randomize Colors for Everyone
 - Unlock Kill Button
 - Game Mode
 - Game Duration
 - Spectator Mode
 - Show Lobby Timer
 - Auto Start Game
-- Game Mode
 - Show Lobby Timer
 - Auto Start Game
 - Spectator Mode
 - Kill While Vanished
 - Bypass Guardian Angel Protections
+- Level Farm
 - Unlock Kill Button
 - Allow Killing in Lobbies
 - Kill While Vanished
@@ -408,6 +455,7 @@
 - Roles
 - Ranks
 
+
 ## 🧑‍💻 Debug (ONLY on Debug Releases)
 - Enable Occlusion Culling
 - Force Load Settings
@@ -415,6 +463,8 @@
 - Clear RPC Queues
 - Log Unity Debug Messages
 - Log Hook Debug Messages
+- Show Example Toast
+- Show Example Toast (Long Message)
 - Replay
 - Colors
 - Profiler
