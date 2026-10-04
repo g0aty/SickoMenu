@@ -90,9 +90,9 @@ A huge amount of features!
 ## 👌 Supported Versions
 - ✅ Steam (Supported)
 - ✅ itch.io (Supported)
-- 🟡 Epic Games (Supported - Experimental)
-- 🟡 Microsoft Store/Xbox App (Windows) (Supported - Experimental)
-- ❓ Cracked (works occasionally, I don't condone it)
+- ✅ Epic Games (Supported)
+- ✅ Microsoft Store/XBOX App - Windows (Supported)
+- 🟡 Cracked (may work if you know what you're doing; I don't condone it, and support will NOT be provided)
 - ❌ iOS/iPadOS/Android (Not Supported)
 - ❌ Switch/Xbox/Playstation (Not Supported)
 
