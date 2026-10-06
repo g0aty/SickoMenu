@@ -100,22 +100,9 @@ void AssignRoles(RoleRates& roleRates, int roleChance, RoleTypes__Enum role, il2
 		GameOptions options;
 		auto roleCount = roleRates.GetRoleCount(role);
 		auto playerAmount = allPlayers.size();
-		auto maxImpostorAmount = GetMaxImpostorAmount((int)playerAmount) - preChosenImpCount;
-
-		//if (role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Impostor) {
-		//	if (State.shapeshifters_amount + State.impostors_amount >= maxImpostorAmount)
-		//		return; //Skip assigns when pre assigned enough imps.
-		//}
 
 		if (options.GetGameMode() == GameModes__Enum::HideNSeek && role == RoleTypes__Enum::Engineer)
 			roleCount = (int)allPlayers.size() - 1;
-
-		//int ssCount = roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter), phCount = roleRates.GetRoleCount(RoleTypes__Enum::Phantom), splImpCount = ssCount + phCount;
-
-		/*if (splImpCount > 0 && splImpCount >= maxImpostorAmount && (role == RoleTypes__Enum::Shapeshifter || role == RoleTypes__Enum::Phantom)) {
-			roleCount = (int)std::round((roleCount / splImpCount) * maxImpostorAmount); //go for the portion of the impostors selected
-			//In previous version, Sicko would assign more imps than MaxImposterAmount based on (shapeshifter + phantom) amount.
-		}*/
 
 		if (roleCount < 1)
 			return;
@@ -181,10 +168,15 @@ bool CanPlayerBeAssignedToRole(app::PlayerControl* player, std::vector<uint8_t>&
 }
 
 void EvenOutImpostorRoleCounts(RoleRates& roleRates) {
-	for (int i = 0; i < 60; ++i) { // My sanity is lost after this code
-		int MoreThanImpostorCountOfImpostorRoles = roleRates.GetRoleCount(RoleTypes__Enum::Shapeshifter) + roleRates.GetRoleCount(RoleTypes__Enum::Phantom) + roleRates.GetRoleCount(RoleTypes__Enum::Viper);
-		if (roleRates.ImpostorCount < MoreThanImpostorCountOfImpostorRoles) {
+	for (int i = 0; i < 60; ++i) {
+		int MoreThanImpostorCountOfImpostorRoles = preChosenImpCount +
+			roleRates.ShapeshifterCount + roleRates.PhantomCount + roleRates.ViperCount;
+		int maxImpostors = GetMaxImpostorAmount((int)GetAllPlayerControl().size());
+		// use maxImpostors rather than roleRates.ImpostorCount since it is more accurate
+
+		if (maxImpostors < MoreThanImpostorCountOfImpostorRoles) {
 			uint8_t numImpRoles = 3; // Add support for more roles as they are added
+
 			switch (randi(1, numImpRoles)) {
 			case 1:
 				if (roleRates.ShapeshifterCount > 0)
