@@ -358,6 +358,7 @@ void Settings::Load() {
         JSON_TRYGET("NameColor2_G", this->NameColor2.y);
         JSON_TRYGET("NameColor2_B", this->NameColor2.z);
         JSON_TRYGET("NameColor2_A", this->NameColor2.w);
+        JSON_TRYGET("AutoStartGame", this->AutoStartGame);
         JSON_TRYGET("AutoStartTimer", this->AutoStartTimer);
         JSON_TRYGET("AutoOpenDoors", this->AutoOpenDoors);
         JSON_TRYGET("MoveInVentAndShapeshift", this->MoveInVentAndShapeshift);
@@ -469,8 +470,9 @@ void Settings::Load() {
         JSON_TRYGET("AlwaysAllowStart", this->AlwaysAllowStart);
         JSON_TRYGET("ModifyStartCountdown", this->ModifyStartCountdown);
         JSON_TRYGET("StartCountdown", this->StartCountdown);
+        JSON_TRYGET("UseGameModeDuration", this->UseGameModeDuration);
         JSON_TRYGET("GameModeDuration", this->GameModeDuration);
-        this->GameModeDuration = std::clamp(this->GameModeDuration, 100, 500);
+        this->GameModeDuration = std::clamp(this->GameModeDuration, 100, 1000);
 
         JSON_TRYGET("Enable_SMAC", this->Enable_SMAC);
         JSON_TRYGET("SMAC_Punishment", this->SMAC_Punishment);
@@ -1074,6 +1076,7 @@ void Settings::Save() {
                 { "NameColor2_G", this->NameColor2.y },
                 { "NameColor2_B", this->NameColor2.z },
                 { "NameColor2_A", this->NameColor2.w },
+                { "AutoStartGame", this->AutoStartGame },
                 { "AutoStartTimer", this->AutoStartTimer },
                 { "AutoOpenDoors", this->AutoOpenDoors },
                 { "MoveInVentAndShapeshift", this->MoveInVentAndShapeshift },
@@ -1183,6 +1186,7 @@ void Settings::Save() {
                 { "AlwaysAllowStart", this->AlwaysAllowStart },
                 { "ModifyStartCountdown", this->ModifyStartCountdown },
                 { "StartCountdown", this->StartCountdown },
+                { "UseGameModeDuration", this->UseGameModeDuration },
                 { "GameModeDuration", this->GameModeDuration },
 
                 { "Enable_SMAC", this->Enable_SMAC },

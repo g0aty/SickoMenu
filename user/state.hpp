@@ -140,6 +140,7 @@ public:
     float SpeedrunTimer = 0.f;
     bool SpeedrunOver = false;
     int GameMode = 0;
+    bool UseGameModeDuration = false;
     int GameModeDuration = 240;
     float GameModeDurationTimer = 0.f; 
     bool GameModeDurationOver = false; 

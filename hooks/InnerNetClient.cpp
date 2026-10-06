@@ -267,11 +267,11 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                     (*Game::pLocalPlayer)->fields.moveable = true;
                 }
 
-                if (IsHost() && State.GameLoaded && State.GameMode != 0 && !State.GameModeDurationOver) {
+                if (IsHost() && State.GameLoaded && State.UseGameModeDuration && !State.GameModeDurationOver) {
                     State.GameModeDurationTimer += Time_get_deltaTime(NULL);
                     if (State.GameModeDurationTimer >= (float)State.GameModeDuration) {
                         State.GameModeDurationOver = true; 
-                        GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::CrewmatesByTask, false, NULL);
+                        GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorDisconnect, false, NULL);
                     }
                 }
             }
@@ -2001,7 +2001,7 @@ void dInnerNetClient_EnqueueDisconnect(InnerNetClient* __this, DisconnectReasons
 
 void dGameManager_RpcEndGame(GameManager* __this, GameOverReason__Enum endReason, bool showAd, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dGameManager_RpcEndGame executed", false);
-    if (!State.PanicMode && IsHost() && State.NoGameEnd)
+    if (!State.PanicMode && IsHost() && (State.NoGameEnd || State.GameMode != 0))
         return;
     GameManager_RpcEndGame(__this, endReason, showAd, method);
 }

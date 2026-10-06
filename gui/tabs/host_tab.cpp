@@ -462,21 +462,25 @@ namespace HostTab {
                 if (ToggleButton("Disable All Votekicks", &State.DisableAllVotekicks))
                     State.Save();
 
-                {
+                if (IsInLobby()) {
                     std::vector<const char*> GAMEMODES = { "Default", "Task Speedrun" };
                     if (State.DisableHostAnticheat) GAMEMODES = { "Default", "Task Speedrun", "Battle Royale" };
                     int maxIndex = State.DisableHostAnticheat ? 2 : 1;
                     State.GameMode = std::clamp(State.GameMode, 0, maxIndex);
-                    if (IsInLobby() && CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 100 * State.dpiScale)) {
+                    if (CustomListBoxInt("Game Mode", &State.GameMode, GAMEMODES, 100 * State.dpiScale)) {
                         State.TaskSpeedrun = (State.GameMode == 1);
                         State.BattleRoyale = (State.DisableHostAnticheat && State.GameMode == 2);
                         State.Save();
                     }
 
-                    if (State.GameMode != 0) {
+                    if (ToggleButton("End Game After Duration", &State.UseGameModeDuration)) {
+                        State.Save();
+                    }
+
+                    if (State.UseGameModeDuration) {
                         ImGui::SetNextItemWidth(100 * State.dpiScale);
                         if (ImGui::InputInt("Game Duration", &State.GameModeDuration)) {
-                            State.GameModeDuration = std::clamp(State.GameModeDuration, 100, 500);
+                            State.GameModeDuration = std::clamp(State.GameModeDuration, 100, 1000);
                         }
                     }
                 }
