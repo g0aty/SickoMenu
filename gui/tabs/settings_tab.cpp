@@ -676,7 +676,7 @@ namespace SettingsTab {
 					State.Save();
 				}
 				ImGui::SameLine();
-				if (CustomListBoxInt("  ", &State.ToastPositionX, { "Left", "Center", "Right" }, 50.f * State.dpiScale)) {
+				if (CustomListBoxInt("    ", &State.ToastPositionX, { "Left", "Center", "Right" }, 50.f * State.dpiScale)) {
 					State.Save();
 				}
 
