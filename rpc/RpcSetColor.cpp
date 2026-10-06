@@ -25,13 +25,6 @@ RpcForceColor::RpcForceColor(PlayerControl* player, uint8_t bodyColor)
 void RpcForceColor::Process()
 {
 	if (!PlayerSelection(Player).has_value()) return;
-	
-	for (auto p : GetAllPlayerControl()) {
-		auto writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), Player->fields._.NetId,
-			uint8_t(RpcCalls__Enum::SetColor), SendOption__Enum::Reliable, p->fields._.OwnerId, NULL);
-		MessageWriter_WriteByte(writer, uint8_t(bodyColor), NULL);
-		InnerNetClient_FinishRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient), writer, NULL);
-	}
 
 	PlayerControl_RpcSetColor(Player, bodyColor, NULL);
 }

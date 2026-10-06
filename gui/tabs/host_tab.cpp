@@ -1144,7 +1144,7 @@ namespace HostTab {
                             ImGui::Columns(1);
                             ImGui::Dummy(ImVec2(0, 6) * State.dpiScale);
                             if (selectedRole == 0) {
-                                ImGui::TextDisabled("Applies to every player automatically - no members needed.");
+                                ImGui::Text("These permissions apply to everyone, regardless of their role!");
                             }
                             else {
                                 ImGui::Text("Members:");

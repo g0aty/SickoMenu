@@ -1320,7 +1320,7 @@ bool FriendCodeHasPermission(const std::string& friendCode, const std::string& c
     if (friendCode.empty()) return false;
     for (size_t i = 0; i < State.Mod_RoleNames.size(); i++) {
         if (i >= State.Mod_RoleMembers.size() || i >= State.Mod_RolePermissions.size()) continue;
-        bool isMember = i == 0; 
+        bool isMember = i == 0;
         if (!isMember) {
             auto& members = State.Mod_RoleMembers[i];
             isMember = std::find(members.begin(), members.end(), friendCode) != members.end();
@@ -1407,7 +1407,7 @@ int GetFriendCodeMaxRank(const std::string& friendCode) {
 }
 
 int GetPlayerMaxRank(PlayerControl* pc) {
-    if (pc == NULL) return -1;
+    if (pc == NULL) return 0;
     auto pd = GetPlayerData(pc);
     if (pd == NULL || pd->fields.FriendCode == NULL) return -1;
     if (pc == (InnerNetClient_GetHost((InnerNetClient*)(*Game::pAmongUsClient), NULL)->fields.Character)) {
