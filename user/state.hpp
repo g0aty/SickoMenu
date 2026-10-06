@@ -516,7 +516,7 @@ public:
     bool Replay_IsPlaying = true;
     bool Replay_IsLive = true;
 
-    std::map<Game::Voter, Game::VotedFor> voteMonitor;
+    std::unordered_map<Game::Voter, Game::VotedFor> voteMonitor;
 
     //std::vector<Game::PlayerId> aumUsers;
     //std::vector<Game::PlayerId> sickoUsers;

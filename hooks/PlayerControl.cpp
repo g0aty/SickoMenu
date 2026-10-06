@@ -390,93 +390,96 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
                 }
             }
 
-            if (IsInGame() && ((State.RevealRoles && shouldSeeName) || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && !State.PanicMode)
-            {
-                std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames, State.LocalizeRoleNames);
-                int completedTasks = 0;
-                int totalTasks = 0;
-                auto tasks = GetNormalPlayerTasks(__this);
-                for (auto task : tasks)
+            // don't render this during a meeting, since this is already shown in the MeetingHud interface
+            if (!State.InMeeting) {
+                if (IsInGame() && ((State.RevealRoles && shouldSeeName) || (IsHost() && (State.TournamentMode || State.TaskSpeedrun))) && !State.PanicMode)
                 {
-                    if (task == nullptr) continue;
-                    if (task->fields.taskStep == task->fields.MaxStep) {
-                        completedTasks++;
-                        totalTasks++;
+                    std::string roleName = GetRoleName(playerData->fields.Role, State.AbbreviatedRoleNames, State.LocalizeRoleNames);
+                    int completedTasks = 0;
+                    int totalTasks = 0;
+                    auto tasks = GetNormalPlayerTasks(__this);
+                    for (auto task : tasks)
+                    {
+                        if (task == nullptr) continue;
+                        if (task->fields.taskStep == task->fields.MaxStep) {
+                            completedTasks++;
+                            totalTasks++;
+                        }
+                        else totalTasks++;
                     }
-                    else totalTasks++;
-                }
 
-                if (totalTasks != 0 && PlayerControl_AllTasksCompleted(__this, NULL)) {
-                    if (IsHost() && State.TournamentMode && !PlayerIsImpostor(playerData) &&
-                        std::find(State.tournamentAllTasksCompleted.begin(), State.tournamentAllTasksCompleted.end(), playerData->fields.PlayerId) == State.tournamentAllTasksCompleted.end()) {
-                        UpdatePoints(playerData, 1);
-                        LOG_DEBUG(std::format("Added 1 point to {} for completing tasks", ToString(playerData)).c_str());
-                        State.tournamentAllTasksCompleted.push_back(playerData->fields.PlayerId);
+                    if (totalTasks != 0 && PlayerControl_AllTasksCompleted(__this, NULL)) {
+                        if (IsHost() && State.TournamentMode && !PlayerIsImpostor(playerData) &&
+                            std::find(State.tournamentAllTasksCompleted.begin(), State.tournamentAllTasksCompleted.end(), playerData->fields.PlayerId) == State.tournamentAllTasksCompleted.end()) {
+                            UpdatePoints(playerData, 1);
+                            LOG_DEBUG(std::format("Added 1 point to {} for completing tasks", ToString(playerData)).c_str());
+                            State.tournamentAllTasksCompleted.push_back(playerData->fields.PlayerId);
+                        }
+                        if (IsHost() && State.TaskSpeedrun && !State.SpeedrunOver) {
+                            int speedrunTimer = int(State.SpeedrunTimer);
+                            std::string timerDisplay = std::format("<#fff><size=50%><#0000>0</color></size>\n{}\n<#0f0><size=50%>All Tasks Completed in {}:{}{}</size></color></color>", playerName, int(speedrunTimer / 60), speedrunTimer % 60 < 10 ? "0" : "", speedrunTimer % 60);
+                            PlayerControl_SetName(__this, convert_to_string(timerDisplay), NULL);
+                            // SetName RPC is patched for host as well, so we use the client sided variation of it
+                            PlayerControl_RpcSetRole(__this, RoleTypes__Enum::ImpostorGhost, false, NULL);
+                            std::string playerName = convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName);
+                            State.SpeedrunOver = true; //prevent duplicate timer
+                            GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorsByKill, false, NULL);
+                        }
                     }
-                    if (IsHost() && State.TaskSpeedrun && !State.SpeedrunOver) {
-                        int speedrunTimer = int(State.SpeedrunTimer);
-                        std::string timerDisplay = std::format("<#fff><size=50%><#0000>0</color></size>\n{}\n<#0f0><size=50%>All Tasks Completed in {}:{}{}</size></color></color>", playerName, int(speedrunTimer / 60), speedrunTimer % 60 < 10 ? "0" : "", speedrunTimer % 60);
-                        PlayerControl_SetName(__this, convert_to_string(timerDisplay), NULL);
-                        // SetName RPC is patched for host as well, so we use the client sided variation of it
-                        PlayerControl_RpcSetRole(__this, RoleTypes__Enum::ImpostorGhost, false, NULL);
-                        std::string playerName = convert_from_string(GetPlayerOutfit(playerData)->fields.PlayerName);
-                        State.SpeedrunOver = true; //prevent duplicate timer
-                        GameManager_RpcEndGame(GameManager__TypeInfo->static_fields->_Instance_k__BackingField, GameOverReason__Enum::ImpostorsByKill, false, NULL);
-                    }
-                }
 
-                if (State.RevealRoles) {
-                    Color32&& roleColor = app::Color32_op_Implicit(GetRoleColor(playerData->fields.Role), NULL);
-                    if (totalTasks == 0 || (PlayerIsImpostor(playerData) && completedTasks == 0)) {
-                        playerName = "<size=1.4>" + roleName + "\n</size>" + playerName + "\n<size=1.4><#0000>0</color>";
-                        playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}",
-                            roleColor.r, roleColor.g, roleColor.b,
-                            roleColor.a, playerName);
+                    if (State.RevealRoles) {
+                        Color32&& roleColor = app::Color32_op_Implicit(GetRoleColor(playerData->fields.Role), NULL);
+                        if (totalTasks == 0 || (PlayerIsImpostor(playerData) && completedTasks == 0)) {
+                            playerName = "<size=1.4>" + roleName + "\n</size>" + playerName + "\n<size=1.4><#0000>0</color>";
+                            playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}",
+                                roleColor.r, roleColor.g, roleColor.b,
+                                roleColor.a, playerName);
+                        }
+                        else {
+                            playerName = "\n</size>" + playerName + "\n<size=1.4><#0000>0</color>";
+                            playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}><size=1.4>{} ({:d}/{:d}) {}",
+                                roleColor.r, roleColor.g, roleColor.b,
+                                roleColor.a, roleName, completedTasks, totalTasks, playerName);
+                        }
                     }
-                    else {
-                        playerName = "\n</size>" + playerName + "\n<size=1.4><#0000>0</color>";
-                        playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}><size=1.4>{} ({:d}/{:d}) {}",
-                            roleColor.r, roleColor.g, roleColor.b,
-                            roleColor.a, roleName, completedTasks, totalTasks, playerName);
-                    }
-                }
-            }
-            else {
-                bool shouldSeeImpostor = PlayerIsImpostor(playerData) && PlayerIsImpostor(localData);
-                Color32&& roleColor = app::Color32_op_Implicit(shouldSeeImpostor ?
-                    Palette__TypeInfo->static_fields->ImpostorRed :
-                    Palette__TypeInfo->static_fields->White, NULL);
-
-                playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
-                    roleColor.r, roleColor.g, roleColor.b,
-                    roleColor.a, playerName);
-            }
-
-            if (IsInGame() && State.ShowKillCD
-                && !playerData->fields.IsDead
-                && playerData->fields.Role
-                && playerData->fields.Role->fields.CanUseKillButton
-                && shouldSeeName
-                && !State.PanicMode) {
-                if (State.RevealRoles) {
-                    float killTimer = __this->fields.killTimer;
-                    Color32&& color = GetKillCooldownColor(killTimer);
-                    playerName += std::format("<size=1.4><#{:02x}{:02x}{:02x}{:02x}>Kill Cooldown: {:.2f}s<#0000>0",
-                        color.r, color.g, color.b, color.a,
-                        killTimer);
                 }
                 else {
-                    float killTimer = __this->fields.killTimer;
-                    Color32&& color = GetKillCooldownColor(killTimer);
-                    playerName = "<size=1.4><#0000>0\n</color></size>" + playerName;
-                    playerName += std::format("\n<size=1.4><#{:02x}{:02x}{:02x}{:02x}>Kill Cooldown: {:.2f}s",
-                        color.r, color.g, color.b, color.a,
-                        killTimer);
-                }
-            }
+                    bool shouldSeeImpostor = PlayerIsImpostor(playerData) && PlayerIsImpostor(localData);
+                    Color32&& roleColor = app::Color32_op_Implicit(shouldSeeImpostor ?
+                        Palette__TypeInfo->static_fields->ImpostorRed :
+                        Palette__TypeInfo->static_fields->White, NULL);
 
-            if (IsInGame() && !shouldSeeName) {
-                playerName = "<#0000>" + RemoveHtmlTags(playerName) + "</color>";
+                    playerName = std::format("<#{:02x}{:02x}{:02x}{:02x}>{}</color>",
+                        roleColor.r, roleColor.g, roleColor.b,
+                        roleColor.a, playerName);
+                }
+
+                if (IsInGame() && State.ShowKillCD
+                    && !playerData->fields.IsDead
+                    && playerData->fields.Role
+                    && playerData->fields.Role->fields.CanUseKillButton
+                    && shouldSeeName
+                    && !State.PanicMode) {
+                    if (State.RevealRoles) {
+                        float killTimer = __this->fields.killTimer;
+                        Color32&& color = GetKillCooldownColor(killTimer);
+                        playerName += std::format("<size=1.4><#{:02x}{:02x}{:02x}{:02x}>Kill Cooldown: {:.2f}s<#0000>0",
+                            color.r, color.g, color.b, color.a,
+                            killTimer);
+                    }
+                    else {
+                        float killTimer = __this->fields.killTimer;
+                        Color32&& color = GetKillCooldownColor(killTimer);
+                        playerName = "<size=1.4><#0000>0\n</color></size>" + playerName;
+                        playerName += std::format("\n<size=1.4><#{:02x}{:02x}{:02x}{:02x}>Kill Cooldown: {:.2f}s",
+                            color.r, color.g, color.b, color.a,
+                            killTimer);
+                    }
+                }
+
+                if (IsInGame() && !shouldSeeName) {
+                    playerName = "<#0000>" + RemoveHtmlTags(playerName) + "</color>";
+                }
             }
 
             if ((IsHost() || !State.SafeMode) && State.TeleportEveryone && (IsInGame() && !State.InMeeting)
