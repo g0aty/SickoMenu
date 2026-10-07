@@ -1,5 +1,6 @@
 #include "pch-il2cpp.h"
 #include "DirectX.h"
+#include "_hooks.h"
 #include "Renderer.hpp"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
@@ -117,6 +118,11 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             KeyBinds::WndProc(uMsg, wParam, lParam);
             break;
         }
+    }
+
+    if (!State.PanicMode && !State.KeybindsBeingEdited && KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Chat) && (IsInGame() || IsInLobby()) && Game::HudManager.IsInstanceExists()) {
+        auto chat = Game::HudManager.GetInstance()->fields.Chat;
+        if (chat != NULL) dChatController_Toggle(chat, NULL);
     }
 
     bool shouldKeybindsActivate = !State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/;

@@ -18,6 +18,7 @@ namespace KeyBinds {
         uint8_t Close_Current_Room_Door;
         uint8_t Toggle_Replay;
         uint8_t Toggle_ChatAlwaysActive;
+        uint8_t Toggle_Chat;
         uint8_t Toggle_ReadGhostMessages;
         uint8_t Toggle_Hud;
         uint8_t Reset_Appearance;
