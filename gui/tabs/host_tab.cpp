@@ -616,10 +616,6 @@ namespace HostTab {
                     State.Save();
                 }
 
-                /*if (ToggleButton("Disable Medbay Scan", &State.DisableMedbayScan)) {
-                    State.Save();
-                }*/
-
                 if (ToggleButton("Bypass Guardian Angel Protections", &State.BypassAngelProt)) {
                     State.Save();
                 }
@@ -861,8 +857,8 @@ namespace HostTab {
                     else killDistance = options.GetInt(Int32OptionNames__Enum::KillDistance);
 
                     // MakeInt(("Kill Distance" + killDistInfo).c_str(), killDistance, Int32OptionNames__Enum::KillDistance);
-                    MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
                     MakeInt("# Common Tasks", commonTasks, Int32OptionNames__Enum::NumCommonTasks);
+                    MakeInt("# Short Tasks", shortTasks, Int32OptionNames__Enum::NumShortTasks);
                     MakeInt("# Long Tasks", longTasks, Int32OptionNames__Enum::NumLongTasks);
 #pragma endregion
 #pragma region Scientist

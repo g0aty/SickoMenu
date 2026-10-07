@@ -308,6 +308,9 @@ void SendKillImmuneToggle(bool enabled);
 void SendBootVentNonHost(PlayerControl* player, int ventId, int targetNetId = -2);
 std::string GetTimeString(bool useLeadingZeroForHours = true, bool showSeconds = true);
 void ReloadCurrentSceneIfNeeded();
+std::vector<app::TaskTypes__Enum> GetMapCommonTasks();
+std::vector<app::TaskTypes__Enum> GetMapShortTasks();
+std::vector<app::TaskTypes__Enum> GetMapLongTasks();
 
 /// <summary>
 /// Simplifies a list of points by ensuring the distance between consecutive points is greater than the squared distance threshold; all other points are discarded.

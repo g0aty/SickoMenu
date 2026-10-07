@@ -6,56 +6,6 @@
 #include "gui-helpers.hpp"
 
 namespace TasksTab {
-	using TaskList = std::vector<TaskTypes__Enum>;
-
-	static const TaskList skeldTasks = {
-		TaskTypes__Enum::SubmitScan, TaskTypes__Enum::PrimeShields, TaskTypes__Enum::FuelEngines,
-		TaskTypes__Enum::ChartCourse, TaskTypes__Enum::StartReactor, TaskTypes__Enum::SwipeCard,
-		TaskTypes__Enum::ClearAsteroids, TaskTypes__Enum::UploadData, TaskTypes__Enum::EmptyChute,
-		TaskTypes__Enum::EmptyGarbage, TaskTypes__Enum::AlignEngineOutput, TaskTypes__Enum::FixWiring,
-		TaskTypes__Enum::CalibrateDistributor, TaskTypes__Enum::DivertPower, TaskTypes__Enum::UnlockManifolds,
-		TaskTypes__Enum::CleanO2Filter, TaskTypes__Enum::VentCleaning, TaskTypes__Enum::StabilizeSteering,
-	};
-	static const TaskList miraHqTasks = {
-		TaskTypes__Enum::SubmitScan, TaskTypes__Enum::PrimeShields, TaskTypes__Enum::UploadData,
-		TaskTypes__Enum::StartReactor, TaskTypes__Enum::ClearAsteroids, TaskTypes__Enum::EmptyGarbage,
-		TaskTypes__Enum::FixWiring, TaskTypes__Enum::DivertPower, TaskTypes__Enum::UnlockManifolds,
-		TaskTypes__Enum::VentCleaning, TaskTypes__Enum::AssembleArtifact, TaskTypes__Enum::SortSamples,
-		TaskTypes__Enum::MeasureWeather, TaskTypes__Enum::EnterIdCode, TaskTypes__Enum::BuyBeverage,
-		TaskTypes__Enum::ProcessData, TaskTypes__Enum::RunDiagnostics, TaskTypes__Enum::WaterPlants,
-		TaskTypes__Enum::MonitorOxygen,
-	};
-	static const TaskList polusTasks = {
-		TaskTypes__Enum::SubmitScan, TaskTypes__Enum::FuelEngines, TaskTypes__Enum::ChartCourse,
-		TaskTypes__Enum::StartReactor, TaskTypes__Enum::SwipeCard, TaskTypes__Enum::ClearAsteroids,
-		TaskTypes__Enum::UploadData, TaskTypes__Enum::InspectSample, TaskTypes__Enum::EmptyGarbage,
-		TaskTypes__Enum::AlignEngineOutput, TaskTypes__Enum::FixWiring, TaskTypes__Enum::UnlockManifolds,
-		TaskTypes__Enum::StoreArtifacts, TaskTypes__Enum::FillCanisters, TaskTypes__Enum::FixWeatherNode,
-		TaskTypes__Enum::InsertKeys, TaskTypes__Enum::ScanBoardingPass, TaskTypes__Enum::OpenWaterways,
-		TaskTypes__Enum::ReplaceWaterJug, TaskTypes__Enum::RepairDrill, TaskTypes__Enum::AlignTelescope,
-		TaskTypes__Enum::RecordTemperature,
-	};
-	static const TaskList airshipTasks = {
-		TaskTypes__Enum::FuelEngines, TaskTypes__Enum::UploadData, TaskTypes__Enum::EmptyChute,
-		TaskTypes__Enum::EmptyGarbage, TaskTypes__Enum::FixWiring, TaskTypes__Enum::CalibrateDistributor,
-		TaskTypes__Enum::DivertPower, TaskTypes__Enum::StabilizeSteering, TaskTypes__Enum::PolishRuby,
-		TaskTypes__Enum::ResetBreakers, TaskTypes__Enum::Decontaminate, TaskTypes__Enum::MakeBurger,
-		TaskTypes__Enum::UnlockSafe, TaskTypes__Enum::SortRecords, TaskTypes__Enum::PutAwayPistols,
-		TaskTypes__Enum::FixShower, TaskTypes__Enum::CleanToilet, TaskTypes__Enum::DressMannequin,
-		TaskTypes__Enum::PickUpTowels, TaskTypes__Enum::RewindTapes, TaskTypes__Enum::StartFans,
-		TaskTypes__Enum::DevelopPhotos, TaskTypes__Enum::GetBiggolSword, TaskTypes__Enum::PutAwayRifles,
-		TaskTypes__Enum::StopCharles, TaskTypes__Enum::VentCleaning,
-	};
-	static const TaskList fungleTasks = {
-		TaskTypes__Enum::UploadData, TaskTypes__Enum::FixWiring, TaskTypes__Enum::VentCleaning,
-		TaskTypes__Enum::RecordTemperature, TaskTypes__Enum::BuildSandcastle, TaskTypes__Enum::CatchFish,
-		TaskTypes__Enum::CollectShells, TaskTypes__Enum::LiftWeights, TaskTypes__Enum::RoastMarshmallow,
-		TaskTypes__Enum::TestFrisbee, TaskTypes__Enum::CollectSamples, TaskTypes__Enum::CollectVegetables,
-		TaskTypes__Enum::HoistSupplies, TaskTypes__Enum::MineOres, TaskTypes__Enum::PolishGem,
-		TaskTypes__Enum::ReplaceParts, TaskTypes__Enum::CrankGenerator, TaskTypes__Enum::TuneRadio,
-		TaskTypes__Enum::ExtractFuel, TaskTypes__Enum::MonitorMushroom, TaskTypes__Enum::PlayVideogame,
-	};
-
 	static void RenderTaskEnforcer() {
 		if (ImGui::CollapsingHeader("Task Enforcer", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::Dummy(ImVec2(5, 5) * State.dpiScale);
@@ -70,6 +20,29 @@ namespace TasksTab {
 		}
 	}
 
+	static void RenderDisableTaskButtons(std::vector<TaskTypes__Enum> taskList, const char* id) {
+		ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
+		ImVec4 themeColDark = ImVec4(themeCol.x * 0.7f, themeCol.y * 0.7f, themeCol.z * 0.7f, themeCol.w);
+		ImVec4 themeColDarker = ImVec4(themeCol.x * 0.5f, themeCol.y * 0.5f, themeCol.z * 0.5f, themeCol.w);
+
+		ImGui::Columns(3, id, false);
+		for (auto taskType : taskList) {
+			int32_t id = (int32_t)taskType;
+			const char* name = TranslateTaskTypes(taskType);
+			bool disabled = State.DisabledTaskTypes.count(id) > 0;
+			ImGui::PushStyleColor(ImGuiCol_Button, disabled ? themeCol : ImVec4(0.f, 0.f, 0.f, 0.f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, disabled ? themeColDarker : themeColDark);
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, themeCol);
+			if (AnimatedButton((std::string(name) + "##" + std::to_string(id)).c_str())) {
+				if (disabled) State.DisabledTaskTypes.erase(id);
+				else State.DisabledTaskTypes.insert(id);
+			}
+			ImGui::PopStyleColor(3);
+			ImGui::NextColumn();
+		}
+		ImGui::Columns(1);
+	}
+
 	static void RenderDisableTasks() {
 		if (ImGui::CollapsingHeader("Disable Tasks", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::TextDisabled("Disabled tasks won't be assigned next game.");
@@ -79,38 +52,26 @@ namespace TasksTab {
 			ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
 
 			int mapId = GameOptions().GetByte(app::ByteOptionNames__Enum::MapId);
-			const TaskList* currentTasks = &skeldTasks;
 			const char* mapName = "The Skeld";
 			switch (mapId) {
-			case 1: currentTasks = &miraHqTasks; mapName = "Mira HQ"; break;
-			case 2: currentTasks = &polusTasks; mapName = "Polus"; break;
-			case 4: currentTasks = &airshipTasks; mapName = "Airship"; break;
-			case 5: currentTasks = &fungleTasks; mapName = "Fungle"; break;
+			case 1: mapName = "Mira HQ"; break;
+			case 2: mapName = "Polus"; break;
+			case 4: mapName = "Airship"; break;
+			case 5: mapName = "Fungle"; break;
 			default: break;
 			}
 
-			ImGui::TextDisabled("Map: %s", mapName);
+			ImGui::Text("Map: %s", mapName);
 			ImGui::Dummy(ImVec2(3, 3) * State.dpiScale);
-			ImVec4 themeCol = State.RgbMenuTheme ? State.RgbColor : (State.GradientMenuTheme ? State.MenuGradientColor : State.MenuThemeColor);
-			ImVec4 themeColDark = ImVec4(themeCol.x * 0.7f, themeCol.y * 0.7f, themeCol.z * 0.7f, themeCol.w);
-			ImVec4 themeColDarker = ImVec4(themeCol.x * 0.5f, themeCol.y * 0.5f, themeCol.z * 0.5f, themeCol.w);
 
-			ImGui::Columns(2, "disabledTasksCols", false);
-			for (auto taskType : *currentTasks) {
-				int id = (int)taskType;
-				const char* name = TranslateTaskTypes(taskType);
-				bool disabled = State.DisabledTaskTypes.count(id) > 0;
-				ImGui::PushStyleColor(ImGuiCol_Button, disabled ? themeCol : ImVec4(0.f, 0.f, 0.f, 0.f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, disabled ? themeColDarker : themeColDark);
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, themeCol);
-				if (AnimatedButton((std::string(name) + "##" + std::to_string(id)).c_str())) {
-					if (disabled) State.DisabledTaskTypes.erase(id);
-					else State.DisabledTaskTypes.insert(id);
-				}
-				ImGui::PopStyleColor(3);
-				ImGui::NextColumn();
-			}
-			ImGui::Columns(1);
+			ImGui::Text("Common Tasks");
+			RenderDisableTaskButtons(GetMapCommonTasks(), "disabledCommonTasksCols");
+
+			ImGui::Text("Short Tasks");
+			RenderDisableTaskButtons(GetMapShortTasks(), "disabledShortTasksCols");
+
+			ImGui::Text("Long Tasks");
+			RenderDisableTaskButtons(GetMapLongTasks(), "disabledLongTasksCols");
 		}
 	}
 
@@ -221,8 +182,8 @@ namespace TasksTab {
 
 				ImGui::TextColored(NormalPlayerTask_get_IsComplete(task, NULL)
 					? ImVec4(0.0F, 1.0F, 0.0F, 1.0F)
-					: taskIncompleteCol
-					, TranslateTaskTypes(task->fields._.TaskType));
+					: taskIncompleteCol,
+					TranslateTaskTypes(task->fields._.TaskType));
 			}
 
 			if (tasks.size() > 0) {

@@ -677,7 +677,7 @@ const char* TranslateTaskTypes(TaskTypes__Enum taskType) {
     static constexpr std::array TASK_TRANSLATIONS = { "Submit Scan", "Prime Shields", "Fuel Engines", "Chart Course", "Start Reactor", "Swipe Card", "Clear Asteroids", "Upload Data",
         "Inspect Sample", "Empty Chute", "Empty Garbage", "Align Engine Output", "Fix Wiring", "Calibrate Distributor", "Divert Power", "Unlock Manifolds", "Stop Reactor Meltdown",
         "Fix Lights", "Clean O2 Filter", "Fix Communications", "Restore Oxygen", "Stabilize Steering", "Assemble Artifact", "Sort Samples", "Measure Weather", "Enter ID Code",
-        "Buy Beverage", "Process Data", "Run Diagnostics", "Water Plants", "Monitor Oxygen", "Store Artifacts", "Fill Canisters", "Activate Weather Nodes", "Insert Keys",
+        "Buy Beverage", "Process Data", "Run Diagnostics", "Water Plants", "Monitor Tree", "Store Artifacts", "Fill Canisters", "Activate Weather Nodes", "Insert Keys",
         "Reset Seismic Stabilizers", "Scan Boarding Pass", "Open Waterways", "Replace Water Jug", "Repair Drill", "Align Telescope", "Record Temperature", "Reboot Wifi",
         "Polish Ruby", "Reset Breakers", "Decontaminate", "Make Burger", "Unlock Safe", "Sort Records", "Put Away Pistols", "Fix Shower", "Clean Toilet", "Dress Mannequin",
         "Pick Up Towels", "Rewind Tapes", "Start Fans", "Develop Photos", "Get Biggol Sword", "Put Away Rifles", "Stop Charles", "Clean Vent", "None", "Build Sandcastle",
@@ -2581,6 +2581,121 @@ void ReloadCurrentSceneIfNeeded() {
     if (State.CurrentScene == "MainMenu" || State.CurrentScene == "MatchMaking") {
         SceneManager_LoadScene(convert_to_string(State.CurrentScene), NULL);
     }
+}
+
+std::vector<app::TaskTypes__Enum> GetMapCommonTasks() {
+    static const std::vector<app::TaskTypes__Enum> skeldTasks = {
+        TaskTypes__Enum::SwipeCard, TaskTypes__Enum::FixWiring
+    };
+    static const std::vector<app::TaskTypes__Enum> miraHqTasks = {
+        TaskTypes__Enum::FixWiring, TaskTypes__Enum::EnterIdCode
+    };
+    static const std::vector<app::TaskTypes__Enum> polusTasks = {
+        TaskTypes__Enum::SwipeCard, TaskTypes__Enum::FixWiring, TaskTypes__Enum::InsertKeys,
+        TaskTypes__Enum::ScanBoardingPass
+    };
+    static const std::vector<app::TaskTypes__Enum> airshipTasks = {
+        TaskTypes__Enum::FixWiring, TaskTypes__Enum::EnterIdCode
+    };
+    static const std::vector<app::TaskTypes__Enum> fungleTasks = {
+        TaskTypes__Enum::EnterIdCode, TaskTypes__Enum::RoastMarshmallow, TaskTypes__Enum::CollectSamples,
+        TaskTypes__Enum::ReplaceParts
+    };
+
+    int mapId = GameOptions().GetByte(app::ByteOptionNames__Enum::MapId, 0);
+    std::vector<app::TaskTypes__Enum> currentTasks = skeldTasks;
+    switch (mapId) {
+    case 1: currentTasks = miraHqTasks; break;
+    case 2: currentTasks = polusTasks; break;
+    case 4: currentTasks = airshipTasks; break;
+    case 5: currentTasks = fungleTasks; break;
+    default: break;
+    }
+    return currentTasks;
+}
+
+std::vector<app::TaskTypes__Enum> GetMapShortTasks() {
+    static const std::vector<app::TaskTypes__Enum> skeldTasks = {
+        TaskTypes__Enum::PrimeShields, TaskTypes__Enum::ChartCourse, TaskTypes__Enum::UploadData,
+        TaskTypes__Enum::CalibrateDistributor, TaskTypes__Enum::DivertPower, TaskTypes__Enum::UnlockManifolds,
+        TaskTypes__Enum::CleanO2Filter, TaskTypes__Enum::StabilizeSteering, TaskTypes__Enum::VentCleaning
+    };
+    static const std::vector<app::TaskTypes__Enum> miraHqTasks = {
+        TaskTypes__Enum::PrimeShields, TaskTypes__Enum::FuelEngines, TaskTypes__Enum::ChartCourse,
+        TaskTypes__Enum::EmptyGarbage, TaskTypes__Enum::DivertPower, TaskTypes__Enum::UnlockManifolds,
+        TaskTypes__Enum::CleanO2Filter, TaskTypes__Enum::AssembleArtifact, TaskTypes__Enum::SortSamples,
+        TaskTypes__Enum::MeasureWeather, TaskTypes__Enum::BuyBeverage, TaskTypes__Enum::ProcessData,
+        TaskTypes__Enum::RunDiagnostics, TaskTypes__Enum::VentCleaning
+    };
+    static const std::vector<app::TaskTypes__Enum> polusTasks = {
+        TaskTypes__Enum::SubmitScan, TaskTypes__Enum::ChartCourse, TaskTypes__Enum::ClearAsteroids,
+        TaskTypes__Enum::EmptyGarbage, TaskTypes__Enum::UnlockManifolds, TaskTypes__Enum::MonitorOxygen,
+        TaskTypes__Enum::StoreArtifacts, TaskTypes__Enum::FillCanisters, TaskTypes__Enum::FixWeatherNode,
+        TaskTypes__Enum::RepairDrill, TaskTypes__Enum::AlignTelescope, TaskTypes__Enum::RecordTemperature
+    };
+    static const std::vector<app::TaskTypes__Enum> airshipTasks = {
+        TaskTypes__Enum::UploadData, TaskTypes__Enum::DivertPower, TaskTypes__Enum::StabilizeSteering,
+        TaskTypes__Enum::PolishRuby, TaskTypes__Enum::Decontaminate, TaskTypes__Enum::MakeBurger,
+        TaskTypes__Enum::SortRecords, TaskTypes__Enum::PutAwayPistols, TaskTypes__Enum::FixShower,
+        TaskTypes__Enum::CleanToilet, TaskTypes__Enum::DressMannequin, TaskTypes__Enum::PickUpTowels,
+        TaskTypes__Enum::PutAwayRifles, TaskTypes__Enum::VentCleaning
+    };
+    static const std::vector<app::TaskTypes__Enum> fungleTasks = {
+        TaskTypes__Enum::EmptyGarbage, TaskTypes__Enum::FixWiring, TaskTypes__Enum::AssembleArtifact,
+        TaskTypes__Enum::RecordTemperature, TaskTypes__Enum::BuildSandcastle, TaskTypes__Enum::CollectShells,
+        TaskTypes__Enum::LiftWeights, TaskTypes__Enum::TestFrisbee, TaskTypes__Enum::CrankGenerator,
+        TaskTypes__Enum::FixAntenna, TaskTypes__Enum::TuneRadio, TaskTypes__Enum::MonitorMushroom,
+        TaskTypes__Enum::PlayVideogame
+    };
+
+    int mapId = GameOptions().GetByte(app::ByteOptionNames__Enum::MapId, 0);
+    std::vector<app::TaskTypes__Enum> currentTasks = skeldTasks;
+    switch (mapId) {
+    case 1: currentTasks = miraHqTasks; break;
+    case 2: currentTasks = polusTasks; break;
+    case 4: currentTasks = airshipTasks; break;
+    case 5: currentTasks = fungleTasks; break;
+    default: break;
+    }
+    return currentTasks;
+}
+
+std::vector<app::TaskTypes__Enum> GetMapLongTasks() {
+    static const std::vector<app::TaskTypes__Enum> skeldTasks = {
+        TaskTypes__Enum::SubmitScan, TaskTypes__Enum::FuelEngines, TaskTypes__Enum::StartReactor,
+        TaskTypes__Enum::ClearAsteroids, TaskTypes__Enum::InspectSample, TaskTypes__Enum::EmptyChute,
+        TaskTypes__Enum::EmptyGarbage, TaskTypes__Enum::AlignEngineOutput
+    };
+    static const std::vector<app::TaskTypes__Enum> miraHqTasks = {
+        TaskTypes__Enum::SubmitScan, TaskTypes__Enum::StartReactor, TaskTypes__Enum::ClearAsteroids,
+        TaskTypes__Enum::DivertPower, TaskTypes__Enum::WaterPlants
+    };
+    static const std::vector<app::TaskTypes__Enum> polusTasks = {
+        TaskTypes__Enum::FuelEngines, TaskTypes__Enum::StartReactor, TaskTypes__Enum::UploadData,
+        TaskTypes__Enum::InspectSample, TaskTypes__Enum::FixWeatherNode, TaskTypes__Enum::OpenWaterways,
+        TaskTypes__Enum::ReplaceWaterJug, TaskTypes__Enum::RebootWifi
+    };
+    static const std::vector<app::TaskTypes__Enum> airshipTasks = {
+        TaskTypes__Enum::FuelEngines, TaskTypes__Enum::UploadData, TaskTypes__Enum::EmptyGarbage,
+        TaskTypes__Enum::CalibrateDistributor, TaskTypes__Enum::ResetBreakers, TaskTypes__Enum::UnlockSafe,
+        TaskTypes__Enum::RewindTapes, TaskTypes__Enum::StartFans, TaskTypes__Enum::DevelopPhotos
+    };
+    static const std::vector<app::TaskTypes__Enum> fungleTasks = {
+        TaskTypes__Enum::WaterPlants, TaskTypes__Enum::ReplaceWaterJug, TaskTypes__Enum::CatchFish,
+        TaskTypes__Enum::CollectVegetables, TaskTypes__Enum::HoistSupplies, TaskTypes__Enum::MineOres,
+        TaskTypes__Enum::PolishGem, TaskTypes__Enum::HelpCritter, TaskTypes__Enum::ExtractFuel
+    };
+
+    int mapId = GameOptions().GetByte(app::ByteOptionNames__Enum::MapId, 0);
+    std::vector<app::TaskTypes__Enum> currentTasks = skeldTasks;
+    switch (mapId) {
+    case 1: currentTasks = miraHqTasks; break;
+    case 2: currentTasks = polusTasks; break;
+    case 4: currentTasks = airshipTasks; break;
+    case 5: currentTasks = fungleTasks; break;
+    default: break;
+    }
+    return currentTasks;
 }
 
 //TODO: Workaround

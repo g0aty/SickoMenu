@@ -35,6 +35,7 @@ namespace HostTab {
 		{"The Skeld",		ImColor::ImColor(0xFF99A800)}, // 0xAABBGGRR
 		{"Mira HQ",			ImColor::ImColor(0xFFFEDAF3)},
 		{"Polus",			ImColor::ImColor(0xFFFE47F5)},
+		{"ehT dlekS",		ImColor::ImColor(0xFF99A800)},
 		{"The Airship",		ImColor::ImColor(0xFF0B64FF)},
 		{"The Fungle",		ImColor::ImColor(0xFF08FD8E)},
 	};

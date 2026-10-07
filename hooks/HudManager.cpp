@@ -341,7 +341,7 @@ void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {
     std::string watermarkText = /*State.AprilFoolsMode ? std::format(" • {} <#fb0>{}</color> <#ca08ff>[{} Mode]</color> by {}", sickoText,
         State.SickoVersion, State.DiddyPartyMode ? "Diddy Party" : (IsChatCensored() || IsStreamerMode() ? "F***son" : "Fuckson"), goatText) :*/
         std::format(" • {} <#fb0>{}</color> by {}", sickoText, sickoVersionText, goatText);
-    const auto& versionText = std::format("<font=\"Barlow-Regular SDF\"><size={}%>{}{}{}{}{}{}</color></size></font>",
+    const auto& versionText = std::format("<size={}%>{}{}{}{}{}{}</color></size>",
         watermarkSize, State.DarkMode ? "<#666>" : "<#fff>", State.versionShowerDefaultText, spoofVersionText,
         State.HideWatermark ? "" : watermarkText, disableHostAnticheatText, watermarkOffset);
     TMP_Text_set_text((TMP_Text*)State.versionShower->fields.text, convert_to_string(versionText), nullptr);

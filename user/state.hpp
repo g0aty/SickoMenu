@@ -926,7 +926,6 @@ public:
     int64_t MAX_BAN_SECONDS = static_cast<int64_t>(100) * 365 * 86400; // also it prevents runtime error (int overflow)
 
     // Disable Tasks
-    bool DisableMedbayScan = false;
     std::unordered_set<int> DisabledTaskTypes;
     std::set<int> DisabledSabotageTypes;
 

@@ -252,13 +252,15 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
 }
 
 void dShipStatus_AddTasksFromList(ShipStatus* __this, int32_t* start, int32_t count, void* tasks, void* usedTaskTypes, List_1_NormalPlayerTask_* unusedTasks, MethodInfo* method) {
-    if (State.DisableMedbayScan || !State.DisabledTaskTypes.empty()) {
+    if (!State.DisabledTaskTypes.empty()) {
+        // unusedTasks is the list of tasks that are to be assigned to players
         il2cpp::List<List_1_NormalPlayerTask_> taskList = unusedTasks;
         for (int i = (int)taskList.size() - 1; i >= 0; i--) {
-            if ((int)taskList.size() <= count) break; 
+            if (taskList.size() == 1) break;
+            // don't clear all unusedTasks,
+            // leave one so the game doesn't throw an error and not spawn us in
             auto taskType = taskList[i]->fields._.TaskType;
-            bool remove = (State.DisableMedbayScan && taskType == TaskTypes__Enum::SubmitScan)
-                || State.DisabledTaskTypes.count((int)taskType);
+            bool remove = State.DisabledTaskTypes.count((int)taskType);
             if (remove) taskList.erase(i);
         }
         unusedTasks = taskList.get();

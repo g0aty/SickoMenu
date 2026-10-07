@@ -16,7 +16,7 @@ static std::string CleanChatPresetName(std::string cpName) {
 }
 
 void Settings::Load() {
-    this->SickoVersion = "v5.1.2";
+    this->SickoVersion = "v5.1.3";
 
     auto path = getModulePath(NULL);
     auto configPath = path.parent_path() / "SickoMenu" / "sicko-selected-config.json";
@@ -559,8 +559,6 @@ void Settings::Load() {
         JSON_TRYGET("WarnedFriendCodes", this->WarnedFriendCodes);
         JSON_TRYGET("WarnReasons", this->WarnReasons);
         JSON_TRYGET("LockedNames", this->LockedNames);
-
-        // JSON_TRYGET("DisableMedbayScan", this->DisableMedbayScan);
 
         JSON_TRYGET("CrewmateGhostColor_R", this->CrewmateGhostColor.x);
         JSON_TRYGET("CrewmateGhostColor_G", this->CrewmateGhostColor.y);
@@ -1255,8 +1253,6 @@ void Settings::Save() {
                 { "WarnedFriendCodes", this->WarnedFriendCodes },
                 { "WarnReasons", this->WarnReasons },
                 { "LockedNames", this->LockedNames },
-
-                // { "DisableMedbayScan", this->DisableMedbayScan },
 
                 { "CrewmateGhostColor_R", this->CrewmateGhostColor.x },
                 { "CrewmateGhostColor_G", this->CrewmateGhostColor.y },
