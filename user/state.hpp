@@ -30,6 +30,7 @@ public:
         0x00, // close current room door
         VK_END, // toggle replay
         0x00, //toggle chat always active
+        VK_F2, //toggle chat
         0x00, //toggle read ghost messages
         0x00, //toggle HUD
         0x00, //reset appearance
