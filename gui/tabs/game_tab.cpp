@@ -121,11 +121,11 @@ namespace GameTab {
             ImGui::Dummy(ImVec2(7, 7) * State.dpiScale);
 
             if (IsHost() || !State.SafeMode) {
-                CustomListBoxIntColored(" ", &State.SelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
+                CustomListBoxIntColored(" ", &State.SelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
             }
             else {
                 if (State.SelectedColorId >= (int)COLORS.size()) State.SelectedColorId = 0;
-                CustomListBoxIntColored(" ", &State.SelectedColorId, COLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
+                CustomListBoxIntColored(" ", &State.SelectedColorId, COLORS, 85.0f * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR));
             }
             ImGui::SameLine();
             if (AnimatedButton("Random Color"))
@@ -424,7 +424,7 @@ namespace GameTab {
                         State.Save();
                     }
 
-                    if (CustomListBoxIntColored(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR))) State.Save();
+                    if (CustomListBoxIntColored(" ­", &State.HostSelectedColorId, HOSTCOLORS, 85.0f * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", COLOR_NAMES_COLOR, IM_ARRAYSIZE(COLOR_NAMES_COLOR))) State.Save();
                 }
             }
         }

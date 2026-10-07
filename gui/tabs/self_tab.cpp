@@ -782,7 +782,7 @@ namespace SelfTab {
                 {"Influencer",      State.InfluencerColor},
             }; // needs to be updated every render
 
-            if (CustomListBoxIntColored("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, " ", FAKEROLE_NAMES_COLOR, IM_ARRAYSIZE(FAKEROLE_NAMES_COLOR))) {
+            if (CustomListBoxIntColored("Select Role", &State.FakeRole, FAKEROLES, 100.0f * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, " ", FAKEROLE_NAMES_COLOR, IM_ARRAYSIZE(FAKEROLE_NAMES_COLOR))) {
                 // for some reason, detective is 12 (0x0c) instead of 11, viper is 18 (0x12) instead of 12, and influencer (SpiritGuide) is 21 (0x15) instead of 20
                 if (State.FakeRole >= 14) State.FakeRoleId = State.FakeRole + 7;
                 else if (State.FakeRole >= 12) State.FakeRoleId = State.FakeRole + 6;

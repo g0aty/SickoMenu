@@ -356,7 +356,7 @@ namespace HostTab {
                         }
                         ImGui::SameLine();
                         int hostRoleInt = (int)State.HostRoleToSet;
-                        if (CustomListBoxIntColored("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", ROLE_NAMES_COLOR, IM_ARRAYSIZE(ROLE_NAMES_COLOR))) {
+                        if (CustomListBoxIntColored("###RoleSelector", &hostRoleInt, ROLE_NAMES, 80 * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", ROLE_NAMES_COLOR, IM_ARRAYSIZE(ROLE_NAMES_COLOR))) {
                             if (State.HostRoleToSet == RoleType::Impostor || State.HostRoleToSet == RoleType::Shapeshifter || State.HostRoleToSet == RoleType::Phantom || State.HostRoleToSet == RoleType::Viper) {
                                 if (State.impostors_amount + State.shapeshifters_amount + State.phantoms_amount + State.vipers_amount < GetMaxImpostorAmount((int)GetAllPlayerData().size()) - 1) {
                                     if (options.GetGameMode() == GameModes__Enum::HideNSeek) hostRoleInt = (int)RoleType::Impostor;
@@ -736,7 +736,7 @@ namespace HostTab {
                 /*if (State.mapHostChoice > 3)
                     State.mapHostChoice--;*/
                 State.mapHostChoice = std::clamp(State.mapHostChoice, 0, (int)MAP_NAMES.size() - 1);
-                if (IsInLobby() && CustomListBoxIntColored("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale, ImVec4(1.f, 1.f, 1.f, 0.f), 0, "", MAP_NAMES_COLOR, IM_ARRAYSIZE(MAP_NAMES_COLOR))) {
+                if (IsInLobby() && CustomListBoxIntColored("Map", &State.mapHostChoice, MAP_NAMES, 75 * State.dpiScale, ImVec4(0.f, 0.f, 0.f, 0.f), 0, "", MAP_NAMES_COLOR, IM_ARRAYSIZE(MAP_NAMES_COLOR))) {
                     //if (!IsInGame()) {
                         // disable flip
                     if (State.mapHostChoice == 3) {
