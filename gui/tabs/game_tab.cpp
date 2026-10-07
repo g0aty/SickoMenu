@@ -299,7 +299,7 @@ namespace GameTab {
                     State.rpcQueue.push(new AttemptToBan(NULL));
                 }
 
-                if (State.mapType == Settings::MapType::Fungle) {
+                if (State.mapType == Settings::MapType::Fungle && !State.SafeMode) {
                     if (AnimatedButton("Make All Climb Zipline (Bottom to Top)")) {
                         for (auto p : GetAllPlayerControl()) {
                             if (State.IgnoreZiplineSelf && p == *Game::pLocalPlayer) continue;

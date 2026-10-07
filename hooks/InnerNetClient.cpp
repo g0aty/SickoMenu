@@ -870,7 +870,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                     else ventTpDelay -= Time_get_deltaTime(NULL);
                 }
 
-                if (IsInGame() && *Game::pShipStatus != NULL && State.mapType == Settings::MapType::Fungle) {
+                if (!State.SafeMode && IsInGame() && *Game::pShipStatus != NULL && State.mapType == Settings::MapType::Fungle) {
                     static float ziplineClimbDelay = 0.f;
                     static bool ziplineTop = false;
 

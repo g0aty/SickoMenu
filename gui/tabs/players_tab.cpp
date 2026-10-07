@@ -1126,7 +1126,7 @@ namespace PlayersTab {
                             }
                         }
 
-                        if (State.mapType == Settings::MapType::Fungle) {
+                        if (State.mapType == Settings::MapType::Fungle && !State.SafeMode) {
                             ImGui::Text("Force Climb Zipline from:");
                             if (AnimatedButton("Bottom to Top")) {
                                 for (auto p : selectedPlayers) {
