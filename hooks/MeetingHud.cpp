@@ -9,6 +9,12 @@
 
 static app::Type* voteSpreaderType = nullptr;
 static bool calloutOver = false;
+struct VoteImmunityRecord {
+    Game::VotedFor originalTarget;
+    size_t order;
+};
+static std::unordered_map<Game::Voter, VoteImmunityRecord> voteImmunityVotes;
+static size_t voteImmunityOrder = 0;
 
 void RecolorVoteArea(PlayerVoteArea* voteArea, NetworkedPlayerInfo* pData = NULL) {
     auto outfit = pData == NULL ?
@@ -98,6 +104,8 @@ void UpdateJudgeRoleAbilities() {
 
 void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_Awake executed", false);
+    voteImmunityVotes.clear();
+    voteImmunityOrder = 0;
     try {
         State.BlinkPlayersTab = true;
         State.voteMonitor.clear();
@@ -122,6 +130,8 @@ void dMeetingHud_Awake(MeetingHud* __this, MethodInfo* method) {
 
 void dMeetingHud_Close(MeetingHud* __this, MethodInfo* method) {
     State.vanishedPlayers.clear();
+    voteImmunityVotes.clear();
+    voteImmunityOrder = 0;
     if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_Close executed", false);
     try {
         State.BlinkPlayersTab = true;
@@ -547,6 +557,7 @@ void dMeetingHud_CheckForEndVoting(MeetingHud* __this, MethodInfo* method) {
                 playerState->fields._VotedForId_k__BackingField.Value = Game::SkippedVote;
         }
     }
+
     __this->fields.playerStates = playerStates.get();
     MeetingHud_CheckForEndVoting(__this, method);
 }
@@ -559,11 +570,109 @@ bool dLogicOptions_GetAnonymousVotes(LogicOptions* __this, MethodInfo* method) {
 
 void dMeetingHud_CastVote(MeetingHud* __this, PlayerId playerId, PlayerId suspectIdx, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dMeetingHud_CastVote executed", false);
-    if (!State.PanicMode && IsHost() && !State.VoteImmunePlayers.empty()) {
-        if (std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), suspectIdx.Value) != State.VoteImmunePlayers.end()) {
-            auto it = State.VoteRedirectTargets.find(suspectIdx.Value);
-            suspectIdx = (PlayerId)((it != State.VoteRedirectTargets.end()) ? it->second : 253);
+
+    if (State.PanicMode || !IsHost() || State.GodMode || State.VoteOffPlayerId != Game::HasNotVoted ||
+        (State.VoteImmunePlayers.empty() && voteImmunityVotes.empty()))
+        return MeetingHud_CastVote(__this, playerId, suspectIdx, method);
+
+    struct CastVote {
+        PlayerVoteArea* area;
+        Game::VotedFor effectiveTarget;
+        size_t order;
+        bool incoming;
+    };
+    std::vector<CastVote> votes;
+    std::unordered_set<Game::Voter> activeVoters;
+    PlayerVoteArea* incomingArea = nullptr;
+
+    for (auto playerState : il2cpp::Array(__this->fields.playerStates)) {
+        if (!playerState) continue;
+        auto voter = playerState->fields._PlayerId_k__BackingField.Value;
+        if (voter == playerId.Value) {
+            incomingArea = playerState;
+            continue;
         }
+
+        auto playerData = GetPlayerDataById(voter);
+        auto effectiveTarget = playerState->fields._VotedForId_k__BackingField.Value;
+        if (!playerData || playerData->fields.Disconnected || playerData->fields.IsDead ||
+            (effectiveTarget != Game::SkippedVote && effectiveTarget >= Game::DeadVote))
+            continue;
+
+        auto record = voteImmunityVotes.try_emplace(voter, VoteImmunityRecord{ effectiveTarget, 0 }).first;
+        votes.push_back({ playerState, record->second.originalTarget, record->second.order, false });
+        activeVoters.insert(voter);
+    }
+
+    auto incomingData = GetPlayerDataById(playerId.Value);
+    auto targetData = suspectIdx.Value < Game::DeadVote ? GetPlayerDataById(suspectIdx.Value) : nullptr;
+    auto previousTarget = incomingArea ? incomingArea->fields._VotedForId_k__BackingField.Value : Game::HasNotVoted;
+    if (!incomingArea || !incomingData || incomingData->fields.Disconnected || incomingData->fields.IsDead ||
+        incomingArea->fields._AmDead_k__BackingField ||
+        previousTarget == Game::SkippedVote || previousTarget < Game::DeadVote ||
+        (suspectIdx.Value != Game::SkippedVote && suspectIdx.Value >= Game::DeadVote) ||
+        (suspectIdx.Value < Game::DeadVote && (!targetData || targetData->fields.Disconnected || targetData->fields.IsDead)))
+        return MeetingHud_CastVote(__this, playerId, suspectIdx, method);
+
+    voteImmunityVotes[playerId.Value] = { suspectIdx.Value, ++voteImmunityOrder };
+    votes.push_back({ incomingArea, suspectIdx.Value, voteImmunityOrder, true });
+    activeVoters.insert(playerId.Value);
+    for (auto it = voteImmunityVotes.begin(); it != voteImmunityVotes.end();) {
+        if (!activeVoters.contains(it->first))
+            it = voteImmunityVotes.erase(it);
+        else
+            ++it;
+    }
+
+    std::unordered_map<Game::VotedFor, int> voteCounts;
+    for (const auto& vote : votes)
+        ++voteCounts[vote.effectiveTarget];
+
+    for (size_t changes = 0; changes < votes.size(); ++changes) {
+        Game::VotedFor unsafeTarget = Game::HasNotVoted;
+        for (auto immune : State.VoteImmunePlayers) {
+            int immuneVotes = voteCounts[immune];
+            if (immuneVotes == 0) continue;
+            int highestOther = 0;
+            for (const auto& [target, count] : voteCounts) {
+                if (target != immune && count > highestOther)
+                    highestOther = count;
+            }
+            if (immuneVotes >= highestOther) {
+                unsafeTarget = immune;
+                break;
+            }
+        }
+        if (unsafeTarget == Game::HasNotVoted) break;
+
+        auto redirect = State.VoteRedirectTargets.find(unsafeTarget);
+        Game::VotedFor target = redirect != State.VoteRedirectTargets.end() ? redirect->second : Game::SkippedVote;
+        if (target == unsafeTarget || (target != Game::SkippedVote && target >= Game::DeadVote) ||
+            std::find(State.VoteImmunePlayers.begin(), State.VoteImmunePlayers.end(), target) != State.VoteImmunePlayers.end())
+            target = Game::SkippedVote;
+        if (target != Game::SkippedVote) {
+            auto targetData = GetPlayerDataById(target);
+            if (!targetData || targetData->fields.Disconnected || targetData->fields.IsDead)
+                target = Game::SkippedVote;
+        }
+
+        CastVote* latestVote = nullptr;
+        for (auto& vote : votes) {
+            if (vote.effectiveTarget == unsafeTarget && (!latestVote || vote.order > latestVote->order))
+                latestVote = &vote;
+        }
+        if (!latestVote) break;
+
+        latestVote->effectiveTarget = target;
+        --voteCounts[unsafeTarget];
+        ++voteCounts[target];
+    }
+
+    for (const auto& vote : votes) {
+        if (vote.incoming)
+            suspectIdx.Value = vote.effectiveTarget;
+        else
+            vote.area->fields._VotedForId_k__BackingField.Value = vote.effectiveTarget;
     }
     MeetingHud_CastVote(__this, playerId, suspectIdx, method);
 }
