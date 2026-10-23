@@ -604,10 +604,11 @@ namespace SelfTab {
                     State.Save();
                 }
             }
-            ImGui::SameLine();
             if (ToggleButton("Always Move", &State.AlwaysMove)) {
                 State.Save();
             }
+
+            if (ToggleButton("Drain CD in vents", &State.DrainCooldownsInVents)) State.Save();
 
             if (ToggleButton("Kill Immunity", &State.KillImmunity)) {
                 SendKillImmuneToggle(State.KillImmunity);

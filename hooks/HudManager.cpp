@@ -280,6 +280,57 @@ void dHudManager_Update(HudManager* __this, MethodInfo* method) {
     }
 
     HudManager_Update(__this, method);
+
+    if (!State.PanicMode && State.DrainCooldownsInVents && *Game::pLocalPlayer && (*Game::pLocalPlayer)->fields.inVent) {
+        if (__this->fields.KillButton != nullptr)
+            ActionButton_SetCoolDown((ActionButton*)__this->fields.KillButton,
+                (*Game::pLocalPlayer)->fields.killTimer, GameOptions().GetKillCooldown(), nullptr);
+
+        auto localData = GetPlayerData(*Game::pLocalPlayer);
+        if (localData != nullptr && localData->fields.Role != nullptr) {
+            const char* cooldownName = nullptr;
+            float maxCooldown = 0.f;
+            switch (localData->fields.RoleType) {
+            case RoleTypes__Enum::Engineer:
+                cooldownName = "cooldownSecondsRemaining";
+                maxCooldown = GameOptions().GetFloat(FloatOptionNames__Enum::EngineerCooldown, 1.f);
+                break;
+            case RoleTypes__Enum::Shapeshifter:
+                cooldownName = "cooldownSecondsRemaining";
+                maxCooldown = GameOptions().GetFloat(FloatOptionNames__Enum::ShapeshifterCooldown, 1.f);
+                break;
+            case RoleTypes__Enum::Phantom:
+                cooldownName = "cooldownSecondsRemaining";
+                maxCooldown = GameOptions().GetFloat(FloatOptionNames__Enum::PhantomCooldown, 1.f);
+                break;
+            case RoleTypes__Enum::Tracker:
+                cooldownName = "cooldownSecondsRemaining";
+                maxCooldown = GameOptions().GetFloat(FloatOptionNames__Enum::TrackerCooldown, 1.f);
+                break;
+            case RoleTypes__Enum::GuardianAngel:
+                cooldownName = "cooldownSecondsRemaining";
+                maxCooldown = GameOptions().GetFloat(FloatOptionNames__Enum::GuardianAngelCooldown, 1.f);
+                break;
+            case RoleTypes__Enum::Scientist:
+                cooldownName = "currentCooldown";
+                maxCooldown = GameOptions().GetFloat(FloatOptionNames__Enum::ScientistCooldown, 1.f);
+                break;
+            case RoleTypes__Enum::Detective:
+                cooldownName = "interrogateCooldown";
+                break;
+            }
+
+            if (cooldownName != nullptr) {
+                FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)localData->fields.Role)->klass, cooldownName);
+                if (cooldownField != nullptr) {
+                    float cooldown = 0.f;
+                    il2cpp_field_get_value((Il2CppObject*)localData->fields.Role, cooldownField, &cooldown);
+                    if (__this->fields.AbilityButton != nullptr && maxCooldown > 0.f)
+                        ActionButton_SetCoolDown((ActionButton*)__this->fields.AbilityButton, cooldown, maxCooldown, nullptr);
+                }
+            }
+        }
+    }
 }
 
 void dVersionShower_Start(VersionShower* __this, MethodInfo* method) {

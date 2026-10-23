@@ -648,6 +648,9 @@ void dPlayerControl_FixedUpdate(PlayerControl* __this, MethodInfo* method) {
             }*/
 
             if (__this == *Game::pLocalPlayer) {
+                if (!State.PanicMode && State.DrainCooldownsInVents && __this->fields.inVent)
+                    __this->fields.killTimer = (std::max)(__this->fields.killTimer - app::Time_get_fixedDeltaTime(nullptr), 0.f);
+
                 if (State.FollowerCam == nullptr) {
                     for (auto cam : GetAllCameras()) {
                         if (Camera_get_orthographicSize(cam, NULL) == 3.0f) {

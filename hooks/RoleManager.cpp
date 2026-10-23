@@ -286,8 +286,18 @@ void dRoleBehaviour_AppendTaskHint(RoleBehaviour* role, void* taskStringBuilder,
 
 // NOTE: the cooldown will be deducted below 0 on the next FixedUpdate call, and the duration can be anything
 
+static bool ShouldDrainCooldown(RoleBehaviour* role) {
+	if (State.PanicMode || !State.DrainCooldownsInVents || !*Game::pLocalPlayer || !(*Game::pLocalPlayer)->fields.inVent)
+		return false;
+
+	auto localData = GetPlayerData(*Game::pLocalPlayer);
+	return localData && localData->fields.Role == role;
+}
+
 void dEngineerRole_FixedUpdate(EngineerRole* __this, MethodInfo* method) {
 	float newCooldown = Time_get_deltaTime(NULL), newDuration = 30.f;
+	if (ShouldDrainCooldown((RoleBehaviour*)__this))
+		__this->fields.cooldownSecondsRemaining = newCooldown;
 
 	if (!State.PanicMode && (State.Engineer_NoVentCooldown || State.UnlockVents)) {
 		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "cooldownSecondsRemaining");
@@ -307,6 +317,8 @@ void dEngineerRole_FixedUpdate(EngineerRole* __this, MethodInfo* method) {
 void dScientistRole_Update(ScientistRole* __this, MethodInfo* method) {
 	float newCooldown = Time_get_deltaTime(NULL), newDuration = 69421.f;
 	float defaultMaxDuration = GameOptions().GetFloat(FloatOptionNames__Enum::ScientistBatteryCharge, 1.f);
+	if (ShouldDrainCooldown((RoleBehaviour*)__this))
+		__this->fields.currentCooldown = newCooldown;
 
 	if (!State.PanicMode && State.Scientist_NoVitalsCooldown) {
 		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "currentCooldown");
@@ -325,6 +337,10 @@ void dScientistRole_Update(ScientistRole* __this, MethodInfo* method) {
 void dTrackerRole_FixedUpdate(TrackerRole* __this, MethodInfo* method) {
 	float newCooldown = Time_get_deltaTime(NULL), newDuration = 69421.f;
 	float defaultMaxDuration = GameOptions().GetFloat(FloatOptionNames__Enum::TrackerDuration, 1.f);
+	if (ShouldDrainCooldown((RoleBehaviour*)__this)) {
+		__this->fields.cooldownSecondsRemaining = newCooldown;
+		__this->fields.delaySecondsRemaining = newCooldown;
+	}
 
 	if (!State.PanicMode && State.Tracker_NoTrackingCooldown) {
 		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "cooldownSecondsRemaining");
@@ -346,9 +362,11 @@ void dTrackerRole_FixedUpdate(TrackerRole* __this, MethodInfo* method) {
 
 void dDetectiveRole_FixedUpdate(DetectiveRole* __this, MethodInfo* method) {
 	float newCooldown = Time_get_deltaTime(NULL);
+	static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "interrogateCooldown");
+	if (ShouldDrainCooldown((RoleBehaviour*)__this) && cooldownField != nullptr)
+		il2cpp_field_set_value((Il2CppObject*)__this, cooldownField, &newCooldown);
 
 	if (!State.PanicMode && State.Detective_NoInterrogateCooldown) {
-		static FieldInfo* cooldownField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "interrogateCooldown");
 		if (cooldownField != nullptr)
 			il2cpp_field_set_value((Il2CppObject*)__this, cooldownField, &newCooldown);
 	}
@@ -357,6 +375,9 @@ void dDetectiveRole_FixedUpdate(DetectiveRole* __this, MethodInfo* method) {
 }
 
 void dGuardianAngelRole_FixedUpdate(GuardianAngelRole* __this, MethodInfo* method) {
+	if (ShouldDrainCooldown((RoleBehaviour*)__this))
+		__this->fields.cooldownSecondsRemaining = Time_get_deltaTime(NULL);
+
 	if (!State.PanicMode && State.GuardianAngel_NoProtectCooldown && (IsHost() || !State.SafeMode)) {
 		float newCooldown = Time_get_deltaTime(NULL);
 
@@ -372,6 +393,8 @@ void dShapeshifterRole_FixedUpdate(ShapeshifterRole* __this, MethodInfo* method)
 	static FieldInfo* durationField = il2cpp_class_get_field_from_name(((Il2CppObject*)__this)->klass, "durationSecondsRemaining");
 	float defaultMaxDuration = GameOptions().GetFloat(FloatOptionNames__Enum::ShapeshifterDuration, 1.f);
 	float newDuration = 69421.f;
+	if (ShouldDrainCooldown((RoleBehaviour*)__this))
+		__this->fields.cooldownSecondsRemaining = Time_get_deltaTime(NULL);
 
 	if (!State.PanicMode && State.Shapeshifter_InfiniteShapeshiftDuration && durationField != nullptr) {
 		il2cpp_field_set_value((Il2CppObject*)__this, durationField, &newDuration);
