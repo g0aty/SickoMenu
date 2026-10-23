@@ -362,6 +362,7 @@ void Settings::Load() {
         JSON_TRYGET("AutoStartTimer", this->AutoStartTimer);
         JSON_TRYGET("AutoOpenDoors", this->AutoOpenDoors);
         JSON_TRYGET("MoveInVentAndShapeshift", this->MoveInVentAndShapeshift);
+        JSON_TRYGET("DrainCooldownsInVents", this->DrainCooldownsInVents);
         JSON_TRYGET("AlwaysMove", this->AlwaysMove);
         JSON_TRYGET("AnimationlessShapeshift", this->AnimationlessShapeshift);
         JSON_TRYGET("DisableKillAnimation", this->DisableKillAnimation);
@@ -1078,6 +1079,7 @@ void Settings::Save() {
                 { "AutoStartTimer", this->AutoStartTimer },
                 { "AutoOpenDoors", this->AutoOpenDoors },
                 { "MoveInVentAndShapeshift", this->MoveInVentAndShapeshift },
+                { "DrainCooldownsInVents", this->DrainCooldownsInVents },
                 { "AlwaysMove", this->AlwaysMove },
                 { "AnimationlessShapeshift", this->AnimationlessShapeshift },
                 { "DisableKillAnimation", this->DisableKillAnimation },

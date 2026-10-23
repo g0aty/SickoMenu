@@ -345,6 +345,7 @@ public:
     bool AutoRepairSabotage = false;
 
     bool MoveInVentAndShapeshift = false;
+    bool DrainCooldownsInVents = false;
     bool AlwaysMove = false;
     bool AnimationlessShapeshift = false;
     bool DisableKillAnimation = false;
