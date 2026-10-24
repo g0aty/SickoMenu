@@ -1933,6 +1933,8 @@ namespace PlayersTab {
                                     State.activeWhisper = true;
                                 }
                             }
+                            ImGui::SameLine();
+                            ImGui::Checkbox("Hide Whisper Prefix", &State.hideWhisperPrefix);
                         }
                         //we have to send these rpc messages as ourselves since anticheat only allows you to send rpcs with your own net id
                         /*if (AnimatedButton(!State.SafeMode ? "Force AUM Detection" : "Fake AUM Detection")) {
