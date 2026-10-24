@@ -1295,7 +1295,7 @@ void dChatController_SendFreeChat(ChatController* __this, MethodInfo* method) {
 			MessageWriter* writer = InnerNetClient_StartRpcImmediately((InnerNetClient*)(*Game::pAmongUsClient),
 				playerToChatAs->fields._.NetId, uint8_t(RpcCalls__Enum::SendChat), SendOption__Enum::Reliable,
 				State.playerToWhisper.get_PlayerControl().value_or(nullptr)->fields._.OwnerId, NULL);
-			std::string whisperMsg = std::format("{} whispers to you:\n{}",
+			std::string whisperMsg = State.hideWhisperPrefix ? chatText : std::format("{} whispers to you:\n{}",
 				RemoveHtmlTags(convert_from_string(NetworkedPlayerInfo_get_PlayerName(GetPlayerData(*Game::pLocalPlayer), NULL))),
 				chatText);
 			if (whisperMsg.length() <= 100 || !State.SafeMode)

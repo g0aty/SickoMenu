@@ -632,6 +632,7 @@ public:
     bool activeImpersonation = false;
     bool activeChatSpoof = false;
     bool activeWhisper = false;
+    bool hideWhisperPrefix = false;
 
     PlayerSelection playerToFollow;
     PlayerSelection playerToAttach;
