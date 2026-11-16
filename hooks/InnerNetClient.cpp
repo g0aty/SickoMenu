@@ -227,33 +227,10 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                 }
             }
             else {
-                if (!State.rpcQueue.empty()) {
-                    auto rpc = State.rpcQueue.front();
-                    //Looks like there is a check on Task completion when u are dead.
-                    //The maximum amount of Tasks that can be completed per Update is at 6 (but it's 1 cuz u still get kicked).
-                    static auto maxProcessedTasks = 0;
-                    if (!State.SafeMode) {
-                        maxProcessedTasks = 765; //max tasks per task type = 255, # task types = 3, max tasks = 765 simple math
-                    }
-                    else {
-                        maxProcessedTasks = 1; //originally 6
-                    }
-                    auto processedTaskCompletes = 0;
-                    if (dynamic_cast<RpcCompleteTask*>(rpc))
-                    {
-                        if (processedTaskCompletes < maxProcessedTasks)
-                        {
-                            State.rpcQueue.pop();
-                            rpc->Process();
-                            processedTaskCompletes++;
-                        }
-                    }
-                    else
-                    {
-                        State.rpcQueue.pop();
-                        rpc->Process();
-                    }
-                    delete rpc;
+                if (auto* rpc = State.rpcQueue.try_pop()) {
+                    // The queue transfers ownership to this scope; exceptions cannot leak the command.
+                    std::unique_ptr<RPCInterface> rpcOwner(rpc);
+                    rpc->Process();
                 }
 
                 if (State.CloseAllDoors) {
@@ -333,30 +310,28 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                     }
                 }
 
-                if (!State.lobbyRpcQueue.empty()) {
-                    auto rpc = State.lobbyRpcQueue.front();
-                    State.lobbyRpcQueue.pop();
-
+                if (auto* rpc = State.lobbyRpcQueue.try_pop()) {
+                    std::unique_ptr<RPCInterface> rpcOwner(rpc);
                     rpc->Process();
-                    delete rpc;
                 }
             }
 
             static int rpcDelay = 0;
-            if ((IsInGame() || IsInLobby()) && !State.taskRpcQueue.empty()) {
-                if (rpcDelay <= 0) {
-                    auto rpc = State.taskRpcQueue.front();
-                    State.taskRpcQueue.pop();
+            if ((IsInGame() || IsInLobby()) && rpcDelay <= 0) {
+                if (auto* rpc = State.taskRpcQueue.try_pop()) {
+                    std::unique_ptr<RPCInterface> rpcOwner(rpc);
                     rpc->Process();
-                    delete rpc;
                     rpcDelay = State.SafeMode ? int(0.1 * GetFps()) : 0;
                 }
-                else rpcDelay--;
+            }
+            else if (rpcDelay > 0) {
+                rpcDelay--;
             }
 
-            if (!IsInGame() && !State.rpcQueue.empty()) State.rpcQueue = {};
-            if (!IsInLobby() && !State.lobbyRpcQueue.empty()) State.lobbyRpcQueue = {};
-            if (!IsInGame() && !IsInLobby() && !State.taskRpcQueue.empty()) State.taskRpcQueue = {};
+            // Dispose of pending commands when their target scene is no longer active.
+            if (!IsInGame()) State.rpcQueue.clear();
+            if (!IsInLobby()) State.lobbyRpcQueue.clear();
+            if (!IsInGame() && !IsInLobby()) State.taskRpcQueue.clear();
 
             if ((IsInGame() || IsInLobby()) && GameOptions().GetGameMode() == GameModes__Enum::Normal && GetPlayerData(*Game::pLocalPlayer) != NULL) {
                 if ((IsHost() || !State.SafeMode) && State.Impostor_NoKillCooldown) {
