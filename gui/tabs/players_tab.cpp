@@ -386,7 +386,7 @@ namespace PlayersTab {
 
                 if (ImGui::Selectable(selectableIdC, !ShouldUsePlayerPicker() && isSelected)) {
                     if (ShouldUsePlayerPicker()) {
-                        std::queue<RPCInterface*>* queue = nullptr;
+                        RpcQueue* queue = nullptr;
                         if (IsInGame())
                             queue = &State.rpcQueue;
                         else if (IsInLobby())
@@ -926,7 +926,7 @@ namespace PlayersTab {
                         {
                             if (AnimatedButton("Shapeshift To"))
                             {
-                                std::queue<RPCInterface*>* queue = nullptr;
+                                RpcQueue* queue = nullptr;
                                 if (IsInGame())
                                     queue = &State.rpcQueue;
                                 else if (IsInLobby())
@@ -940,7 +940,7 @@ namespace PlayersTab {
                             ImGui::SameLine();
                             if (AnimatedButton("Turn Into"))
                             {
-                                std::queue<RPCInterface*>* queue = nullptr;
+                                RpcQueue* queue = nullptr;
                                 if (IsInGame())
                                     queue = &State.rpcQueue;
                                 else if (IsInLobby())
@@ -1399,7 +1399,7 @@ namespace PlayersTab {
                             auto visorId = outfit->fields.VisorId;
                             auto colorId = outfit->fields.ColorId;
                             auto namePlateId = outfit->fields.NamePlateId;
-                            std::queue<RPCInterface*>* queue = nullptr;
+                            RpcQueue* queue = nullptr;
                             if (IsInGame())
                                 queue = &State.rpcQueue;
                             else if (IsInLobby())
@@ -1489,7 +1489,7 @@ namespace PlayersTab {
                         auto visorId = outfit->fields.VisorId;
                         auto colorId = outfit->fields.ColorId;
                         auto namePlateId = outfit->fields.NamePlateId;
-                        std::queue<RPCInterface*>* queue = nullptr;
+                        RpcQueue* queue = nullptr;
                         if (IsInGame())
                             queue = &State.rpcQueue;
                         else if (IsInLobby())
@@ -1640,7 +1640,7 @@ namespace PlayersTab {
                         }
                     }
 
-                    std::queue<RPCInterface*>* queue = nullptr;
+                    RpcQueue* queue = nullptr;
                     if (IsInGame())
                         queue = &State.rpcQueue;
                     else if (IsInLobby())
