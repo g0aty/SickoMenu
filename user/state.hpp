@@ -2,6 +2,7 @@
 #include <set>
 #include <bitset>
 #include <queue>
+#include <mutex>
 #include <unordered_set>
 #include "_events.h"
 #include "_rpc.h"
@@ -13,6 +14,52 @@ template<typename T>
 constexpr T SafeMax(const T& a, const T& b) {
     return (a > b) ? a : b;
 }
+
+// Commands are produced by UI callbacks and consumed by the game update.
+// Synchronize ownership transfer and dispose of commands discarded on scene changes.
+class RpcQueue {
+public:
+    RpcQueue() = default;
+    RpcQueue(const RpcQueue&) = delete;
+    RpcQueue& operator=(const RpcQueue&) = delete;
+
+    ~RpcQueue() { clear(); }
+
+    void push(RPCInterface* rpc) {
+        if (rpc == nullptr) return;
+        std::lock_guard<std::mutex> lock(mutex_);
+        queue_.push(rpc);
+    }
+
+    bool empty() const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return queue_.empty();
+    }
+
+    RPCInterface* try_pop() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (queue_.empty()) return nullptr;
+        RPCInterface* rpc = queue_.front();
+        queue_.pop();
+        return rpc;
+    }
+
+    void clear() {
+        std::queue<RPCInterface*> pending;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            queue_.swap(pending);
+        }
+        while (!pending.empty()) {
+            delete pending.front();
+            pending.pop();
+        }
+    }
+
+private:
+    mutable std::mutex mutex_;
+    std::queue<RPCInterface*> queue_;
+};
 
 class Settings {
 public:
@@ -385,9 +432,9 @@ public:
 
     PlayerSelection selectedPlayer;
     std::vector<uint8_t> selectedPlayers = {};
-    std::queue<RPCInterface*> rpcQueue;
-    std::queue<RPCInterface*> lobbyRpcQueue;
-    std::queue<RPCInterface*> taskRpcQueue;
+    RpcQueue rpcQueue;
+    RpcQueue lobbyRpcQueue;
+    RpcQueue taskRpcQueue;
 
     bool ShowRadar = false;
     bool ShowRadar_DeadBodies = false;
