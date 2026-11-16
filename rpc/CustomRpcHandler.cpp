@@ -7,9 +7,13 @@
 #include "utility.h"
 
 std::string SafelyReadString(MessageReader* reader) {
-	int32_t pos = reader->fields._position, head = reader->fields.readHead;
+	if (reader == nullptr) return "";
+
+	int32_t pos = reader->fields._position;
+	int32_t head = reader->fields.readHead;
 	int32_t num = MessageReader_ReadPackedInt32(reader, NULL);
-	bool hasString = MessageReader_get_BytesRemaining(reader, NULL) >= num;
+	int32_t remaining = MessageReader_get_BytesRemaining(reader, NULL);
+	bool hasString = num >= 0 && remaining >= num;
 	reader->fields._position = pos;
 	reader->fields.readHead = head;
 
@@ -17,7 +21,7 @@ std::string SafelyReadString(MessageReader* reader) {
 }
 
 void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
-	if (player == nullptr) return;
+	if (player == nullptr || reader == nullptr) return;
 
 	uint8_t playerId = player->fields.PlayerId; //true mod detection
 
@@ -33,14 +37,19 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		}
 
 		if (++State.rpc101Counter > State.RPC101_LIMIT) {
-			if (player && player != *Game::pLocalPlayer) {
-				int32_t playerId = player->fields.PlayerId;
+			PlayerControl* localPlayer = Game::pLocalPlayer != nullptr ? *Game::pLocalPlayer : nullptr;
+			if (localPlayer != nullptr && player != localPlayer) {
+				int32_t senderId = player->fields.PlayerId;
 
-				auto it = State.Rpc101OverloadTimestamps.find(playerId);
+				auto it = State.Rpc101OverloadTimestamps.find(senderId);
 				if (it == State.Rpc101OverloadTimestamps.end() || duration_cast<seconds>(now - it->second).count() >= 3) {
-					State.Rpc101OverloadTimestamps[playerId] = now;
+					State.Rpc101OverloadTimestamps[senderId] = now;
 
-					std::string name = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(GetPlayerData(player))->fields.PlayerName));
+					auto* playerData = GetPlayerData(player);
+					auto* outfit = playerData != nullptr ? GetPlayerOutfit(playerData) : nullptr;
+					std::string name = outfit != nullptr
+						? RemoveHtmlTags(convert_from_string(outfit->fields.PlayerName))
+						: std::format("Player {}", senderId);
 					std::string actionMessage = std::format("{} has exceeded the rate-limit of SickoChat!", name);
 
 					Toasts::AddToast("SickoChat Rate-Limit", actionMessage, ImVec4(1.f, 0.f, 0.f, 1.f));
@@ -51,25 +60,38 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 
 		std::string playerName = SafelyReadString(reader);
 		std::string message = SafelyReadString(reader);
+		if (MessageReader_get_BytesRemaining(reader, NULL) < (int32_t)sizeof(uint32_t)) return;
 		uint32_t colorId = MessageReader_ReadInt32(reader, NULL);
+		(void)colorId;
 
-		if (message.empty()) return;
+		if (message.empty() || Game::pLocalPlayer == nullptr) return;
+		PlayerControl* localPlayer = *Game::pLocalPlayer;
+		if (localPlayer == nullptr) return;
 
-		NetworkedPlayerInfo* local = GetPlayerData(*Game::pLocalPlayer);
+		NetworkedPlayerInfo* local = GetPlayerData(localPlayer);
+		auto* senderData = GetPlayerData(player);
 		bool wasDead = false;
 
-		if (player != NULL && GetPlayerData(player)->fields.IsDead && local != NULL && !local->fields.IsDead) {
+		if (senderData != nullptr && senderData->fields.IsDead && local != nullptr && !local->fields.IsDead) {
 			local->fields.IsDead = true;
 			wasDead = true;
 		}
 
-		State.IsProcessingSickoChat = true;
-		ChatController_AddChat(Game::HudManager.GetInstance()->fields.Chat, player, convert_to_string(message), false, NULL);
+		try {
+			auto* hud = Game::HudManager.GetInstance();
+			if (hud != nullptr && hud->fields.Chat != nullptr) {
+				State.IsProcessingSickoChat = true;
+				ChatController_AddChat(hud->fields.Chat, player, convert_to_string(message), false, NULL);
+			}
+		}
+		catch (...) {
+			State.IsProcessingSickoChat = false;
+			if (wasDead && local != nullptr) local->fields.IsDead = false;
+			throw;
+		}
 		State.IsProcessingSickoChat = false;
 
-		if (wasDead) {
-			local->fields.IsDead = false;
-		}
+		if (wasDead && local != nullptr) local->fields.IsDead = false;
 
 		STREAM_DEBUG("SickoChat RPC from " << playerName << " (RPC sent by " << ToString((Game::PlayerId)player->fields.PlayerId) << ")");
 	}
