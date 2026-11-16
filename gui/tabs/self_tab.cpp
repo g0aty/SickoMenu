@@ -753,7 +753,7 @@ namespace SelfTab {
                 {
                     Vector2 position = GetTrueAdjustedPosition(*Game::pLocalPlayer);
                     Vector2 target = { (State.RelativeTeleport ? position.x : 0.f) + State.xCoordinate, (State.RelativeTeleport ? position.y : 0.f) + State.yCoordinate };
-                    std::queue<RPCInterface*>* queue = nullptr;
+                    RpcQueue* queue = nullptr;
                     if (IsInGame())
                         queue = &State.rpcQueue;
                     else if (IsInLobby())
@@ -1087,7 +1087,7 @@ namespace SelfTab {
                         ImGui::SameLine();
                 }
                 if ((IsInGame() || IsInLobby()) && !State.SafeMode && AnimatedButton("Randomize Everyone")) {
-                    std::queue<RPCInterface*>* queue = nullptr;
+                    RpcQueue* queue = nullptr;
                     if (IsInGame())
                         queue = &State.rpcQueue;
                     else if (IsInLobby())
