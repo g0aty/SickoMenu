@@ -12,6 +12,7 @@
 #include "toasts.hpp"
 #include "console.hpp"
 #include <chrono>
+#include <memory>
 #include "achievements.hpp"
 
 using namespace std::string_view_literals;
@@ -272,7 +273,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                 auto outfit = GetPlayerOutfit(GetPlayerData(*Game::pLocalPlayer));
                 if ((IsColorAvailable(State.SelectedColorId) || !State.SafeMode) && outfit != NULL &&
                     outfit->fields.ColorId != State.SelectedColorId) {
-                    std::queue<RPCInterface*>* queue = nullptr;
+                    RpcQueue* queue = nullptr;
                     if (IsInGame())
                         queue = &State.rpcQueue;
                     else if (IsInLobby())
@@ -720,7 +721,7 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
                 else
                     State.IsRevived = false;
 
-                std::queue<RPCInterface*>* queue = IsInGame() ? &State.rpcQueue : &State.lobbyRpcQueue;
+                RpcQueue* queue = IsInGame() ? &State.rpcQueue : &State.lobbyRpcQueue;
                 if (!IsHost() && (IsInMultiplayerGame() || IsInLobby())) {
                     if (roleType == RoleTypes__Enum::GuardianAngel && State.RealRole != RoleTypes__Enum::GuardianAngel) {
                         queue->push(new SetRole(RoleTypes__Enum::CrewmateGhost)); //prevent being unable to protect
