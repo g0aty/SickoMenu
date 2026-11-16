@@ -1228,7 +1228,7 @@ void ControlAppearance(bool randomize)
 {
     if ((!IsInGame() && !IsInLobby()) || *Game::pLocalPlayer == nullptr) return;
     try {
-        std::queue<RPCInterface*>* queue = nullptr;
+        RpcQueue* queue = nullptr;
         if (IsInGame())
             queue = &State.rpcQueue;
         else if (IsInLobby())
