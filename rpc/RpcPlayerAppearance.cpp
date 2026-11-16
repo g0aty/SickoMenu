@@ -2,6 +2,11 @@
 #include "_rpc.h"
 #include "game.h"
 
+static PlayerControl* GetLocalPlayerForCosmeticRpc() {
+	if (Game::pLocalPlayer == nullptr) return nullptr;
+	return *Game::pLocalPlayer;
+}
+
 RpcSetPet::RpcSetPet(String* petId)
 {
 	this->PetId = petId ? petId : convert_to_string("0");
@@ -9,7 +14,9 @@ RpcSetPet::RpcSetPet(String* petId)
 
 void RpcSetPet::Process()
 {
-	PlayerControl_RpcSetPet((*Game::pLocalPlayer), this->PetId, NULL);
+	PlayerControl* localPlayer = GetLocalPlayerForCosmeticRpc();
+	if (localPlayer == nullptr) return;
+	PlayerControl_RpcSetPet(localPlayer, this->PetId, NULL);
 }
 
 RpcForcePet::RpcForcePet(PlayerControl* Player, String* petId)
@@ -32,7 +39,9 @@ RpcSetSkin::RpcSetSkin(String* skinId)
 
 void RpcSetSkin::Process()
 {
-	PlayerControl_RpcSetSkin((*Game::pLocalPlayer), this->SkinId, NULL);
+	PlayerControl* localPlayer = GetLocalPlayerForCosmeticRpc();
+	if (localPlayer == nullptr) return;
+	PlayerControl_RpcSetSkin(localPlayer, this->SkinId, NULL);
 }
 
 RpcForceSkin::RpcForceSkin(PlayerControl* Player, String* skinId)
@@ -55,7 +64,9 @@ RpcSetHat::RpcSetHat(String* hatId)
 
 void RpcSetHat::Process()
 {
-	PlayerControl_RpcSetHat((*Game::pLocalPlayer), this->HatId, NULL);
+	PlayerControl* localPlayer = GetLocalPlayerForCosmeticRpc();
+	if (localPlayer == nullptr) return;
+	PlayerControl_RpcSetHat(localPlayer, this->HatId, NULL);
 }
 
 RpcForceHat::RpcForceHat(PlayerControl* Player, String* hatId)
@@ -78,7 +89,9 @@ RpcSetVisor::RpcSetVisor(String* visorId)
 
 void RpcSetVisor::Process()
 {
-	PlayerControl_RpcSetVisor((*Game::pLocalPlayer), this->VisorId, NULL);
+	PlayerControl* localPlayer = GetLocalPlayerForCosmeticRpc();
+	if (localPlayer == nullptr) return;
+	PlayerControl_RpcSetVisor(localPlayer, this->VisorId, NULL);
 }
 
 RpcForceVisor::RpcForceVisor(PlayerControl* Player, String* visorId)
@@ -101,7 +114,9 @@ RpcSetNamePlate::RpcSetNamePlate(String* namePlateId)
 
 void RpcSetNamePlate::Process()
 {
-	PlayerControl_RpcSetNamePlate((*Game::pLocalPlayer), this->NamePlateId, NULL);
+	PlayerControl* localPlayer = GetLocalPlayerForCosmeticRpc();
+	if (localPlayer == nullptr) return;
+	PlayerControl_RpcSetNamePlate(localPlayer, this->NamePlateId, NULL);
 }
 
 RpcForceNamePlate::RpcForceNamePlate(PlayerControl* Player, String* namePlateId)
