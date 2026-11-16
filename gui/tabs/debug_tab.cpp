@@ -37,8 +37,9 @@ namespace DebugTab {
 		}
 		if (AnimatedButton("Clear RPC Queues"))
 		{
-			State.rpcQueue = std::queue<RPCInterface*>();
-			State.lobbyRpcQueue = std::queue<RPCInterface*>();
+			State.rpcQueue.clear();
+			State.lobbyRpcQueue.clear();
+			State.taskRpcQueue.clear();
 		}
 
 		ImGui::Dummy(ImVec2(4, 4) * State.dpiScale);
