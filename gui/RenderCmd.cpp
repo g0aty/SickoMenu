@@ -51,8 +51,12 @@ void* RenderCmdQueue::Allocate(uint32_t size, size_t alignment)
         return nullptr;
     }
 
+    const size_t previousOffset = m_CmdBufferOffset;
     m_CmdBufferOffset = payloadOffset + size;
-    return m_CmdBuffer + payloadOffset;
+    m_LastAllocationStorage = m_CmdBuffer + payloadOffset;
+    m_LastAllocationPreviousOffset = previousOffset;
+    m_LastAllocationEnd = m_CmdBufferOffset;
+    return m_LastAllocationStorage;
 }
 
 bool RenderCmdQueue::Enqueue(RenderCmdFunc execute, RenderCmdFunc destroy, void* storage)
@@ -63,12 +67,35 @@ bool RenderCmdQueue::Enqueue(RenderCmdFunc execute, RenderCmdFunc destroy, void*
     try
     {
         m_Commands.push_back({ execute, destroy, storage });
+        if (m_LastAllocationStorage == storage)
+        {
+            m_LastAllocationStorage = nullptr;
+            m_LastAllocationPreviousOffset = 0;
+            m_LastAllocationEnd = 0;
+        }
         return true;
     }
     catch (...)
     {
         return false;
     }
+}
+
+bool RenderCmdQueue::RollbackAllocation(void* storage)
+{
+    // Only the most recent uncommitted allocation can be rolled back safely.
+    if (storage == nullptr ||
+        storage != m_LastAllocationStorage ||
+        m_CmdBufferOffset != m_LastAllocationEnd)
+    {
+        return false;
+    }
+
+    m_CmdBufferOffset = m_LastAllocationPreviousOffset;
+    m_LastAllocationStorage = nullptr;
+    m_LastAllocationPreviousOffset = 0;
+    m_LastAllocationEnd = 0;
+    return true;
 }
 
 void RenderCmdQueue::Execute()
@@ -96,9 +123,15 @@ void RenderCmdQueue::Execute()
 
         m_Commands.clear();
         m_CmdBufferOffset = 0;
+        m_LastAllocationStorage = nullptr;
+        m_LastAllocationPreviousOffset = 0;
+        m_LastAllocationEnd = 0;
         throw;
     }
 
     m_Commands.clear();
     m_CmdBufferOffset = 0;
+    m_LastAllocationStorage = nullptr;
+    m_LastAllocationPreviousOffset = 0;
+    m_LastAllocationEnd = 0;
 }

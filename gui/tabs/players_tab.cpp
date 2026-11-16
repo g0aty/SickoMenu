@@ -15,6 +15,15 @@ namespace PlayersTab {
     static std::string forcedName = "";
     static int forcedColor = 0;
 
+    static PlayerSelection ValidatePlayerSelection(PlayerSelection selection)
+    {
+        auto validated = selection.validate();
+        if (!validated.has_value() || validated.is_Disconnected())
+            return {};
+
+        return PlayerSelection(validated);
+    }
+
     enum Groups {
         Player,
         Trolling,
@@ -163,9 +172,7 @@ namespace PlayersTab {
             ImGui::SameLine(100 * State.dpiScale);
             ImGui::BeginChild("players#list", ImVec2(200, 0) * State.dpiScale, true, ImGuiWindowFlags_NoBackground);
 
-            if (!State.selectedPlayer.has_value() || State.selectedPlayer.validate().is_Disconnected()) {
-                State.selectedPlayer = {};
-            }
+            State.selectedPlayer = ValidatePlayerSelection(State.selectedPlayer);
 
             if (!State.PendingRejoinTargetFC.empty() && State.PendingRejoinReady) {
                 for (auto pc : GetAllPlayerControl()) {
@@ -175,7 +182,7 @@ namespace PlayersTab {
                     std::string fc = convert_from_string(pd->fields.FriendCode);
                     std::string name = convert_from_string(NetworkedPlayerInfo_get_PlayerName(pd, nullptr));
                     if (fc == State.PendingRejoinTargetFC || name == State.PendingRejoinTargetFC) {
-                        State.selectedPlayer = PlayerSelection(pc);
+                        State.selectedPlayer = ValidatePlayerSelection(PlayerSelection(pc));
                         State.selectedPlayers = { pd->fields.PlayerId };
                         State.PendingRejoinTargetFC = "";
                         State.PendingRejoinReady = false;
@@ -199,7 +206,10 @@ namespace PlayersTab {
                     auto pc = GetPlayerControlById(pId);
                     if (pc == NULL) continue;
 
-                    auto outfit = GetPlayerOutfit(GetPlayerData(pc));
+                    auto playerSelection = ValidatePlayerSelection(PlayerSelection(pc));
+                    if (!playerSelection.has_value()) continue;
+
+                    auto outfit = GetPlayerOutfit(playerSelection.validate().get_PlayerData());
                     if (outfit != NULL) {
                         pName = convert_from_string(outfit->fields.PlayerName);
                         newPlayersToShift.push_back(pId);
@@ -358,7 +368,7 @@ namespace PlayersTab {
             for (auto playerCtrl : allControllers) {
                 if (playerCtrl == NULL) continue;
 
-                auto player = PlayerSelection(playerCtrl);
+                auto player = ValidatePlayerSelection(PlayerSelection(playerCtrl));
                 if (!player.has_value()) continue;
 
                 auto playerData = GetPlayerData(playerCtrl);
@@ -421,8 +431,10 @@ namespace PlayersTab {
                                     State.selectedPlayers.clear();
                                     for (auto p : allControllers) {
                                         if (p) {
-                                            State.selectedPlayers.push_back(p->fields.PlayerId);
-                                            State.selectedPlayer = PlayerSelection(p);
+                                            auto validSelection = ValidatePlayerSelection(PlayerSelection(p));
+                                            if (!validSelection.has_value()) continue;
+                                            State.selectedPlayers.push_back(validSelection.get_PlayerId());
+                                            State.selectedPlayer = validSelection;
                                         }
                                     }
                                 }
@@ -442,8 +454,8 @@ namespace PlayersTab {
                                 }
                                 else {
                                     State.selectedPlayers.push_back(player.get_PlayerId());
-                                    State.selectedPlayer = player.validate();
-                                    selectedPlayer = player.validate();
+                                    State.selectedPlayer = ValidatePlayerSelection(player);
+                                    selectedPlayer = State.selectedPlayer.validate();
                                     if (State.selectedPlayer.has_value()) {
                                         forcedName = cached.nameRaw;
                                         forcedColor = outfit->fields.ColorId;
@@ -452,8 +464,8 @@ namespace PlayersTab {
                             }
                         }
                         else {
-                            State.selectedPlayer = player.validate();
-                            selectedPlayer = player.validate();
+                            State.selectedPlayer = ValidatePlayerSelection(player);
+                            selectedPlayer = State.selectedPlayer.validate();
                             State.selectedPlayers = { player.get_PlayerId() };
                             if (State.selectedPlayer.has_value()) {
                                 forcedName = cached.nameRaw;
@@ -508,13 +520,18 @@ namespace PlayersTab {
                 ImGui::ListBoxFooter();
 
             std::vector<PlayerSelection> selectedPlayers = {};
+            std::vector<uint8_t> validSelectedIds;
             for (auto id : State.selectedPlayers) {
                 auto playerCtrl = GetPlayerControlById(id);
                 if (!playerCtrl) continue;
-                auto validPlayer = PlayerSelection(playerCtrl).validate();
-                if (!validPlayer.has_value() || validPlayer.is_Disconnected()) continue;
-                selectedPlayers.push_back(PlayerSelection(playerCtrl));
+
+                auto validPlayer = ValidatePlayerSelection(PlayerSelection(playerCtrl));
+                if (!validPlayer.has_value()) continue;
+
+                validSelectedIds.push_back(validPlayer.get_PlayerId());
+                selectedPlayers.push_back(validPlayer);
             }
+            State.selectedPlayers.swap(validSelectedIds);
 
             /*if () {
                 ImGui::NewLine();
@@ -848,6 +865,7 @@ namespace PlayersTab {
                         }
 
                         // Refresh after Kick/Ban/Votekick may have cleared the selection.
+                        State.selectedPlayer = ValidatePlayerSelection(State.selectedPlayer);
                         selectedPlayer = State.selectedPlayer.validate();
                         auto* selectedPlayerOutfit =
                             selectedPlayer.has_value() && selectedPlayer.get_PlayerData() != nullptr

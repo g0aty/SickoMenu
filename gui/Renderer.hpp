@@ -25,9 +25,21 @@ public:
 		if (storageBuffer == nullptr)
 			return;
 
-		new (storageBuffer) Function(std::forward<Function>(function));
+		try
+		{
+			new (storageBuffer) Function(std::forward<Function>(function));
+		}
+		catch (...)
+		{
+			commandQueue.RollbackAllocation(storageBuffer);
+			return;
+		}
+
 		if (!commandQueue.Enqueue(renderCmd, destroyCmd, storageBuffer))
+		{
 			destroyCmd(storageBuffer);
+			commandQueue.RollbackAllocation(storageBuffer);
+		}
 	}
 
 	static void ExecuteQueue();
