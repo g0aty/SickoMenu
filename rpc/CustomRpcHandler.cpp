@@ -87,7 +87,8 @@ void HandleRpc(PlayerControl* player, uint8_t callId, MessageReader* reader) {
 		catch (...) {
 			State.IsProcessingSickoChat = false;
 			if (wasDead && local != nullptr) local->fields.IsDead = false;
-			throw;
+			LOG_ERROR("Failed to process incoming SickoChat RPC");
+			return;
 		}
 		State.IsProcessingSickoChat = false;
 
