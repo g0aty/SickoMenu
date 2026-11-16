@@ -360,7 +360,7 @@ void dGameStartManager_ReallyBegin(GameStartManager* __this, bool neverShow, Met
 }
 
 void ApplyCosmeticPreset(const Settings::CosmeticPreset& p) {
-    std::queue<RPCInterface*>* queue = IsInGame() ? &State.rpcQueue : (IsInLobby() ? &State.lobbyRpcQueue : nullptr);
+    RpcQueue* queue = IsInGame() ? &State.rpcQueue : (IsInLobby() ? &State.lobbyRpcQueue : nullptr);
     if (queue == nullptr) return;
     queue->push(new RpcSetColor((uint8_t)p.ColorId));
     if (!p.HatId.empty()) queue->push(new RpcSetHat(convert_to_string(p.HatId)));
