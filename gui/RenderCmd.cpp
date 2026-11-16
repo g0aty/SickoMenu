@@ -1,49 +1,104 @@
 #include "RenderCmd.hpp"
 
-#include <memory>
+#include <limits>
+
+namespace
+{
+    bool AlignOffset(size_t offset, size_t alignment, size_t& alignedOffset)
+    {
+        if (alignment == 0 || (alignment & (alignment - 1)) != 0)
+            return false;
+
+        const size_t mask = alignment - 1;
+        if (offset > (std::numeric_limits<size_t>::max)() - mask)
+            return false;
+
+        alignedOffset = (offset + mask) & ~mask;
+        return true;
+    }
+}
 
 RenderCmdQueue::RenderCmdQueue()
 {
-	m_CmdBuffer = new byte[10 * 1024 * 1024];
-	m_CmdBufferPtr = m_CmdBuffer;
-	memset(m_CmdBuffer, 0, 10 * 1024 * 1024);
+    m_CmdBuffer = new byte[CmdBufferCapacity];
 }
 
 RenderCmdQueue::~RenderCmdQueue()
 {
-	delete[] m_CmdBuffer;
+    for (auto& command : m_Commands)
+    {
+        if (command.destroy != nullptr && command.storage != nullptr)
+            command.destroy(command.storage);
+    }
+
+    delete[] m_CmdBuffer;
 }
 
-void* RenderCmdQueue::Allocate(RenderCmdFunc function, uint32_t size)
+void* RenderCmdQueue::Allocate(uint32_t size, size_t alignment)
 {
-	*reinterpret_cast<RenderCmdFunc*>(m_CmdBufferPtr) = function;
-	m_CmdBufferPtr += sizeof(RenderCmdFunc);
+    if (alignment == 0 ||
+        alignment > alignof(std::max_align_t) ||
+        (alignment & (alignment - 1)) != 0)
+    {
+        return nullptr;
+    }
 
-	*reinterpret_cast<uint32_t*>(m_CmdBufferPtr) = size;
-	m_CmdBufferPtr += sizeof(uint32_t);
+    size_t payloadOffset = 0;
+    if (!AlignOffset(m_CmdBufferOffset, alignment, payloadOffset) ||
+        payloadOffset > CmdBufferCapacity ||
+        static_cast<size_t>(size) > CmdBufferCapacity - payloadOffset)
+    {
+        return nullptr;
+    }
 
-	void* memory = m_CmdBufferPtr;
-	m_CmdBufferPtr += size;
+    m_CmdBufferOffset = payloadOffset + size;
+    return m_CmdBuffer + payloadOffset;
+}
 
-	m_CmdCount++;
-	return memory;
+bool RenderCmdQueue::Enqueue(RenderCmdFunc execute, RenderCmdFunc destroy, void* storage)
+{
+    if (execute == nullptr || destroy == nullptr || storage == nullptr)
+        return false;
+
+    try
+    {
+        m_Commands.push_back({ execute, destroy, storage });
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
 
 void RenderCmdQueue::Execute()
 {
-	byte* buffer = m_CmdBuffer;
+    size_t commandIndex = 0;
 
-	for (uint32_t i = 0; i < m_CmdCount; i++)
-	{
-		RenderCmdFunc function = *reinterpret_cast<RenderCmdFunc*>(buffer);
-		buffer += sizeof(RenderCmdFunc);
+    try
+    {
+        for (; commandIndex < m_Commands.size(); ++commandIndex)
+        {
+            auto& command = m_Commands[commandIndex];
+            command.execute(command.storage);
+            command.destroy(command.storage);
+        }
+    }
+    catch (...)
+    {
+        // Destroy the throwing command and all commands that can no longer execute.
+        for (size_t i = commandIndex; i < m_Commands.size(); ++i)
+        {
+            auto& command = m_Commands[i];
+            if (command.destroy != nullptr && command.storage != nullptr)
+                command.destroy(command.storage);
+        }
 
-		uint32_t size = *reinterpret_cast<uint32_t*>(buffer);
-		buffer += sizeof(uint32_t);
-		function(buffer);
-		buffer += size;
-	}
+        m_Commands.clear();
+        m_CmdBufferOffset = 0;
+        throw;
+    }
 
-	m_CmdBufferPtr = m_CmdBuffer;
-	m_CmdCount = 0;
+    m_Commands.clear();
+    m_CmdBufferOffset = 0;
 }

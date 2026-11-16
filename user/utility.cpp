@@ -2583,7 +2583,39 @@ void ReloadCurrentSceneIfNeeded() {
     }
 }
 
+// Prefer the task prefabs supplied by the active ShipStatus. Static lists below are
+// only a lobby fallback, where the map's ShipStatus may not have been instantiated yet.
+static std::vector<app::TaskTypes__Enum> GetRuntimeTaskTypes(app::NormalPlayerTask__Array* taskArray) {
+    std::vector<app::TaskTypes__Enum> taskTypes;
+    if (taskArray == nullptr) return taskTypes;
+
+    const size_t reportedTaskCount = taskArray->bounds != nullptr
+        ? static_cast<size_t>(taskArray->bounds->length)
+        : static_cast<size_t>(taskArray->max_length);
+    // IL2CPP declares vector as a fixed-size trailing member in generated headers;
+    // its sizeof does not describe the actual allocation length.
+    constexpr size_t MaxRuntimeTaskPrefabCount = 1024;
+    const size_t taskCount = (std::min)(reportedTaskCount, MaxRuntimeTaskPrefabCount);
+
+    taskTypes.reserve(taskCount);
+    for (size_t i = 0; i < taskCount; ++i) {
+        auto* task = taskArray->vector[i];
+        if (task == nullptr) continue;
+
+        const auto taskType = task->fields._.TaskType;
+        if (std::find(taskTypes.begin(), taskTypes.end(), taskType) == taskTypes.end()) {
+            taskTypes.push_back(taskType);
+        }
+    }
+
+    return taskTypes;
+}
+
 std::vector<app::TaskTypes__Enum> GetMapCommonTasks() {
+    auto* shipStatus = Game::pShipStatus != nullptr ? *Game::pShipStatus : nullptr;
+    if (shipStatus != nullptr && shipStatus->fields.CommonTasks != nullptr)
+        return GetRuntimeTaskTypes(shipStatus->fields.CommonTasks);
+
     static const std::vector<app::TaskTypes__Enum> skeldTasks = {
         TaskTypes__Enum::SwipeCard, TaskTypes__Enum::FixWiring
     };
@@ -2603,18 +2635,22 @@ std::vector<app::TaskTypes__Enum> GetMapCommonTasks() {
     };
 
     int mapId = GameOptions().GetByte(app::ByteOptionNames__Enum::MapId, 0);
-    std::vector<app::TaskTypes__Enum> currentTasks = skeldTasks;
     switch (mapId) {
-    case 1: currentTasks = miraHqTasks; break;
-    case 2: currentTasks = polusTasks; break;
-    case 4: currentTasks = airshipTasks; break;
-    case 5: currentTasks = fungleTasks; break;
-    default: break;
+    case 0:
+    case 3: return skeldTasks;
+    case 1: return miraHqTasks;
+    case 2: return polusTasks;
+    case 4: return airshipTasks;
+    case 5: return fungleTasks;
+    default: return {};
     }
-    return currentTasks;
 }
 
 std::vector<app::TaskTypes__Enum> GetMapShortTasks() {
+    auto* shipStatus = Game::pShipStatus != nullptr ? *Game::pShipStatus : nullptr;
+    if (shipStatus != nullptr && shipStatus->fields.ShortTasks != nullptr)
+        return GetRuntimeTaskTypes(shipStatus->fields.ShortTasks);
+
     static const std::vector<app::TaskTypes__Enum> skeldTasks = {
         TaskTypes__Enum::PrimeShields, TaskTypes__Enum::ChartCourse, TaskTypes__Enum::UploadData,
         TaskTypes__Enum::CalibrateDistributor, TaskTypes__Enum::DivertPower, TaskTypes__Enum::UnlockManifolds,
@@ -2649,18 +2685,22 @@ std::vector<app::TaskTypes__Enum> GetMapShortTasks() {
     };
 
     int mapId = GameOptions().GetByte(app::ByteOptionNames__Enum::MapId, 0);
-    std::vector<app::TaskTypes__Enum> currentTasks = skeldTasks;
     switch (mapId) {
-    case 1: currentTasks = miraHqTasks; break;
-    case 2: currentTasks = polusTasks; break;
-    case 4: currentTasks = airshipTasks; break;
-    case 5: currentTasks = fungleTasks; break;
-    default: break;
+    case 0:
+    case 3: return skeldTasks;
+    case 1: return miraHqTasks;
+    case 2: return polusTasks;
+    case 4: return airshipTasks;
+    case 5: return fungleTasks;
+    default: return {};
     }
-    return currentTasks;
 }
 
 std::vector<app::TaskTypes__Enum> GetMapLongTasks() {
+    auto* shipStatus = Game::pShipStatus != nullptr ? *Game::pShipStatus : nullptr;
+    if (shipStatus != nullptr && shipStatus->fields.LongTasks != nullptr)
+        return GetRuntimeTaskTypes(shipStatus->fields.LongTasks);
+
     static const std::vector<app::TaskTypes__Enum> skeldTasks = {
         TaskTypes__Enum::SubmitScan, TaskTypes__Enum::FuelEngines, TaskTypes__Enum::StartReactor,
         TaskTypes__Enum::ClearAsteroids, TaskTypes__Enum::InspectSample, TaskTypes__Enum::EmptyChute,
@@ -2687,15 +2727,15 @@ std::vector<app::TaskTypes__Enum> GetMapLongTasks() {
     };
 
     int mapId = GameOptions().GetByte(app::ByteOptionNames__Enum::MapId, 0);
-    std::vector<app::TaskTypes__Enum> currentTasks = skeldTasks;
     switch (mapId) {
-    case 1: currentTasks = miraHqTasks; break;
-    case 2: currentTasks = polusTasks; break;
-    case 4: currentTasks = airshipTasks; break;
-    case 5: currentTasks = fungleTasks; break;
-    default: break;
+    case 0:
+    case 3: return skeldTasks;
+    case 1: return miraHqTasks;
+    case 2: return polusTasks;
+    case 4: return airshipTasks;
+    case 5: return fungleTasks;
+    default: return {};
     }
-    return currentTasks;
 }
 
 //TODO: Workaround

@@ -78,11 +78,13 @@ const char* Profiler::GetFormattedStatString(const char* Stat_Name)
 {
 #if _DEBUG
 	StatObject* stat = &StatMap[Stat_Name];
+	static thread_local std::string formatted;
 	std::stringstream profilingSS;
 	profilingSS << stat->AverageSample_Microseconds << " us (" << (stat->AverageSample_Microseconds / 1000ll) << " ms)"
 		<< "[longest: " << stat->LongestSample_Microseconds << " us][" << stat->TotalSamples << "]";
 
-	return profilingSS.str().c_str();
+	formatted = profilingSS.str();
+	return formatted.c_str();
 #else
 	return "ERROR";
 #endif
@@ -92,11 +94,13 @@ const wchar_t* Profiler::GetFormattedStatStringWide(const char* Stat_Name)
 {
 #if _DEBUG
 	StatObject* stat = &StatMap[Stat_Name];
+	static thread_local std::wstring formatted;
 	std::wstringstream profilingWSS;
 	profilingWSS << stat->AverageSample_Microseconds << L" us (" << (stat->AverageSample_Microseconds / 1000ll) << L" ms)"
 		<< L"[longest: " << stat->LongestSample_Microseconds << L" us][" << stat->TotalSamples << L"]";
 
-	return profilingWSS.str().c_str();
+	formatted = profilingWSS.str();
+	return formatted.c_str();
 #else
 	return L"ERROR";
 #endif

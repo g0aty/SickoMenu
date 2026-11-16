@@ -56,7 +56,6 @@ static void onGameEnd() {
     try {
         LOG_DEBUG("Reset All");
         Replay::Reset();
-        State.liveReplayEvents.clear();
         State.modUsers.clear();
         State.activeImpersonation = false;
         State.FollowerCam = nullptr;
@@ -135,15 +134,6 @@ static void onGameEnd() {
     }
 }
 
-void RemoveExcessDisabledTasks(std::vector<TaskTypes__Enum> taskList) {
-    uint8_t numTasks = 0;
-    for (auto taskType : taskList) {
-        int32_t taskId = (int32_t)taskType;
-        if (State.DisabledTaskTypes.count(taskId) > 0) numTasks++;
-        if (numTasks == (uint8_t)taskList.size()) State.DisabledTaskTypes.erase(taskId);
-    }
-
-}
 
 void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dInnerNetClient_Update executed", false);
@@ -1394,14 +1384,6 @@ void dInnerNetClient_Update(InnerNetClient* __this, MethodInfo* method) {
             else State.suicideDelay--;
         }
 
-        if (IsHost() && !State.DisabledTaskTypes.empty() && GameOptions().HasOptions()) {
-            // we want to preserve the task counts set by the host,
-            // so we get rid of one excess common task to assign that task instead
-
-            RemoveExcessDisabledTasks(GetMapCommonTasks());
-            RemoveExcessDisabledTasks(GetMapShortTasks());
-            RemoveExcessDisabledTasks(GetMapLongTasks());
-        }
     }
     catch (Exception* ex) {
         onGameEnd();

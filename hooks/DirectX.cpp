@@ -69,7 +69,7 @@ ImVec2 DirectX::GetWindowSize(bool fullScreenCheck)
 
 static bool CanDrawEsp()
 {
-    return (!State.PanicMode && IsInGame() || IsInLobby()) && State.ShowEsp && ((!State.InMeeting && !State.InExileUI) || !State.HideEsp_During_Meetings);
+    return !State.PanicMode && (IsInGame() || IsInLobby()) && State.ShowEsp && ((!State.InMeeting && !State.InExileUI) || !State.HideEsp_During_Meetings);
 }
 
 static bool CanDrawRadar()
@@ -122,7 +122,10 @@ LRESULT __stdcall dWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     bool shouldKeybindsActivate = !State.PanicMode && !State.KeybindsBeingEdited && (!State.ChatFocused || State.KeybindsWhileChatting) /*disable keybinds when chatting*/;
 
     if (shouldKeybindsActivate) {
-        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Menu)) State.ShowMenu = !State.ShowMenu;
+        if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Menu)) {
+            State.ShowMenu = !State.ShowMenu;
+            if (!State.ShowMenu) State.searchQuery.clear();
+        }
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Radar)) State.ShowRadar = !State.ShowRadar;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Toggle_Console)) State.ShowConsole = !State.ShowConsole;
         if (KeyBinds::IsKeyPressed(State.KeyBinds.Repair_Sabotage) && IsInGame()) RepairSabotage(*Game::pLocalPlayer);
@@ -368,7 +371,7 @@ HRESULT __stdcall dPresent(IDXGISwapChain* __this, UINT SyncInterval, UINT Flags
             ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
 
             //Setup BackBuffer
-            ImGui::Begin("BackBuffer", reinterpret_cast<bool*>(true),
+            ImGui::Begin("BackBuffer", nullptr,
                     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoScrollbar);
 
             s_Cache.Winsize = DirectX::GetWindowSize();

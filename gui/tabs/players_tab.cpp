@@ -5,7 +5,7 @@
 #include "toasts.hpp"
 #include "utility.h"
 #include "gui-helpers.hpp"
-#include <future>
+#include <chrono>
 #include <_hooks.h>
 #include <unordered_map>
 
@@ -753,14 +753,23 @@ namespace PlayersTab {
                         if (IsHost() && AnimatedButton("Kick")) {
                             State.selectedPlayer = {};
                             State.selectedPlayers.clear();
-                            auto future = std::async(std::launch::async, [&]() {
+
+                            auto* client = reinterpret_cast<InnerNetClient*>(*Game::pAmongUsClient);
+                            auto* localPlayer = *Game::pLocalPlayer;
+                            if (client != nullptr) {
                                 for (auto p : selectedPlayers) {
-                                    if (p.has_value() && p.validate().get_PlayerControl() != *Game::pLocalPlayer)
-                                        app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, false, NULL);
-                                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                                    if (!p.has_value()) continue;
+
+                                    const auto validPlayer = p.validate();
+                                    if (!validPlayer.has_value()) continue;
+
+                                    auto* playerControl = validPlayer.get_PlayerControl();
+                                    if (playerControl == nullptr || playerControl == localPlayer) continue;
+
+                                    app::InnerNetClient_KickPlayer(
+                                        client, playerControl->fields._.OwnerId, false, NULL);
                                 }
-                                });
-                            future.get();
+                            }
                         }
 
                         if (AnimatedButton("Votekick")) {
@@ -768,22 +777,23 @@ namespace PlayersTab {
                                 State.selectedPlayer = {};
                                 State.selectedPlayers.clear();
                             }
+
                             for (auto p : selectedPlayers) {
-                                if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-                                auto future = std::async(std::launch::async, [&]() {
-                                    for (auto p : selectedPlayers) {
-                                        if (p.has_value() && p.validate().get_PlayerControl() != *Game::pLocalPlayer) {
-                                            if (IsInGame()) {
-                                                State.rpcQueue.push(new RpcVoteKick(p.validate().get_PlayerControl()));
-                                            }
-                                            else if (IsInLobby()) {
-                                                State.lobbyRpcQueue.push(new RpcVoteKick(p.validate().get_PlayerControl()));
-                                            }
-                                        }
-                                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                                    }
-                                    });
-                                future.get();
+                                if (!p.has_value()) continue;
+
+                                const auto validPlayer = p.validate();
+                                if (!validPlayer.has_value()) continue;
+
+                                auto* playerControl = validPlayer.get_PlayerControl();
+                                if (playerControl == nullptr || playerControl == *Game::pLocalPlayer) continue;
+
+                                if (IsInGame()) {
+                                    State.rpcQueue.push(new RpcVoteKick(playerControl));
+                                }
+                                else if (IsInLobby()) {
+                                    State.lobbyRpcQueue.push(new RpcVoteKick(playerControl));
+                                }
+
                             }
                         }
 
@@ -818,18 +828,38 @@ namespace PlayersTab {
                         if (IsHost() && AnimatedButton("Ban")) {
                             State.selectedPlayer = {};
                             State.selectedPlayers.clear();
-                            auto future = std::async(std::launch::async, [&]() {
+
+                            auto* client = reinterpret_cast<InnerNetClient*>(*Game::pAmongUsClient);
+                            auto* localPlayer = *Game::pLocalPlayer;
+                            if (client != nullptr) {
                                 for (auto p : selectedPlayers) {
-                                    if (p.has_value() && p.validate().is_LocalPlayer()) continue;
-                                    app::InnerNetClient_KickPlayer((InnerNetClient*)(*Game::pAmongUsClient), p.validate().get_PlayerControl()->fields._.OwnerId, true, NULL);
-                                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                                    if (!p.has_value()) continue;
+
+                                    const auto validPlayer = p.validate();
+                                    if (!validPlayer.has_value()) continue;
+
+                                    auto* playerControl = validPlayer.get_PlayerControl();
+                                    if (playerControl == nullptr || playerControl == localPlayer) continue;
+
+                                    app::InnerNetClient_KickPlayer(
+                                        client, playerControl->fields._.OwnerId, true, NULL);
                                 }
-                                });
-                            future.get();
+                            }
                         }
 
-                        std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
-                        std::string nickname = RemoveHtmlTags(convert_from_string(GetPlayerOutfit(selectedPlayer.get_PlayerData())->fields.PlayerName));
+                        // Refresh after Kick/Ban/Votekick may have cleared the selection.
+                        selectedPlayer = State.selectedPlayer.validate();
+                        auto* selectedPlayerOutfit =
+                            selectedPlayer.has_value() && selectedPlayer.get_PlayerData() != nullptr
+                                ? GetPlayerOutfit(selectedPlayer.get_PlayerData())
+                                : nullptr;
+                        if (selectedPlayer.has_value() &&
+                            selectedPlayer.get_PlayerData() != nullptr &&
+                            selectedPlayer.get_PlayerControl() != nullptr &&
+                            selectedPlayerOutfit != nullptr &&
+                            !selectedPlayer.is_Disconnected()) {
+                            std::string friendCode = convert_from_string(selectedPlayer.get_PlayerData()->fields.FriendCode);
+                        std::string nickname = RemoveHtmlTags(convert_from_string(selectedPlayerOutfit->fields.PlayerName));
 
                         if (selectedPlayers.size() == 1 && friendCode != "") {
                             Game::PlayerId playerId = selectedPlayer.get_PlayerControl()->fields.PlayerId;
@@ -1304,7 +1334,9 @@ namespace PlayersTab {
                             }
                         }
                     }
-                }
+                                        }
+
+}
 
                 if (openTrolling && selectedPlayer.has_value()) {
                     if ((IsHost() && IsInGame()) || !State.SafeMode) {

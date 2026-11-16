@@ -252,18 +252,54 @@ void dShipStatus_UpdateSystem(ShipStatus* __this, SystemTypes__Enum systemType, 
 }
 
 void dShipStatus_AddTasksFromList(ShipStatus* __this, int32_t* start, int32_t count, void* tasks, void* usedTaskTypes, List_1_NormalPlayerTask_* unusedTasks, MethodInfo* method) {
-    if (!State.DisabledTaskTypes.empty()) {
-        // unusedTasks is the list of tasks that are to be assigned to players
+    if (unusedTasks != nullptr && count > 0 && !State.DisabledTaskTypes.empty()) {
+        // Keep enough valid prefabs for the number of tasks the game is about to assign.
+        // If the enabled pool is too small, retain only the minimum number of disabled
+        // prefabs needed for this call. This does not mutate the user's global settings.
         il2cpp::List<List_1_NormalPlayerTask_> taskList = unusedTasks;
-        for (int i = (int)taskList.size() - 1; i >= 0; i--) {
-            if (taskList.size() == 1) break;
-            // don't clear all unusedTasks,
-            // leave one so the game doesn't throw an error and not spawn us in
-            auto taskType = taskList[i]->fields._.TaskType;
-            bool remove = State.DisabledTaskTypes.count((int)taskType);
-            if (remove) taskList.erase(i);
+        const size_t originalSize = taskList.size();
+        size_t availableTaskCount = 0;
+        size_t enabledTaskCount = 0;
+
+        for (size_t i = 0; i < originalSize; ++i) {
+            auto* task = taskList[i];
+            if (task == nullptr) continue;
+
+            ++availableTaskCount;
+            const auto taskId = static_cast<int32_t>(task->fields._.TaskType);
+            if (State.DisabledTaskTypes.count(taskId) == 0) {
+                ++enabledTaskCount;
+            }
         }
+
+        const size_t requiredTaskCount = (std::min)(
+            static_cast<size_t>(count), availableTaskCount);
+        size_t disabledFallbacksToKeep = requiredTaskCount > enabledTaskCount
+            ? requiredTaskCount - enabledTaskCount
+            : 0;
+
+        for (size_t i = originalSize; i > 0; --i) {
+            const size_t index = i - 1;
+            auto* task = taskList[index];
+
+            if (task == nullptr) {
+                taskList.erase(index);
+                continue;
+            }
+
+            const auto taskId = static_cast<int32_t>(task->fields._.TaskType);
+            if (State.DisabledTaskTypes.count(taskId) == 0) continue;
+
+            if (disabledFallbacksToKeep > 0) {
+                --disabledFallbacksToKeep;
+                continue;
+            }
+
+            taskList.erase(index);
+        }
+
         unusedTasks = taskList.get();
     }
+
     ShipStatus_AddTasksFromList(__this, start, count, tasks, usedTaskTypes, unusedTasks, method);
 }

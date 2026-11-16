@@ -25,10 +25,20 @@ std::string GetCRC32(std::filesystem::path filePath) {
 
     std::ifstream fin(filePath, std::ifstream::binary);
 
-    while (!fin.eof()) {
-        fin.read(&buffer[0], 4096);
-        auto readSize = fin.gcount();
-        crc32.add(&buffer[0], (size_t)readSize);
+    if (!fin.is_open()) {
+        return "";
+    }
+
+    while (fin) {
+        fin.read(buffer, sizeof(buffer));
+        const auto readSize = fin.gcount();
+        if (readSize > 0) {
+            crc32.add(buffer, static_cast<size_t>(readSize));
+        }
+    }
+
+    if (fin.bad()) {
+        return "";
     }
     //LOG_DEBUG("CRC32 of \"" + filePath.string() + "\" is " + crc32.getHash());
     return crc32.getHash();

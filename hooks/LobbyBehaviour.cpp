@@ -229,7 +229,10 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
     if (State.ShowHookLogs) Log.HookDebug("Hook dGameStartManager_Update executed", false);
     try {
         State.LobbyTimer -= Time_get_deltaTime(NULL);
-        std::string LobbyCode = convert_from_string(InnerNet_GameCode_IntToGameName((*Game::pAmongUsClient)->fields._.GameId, NULL));
+        auto* amongUsClient = Game::pAmongUsClient != nullptr ? *Game::pAmongUsClient : nullptr;
+        std::string LobbyCode = amongUsClient != nullptr
+            ? convert_from_string(InnerNet_GameCode_IntToGameName(amongUsClient->fields._.GameId, NULL))
+            : std::string{};
         
         std::string lobbyTimeDisplay = "";
         int LobbyTime = (int)State.LobbyTimer;
@@ -251,20 +254,23 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
                 if (glitchEndings.find(codeEnding) != glitchEndings.end()) glitchDisplay = " * ";
             }*/
 
-            TMP_Text_set_fontStyle((TMP_Text*)__this->fields.GameRoomNameCode, FontStyles__Enum::Normal, NULL);
+            auto* roomNameCode = (TMP_Text*)__this->fields.GameRoomNameCode;
+            if (roomNameCode != nullptr) {
+                TMP_Text_set_fontStyle(roomNameCode, FontStyles__Enum::Normal, NULL);
 
-            if (State.HideCode && IsStreamerMode() && !State.PanicMode && LobbyCode != "") {
-                std::string customCode = State.HideCode && IsStreamerMode() ? State.customCode : "******";
-                if (State.RgbLobbyCode)
-                    TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
-                else
-                    TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(/*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
-            }
-            else {
-                if (State.RgbLobbyCode && !State.PanicMode)
-                    TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ LobbyCode + lobbyTimeDisplay), NULL);
-                else
-                    TMP_Text_set_text((TMP_Text*)__this->fields.GameRoomNameCode, convert_to_string(LobbyCode + /*glitchDisplay +*/ lobbyTimeDisplay), NULL);
+                if (State.HideCode && IsStreamerMode() && !State.PanicMode && LobbyCode != "") {
+                    std::string customCode = State.HideCode && IsStreamerMode() ? State.customCode : "******";
+                    if (State.RgbLobbyCode)
+                        TMP_Text_set_text(roomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
+                    else
+                        TMP_Text_set_text(roomNameCode, convert_to_string(/*glitchDisplay +*/ customCode + lobbyTimeDisplay), NULL);
+                }
+                else {
+                    if (State.RgbLobbyCode && !State.PanicMode)
+                        TMP_Text_set_text(roomNameCode, convert_to_string(State.rgbCode + /*glitchDisplay +*/ LobbyCode + lobbyTimeDisplay), NULL);
+                    else
+                        TMP_Text_set_text(roomNameCode, convert_to_string(LobbyCode + /*glitchDisplay +*/ lobbyTimeDisplay), NULL);
+                }
             }
         }
 
@@ -279,21 +285,27 @@ void dGameStartManager_Update(GameStartManager* __this, MethodInfo* method) {
                 auto clientButton = Transform_FindChild(sgaTransform, convert_to_string("StartButton (Client)"), NULL);
                 auto startingButton = Transform_FindChild(sgaTransform, convert_to_string("GameStarting"), NULL);
 
-                auto hostButtonPos = Transform_get_localPosition(hostButton, NULL);
-                auto clientButtonPos = Transform_get_localPosition(clientButton, NULL);
-                auto startingButtonPos = Transform_get_localPosition(startingButton, NULL);
+                // Lobby UI elements can be absent while the game is transitioning between states.
+                // Only reposition the buttons when all three transforms are available.
+                if (hostButton != nullptr && clientButton != nullptr && startingButton != nullptr) {
+                    auto hostButtonPos = Transform_get_localPosition(hostButton, NULL);
+                    auto clientButtonPos = Transform_get_localPosition(clientButton, NULL);
+                    auto startingButtonPos = Transform_get_localPosition(startingButton, NULL);
 
-                // center the buttons and move them with the camera height
-                Transform_set_localPosition(hostButton, { 0.3006f, 3.2736f - camHeight, hostButtonPos.z }, NULL);
-                Transform_set_localPosition(clientButton, { -0.131f, 3.309f - camHeight, clientButtonPos.z }, NULL);
-                Transform_set_localPosition(startingButton, { -0.131f, 3.309f - camHeight, startingButtonPos.z }, NULL);
+                    // center the buttons and move them with the camera height
+                    Transform_set_localPosition(hostButton, { 0.3006f, 3.2736f - camHeight, hostButtonPos.z }, NULL);
+                    Transform_set_localPosition(clientButton, { -0.131f, 3.309f - camHeight, clientButtonPos.z }, NULL);
+                    Transform_set_localPosition(startingButton, { -0.131f, 3.309f - camHeight, startingButtonPos.z }, NULL);
+                }
 
-                static std::string aspectPositionTypeName = translate_type_name("AspectPosition, Assembly-CSharp");
-                Type* aspectPositionType = app::Type_GetType(convert_to_string(aspectPositionTypeName), NULL);
-
-                auto hostInfoAspectPosition = (AspectPosition*)Component_GetComponent((Component_1*)hostInfoPanel, aspectPositionType, NULL);
-                if (hostInfoAspectPosition != NULL) {
-                    hostInfoAspectPosition->fields.DistanceFromEdge.x = 0.095f;
+                if (hostInfoPanel != nullptr) {
+                    static std::string aspectPositionTypeName = translate_type_name("AspectPosition, Assembly-CSharp");
+                    Type* aspectPositionType = app::Type_GetType(convert_to_string(aspectPositionTypeName), NULL);
+                    if (aspectPositionType != nullptr) {
+                        auto hostInfoAspectPosition = (AspectPosition*)Component_GetComponent((Component_1*)hostInfoPanel, aspectPositionType, NULL);
+                        if (hostInfoAspectPosition != nullptr)
+                            hostInfoAspectPosition->fields.DistanceFromEdge.x = 0.095f;
+                    }
                 }
             }
         }

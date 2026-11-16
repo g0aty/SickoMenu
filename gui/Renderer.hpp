@@ -14,14 +14,20 @@ public:
 	static void Submit(Function&& function)
 	{
 		auto renderCmd = [](void* ptr) {
-			auto pFunction = (Function*)ptr;
-			(*pFunction)();
-
-			//static_assert(std::is_trivially_destructible_v<Function>, "Function must be trivially destructible");
-			pFunction->~Function();
+			(*static_cast<Function*>(ptr))();
 		};
-		auto storageBuffer = GetCmdQueue().Allocate(renderCmd, sizeof(function));
+		auto destroyCmd = [](void* ptr) {
+			static_cast<Function*>(ptr)->~Function();
+		};
+
+		auto& commandQueue = GetCmdQueue();
+		auto storageBuffer = commandQueue.Allocate(sizeof(function), alignof(Function));
+		if (storageBuffer == nullptr)
+			return;
+
 		new (storageBuffer) Function(std::forward<Function>(function));
+		if (!commandQueue.Enqueue(renderCmd, destroyCmd, storageBuffer))
+			destroyCmd(storageBuffer);
 	}
 
 	static void ExecuteQueue();
